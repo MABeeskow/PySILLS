@@ -1,0 +1,111 @@
+[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+
+# PySILLS
+
+SILLS 2 is a completely new developed tool for data reduction, concentration
+calculation and statistical analysis of transient Laser Ablation ICP-MS signals.
+It is written in vb.net and has the aim to provide the user with a flexible,
+user-friendly and powerful tool for a qualitative and quantitative analysis of
+fluid, melt or mineral inclusion, embedded in a mineral or glass matrix, but
+also for homogenous samples. SILLS 2 is based on
+SILLS which was developed by Dr. Peter Tollan at ETH Zurich.
+
+### Getting Started
+
+We use GitLab for the cooperative work among the members of our working group. 
+By using this tool, we can keep all codes under version control and can easily 
+share a stable version of PySILLS.
+Before a new feature will be added to the stable version of the master branch,
+all new features have to be developed and tested in at least one additional 
+branch first, before they will be committed to the stable version.  
+
+More detailed information about GitLab with focus on the functionality and the 
+workflow can be found behind [here](https://docs.gitlab.com/ee/gitlab-basics/)
+
+### Prerequisites/Installing
+
+Please install the latest version of 
+[Git](https://docs.gitlab.com/ee/topics/git/how_to_install_git/) or keep your
+already existing version up to date, before you clone our shared repository by:
+
+```
+git clone git@git.rwth-aachen.de:MABeeskow/pysills.git
+```
+
+The path where you carry out this command will now include the git repository as 
+a new folder. You need to navigate into this new folder to execute any git 
+commands. 
+
+### Creating a new branch
+
+As a member of this repository, a new branch can easiliy created within the 
+browser environment. Otherwise, a new branch can also be created by using the
+following command:
+
+```
+git checkout -b name_of_your_branch
+```
+
+You can use your new branch as a personal version-control when new features will 
+be developed by you. Please always make sure that you are working on this 
+particular branch before any changes will be added to the master branch! New 
+features have to be tested sufficiently to ensure a stable working version of 
+PySILLS on the master branch.
+
+### Workflow
+#### Updating your branch
+
+It can be useful to update your branch with the stable version of PySILLS on the
+master branch, but you can of course update your branch with any other branch
+of the reposity. Before you do that, you should be sure that you have committed 
+all changes of your branch to the local version. You can check this by using:
+
+```
+git status
+```
+
+Now you can update your branch with the master branch by:
+
+```
+git pull origin master
+```
+
+This command will merge any changes between your local branch and the latest 
+version of the development branch.
+
+#### Adding new features to your branch
+
+If you have made any changes within your branch, for example the creation of a 
+new file, you have to add this file to the index by using the following command:
+
+```
+git add .
+```
+
+By using `git status`, all new or modified files are now green colored. Before 
+these files were added, they appeared red colored.  
+The next step is to commit these changes to your local version of the current
+branch. This will be done by using:
+
+```
+git commit -m "additional information"
+```
+
+It can be useful, especially if conflicts have to be solved, if the comment 
+function was used.  
+The last step is to update the version of your branch with the local changes. 
+For this purpose, the following command has to be used:
+
+```
+git push origin name_of_your_branch
+```
+
+#### Adding new features to the master branch
+
+This step will take place if new features that were sufficiently tested, can
+now be added to the stable version of PySILLS on the master branch. The workflow
+is similar to the chapter before but it ends now with the (additional) command
+
+```
+git push origin master
+```

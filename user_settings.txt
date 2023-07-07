@@ -1,0 +1,15 @@
+GENERAL SETTINGS;
+Default Author;M. Beeskow;
+Default SRM;NIST 610 (GeoReM);
+Default IS MA;Select IS;
+Default IS FI;Select IS;
+Default IS MI;Select IS;
+Accuracy Intensity;3;
+Accuracy Sensitivity;3;
+Accuracy Concentration;3;
+Sensitivity Drift;0;
+LOD Selection;0;
+BG Offset Start;15;
+BG Offset End;15;
+MAT Offset Start;15;
+MAT Offset End;15;
