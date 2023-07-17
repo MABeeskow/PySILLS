@@ -15567,8 +15567,6 @@ class PySILLS(tk.Frame):
         ## INITIALIZATION
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(), start_row=start_row_09, mode="MA")
-        self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
         #
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
@@ -15582,6 +15580,11 @@ class PySILLS(tk.Frame):
                     var_method = "Grubbs"
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+        else:
+            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+            self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+            self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
 
     #
     ## MATRIX SETTINGS #################################################################################################
@@ -15978,14 +15981,26 @@ class PySILLS(tk.Frame):
         #
         self.fill_srm_values(var_srm=var_opt)
         #
+        # if mode == "STD":
+        #     for file_std in self.container_lists["STD"]["Long"]:
+        #         var_srm = self.container_var["SRM"][file_std].get()
+        #         var_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
+        #         key = re.search("(\D+)(\d*)", var_is)
+        #         element_is = key.group(1)
+        #         self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(self.srm_actual[var_srm][
+        #                                                                                 element_is])
+    #
+    def ma_select_is_default(self, var_opt, mode="STD"):
         if mode == "STD":
-            for file_std in self.container_lists["STD"]["Long"]:
-                var_srm = self.container_var["SRM"][file_std].get()
-                var_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
-                key = re.search("(\D+)(\d*)", var_is)
-                element_is = key.group(1)
-                self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(self.srm_actual[var_srm][
-                                                                                        element_is])
+            var_is = var_opt
+            for file_std in self.list_std:
+                self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
+
+    #
+    def ma_select_id_default(self, var_opt):
+        var_id = var_opt
+        for file_smpl in self.list_smpl:
+            self.container_var["SMPL"][file_smpl]["ID"].set(var_id)
     #
     def ma_change_srm_individual(self, var_opt, var_indiv, mode="STD"):
         if mode == "STD":
@@ -16591,7 +16606,7 @@ class PySILLS(tk.Frame):
         #
         self.tv_results_quick = SE(
             parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=14, n_columns=38,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(list_categories), text_n=list_categories,
             width_n=list_width, individual=True)
         #
@@ -16604,23 +16619,42 @@ class PySILLS(tk.Frame):
         scb_h.grid(row=14, column=14, rowspan=1, columnspan=38, sticky="ew")
         #
         ## INITIALIZATION
-        self.ma_get_intensity_data(
-            var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All")
-        self.ma_get_intensity_data(
-            var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="MAT",
-            mode="All")
-        self.ma_get_intensity_corrected_data(
-            var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-            mode="All")
+        # Intensity-related parameters
+        if var_type == "STD":
+            self.ma_get_intensity_data(
+                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
+                mode="Specific")
+            self.ma_get_intensity_corrected_data(
+                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
+                mode="Specific")
+        else:
+            for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
+                file_std_long = self.container_lists["STD"]["Long"][index]
+                self.ma_get_intensity_data(
+                    var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, var_focus="All",
+                    mode="Specific")
+            self.ma_get_intensity_corrected_data(
+                var_filetype="STD", var_datatype="RAW", var_file_short=None,
+                var_file_long=None, mode="only STD")
+            #
+            self.ma_get_intensity_data(
+                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
+                mode="Specific")
+            self.ma_get_intensity_corrected_data(
+                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
+                mode="Specific")
+            #
         self.ma_get_intensity_ratio_data(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
             var_focus="MAT")
+        # Sensitivity-related parameters
         self.ma_get_analytical_sensitivity_data(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
         self.ma_get_normalized_sensitivity_data(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
         self.ma_get_rsf_data(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+        # Concentration-related parameters
         self.ma_get_concentration_data(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
         self.ma_get_concentration_ratio_data(
@@ -17447,6 +17481,30 @@ class PySILLS(tk.Frame):
                 #
                 self.container_intensity_corrected[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope] = var_result
+            #
+        elif mode == "only STD":
+            for var_filetype in ["STD"]:
+                for var_focus in ["MAT"]:
+                    if var_focus not in self.container_intensity_corrected[var_filetype][var_datatype]:
+                        self.container_intensity_corrected[var_filetype][var_datatype][var_focus] = {}
+                        #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        helper_results = []
+                        #
+                        for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
+                            var_file_short = self.container_lists[var_filetype]["Short"][index]
+                            #
+                            self.ma_get_intensity_corrected_data(
+                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                var_file_long=var_file_long)
+                            var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short][var_focus][isotope]
+                            helper_results.append(var_result_i)
+                            #
+                        var_result_i = np.mean(helper_results)
+                        self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
+                        self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
+                            isotope] = var_result_i
             #
         else:
             for var_filetype in ["STD", "SMPL"]:
@@ -23635,7 +23693,7 @@ class PySILLS(tk.Frame):
         #
         self.tv_results_quick = SE(
             parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=14, n_columns=38,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(list_categories), text_n=list_categories,
             width_n=list_width, individual=True)
         #
