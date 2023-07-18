@@ -16634,45 +16634,45 @@ class PySILLS(tk.Frame):
         ## INITIALIZATION
         # Intensity-related parameters
         if var_type == "STD":
-            self.ma_get_intensity_data(
+            self.ma_get_intensity(
                 var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
                 mode="Specific")
-            self.ma_get_intensity_corrected_data(
+            self.ma_get_intensity_corrected(
                 var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                 mode="Specific")
         else:
             for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
                 file_std_long = self.container_lists["STD"]["Long"][index]
-                self.ma_get_intensity_data(
+                self.ma_get_intensity(
                     var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, var_focus="All",
                     mode="Specific")
-            self.ma_get_intensity_corrected_data(
+            self.ma_get_intensity_corrected(
                 var_filetype="STD", var_datatype="RAW", var_file_short=None,
                 var_file_long=None, mode="only STD")
             #
-            self.ma_get_intensity_data(
+            self.ma_get_intensity(
                 var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
                 mode="Specific")
-            self.ma_get_intensity_corrected_data(
+            self.ma_get_intensity_corrected(
                 var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                 mode="Specific")
             #
-        self.ma_get_intensity_ratio_data(
+        self.ma_get_intensity_ratio(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
             var_focus="MAT")
         # Sensitivity-related parameters
-        self.ma_get_analytical_sensitivity_data(
+        self.ma_get_analytical_sensitivity(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-        self.ma_get_normalized_sensitivity_data(
+        self.ma_get_normalized_sensitivity(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-        self.ma_get_rsf_data(
+        self.ma_get_rsf(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
         # Concentration-related parameters
-        self.ma_get_concentration_data(
+        self.ma_get_concentration(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-        self.ma_get_concentration_ratio_data(
+        self.ma_get_concentration_ratio(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-        self.ma_get_lod_data(
+        self.ma_get_lod(
             var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
         #
         entries_intensity_bg_i = ["Intensity BG"]
@@ -17001,33 +17001,33 @@ class PySILLS(tk.Frame):
             #
             for var_datatype in ["RAW", "SMOOTHED"]:
                 # Intensity Analysis
-                self.ma_get_intensity_data(
+                self.ma_get_intensity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_focus=var_focus, mode="All")
-                self.ma_get_intensity_corrected_data(
+                self.ma_get_intensity_corrected(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                self.ma_get_intensity_ratio_data(
+                self.ma_get_intensity_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
                 # Sensitivity Analysis
-                self.ma_get_analytical_sensitivity_data(
+                self.ma_get_analytical_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                self.ma_get_normalized_sensitivity_data(
+                self.ma_get_normalized_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                self.ma_get_rsf_data(
+                self.ma_get_rsf(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
                 # Compositional Analysis
-                self.ma_get_concentration_data(
+                self.ma_get_concentration(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                self.ma_get_concentration_ratio_data(
+                self.ma_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                self.ma_get_lod_data(
+                self.ma_get_lod(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
         #
@@ -17321,7 +17321,7 @@ class PySILLS(tk.Frame):
         self.tv_results_files.insert("", tk.END, values=entries_mean)
         self.tv_results_files.insert("", tk.END, values=entries_std)
     #
-    def ma_get_intensity_data(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific",
+    def ma_get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific",
                               check=False):
         if mode == "Specific":
             if var_focus in ["BG", "MAT"]:
@@ -17370,7 +17370,7 @@ class PySILLS(tk.Frame):
                                     var_id_selected = self.container_var["ID"]["Results Files"].get()
                                     #
                                     if var_id == var_id_selected:
-                                        self.ma_get_intensity_data(
+                                        self.ma_get_intensity(
                                             var_filetype=var_filetype, var_datatype=var_datatype,
                                             var_file_short=var_file_short, var_focus=var_focus)
                                         var_result_i = self.container_intensity[var_filetype][var_datatype][
@@ -17378,7 +17378,7 @@ class PySILLS(tk.Frame):
                                         helper_results.append(var_result_i)
                                     #
                                 else:
-                                    self.ma_get_intensity_data(
+                                    self.ma_get_intensity(
                                         var_filetype=var_filetype, var_datatype=var_datatype,
                                         var_file_short=var_file_short, var_focus=var_focus)
                                     #
@@ -17398,7 +17398,7 @@ class PySILLS(tk.Frame):
                     print("Datatype:", key_02)
                     print(item_02)
     #
-    def ma_get_intensity_corrected_data(self, var_filetype, var_datatype, var_file_short, var_file_long,
+    def ma_get_intensity_corrected(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                         mode="Specific"):
         if mode == "Specific":
             for isotope in self.container_lists["ISOTOPES"]:
@@ -17426,7 +17426,7 @@ class PySILLS(tk.Frame):
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             #
-                            self.ma_get_intensity_corrected_data(
+                            self.ma_get_intensity_corrected(
                                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                 var_file_long=var_file_long)
                             var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
@@ -17447,7 +17447,7 @@ class PySILLS(tk.Frame):
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             #
-                            self.ma_get_intensity_corrected_data(
+                            self.ma_get_intensity_corrected(
                                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                 var_file_long=var_file_long)
                             var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
@@ -17457,7 +17457,7 @@ class PySILLS(tk.Frame):
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_intensity_ratio_data(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, 
+    def ma_get_intensity_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, 
                                     mode="Specific"):
         if mode == "Specific":
             var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
@@ -17490,7 +17490,7 @@ class PySILLS(tk.Frame):
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             #
-                            self.ma_get_intensity_ratio_data(
+                            self.ma_get_intensity_ratio(
                                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                 var_file_long=var_file_long, var_focus=var_focus)
                             var_result_i = self.container_intensity_ratio[var_filetype][var_datatype][var_file_short][
@@ -17500,7 +17500,7 @@ class PySILLS(tk.Frame):
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_ratio[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_normalized_sensitivity_data(self, var_filetype, var_datatype, var_file_short, var_file_long,
+    def ma_get_normalized_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                            mode="Specific"):
         if mode == "Specific":
             for isotope in self.container_lists["ISOTOPES"]:
@@ -17540,7 +17540,7 @@ class PySILLS(tk.Frame):
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             #
-                            self.ma_get_normalized_sensitivity_data(
+                            self.ma_get_normalized_sensitivity(
                                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                 var_file_long=var_file_long)
                             var_result_i = self.container_normalized_sensitivity[var_filetype][var_datatype][
@@ -17550,7 +17550,7 @@ class PySILLS(tk.Frame):
                         var_result_i = np.mean(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_analytical_sensitivity_data(self, var_filetype, var_datatype, var_file_short, var_file_long,
+    def ma_get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                            mode="Specific"):
         if mode == "Specific":
             if var_filetype == "STD":
@@ -17584,7 +17584,7 @@ class PySILLS(tk.Frame):
                     file_std_short = self.container_lists["STD"]["Short"][index]
                     #
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
-                        self.ma_get_analytical_sensitivity_data(
+                        self.ma_get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
                             var_file_long=file_std)
                         list_valid_std.append(file_std_short)
@@ -17622,7 +17622,7 @@ class PySILLS(tk.Frame):
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             #
-                            self.ma_get_analytical_sensitivity_data(
+                            self.ma_get_analytical_sensitivity(
                                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                 var_file_long=var_file_long)
                             var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
@@ -17632,7 +17632,7 @@ class PySILLS(tk.Frame):
                         var_result_i = np.mean(helper_results)
                         self.container_analytical_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_rsf_data(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
+    def ma_get_rsf(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
         """ Calculates the Relative Sensitivity Factor, RSF, based on the following two equations:
         1) Standard Files:  RSF_i = sensitivity_i*(concentration_std_i/intensity_std_i)*
                                     (intensity_std_is/concentration_std_is) = 1
@@ -17691,7 +17691,7 @@ class PySILLS(tk.Frame):
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
                         #
-                        self.ma_get_rsf_data(
+                        self.ma_get_rsf(
                             var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                             var_file_long=var_file_long)
                         var_result_i = self.container_rsf[var_filetype][var_datatype][var_file_short]["MAT"][
@@ -17701,7 +17701,7 @@ class PySILLS(tk.Frame):
                     var_result_i = np.mean(helper_results)
                     self.container_rsf[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_concentration_data(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
+    def ma_get_concentration(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
         """ Calculates the concentration, C, based on the following two equations:
         1) Standard Files:  C_i = SRM_dataset(element)
         2) Sample Files:    C_i = (intensity_smpl_i/intensity_smpl_is)*(concentration_smpl_is/sensitivity_i)
@@ -17756,7 +17756,7 @@ class PySILLS(tk.Frame):
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
                         #
-                        self.ma_get_concentration_data(
+                        self.ma_get_concentration(
                             var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                             var_file_long=var_file_long)
                         var_result_i = self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
@@ -17766,7 +17766,7 @@ class PySILLS(tk.Frame):
                     var_result_i = np.mean(helper_results)
                     self.container_concentration[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_concentration_ratio_data(self, var_filetype, var_datatype, var_file_short, var_file_long,
+    def ma_get_concentration_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                         mode="Specific"):
         """ Calculates the concentration ratio, C_i/C_is, based on the following two equations:
                 1) Standard Files:  C_i = C_std_i/C_std_is
@@ -17808,7 +17808,7 @@ class PySILLS(tk.Frame):
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
                         #
-                        self.ma_get_concentration_ratio_data(
+                        self.ma_get_concentration_ratio(
                             var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                             var_file_long=var_file_long)
                         var_result_i = self.container_concentration_ratio[var_filetype][var_datatype][var_file_short][
@@ -17818,7 +17818,7 @@ class PySILLS(tk.Frame):
                     var_result_i = np.mean(helper_results)
                     self.container_concentration_ratio[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_lod_data(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
+    def ma_get_lod(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
         """ Calculates the Limit of Detection, LoD, based on the following two equations:
         1) Standard Files:  C_i = C_std_i/C_std_is
         2) Sample Files:    C_i = C_smpl_i/C_smpl_is
@@ -17937,7 +17937,7 @@ class PySILLS(tk.Frame):
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
                         #
-                        self.ma_get_lod_data(
+                        self.ma_get_lod(
                             var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                             var_file_long=var_file_long)
                         var_result_i = self.container_lod[var_filetype][var_datatype][var_file_short][
