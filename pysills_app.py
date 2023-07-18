@@ -16991,206 +16991,7 @@ class PySILLS(tk.Frame):
                     elif key == "End":
                         item.set("Set end value")
     #
-    def ma_datareduction_isotopes(self):  # MA - DATAREDUCTION ISOTOPES ################################################
-        ## Window Settings
-        window_width = 1260
-        window_heigth = 600
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
-        row_min = 25
-        n_rows = int(window_heigth/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
-        #
-        self.subwindow_ma_datareduction_isotopes = tk.Toplevel(self.parent)
-        self.subwindow_ma_datareduction_isotopes.title("MINERAL ANALYSIS - Data Reduction (Isotopes)")
-        self.subwindow_ma_datareduction_isotopes.geometry(var_geometry)
-        self.subwindow_ma_datareduction_isotopes.resizable(False, False)
-        self.subwindow_ma_datareduction_isotopes["bg"] = self.bg_colors["Super Dark"]
-        #
-        for x in range(n_columns):
-            tk.Grid.columnconfigure(self.subwindow_ma_datareduction_isotopes, x, weight=1)
-        for y in range(n_rows):
-            tk.Grid.rowconfigure(self.subwindow_ma_datareduction_isotopes, y, weight=1)
-        #
-        # Rows
-        for i in range(0, n_rows):
-            self.subwindow_ma_datareduction_isotopes.grid_rowconfigure(i, minsize=row_min)
-        # Columns
-        for i in range(0, n_columns):
-            self.subwindow_ma_datareduction_isotopes.grid_columnconfigure(i, minsize=column_min)
-        #
-        ################################################################################################################
-        #
-        start_row = 0
-        start_column = 0
-        #
-        ## LABELS
-        lbl_01 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="File Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_02 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 3, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Data Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_03 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 6, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Assemblage Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_04 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 8, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Focus Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_05 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 10, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 14, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_07 = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 17, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        ## RADIOBUTTONS
-        rb_01a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 1, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["File Type"], value_rb=0,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Standard Files", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        rb_01b = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 2, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["File Type"], value_rb=1,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Sample Files", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        #
-        rb_02a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 4, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Data Type"], value_rb=0,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="RAW Data", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        rb_02b = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 5, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Data Type"], value_rb=1,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="SMOOTHED Data", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        #
-        rb_04a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 9, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Focus"], value_rb=0,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Matrix", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        #
-        rb_05a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 11, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Result Category"], value_rb=0,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Concentrations", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        rb_05b = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 12, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Result Category"], value_rb=1,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Intensities", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        rb_05c = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 13, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Result Category"], value_rb=2,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Sensitivities", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Isotopes": self.ma_datareduction_tables(mode))
-        #
-        rb_07a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 18, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Display Option"], value_rb=0,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Table", sticky="nesw",
-            relief=tk.FLAT)
-        rb_07b = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 19, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Display Option"], value_rb=1,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Histograms", sticky="nesw",
-            relief=tk.FLAT)
-        rb_07c = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 20, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Display Option"], value_rb=2,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Scatter Plots", sticky="nesw",
-            relief=tk.FLAT)
-        rb_07d = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 21, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_isotopes"]["Display Option"], value_rb=3,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Box Plots", sticky="nesw",
-            relief=tk.FLAT)
-        #
-        ## OPTION MENUS
-        if self.container_var["ID"]["Default SMPL"].get() != "Select ID":
-            var_text = self.container_var["ID"]["Default SMPL"].get()
-        else:
-            var_text = "Select ID"
-        #
-        opt_03a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 7, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_option_isotope(
-            var_iso=self.container_var["ID"]["Results Isotopes"], option_list=self.list_alphabet,
-            text_set=var_text, fg_active=self.bg_colors["Dark Font"], bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["ID"]["Results Isotopes"], var_mode="Isotopes":
-            self.change_id_results(var_opt, var_mode))
-        opt_03a["menu"].config(
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.red_dark)
-        opt_03a.config(
-            bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], activebackground=self.red_dark,
-            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        ## BUTTONS
-        btn_06a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row + 15, column_id=start_column, n_rows=2,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-            text="Export Results", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
-            command=self.ma_export_calculation_report)
-        #
-        ## FRAMES
-        frm_a = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=start_row, column_id=start_column + 11,
-            n_rows=n_rows, n_columns=n_columns - 11, fg=self.bg_colors["Very Light"],
-            bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
-        #
-        ## TREEVIEWS
-        list_categories = ["Category"]
-        list_categories.extend(self.container_lists["ISOTOPES"])
-        list_width = list(75*np.ones(len(list_categories)))
-        list_width = [int(item) for item in list_width]
-        list_width[0] = 150
-        #
-        self.tv_results_isotopes = SE(
-            parent=self.subwindow_ma_datareduction_isotopes, row_id=0, column_id=12, n_rows=12, n_columns=50,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
-            n_categories=len(list_categories), text_n=list_categories,
-            width_n=list_width, individual=True)
-        #
-        scb_v = ttk.Scrollbar(self.subwindow_ma_datareduction_isotopes, orient="vertical")
-        scb_h = ttk.Scrollbar(self.subwindow_ma_datareduction_isotopes, orient="horizontal")
-        self.tv_results_isotopes.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
-        scb_v.config(command=self.tv_results_isotopes.yview)
-        scb_h.config(command=self.tv_results_isotopes.xview)
-        scb_v.grid(row=0, column=62, rowspan=12, columnspan=1, sticky="ns")
-        scb_h.grid(row=12, column=12, rowspan=1, columnspan=50, sticky="ew")
-        #
-        ## INITIALIZATION
-        self.ma_datareduction_tables(mode="Isotopes", init=True)
-        #
-    def ma_datareduction_tables(self, mode="Isotopes", init=False): # MA - data reduction tables #######################
+    def ma_datareduction_tables(self, init=False): # MA - data reduction tables #######################
         ## Initialization
         if init == True:
             var_filetype = "None"
@@ -17230,228 +17031,295 @@ class PySILLS(tk.Frame):
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
         #
-        n_digits_intensity = self.container_var["General Settings"]["Accuracy Intensity"].get()
-        n_digits_sensitivity = self.container_var["General Settings"]["Accuracy Sensitivity"].get()
-        n_digits_concentration = self.container_var["General Settings"]["Accuracy Concentration"].get()
+        if self.container_var["ma_datareduction_files"]["File Type"].get() == 0:
+            var_filetype = "STD"
+        elif self.container_var["ma_datareduction_files"]["File Type"].get() == 1:
+            var_filetype = "SMPL"
         #
-        if mode == "Isotopes":
-            if self.container_var["ma_datareduction_isotopes"]["File Type"].get() == 0:
-                var_filetype = "STD"
-            elif self.container_var["ma_datareduction_isotopes"]["File Type"].get() == 1:
-                var_filetype = "SMPL"
-            #
-            if len(self.tv_results_isotopes.get_children()) > 0:
-                for item in self.tv_results_isotopes.get_children():
-                    self.tv_results_isotopes.delete(item)
-            #
-            if self.container_var["ma_datareduction_isotopes"]["Result Category"].get() == 0:  # Concentrations
-                entries_concentration = ["Concentration"]
-                entries_concentrationratio = ["Concentration Ratio"]
-                entries_lod = ["Limit of Detection"]
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    var_result_concentration = self.container_concentration[var_filetype][var_datatype][
-                        isotope]
-                    var_result_concentrationratio = self.container_concentration_ratio[var_filetype][var_datatype][
-                        isotope]
-                    var_result_lod = self.container_lod[var_filetype][var_datatype][isotope]
+        if self.container_var["ma_datareduction_files"]["Data Type"].get() == 0:
+            var_datatype = "RAW"
+        elif self.container_var["ma_datareduction_files"]["Data Type"].get() == 1:
+            var_datatype = "SMOOTHED"
+        #
+        if self.container_var["ma_datareduction_files"]["Focus"].get() == 0:
+            var_focus = "MAT"
+        #
+        var_id = self.container_var["ID"]["Results Files"].get()
+        #
+        if len(self.tv_results_files.get_children()) > 0:
+            for item in self.tv_results_files.get_children():
+                self.tv_results_files.delete(item)
+        #
+        helper_values = {}
+        helper_separator = ["-"]
+        for isotope in self.container_lists["ISOTOPES"]:
+            if isotope not in helper_values:
+                helper_values[isotope] = []
+                helper_separator.append("-")
+        #
+        if self.container_var["ma_datareduction_files"]["Result Category"].get() == 0:  # Concentrations
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
                     #
-                    entries_concentration.append(f"{var_result_concentration:.{n_digits_concentration}f}")
-                    entries_concentrationratio.append(f"{var_result_concentrationratio:.{n_digits_concentration}E}")
-                    entries_lod.append(f"{var_result_lod:.{n_digits_concentration}f}")
-                #
-                self.tv_results_isotopes.insert("", tk.END, values=entries_concentration)
-                self.tv_results_isotopes.insert("", tk.END, values=entries_concentrationratio)
-                self.tv_results_isotopes.insert("", tk.END, values=entries_lod)
-                #
-            elif self.container_var["ma_datareduction_isotopes"]["Result Category"].get() == 1:  # Intensities
-                entries_intensity = ["Intensity"]
-                entries_intensity_corrected = ["Intensity (corrected)"]
-                entries_intensity_ratio = ["Intensity Ratio"]
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    var_result_intensity = self.container_intensity[var_filetype][var_datatype][isotope]
-                    var_result_intensity_corrected = self.container_intensity_corrected[var_filetype][var_datatype][
-                        isotope]
-                    var_result_intensity_ratio = self.container_intensity_ratio[var_filetype][var_datatype][isotope]
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        try:
+                            value = self.container_concentration[var_filetype][var_datatype][file_short][
+                                var_focus][isotope]
+                            value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
+                                isotope]
+                            #
+                            if value >= value_lod_i:
+                                n_digits = self.ma_determine_ndigits(var_value=value)
+                                entries_category.append(f"{value:.{n_digits}f}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("< LoD")
+                        except:
+                            entries_category.append(None)
                     #
-                    entries_intensity.append(f"{var_result_intensity:.{n_digits_intensity}f}")
-                    entries_intensity_corrected.append(f"{var_result_intensity_corrected:.{n_digits_intensity}f}")
-                    entries_intensity_ratio.append(f"{var_result_intensity_ratio:.{n_digits_intensity}E}")
-                #
-                self.tv_results_isotopes.insert("", tk.END, values=entries_intensity)
-                self.tv_results_isotopes.insert("", tk.END, values=entries_intensity_corrected)
-                self.tv_results_isotopes.insert("", tk.END, values=entries_intensity_ratio)
-                #
-            elif self.container_var["ma_datareduction_isotopes"]["Result Category"].get() == 2:  # Sensitivities
-                entries_analyticalsensitivity = ["Analytical Sensitivity"]
-                entries_normalizedsensitivity = ["Normalized Sensitivity"]
-                entries_rsf = ["Relative Sensitivity Factor"]
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    var_result_analytical = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
-                    var_result_normalized = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
-                    var_result_rsf = self.container_rsf[var_filetype][var_datatype][isotope]
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
                     #
-                    entries_analyticalsensitivity.append(f"{var_result_analytical:.{n_digits_sensitivity}f}")
-                    entries_normalizedsensitivity.append(f"{var_result_normalized:.{n_digits_sensitivity}f}")
-                    entries_rsf.append(f"{var_result_rsf:.{n_digits_sensitivity}f}")
-                #
-                self.tv_results_isotopes.insert("", tk.END, values=entries_analyticalsensitivity)
-                self.tv_results_isotopes.insert("", tk.END, values=entries_normalizedsensitivity)
-                self.tv_results_isotopes.insert("", tk.END, values=entries_rsf)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
             #
-        elif mode == "Files":
-            if self.container_var["ma_datareduction_files"]["File Type"].get() == 0:
-                var_filetype = "STD"
-            elif self.container_var["ma_datareduction_files"]["File Type"].get() == 1:
-                var_filetype = "SMPL"
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values)
             #
-            if self.container_var["ma_datareduction_files"]["Data Type"].get() == 0:
-                var_datatype = "RAW"
-            elif self.container_var["ma_datareduction_files"]["Data Type"].get() == 1:
-                var_datatype = "SMOOTHED"
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 1:  # Concentration Ratios
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
+                            var_focus][isotope]
+                        entries_category.append(f"{value:.{4}E}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
             #
-            if self.container_var["ma_datareduction_files"]["Focus"].get() == 0:
-                var_focus = "MAT"
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
             #
-            var_id = self.container_var["ID"]["Results Files"].get()
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 2:  # LoDs
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
+                        n_digits = self.ma_determine_ndigits(var_value=value)
+                        entries_category.append(f"{value:.{n_digits}f}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
             #
-            if len(self.tv_results_files.get_children()) > 0:
-                for item in self.tv_results_files.get_children():
-                    self.tv_results_files.delete(item)
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values)
             #
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 3:  # Intensities (corrected)
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
+                            var_focus][isotope]
+                        n_digits = self.ma_determine_ndigits(var_value=value)
+                        entries_category.append(f"{value:.{n_digits}f}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
+            #
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values)
+            #
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 4:  # Intensity Ratios
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
+                            var_focus][isotope]
+                        entries_category.append(f"{value:.{4}E}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
+            #
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
+            #
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 5:  # Analytical Sensitivities
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
+                            var_focus][isotope]
+                        n_digits = self.ma_determine_ndigits(var_value=value)
+                        entries_category.append(f"{value:.{n_digits}f}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
+            #
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values)
+            #
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 6:  # Normalized Sensitivities
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                            var_focus][isotope]
+                        n_digits = self.ma_determine_ndigits(var_value=value)
+                        entries_category.append(f"{value:.{n_digits}f}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
+            #
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values)
+            #
+        elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 7:  # RSFs
+            for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                var_file_long = self.container_lists[var_filetype]["Long"][index]
+                if var_filetype == "SMPL":
+                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                else:
+                    var_id_i = None
+                if var_id_i == var_id or var_filetype == "STD":
+                    entries_category = [file_short]
+                    #
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
+                        entries_category.append(f"{value:.{4}E}")
+                        helper_values[isotope].append(value)
+                    #
+                    self.tv_results_files.insert("", tk.END, values=entries_category)
+                else:
+                    for isotope in self.container_lists["ISOTOPES"]:
+                        if isotope not in helper_values:
+                            helper_values[isotope] = []
+                            helper_separator.append("-")
+            #
+            self.tv_results_files.insert("", tk.END, values=helper_separator)
+            self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
+    #
+    def ma_determine_ndigits(self, var_value):
+        trunc_value = math.trunc(var_value)
+        #
+        if len(str(trunc_value)) >= 9:
+            n_digits = 0
+        elif len(str(trunc_value)) >= 8:
+            n_digits = 1
+        elif len(str(trunc_value)) >= 7:
+            n_digits = 2
+        elif len(str(trunc_value)) >= 6:
+            n_digits = 3
+        else:
             n_digits = 4
+        #
+        return n_digits
+    #
+    def ma_calculate_statistics_table(self, var_data, ratio=False):
+        entries_mean = ["Arithmetic Mean"]
+        entries_std = ["Standard Deviation"]
+        #
+        for isotope in self.container_lists["ISOTOPES"]:
+            value = np.mean(var_data[isotope])
+            if len(var_data[isotope]) > 1:
+                value_std = np.std(var_data[isotope], ddof=1)
+            else:
+                value_std = 0.0
+            if len(var_data[isotope]) > 0:
+                n_digits = self.ma_determine_ndigits(var_value=value)
+                n_digits_std = self.ma_determine_ndigits(var_value=value_std)
+                #
+                if ratio == False:
+                    entries_mean.append(f"{value:.{n_digits}f}")
+                    entries_std.append(f"{value_std:.{n_digits_std}f}")
+                else:
+                    entries_mean.append(f"{value:.{4}E}")
+                    entries_std.append(f"{value_std:.{4}E}")
+            else:
+                entries_mean.append("---")
+                entries_std.append("---")
             #
-            if self.container_var["ma_datareduction_files"]["Result Category"].get() == 0:  # Concentrations
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    else:
-                        var_id_i = None
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            try:
-                                value = self.container_concentration[var_filetype][var_datatype][file_short][
-                                    var_focus][isotope]
-                                value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
-                                    isotope]
-                                if value >= value_lod_i:
-                                    entries_category.append(f"{value:.{n_digits}f}")
-                                else:
-                                    entries_category.append("< LoD")
-                            except:
-                                entries_category.append(None)
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                    #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 1:  # Concentration Ratios
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}E}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 2:  # LoDs
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}f}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 3:  # Intensities (corrected)
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    else:
-                        var_id_i = None
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}f}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 4:  # Intensity Ratios
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}E}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 5:  # Analytical Sensitivities
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}f}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 6:  # Normalized Sensitivities
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}f}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
-            elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 7:  # RSFs
-                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
-                    var_file_long = self.container_lists[var_filetype]["Long"][index]
-                    if var_filetype == "SMPL":
-                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                    if var_id_i == var_id or var_filetype == "STD":
-                        entries_category = [file_short]
-                        #
-                        for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
-                            entries_category.append(f"{value:.{n_digits}E}")
-                        #
-                        self.tv_results_files.insert("", tk.END, values=entries_category)
+        self.tv_results_files.insert("", tk.END, values=entries_mean)
+        self.tv_results_files.insert("", tk.END, values=entries_std)
     #
     def ma_get_intensity_data(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific",
                               check=False):
@@ -18174,82 +18042,82 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["File Type"], value_rb=0,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Standard Files", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_01b = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["File Type"], value_rb=1,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Sample Files", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         #
         rb_02a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Data Type"], value_rb=0,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="RAW Data", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_02b = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Data Type"], value_rb=1,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="SMOOTHED Data", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         #
         rb_04a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Focus"], value_rb=0,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Matrix", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         #
         rb_05a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 11, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=0,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Concentration", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05b = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=1,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Concentration Ratio", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05c = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 13, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=2,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Limit of Detection", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05d = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 14, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=3,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Intensity", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05e = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=4,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Intensity Ratio", sticky="nesw",
-            relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05f = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 16, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=5,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Analytical Sensitivity",
-            sticky="nesw", relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05g = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 17, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=6,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Normalized Sensitivity",
-            sticky="nesw", relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05h = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 18, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=7,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Relative Sensitivity Factor",
-            sticky="nesw", relief=tk.FLAT, command=lambda mode="Files": self.ma_datareduction_tables(mode))
+            sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
         #
         rb_07a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=1,
@@ -18287,8 +18155,7 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_option_isotope(
             var_iso=self.container_var["ID"]["Results Files"], option_list=self.list_alphabet,
             text_set=var_text, fg_active=self.bg_colors["Dark Font"], bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["ID"]["Results Files"], var_mode="Files":
-            self.change_id_results(var_opt, var_mode))
+            command=lambda var_opt=self.container_var["ID"]["Results Files"]: self.change_id_results(var_opt))
         opt_03a["menu"].config(
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.red_dark)
@@ -18331,12 +18198,10 @@ class PySILLS(tk.Frame):
         scb_h.grid(row=15, column=12, rowspan=1, columnspan=50, sticky="ew")
         #
         ## INITIALIZATION
-        self.ma_datareduction_tables(mode="Files", init=True)
+        self.ma_datareduction_tables(init=True)
     #
-    def change_id_results(self, var_opt, var_mode="Files"):
-        print(var_opt)
-        #
-        self.ma_datareduction_tables(mode=var_mode)
+    def change_id_results(self, var_opt):
+        self.ma_datareduction_tables()
 #
 ########################################################################################################################
 # FLUID INCLUSION ANALYSIS #############################################################################################
