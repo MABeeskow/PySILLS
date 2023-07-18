@@ -919,7 +919,7 @@ class PySILLS(tk.Frame):
             rb_mode = SE(
                 parent=self.parent, row_id=5 + index, column_id=11, n_rows=1, n_columns=10, fg=self.green_medium,
                 bg=self.green_dark).create_radiobutton(
-                var_rb=var_rb_main, value_rb=index, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
+                var_rb=var_rb_main, value_rb=index, color_bg=self.bg_colors["Medium"], fg=self.bg_colors["Dark Font"],
                 text=mode, sticky="NESW", relief=tk.FLAT, font="sans 10 bold",
                 command=lambda var_rb=var_rb_main: self.select_experiment(var_rb))
             #
@@ -964,50 +964,50 @@ class PySILLS(tk.Frame):
         # Data Import
         SE(
             parent=self.parent, row_id=19, column_id=0, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Add", bg_active=self.red_dark, fg_active=self.green_dark,
             command=lambda datatype="STD": self.open_csv(datatype))
         SE(
             parent=self.parent, row_id=19, column_id=5, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Delete", bg_active=self.red_dark, fg_active=self.green_dark,
             command=lambda var_lb=self.lb_std, var_list=self.list_std: self.delete_csv(var_lb, var_list))
         SE(
             parent=self.parent, row_id=19, column_id=11, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Add", bg_active=self.red_dark, fg_active=self.green_dark,
             command=lambda datatype="SMPL": self.open_csv(datatype))
         SE(
             parent=self.parent, row_id=19, column_id=16, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Delete", bg_active=self.red_dark, fg_active=self.green_dark,
             command=lambda var_lb=self.lb_smpl, var_list=self.list_smpl: self.delete_csv(var_lb, var_list))
         #
         SE(
             parent=self.parent, row_id=5, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="New Project", bg_active=self.red_dark, fg_active=self.green_dark, command=self.restart_pysills)
         SE(
             parent=self.parent, row_id=7, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Load Project", bg_active=self.red_dark, fg_active=self.green_dark, command=self.open_project)
         SE(
             parent=self.parent, row_id=9, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Save Project", bg_active=self.red_dark, fg_active=self.green_dark, command=self.save_project)
         SE(
             parent=self.parent, row_id=11, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="General Settings", bg_active=self.red_dark, fg_active=self.green_dark,
             command=self.subwindow_general_settings)
         btn_docu = SE(
             parent=self.parent, row_id=13, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Documentation", bg_active=self.red_dark, fg_active=self.green_dark)
         btn_docu.configure(state="disabled")
         SE(
             parent=self.parent, row_id=15, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Dark"]).create_simple_button(
+            bg=self.bg_colors["Medium"]).create_simple_button(
             text="Quit", bg_active=self.red_dark, fg_active=self.green_dark, command=self.parent.quit)
         #
         ## Initialization
@@ -1042,16 +1042,22 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
                 text="Settings", bg_active=self.red_dark, fg_active=self.green_dark,
                 command=self.ma_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
                 text="Results", bg_active=self.red_dark, fg_active=self.green_dark,
                 command=self.ma_datareduction_files)
+            btn_03 = SE(
+                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                command=self.ma_datareduction_files)
+            btn_03.configure(state="disabled")
             #
-            self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02])
+            self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
         #
         elif var_rb.get() == 1:   # Fluid Inclusions
             self.pysills_mode = "FI"
@@ -1073,16 +1079,22 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
                 text="Settings", bg_active=self.red_dark, fg_active=self.green_dark,
                 command=self.fi_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
                 text="Results", bg_active=self.red_dark, fg_active=self.green_dark,
                 command=self.fi_datareduction_files)
+            btn_03 = SE(
+                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                command=self.ma_datareduction_files)
+            btn_03.configure(state="disabled")
             #
-            self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02])
+            self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
         #
         elif var_rb.get() == 2:   # Melt Inclusions
             self.pysills_mode = "MI"
@@ -1104,16 +1116,18 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
                 text="Settings", bg_active=self.red_dark, fg_active=self.green_dark)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-                text="Data Reduction (Isotopes)", bg_active=self.red_dark, fg_active=self.green_dark)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+                text="Results", bg_active=self.red_dark, fg_active=self.green_dark)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-                text="Data Reduction (Files)", bg_active=self.red_dark, fg_active=self.green_dark)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                command=self.ma_datareduction_files)
+            btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
         #
@@ -1135,15 +1149,20 @@ class PySILLS(tk.Frame):
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
             ## Buttons
-            btn_01 = SE(parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                        fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+            btn_01 = SE(
+                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
                 text="Settings", bg_active=self.red_dark, fg_active=self.green_dark)
-            btn_02 = SE(parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                        fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-                text="Data Reduction", bg_active=self.red_dark, fg_active=self.green_dark)
-            btn_03 = SE(parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
-                        fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-                text="Data Exploration", bg_active=self.red_dark, fg_active=self.green_dark)
+            btn_02 = SE(
+                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+                text="Results", bg_active=self.red_dark, fg_active=self.green_dark)
+            btn_03 = SE(
+                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                command=self.ma_datareduction_files)
+            btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
     #
@@ -17325,7 +17344,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 1:  # Concentration Ratios
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
@@ -17340,7 +17359,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 2:  # LoDs
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
@@ -17354,7 +17373,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 3:  # Intensities (corrected)
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
@@ -17369,7 +17388,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 4:  # Intensity Ratios
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
@@ -17384,7 +17403,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 5:  # Analytical Sensitivities
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
@@ -17399,7 +17418,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 6:  # Normalized Sensitivities
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
@@ -17414,7 +17433,7 @@ class PySILLS(tk.Frame):
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
             elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 7:  # RSFs
-                for file_short in self.container_lists[var_filetype]["Short"]:
+                for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
