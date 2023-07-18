@@ -17191,46 +17191,48 @@ class PySILLS(tk.Frame):
         self.ma_datareduction_tables(mode="Isotopes", init=True)
         #
     def ma_datareduction_tables(self, mode="Isotopes", init=False): # MA - data reduction tables #######################
+        ## Initialization
+        if init == True:
+            var_filetype = "None"
+            var_file_short = "None"
+            var_file_long = "None"
+            var_focus = "None"
+            #
+            for var_datatype in ["RAW", "SMOOTHED"]:
+                # Intensity Analysis
+                self.ma_get_intensity_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_focus=var_focus, mode="All")
+                self.ma_get_intensity_corrected_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                self.ma_get_intensity_ratio_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                # Sensitivity Analysis
+                self.ma_get_analytical_sensitivity_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                self.ma_get_normalized_sensitivity_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                self.ma_get_rsf_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                # Compositional Analysis
+                self.ma_get_concentration_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                self.ma_get_concentration_ratio_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                self.ma_get_lod_data(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+        #
         n_digits_intensity = self.container_var["General Settings"]["Accuracy Intensity"].get()
         n_digits_sensitivity = self.container_var["General Settings"]["Accuracy Sensitivity"].get()
         n_digits_concentration = self.container_var["General Settings"]["Accuracy Concentration"].get()
-        #
-        ## Initialization
-        var_filetype = None
-        file_short = None
-        file_long = None
-        #
-        for var_datatype in ["RAW", "SMOOTHED"]:
-            # Intensity Analysis
-            self.ma_get_intensity_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_focus="MAT", mode="All")
-            self.ma_get_intensity_corrected_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
-            self.ma_get_intensity_ratio_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=None, var_focus="MAT", mode="All")
-            # Sensitivity Analysis
-            self.ma_get_analytical_sensitivity_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
-            self.ma_get_normalized_sensitivity_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
-            self.ma_get_rsf_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
-            # Compositional Analysis
-            self.ma_get_concentration_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
-            self.ma_get_concentration_ratio_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
-            self.ma_get_lod_data(
-                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=file_short,
-                var_file_long=file_long, mode="All")
         #
         if mode == "Isotopes":
             if self.container_var["ma_datareduction_isotopes"]["File Type"].get() == 0:
@@ -17319,6 +17321,8 @@ class PySILLS(tk.Frame):
                 for item in self.tv_results_files.get_children():
                     self.tv_results_files.delete(item)
             #
+            n_digits = 4
+            #
             if self.container_var["ma_datareduction_files"]["Result Category"].get() == 0:  # Concentrations
                 for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
@@ -17331,11 +17335,12 @@ class PySILLS(tk.Frame):
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
                             try:
-                                var_result = self.container_concentration[var_filetype][var_datatype][file_short][
+                                value = self.container_concentration[var_filetype][var_datatype][file_short][
                                     var_focus][isotope]
-                                var_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
-                                if var_result >= var_lod_i:
-                                    entries_category.append(f"{var_result:.{n_digits_concentration}f}")
+                                value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
+                                    isotope]
+                                if value >= value_lod_i:
+                                    entries_category.append(f"{value:.{n_digits}f}")
                                 else:
                                     entries_category.append("< LoD")
                             except:
@@ -17352,9 +17357,9 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
+                            value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
                                 var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_concentration}E}")
+                            entries_category.append(f"{value:.{n_digits}E}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
@@ -17367,8 +17372,8 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_concentration}f}")
+                            value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
+                            entries_category.append(f"{value:.{n_digits}f}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
@@ -17377,13 +17382,15 @@ class PySILLS(tk.Frame):
                     var_file_long = self.container_lists[var_filetype]["Long"][index]
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
+                            value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
                                 var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_intensity}f}")
+                            entries_category.append(f"{value:.{n_digits}f}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
@@ -17396,9 +17403,9 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
+                            value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
                                 var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_intensity}E}")
+                            entries_category.append(f"{value:.{n_digits}E}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
@@ -17411,9 +17418,9 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
+                            value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
                                 var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_sensitivity}f}")
+                            entries_category.append(f"{value:.{n_digits}f}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
@@ -17426,9 +17433,9 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                            value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
                                 var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_sensitivity}f}")
+                            entries_category.append(f"{value:.{n_digits}f}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                         #
@@ -17441,12 +17448,13 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            var_result = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
-                            entries_category.append(f"{var_result:.{n_digits_sensitivity}f}")
+                            value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
+                            entries_category.append(f"{value:.{n_digits}E}")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
     #
-    def ma_get_intensity_data(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific"):
+    def ma_get_intensity_data(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific",
+                              check=False):
         if mode == "Specific":
             if var_focus in ["BG", "MAT"]:
                 for isotope in self.container_lists["ISOTOPES"]:
@@ -17491,7 +17499,7 @@ class PySILLS(tk.Frame):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 if var_filetype == "SMPL":
                                     var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                                    var_id_selected = self.container_var["ID"]["Default SMPL"].get()
+                                    var_id_selected = self.container_var["ID"]["Results Files"].get()
                                     #
                                     if var_id == var_id_selected:
                                         self.ma_get_intensity_data(
@@ -17513,6 +17521,14 @@ class PySILLS(tk.Frame):
                             #
                         var_result_i = np.mean(helper_results)
                         self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
+        #
+        ## CHECK
+        if check == True:
+            for key_01, item_01 in self.container_intensity.items():
+                print("Filetype:", key_01)
+                for key_02, item_02 in item_01.items():
+                    print("Datatype:", key_02)
+                    print(item_02)
     #
     def ma_get_intensity_corrected_data(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                         mode="Specific"):
@@ -18315,7 +18331,7 @@ class PySILLS(tk.Frame):
         scb_h.grid(row=15, column=12, rowspan=1, columnspan=50, sticky="ew")
         #
         ## INITIALIZATION
-        self.ma_datareduction_tables(mode="Files")
+        self.ma_datareduction_tables(mode="Files", init=True)
     #
     def change_id_results(self, var_opt, var_mode="Files"):
         print(var_opt)
