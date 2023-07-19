@@ -6,7 +6,7 @@
 # Name:		pysills.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		18.07.2023
+# Date:		19.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -8012,15 +8012,6 @@ class PySILLS(tk.Frame):
                             value_i = 0.0
                             value_mean = 0.0
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8031,15 +8022,6 @@ class PySILLS(tk.Frame):
                         value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
                         value_mean = self.container_concentration[var_filetype][var_datatype]["MAT"][isotope]
-                        #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
                         #
                         n_digits = 5
                         #
@@ -8056,15 +8038,6 @@ class PySILLS(tk.Frame):
                             value_i = 0.0
                             value_mean = 0.0
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_concentration_mix[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8079,15 +8052,6 @@ class PySILLS(tk.Frame):
                             value_i = 0.0
                             value_mean = 0.0
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_lod_incl[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8097,15 +8061,6 @@ class PySILLS(tk.Frame):
                         # Limit of Detection (Matrix)
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         value_mean = self.container_lod[var_filetype][var_datatype]["MAT"][isotope]
-                        #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
                         #
                         n_digits = 5
                         #
@@ -8148,15 +8103,6 @@ class PySILLS(tk.Frame):
                             value_i = 0.0
                             value_mean = 0.0
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) < 3:
-                        #     n_digits = 3
-                        # elif 3 <= len(str(trunc_value)) < 6:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_intensity_incl[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8168,15 +8114,6 @@ class PySILLS(tk.Frame):
                             isotope]
                         value_mean = self.container_intensity_corrected[var_filetype][var_datatype]["MAT"][isotope]
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) < 3:
-                        #     n_digits = 3
-                        # elif 3 <= len(str(trunc_value)) < 6:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_intensity_mat[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8187,15 +8124,6 @@ class PySILLS(tk.Frame):
                         value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["BG"][
                             isotope]
                         value_mean = self.container_intensity_corrected[var_filetype][var_datatype]["BG"][isotope]
-                        #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) < 3:
-                        #     n_digits = 3
-                        # elif 3 <= len(str(trunc_value)) < 6:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
                         #
                         n_digits = 5
                         #
@@ -8211,15 +8139,6 @@ class PySILLS(tk.Frame):
                             value_i = 0.0
                             value_mean = 0.0
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) < 3:
-                        #     n_digits = 3
-                        # elif 3 <= len(str(trunc_value)) < 6:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_intensity_mix[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8232,15 +8151,6 @@ class PySILLS(tk.Frame):
                             isotope]
                         value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
                         #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
-                        #
                         n_digits = 5
                         #
                         report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
@@ -8251,15 +8161,6 @@ class PySILLS(tk.Frame):
                         value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
                         value_mean = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
-                        #
-                        # trunc_value = math.trunc(value_i)
-                        # #
-                        # if len(str(trunc_value)) == 1:
-                        #     n_digits = 3
-                        # elif len(str(trunc_value)) in [2, 3, 4]:
-                        #     n_digits = 2
-                        # else:
-                        #     n_digits = 1
                         #
                         n_digits = 5
                         #
