@@ -21068,12 +21068,12 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_02, value_rb=0, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            text="RAW Data", sticky="nesw", relief=tk.FLAT)
+            text="RAW Data", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
         rb_02b = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_02, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            text="SMOOTHED Data", sticky="nesw", relief=tk.FLAT)
+            text="SMOOTHED Data", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
         #
         rb_03a = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 7, column_id=start_column, n_rows=1,
@@ -21669,10 +21669,16 @@ class PySILLS(tk.Frame):
         else:
             var_text = "Select ID"
         #
+        list_id_found = []
+        for var_file_long in self.container_lists["SMPL"]["Long"]:
+            var_id_i = self.container_var["SMPL"][var_file_long]["ID"].get()
+            if var_id_i not in list_id_found:
+                list_id_found.append(var_id_i)
+        #
         opt_03a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 7, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_option_isotope(
-            var_iso=self.container_var["ID"]["Results Files"], option_list=self.list_alphabet, text_set=var_text,
+            var_iso=self.container_var["ID"]["Results Files"], option_list=list_id_found, text_set=var_text,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["ID"]["Results Files"], mode="FI":
             self.change_id_results(var_opt, mode))
