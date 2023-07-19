@@ -17049,36 +17049,37 @@ class PySILLS(tk.Frame):
         if self.container_var["ma_datareduction_files"]["Result Category"].get() == 0:  # Concentrations
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        try:
-                            value = self.container_concentration[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
-                                isotope]
-                            #
-                            if value >= value_lod_i:
-                                n_digits = self.ma_determine_ndigits(var_value=value)
-                                entries_category.append(f"{value:.{n_digits}f}")
-                                helper_values[isotope].append(value)
-                            else:
-                                entries_category.append("< LoD")
-                        except:
-                            entries_category.append(None)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                    #
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            try:
+                                value = self.container_concentration[var_filetype][var_datatype][file_short][
+                                    var_focus][isotope]
+                                value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
+                                    isotope]
+                                #
+                                if value >= value_lod_i:
+                                    n_digits = self.ma_determine_ndigits(var_value=value)
+                                    entries_category.append(f"{value:.{n_digits}f}")
+                                    helper_values[isotope].append(value)
+                                else:
+                                    entries_category.append("< LoD")
+                            except:
+                                entries_category.append(None)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                        #
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values)
@@ -17086,25 +17087,26 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 1:  # Concentration Ratios
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
-                            var_focus][isotope]
-                        entries_category.append(f"{value:.{4}E}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
+                                var_focus][isotope]
+                            entries_category.append(f"{value:.{4}E}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
@@ -17112,25 +17114,26 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 2:  # LoDs
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
-                        n_digits = self.ma_determine_ndigits(var_value=value)
-                        entries_category.append(f"{value:.{n_digits}f}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
+                            n_digits = self.ma_determine_ndigits(var_value=value)
+                            entries_category.append(f"{value:.{n_digits}f}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values)
@@ -17138,26 +17141,27 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 3:  # Intensities (corrected)
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
-                            var_focus][isotope]
-                        n_digits = self.ma_determine_ndigits(var_value=value)
-                        entries_category.append(f"{value:.{n_digits}f}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
+                                var_focus][isotope]
+                            n_digits = self.ma_determine_ndigits(var_value=value)
+                            entries_category.append(f"{value:.{n_digits}f}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values)
@@ -17165,25 +17169,26 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 4:  # Intensity Ratios
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
-                            var_focus][isotope]
-                        entries_category.append(f"{value:.{4}E}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
+                                var_focus][isotope]
+                            entries_category.append(f"{value:.{4}E}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
@@ -17191,26 +17196,27 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 5:  # Analytical Sensitivities
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
-                            var_focus][isotope]
-                        n_digits = self.ma_determine_ndigits(var_value=value)
-                        entries_category.append(f"{value:.{n_digits}f}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
+                                var_focus][isotope]
+                            n_digits = self.ma_determine_ndigits(var_value=value)
+                            entries_category.append(f"{value:.{n_digits}f}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values)
@@ -17218,26 +17224,27 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 6:  # Normalized Sensitivities
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
-                            var_focus][isotope]
-                        n_digits = self.ma_determine_ndigits(var_value=value)
-                        entries_category.append(f"{value:.{n_digits}f}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                                var_focus][isotope]
+                            n_digits = self.ma_determine_ndigits(var_value=value)
+                            entries_category.append(f"{value:.{n_digits}f}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values)
@@ -17245,24 +17252,25 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_datareduction_files"]["Result Category"].get() == 7:  # RSFs
             for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_category = [file_short]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
-                        entries_category.append(f"{value:.{4}E}")
-                        helper_values[isotope].append(value)
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_category)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_category = [file_short]
+                        #
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
+                            entries_category.append(f"{value:.{4}E}")
+                            helper_values[isotope].append(value)
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_category)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
@@ -17599,6 +17607,8 @@ class PySILLS(tk.Frame):
                     #
                     for isotope in self.container_lists["ISOTOPES"]:
                         var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
+                        self.container_lists["Analytical Sensitivity Regression"][isotope] = {
+                            "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
                         self.container_analytical_sensitivity[var_filetype][var_datatype][file_smpl]["MAT"][
                             isotope] = var_result_i
             #
@@ -17961,7 +17971,7 @@ class PySILLS(tk.Frame):
     def ma_datareduction_files(self):  # MA - DATAREDUCTION FILES ######################################################
         ## Window Settings
         window_width = 1260
-        window_heigth = 725
+        window_heigth = 675
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
@@ -18108,31 +18118,6 @@ class PySILLS(tk.Frame):
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Relative Sensitivity Factor",
             sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
         #
-        rb_07a = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_files"]["Display Option"], value_rb=0,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Table", sticky="nesw",
-            relief=tk.FLAT)
-        rb_07b = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_files"]["Display Option"], value_rb=1,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Histograms", sticky="nesw",
-            relief=tk.FLAT)
-        rb_07c = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 25, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_files"]["Display Option"], value_rb=2,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Scatter Plots", sticky="nesw",
-            relief=tk.FLAT)
-        rb_07d = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_datareduction_files"]["Display Option"], value_rb=3,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Box Plots", sticky="nesw",
-            relief=tk.FLAT)
-        #
         ## OPTION MENUS
         if self.container_var["ID"]["Default SMPL"].get() != "Select ID":
             var_text = self.container_var["ID"]["Default SMPL"].get()
@@ -18164,6 +18149,33 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_button(
             text="Export Results", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
             command=self.ma_export_calculation_report)
+        #
+        btn_07a = SE(
+            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            text="Concentration Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.fi_show_diagrams_concentration)
+        btn_07a.configure(state="disabled")
+        #
+        btn_07b = SE(
+            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            text="Intensity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.fi_show_diagrams_intensity)
+        btn_07b.configure(state="disabled")
+        #
+        self.var_rb_01 = tk.IntVar()
+        self.var_rb_01.set(1)
+        self.var_rb_02 = tk.IntVar()
+        self.var_rb_02.set(0)
+        self.var_rb_03 = tk.IntVar()
+        self.var_rb_03.set(0)
+        #
+        btn_07c = SE(
+            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 25, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.fi_show_diagrams_sensitivity)
         #
         ## FRAMES
         frm_a = SE(
@@ -21264,19 +21276,21 @@ class PySILLS(tk.Frame):
             #
             if self.container_var[var_filetype_2][var_file_long]["Checkbox"].get() == 1:
                 if var_filetype == "STD" and var_file in self.container_lists[var_filetype]["Short"]:
-                    x_value = value
-                    y_value = self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["a"] * x_value + \
-                              self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["b"]
+                    x_value_std = value
+                    y_value_std = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
+                            var_iso_01]
                     #
+                    self.ax_sensitivity_03a.scatter(
+                        x=x_value_std, y=y_value_std, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
+                    #
+                    x_value = value
+                    y_value = self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["a"]*x_value + \
+                              self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["b"]
                     x_values.append(x_value)
                     y_values.append(y_value)
                     #
-                    self.ax_sensitivity_03a.scatter(
-                        x=x_value, y=y_value, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
-                    #
                 elif var_filetype == "SMPL":
                     x_value = value
-                    x_values.append(x_value)
                     #
                     try:
                         y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
@@ -21296,6 +21310,8 @@ class PySILLS(tk.Frame):
                     #
                     y_value = self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["a"]*x_value + \
                               self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["b"]
+                    #
+                    x_values.append(x_value)
                     y_values.append(y_value)
         #
         zipped_lists = zip(x_values, y_values)
@@ -21701,12 +21717,14 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
             text="Concentration Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_concentration)
+        btn_07a.configure(state="disabled")
         #
         btn_07b = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 27, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
             text="Intensity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_intensity)
+        btn_07b.configure(state="disabled")
         #
         self.var_rb_01 = tk.IntVar()
         self.var_rb_01.set(1)
