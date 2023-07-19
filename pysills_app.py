@@ -19569,7 +19569,7 @@ class PySILLS(tk.Frame):
                                                 var_file_short][var_focus][isotope]
                                             #
                                             helper_results.append(var_result_i)
-                                    #
+                                            #
                                 var_result_i = np.mean(helper_results)
                                 self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
             #
@@ -19590,7 +19590,6 @@ class PySILLS(tk.Frame):
                                        var_indices[0]:var_indices[1] + 1]
                             helper_results.extend(var_data)
                         #
-                        #var_result = round(np.mean(helper_results), 3)
                         var_result = np.mean(helper_results)
                         self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = var_result
@@ -19615,13 +19614,15 @@ class PySILLS(tk.Frame):
                     helper_results = []
                     #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                        var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        #
-                        self.fi_get_intensity_mix(
-                            var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short)
-                        var_result_i = self.container_intensity_mix[var_filetype][var_datatype][var_file_short][isotope]
-                        helper_results.append(var_result_i)
-                        #
+                        if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                            var_file_short = self.container_lists[var_filetype]["Short"][index]
+                            #
+                            self.fi_get_intensity_mix(
+                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short)
+                            var_result_i = self.container_intensity_mix[var_filetype][var_datatype][var_file_short][
+                                isotope]
+                            helper_results.append(var_result_i)
+                            #
                     var_result_i = np.mean(helper_results)
                     self.container_intensity_mix[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -19686,15 +19687,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_intensity_corrected(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_focus=var_focus)
-                            var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short][var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_intensity_corrected(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_focus=var_focus)
+                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
                             isotope] = var_result_i
@@ -19709,15 +19711,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_intensity_corrected(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_focus=var_focus)
-                            var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short][var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_intensity_corrected(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_focus=var_focus)
+                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
@@ -19733,15 +19736,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_intensity_corrected(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_focus=var_focus)
-                            var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short][var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_intensity_corrected(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_focus=var_focus)
+                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
@@ -19778,15 +19782,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_intensity_ratio(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long, var_focus=var_focus)
-                            var_result_i = self.container_intensity_ratio[var_filetype][var_datatype][var_file_short][
-                                var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_intensity_ratio(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long, var_focus=var_focus)
+                                var_result_i = self.container_intensity_ratio[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_ratio[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -19865,15 +19870,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_analytical_sensitivity(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long)
-                            var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short][var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_analytical_sensitivity(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long)
+                                var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_analytical_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -19918,15 +19924,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_normalized_sensitivity(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long)
-                            var_result_i = self.container_normalized_sensitivity[var_filetype][var_datatype][
-                                var_file_short][var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_normalized_sensitivity(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long)
+                                var_result_i = self.container_normalized_sensitivity[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -19998,15 +20005,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_rsf(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long, var_focus=var_focus)
-                            var_result_i = self.container_rsf[var_filetype][var_datatype][var_file_short][var_focus][
-                                isotope]
-                            helper_results.append(var_result_i)
-                        #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_rsf(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long, var_focus=var_focus)
+                                var_result_i = self.container_rsf[var_filetype][var_datatype][var_file_short][var_focus][
+                                    isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_rsf[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -20186,15 +20194,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_concentration(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long, var_focus=var_focus)
-                            var_result_i = self.container_concentration[var_filetype][var_datatype][var_file_short][
-                                var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_concentration(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long, var_focus=var_focus)
+                                var_result_i = self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_concentration[var_filetype][var_datatype][var_focus][isotope] = var_result_i
     #
@@ -20228,14 +20237,15 @@ class PySILLS(tk.Frame):
                     helper_results = []
                     #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                        var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        #
-                        self.fi_get_mixed_concentration_ratio(
-                            var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long)
-                        var_result_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][
-                            var_file_short][isotope]
-                        helper_results.append(var_result_i)
-                        #
+                        if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                            var_file_short = self.container_lists[var_filetype]["Short"][index]
+                            #
+                            self.fi_get_mixed_concentration_ratio(
+                                var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long)
+                            var_result_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][
+                                var_file_short][isotope]
+                            helper_results.append(var_result_i)
+                            #
                     var_result_i = np.mean(helper_results)
                     self.container_mixed_concentration_ratio[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -20304,13 +20314,15 @@ class PySILLS(tk.Frame):
                     helper_results = []
                     #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                        var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        #
-                        self.fi_get_mixing_ratio(
-                            var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long)
-                        var_result_i = self.container_mixing_ratio[var_filetype][var_datatype][var_file_short][isotope]
-                        helper_results.append(var_result_i)
-                    #
+                        if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                            var_file_short = self.container_lists[var_filetype]["Short"][index]
+                            #
+                            self.fi_get_mixing_ratio(
+                                var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long)
+                            var_result_i = self.container_mixing_ratio[var_filetype][var_datatype][var_file_short][
+                                isotope]
+                            helper_results.append(var_result_i)
+                            #
                     var_result_i = np.mean(helper_results)
                     self.container_mixing_ratio["SMPL"][var_datatype][isotope] = var_result_i
     #
@@ -20332,14 +20344,15 @@ class PySILLS(tk.Frame):
                     helper_results = []
                     #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                        var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        #
-                        self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short)
-                        #
-                        var_result_i = self.container_mixed_concentration[var_filetype][var_datatype][var_file_short][
-                            isotope]
-                        helper_results.append(var_result_i)
-                        #
+                        if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                            var_file_short = self.container_lists[var_filetype]["Short"][index]
+                            #
+                            self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short)
+                            #
+                            var_result_i = self.container_mixed_concentration[var_filetype][var_datatype][
+                                var_file_short][isotope]
+                            helper_results.append(var_result_i)
+                            #
                     var_result_i = np.mean(helper_results)
                     self.container_mixed_concentration[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -20398,15 +20411,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_concentration_ratio(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long, var_focus=var_focus)
-                            var_result_i = self.container_concentration_ratio[var_filetype][var_datatype][
-                                var_file_short][var_focus][isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_concentration_ratio(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long, var_focus=var_focus)
+                                var_result_i = self.container_concentration_ratio[var_filetype][var_datatype][
+                                    var_file_short][var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_concentration_ratio[var_filetype][var_datatype][var_focus][
                             isotope] = var_result_i
@@ -20544,15 +20558,16 @@ class PySILLS(tk.Frame):
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
-                            self.fi_get_lod(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long, var_focus=var_focus)
-                            var_result_i = self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
-                                isotope]
-                            helper_results.append(var_result_i)
-                            #
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                #
+                                self.fi_get_lod(
+                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                                    var_file_long=var_file_long, var_focus=var_focus)
+                                var_result_i = self.container_lod[var_filetype][var_datatype][var_file_short][
+                                    var_focus][isotope]
+                                helper_results.append(var_result_i)
+                                #
                         var_result_i = np.mean(helper_results)
                         self.container_lod[var_filetype][var_datatype][var_focus][isotope] = var_result_i
     #
@@ -20657,31 +20672,32 @@ class PySILLS(tk.Frame):
         if self.container_var["fi_datareduction_files"]["Result Category"].get() == 0:  # Concentration
             for index, var_file in enumerate(self.container_lists[var_filetype]["Short"]):
                 var_file_long = self.container_lists[var_filetype]["Long"][index]
-                if var_filetype == "SMPL":
-                    var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
-                else:
-                    var_id_i = None
-                if var_id_i == var_id or var_filetype == "STD":
-                    entries_container = [var_file]
-                    #
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        value = self.container_concentration[var_filetype][var_datatype][var_file][var_focus][
-                            isotope]
-                        value_lod = self.container_lod[var_filetype][var_datatype][var_file][var_focus][isotope]
-                        n_digits = self.ma_determine_ndigits(var_value=value)
+                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                    if var_filetype == "SMPL":
+                        var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                    else:
+                        var_id_i = None
+                    if var_id_i == var_id or var_filetype == "STD":
+                        entries_container = [var_file]
                         #
-                        if value >= value_lod:
-                            entries_container.append(f"{value:.{n_digits}f}")
-                            helper_values[isotope].append(value)
-                        else:
-                            entries_container.append("< LoD")
-                    #
-                    self.tv_results_files.insert("", tk.END, values=entries_container)
-                else:
-                    for isotope in self.container_lists["ISOTOPES"]:
-                        if isotope not in helper_values:
-                            helper_values[isotope] = []
-                            helper_separator.append("-")
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            value = self.container_concentration[var_filetype][var_datatype][var_file][var_focus][
+                                isotope]
+                            value_lod = self.container_lod[var_filetype][var_datatype][var_file][var_focus][isotope]
+                            n_digits = self.ma_determine_ndigits(var_value=value)
+                            #
+                            if value >= value_lod:
+                                entries_container.append(f"{value:.{n_digits}f}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_container.append("< LoD")
+                        #
+                        self.tv_results_files.insert("", tk.END, values=entries_container)
+                    else:
+                        for isotope in self.container_lists["ISOTOPES"]:
+                            if isotope not in helper_values:
+                                helper_values[isotope] = []
+                                helper_separator.append("-")
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values)
