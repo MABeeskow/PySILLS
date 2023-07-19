@@ -273,6 +273,11 @@ class PySILLS(tk.Frame):
                                           "FI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
                                           "MI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}}}
         self.container_var["Subwindows"] = {"MA": {}, "FI": {}, "MI": {}}
+        self.container_var["Spike Elimination Check"] = {}
+        self.container_var["Spike Elimination Check"]["RB Value STD"] = tk.IntVar()
+        self.container_var["Spike Elimination Check"]["RB Value STD"].set(1)
+        self.container_var["Spike Elimination Check"]["RB Value SMPL"] = tk.IntVar()
+        self.container_var["Spike Elimination Check"]["RB Value SMPL"].set(1)
         #
         self.container_var["Spike Elimination"] = {"STD": {"State": False}, "SMPL": {"State": False}}
         #
@@ -25603,7 +25608,8 @@ class PySILLS(tk.Frame):
             btn_09e2 = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=12, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-                text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda mode="STD": self.custom_spike_check(mode))
             btn_09f1 = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=7, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
@@ -25612,7 +25618,8 @@ class PySILLS(tk.Frame):
             btn_09f2 = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=12, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-                text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda mode="SMPL": self.custom_spike_check(mode))
             btn_09g = SE(
                 parent=var_parent, row_id=start_row + 7, column_id=7, n_rows=1, n_columns=11,
                 fg=self.colors_fi["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
@@ -25627,6 +25634,109 @@ class PySILLS(tk.Frame):
                 parent=var_parent, row_id=start_row + 6, column_id=17, n_rows=1, n_columns=1,
                 fg=self.bg_colors["Very Dark"], bg=self.sign_red).create_frame(relief=tk.SOLID)
             self.frm_09f.config(highlightbackground="black", bd=1)
+
+    def custom_spike_check(self, mode="SMPL"):
+        ## Window Settings
+        window_width = 900
+        window_heigth = 600
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        #
+        row_min = 25
+        n_rows = int(window_heigth / row_min)
+        column_min = 20
+        n_columns = int(window_width / column_min)
+        #
+        subwindow_spike_check = tk.Toplevel(self.parent)
+        if self.pysills_mode == "MA":
+            subwindow_spike_check.title("MINERAL ANALYSIS -  Spike Check")
+        elif self.pysills_mode == "FI":
+            subwindow_spike_check.title("FLUID INCLUSION ANALYSIS -  Spike Check")
+        elif self.pysills_mode == "MI":
+            subwindow_spike_check.title("MELT INCLUSION ANALYSIS -  Spike Check")
+        subwindow_spike_check.geometry(var_geometry)
+        subwindow_spike_check.resizable(False, False)
+        subwindow_spike_check["bg"] = self.bg_colors["Super Dark"]
+        #
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_spike_check, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_spike_check, y, weight=1)
+        #
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_spike_check.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_spike_check.grid_columnconfigure(i, minsize=column_min)
+        #
+        start_row = 0
+        start_column = 0
+        #
+        ## FRAMES
+        frm_smpl = SE(
+            parent=subwindow_spike_check, row_id=start_row, column_id=start_column + 13,
+            n_rows=n_rows, n_columns=n_columns - 13, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame()
+        #
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="File Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02 = SE(
+            parent=subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Isotope Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03 = SE(
+            parent=subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Spike Correction", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_03a = SE(
+        #     parent=subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=6,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+        #     text="original value", relief=tk.GROOVE, fontsize="sans 10 bold")
+        # lbl_03b = SE(
+        #     parent=subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1, n_columns=6,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+        #     text="suggested value", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_04 = SE(
+            parent=subwindow_spike_check, row_id=start_row + 8, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Found Spikes", relief=tk.FLAT, fontsize="sans 10 bold")
+        #
+        ## BUTTONS
+        btn_01 = SE(
+            parent=subwindow_spike_check, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Before", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_02 = SE(
+            parent=subwindow_spike_check, row_id=start_row + 2, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        #
+        ## RADIOBUTTONS
+        if mode == "STD":
+            var_rb_03 = self.container_var["Spike Elimination Check"]["RB Value STD"]
+        else:
+            var_rb_03 = self.container_var["Spike Elimination Check"]["RB Value SMPL"]
+        #
+        rbtn_03a = SE(
+            parent=subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1,
+            n_columns=6, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=var_rb_03, value_rb=0, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
+            text="original value", sticky="nesw", relief=tk.FLAT)
+        rbtn_03b = SE(
+            parent=subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1,
+            n_columns=6, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=var_rb_03, value_rb=1, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
+            text="suggested value", sticky="nesw", relief=tk.FLAT)
+        #
+        ## SCALES
+        scl_01 = tk.Scale(
+            subwindow_spike_check, from_=0, to=10, tickinterval=1, orient=tk.HORIZONTAL,
+            background=self.bg_colors["Light"], foreground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, troughcolor=self.bg_colors["Dark"], highlightthickness=0)
+        scl_01.grid(row=start_row + 9, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
     #
 ########################################################################################################################
 # MELT INCLUSION ANALYSIS ##############################################################################################
