@@ -3,10 +3,10 @@
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-# Name:		pysills.py
+# Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		19.07.2023
+# Date:		20.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, font
 import numpy as np
 from modules.gui_elements import SimpleElements as SE
-from modules.spike_elimination import SpikeElimination
+from modules.spike_elimination import SpikeElimination, GrubbsTestSILLS, GrubbsTest
 from modules.essential_functions import EssentialsSRM as ESRM
 from modules.essential_functions import Essentials as ES
 from modules.chemistry import PeriodicSystemOfElements as PSE
@@ -633,8 +633,8 @@ class PySILLS(tk.Frame):
         self.container_var["Gas Energy"] = tk.StringVar()
         self.container_var["Gas Energy"].set("15.760")
         self.container_var["Spike Elimination Method"] = tk.StringVar()
-        self.container_var["Spike Elimination Method"].set("Grubbs-Test")
-        self.list_se_methods = ["Grubbs-Test"]
+        self.container_var["Spike Elimination Method"].set("Grubbs-Test (SILLS)")
+        self.list_se_methods = ["Grubbs-Test (SILLS)", "Grubbs-Test"]
         self.list_isotopes = []
         self.srm_actual = {}
         self.container_files = {}
@@ -7124,22 +7124,25 @@ class PySILLS(tk.Frame):
             self.container_spikes["Selection"] = {}
         #
         if self.pysills_mode == "MA":
+            var_alpha = float(self.container_var["ma_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["ma_setting"]["SE Threshold"].get())
-            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (SILLS)":
                 var_method = 0
-            else:
+            elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
         elif self.pysills_mode == "FI":
+            var_alpha = float(self.container_var["fi_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["fi_setting"]["SE Threshold"].get())
-            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (SILLS)":
                 var_method = 0
-            else:
+            elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
         elif self.pysills_mode == "MI":
+            var_alpha = float(self.container_var["mi_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["mi_setting"]["SE Threshold"].get())
-            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (SILLS)":
                 var_method = 0
-            else:
+            elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
         #
         if filetype == "STD":
@@ -7165,27 +7168,21 @@ class PySILLS(tk.Frame):
                                     spike_intervals = np.array(intervals)
                                     merged_intervals = ES(variable=spike_intervals).merge_times()
                                     for interval in merged_intervals:
+                                        dataset_raw = self.container_measurements["RAW"][file_std][isotope][
+                                                      interval[0]:interval[1]]
+                                        dataset_complete = self.container_measurements["RAW"][file_std][isotope]
+
                                         if var_method == 0:
-                                            data_smoothed, indices_outl = ES(
-                                                variable=self.container_measurements["RAW"][file_std][isotope][
-                                                         interval[0]:interval[1]]).do_grubbs_test(
-                                                alpha=float(self.container_var["settings"]["SE Alpha"].get()),
-                                                dataset_complete=self.container_measurements["RAW"][file_std][isotope],
-                                                threshold=var_threshold)
+                                            data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                start_index=interval[0],
+                                                dataset_complete=dataset_complete).determine_outlier()
                                         elif var_method == 1:
-                                            data_smoothed, indices_outl = ES(
-                                                variable=self.container_measurements["RAW"][file_std][isotope][
-                                                         interval[0]:interval[1]]).find_outlier(
-                                                limit=float(self.container_var["settings"]["SE Deviation"].get()),
-                                                interval=interval,
-                                                data_total=self.container_measurements["RAW"][file_std],
-                                                isotope=isotope, threshold=var_threshold)
-                                        #
-                                        # if self.pysills_mode == "MA":
-                                        #     self.container_measurements["EDITED"][file_std][isotope] = data_smoothed
-                                        # else:
-                                        #     self.container_measurements["EDITED"][file_std][isotope][
-                                        #         "Uncut"] = data_smoothed
+                                            data_smoothed, indices_outl = GrubbsTest(
+                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                start_index=interval[0],
+                                                dataset_complete=dataset_complete).determine_outlier()
+
                                         self.container_measurements["EDITED"][file_std][isotope][
                                             "Uncut"] = data_smoothed
                                         #
@@ -7203,12 +7200,6 @@ class PySILLS(tk.Frame):
                             else:
                                 if isotope not in not_corrected_isotopes:
                                     not_corrected_isotopes.append(isotope)
-                                    # if self.pysills_mode == "MA":
-                                    #     self.container_measurements["EDITED"][file_std][isotope] = \
-                                    #         self.container_measurements["RAW"][file_std][isotope]
-                                    # else:
-                                    #     self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
-                                    #         self.container_measurements["RAW"][file_std][isotope]
                                     self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
                                         self.container_measurements["RAW"][file_std][isotope]
                                 else:
@@ -7216,12 +7207,6 @@ class PySILLS(tk.Frame):
                     else:
                         if isotope not in not_corrected_isotopes:
                             not_corrected_isotopes.append(isotope)
-                            # if self.pysills_mode == "MA":
-                            #     self.container_measurements["EDITED"][file_std][isotope] = \
-                            #         self.container_measurements["RAW"][file_std][isotope]
-                            # else:
-                            #     self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
-                            #         self.container_measurements["RAW"][file_std][isotope]
                             self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
                                 self.container_measurements["RAW"][file_std][isotope]
                         else:
@@ -7250,21 +7235,19 @@ class PySILLS(tk.Frame):
                                     spike_intervals = np.array(intervals)
                                     merged_intervals = ES(variable=spike_intervals).merge_times()
                                     for interval in merged_intervals:
+                                        dataset_raw = self.container_measurements["RAW"][file_smpl][isotope][
+                                                      interval[0]:interval[1]]
+                                        dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
                                         if var_method == 0:
-                                            data_smoothed, indices_outl = ES(
-                                                variable=self.container_measurements["RAW"][file_smpl][isotope][
-                                                         interval[0]:interval[1]]).do_grubbs_test(
-                                                alpha=float(self.container_var["settings"]["SE Alpha"].get()),
-                                                dataset_complete=self.container_measurements["RAW"][file_smpl][isotope],
-                                                threshold=var_threshold)
+                                            data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                start_index=interval[0],
+                                                dataset_complete=dataset_complete).determine_outlier()
                                         elif var_method == 1:
-                                            data_smoothed, indices_outl = ES(
-                                                variable=self.container_measurements["RAW"][file_smpl][isotope][
-                                                         interval[0]:interval[1]]).find_outlier(
-                                                limit=float(self.container_var["settings"]["SE Deviation"].get()),
-                                                interval=interval,
-                                                data_total=self.container_measurements["RAW"][file_smpl],
-                                                isotope=isotope, threshold=var_threshold)
+                                            data_smoothed, indices_outl = GrubbsTest(
+                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                start_index=interval[0],
+                                                dataset_complete=dataset_complete).determine_outlier()
                                         #
                                         if self.pysills_mode == "FI":
                                             if self.container_var["fi_setting"]["Spike Elimination Inclusion"].get() == 2:
@@ -7296,31 +7279,15 @@ class PySILLS(tk.Frame):
                             else:
                                 if isotope not in not_corrected_isotopes:
                                     not_corrected_isotopes.append(isotope)
-                                    # if self.pysills_mode == "MA":
-                                    #     self.container_measurements["EDITED"][file_smpl][isotope] = \
-                                    #         self.container_measurements["RAW"][file_smpl][isotope]
-                                    # else:
-                                    #     self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
-                                    #         self.container_measurements["RAW"][file_smpl][isotope]
                                     self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
                                         self.container_measurements["RAW"][file_smpl][isotope]
-                                    #self.container_measurements["EDITED"][file_smpl][isotope] = \
-                                    #    self.container_measurements["RAW"][file_smpl][isotope]
                                 else:
                                     pass
                     else:
                         if isotope not in not_corrected_isotopes:
                             not_corrected_isotopes.append(isotope)
-                            # if self.pysills_mode == "MA":
-                            #     self.container_measurements["EDITED"][file_smpl][isotope] = \
-                            #         self.container_measurements["RAW"][file_smpl][isotope]
-                            # else:
-                            #     self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
-                            #         self.container_measurements["RAW"][file_smpl][isotope]
                             self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
                                 self.container_measurements["RAW"][file_smpl][isotope]
-                            #self.container_measurements["EDITED"][file_smpl][isotope] = \
-                            #    self.container_measurements["RAW"][file_smpl][isotope]
                         else:
                             pass
                     #
@@ -15577,13 +15544,13 @@ class PySILLS(tk.Frame):
         #
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
-                if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                 #
                 self.spike_elimination_all(filetype="STD", algorithm=var_method)
                 #
             if self.container_var["Spike Elimination"]["SMPL"]["State"] == True:
-                if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
@@ -19524,7 +19491,7 @@ class PySILLS(tk.Frame):
         #
         for filetype in ["STD", "SMPL"]:
             if self.container_var["Spike Elimination"][filetype]["State"] == True:
-                if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                     #
                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
@@ -25555,19 +25522,25 @@ class PySILLS(tk.Frame):
         bg_light = self.bg_colors["Very Light"]
         bg_medium = self.bg_colors["Light"]
         #
-        if mode == "MA":
+        if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_row_correction = -1
-        elif mode == "FI":
+            var_alpha = self.container_var["ma_setting"]["SE Alpha"]
+            var_threshold = self.container_var["ma_setting"]["SE Threshold"]
+        elif self.pysills_mode == "FI":
             var_parent = self.subwindow_fi_settings
             var_row_correction = 0
-        elif mode == "MI":
+            var_alpha = self.container_var["fi_setting"]["SE Alpha"]
+            var_threshold = self.container_var["fi_setting"]["SE Threshold"]
+        elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
             var_row_correction = 0
+            var_alpha = self.container_var["mi_setting"]["SE Alpha"]
+            var_threshold = self.container_var["mi_setting"]["SE Threshold"]
         #
         start_row = start_row + 1 + var_row_correction
         #
-        if var_opt == "Grubbs-Test":
+        if var_opt in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
             ## GUI
             # Labels
             lbl_09c = SE(
@@ -25592,12 +25565,12 @@ class PySILLS(tk.Frame):
             entr_09c = SE(
                 parent=var_parent, row_id=start_row + 3, column_id=7, n_rows=1, n_columns=11,
                 fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-                var=self.container_var["fi_setting"]["SE Alpha"], text_default=var_entr_09c_default)
+                var=var_alpha, text_default=var_entr_09c_default)
             var_entr_09d_default = "1000"
             entr_09d = SE(
                 parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
                 fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-                var=self.container_var["fi_setting"]["SE Threshold"], text_default=var_entr_09d_default)
+                var=var_threshold, text_default=var_entr_09d_default)
             #
             # Buttons
             btn_09e1 = SE(

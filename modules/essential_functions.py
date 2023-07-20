@@ -3,7 +3,7 @@
 # ----------------------
 # essential_functions.py
 # Maximilian Beeskow
-# 24.11.2022
+# 20.12.2023
 # ----------------------
 #
 ## MODULES
@@ -143,7 +143,24 @@ class Essentials:
         for index, value in enumerate(dataset_complete):
             if value >= int(threshold):
                 if index in outlier_indices:
-                    lower_limit = index - 2
+                    if index >= 3:
+                        lower_limit = index - 3
+                    elif index == 2:
+                        lower_limit = index - 2
+                    elif index == 1:
+                        lower_limit = index - 1
+                    elif index == 0:
+                        lower_limit = index
+
+                    if index <= len(dataset_complete) - 4:
+                        upper_limit = index + 3
+                    elif index < len(dataset_complete) - 3:
+                        upper_limit = index + 2
+                    elif index < len(dataset_complete) - 2:
+                        upper_limit = index + 1
+                    elif index < len(dataset_complete) - 1:
+                        upper_limit = index
+
                     upper_limit = index + 2
                     value_corrected = np.mean(dataset_complete[lower_limit:upper_limit])
                     data_smoothed.append(value_corrected)

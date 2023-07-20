@@ -6,12 +6,13 @@
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		31.01.2023
+# Date:		20.07.2023
 
 #-----------------------------------------------
 
 ## MODULES
 import numpy as np
+import scipy.stats as stats
 import tkinter as tk
 from modules.gui_elements import SimpleElements as SE
 import matplotlib.pyplot as plt
@@ -381,3 +382,144 @@ class SpikeElimination:
             self.container_spikes["Selection"][var_file][var_isotope][var_index] = self.var_raw[var_index]
         else:
             self.container_spikes["Selection"][var_file][var_isotope][var_index] = self.var_smoothed[var_index]
+
+class GrubbsTestSILLS:
+    def __init__(self, raw_data, alpha, threshold, start_index, dataset_complete):
+        self.raw_data = raw_data
+        self.alpha = alpha
+        self.threshold = threshold
+        #self.val_check_3 = 2.097
+        #self.val_check_4 = 2.323
+        self.smoothed_data = []
+        self.spike_indices = []
+        self.start_index = start_index
+        self.dataset_complete = dataset_complete
+
+    def determine_outlier(self):
+        helper_data = {}
+        for index, value in enumerate(self.raw_data):
+            if value >= self.threshold:
+                surrounding_3 = self.determine_surrounded_values(index=index, stepsize=3)
+                surrounding_4 = self.determine_surrounded_values(index=index, stepsize=4)
+
+                mean_3 = np.mean(surrounding_3["All"])
+                std_3 = np.std(surrounding_3["All"], ddof=1)
+                mean_4 = np.mean(surrounding_4["All"])
+                std_4 = np.std(surrounding_4["All"], ddof=1)
+
+                val_poi_3 = round(abs(value - mean_3)/std_3, 3)
+                val_poi_4 = round(abs(value - mean_4)/std_4, 3)
+
+                val_crit_3 = round(self.calculate_grubbs_critical_value(size=len(surrounding_3["All"])), 3)
+                val_crit_4 = round(self.calculate_grubbs_critical_value(size=len(surrounding_4["All"])), 3)
+
+                if val_poi_3 > val_crit_3 and val_poi_4 > val_crit_4:
+                    val_corr = np.mean(surrounding_3["SP"])
+                    self.spike_indices.append(index + self.start_index)
+                    helper_data[index + self.start_index] = val_corr
+
+        for index, value in enumerate(self.dataset_complete):
+            if index in self.spike_indices:
+                self.smoothed_data.append(helper_data[index])
+            else:
+                self.smoothed_data.append(value)
+
+        return self.smoothed_data, self.spike_indices
+
+    def determine_surrounded_values(self, index, stepsize=4):
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = self.raw_data[index]
+        helper_values["POI"] = val_poi
+        helper_values["All"].append(val_poi)
+
+        for step in range(1, stepsize):
+            step_before = index - step
+            step_after = index + step
+            if step_before >= 0:
+                helper_values["SP"].append(self.raw_data[step_before])
+                helper_values["All"].append(self.raw_data[step_before])
+            if step_after < len(self.raw_data):
+                helper_values["SP"].append(self.raw_data[step_after])
+                helper_values["All"].append(self.raw_data[step_after])
+
+        return helper_values
+
+    def calculate_grubbs_critical_value(self, size):
+        t_dist = stats.t.ppf(1 - self.alpha/(2*size), size - 2)
+        numerator = (size - 1)*np.sqrt(np.square(t_dist))
+        denominator = np.sqrt(size)*np.sqrt(size - 2 + np.square(t_dist))
+        critical_value = numerator/denominator
+
+        return critical_value
+
+class GrubbsTest:
+    def __init__(self, raw_data, alpha, threshold, start_index, dataset_complete):
+        self.raw_data = raw_data
+        self.alpha = alpha
+        self.threshold = threshold
+        self.smoothed_data = []
+        self.spike_indices = []
+        self.start_index = start_index
+        self.dataset_complete = dataset_complete
+
+    def determine_outlier(self):
+        helper_data = {}
+        for index, value in enumerate(self.raw_data):
+            if value >= self.threshold:
+                surrounding_3 = self.determine_surrounded_values(index=index, stepsize=3)
+                surrounding_4 = self.determine_surrounded_values(index=index, stepsize=4)
+                val_poi_3, index_poi_3 = self.calculate_grubbs_value()
+                val_poi_3 = round(val_poi_3, 3)
+                val_crit_3 = round(self.calculate_grubbs_critical_value(size=len(surrounding_3["All"])), 3)
+                val_poi_4, index_poi_4 = self.calculate_grubbs_value()
+                val_poi_4 = round(val_poi_4, 3)
+                val_crit_4 = round(self.calculate_grubbs_critical_value(size=len(surrounding_4["All"])), 3)
+
+                if val_poi_3 > val_crit_3 and val_poi_4 > val_crit_4:
+                    val_corr = np.mean(surrounding_3["SP"])
+                    self.spike_indices.append(index + self.start_index)
+                    helper_data[index + self.start_index] = val_corr
+
+        for index, value in enumerate(self.dataset_complete):
+            if index in self.spike_indices:
+                self.smoothed_data.append(helper_data[index])
+            else:
+                self.smoothed_data.append(value)
+
+        return self.smoothed_data, self.spike_indices
+
+    def determine_surrounded_values(self, index, stepsize=4):
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = self.raw_data[index]
+        helper_values["POI"] = val_poi
+        helper_values["All"].append(val_poi)
+
+        for step in range(1, stepsize):
+            step_before = index - step
+            step_after = index + step
+            if step_before >= 0:
+                helper_values["SP"].append(self.raw_data[step_before])
+                helper_values["All"].append(self.raw_data[step_before])
+            if step_after < len(self.raw_data):
+                helper_values["SP"].append(self.raw_data[step_after])
+                helper_values["All"].append(self.raw_data[step_after])
+
+        return helper_values
+
+    def calculate_grubbs_critical_value(self, size):
+        t_dist = stats.t.ppf(1 - self.alpha/(2*size), size - 2)
+        numerator = (size - 1)*np.sqrt(np.square(t_dist))
+        denominator = np.sqrt(size)*np.sqrt(size - 2 + np.square(t_dist))
+        critical_value = numerator/denominator
+
+        return critical_value
+
+    def calculate_grubbs_value(self):
+        std_dev = np.std(self.raw_data, ddof=1)
+        avg_y = np.mean(self.raw_data)
+        abs_val_minus_avg = abs(np.array(self.raw_data) - avg_y)
+        max_of_deviations = max(abs_val_minus_avg)
+        max_ind = np.argmax(abs_val_minus_avg)
+        Gcal = max_of_deviations/std_dev
+
+        return Gcal, max_ind
