@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		20.07.2023
+# Date:		21.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -25620,8 +25620,7 @@ class PySILLS(tk.Frame):
         n_rows = int(window_heigth / row_min)
         column_min = 20
         n_columns = int(window_width / column_min)
-        print(n_rows, n_columns)
-        #
+
         self.subwindow_spike_check = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
             self.subwindow_spike_check.title("MINERAL ANALYSIS -  Spike Check")
@@ -25632,19 +25631,19 @@ class PySILLS(tk.Frame):
         self.subwindow_spike_check.geometry(var_geometry)
         self.subwindow_spike_check.resizable(False, False)
         self.subwindow_spike_check["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_spike_check, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_spike_check, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_spike_check.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_spike_check.grid_columnconfigure(i, minsize=column_min)
-        #
+
         start_row = 0
         start_column = 0
 
@@ -25662,7 +25661,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column + 13, n_rows=n_rows,
             n_columns=n_columns - 13, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
-        #
+
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
@@ -25817,6 +25816,8 @@ class PySILLS(tk.Frame):
         var_isotope = var_opt_iso
         self.var_opt_spk_iso.set(var_isotope)
         self.current_isotope = var_isotope
+        self.scl_01.set(1)
+
         self.show_spike_data()
 
     def change_spk_id(self, mode=None):
@@ -25846,6 +25847,8 @@ class PySILLS(tk.Frame):
         self.lbl_03a.config(text=val_original)
         self.lbl_03b.config(text=val_corrected)
         self.lbl_03c.configure(text=val_current)
+
+        self.show_spike_diagram()
 
     def change_file_spk(self, mode):
         if mode == "Next":
@@ -25878,6 +25881,7 @@ class PySILLS(tk.Frame):
         possible_spk_isotopes = self.check_spikes_isotope()
         self.var_opt_spk_iso.set(possible_spk_isotopes[0])
         self.current_isotope = possible_spk_isotopes[0]
+        self.scl_01.set(1)
 
         for index, isotope in enumerate(possible_spk_isotopes):
             if index == 0:
@@ -25905,9 +25909,20 @@ class PySILLS(tk.Frame):
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
         self.lbl_03c.configure(text=val_updated)
 
+        self.show_spike_diagram()
+
     def show_spike_diagram(self):
+        try:
+            if self.canvas_spikes == None:
+                self.canvas_spikes.get_tk_widget().grid_remove()
+                self.toolbarFrame_spikes.grid_remove()
+        except AttributeError:
+            pass
+
         var_file = self.currest_file_spk
         var_isotope = self.current_isotope
+        current_id = self.scl_01.get()
+        var_id_real = self.list_indices[current_id - 1]
 
         ## Diagram
         self.fig_spikes = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
@@ -25923,11 +25938,35 @@ class PySILLS(tk.Frame):
         self.toolbar_spikes.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
 
         data_x = self.container_spikes[var_file][var_isotope]["Times"]
+        x_max = max(data_x)
         data_y_raw = self.container_spikes[var_file][var_isotope]["Data RAW"]
         data_y_smoothed = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"]
+        y_min = min(data_y_raw)
+        y_max = max(data_y_raw)
 
-        self.ax_spikes.plot(data_x, data_y_raw)
-        self.ax_spikes.plot(data_x, data_y_smoothed)
+        self.ax_spikes.plot(data_x, data_y_raw, color=self.bg_colors["Super Dark"], label="Original data", linewidth=2)
+        self.ax_spikes.plot(data_x, data_y_smoothed, color=self.accent_color, label="Smoothed data", linewidth=2)
+        self.ax_spikes.axvline(x=data_x[var_id_real], color=self.bg_colors["Medium"], label="Current spike",
+                               linewidth=2, linestyle="dotted")
+
+        self.ax_spikes.grid(True)
+        self.ax_spikes.set_yscale("log")
+        self.ax_spikes.set_xlim(left=0, right=x_max)
+        self.ax_spikes.set_xticks(np.arange(0, x_max, 20))
+        self.ax_spikes.set_ylim(bottom=0.1*y_min, top=1.5*y_max)
+        self.ax_spikes.grid(which="major", linestyle="-", linewidth=1)
+        self.ax_spikes.minorticks_on()
+        self.ax_spikes.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+        self.ax_spikes.set_axisbelow(True)
+        self.ax_spikes.set_title(var_file, fontsize=9)
+        self.ax_spikes.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
+        self.ax_spikes.set_ylabel("Signal Intensity Ratio $I$ (cps/cps)", labelpad=0.5, fontsize=8)
+        self.ax_spikes.xaxis.set_tick_params(labelsize=8)
+        self.ax_spikes.yaxis.set_tick_params(labelsize=8)
+
+        self.leg_spikes = self.fig_spikes.legend(loc="upper left", fontsize="x-small", bbox_to_anchor=(0.075, 0.925))
+        self.leg_spikes.set_in_layout(False)
+        self.fig_spikes.tight_layout()
 
         self.canvas_spikes.draw()
 
