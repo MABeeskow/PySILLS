@@ -287,6 +287,8 @@ class PySILLS(tk.Frame):
         self.list_smpl_changed = False
         self.list_std_previous = []
         self.list_smpl_previous = []
+
+        self.container_spike_values = {}
         #
         self.counter_fast_track_std = 0
         self.counter_fast_track_smpl = 0
@@ -25618,6 +25620,7 @@ class PySILLS(tk.Frame):
         n_rows = int(window_heigth / row_min)
         column_min = 20
         n_columns = int(window_width / column_min)
+        print(n_rows, n_columns)
         #
         self.subwindow_spike_check = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
@@ -25650,7 +25653,9 @@ class PySILLS(tk.Frame):
         self.currest_file_spk = var_list_files[self.current_file_id]
         self.current_original_value = 0
         self.current_suggested_value = 0
+        self.current_current_value = 0
         self.current_isotope = self.container_lists["ISOTOPES"][0]
+        self.current_nspikes = 0
 
         ## FRAMES
         frm_smpl = SE(
@@ -25662,7 +25667,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="File Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="File selection", relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_01a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 1, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
@@ -25670,24 +25675,52 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Isotope Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Isotope selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 9, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Spike Correction", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Spike correction", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03a1 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Original value", relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03a = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
             text=self.current_original_value, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03b1 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Smoothed value", relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03b = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 7, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
             text=self.current_suggested_value, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03c1 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Current value", relief=tk.FLAT, fontsize="sans 10 bold")
+        self.lbl_03c = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
+            text=self.current_current_value, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 8, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Found Spikes", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+            text="Spike selection", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_04a1 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Number of spikes", relief=tk.FLAT, fontsize="sans 10 bold")
+        self.lbl_04a2 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
+            text=self.current_nspikes, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_05 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 13, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Value selection", relief=tk.FLAT, fontsize="sans 10 bold")
+
         ## BUTTONS
         btn_01 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=6,
@@ -25699,23 +25732,16 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Next": self.change_file_spk(mode))
-        #
-        ## RADIOBUTTONS
-        if mode == "STD":
-            var_rb_03 = self.container_var["Spike Elimination Check"]["RB Value STD"]
-        else:
-            var_rb_03 = self.container_var["Spike Elimination Check"]["RB Value SMPL"]
-        #
-        rbtn_03a = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1,
-            n_columns=6, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=var_rb_03, value_rb=0, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
-            text="Original value", sticky="nesw", relief=tk.FLAT)
-        rbtn_03b = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1,
-            n_columns=6, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=var_rb_03, value_rb=1, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
-            text="Corrected value", sticky="nesw", relief=tk.FLAT)
+        btn_05a1 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Original value", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="RAW": self.replace_spike_value(mode))
+        btn_05a2 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Smoothed value", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="SMOOTHED": self.replace_spike_value(mode))
 
         ## SCALES
         self.scl_01 = tk.Scale(
@@ -25723,65 +25749,73 @@ class PySILLS(tk.Frame):
             background=self.bg_colors["Light"], foreground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color, troughcolor=self.bg_colors["Dark"], highlightthickness=0,
             command=self.change_spk_id)
-        self.scl_01.grid(row=start_row + 9, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
+        self.scl_01.grid(row=start_row + 7, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
 
         ## OPTION MENUS
         self.var_opt_spk_iso = tk.StringVar()
         self.var_opt_spk_iso.set("Select isotope")
         var_opt_is_default = self.current_isotope
-        opt_02a = SE(
+        list_spk_isotopes = self.check_spikes_isotope()
+
+        self.opt_02a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.var_opt_spk_iso, option_list=self.container_lists["ISOTOPES"], text_set=var_opt_is_default,
+            var_iso=self.var_opt_spk_iso, option_list=list_spk_isotopes, text_set=var_opt_is_default,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt_iso=self.var_opt_spk_iso: self.change_spk_isotope(var_opt_iso))
-        opt_02a["menu"].config(
+        self.opt_02a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
-        opt_02a.config(
+        self.opt_02a.config(
             bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
-        ## TREEVIEWS
-        self.frm_spk = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=n_rows - 12,
-            n_columns=12, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
-        vsb_spk = tk.Scrollbar(master=self.frm_spk, orient="vertical")
-        self.text_spk = tk.Text(
-            master=self.frm_spk, width=30, height=25, yscrollcommand=vsb_spk.set, bg=self.bg_colors["Very Light"])
-        vsb_spk.config(command=self.text_spk.yview)
-        vsb_spk.pack(side="right", fill="y")
-        self.text_spk.pack(side="left", fill="both", expand=True)
-
         ## INITIALIZATION
         self.show_spike_data()
+
+    def check_spikes_isotope(self):
+        var_file = self.currest_file_spk
+        helper_list = []
+
+        for var_isotope in self.container_lists["ISOTOPES"]:
+            list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
+            if len(list_indices) > 0:
+                helper_list.append(var_isotope)
+
+        return helper_list
 
     def show_spike_data(self):
         var_isotope = self.var_opt_spk_iso.get()
         var_file = self.currest_file_spk
         self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
         self.scl_01.configure(to=len(self.list_indices))
+        self.current_nspikes = len(self.list_indices)
+        self.lbl_04a2.configure(text=self.current_nspikes)
 
-        self.text_spk.delete("1.0", tk.END)
+        value_0 = self.list_indices[0]
+        self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
+        self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
+        self.current_current_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
+        self.lbl_03a.configure(text=self.current_original_value)
+        self.lbl_03b.configure(text=self.current_suggested_value)
+        self.lbl_03c.configure(text=self.current_current_value)
 
-        for index, value in enumerate(self.list_indices):
-            lbl_i = tk.Label(self.frm_spk, text=index + 1, bg=self.bg_colors["Very Light"],
-                             fg=self.bg_colors["Dark Font"])
-            self.text_spk.window_create("end", window=lbl_i)
-            self.text_spk.insert("end", "\t")
-            lbl_i = tk.Label(
-                self.frm_spk, text=self.container_spikes[var_file][var_isotope]["Data RAW"][value],
-                bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-            self.text_spk.window_create("end", window=lbl_i)
-            self.text_spk.insert("end", "\t")
-            lbl_i = tk.Label(
-                self.frm_spk, text=self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value],
-                bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-            self.text_spk.window_create("end", window=lbl_i)
-            self.text_spk.insert("end", "\n")
+        if var_file not in self.container_spike_values:
+            self.container_spike_values[var_file] = {}
+        if var_isotope not in self.container_spike_values[var_file]:
+            self.container_spike_values[var_file][var_isotope] = {"RAW": [], "SMOOTHED": [], "Current": []}
+        if self.current_original_value not in self.container_spike_values[var_file][var_isotope]["RAW"]:
+            self.container_spike_values[var_file][var_isotope]["RAW"].append(self.current_original_value)
+        if self.current_suggested_value not in self.container_spike_values[var_file][var_isotope]["SMOOTHED"]:
+            self.container_spike_values[var_file][var_isotope]["SMOOTHED"].append(self.current_suggested_value)
+        if self.current_suggested_value not in self.container_spike_values[var_file][var_isotope]["Current"]:
+            self.container_spike_values[var_file][var_isotope]["Current"].append(self.current_current_value)
+
+        self.show_spike_diagram()
 
     def change_spk_isotope(self, var_opt_iso):
         var_isotope = var_opt_iso
+        self.var_opt_spk_iso.set(var_isotope)
         self.current_isotope = var_isotope
         self.show_spike_data()
 
@@ -25793,8 +25827,25 @@ class PySILLS(tk.Frame):
         val_original = self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real]
         val_corrected = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real]
 
+        if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
+            val_current = val_corrected
+        else:
+            val_current = self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1]
+
+        if var_file not in self.container_spike_values:
+            self.container_spike_values[var_file] = {}
+        if var_isotope not in self.container_spike_values[var_file]:
+            self.container_spike_values[var_file][var_isotope] = {"RAW": [], "SMOOTHED": [], "Current": []}
+        if val_original not in self.container_spike_values[var_file][var_isotope]["RAW"]:
+            self.container_spike_values[var_file][var_isotope]["RAW"].append(val_original)
+        if val_corrected not in self.container_spike_values[var_file][var_isotope]["SMOOTHED"]:
+            self.container_spike_values[var_file][var_isotope]["SMOOTHED"].append(val_corrected)
+        if val_corrected not in self.container_spike_values[var_file][var_isotope]["Current"]:
+            self.container_spike_values[var_file][var_isotope]["Current"].append(val_current)
+
         self.lbl_03a.config(text=val_original)
         self.lbl_03b.config(text=val_corrected)
+        self.lbl_03c.configure(text=val_current)
 
     def change_file_spk(self, mode):
         if mode == "Next":
@@ -25824,7 +25875,61 @@ class PySILLS(tk.Frame):
             self.currest_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
             self.lbl_01a.configure(text=self.currest_file_spk)
 
+        possible_spk_isotopes = self.check_spikes_isotope()
+        self.var_opt_spk_iso.set(possible_spk_isotopes[0])
+        self.current_isotope = possible_spk_isotopes[0]
+
+        for index, isotope in enumerate(possible_spk_isotopes):
+            if index == 0:
+                self.opt_02a["menu"].delete(0, "end")
+            #
+            self.opt_02a["menu"].add_command(
+                label=isotope, command=lambda var_opt_iso=isotope: self.change_spk_isotope(var_opt_iso))
+
         self.show_spike_data()
+
+    def replace_spike_value(self, mode):
+        current_id = self.scl_01.get()
+        var_id_real = self.list_indices[current_id - 1]
+        var_file = self.currest_file_spk
+        var_isotope = self.current_isotope
+        val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
+        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
+
+        if mode == "RAW":
+            val_updated = val_original
+        else:
+            val_updated = val_corrected
+
+        self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real] = val_updated
+        self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
+        self.lbl_03c.configure(text=val_updated)
+
+    def show_spike_diagram(self):
+        var_file = self.currest_file_spk
+        var_isotope = self.current_isotope
+
+        ## Diagram
+        self.fig_spikes = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        self.ax_spikes = self.fig_spikes.add_subplot(label=np.random.uniform())
+
+        self.canvas_spikes = FigureCanvasTkAgg(self.fig_spikes, master=self.subwindow_spike_check)
+        self.canvas_spikes.get_tk_widget().grid(row=0, column=12, rowspan=22, columnspan=33, sticky="nesw")
+        self.toolbarFrame_spikes = tk.Frame(master=self.subwindow_spike_check)
+        self.toolbarFrame_spikes.grid(row=22, column=12, rowspan=2, columnspan=33, sticky="w")
+        self.toolbar_spikes = NavigationToolbar2Tk(self.canvas_spikes, self.toolbarFrame_spikes)
+        self.toolbar_spikes.config(background=self.bg_colors["Very Light"])
+        self.toolbar_spikes._message_label.config(background=self.bg_colors["Very Light"])
+        self.toolbar_spikes.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
+
+        data_x = self.container_spikes[var_file][var_isotope]["Times"]
+        data_y_raw = self.container_spikes[var_file][var_isotope]["Data RAW"]
+        data_y_smoothed = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"]
+
+        self.ax_spikes.plot(data_x, data_y_raw)
+        self.ax_spikes.plot(data_x, data_y_smoothed)
+
+        self.canvas_spikes.draw()
 
 ########################################################################################################################
 # MELT INCLUSION ANALYSIS ##############################################################################################
