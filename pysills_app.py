@@ -25619,73 +25619,86 @@ class PySILLS(tk.Frame):
         column_min = 20
         n_columns = int(window_width / column_min)
         #
-        subwindow_spike_check = tk.Toplevel(self.parent)
+        self.subwindow_spike_check = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
-            subwindow_spike_check.title("MINERAL ANALYSIS -  Spike Check")
+            self.subwindow_spike_check.title("MINERAL ANALYSIS -  Spike Check")
         elif self.pysills_mode == "FI":
-            subwindow_spike_check.title("FLUID INCLUSION ANALYSIS -  Spike Check")
+            self.subwindow_spike_check.title("FLUID INCLUSION ANALYSIS -  Spike Check")
         elif self.pysills_mode == "MI":
-            subwindow_spike_check.title("MELT INCLUSION ANALYSIS -  Spike Check")
-        subwindow_spike_check.geometry(var_geometry)
-        subwindow_spike_check.resizable(False, False)
-        subwindow_spike_check["bg"] = self.bg_colors["Super Dark"]
+            self.subwindow_spike_check.title("MELT INCLUSION ANALYSIS -  Spike Check")
+        self.subwindow_spike_check.geometry(var_geometry)
+        self.subwindow_spike_check.resizable(False, False)
+        self.subwindow_spike_check["bg"] = self.bg_colors["Super Dark"]
         #
         for x in range(n_columns):
-            tk.Grid.columnconfigure(subwindow_spike_check, x, weight=1)
+            tk.Grid.columnconfigure(self.subwindow_spike_check, x, weight=1)
         for y in range(n_rows):
-            tk.Grid.rowconfigure(subwindow_spike_check, y, weight=1)
+            tk.Grid.rowconfigure(self.subwindow_spike_check, y, weight=1)
         #
         # Rows
         for i in range(0, n_rows):
-            subwindow_spike_check.grid_rowconfigure(i, minsize=row_min)
+            self.subwindow_spike_check.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
-            subwindow_spike_check.grid_columnconfigure(i, minsize=column_min)
+            self.subwindow_spike_check.grid_columnconfigure(i, minsize=column_min)
         #
         start_row = 0
         start_column = 0
-        #
+
+        var_list_files = self.container_lists[mode]["Short"]
+        self.current_file_id = 0
+        self.currest_file_spk = var_list_files[self.current_file_id]
+        self.current_original_value = 0
+        self.current_suggested_value = 0
+        self.current_isotope = self.container_lists["ISOTOPES"][0]
+
         ## FRAMES
         frm_smpl = SE(
-            parent=subwindow_spike_check, row_id=start_row, column_id=start_column + 13,
-            n_rows=n_rows, n_columns=n_columns - 13, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Very Light"]).create_frame()
+            parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column + 13, n_rows=n_rows,
+            n_columns=n_columns - 13, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
         #
         ## LABELS
         lbl_01 = SE(
-            parent=subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="File Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+        self.lbl_01a = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 1, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text=self.currest_file_spk, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Isotope Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
-            parent=subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Spike Correction", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_03a = SE(
-        #     parent=subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=6,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-        #     text="original value", relief=tk.GROOVE, fontsize="sans 10 bold")
-        # lbl_03b = SE(
-        #     parent=subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1, n_columns=6,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-        #     text="suggested value", relief=tk.GROOVE, fontsize="sans 10 bold")
+        self.lbl_03a = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
+            text=self.current_original_value, relief=tk.FLAT, fontsize="sans 10 bold")
+        self.lbl_03b = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 7, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
+            text=self.current_suggested_value, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
-            parent=subwindow_spike_check, row_id=start_row + 8, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 8, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Found Spikes", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         ## BUTTONS
         btn_01 = SE(
-            parent=subwindow_spike_check, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=6,
             fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Before", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Before", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Before": self.change_file_spk(mode))
         btn_02 = SE(
-            parent=subwindow_spike_check, row_id=start_row + 2, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 2, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Next": self.change_file_spk(mode))
         #
         ## RADIOBUTTONS
         if mode == "STD":
@@ -25694,23 +25707,125 @@ class PySILLS(tk.Frame):
             var_rb_03 = self.container_var["Spike Elimination Check"]["RB Value SMPL"]
         #
         rbtn_03a = SE(
-            parent=subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1,
+            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1,
             n_columns=6, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=var_rb_03, value_rb=0, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
-            text="original value", sticky="nesw", relief=tk.FLAT)
+            text="Original value", sticky="nesw", relief=tk.FLAT)
         rbtn_03b = SE(
-            parent=subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1,
+            parent=self.subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1,
             n_columns=6, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=var_rb_03, value_rb=1, color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"],
-            text="suggested value", sticky="nesw", relief=tk.FLAT)
-        #
+            text="Corrected value", sticky="nesw", relief=tk.FLAT)
+
         ## SCALES
-        scl_01 = tk.Scale(
-            subwindow_spike_check, from_=0, to=10, tickinterval=1, orient=tk.HORIZONTAL,
+        self.scl_01 = tk.Scale(
+            self.subwindow_spike_check, from_=1, to=10, tickinterval=1, orient=tk.HORIZONTAL,
             background=self.bg_colors["Light"], foreground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, troughcolor=self.bg_colors["Dark"], highlightthickness=0)
-        scl_01.grid(row=start_row + 9, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
-    #
+            activebackground=self.accent_color, troughcolor=self.bg_colors["Dark"], highlightthickness=0,
+            command=self.change_spk_id)
+        self.scl_01.grid(row=start_row + 9, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
+
+        ## OPTION MENUS
+        self.var_opt_spk_iso = tk.StringVar()
+        self.var_opt_spk_iso.set("Select isotope")
+        var_opt_is_default = self.current_isotope
+        opt_02a = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=12,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.var_opt_spk_iso, option_list=self.container_lists["ISOTOPES"], text_set=var_opt_is_default,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt_iso=self.var_opt_spk_iso: self.change_spk_isotope(var_opt_iso))
+        opt_02a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_02a.config(
+            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+
+        ## TREEVIEWS
+        self.frm_spk = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=n_rows - 12,
+            n_columns=12, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
+        vsb_spk = tk.Scrollbar(master=self.frm_spk, orient="vertical")
+        self.text_spk = tk.Text(
+            master=self.frm_spk, width=30, height=25, yscrollcommand=vsb_spk.set, bg=self.bg_colors["Very Light"])
+        vsb_spk.config(command=self.text_spk.yview)
+        vsb_spk.pack(side="right", fill="y")
+        self.text_spk.pack(side="left", fill="both", expand=True)
+
+        ## INITIALIZATION
+        self.show_spike_data()
+
+    def show_spike_data(self):
+        var_isotope = self.var_opt_spk_iso.get()
+        var_file = self.currest_file_spk
+        self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
+        self.scl_01.configure(to=len(self.list_indices))
+
+        self.text_spk.delete("1.0", tk.END)
+
+        for index, value in enumerate(self.list_indices):
+            lbl_i = tk.Label(self.frm_spk, text=index + 1, bg=self.bg_colors["Very Light"],
+                             fg=self.bg_colors["Dark Font"])
+            self.text_spk.window_create("end", window=lbl_i)
+            self.text_spk.insert("end", "\t")
+            lbl_i = tk.Label(
+                self.frm_spk, text=self.container_spikes[var_file][var_isotope]["Data RAW"][value],
+                bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            self.text_spk.window_create("end", window=lbl_i)
+            self.text_spk.insert("end", "\t")
+            lbl_i = tk.Label(
+                self.frm_spk, text=self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value],
+                bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            self.text_spk.window_create("end", window=lbl_i)
+            self.text_spk.insert("end", "\n")
+
+    def change_spk_isotope(self, var_opt_iso):
+        var_isotope = var_opt_iso
+        self.current_isotope = var_isotope
+        self.show_spike_data()
+
+    def change_spk_id(self, mode=None):
+        current_id = self.scl_01.get()
+        var_id_real = self.list_indices[current_id - 1]
+        var_file = self.currest_file_spk
+        var_isotope = self.var_opt_spk_iso.get()
+        val_original = self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real]
+        val_corrected = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real]
+
+        self.lbl_03a.config(text=val_original)
+        self.lbl_03b.config(text=val_corrected)
+
+    def change_file_spk(self, mode):
+        if mode == "Next":
+            if self.currest_file_spk in self.container_lists["STD"]["Short"]:
+                var_filetype = "STD"
+            else:
+                var_filetype = "SMPL"
+
+            if self.current_file_id < len(self.container_lists[var_filetype]["Short"]) - 1:
+                self.current_file_id += 1
+            elif self.current_file_id == len(self.container_lists[var_filetype]["Short"]) - 1:
+                self.current_file_id = 0
+
+            self.currest_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
+            self.lbl_01a.configure(text=self.currest_file_spk)
+        elif mode == "Before":
+            if self.currest_file_spk in self.container_lists["STD"]["Short"]:
+                var_filetype = "STD"
+            else:
+                var_filetype = "SMPL"
+
+            if self.current_file_id > 0:
+                self.current_file_id -= 1
+            elif self.current_file_id == 0:
+                self.current_file_id = len(self.container_lists[var_filetype]["Short"]) - 1
+
+            self.currest_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
+            self.lbl_01a.configure(text=self.currest_file_spk)
+
+        self.show_spike_data()
+
 ########################################################################################################################
 # MELT INCLUSION ANALYSIS ##############################################################################################
 ########################################################################################################################
