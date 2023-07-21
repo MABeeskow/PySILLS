@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, font
 import numpy as np
 from modules.gui_elements import SimpleElements as SE
-from modules.spike_elimination import SpikeElimination, GrubbsTestSILLS, GrubbsTest
+from modules.spike_elimination import GrubbsTestSILLS, GrubbsTest
 from modules.essential_functions import EssentialsSRM as ESRM
 from modules.essential_functions import Essentials as ES
 from modules.chemistry import PeriodicSystemOfElements as PSE
@@ -635,8 +635,8 @@ class PySILLS(tk.Frame):
         self.container_var["Gas Energy"] = tk.StringVar()
         self.container_var["Gas Energy"].set("15.760")
         self.container_var["Spike Elimination Method"] = tk.StringVar()
-        self.container_var["Spike Elimination Method"].set("Grubbs-Test (SILLS)")
-        self.list_se_methods = ["Grubbs-Test (SILLS)", "Grubbs-Test"]
+        self.container_var["Spike Elimination Method"].set("Grubbs-Test")
+        self.list_se_methods = ["Grubbs-Test", "Grubbs-Test (SILLS)"]
         self.list_isotopes = []
         self.srm_actual = {}
         self.container_files = {}
@@ -1178,197 +1178,197 @@ class PySILLS(tk.Frame):
         # when all widgets are in canvas
         var_cnv.configure(scrollregion=var_cnv.bbox("all"))
     #
-    def change_rb_spike(self, var_rb, start_row=0, start_col=21):
-        if var_rb.get() == 0:   # Grubbs Test
-            ## Cleaning
-            categories = ["Label", "Entry", "Button", "Frame"]
-            for category in categories:
-                if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
-                    for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
-                        gui_item.grid_remove()
-                    self.gui_elements["ma_setting"][category]["Specific"].clear()
-            #
-            ## Labels
-            lb_spk_01 = SE(
-                parent=self.parent, row_id=start_row + 26, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Significance Level", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lb_spk_02 = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lb_spk_03 = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lb_spk_04 = SE(
-                parent=self.parent, row_id=start_row + 27, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Threshold", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.container_elements["ma_setting"]["Label"].extend([lb_spk_01, lb_spk_02, lb_spk_03, lb_spk_04])
-            self.gui_elements["ma_setting"]["Label"]["Specific"].extend([lb_spk_01, lb_spk_02, lb_spk_03, lb_spk_04])
-            #
-            ## Entries
-            entr_01 = SE(
-                parent=self.parent, row_id=start_row + 26, column_id=start_col + 8, n_rows=1,
-                n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=self.container_var["settings"]["SE Alpha"], text_default="0.05",
-                command=lambda event, var_entry=self.container_var["settings"]["SE Alpha"]:
-                self.update_significance_level(var_entry, event))
-            #
-            self.container_var["settings"]["SE Threshold"] = tk.StringVar()
-            #
-            entr_02 = SE(
-                parent=self.parent, row_id=start_row + 27, column_id=start_col + 8, n_rows=1,
-                n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=self.container_var["settings"]["SE Threshold"], text_default="1000",
-                command=lambda event, var=self.container_var["settings"]["SE Threshold"], category_01="MA",
-                               category_02="Threshold": self.set_entry_value(var, category_01, category_02, event))
-            #
-            self.container_elements["ma_setting"]["Entry"].extend([entr_01, entr_02])
-            self.gui_elements["ma_setting"]["Entry"]["Specific"].extend([entr_01, entr_02])
-            #
-            ## Buttons
-            btn_std_01 = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col + 8, n_rows=1,
-                n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-                command=lambda filetype="STD", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
-            btn_std_02 = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col + 13, n_rows=1,
-                n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Check", bg_active=self.red_dark, fg_active=self.green_dark,
-                command=lambda filetype="STD": SpikeElimination(
-                    container_lists=self.container_lists,
-                    gui_elements=self.gui_elements,
-                    container_spikes=self.container_spikes).spike_elimination_check(filetype))
-            btn_smpl_01 = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col + 8, n_rows=1,
-                n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-                command=lambda filetype="SMPL", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
-            btn_smpl_02 = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col + 13, n_rows=1,
-                n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Check", bg_active=self.red_dark, fg_active=self.green_dark,
-                command=lambda filetype="SMPL": SpikeElimination(
-                    container_lists=self.container_lists,
-                    gui_elements=self.gui_elements,
-                    container_spikes=self.container_spikes).spike_elimination_check(filetype))
-            btn_confirmall_spk = SE(
-                parent=self.parent, row_id=start_row + 30, column_id=start_col + 8, n_rows=1,
-                n_columns=9, fg=self.green_dark, bg=self.yellow_dark).create_simple_button(
-                text="Confirm All Spikes", bg_active=self.yellow_dark, fg_active=self.green_dark,
-                command=self.confirm_all_spikes)
-            #
-            self.container_elements["ma_setting"]["Button"].extend(
-                [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
-            self.gui_elements["ma_setting"]["Button"]["Specific"].extend(
-                [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
-            #
-            ## Frames
-            frm_std = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col + 16, n_rows=1, n_columns=1,
-                fg=self.green_light, bg=self.sign_red).create_frame()
-            frm_smpl = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col + 16, n_rows=1, n_columns=1,
-                fg=self.green_light, bg=self.sign_red).create_frame()
-            #
-            self.container_elements["ma_setting"]["Frame"].extend([frm_std, frm_smpl])
-            self.gui_elements["ma_setting"]["Frame"]["Specific"].extend([frm_std, frm_smpl])
-        #
-        elif var_rb.get() == 1: # Pointwise Test
-            ## Cleaning
-            categories = ["Label", "Entry", "Button", "Frame"]
-            for category in categories:
-                if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
-                    for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
-                        gui_item.grid_remove()
-                    self.gui_elements["ma_setting"][category]["Specific"].clear()
-            #
-            ## Labels
-            lbl_ma_setting_11 = SE(
-                parent=self.parent, row_id=start_row + 26, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Deviation", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_ma_setting_12 = SE(
-                parent=self.parent, row_id=start_row + 27, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Threshold", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_ma_setting_13 = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_ma_setting_14 = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col, n_rows=1,
-                n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-                text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_setting"]["Label"]["Specific"].extend(
-                [lbl_ma_setting_11, lbl_ma_setting_12, lbl_ma_setting_13, lbl_ma_setting_14])
-            #
-            ## Entries
-            var_entr_05 = tk.StringVar()
-            self.container_var["settings"]["SE Deviation"] = var_entr_05
-            #
-            entr_05 = SE(
-                parent=self.parent, row_id=start_row + 26, column_id=start_col + 8, n_rows=1,
-                n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=var_entr_05, text_default="10",
-                command=lambda event, var=var_entr_05, category_01="MA", category_02="Deviation":
-                self.set_entry_value(var, category_01, category_02, event))
-            #
-            var_entr_06 = tk.StringVar()
-            self.container_var["settings"]["SE Threshold"] = var_entr_06
-            #
-            entr_06 = SE(
-                parent=self.parent, row_id=start_row + 27, column_id=start_col + 8, n_rows=1,
-                n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=var_entr_06, text_default="1000",
-                command=lambda event, var=var_entr_06, category_01="MA", category_02="Threshold":
-                self.set_entry_value(var, category_01, category_02, event))
-            #
-            self.gui_elements["ma_setting"]["Entry"]["Specific"].extend(
-                [entr_05, entr_06])
-            #
-            ## Buttons
-            btn_std_01 = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col + 8, n_rows=1,
-                n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-                command=lambda filetype="STD": self.fast_track(filetype))
-            btn_std_02 = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col + 13, n_rows=1,
-                n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Check", bg_active=self.red_dark, fg_active=self.green_dark)
-            btn_smpl_01 = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col + 8, n_rows=1,
-                n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-                command=lambda filetype="SMPL": self.fast_track(filetype))
-            btn_smpl_02 = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col + 13, n_rows=1,
-                n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-                text="Check", bg_active=self.red_dark, fg_active=self.green_dark)
-            btn_confirmall_spk = SE(
-                parent=self.parent, row_id=start_row + 30, column_id=start_col + 8, n_rows=1,
-                n_columns=9, fg=self.green_dark, bg=self.yellow_dark).create_simple_button(
-                text="Confirm All Spikes", bg_active=self.yellow_dark, fg_active=self.green_dark,
-                command=self.confirm_all_spikes)
-            #
-            self.gui_elements["ma_setting"]["Button"]["Specific"].extend(
-                [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
-            #
-            ## Frames
-            frm_std = SE(
-                parent=self.parent, row_id=start_row + 28, column_id=start_col + 16, n_rows=1, n_columns=1,
-                fg=self.green_light, bg=self.sign_red).create_frame()
-            frm_smpl = SE(
-                parent=self.parent, row_id=start_row + 29, column_id=start_col + 16, n_rows=1, n_columns=1,
-                fg=self.green_light, bg=self.sign_red).create_frame()
-            #
-            self.gui_elements["ma_setting"]["Frame"]["Specific"].extend([frm_std, frm_smpl])
+    # def change_rb_spike(self, var_rb, start_row=0, start_col=21):
+    #     if var_rb.get() == 0:   # Grubbs Test
+    #         ## Cleaning
+    #         categories = ["Label", "Entry", "Button", "Frame"]
+    #         for category in categories:
+    #             if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
+    #                 for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
+    #                     gui_item.grid_remove()
+    #                 self.gui_elements["ma_setting"][category]["Specific"].clear()
+    #         #
+    #         ## Labels
+    #         lb_spk_01 = SE(
+    #             parent=self.parent, row_id=start_row + 26, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Significance Level", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lb_spk_02 = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lb_spk_03 = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lb_spk_04 = SE(
+    #             parent=self.parent, row_id=start_row + 27, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Threshold", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         #
+    #         self.container_elements["ma_setting"]["Label"].extend([lb_spk_01, lb_spk_02, lb_spk_03, lb_spk_04])
+    #         self.gui_elements["ma_setting"]["Label"]["Specific"].extend([lb_spk_01, lb_spk_02, lb_spk_03, lb_spk_04])
+    #         #
+    #         ## Entries
+    #         entr_01 = SE(
+    #             parent=self.parent, row_id=start_row + 26, column_id=start_col + 8, n_rows=1,
+    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #             var=self.container_var["settings"]["SE Alpha"], text_default="0.05",
+    #             command=lambda event, var_entry=self.container_var["settings"]["SE Alpha"]:
+    #             self.update_significance_level(var_entry, event))
+    #         #
+    #         self.container_var["settings"]["SE Threshold"] = tk.StringVar()
+    #         #
+    #         entr_02 = SE(
+    #             parent=self.parent, row_id=start_row + 27, column_id=start_col + 8, n_rows=1,
+    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #             var=self.container_var["settings"]["SE Threshold"], text_default="1000",
+    #             command=lambda event, var=self.container_var["settings"]["SE Threshold"], category_01="MA",
+    #                            category_02="Threshold": self.set_entry_value(var, category_01, category_02, event))
+    #         #
+    #         self.container_elements["ma_setting"]["Entry"].extend([entr_01, entr_02])
+    #         self.gui_elements["ma_setting"]["Entry"]["Specific"].extend([entr_01, entr_02])
+    #         #
+    #         ## Buttons
+    #         btn_std_01 = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 8, n_rows=1,
+    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
+    #             command=lambda filetype="STD", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
+    #         btn_std_02 = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 13, n_rows=1,
+    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark,
+    #             command=lambda filetype="STD": SpikeElimination(
+    #                 container_lists=self.container_lists,
+    #                 gui_elements=self.gui_elements,
+    #                 container_spikes=self.container_spikes).spike_elimination_check(filetype))
+    #         btn_smpl_01 = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 8, n_rows=1,
+    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
+    #             command=lambda filetype="SMPL", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
+    #         btn_smpl_02 = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 13, n_rows=1,
+    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark,
+    #             command=lambda filetype="SMPL": SpikeElimination(
+    #                 container_lists=self.container_lists,
+    #                 gui_elements=self.gui_elements,
+    #                 container_spikes=self.container_spikes).spike_elimination_check(filetype))
+    #         btn_confirmall_spk = SE(
+    #             parent=self.parent, row_id=start_row + 30, column_id=start_col + 8, n_rows=1,
+    #             n_columns=9, fg=self.green_dark, bg=self.yellow_dark).create_simple_button(
+    #             text="Confirm All Spikes", bg_active=self.yellow_dark, fg_active=self.green_dark,
+    #             command=self.confirm_all_spikes)
+    #         #
+    #         self.container_elements["ma_setting"]["Button"].extend(
+    #             [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
+    #         self.gui_elements["ma_setting"]["Button"]["Specific"].extend(
+    #             [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
+    #         #
+    #         ## Frames
+    #         frm_std = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 16, n_rows=1, n_columns=1,
+    #             fg=self.green_light, bg=self.sign_red).create_frame()
+    #         frm_smpl = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 16, n_rows=1, n_columns=1,
+    #             fg=self.green_light, bg=self.sign_red).create_frame()
+    #         #
+    #         self.container_elements["ma_setting"]["Frame"].extend([frm_std, frm_smpl])
+    #         self.gui_elements["ma_setting"]["Frame"]["Specific"].extend([frm_std, frm_smpl])
+    #     #
+    #     elif var_rb.get() == 1: # Pointwise Test
+    #         ## Cleaning
+    #         categories = ["Label", "Entry", "Button", "Frame"]
+    #         for category in categories:
+    #             if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
+    #                 for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
+    #                     gui_item.grid_remove()
+    #                 self.gui_elements["ma_setting"][category]["Specific"].clear()
+    #         #
+    #         ## Labels
+    #         lbl_ma_setting_11 = SE(
+    #             parent=self.parent, row_id=start_row + 26, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Deviation", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_ma_setting_12 = SE(
+    #             parent=self.parent, row_id=start_row + 27, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Threshold", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_ma_setting_13 = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_ma_setting_14 = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col, n_rows=1,
+    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #             text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         #
+    #         self.gui_elements["ma_setting"]["Label"]["Specific"].extend(
+    #             [lbl_ma_setting_11, lbl_ma_setting_12, lbl_ma_setting_13, lbl_ma_setting_14])
+    #         #
+    #         ## Entries
+    #         var_entr_05 = tk.StringVar()
+    #         self.container_var["settings"]["SE Deviation"] = var_entr_05
+    #         #
+    #         entr_05 = SE(
+    #             parent=self.parent, row_id=start_row + 26, column_id=start_col + 8, n_rows=1,
+    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #             var=var_entr_05, text_default="10",
+    #             command=lambda event, var=var_entr_05, category_01="MA", category_02="Deviation":
+    #             self.set_entry_value(var, category_01, category_02, event))
+    #         #
+    #         var_entr_06 = tk.StringVar()
+    #         self.container_var["settings"]["SE Threshold"] = var_entr_06
+    #         #
+    #         entr_06 = SE(
+    #             parent=self.parent, row_id=start_row + 27, column_id=start_col + 8, n_rows=1,
+    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #             var=var_entr_06, text_default="1000",
+    #             command=lambda event, var=var_entr_06, category_01="MA", category_02="Threshold":
+    #             self.set_entry_value(var, category_01, category_02, event))
+    #         #
+    #         self.gui_elements["ma_setting"]["Entry"]["Specific"].extend(
+    #             [entr_05, entr_06])
+    #         #
+    #         ## Buttons
+    #         btn_std_01 = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 8, n_rows=1,
+    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
+    #             command=lambda filetype="STD": self.fast_track(filetype))
+    #         btn_std_02 = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 13, n_rows=1,
+    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark)
+    #         btn_smpl_01 = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 8, n_rows=1,
+    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
+    #             command=lambda filetype="SMPL": self.fast_track(filetype))
+    #         btn_smpl_02 = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 13, n_rows=1,
+    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
+    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark)
+    #         btn_confirmall_spk = SE(
+    #             parent=self.parent, row_id=start_row + 30, column_id=start_col + 8, n_rows=1,
+    #             n_columns=9, fg=self.green_dark, bg=self.yellow_dark).create_simple_button(
+    #             text="Confirm All Spikes", bg_active=self.yellow_dark, fg_active=self.green_dark,
+    #             command=self.confirm_all_spikes)
+    #         #
+    #         self.gui_elements["ma_setting"]["Button"]["Specific"].extend(
+    #             [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
+    #         #
+    #         ## Frames
+    #         frm_std = SE(
+    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 16, n_rows=1, n_columns=1,
+    #             fg=self.green_light, bg=self.sign_red).create_frame()
+    #         frm_smpl = SE(
+    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 16, n_rows=1, n_columns=1,
+    #             fg=self.green_light, bg=self.sign_red).create_frame()
+    #         #
+    #         self.gui_elements["ma_setting"]["Frame"]["Specific"].extend([frm_std, frm_smpl])
     #
     def confirm_all_spikes(self, file_loaded=False):
         container_interval = {"BG": [], "SIG": [], "MAT": [], "INCL": []}
@@ -7132,6 +7132,8 @@ class PySILLS(tk.Frame):
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
+            # elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (alternative)":
+            #     var_method = 2
         elif self.pysills_mode == "FI":
             var_alpha = float(self.container_var["fi_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["fi_setting"]["SE Threshold"].get())
@@ -7139,6 +7141,8 @@ class PySILLS(tk.Frame):
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
+            # elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (alternative)":
+            #     var_method = 2
         elif self.pysills_mode == "MI":
             var_alpha = float(self.container_var["mi_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["mi_setting"]["SE Threshold"].get())
@@ -7146,6 +7150,8 @@ class PySILLS(tk.Frame):
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
+            # elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (alternative)":
+            #     var_method = 2
         #
         if filetype == "STD":
             for file_std in self.container_lists["STD"]["Short"]:
@@ -7179,11 +7185,15 @@ class PySILLS(tk.Frame):
                                                 raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
                                                 start_index=interval[0],
                                                 dataset_complete=dataset_complete).determine_outlier()
+                                        # elif var_method == 1:
+                                        #     data_smoothed, indices_outl = GrubbsTest(
+                                        #         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                        #         start_index=interval[0],
+                                        #         dataset_complete=dataset_complete).determine_outlier()
                                         elif var_method == 1:
-                                            data_smoothed, indices_outl = GrubbsTest(
-                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                                start_index=interval[0],
-                                                dataset_complete=dataset_complete).determine_outlier()
+                                            data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                alpha=var_alpha, dataset_complete=dataset_complete,
+                                                threshold=var_threshold)
 
                                         self.container_measurements["EDITED"][file_std][isotope][
                                             "Uncut"] = data_smoothed
@@ -7245,11 +7255,15 @@ class PySILLS(tk.Frame):
                                                 raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
                                                 start_index=interval[0],
                                                 dataset_complete=dataset_complete).determine_outlier()
+                                        # elif var_method == 1:
+                                        #     data_smoothed, indices_outl = GrubbsTest(
+                                        #         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                        #         start_index=interval[0],
+                                        #         dataset_complete=dataset_complete).determine_outlier()
                                         elif var_method == 1:
-                                            data_smoothed, indices_outl = GrubbsTest(
-                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                                start_index=interval[0],
-                                                dataset_complete=dataset_complete).determine_outlier()
+                                            data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                alpha=var_alpha, dataset_complete=dataset_complete,
+                                                threshold=var_threshold)
                                         #
                                         if self.pysills_mode == "FI":
                                             if self.container_var["fi_setting"]["Spike Elimination Inclusion"].get() == 2:
@@ -25653,8 +25667,8 @@ class PySILLS(tk.Frame):
         self.current_original_value = 0
         self.current_suggested_value = 0
         self.current_current_value = 0
-        self.current_isotope = self.container_lists["ISOTOPES"][0]
         self.current_nspikes = 0
+        list_spk_isotopes = self.check_spikes_isotope()
 
         ## FRAMES
         frm_smpl = SE(
@@ -25731,46 +25745,53 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Next": self.change_file_spk(mode))
-        btn_05a1 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Original value", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda mode="RAW": self.replace_spike_value(mode))
-        btn_05a2 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column + 6, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Smoothed value", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda mode="SMOOTHED": self.replace_spike_value(mode))
+        if len(list_spk_isotopes) > 0:
+            btn_05a1 = SE(
+                parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column, n_rows=1, n_columns=6,
+                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Original value", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda mode="RAW": self.replace_spike_value(mode))
+            btn_05a2 = SE(
+                parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column + 6, n_rows=1,
+                n_columns=6, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Smoothed value", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda mode="SMOOTHED": self.replace_spike_value(mode))
 
         ## SCALES
-        self.scl_01 = tk.Scale(
-            self.subwindow_spike_check, from_=1, to=10, tickinterval=1, orient=tk.HORIZONTAL,
-            background=self.bg_colors["Light"], foreground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, troughcolor=self.bg_colors["Dark"], highlightthickness=0,
-            command=self.change_spk_id)
-        self.scl_01.grid(row=start_row + 7, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
+        if len(list_spk_isotopes) > 0:
+            self.scl_01 = tk.Scale(
+                self.subwindow_spike_check, from_=1, to=10, tickinterval=1, orient=tk.HORIZONTAL,
+                background=self.bg_colors["Light"], foreground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, troughcolor=self.bg_colors["Dark"], highlightthickness=0,
+                command=self.change_spk_id)
+            self.scl_01.grid(row=start_row + 7, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
 
         ## OPTION MENUS
         self.var_opt_spk_iso = tk.StringVar()
         self.var_opt_spk_iso.set("Select isotope")
+        if len(list_spk_isotopes) > 0:
+            self.current_isotope = list_spk_isotopes[0]
+        else:
+            self.current_isotope = "No isotope"
         var_opt_is_default = self.current_isotope
-        list_spk_isotopes = self.check_spikes_isotope()
 
-        self.opt_02a = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=12,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.var_opt_spk_iso, option_list=list_spk_isotopes, text_set=var_opt_is_default,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt_iso=self.var_opt_spk_iso: self.change_spk_isotope(var_opt_iso))
-        self.opt_02a["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        self.opt_02a.config(
-            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+        if len(list_spk_isotopes) > 0:
+            self.opt_02a = SE(
+                parent=self.subwindow_spike_check, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=12,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=self.var_opt_spk_iso, option_list=list_spk_isotopes, text_set=var_opt_is_default,
+                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                command=lambda var_opt_iso=self.var_opt_spk_iso: self.change_spk_isotope(var_opt_iso))
+            self.opt_02a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            self.opt_02a.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
         ## INITIALIZATION
-        self.show_spike_data()
+        if len(list_spk_isotopes) > 0:
+            self.show_spike_data()
 
     def check_spikes_isotope(self):
         var_file = self.currest_file_spk
@@ -25787,7 +25808,16 @@ class PySILLS(tk.Frame):
         var_isotope = self.var_opt_spk_iso.get()
         var_file = self.currest_file_spk
         self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
-        self.scl_01.configure(to=len(self.list_indices))
+        if len(self.list_indices) < 16:
+            n_ticks = 1
+        else:
+            if len(self.list_indices) < 31:
+                n_ticks = 2
+            elif len(self.list_indices) < 51:
+                n_ticks = 5
+            else:
+                n_ticks = 8
+        self.scl_01.configure(to=len(self.list_indices), tickinterval=n_ticks)
         self.current_nspikes = len(self.list_indices)
         self.lbl_04a2.configure(text=self.current_nspikes)
 
@@ -25879,18 +25909,23 @@ class PySILLS(tk.Frame):
             self.lbl_01a.configure(text=self.currest_file_spk)
 
         possible_spk_isotopes = self.check_spikes_isotope()
-        self.var_opt_spk_iso.set(possible_spk_isotopes[0])
-        self.current_isotope = possible_spk_isotopes[0]
-        self.scl_01.set(1)
+        if len(possible_spk_isotopes) > 0:
+            self.var_opt_spk_iso.set(possible_spk_isotopes[0])
+            self.current_isotope = possible_spk_isotopes[0]
+        else:
+            self.var_opt_spk_iso.set("No isotope")
+            self.current_isotope = "No isotope"
+        if len(possible_spk_isotopes) > 0:
+            self.scl_01.set(1)
 
-        for index, isotope in enumerate(possible_spk_isotopes):
-            if index == 0:
-                self.opt_02a["menu"].delete(0, "end")
-            #
-            self.opt_02a["menu"].add_command(
-                label=isotope, command=lambda var_opt_iso=isotope: self.change_spk_isotope(var_opt_iso))
+            for index, isotope in enumerate(possible_spk_isotopes):
+                if index == 0:
+                    self.opt_02a["menu"].delete(0, "end")
+                #
+                self.opt_02a["menu"].add_command(
+                    label=isotope, command=lambda var_opt_iso=isotope: self.change_spk_isotope(var_opt_iso))
 
-        self.show_spike_data()
+            self.show_spike_data()
 
     def replace_spike_value(self, mode):
         current_id = self.scl_01.get()
@@ -25953,7 +25988,11 @@ class PySILLS(tk.Frame):
         self.ax_spikes.set_yscale("log")
         self.ax_spikes.set_xlim(left=0, right=x_max)
         self.ax_spikes.set_xticks(np.arange(0, x_max, 20))
-        self.ax_spikes.set_ylim(bottom=0.1*y_min, top=1.5*y_max)
+        if abs(0.1*y_min) > 0:
+            y_min_log = abs(0.1*y_min)
+        else:
+            y_min_log = 1*10**(1)
+        self.ax_spikes.set_ylim(bottom=y_min_log, top=1.5*y_max)
         self.ax_spikes.grid(which="major", linestyle="-", linewidth=1)
         self.ax_spikes.minorticks_on()
         self.ax_spikes.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)

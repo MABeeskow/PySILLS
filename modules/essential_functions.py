@@ -3,7 +3,7 @@
 # ----------------------
 # essential_functions.py
 # Maximilian Beeskow
-# 20.12.2023
+# 21.07.2023
 # ----------------------
 #
 ## MODULES
@@ -14,6 +14,7 @@ import numpy as np
 from modules import data
 import tkinter.filedialog as fd
 from outliers import smirnov_grubbs
+from modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
 #
 ## CLASSES
 #
@@ -137,11 +138,17 @@ class Essentials:
     def do_grubbs_test(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
         dataset = self.variable
         #
-        outlier_indices = smirnov_grubbs.two_sided_test_indices(data=dataset, alpha=alpha)
+        outlier_indices_pre = two_sided_test_indices(data=dataset, alpha=alpha)
+        outlier_values_pre = two_sided_test_outliers(data=dataset, alpha=alpha)
+        outlier_indices = []
+        for index, value in enumerate(outlier_values_pre):
+            if value > threshold:
+                outlier_indices.append(outlier_indices_pre[index])
+        outlier_indices.sort()
         #
         data_smoothed = []
         for index, value in enumerate(dataset_complete):
-            if value >= int(threshold):
+            if value > threshold:
                 if index in outlier_indices:
                     if index >= 3:
                         lower_limit = index - 3
@@ -161,8 +168,10 @@ class Essentials:
                     elif index < len(dataset_complete) - 1:
                         upper_limit = index
 
-                    upper_limit = index + 2
-                    value_corrected = np.mean(dataset_complete[lower_limit:upper_limit])
+                    average_dataset = dataset_complete[lower_limit:upper_limit]
+                    var_index = average_dataset.index(value)
+                    value_popped = average_dataset.pop(var_index)
+                    value_corrected = np.mean(average_dataset)
                     data_smoothed.append(value_corrected)
                 else:
                     data_smoothed.append(value)
