@@ -8476,14 +8476,29 @@ class PySILLS(tk.Frame):
             #
             ## Save information about 'Spike Elimination'
             save_file.write("SPIKE ELIMINATION" + "\n")
-            #
+
             info_std_state = self.container_var["Spike Elimination"]["STD"]["State"]
             info_smpl_state = self.container_var["Spike Elimination"]["SMPL"]["State"]
-            #
-            str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state)
-            #
+            info_method = self.container_var["Spike Elimination Method"].get()
+            info_alpha = self.container_var["ma_setting"]["SE Alpha"].get()
+            info_threshold = self.container_var["ma_setting"]["SE Threshold"].get()
+
+            str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";" \
+                        + str(info_method) + ";" + str(info_alpha) + ";" + str(info_threshold) + "\n"
+
             save_file.write(str_spike)
-            #
+
+            for var_file, dataset_isotopes in self.container_spike_values.items():
+                str_spike_file = var_file + "\n"
+                save_file.write(str_spike_file)
+                for var_isotope, dataset_values in dataset_isotopes.items():
+                    str_spike_isotope = str(var_isotope) + ";"
+                    for var_id, val_id in dataset_values["Save"].items():
+                        str_spike_isotope += str(var_id) + ";" + str(val_id) + ";"
+                    str_spike_isotope = str_spike_isotope[:-1]
+                    str_spike_isotope += "\n"
+                    save_file.write(str_spike_isotope)
+
         elif self.pysills_mode == "FI":
             save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
             #
@@ -8694,16 +8709,31 @@ class PySILLS(tk.Frame):
             #
             ## Save information about 'Spike Elimination'
             save_file.write("SPIKE ELIMINATION" + "\n")
-            #
+
             info_std_state = self.container_var["Spike Elimination"]["STD"]["State"]
             info_smpl_state = self.container_var["Spike Elimination"]["SMPL"]["State"]
             info_inclusion_consideration = self.container_var["fi_setting"]["Spike Elimination Inclusion"].get()
-            #
+            info_method = self.container_var["Spike Elimination Method"].get()
+            info_alpha = self.container_var["fi_setting"]["SE Alpha"].get()
+            info_threshold = self.container_var["fi_setting"]["SE Threshold"].get()
+
             str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";" \
-                        + str(info_inclusion_consideration)
-            #
+                        + str(info_inclusion_consideration) + str(info_method) + ";" + str(info_alpha) + ";" \
+                        + str(info_threshold) + "\n"
+
             save_file.write(str_spike)
-            #
+
+            for var_file, dataset_isotopes in self.container_spike_values.items():
+                str_spike_file = var_file + "\n"
+                save_file.write(str_spike_file)
+                for var_isotope, dataset_values in dataset_isotopes.items():
+                    str_spike_isotope = str(var_isotope) + ";"
+                    for var_id, val_id in dataset_values["Save"].items():
+                        str_spike_isotope += str(var_id) + ";" + str(val_id) + ";"
+                    str_spike_isotope = str_spike_isotope[:-1]
+                    str_spike_isotope += "\n"
+                    save_file.write(str_spike_isotope)
+
         elif self.pysills_mode == "MI":
             pass
         #
@@ -8887,14 +8917,35 @@ class PySILLS(tk.Frame):
                                 "Indices"] = [int(key_indices.group(1)), int(key_indices.group(3))]
                     #
                 ## SPIKE ELIMINATION
+                index = 0
                 for i in range(index_container["SPIKE ELIMINATION"] + 1,
-                               index_container["END"] - 1):
+                               index_container["END"] - 2):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
                     #
-                    self.container_var["Spike Elimination"]["STD"]["State"] = bool(splitted_std[1])
-                    self.container_var["Spike Elimination"]["SMPL"]["State"] = bool(splitted_std[3])
-                #
+                    if index == 0:
+                        self.container_var["Spike Elimination"]["STD"]["State"] = bool(splitted_std[1])
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] = bool(splitted_std[3])
+                        self.container_var["Spike Elimination Method"].set(splitted_std[4])
+                        self.container_var["ma_setting"]["SE Alpha"].set(splitted_std[5])
+                        self.container_var["ma_setting"]["SE Threshold"].set(int(splitted_std[6]))
+                        index += 1
+                    else:
+                        if len(splitted_std) == 1:
+                            var_file = splitted_std[0]
+                            if var_file not in self.container_spike_values:
+                                self.container_spike_values[var_file] = {}
+                        if len(splitted_std) > 1:
+                            var_isotope = splitted_std[0]
+                            list_values = splitted_std[1:]
+                            if var_isotope not in self.container_spike_values[var_file]:
+                                self.container_spike_values[var_file][var_isotope] = {
+                                    "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+                            for var_index in range(0, len(list_values), 2):
+                                var_id = int(list_values[var_index])
+                                val_id = float(list_values[var_index + 1])
+                                self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+
             elif self.pysills_mode == "FI":
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
@@ -9152,15 +9203,35 @@ class PySILLS(tk.Frame):
                             self.container_helper[var_filetype][var_file_short]["INCL"]["Content"])
                 #
                 ## SPIKE ELIMINATION
-                for i in range(index_container["SPIKE ELIMINATION"] + 1,
-                               index_container["END"] - 1):
+                index = 0
+                for i in range(index_container["SPIKE ELIMINATION"] + 1, index_container["END"] - 1):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
-                    #
-                    self.container_var["Spike Elimination"]["STD"]["State"] = bool(splitted_std[1])
-                    self.container_var["Spike Elimination"]["SMPL"]["State"] = bool(splitted_std[3])
-                    self.container_var["fi_setting"]["Spike Elimination Inclusion"].set(splitted_std[4])
-                #
+
+                    if index == 0:
+                        self.container_var["Spike Elimination"]["STD"]["State"] = bool(splitted_std[1])
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] = bool(splitted_std[3])
+                        self.container_var["fi_setting"]["Spike Elimination Inclusion"].set(splitted_std[4])
+                        self.container_var["Spike Elimination Method"].set(splitted_std[5])
+                        self.container_var["fi_setting"]["SE Alpha"].set(splitted_std[6])
+                        self.container_var["fi_setting"]["SE Threshold"].set(int(splitted_std[7]))
+                        index += 1
+                    else:
+                        if len(splitted_std) == 1:
+                            var_file = splitted_std[0]
+                            if var_file not in self.container_spike_values:
+                                self.container_spike_values[var_file] = {}
+                        if len(splitted_std) > 1:
+                            var_isotope = splitted_std[0]
+                            list_values = splitted_std[1:]
+                            if var_isotope not in self.container_spike_values[var_file]:
+                                self.container_spike_values[var_file][var_isotope] = {
+                                    "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+                            for var_index in range(0, len(list_values), 2):
+                                var_id = int(list_values[var_index])
+                                val_id = float(list_values[var_index + 1])
+                                self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+
             elif self.pysills_mode == "MI":
                 pass
             #
@@ -25791,10 +25862,14 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         if len(list_spk_isotopes) > 0:
-            self.show_spike_data()
+            self.show_spike_data(mode=mode)
 
-    def check_spikes_isotope(self):
-        var_file = self.currest_file_spk
+    def check_spikes_isotope(self, var_file=None):
+        if var_file == None:
+            var_file = self.currest_file_spk
+        else:
+            var_file = var_file
+
         helper_list = []
 
         for var_isotope in self.container_lists["ISOTOPES"]:
@@ -25804,7 +25879,7 @@ class PySILLS(tk.Frame):
 
         return helper_list
 
-    def show_spike_data(self):
+    def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
         var_file = self.currest_file_spk
         self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
@@ -25832,13 +25907,26 @@ class PySILLS(tk.Frame):
         if var_file not in self.container_spike_values:
             self.container_spike_values[var_file] = {}
         if var_isotope not in self.container_spike_values[var_file]:
-            self.container_spike_values[var_file][var_isotope] = {"RAW": [], "SMOOTHED": [], "Current": []}
+            self.container_spike_values[var_file][var_isotope] = {"RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
         if self.current_original_value not in self.container_spike_values[var_file][var_isotope]["RAW"]:
             self.container_spike_values[var_file][var_isotope]["RAW"].append(self.current_original_value)
         if self.current_suggested_value not in self.container_spike_values[var_file][var_isotope]["SMOOTHED"]:
             self.container_spike_values[var_file][var_isotope]["SMOOTHED"].append(self.current_suggested_value)
         if self.current_suggested_value not in self.container_spike_values[var_file][var_isotope]["Current"]:
             self.container_spike_values[var_file][var_isotope]["Current"].append(self.current_current_value)
+
+        if mode != None:
+            for var_file in self.container_lists[mode]["Short"]:
+                if var_file not in self.container_spike_values:
+                    self.container_spike_values[var_file] = {}
+                list_spk_isotopes = self.check_spikes_isotope(var_file=var_file)
+                for var_isotope in list_spk_isotopes:
+                    if var_isotope not in self.container_spike_values[var_file]:
+                        self.container_spike_values[var_file][var_isotope] = {
+                            "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+                    for var_id in self.container_spikes[var_file][var_isotope]["Indices"]:
+                        val_id = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id]
+                        self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
 
         self.show_spike_diagram()
 
@@ -25943,6 +26031,7 @@ class PySILLS(tk.Frame):
         self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real] = val_updated
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
         self.lbl_03c.configure(text=val_updated)
+        self.container_spike_values[var_file][var_isotope]["Save"][var_id_real] = val_updated
 
         self.show_spike_diagram()
 
