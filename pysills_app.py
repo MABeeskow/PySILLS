@@ -17690,7 +17690,6 @@ class PySILLS(tk.Frame):
                         self.ma_get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
                             var_file_long=file_std)
-                        #list_valid_std.append(file_std_short)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         #
@@ -17729,22 +17728,23 @@ class PySILLS(tk.Frame):
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            if var_filetype == "STD":
-                                var_srm_file = self.container_var["SRM"][var_file_long].get()
-                                if var_srm_i == var_srm_file:
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                if var_filetype == "STD":
+                                    var_srm_file = self.container_var["SRM"][var_file_long].get()
+                                    if var_srm_i == var_srm_file:
+                                        self.ma_get_analytical_sensitivity(
+                                            var_filetype=var_filetype, var_datatype=var_datatype,
+                                            var_file_short=var_file_short, var_file_long=var_file_long)
+                                        var_result_i = self.container_analytical_sensitivity[var_filetype][
+                                            var_datatype][var_file_short][var_focus][isotope]
+                                        helper_results.append(var_result_i)
+                                else:
                                     self.ma_get_analytical_sensitivity(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_file_long=var_file_long)
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
                                     var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                         var_file_short][var_focus][isotope]
                                     helper_results.append(var_result_i)
-                            else:
-                                self.ma_get_analytical_sensitivity(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_file_long=var_file_long)
-                                var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
                             #
                         var_result_i = np.mean(helper_results)
                         self.container_analytical_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
@@ -19928,6 +19928,7 @@ class PySILLS(tk.Frame):
     def fi_get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
         if mode == "Specific":
             if var_filetype == "STD":
+                var_srm_file = self.container_var["SRM"][var_file_long].get()
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 var_srm_is = self.container_var["SRM"][var_is].get()
                 #
@@ -19940,17 +19941,17 @@ class PySILLS(tk.Frame):
                 #
                 for isotope in self.container_lists["ISOTOPES"]:
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    #
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    var_concentration_i = self.srm_actual[var_srm_i][element]
-                    #
-                    var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                        "MAT"][isotope]
-                    #
-                    var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
-                    self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                        isotope] = var_result_i
+                    if var_srm_i == var_srm_file:
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        var_concentration_i = self.srm_actual[var_srm_i][element]
+
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+
+                        var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                        self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
                 #
             else:
                 self.calculate_acquisition_time_deltas()
@@ -19959,24 +19960,27 @@ class PySILLS(tk.Frame):
                 list_valid_std = []
                 #
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
+                    var_srm_file = self.container_var["SRM"][file_std].get()
                     file_std_short = self.container_lists["STD"]["Short"][index]
                     #
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.fi_get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
                             var_file_long=file_std)
-                        list_valid_std.append(file_std_short)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            if isotope not in xi_opt:
-                                xi_opt[isotope] = []
-                            #
-                            sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
-                                file_std_short]["MAT"][isotope]
-                            #
-                            xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_i == var_srm_file:
+                                list_valid_std.append(file_std_short)
+                                if isotope not in xi_opt:
+                                    xi_opt[isotope] = []
+
+                                sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
+                                    file_std_short]["MAT"][isotope]
+
+                                xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
                 #
                 for isotope in self.container_lists["ISOTOPES"]:
                     xi_regr = self.calculate_regression(
@@ -19998,17 +20002,30 @@ class PySILLS(tk.Frame):
                 for var_focus in ["MAT"]:
                     for isotope in self.container_lists["ISOTOPES"]:
                         helper_results = []
-                        #
+                        var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                                var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                #
-                                self.fi_get_analytical_sensitivity(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_file_long=var_file_long)
-                                var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
+                            if var_filetype == "STD":
+                                var_srm_file = self.container_var["SRM"][var_file_long].get()
+                                if var_srm_i == var_srm_file:
+                                    if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                        var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                        #
+                                        self.fi_get_analytical_sensitivity(
+                                            var_filetype=var_filetype, var_datatype=var_datatype,
+                                            var_file_short=var_file_short, var_file_long=var_file_long)
+                                        var_result_i = self.container_analytical_sensitivity[var_filetype][
+                                            var_datatype][var_file_short][var_focus][isotope]
+                                        helper_results.append(var_result_i)
+                            else:
+                                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                    var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                    #
+                                    self.fi_get_analytical_sensitivity(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                    var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                        var_file_short][var_focus][isotope]
+                                    helper_results.append(var_result_i)
                                 #
                         var_result_i = np.mean(helper_results)
                         self.container_analytical_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
