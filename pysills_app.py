@@ -918,6 +918,7 @@ class PySILLS(tk.Frame):
         #
         ## Radiobuttons
         self.pysills_mode = None
+        self.demo_mode = True
         var_rb_main = tk.IntVar()
         var_rb_main.set(0)
         self.container_var["main"]["Radiobutton"].append(var_rb_main)
@@ -10584,12 +10585,15 @@ class PySILLS(tk.Frame):
                 file_parts = i.split("/")
                 var_listbox.insert(tk.END, file_parts[-1])
                 #
-                self.container_lists[datatype]["Long"].append(i)
-                self.container_lists[datatype]["Short"].append(file_parts[-1])
+                if i not in self.container_lists[datatype]["Long"]:
+                    self.container_lists[datatype]["Long"].append(i)
+                    self.container_lists[datatype]["Short"].append(file_parts[-1])
                 #
                 self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
                 self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
                 self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
+
+        self.demo_mode = False
     #
     def import_concentration_data(self):
         filename = filedialog.askopenfilenames(
@@ -14402,30 +14406,29 @@ class PySILLS(tk.Frame):
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
-            ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
-            demo_files = os.listdir(path=path + str("/demo_files/"))
-            for file in demo_files:
-                if file.startswith("demo_ma"):
-                    path_complete = os.path.join(path + str("/demo_files/"), file)
-                    path_raw = pathlib.PureWindowsPath(path_complete)
-                    ma_demo_files["ALL"].append(str(path_raw.as_posix()))
-            ma_demo_files["ALL"].sort()
-            ma_demo_files["STD"].extend(ma_demo_files["ALL"][:3])
-            ma_demo_files["STD"].extend(ma_demo_files["ALL"][-3:])
-            ma_demo_files["SMPL"].extend(ma_demo_files["ALL"][3:-4])
-            # ma_demo_files["STD"].extend(ma_demo_files["ALL"][:1])
-            # ma_demo_files["STD"].extend(ma_demo_files[" ALL"][-1:])
-            # ma_demo_files["SMPL"].extend(ma_demo_files["ALL"][3:-7])
-            #
-            self.list_std = ma_demo_files["STD"]
-            self.list_smpl = ma_demo_files["SMPL"]
+            if self.demo_mode == True:
+                ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
+                demo_files = os.listdir(path=path + str("/demo_files/"))
+                for file in demo_files:
+                    if file.startswith("demo_ma"):
+                        path_complete = os.path.join(path + str("/demo_files/"), file)
+                        path_raw = pathlib.PureWindowsPath(path_complete)
+                        ma_demo_files["ALL"].append(str(path_raw.as_posix()))
+                ma_demo_files["ALL"].sort()
+                ma_demo_files["STD"].extend(ma_demo_files["ALL"][:3])
+                ma_demo_files["STD"].extend(ma_demo_files["ALL"][-3:])
+                ma_demo_files["SMPL"].extend(ma_demo_files["ALL"][3:-4])
+                #
+                self.list_std = ma_demo_files["STD"]
+                self.list_smpl = ma_demo_files["SMPL"]
             #
             self.ma_current_file_std = self.list_std[0]
             self.ma_current_file_smpl = self.list_smpl[0]
             #
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
-                self.lb_std.insert(tk.END, file_parts[-1])
+                if self.demo_mode == True:
+                    self.lb_std.insert(tk.END, file_parts[-1])
                 #
                 for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
                              "Results Sensitivity", "SE STD", "SE SMPL"]:
@@ -14433,7 +14436,8 @@ class PySILLS(tk.Frame):
             #
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
-                self.lb_smpl.insert(tk.END, file_parts[-1])
+                if self.demo_mode == True:
+                    self.lb_smpl.insert(tk.END, file_parts[-1])
             #
             dataset_exmpl = Data(filename=self.list_std[0])
             df_exmpl = dataset_exmpl.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
@@ -14671,9 +14675,19 @@ class PySILLS(tk.Frame):
             df_std_i = dataset_std_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
             times_std_i = df_std_i.iloc[:, 0]
             #
-            if file_std not in self.container_lists["STD"]["Long"]:
+            if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
                 self.container_lists["STD"]["Long"].append(file_std)
                 self.container_lists["STD"]["Short"].append(file_std_short)
+                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
+                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+                self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short] = {}
+                self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
+            else:
+                if file_std not in self.container_lists["STD"]["Long"]:
+                    self.container_lists["STD"]["Long"].append(file_std)
+                    self.container_lists["STD"]["Short"].append(file_std_short)
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
                 self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
@@ -14737,6 +14751,7 @@ class PySILLS(tk.Frame):
                 #
                 self.create_container_results(var_filetype="STD", var_file_short=file_std_short)
             #
+            print(len(self.container_lists["STD"]["Long"]), len(self.list_std), self.file_loaded)
             if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
                 self.container_helper["STD"][file_std_short] = {}
                 self.container_helper["STD"][file_std_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
@@ -14949,9 +14964,19 @@ class PySILLS(tk.Frame):
             df_smpl_i = dataset_smpl_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
             times_smpl_i = df_smpl_i.iloc[:, 0]
             #
-            if file_smpl not in self.container_lists["SMPL"]["Long"]:
+            if file_smpl not in self.container_lists["SMPL"]["Long"] and self.demo_mode == True:
                 self.container_lists["SMPL"]["Long"].append(file_smpl)
                 self.container_lists["SMPL"]["Short"].append(file_smpl_short)
+                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+                self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
+                self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+            else:
+                if file_smpl not in self.container_lists["SMPL"]["Long"]:
+                    self.container_lists["SMPL"]["Long"].append(file_smpl)
+                    self.container_lists["SMPL"]["Short"].append(file_smpl_short)
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
                 self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
@@ -14990,7 +15015,9 @@ class PySILLS(tk.Frame):
                 #
                 self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short)
             #
+            print(len(self.container_lists["SMPL"]["Long"]), len(self.list_smpl), self.file_loaded)
             if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
+                print("A")
                 self.container_helper["SMPL"][file_smpl_short] = {}
                 self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
                                                                         "Indices": []}
@@ -15018,6 +15045,7 @@ class PySILLS(tk.Frame):
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
                 #
             elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
+                print("B")
                 self.container_helper["SMPL"][file_smpl_short] = {}
                 self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
                                                                         "Indices": []}
