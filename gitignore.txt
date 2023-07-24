@@ -21,6 +21,7 @@ tests/.ipynb_checkpoints/
 
 .idea/
 .git/
+.github/
 
 # dotenv
 .env
