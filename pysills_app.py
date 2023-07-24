@@ -14740,8 +14740,7 @@ class PySILLS(tk.Frame):
                 self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
                 #
                 self.create_container_results(var_filetype="STD", var_file_short=file_std_short)
-            #
-            print(len(self.container_lists["STD"]["Long"]), len(self.list_std), self.file_loaded)
+
             if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
                 self.container_helper["STD"][file_std_short] = {}
                 self.container_helper["STD"][file_std_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
@@ -15531,7 +15530,7 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["IS"]["Default STD"], text_set=var_text_std_is, option_list=self.container_lists["ISOTOPES"],
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["IS"]["Default STD"], mode="STD":
-            self.fi_select_is_default(var_opt, mode))
+            self.ma_select_is_default(var_opt, mode))
         opt_02c.grid(row=start_row_02 + 3, column=n_col_category - 4, rowspan=1, columnspan=n_col_category - 2)
         opt_02c["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
                                activebackground=self.accent_color)
@@ -16014,8 +16013,6 @@ class PySILLS(tk.Frame):
         if state_default == True:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_opt)
-                #self.container_var["SMPL"][file_smpl]["IS"].set(var_opt)
-                #
                 if var_key == "Oxide":
                     var_oxide = self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].get()
                     key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
@@ -16097,14 +16094,15 @@ class PySILLS(tk.Frame):
                 var_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
                 key = re.search("(\D+)(\d*)", var_is)
                 element_is = key.group(1)
-                self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(self.srm_actual[var_srm][
-                                                                                        element_is])
-    #
-    def ma_select_is_default(self, var_opt, mode="STD"):
-        if mode == "STD":
-            var_is = var_opt
-            for file_std in self.list_std:
-                self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
+                if var_srm != "Select SRM":
+                    self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(
+                        self.srm_actual[var_srm][element_is])
+
+    # def ma_select_is_default(self, var_opt, mode="STD"):
+    #     if mode == "STD":
+    #         var_is = var_opt
+    #         for file_std in self.list_std:
+    #             self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
 
     #
     def ma_select_id_default(self, var_opt):
@@ -17667,14 +17665,12 @@ class PySILLS(tk.Frame):
                 #
                 for isotope in self.container_lists["ISOTOPES"]:
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    #
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     var_concentration_i = self.srm_actual[var_srm_i][element]
-                    #
                     var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         "MAT"][isotope]
-                    #
+
                     var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
                     self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
@@ -17712,7 +17708,6 @@ class PySILLS(tk.Frame):
                 #
                 for file_smpl in self.container_lists["SMPL"]["Short"]:
                     delta_i = self.container_lists["Acquisition Times Delta"][file_smpl]
-                    #
                     for isotope in self.container_lists["ISOTOPES"]:
                         var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
                         self.container_lists["Analytical Sensitivity Regression"][isotope] = {
@@ -17850,7 +17845,7 @@ class PySILLS(tk.Frame):
                         "MAT"][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
-                    #
+
                     var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
                     self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
@@ -22266,8 +22261,15 @@ class PySILLS(tk.Frame):
     def ma_select_is_default(self, var_opt, mode="STD"):
         if mode == "STD":
             var_is = var_opt
+            if var_is != "Select IS":
+                var_srm_is = self.container_var["SRM"][var_is].get()
+                key_element = re.search("(\D+)(\d+)", var_is)
+                element = key_element.group(1)
+                var_concentration_is = self.srm_actual[var_srm_is][element]
             for file_std in self.container_lists["STD"]["Long"]:
                 self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
+                if var_is != "Select IS":
+                    self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(var_concentration_is)
         elif mode == "SMPL":
             var_is = var_opt
             for file_smpl in self.container_lists["SMPL"]["Long"]:
