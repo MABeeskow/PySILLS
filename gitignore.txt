@@ -1,0 +1,31 @@
+*-checkpoint.ipynb
+**/.DS_Store
+*.py[cod]
+*.pyc
+.DS_Store
+notebooks/*.png
+notebooks/*.csv
+tests/*.png
+tests/*.csv
+outputs/*.csv
+user_settings.txt
+
+__pycache__/
+thesis/
+modules/__pycache__/
+modules/__pycache__/*.pyc
+*.py[cod]
+*.pyc
+notebooks/.ipynb_checkpoints/
+tests/.ipynb_checkpoints/
+
+.idea/
+.git/
+
+# dotenv
+.env
+
+# virtualenv
+.venv
+venv/
+ENV/
