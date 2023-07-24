@@ -3,7 +3,7 @@
 # ----------------------
 # essential_functions.py
 # Maximilian Beeskow
-# 21.07.2023
+# 24.07.2023
 # ----------------------
 #
 ## MODULES
@@ -13,7 +13,6 @@ import tkinter as tk
 import numpy as np
 from modules import data
 import tkinter.filedialog as fd
-from outliers import smirnov_grubbs
 from modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
 #
 ## CLASSES
