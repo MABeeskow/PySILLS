@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		21.07.2023
+# Date:		24.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, font
 import numpy as np
 from modules.gui_elements import SimpleElements as SE
-from modules.spike_elimination import GrubbsTestSILLS, GrubbsTest
+from modules.spike_elimination import GrubbsTestSILLS
 from modules.essential_functions import EssentialsSRM as ESRM
 from modules.essential_functions import Essentials as ES
 from modules.chemistry import PeriodicSystemOfElements as PSE
@@ -7186,11 +7186,6 @@ class PySILLS(tk.Frame):
                                                 raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
                                                 start_index=interval[0],
                                                 dataset_complete=dataset_complete).determine_outlier()
-                                        # elif var_method == 1:
-                                        #     data_smoothed, indices_outl = GrubbsTest(
-                                        #         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                        #         start_index=interval[0],
-                                        #         dataset_complete=dataset_complete).determine_outlier()
                                         elif var_method == 1:
                                             data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
                                                 alpha=var_alpha, dataset_complete=dataset_complete,
@@ -7256,11 +7251,6 @@ class PySILLS(tk.Frame):
                                                 raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
                                                 start_index=interval[0],
                                                 dataset_complete=dataset_complete).determine_outlier()
-                                        # elif var_method == 1:
-                                        #     data_smoothed, indices_outl = GrubbsTest(
-                                        #         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                        #         start_index=interval[0],
-                                        #         dataset_complete=dataset_complete).determine_outlier()
                                         elif var_method == 1:
                                             data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
                                                 alpha=var_alpha, dataset_complete=dataset_complete,
@@ -15015,9 +15005,7 @@ class PySILLS(tk.Frame):
                 #
                 self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short)
             #
-            print(len(self.container_lists["SMPL"]["Long"]), len(self.list_smpl), self.file_loaded)
             if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
-                print("A")
                 self.container_helper["SMPL"][file_smpl_short] = {}
                 self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
                                                                         "Indices": []}
@@ -15045,7 +15033,6 @@ class PySILLS(tk.Frame):
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
                 #
             elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
-                print("B")
                 self.container_helper["SMPL"][file_smpl_short] = {}
                 self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
                                                                         "Indices": []}
@@ -15603,7 +15590,7 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["IS"]["Default SMPL"], text_set=var_text_std_is, option_list=self.container_lists["ISOTOPES"],
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["IS"]["Default SMPL"], mode="SMPL":
-            self.fi_select_is_default(var_opt, mode))
+            self.ma_select_is_default(var_opt, mode))
         opt_03c.grid(row=start_row_03 + 4, column=n_col_category - 4, rowspan=1, columnspan=n_col_category - 2)
         opt_03c["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
                                activebackground=self.accent_color)
@@ -22275,7 +22262,17 @@ class PySILLS(tk.Frame):
             ESRM().place_srm_values(srm_name=var_opt, srm_dict=self.srm_actual)
         #
         self.fill_srm_values(var_srm=var_opt)
-    #
+
+    def ma_select_is_default(self, var_opt, mode="STD"):
+        if mode == "STD":
+            var_is = var_opt
+            for file_std in self.container_lists["STD"]["Long"]:
+                self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
+        elif mode == "SMPL":
+            var_is = var_opt
+            for file_smpl in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is)
+
     def fi_select_is_default(self, var_opt, mode="STD"):
         if mode == "STD":
             var_is = var_opt
