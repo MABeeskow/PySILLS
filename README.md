@@ -2,12 +2,12 @@
 
 # PySILLS
 
-SILLS 2 is a completely new developed tool for data reduction, concentration
+PySILLS is a completely new developed tool for data reduction, concentration
 calculation and statistical analysis of transient Laser Ablation ICP-MS signals.
 It is written in vb.net and has the aim to provide the user with a flexible,
 user-friendly and powerful tool for a qualitative and quantitative analysis of
 fluid, melt or mineral inclusion, embedded in a mineral or glass matrix, but
-also for homogenous samples. SILLS 2 is based on
+also for homogenous samples. PySILLS is based on
 SILLS which was developed by Dr. Peter Tollan at ETH Zurich.
 
 ### Getting Started
