@@ -18343,23 +18343,21 @@ class PySILLS(tk.Frame):
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
-            fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
-            demo_files = os.listdir(path=path + str("/demo_files/"))
-            for file in demo_files:
-                if file.startswith("demo_fi"):
-                    path_complete = os.path.join(path + str("/demo_files/"), file)
-                    path_raw = pathlib.PureWindowsPath(path_complete)
-                    fi_demo_files["ALL"].append(str(path_raw.as_posix()))
-            fi_demo_files["ALL"].sort()
-            fi_demo_files["STD"].extend(fi_demo_files["ALL"][:2])
-            fi_demo_files["STD"].extend(fi_demo_files["ALL"][-2:])
-            fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:-2])
-            # fi_demo_files["STD"].extend(fi_demo_files["ALL"][:1])
-            # fi_demo_files["STD"].extend(fi_demo_files["ALL"][-1:])
-            # fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:-7])
-            #
-            self.list_std = fi_demo_files["STD"]
-            self.list_smpl = fi_demo_files["SMPL"]
+            if self.demo_mode == True:
+                fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
+                demo_files = os.listdir(path=path + str("/demo_files/"))
+                for file in demo_files:
+                    if file.startswith("demo_fi"):
+                        path_complete = os.path.join(path + str("/demo_files/"), file)
+                        path_raw = pathlib.PureWindowsPath(path_complete)
+                        fi_demo_files["ALL"].append(str(path_raw.as_posix()))
+                fi_demo_files["ALL"].sort()
+                fi_demo_files["STD"].extend(fi_demo_files["ALL"][:2])
+                fi_demo_files["STD"].extend(fi_demo_files["ALL"][-2:])
+                fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:-2])
+
+                self.list_std = fi_demo_files["STD"]
+                self.list_smpl = fi_demo_files["SMPL"]
             #
             self.fi_current_file_std = self.list_std[0]
             self.fi_current_file_smpl = self.list_smpl[0]
