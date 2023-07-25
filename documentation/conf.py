@@ -32,19 +32,19 @@ version = release
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'nbsphinx',
-    'sphinx_book_theme',
+    #'nbsphinx',
+    #'sphinx_book_theme',
     #'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.doctest',
+    #'sphinx.ext.napoleon',
+    #'sphinx.ext.doctest',
     #'sphinx.ext.autosummary',
-    'sphinx_markdown_tables',
+    #'sphinx_markdown_tables',
     # 'notfound.extension',
-    'sphinx_copybutton',
+    #'sphinx_copybutton',
     #'sphinx_gallery.gen_gallery',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
+    #'sphinx.ext.extlinks',
+    #'sphinx.ext.coverage',
+    #'sphinx.ext.mathjax',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -59,7 +59,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = "sphinx_book_theme"
+#html_theme = "sphinx_book_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -70,11 +70,11 @@ html_title = "PySILLS - LA-ICP-MS data reduction for minerals and fluid/melt inc
 html_logo = "documentation/images/PySILLS_Logo_GitHub.png"
 #html_favicon = ""
 
-nbsphinx_execute = "never"
+#nbsphinx_execute = "never"
 
-nbsphinx_execute_arguments = [
-    "--InlineBackend.figure_formats={'svg', 'pdf'}",
-    "--InlineBackend.rc={'figure.dpi': 96}",
+#nbsphinx_execute_arguments = [
+#    "--InlineBackend.figure_formats={'svg', 'pdf'}",
+#    "--InlineBackend.rc={'figure.dpi': 96}",
 ]
 
 copybutton_prompt_text = ">>> "
