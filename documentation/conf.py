@@ -75,6 +75,6 @@ html_logo = "documentation/images/PySILLS_Logo_GitHub.png"
 #nbsphinx_execute_arguments = [
 #    "--InlineBackend.figure_formats={'svg', 'pdf'}",
 #    "--InlineBackend.rc={'figure.dpi': 96}",
-]
+#]
 
 copybutton_prompt_text = ">>> "
