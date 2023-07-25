@@ -8709,7 +8709,7 @@ class PySILLS(tk.Frame):
             info_threshold = self.container_var["fi_setting"]["SE Threshold"].get()
 
             str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";" \
-                        + str(info_inclusion_consideration) + str(info_method) + ";" + str(info_alpha) + ";" \
+                        + str(info_inclusion_consideration) + ";" + str(info_method) + ";" + str(info_alpha) + ";" \
                         + str(info_threshold) + "\n"
 
             save_file.write(str_spike)
@@ -18369,7 +18369,7 @@ class PySILLS(tk.Frame):
         ## COLORS
         bg_light = self.bg_colors["Very Light"]
         bg_medium = self.bg_colors["Light"]
-        #
+
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
@@ -18408,6 +18408,18 @@ class PySILLS(tk.Frame):
             self.palette_complete = sns.color_palette(
                 "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
             #
+            if bool(self.container_files["SRM"]) == False:
+                self.isotope_colors = {}
+                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                    self.container_files["SRM"][isotope] = tk.StringVar()
+                    self.isotope_colors[isotope] = self.palette_complete[index]
+        else:
+            self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
+            self.fi_current_file_smpl = self.container_lists["SMPL"]["Long"][0]
+
+            self.palette_complete = sns.color_palette(
+                "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+
             if bool(self.container_files["SRM"]) == False:
                 self.isotope_colors = {}
                 for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
@@ -20255,8 +20267,11 @@ class PySILLS(tk.Frame):
                         var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                             var_file_short]["MAT"][isotope]
                         #
-                        var_result_i = (var_intensity_i/var_intensity_host_is)*\
-                                       (var_concentration_host_is/var_sensitivity_i)
+                        if var_intensity_host_is > 0 and var_sensitivity_i > 0:
+                            var_result_i = (var_intensity_i/var_intensity_host_is)*\
+                                           (var_concentration_host_is/var_sensitivity_i)
+                        else:
+                            var_result_i = 0.0
                         #
                         self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
@@ -25719,6 +25734,19 @@ class PySILLS(tk.Frame):
 
     def export_data_for_external_calculations(self):
         for key, variable in self.container_var["fi_setting"]["Inclusion Plugin"].items():
+            if key == "Intensity BG" and variable.get() == 1:
+                pass
+            elif key == "Intensity MAT" and variable.get() == 1:
+                pass
+            elif key == "Intensity MIX" and variable.get() == 1:
+                pass
+            elif key == "Intensity INCL" and variable.get() == 1:
+                pass
+            elif key == "Analytical Sensitivity" and variable.get() == 1:
+                pass
+            elif key == "Concentration SRM" and variable.get() == 1:
+                pass
+
             print(key, variable.get())
 
     ## SPIKE ELIMINATION
