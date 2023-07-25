@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		24.07.2023
+# Date:		25.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -15651,14 +15651,12 @@ class PySILLS(tk.Frame):
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
         else:
-            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-            self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
-    #
     ## MATRIX SETTINGS #################################################################################################
-    #
     def ma_matrix_concentration_setup(self):
         ## Window Settings
         window_width = 800
@@ -16137,13 +16135,6 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(
                         self.srm_actual[var_srm][element_is])
 
-    # def ma_select_is_default(self, var_opt, mode="STD"):
-    #     if mode == "STD":
-    #         var_is = var_opt
-    #         for file_std in self.list_std:
-    #             self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
-
-    #
     def ma_select_id_default(self, var_opt):
         var_id = var_opt
         for file_smpl in self.list_smpl:
