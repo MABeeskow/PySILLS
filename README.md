@@ -15,11 +15,11 @@ PySILLS was inspired conceptionally by the widely-used data reduction tool SILLS
 
 ---
 
-### 🚀 Installation
+## 🚀 Installation
 
 Coming soon ...
 
-### 💻 Resources
+## 💻 Resources
 
 Coming soon ...
 
@@ -27,27 +27,43 @@ Coming soon ...
 [PySILLS on Blogger](https://pysills.blogspot.com/) | 
 [PySILLS on YouTube](https://www.youtube.com/@PySILLS)
 
-### 💭 Citing PySILLS
+## 💭 Citing PySILLS
 
 Coming soon ...
 
 ---
 
-### 💎 Mineral Analysis
+## 💎 Mineral Analysis
 
 Coming soon ...
 
-### 💎 Fluid Inclusion Analysis
+### Top Features
 
 Coming soon ...
 
-### 💎 Melt Inclusion Analysis
+### Screenshots
+
+Coming soon ...
+
+## 💎 Fluid Inclusion Analysis
+
+Coming soon ...
+
+### Top Features
+
+Coming soon ...
+
+### Screenshots
+
+Coming soon ...
+
+## 💎 Melt Inclusion Analysis
 
 Coming soon ...
 
 ---
 
-### 📦 PyPitzer
+## 📦 PyPitzer
 
 Coming soon ...
 
@@ -55,6 +71,6 @@ Coming soon ...
 
 ---
 
-### 📚 References
+## 📚 References
 
 Coming soon ...
