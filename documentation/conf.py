@@ -67,7 +67,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 html_static_path = []
 
 html_title = "PySILLS - LA-ICP-MS data reduction for minerals and fluid/melt inclusions"
-html_logo = "documentation/images/PySILLS_Logo_GitHub.png"
+html_logo = "/documentation/images/PySILLS_Logo_GitHub.png"
 #html_favicon = ""
 
 #nbsphinx_execute = "never"
