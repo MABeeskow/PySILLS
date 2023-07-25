@@ -25,6 +25,7 @@ Coming soon ...
 
 Coming soon ...
 
+[PySILLS on ReadTheDocs](https://pysills.readthedocs.io/en/latest/) |
 [PySILLS on Blogger](https://pysills.blogspot.com/) | 
 [PySILLS on YouTube](https://www.youtube.com/@PySILLS)
 
