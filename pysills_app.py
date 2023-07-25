@@ -15312,11 +15312,6 @@ class PySILLS(tk.Frame):
         ## BUTTONS
         # Matrix Settings
         btn_03a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 3, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 2, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.ma_matrix_concentration_setup)  # Host - Concentration Setup
-        btn_03a = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_03 + 5, column_id=0, n_rows=1,
             n_columns=n_col_header,
             fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
@@ -15403,7 +15398,7 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Very Dark"], text="Element (in ppm)", sticky="nesw", relief=tk.GROOVE)
         rb_03c = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_03 + 3, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4,
+            n_columns=n_col_category + 6,
             fg=bg_light, bg=bg_medium).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=3, color_bg=bg_medium,
             fg=self.bg_colors["Very Dark"], text="Experimental Data", sticky="nesw", relief=tk.GROOVE)
@@ -15699,8 +15694,13 @@ class PySILLS(tk.Frame):
         ## LABELS
         if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
             var_text_02 = "Oxide Settings (default)"
-        else:
+            var_key = "oxides"
+        elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 2:
             var_text_02 = "Element Settings (default)"
+            var_key = "elements"
+        elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 3:
+            var_text_02 = "Experimental data"
+            var_key = "experiments"
         #
         lbl_01 = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1,
@@ -15711,13 +15711,14 @@ class PySILLS(tk.Frame):
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
             n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=var_text_02, relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_03 = SE(
-            parent=subwindow_ma_matrix_concentration, row_id=start_row + 3, column_id=start_column + 30, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+        if self.container_var["ma_setting"]["Host Setup Selection"].get() != 3:
+            lbl_03 = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 3, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         ## OPTION MENUS
-        if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
+        if var_key == "oxides":
             list_elements = []
             list_compound = []
             for isotope in self.container_lists["ISOTOPES"]:
@@ -15745,8 +15746,7 @@ class PySILLS(tk.Frame):
                 var_entr_default_text = self.container_var["ma_setting"]["Oxide Concentration"].get()
             else:
                 var_entr_default_text = "100.0"
-            #
-        elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 2:
+        elif var_key == "elements":
             list_elements = []
             list_compound = []
             for isotope in self.container_lists["ISOTOPES"]:
@@ -15772,63 +15772,70 @@ class PySILLS(tk.Frame):
                 var_entr_default_text = self.container_var["ma_setting"]["Element Concentration"].get()
             else:
                 var_entr_default_text = "1000000"
+        elif var_key == "experiments":
+            btn_smpl = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda parent=subwindow_ma_matrix_concentration, mode="MA": self.import_is_data(parent, mode))
         #
-        var_opt_is_default = self.container_var["IS"]["Default SMPL"]
-        var_opt_is_list = self.container_lists["ISOTOPES"]
-        var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
-        #
-        if var_opt_is_default.get() != "Select IS":
-            var_opt_is_default_text = var_opt_is_default.get()
-        else:
-            var_opt_is_default_text = "Select IS"
-        #
-        var_entr_is_default_text = self.container_var["IS"]["Default SMPL Concentration"].get()
-        #
-        opt_02a = SE(
-            parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=var_opt_default, option_list=list_compound, text_set=var_opt_default_text,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=var_opt_default, var_file=None, state_default=True:
-            self.ma_change_matrix_compound(var_opt, var_file, state_default))
-        opt_02a["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-            activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        opt_02a.config(
-            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, highlightthickness=0)
-        #
-        self.opt_02b = SE(
-            parent=subwindow_ma_matrix_concentration, row_id=start_row + 4, column_id=start_column + 30, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=var_opt_is_default, option_list=var_opt_is_list, text_set=var_opt_is_default_text,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=var_opt_is_default, var_file=None, state_default=True:
-            self.ma_change_is_smpl(var_opt, var_file, state_default))
-        self.opt_02b["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-            activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        self.opt_02b.config(
-            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, highlightthickness=0)
-        #
-        ## ENTRIES
-        entr_02a = SE(
-            parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
-            var=var_entr_default, text_default=var_entr_default_text,
-            command=lambda event, var_entr=var_entr_default, var_file=None, state_default=True:
-            self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
-        entr_02b = SE(
-            parent=subwindow_ma_matrix_concentration, row_id=start_row + 5, column_id=start_column + 30, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
-            var=var_entr_is_default, text_default=var_entr_is_default_text,
-            command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
-            self.ma_change_is_concentration(var_entr, var_file, state_default, event))
+        if var_key != "experiments":
+            var_opt_is_default = self.container_var["IS"]["Default SMPL"]
+            var_opt_is_list = self.container_lists["ISOTOPES"]
+            var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
+            #
+            if var_opt_is_default.get() != "Select IS":
+                var_opt_is_default_text = var_opt_is_default.get()
+            else:
+                var_opt_is_default_text = "Select IS"
+            #
+            var_entr_is_default_text = self.container_var["IS"]["Default SMPL Concentration"].get()
+            #
+            opt_02a = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=var_opt_default, option_list=list_compound, text_set=var_opt_default_text,
+                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                command=lambda var_opt=var_opt_default, var_file=None, state_default=True:
+                self.ma_change_matrix_compound(var_opt, var_file, state_default))
+            opt_02a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_02a.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
+            #
+            self.opt_02b = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 4, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=var_opt_is_default, option_list=var_opt_is_list, text_set=var_opt_is_default_text,
+                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                command=lambda var_opt=var_opt_is_default, var_file=None, state_default=True:
+                self.ma_change_is_smpl(var_opt, var_file, state_default))
+            self.opt_02b["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            self.opt_02b.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
+            #
+            ## ENTRIES
+            entr_02a = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                var=var_entr_default, text_default=var_entr_default_text,
+                command=lambda event, var_entr=var_entr_default, var_file=None, state_default=True:
+                self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
+            entr_02b = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 5, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                var=var_entr_is_default, text_default=var_entr_is_default_text,
+                command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
+                self.ma_change_is_concentration(var_entr, var_file, state_default, event))
         #
         ## SAMPLE FILES
         frm_smpl = SE(
@@ -15848,7 +15855,7 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=lbl_i)
             text_smpl.insert("end", "\t")
             #
-            if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:  # Oxide Selection
+            if var_key == "oxides":     # Oxide Selection
                 var_list_is = self.container_lists["ISOTOPES"]
                 var_list_comp = self.container_lists["Oxides"]
                 var_opt_comp_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"]
@@ -15876,7 +15883,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_entr_is_default = "1000000"
                 #
-            elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 2:  # Element Selection
+            elif var_key == "elements":  # Element Selection
                 var_list_is = self.container_lists["ISOTOPES"]
                 var_list_comp = self.container_lists["Elements"]
                 var_opt_comp_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"]
@@ -15904,32 +15911,47 @@ class PySILLS(tk.Frame):
                     var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
                 else:
                     var_entr_is_default = "1000000"
-                #
-            #
-            var_opt_comp_i.set(var_opt_i_default)
-            var_entr_i.set(var_entr_i_default)
+            elif var_key == "experiments":  # Experimental Data Selection
+                var_list_is = self.container_lists["ISOTOPES"]
+                var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
+                var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"]
+                var_entr_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"]
+
+                if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].get() != "100.0":
+                    var_entr_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
+                        "Concentration"].get()
+                else:
+                    var_entr_i_default = "100.0"
+
+                if self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get() != "1000000":
+                    var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
+                else:
+                    var_entr_is_default = "1000000"
+
             var_entr_is_i.set(var_entr_is_default)
-            #
-            opt_comp_i = tk.OptionMenu(
-                frm_smpl, var_opt_comp_i, *var_list_comp,
-                command=lambda var_opt=var_opt_comp_i, var_file=file_smpl, state_default=False:
-                self.ma_change_matrix_compound(var_opt, var_file, state_default))
-            opt_comp_i["menu"].config(fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                                    activeforeground=self.colors_fi["Dark Font"],
-                                    activebackground=self.accent_color)
-            opt_comp_i.config(bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                            activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color,
-                            highlightthickness=0)
-            text_smpl.window_create("end", window=opt_comp_i)
-            text_smpl.insert("end", " \t")
-            #
-            entr_i = tk.Entry(frm_smpl, textvariable=var_entr_i, width=15)
-            entr_i.bind(
-                "<Return>", lambda event, var_entr=var_entr_i, var_file=file_smpl, state_default=False:
-                self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
-            text_smpl.window_create("insert", window=entr_i)
-            text_smpl.insert("end", "\t")
-            #
+            if var_key != "experiments":
+                var_entr_i.set(var_entr_i_default)
+                var_opt_comp_i.set(var_opt_i_default)
+                opt_comp_i = tk.OptionMenu(
+                    frm_smpl, var_opt_comp_i, *var_list_comp,
+                    command=lambda var_opt=var_opt_comp_i, var_file=file_smpl, state_default=False:
+                    self.ma_change_matrix_compound(var_opt, var_file, state_default))
+                opt_comp_i["menu"].config(fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                                        activeforeground=self.colors_fi["Dark Font"],
+                                        activebackground=self.accent_color)
+                opt_comp_i.config(bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                                activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color,
+                                highlightthickness=0)
+                text_smpl.window_create("end", window=opt_comp_i)
+                text_smpl.insert("end", " \t")
+
+                entr_i = tk.Entry(frm_smpl, textvariable=var_entr_i, width=15)
+                entr_i.bind(
+                    "<Return>", lambda event, var_entr=var_entr_i, var_file=file_smpl, state_default=False:
+                    self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
+                text_smpl.window_create("insert", window=entr_i)
+                text_smpl.insert("end", "\t")
+
             opt_is_i = tk.OptionMenu(
                 frm_smpl, var_opt_is_i, *var_list_is,
                 command=lambda var_opt=var_opt_is_i, var_file=file_smpl, state_default=False:
@@ -15949,8 +15971,25 @@ class PySILLS(tk.Frame):
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
             text_smpl.window_create("insert", window=entr_is_i)
             text_smpl.insert("end", "\n")
-            #
-        #
+
+    def import_is_data(self, parent, mode="MA"):
+        filename = filedialog.askopenfilenames(
+            parent=parent, filetypes=(("csv files", "*.csv"), ("all files", "*.*")), initialdir=os.getcwd())
+        df_expdata = pd.read_csv(filename[0])
+
+        if mode == "MA":
+            for index, file in enumerate(df_expdata["file"]):
+                file_id = self.container_lists["SMPL"]["Short"].index(file)
+                file_long = self.container_lists["SMPL"]["Long"][file_id]
+                self.container_var["SMPL"][file_long]["IS Data"]["IS"].set(df_expdata["isotope"][index])
+                self.container_var["SMPL"][file_long]["IS Data"]["Concentration"].set(df_expdata["value"][index])
+        elif mode in ["FI", "MI"]:
+            for index, file in enumerate(df_expdata["file"]):
+                file_id = self.container_lists["SMPL"]["Short"].index(file)
+                file_long = self.container_lists["SMPL"]["Long"][file_id]
+                self.container_var["SMPL"][file_long]["IS Data"]["IS"].set(df_expdata["isotope"][index])
+                self.container_var["SMPL"][file_long]["IS Data"]["Concentration"].set(df_expdata["value"][index])
+
     def ma_change_matrix_compound(self, var_opt, var_file=None, state_default=False):
         if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
             var_key = "Oxide"
