@@ -26,18 +26,14 @@ author = "Maximilian A. Beeskow"
 release = "v.1.1.0-beta"
 version = release
 
-# -- GemGIS configuration ---------------------------------------------------
-#sys.path.append('../../gemgis')
-
-
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    #'nbsphinx',
-    'sphinx_book_theme',
+    'nbsphinx',
+    'sphinx-book-theme',
     #'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
@@ -74,7 +70,7 @@ html_title = "PySILLS - LA-ICP-MS data reduction for minerals and fluid/melt inc
 html_logo = "documentation/images/PySILLS_Logo_GitHub.png"
 #html_favicon = ""
 
-#nbsphinx_execute = "never"
+nbsphinx_execute = "never"
 
 nbsphinx_execute_arguments = [
     "--InlineBackend.figure_formats={'svg', 'pdf'}",
