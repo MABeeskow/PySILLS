@@ -48,6 +48,14 @@ Coming soon ...
 
 ---
 
+### 📦 PyPitzer
+
+Coming soon ...
+
+[PyPitzer](https://github.com/pypitzer/pypitzer)
+
+---
+
 ### 📚 References
 
 Coming soon ...
