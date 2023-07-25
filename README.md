@@ -1,10 +1,8 @@
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 <a href="https://github.com/MABeeskow/PySILLS">
-  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/documentation/images/PySILLS_Logo_Header.png" width="50%">
+  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/documentation/images/PySILLS_Logo_Header.png" width="75%">
 </a>
-
-# PySILLS
 
 PySILLS is a newly developed, Python-based open source tool for a modern data 
 reduction of LA-ICP-MS experiments. It is focused on the compositional analysis 
