@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		24.07.2023
+# Date:		25.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -8709,7 +8709,7 @@ class PySILLS(tk.Frame):
             info_threshold = self.container_var["fi_setting"]["SE Threshold"].get()
 
             str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";" \
-                        + str(info_inclusion_consideration) + str(info_method) + ";" + str(info_alpha) + ";" \
+                        + str(info_inclusion_consideration) + ";" + str(info_method) + ";" + str(info_alpha) + ";" \
                         + str(info_threshold) + "\n"
 
             save_file.write(str_spike)
@@ -15651,14 +15651,12 @@ class PySILLS(tk.Frame):
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
         else:
-            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-            self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
-    #
     ## MATRIX SETTINGS #################################################################################################
-    #
     def ma_matrix_concentration_setup(self):
         ## Window Settings
         window_width = 800
@@ -16137,13 +16135,6 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(
                         self.srm_actual[var_srm][element_is])
 
-    # def ma_select_is_default(self, var_opt, mode="STD"):
-    #     if mode == "STD":
-    #         var_is = var_opt
-    #         for file_std in self.list_std:
-    #             self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
-
-    #
     def ma_select_id_default(self, var_opt):
         var_id = var_opt
         for file_smpl in self.list_smpl:
@@ -18378,7 +18369,7 @@ class PySILLS(tk.Frame):
         ## COLORS
         bg_light = self.bg_colors["Very Light"]
         bg_medium = self.bg_colors["Light"]
-        #
+
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
@@ -18417,6 +18408,18 @@ class PySILLS(tk.Frame):
             self.palette_complete = sns.color_palette(
                 "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
             #
+            if bool(self.container_files["SRM"]) == False:
+                self.isotope_colors = {}
+                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                    self.container_files["SRM"][isotope] = tk.StringVar()
+                    self.isotope_colors[isotope] = self.palette_complete[index]
+        else:
+            self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
+            self.fi_current_file_smpl = self.container_lists["SMPL"]["Long"][0]
+
+            self.palette_complete = sns.color_palette(
+                "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+
             if bool(self.container_files["SRM"]) == False:
                 self.isotope_colors = {}
                 for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
@@ -20264,8 +20267,11 @@ class PySILLS(tk.Frame):
                         var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                             var_file_short]["MAT"][isotope]
                         #
-                        var_result_i = (var_intensity_i/var_intensity_host_is)*\
-                                       (var_concentration_host_is/var_sensitivity_i)
+                        if var_intensity_host_is > 0 and var_sensitivity_i > 0:
+                            var_result_i = (var_intensity_i/var_intensity_host_is)*\
+                                           (var_concentration_host_is/var_sensitivity_i)
+                        else:
+                            var_result_i = 0.0
                         #
                         self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
@@ -25589,7 +25595,7 @@ class PySILLS(tk.Frame):
     #
     def fi_inclusion_setup_plugin(self):
         ## Window Settings
-        window_width = 680
+        window_width = 660
         window_heigth = 280
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
@@ -25675,31 +25681,75 @@ class PySILLS(tk.Frame):
         btn_01h = SE(
             parent=subwindow_fi_inclusion_plugin, row_id=start_row + 7, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Export Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"])
+            text="Export Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
+            command=self.export_data_for_external_calculations)
         btn_02a = SE(
             parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Import Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"])
+            text="Import Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
+            command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
         #
         ## TREEVIEWS
-        list_categories = ["Filename", "Internal Standard", "Concentration (ppm)"]
-        list_width = list(120*np.ones(len(list_categories)))
-        list_width = [int(item) for item in list_width]
-        list_width[0] = 150
-        list_width[-1] = 150
-        #
-        self.tv_inclusion_plugin_import = SE(
+        frm_incl_is = SE(
             parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column + 11, n_rows=8,
-            n_columns=21, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
-            n_categories=len(list_categories), text_n=list_categories, width_n=list_width, individual=True)
-        #
-        scb_v = ttk.Scrollbar(subwindow_fi_inclusion_plugin, orient="vertical")
-        self.tv_inclusion_plugin_import.configure(yscrollcommand=scb_v.set)
-        scb_v.config(command=self.tv_inclusion_plugin_import.yview)
-        scb_v.grid(row=start_row + 2, column=start_column + 11 + 21, rowspan=8, columnspan=1, sticky="ns")
-    #
+            n_columns=21, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_incl_is = tk.Scrollbar(master=frm_incl_is, orient="vertical")
+        text_incl_is = tk.Text(
+            master=frm_incl_is, width=30, height=25, yscrollcommand=vsb_incl_is.set, bg=self.bg_colors["Very Light"])
+        vsb_incl_is.config(command=text_incl_is.yview)
+        vsb_incl_is.pack(side="right", fill="y")
+        text_incl_is.pack(side="left", fill="both", expand=True)
+
+        var_list_is = self.container_lists["ISOTOPES"]
+
+        for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            file_smpl = self.container_lists["SMPL"]["Long"][index]
+            var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
+            var_entr_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"]
+
+            lbl_i = tk.Label(frm_incl_is, text=file_smpl_short, bg=self.bg_colors["Very Light"],
+                             fg=self.bg_colors["Dark Font"])
+            text_incl_is.window_create("end", window=lbl_i)
+            text_incl_is.insert("end", "\t")
+
+            opt_is_i = tk.OptionMenu(
+                frm_incl_is, var_opt_is_i, *var_list_is,
+                command=lambda var_opt=var_opt_is_i, var_file=file_smpl, state_default=False:
+                self.ma_change_matrix_compound(var_opt, var_file, state_default))
+            opt_is_i["menu"].config(fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                                    activeforeground=self.colors_fi["Dark Font"],
+                                    activebackground=self.accent_color)
+            opt_is_i.config(bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                            activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color,
+                            highlightthickness=0)
+            text_incl_is.window_create("end", window=opt_is_i)
+            text_incl_is.insert("end", " \t")
+            #
+            entr_is_i = tk.Entry(frm_incl_is, textvariable=var_entr_is_i, width=30)
+            entr_is_i.bind(
+                "<Return>", lambda event, var_entr=var_entr_is_i, var_file=file_smpl, state_default=False:
+                self.ma_change_is_concentration(var_entr, var_file, state_default, event))
+            text_incl_is.window_create("insert", window=entr_is_i)
+            text_incl_is.insert("end", "\n")
+
+    def export_data_for_external_calculations(self):
+        for key, variable in self.container_var["fi_setting"]["Inclusion Plugin"].items():
+            if key == "Intensity BG" and variable.get() == 1:
+                pass
+            elif key == "Intensity MAT" and variable.get() == 1:
+                pass
+            elif key == "Intensity MIX" and variable.get() == 1:
+                pass
+            elif key == "Intensity INCL" and variable.get() == 1:
+                pass
+            elif key == "Analytical Sensitivity" and variable.get() == 1:
+                pass
+            elif key == "Concentration SRM" and variable.get() == 1:
+                pass
+
+            print(key, variable.get())
+
     ## SPIKE ELIMINATION
-    #
     def select_spike_elimination(self, var_opt, start_row, mode="FI"):
         ## COLORS
         bg_light = self.bg_colors["Very Light"]
