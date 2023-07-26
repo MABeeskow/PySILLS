@@ -116,7 +116,11 @@ Coming soon ...
 
 ## 📦 PyPitzer
 
-Coming soon ...
+PyPitzer allows thermodynamic modeling of fluid inclusion systems based on the Pitzer model. The quantification of those
+systems requires microthermometric data as well as element/Na ratios from LA-ICP-MS experiments. PyPitzer is able to 
+calculate precise concentrations of fluid inclusion compositions for also complex multi-element systems.
+The calculated results of PyPitzer can be imported in PySILLS. It is planned to integrate PyPitzer in PySILLS in the 
+future.
 
 [PyPitzer](https://github.com/pypitzer/pypitzer)
 
