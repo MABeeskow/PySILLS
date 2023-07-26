@@ -18,10 +18,10 @@ PySILLS was inspired conceptionally by the widely-used data reduction tool SILLS
 ## ⚠️ Pre-release comment / disclaimer
 
 I am aware of the fact that there are still some bugs and some of them can also cause a crash of the program. But, those
-bugs are the reason why I have decided to publish this pre-realse version, because, as a developer, I see everywhere 
-constructon sites in the code, but I would like to know which ones are the most important. It is possible that different
-users have different ideas how a mineral or fluid inclusion analysis project should be done. I have developed PySILLS 
-with my workflow in my mind. Now, the goal is to make it also applicable for your workflows.
+bugs are the reason why I have decided to publish this pre-release version, because, as a developer, I see everywhere 
+construction sites in the code, but I would like to know which ones are the most important. So, it is possible that 
+different users have different ideas how a mineral or fluid inclusion analysis project should be done. I have developed 
+PySILLS with my workflow in my mind. Now, the goal is to make it also applicable for your workflow.
 
 Let's catch the bugs and smash them! 👊🪲🪳
 
@@ -102,6 +102,8 @@ possible values that can be displayed in the table.
 
 Coming soon ...
 
+---
+
 ## 💎 Fluid Inclusion Analysis
 
 Coming soon ...
@@ -118,12 +120,6 @@ Coming soon ...
 
 Coming soon ...
 
-## 💎 Melt Inclusion Analysis
-
-Coming soon ...
-
----
-
 ## 📦 PyPitzer
 
 PyPitzer allows thermodynamic modeling of fluid inclusion systems based on the Pitzer model. The quantification of those
@@ -133,6 +129,12 @@ The calculated results of PyPitzer can be imported in PySILLS. It is planned to 
 future.
 
 [PyPitzer](https://github.com/pypitzer/pypitzer)
+
+---
+
+## 💎 Melt Inclusion Analysis
+
+Coming soon ...
 
 ---
 
