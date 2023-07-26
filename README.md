@@ -35,11 +35,18 @@ Coming soon ...
 
 ## 💎 Mineral Analysis
 
-Coming soon ...
+PySILLS allows a major, minor and trace element analysis of minerals and glasses. The calculations are based on the 
+measured intensity signals and sensitivities of the ICP-MS instrument.
 
 ### Top Features
 
-Coming soon ...
+* use of multiple standard reference materials in one project file
+* use of multiple internal standards in one project file
+* consideration of isotope-specific standard reference materials
+* assemblage definition
+* file-specific quick analysis
+* intuitive, fast and flexible workflow
+* multiple check-up possibilities
 
 ### Short Step-by-Step Manual
 
