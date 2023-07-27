@@ -12361,16 +12361,16 @@ class PySILLS(tk.Frame):
         ## Window Settings
         window_dwell = tk.Toplevel(self.parent)
         window_dwell.title("Dwell Times Setup")
-        window_dwell.geometry("600x400+0+0")
+        window_dwell.geometry("300x450+0+0")
         window_dwell.resizable(False, False)
-        window_dwell["bg"] = self.green_light
+        window_dwell["bg"] = self.bg_colors["Super Dark"]
         #
-        window_width = 600
-        window_heigth = 400
+        window_width = 300
+        window_heigth = 450
         row_min = 25
-        n_rows = int(window_heigth / row_min)
+        n_rows = int(window_heigth/row_min)
         column_min = 20
-        n_columns = int(window_width / column_min)
+        n_columns = int(window_width/column_min)
         #
         for x in range(n_columns):
             tk.Grid.columnconfigure(window_dwell, x, weight=1)
@@ -12383,98 +12383,55 @@ class PySILLS(tk.Frame):
         # Columns
         for i in range(0, n_columns):
             window_dwell.grid_columnconfigure(i, minsize=column_min)
-        #
-        n_isotopes = len(self.container_lists["ISOTOPES"])
-        n_columns = 3
-        a = n_isotopes / n_columns
-        a_int = int(a)
-        b = n_isotopes - (n_columns - 1) * a_int
-        #
+
         ## Labels
         lbl_01 = SE(
-            parent=window_dwell, row_id=0, column_id=0, n_rows=1, n_columns=2*n_columns*4, fg=self.green_light,
-            bg=self.green_dark).create_simple_label(
-            text="Dwell Time Setup", relief=tk.GROOVE, fontsize="sans 10 bold")
+            parent=window_dwell, row_id=0, column_id=0, n_rows=1, n_columns=14,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Dwell Time Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=window_dwell, row_id=1, column_id=0, n_rows=1, n_columns=8, fg=self.green_light,
-            bg=self.green_medium).create_simple_label(
-            text="Default Dwell Time", relief=tk.GROOVE, fontsize="sans 10 bold")
-        #
+            parent=window_dwell, row_id=1, column_id=0, n_rows=1, n_columns=7, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Default Dwell Time", relief=tk.FLAT, fontsize="sans 10 bold")
+
         self.container_elements["dwell_times"]["Label"].extend([lbl_01, lbl_02])
-        #
+
         if self.container_var["dwell_times"]["Entry"]["Default"].get() != "0.01":
             var_text = self.container_var["dwell_times"]["Entry"]["Default"].get()
         else:
             var_text = "0.01"
+
         entr_dwell = SE(
-            parent=window_dwell, row_id=1, column_id=8, n_rows=1, n_columns=4,
-            fg=self.green_light, bg=self.green_dark).create_simple_entry(
+            parent=window_dwell, row_id=1, column_id=7, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["dwell_times"]["Entry"]["Default"], text_default=var_text,
             command=lambda event, var_isotope=None, mode="Default":
             self.change_dwell_times(var_isotope, mode, event))
-        #
+
         self.container_elements["dwell_times"]["Entry"].append(entr_dwell)
-        #
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"][:b]):
-            lbl_isotope = SE(
-                parent=window_dwell, row_id=3 + index, column_id=0, n_rows=1, n_columns=4, fg=self.green_light,
-                bg=self.green_medium).create_simple_label(
-                text=isotope, relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            if self.container_var["dwell_times"]["Entry"][isotope].get() != "0.01":
-                var_text = self.container_var["dwell_times"]["Entry"][isotope].get()
-            else:
-                var_text = "0.01"
-            entr_dwell = SE(
-                parent=window_dwell, row_id=3 + index, column_id=4, n_rows=1, n_columns=4,
-                fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=self.container_var["dwell_times"]["Entry"][isotope], text_default=var_text,
-                command=lambda event, var_isotope=isotope, mode="Specific":
-                self.change_dwell_times(var_isotope, mode, event))
-            #
-            self.container_elements["dwell_times"]["Label"].append(lbl_isotope)
-            self.container_elements["dwell_times"]["Entry"].append(entr_dwell)
-            #
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"][b:int(b+a_int)]):
-            lbl_isotope = SE(
-                parent=window_dwell, row_id=3 + index, column_id=8, n_rows=1, n_columns=4, fg=self.green_light,
-                bg=self.green_medium).create_simple_label(
-                text=isotope, relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            if self.container_var["dwell_times"]["Entry"][isotope].get() != "0.01":
-                var_text = self.container_var["dwell_times"]["Entry"][isotope].get()
-            else:
-                var_text = "0.01"
-            entr_dwell = SE(
-                parent=window_dwell, row_id=3 + index, column_id=12, n_rows=1, n_columns=4,
-                fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=self.container_var["dwell_times"]["Entry"][isotope], text_default=var_text,
-                command=lambda event, var_isotope=isotope, mode="Specific":
-                self.change_dwell_times(var_isotope, mode, event))
-            #
-            self.container_elements["dwell_times"]["Label"].append(lbl_isotope)
-            self.container_elements["dwell_times"]["Entry"].append(entr_dwell)
-            #
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"][-a_int:]):
-            lbl_isotope = SE(
-                parent=window_dwell, row_id=3 + index, column_id=16, n_rows=1, n_columns=4, fg=self.green_light,
-                bg=self.green_medium).create_simple_label(
-                text=isotope, relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            if self.container_var["dwell_times"]["Entry"][isotope].get() != "0.01":
-                var_text = self.container_var["dwell_times"]["Entry"][isotope].get()
-            else:
-                var_text = "0.01"
-            entr_dwell = SE(
-                parent=window_dwell, row_id=3 + index, column_id=20, n_rows=1, n_columns=4,
-                fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                var=self.container_var["dwell_times"]["Entry"][isotope], text_default=var_text,
-                command=lambda event, var_isotope=isotope, mode="Specific":
-                self.change_dwell_times(var_isotope, mode, event))
-            #
-            self.container_elements["dwell_times"]["Label"].append(lbl_isotope)
-            self.container_elements["dwell_times"]["Entry"].append(entr_dwell)
-    #
+
+        ## TREEVIEWS
+        frm_dwell = SE(
+            parent=window_dwell, row_id=2, column_id=0, n_rows=15, n_columns=14, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_dwell = tk.Scrollbar(master=frm_dwell, orient="vertical")
+        text_dwell = tk.Text(
+            master=frm_dwell, width=30, height=25, yscrollcommand=vsb_dwell.set, bg=self.bg_colors["Very Light"])
+        vsb_dwell.config(command=text_dwell.yview)
+        vsb_dwell.pack(side="right", fill="y")
+        text_dwell.pack(side="left", fill="both", expand=True)
+
+        for var_isotope in self.container_lists["ISOTOPES"]:
+            lbl_i = tk.Label(
+                frm_dwell, text=var_isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            text_dwell.window_create("end", window=lbl_i)
+            text_dwell.insert("end", "\t")
+
+            entr_i = tk.Entry(
+                frm_dwell, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope])
+            text_dwell.window_create("insert", window=entr_i)
+            text_dwell.insert("end", "\n")
+
     def change_dwell_times(self, var_isotope, mode, event):
         if mode == "Default":
             value = self.container_var["dwell_times"]["Entry"]["Default"].get()
