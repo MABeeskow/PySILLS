@@ -1175,202 +1175,8 @@ class PySILLS(tk.Frame):
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
     #
     def on_configure(self, var_cnv, event):
-        # update scrollregion after starting 'mainloop'
-        # when all widgets are in canvas
         var_cnv.configure(scrollregion=var_cnv.bbox("all"))
-    #
-    # def change_rb_spike(self, var_rb, start_row=0, start_col=21):
-    #     if var_rb.get() == 0:   # Grubbs Test
-    #         ## Cleaning
-    #         categories = ["Label", "Entry", "Button", "Frame"]
-    #         for category in categories:
-    #             if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
-    #                 for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
-    #                     gui_item.grid_remove()
-    #                 self.gui_elements["ma_setting"][category]["Specific"].clear()
-    #         #
-    #         ## Labels
-    #         lb_spk_01 = SE(
-    #             parent=self.parent, row_id=start_row + 26, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Significance Level", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         lb_spk_02 = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         lb_spk_03 = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         lb_spk_04 = SE(
-    #             parent=self.parent, row_id=start_row + 27, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Threshold", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         #
-    #         self.container_elements["ma_setting"]["Label"].extend([lb_spk_01, lb_spk_02, lb_spk_03, lb_spk_04])
-    #         self.gui_elements["ma_setting"]["Label"]["Specific"].extend([lb_spk_01, lb_spk_02, lb_spk_03, lb_spk_04])
-    #         #
-    #         ## Entries
-    #         entr_01 = SE(
-    #             parent=self.parent, row_id=start_row + 26, column_id=start_col + 8, n_rows=1,
-    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #             var=self.container_var["settings"]["SE Alpha"], text_default="0.05",
-    #             command=lambda event, var_entry=self.container_var["settings"]["SE Alpha"]:
-    #             self.update_significance_level(var_entry, event))
-    #         #
-    #         self.container_var["settings"]["SE Threshold"] = tk.StringVar()
-    #         #
-    #         entr_02 = SE(
-    #             parent=self.parent, row_id=start_row + 27, column_id=start_col + 8, n_rows=1,
-    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #             var=self.container_var["settings"]["SE Threshold"], text_default="1000",
-    #             command=lambda event, var=self.container_var["settings"]["SE Threshold"], category_01="MA",
-    #                            category_02="Threshold": self.set_entry_value(var, category_01, category_02, event))
-    #         #
-    #         self.container_elements["ma_setting"]["Entry"].extend([entr_01, entr_02])
-    #         self.gui_elements["ma_setting"]["Entry"]["Specific"].extend([entr_01, entr_02])
-    #         #
-    #         ## Buttons
-    #         btn_std_01 = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 8, n_rows=1,
-    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-    #             command=lambda filetype="STD", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
-    #         btn_std_02 = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 13, n_rows=1,
-    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark,
-    #             command=lambda filetype="STD": SpikeElimination(
-    #                 container_lists=self.container_lists,
-    #                 gui_elements=self.gui_elements,
-    #                 container_spikes=self.container_spikes).spike_elimination_check(filetype))
-    #         btn_smpl_01 = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 8, n_rows=1,
-    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-    #             command=lambda filetype="SMPL", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
-    #         btn_smpl_02 = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 13, n_rows=1,
-    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark,
-    #             command=lambda filetype="SMPL": SpikeElimination(
-    #                 container_lists=self.container_lists,
-    #                 gui_elements=self.gui_elements,
-    #                 container_spikes=self.container_spikes).spike_elimination_check(filetype))
-    #         btn_confirmall_spk = SE(
-    #             parent=self.parent, row_id=start_row + 30, column_id=start_col + 8, n_rows=1,
-    #             n_columns=9, fg=self.green_dark, bg=self.yellow_dark).create_simple_button(
-    #             text="Confirm All Spikes", bg_active=self.yellow_dark, fg_active=self.green_dark,
-    #             command=self.confirm_all_spikes)
-    #         #
-    #         self.container_elements["ma_setting"]["Button"].extend(
-    #             [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
-    #         self.gui_elements["ma_setting"]["Button"]["Specific"].extend(
-    #             [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
-    #         #
-    #         ## Frames
-    #         frm_std = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 16, n_rows=1, n_columns=1,
-    #             fg=self.green_light, bg=self.sign_red).create_frame()
-    #         frm_smpl = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 16, n_rows=1, n_columns=1,
-    #             fg=self.green_light, bg=self.sign_red).create_frame()
-    #         #
-    #         self.container_elements["ma_setting"]["Frame"].extend([frm_std, frm_smpl])
-    #         self.gui_elements["ma_setting"]["Frame"]["Specific"].extend([frm_std, frm_smpl])
-    #     #
-    #     elif var_rb.get() == 1: # Pointwise Test
-    #         ## Cleaning
-    #         categories = ["Label", "Entry", "Button", "Frame"]
-    #         for category in categories:
-    #             if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
-    #                 for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
-    #                     gui_item.grid_remove()
-    #                 self.gui_elements["ma_setting"][category]["Specific"].clear()
-    #         #
-    #         ## Labels
-    #         lbl_ma_setting_11 = SE(
-    #             parent=self.parent, row_id=start_row + 26, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Deviation", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         lbl_ma_setting_12 = SE(
-    #             parent=self.parent, row_id=start_row + 27, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Threshold", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         lbl_ma_setting_13 = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         lbl_ma_setting_14 = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col, n_rows=1,
-    #             n_columns=8, fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #             text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #         #
-    #         self.gui_elements["ma_setting"]["Label"]["Specific"].extend(
-    #             [lbl_ma_setting_11, lbl_ma_setting_12, lbl_ma_setting_13, lbl_ma_setting_14])
-    #         #
-    #         ## Entries
-    #         var_entr_05 = tk.StringVar()
-    #         self.container_var["settings"]["SE Deviation"] = var_entr_05
-    #         #
-    #         entr_05 = SE(
-    #             parent=self.parent, row_id=start_row + 26, column_id=start_col + 8, n_rows=1,
-    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #             var=var_entr_05, text_default="10",
-    #             command=lambda event, var=var_entr_05, category_01="MA", category_02="Deviation":
-    #             self.set_entry_value(var, category_01, category_02, event))
-    #         #
-    #         var_entr_06 = tk.StringVar()
-    #         self.container_var["settings"]["SE Threshold"] = var_entr_06
-    #         #
-    #         entr_06 = SE(
-    #             parent=self.parent, row_id=start_row + 27, column_id=start_col + 8, n_rows=1,
-    #             n_columns=9, fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #             var=var_entr_06, text_default="1000",
-    #             command=lambda event, var=var_entr_06, category_01="MA", category_02="Threshold":
-    #             self.set_entry_value(var, category_01, category_02, event))
-    #         #
-    #         self.gui_elements["ma_setting"]["Entry"]["Specific"].extend(
-    #             [entr_05, entr_06])
-    #         #
-    #         ## Buttons
-    #         btn_std_01 = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 8, n_rows=1,
-    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-    #             command=lambda filetype="STD": self.fast_track(filetype))
-    #         btn_std_02 = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 13, n_rows=1,
-    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark)
-    #         btn_smpl_01 = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 8, n_rows=1,
-    #             n_columns=5, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Apply to all", bg_active=self.red_dark, fg_active=self.green_dark,
-    #             command=lambda filetype="SMPL": self.fast_track(filetype))
-    #         btn_smpl_02 = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 13, n_rows=1,
-    #             n_columns=3, fg=self.green_dark, bg=self.green_medium).create_simple_button(
-    #             text="Check", bg_active=self.red_dark, fg_active=self.green_dark)
-    #         btn_confirmall_spk = SE(
-    #             parent=self.parent, row_id=start_row + 30, column_id=start_col + 8, n_rows=1,
-    #             n_columns=9, fg=self.green_dark, bg=self.yellow_dark).create_simple_button(
-    #             text="Confirm All Spikes", bg_active=self.yellow_dark, fg_active=self.green_dark,
-    #             command=self.confirm_all_spikes)
-    #         #
-    #         self.gui_elements["ma_setting"]["Button"]["Specific"].extend(
-    #             [btn_std_01, btn_std_02, btn_smpl_01, btn_smpl_02, btn_confirmall_spk])
-    #         #
-    #         ## Frames
-    #         frm_std = SE(
-    #             parent=self.parent, row_id=start_row + 28, column_id=start_col + 16, n_rows=1, n_columns=1,
-    #             fg=self.green_light, bg=self.sign_red).create_frame()
-    #         frm_smpl = SE(
-    #             parent=self.parent, row_id=start_row + 29, column_id=start_col + 16, n_rows=1, n_columns=1,
-    #             fg=self.green_light, bg=self.sign_red).create_frame()
-    #         #
-    #         self.gui_elements["ma_setting"]["Frame"]["Specific"].extend([frm_std, frm_smpl])
-    #
+
     def confirm_all_spikes(self, file_loaded=False):
         container_interval = {"BG": [], "SIG": [], "MAT": [], "INCL": []}
         if self.fast_track_std == False or file_loaded == True:
@@ -12907,34 +12713,35 @@ class PySILLS(tk.Frame):
             ## LABELS
             lbl_header_smpl = SE(
                 parent=window_issetup, row_id=0, column_id=0, n_rows=1,
-                n_columns=20, fg=accent_fg, bg=accent_bg).create_simple_label(
-                text="Internal Standard Setup", relief=tk.GROOVE, fontsize="sans 10 bold")
+                n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Internal Standard Setup", relief=tk.FLAT, fontsize="sans 10 bold")
             #
             self.gui_subwindows["Mineral Analysis"]["Check IS"]["Label"]["Permanent"].extend(
                 [lbl_header_smpl])
             #
             frm_iso = SE(
                 parent=window_issetup, row_id=1, column_id=0, n_rows=15, n_columns=20, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_frame()
+                bg=self.bg_colors["Very Light"]).create_frame()
             vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
             text_iso = tk.Text(
-                master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Light"])
+                master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
             vsb_iso.config(command=text_iso.yview)
             vsb_iso.pack(side="right", fill="y")
             text_iso.pack(side="left", fill="both", expand=True)
             #
             for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
                 file = self.container_lists["SMPL"]["Long"][index]
-                #
-                lbl_i = tk.Label(frm_iso, text=file_smpl, bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"])
+
+                lbl_i = tk.Label(
+                    frm_iso, text=file_smpl, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
-                #
+
                 if len(self.container_lists["Possible IS"]) == 0:
                     var_list_is = self.container_lists["ISOTOPES"]
                 else:
                     var_list_is = self.container_lists["Possible IS"]
-                #
+
                 opt_is_i = tk.OptionMenu(
                     frm_iso, self.container_var["SMPL"][file]["IS Data"]["IS"], *var_list_is,
                     command=lambda var_is=self.container_var["SMPL"][file]["IS Data"]["IS"], var_file=file,
@@ -12947,8 +12754,7 @@ class PySILLS(tk.Frame):
                     activeforeground=accent_fg, highlightthickness=0)
                 text_iso.window_create("end", window=opt_is_i)
                 text_iso.insert("end", "\t")
-                #
-                #self.container_files["SMPL"][file_smpl_short]["IS Concentration"]
+
                 if self.container_var["SMPL"][file]["IS Data"]["Concentration"].get() != "0.0":
                     var_txt_smpl_i = self.container_var["SMPL"][file]["IS Data"]["Concentration"].get()
                 else:
@@ -12958,7 +12764,7 @@ class PySILLS(tk.Frame):
                     frm_iso, textvariable=self.container_var["SMPL"][file]["IS Data"]["Concentration"])
                 text_iso.window_create("insert", window=entr_i)
                 text_iso.insert("end", "\n")
-            #
+
             ## Option Menu
             if self.container_var["IS"]["Default SMPL"].get() != "Select IS":
                 var_text_smpl = self.container_var["IS"]["Default SMPL"].get()
@@ -13526,7 +13332,7 @@ class PySILLS(tk.Frame):
         #
         tv_isotope = SE(
             parent=subwindow_srm_checkup, row_id=start_row + 12, column_id=start_column, n_rows=10, n_columns=17,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=3, text_n=["Name", "SRM", "Concentration (ppm)"], width_n=["70", "130", "140"],
             individual=True)
         #
@@ -13543,7 +13349,7 @@ class PySILLS(tk.Frame):
         #
         tv_srm = SE(
             parent=subwindow_srm_checkup, row_id=start_row + 2, column_id=start_column + 18, n_rows=20, n_columns=13,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=2, text_n=["Element", "Concentration (ppm)"], width_n=["100", "160"], individual=True)
         #
         ## Option Menus
@@ -13743,7 +13549,7 @@ class PySILLS(tk.Frame):
         #
         tv_std = SE(
             parent=subwindow_intervals, row_id=start_row + 1, column_id=start_column, n_rows=15, n_columns=26,
-            fg=self.slate_grey_dark, bg=self.slate_grey_light).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(var_categories), text_n=var_categories, width_n=var_widths, individual=True)
         #
         if self.pysills_mode == "MA":
@@ -13794,7 +13600,7 @@ class PySILLS(tk.Frame):
         #
         tv_smpl = SE(
             parent=subwindow_intervals, row_id=start_row + 17, column_id=start_column, n_rows=15, n_columns=26,
-            fg=self.slate_grey_dark, bg=self.slate_grey_light).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(var_categories), text_n=var_categories, width_n=var_widths, individual=True)
         #
         if self.pysills_mode == "MA":
@@ -13852,48 +13658,33 @@ class PySILLS(tk.Frame):
         window_width = 520
         window_heigth = 825
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         subwindow_aquisition_times = tk.Toplevel(self.parent)
         subwindow_aquisition_times.title("Check-Up - Acquisition  Times")
         subwindow_aquisition_times.geometry(var_geometry)
         subwindow_aquisition_times.resizable(False, False)
         subwindow_aquisition_times["bg"] = self.bg_colors["Very Dark"]
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_aquisition_times, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_aquisition_times, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_aquisition_times.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             subwindow_aquisition_times.grid_columnconfigure(i, minsize=column_min)
-        #
-        if self.pysills_mode == "MA":
-            accent_bg = self.colors_ma["Dark"]
-            accent_fg = self.colors_ma["Light Font"]
-        elif self.pysills_mode == "FI":
-            accent_bg = self.colors_fi["Dark"]
-            accent_fg = self.colors_fi["Light Font"]
-        elif self.pysills_mode == "MI":
-            accent_bg = self.colors_mi["Dark"]
-            accent_fg = self.colors_mi["Light Font"]
-        elif self.pysills_mode == "OA":
-            accent_bg = self.bg_colors["Dark"]
-            accent_fg = self.bg_colors["Light Font"]
-        #
-        ###########################################################
-        #
+
         start_column = 0
         start_row = 0
-        #
+
         ## LABELS
         lbl_std = SE(
             parent=subwindow_aquisition_times, row_id=start_row, column_id=start_column, n_rows=1, n_columns=16,
@@ -13903,33 +13694,33 @@ class PySILLS(tk.Frame):
             parent=subwindow_aquisition_times, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=16,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+
         ## ENTRY
         self.var_entr_std_time = tk.StringVar()
         self.var_entr_std_time.set("00:00:00")
-        #
+
         entr_std = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 1, column_id=start_column + 17, n_rows=2,
             n_columns=8, fg=self.green_dark, bg=self.green_medium).create_simple_entry(
             var=self.var_entr_std_time, text_default=self.var_entr_std_time.get(),
             command=lambda event, filetype="STD": self.change_value_acquisition(filetype, event))
-        #
+
         self.var_entr_smpl_time = tk.StringVar()
         self.var_entr_smpl_time.set("00:00:00")
-        #
+
         entr_smpl = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 17, column_id=start_column + 17, n_rows=2,
             n_columns=8, fg=self.green_dark, bg=self.green_medium).create_simple_entry(
             var=self.var_entr_smpl_time, text_default=self.var_entr_smpl_time.get(),
             command=lambda event, filetype="SMPL": self.change_value_acquisition(filetype, event))
-        #
+
         ## TREEVIEWS
         self.tv_std = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 1, column_id=start_column, n_rows=14, n_columns=15,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=2, text_n=["Filename", "Acquisition Time"],
             width_n=["150", "150"], individual=True)
-        #
+
         scb_v = ttk.Scrollbar(subwindow_aquisition_times, orient="vertical")
         scb_h = ttk.Scrollbar(subwindow_aquisition_times, orient="horizontal")
         self.tv_std.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
@@ -13937,13 +13728,12 @@ class PySILLS(tk.Frame):
         scb_h.config(command=self.tv_std.xview)
         scb_v.grid(row=start_row + 1, column=start_column + 15, rowspan=14, columnspan=1, sticky="ns")
         scb_h.grid(row=start_row + 15, column=start_column, rowspan=1, columnspan=15, sticky="ew")
-        #
+
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            #
             dates, times = Data(filename=var_file).import_as_list()
-            #
+
             if index == 0:
                 t_start_0 = datetime.timedelta(
                     hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
@@ -13952,25 +13742,24 @@ class PySILLS(tk.Frame):
             else:
                 t_start = datetime.timedelta(
                     hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
-            #
+
             t_delta_0 = (t_start - t_start_0).total_seconds()
             self.container_lists["Acquisition Times Delta"][file_std] = t_delta_0
-            #
+
             if file_std not in self.container_var["acquisition times"]["STD"]:
                 self.container_var["acquisition times"]["STD"][file_std] = tk.StringVar()
                 self.container_var["acquisition times"]["STD"][file_std].set(
                     times[0][0] + ":" + times[0][1] + ":" + times[0][2])
-            #
+
             entry_std = [file_std, self.container_var["acquisition times"]["STD"][file_std].get()]
-            #
             self.tv_std.insert("", tk.END, values=entry_std)
-        #
+
         self.tv_smpl = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 17, column_id=start_column, n_rows=14, n_columns=15,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=2, text_n=["Filename", "Acquisition Time"],
             width_n=["150", "150"], individual=True)
-        #
+
         scb_v = ttk.Scrollbar(subwindow_aquisition_times, orient="vertical")
         scb_h = ttk.Scrollbar(subwindow_aquisition_times, orient="horizontal")
         self.tv_smpl.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
@@ -13978,28 +13767,24 @@ class PySILLS(tk.Frame):
         scb_h.config(command=self.tv_smpl.xview)
         scb_v.grid(row=start_row + 17, column=start_column + 15, rowspan=14, columnspan=1, sticky="ns")
         scb_h.grid(row=start_row + 31, column=start_column, rowspan=1, columnspan=15, sticky="ew")
-        #
+
         for index, var_file in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = var_file.split("/")
             file_smpl = parts[-1]
-            #
-            # df_data = self.load_and_assign_data(filename=var_file)
+
             dates, times = Data(filename=var_file).import_as_list()
-            #
             t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
-            #
             t_delta_0 = (t_start - t_start_0).total_seconds()
             self.container_lists["Acquisition Times Delta"][file_smpl] = t_delta_0
-            #
+
             if file_smpl not in self.container_var["acquisition times"]["SMPL"]:
                 self.container_var["acquisition times"]["SMPL"][file_smpl] = tk.StringVar()
                 self.container_var["acquisition times"]["SMPL"][file_smpl].set(
                     times[0][0] + ":" + times[0][1] + ":" + times[0][2])
-            #
+
             entry_smpl = [file_smpl, self.container_var["acquisition times"]["SMPL"][file_smpl].get()]
-            #
             self.tv_smpl.insert("", tk.END, values=entry_smpl)
-    #
+
     def calculate_acquisition_time_deltas(self):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
@@ -14176,7 +13961,7 @@ class PySILLS(tk.Frame):
         ## TREEVIEW
         tv_std = SE(
             parent=subwindow_imported_files, row_id=start_row + 1, column_id=start_column, n_rows=15, n_columns=26,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=6, text_n=["Name", "N Isotopes", "t(start)", "t(end)", "t(day)", "date"],
             width_n=["120", "80", "80", "80", "80", "80"], individual=True)
         #
@@ -14197,7 +13982,7 @@ class PySILLS(tk.Frame):
         #
         tv_smpl = SE(
             parent=subwindow_imported_files, row_id=start_row + 17, column_id=start_column, n_rows=15, n_columns=26,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_treeview(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=6, text_n=["Name", "N Isotopes", "t(start)", "t(end)", "t(day)", "date"],
             width_n=["120", "80", "80", "80", "80", "80"], individual=True)
         #
