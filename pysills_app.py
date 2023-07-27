@@ -15,7 +15,7 @@
 import os, pathlib, sys, re, datetime, csv, string, math
 import numpy as np
 import pandas as pd
-import seaborn as sns
+#import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -9622,33 +9622,33 @@ class PySILLS(tk.Frame):
         #
         return results
     #
-    def show_histogram(self, filename):
-        self.fig = Figure(figsize=(10, 5), facecolor=self.green_light)
-        self.ax = self.fig.add_subplot()
-        sns.set_theme()
-
-        for isotope in self.container_lists["ISOTOPES"]:
-            hist = sns.histplot(data=self.container_measurements["EDITED"][filename][isotope]*10**(-6), multiple="stack", ax=self.ax)
-        self.ax.grid(True)
-        self.ax.set_axisbelow(True)
-
-        self.fig.subplots_adjust(bottom=0.125, top=0.975, left=0.075, right=0.975)
-
-        legend = self.ax.legend(fontsize="x-small", framealpha=1.0, edgecolor="white",
-                                bbox_to_anchor=(0.125, 0.015), loc=3, borderaxespad=0,
-                                bbox_transform=plt.gcf().transFigure, ncol=int(len(self.container_lists["ISOTOPES"])/2 + 1),
-                                facecolor="white")
-        plt.rcParams["savefig.facecolor"] = "white"
-        plt.rcParams["savefig.dpi"] = 300
-
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.parent)
-        self.canvas.get_tk_widget().grid(row=0, column=50, rowspan=38, columnspan=60, sticky="nesw")
-        self.toolbarFrame = tk.Frame(master=self.parent)
-        self.toolbarFrame.grid(row=38, column=50, rowspan=2, columnspan=60, sticky="w")
-        self.toolbar = NavigationToolbar2Tk(self.canvas, self.toolbarFrame)
-        self.toolbar.config(background=self.green_light)
-        self.toolbar._message_label.config(background=self.green_light)
-        self.toolbar.winfo_children()[-2].config(background=self.green_light)
+    # def show_histogram(self, filename):
+    #     self.fig = Figure(figsize=(10, 5), facecolor=self.green_light)
+    #     self.ax = self.fig.add_subplot()
+    #     sns.set_theme()
+    #
+    #     for isotope in self.container_lists["ISOTOPES"]:
+    #         hist = sns.histplot(data=self.container_measurements["EDITED"][filename][isotope]*10**(-6), multiple="stack", ax=self.ax)
+    #     self.ax.grid(True)
+    #     self.ax.set_axisbelow(True)
+    #
+    #     self.fig.subplots_adjust(bottom=0.125, top=0.975, left=0.075, right=0.975)
+    #
+    #     legend = self.ax.legend(fontsize="x-small", framealpha=1.0, edgecolor="white",
+    #                             bbox_to_anchor=(0.125, 0.015), loc=3, borderaxespad=0,
+    #                             bbox_transform=plt.gcf().transFigure, ncol=int(len(self.container_lists["ISOTOPES"])/2 + 1),
+    #                             facecolor="white")
+    #     plt.rcParams["savefig.facecolor"] = "white"
+    #     plt.rcParams["savefig.dpi"] = 300
+    #
+    #     self.canvas = FigureCanvasTkAgg(self.fig, master=self.parent)
+    #     self.canvas.get_tk_widget().grid(row=0, column=50, rowspan=38, columnspan=60, sticky="nesw")
+    #     self.toolbarFrame = tk.Frame(master=self.parent)
+    #     self.toolbarFrame.grid(row=38, column=50, rowspan=2, columnspan=60, sticky="w")
+    #     self.toolbar = NavigationToolbar2Tk(self.canvas, self.toolbarFrame)
+    #     self.toolbar.config(background=self.green_light)
+    #     self.toolbar._message_label.config(background=self.green_light)
+    #     self.toolbar.winfo_children()[-2].config(background=self.green_light)
     #
     def save_settings(self):
         #
@@ -15836,40 +15836,49 @@ class PySILLS(tk.Frame):
                 self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_opt)
                 if var_key == "Oxide":
                     var_oxide = self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].get()
-                    key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
-                    list_elements = []
-                    list_amounts = []
-                    list_fraction = {}
-                    #
-                    for index, item in enumerate(key.groups()):
-                        if index in [0, 2]:
-                            list_elements.append(item)
-                        else:
-                            if item == "":
-                                list_amounts.append(1)
-                            else:
-                                list_amounts.append(int(item))
-                    #
-                    mass_total = 0
-                    for index, element in enumerate(list_elements):
-                        if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-                            mass_total += list_amounts[index]*self.chemistry_data[element]
-                        else:
-                            mass_total += list_amounts[index]*self.chemistry_data_sills[element]
-                    #
-                    for index, element in enumerate(list_elements):
-                        if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-                            list_fraction[element] = (list_amounts[index]*self.chemistry_data[element])/mass_total
-                        else:
-                            list_fraction[element] = (list_amounts[index]*self.chemistry_data_sills[element])/mass_total
+                    if var_oxide != "Select Oxide":
+                        key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
+                        list_elements = []
+                        list_amounts = []
+                        list_fraction = {}
                         #
-                        if index == 0:
-                            oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"][
-                                "Concentration"].get()))/100
-                            is_concentration = round(list_fraction[element]*10**6, 4)
-                            self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
-                            self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(round(
-                                oxide_weight*is_concentration, 4))
+                        for index, item in enumerate(key.groups()):
+                            if index in [0, 2]:
+                                list_elements.append(item)
+                            else:
+                                if item == "":
+                                    list_amounts.append(1)
+                                else:
+                                    list_amounts.append(int(item))
+                        #
+                        mass_total = 0
+                        for index, element in enumerate(list_elements):
+                            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+                                mass_total += list_amounts[index]*self.chemistry_data[element]
+                            else:
+                                mass_total += list_amounts[index]*self.chemistry_data_sills[element]
+                        #
+                        for index, element in enumerate(list_elements):
+                            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+                                list_fraction[element] = (list_amounts[index]*self.chemistry_data[element])/mass_total
+                            else:
+                                list_fraction[element] = (list_amounts[index]*self.chemistry_data_sills[element])/mass_total
+                            #
+                            if index == 0:
+                                oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"][
+                                    "Concentration"].get()))/100
+                                is_concentration = round(list_fraction[element]*10**6, 4)
+                                self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
+                                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(round(
+                                    oxide_weight*is_concentration, 4))
+                    else:
+                        if self.container_var["IS"]["Default SMPL"].get() == "Select IS":
+                            self.container_var["IS"]["Default SMPL"].set(var_opt)
+                        if self.container_var["IS"]["Default STD"].get() == "Select IS":
+                            self.container_var["IS"]["Default STD"].set(var_opt)
+                            for file_std in self.container_lists["STD"]["Long"]:
+                                if self.container_var["STD"][file_std]["IS Data"]["IS"].get() == "Select IS":
+                                    self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_opt)
                 #
                 else:
                     oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
