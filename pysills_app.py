@@ -11,12 +11,19 @@
 #-----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES
-import os, pathlib
-import re, datetime, csv, string
-import sys
+# external
+import os, pathlib, sys, re, datetime, csv, string, math
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.figure import Figure
+import matplotlib.colors as mcolors
 import tkinter as tk
 from tkinter import filedialog, ttk, font
-import numpy as np
+# internal
 from modules.gui_elements import SimpleElements as SE
 from modules.spike_elimination import GrubbsTestSILLS
 from modules.essential_functions import EssentialsSRM as ESRM
@@ -26,15 +33,10 @@ from modules.chemistry import PeriodicSystem
 from modules.data import Data
 from modules.fluid_inclusions import FluidInclusions
 from modules.mineral_analysis import MineralAnalysis
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.figure import Figure
-import matplotlib.colors as mcolors
-import seaborn as sns
-import pandas as pd
-import math
 
-## GUI
+###############
+### PySILLS ###
+###############
 class PySILLS(tk.Frame):
     #
     def __init__(self, parent, var_screen_width, var_screen_height):
@@ -1194,8 +1196,6 @@ class PySILLS(tk.Frame):
                         t_end = self.container_helper["STD"][filename]["BG"][1]["Times"][1]
                         start_index = times[times == t_start].index[0]
                         end_index = times[times == t_end].index[0]
-                        # start_index = times[times == self.container_helper["Default BG"]["Times"][0]].index[0]
-                        # end_index = times[times == self.container_helper["Default BG"]["Times"][1]].index[0]
                         self.container_helper["Default BG"]["Positions"][0] = start_index
                         self.container_helper["Default BG"]["Positions"][1] = end_index
                         #
@@ -1203,8 +1203,6 @@ class PySILLS(tk.Frame):
                         t_end = self.container_helper["STD"][filename]["SIG"][1]["Times"][1]
                         start_index = times[times == t_start].index[0]
                         end_index = times[times == t_end].index[0]
-                        # start_index = times[times == self.container_helper["Default SIG"]["Times"][0]].index[0]
-                        # end_index = times[times == self.container_helper["Default SIG"]["Times"][1]].index[0]
                         self.container_helper["Default SIG"]["Positions"][0] = start_index
                         self.container_helper["Default SIG"]["Positions"][1] = end_index
                 #
@@ -1305,8 +1303,6 @@ class PySILLS(tk.Frame):
                         t_end = self.container_helper["SMPL"][filename]["BG"][1]["Times"][1]
                         start_index = times[times == t_start].index[0]
                         end_index = times[times == t_end].index[0]
-                        # start_index = times[times == self.container_helper["Default BG"]["Times"][0]].index[0]
-                        # end_index = times[times == self.container_helper["Default BG"]["Times"][1]].index[0]
                         self.container_helper["Default BG"]["Positions"][0] = start_index
                         self.container_helper["Default BG"]["Positions"][1] = end_index
                         #
@@ -1314,8 +1310,6 @@ class PySILLS(tk.Frame):
                         t_end = self.container_helper["SMPL"][filename]["SIG"][1]["Times"][1]
                         start_index = times[times == t_start].index[0]
                         end_index = times[times == t_end].index[0]
-                        # start_index = times[times == self.container_helper["Default SIG"]["Times"][0]].index[0]
-                        # end_index = times[times == self.container_helper["Default SIG"]["Times"][1]].index[0]
                         self.container_helper["Default SIG"]["Positions"][0] = start_index
                         self.container_helper["Default SIG"]["Positions"][1] = end_index
                 #
@@ -1670,13 +1664,7 @@ class PySILLS(tk.Frame):
                     self.container_measurements["RAW"][filename_short]["Time"] = times.tolist()
                     self.container_measurements["EDITED"][filename_short]["Time"] = times.tolist()
                     self.container_measurements["SELECTED"][filename_short]["Time"] = times.tolist()
-                    #
-                    # self.container_helper["limits SPK"][filename_long]["ID"].append(spk_id)
-                    # self.container_helper["limits SPK"][filename_long]["type"].append("custom")
-                    # self.container_helper["limits SPK"][filename_long]["info"].append([isotope, spk_id])
-                    # self.container_helper["positions"]["SPK"][filename_short].append(
-                    #     [round(start_time, 4), round(end_time, 4)])
-                    #
+
                     for isotope in self.container_lists["ISOTOPES"]:
                         self.container_measurements["RAW"][filename_short][isotope] = df_data[isotope].tolist()
                         self.container_measurements["EDITED"][filename_short][isotope] = {}
@@ -1706,15 +1694,10 @@ class PySILLS(tk.Frame):
                                 var_settings = "fi_setting"
                             elif mode == "MI":
                                 var_settings = "mi_setting"
-                        #
+
                         self.spikes_isotopes["STD"][filename_short][isotope] = []
                         self.spikes_isotopes["STD"][filename_short][isotope].append([start_index, end_index])
-                        # self.container_helper["STD"][filename_short]["SPK"][isotope] = {}
-                        # self.container_helper["STD"][filename_short]["SPK"][isotope][spk_id] = {
-                        #     "Times": [round(start_time, 4), round(end_time, 4)],
-                        #     "Positions": [start_index, end_index],
-                        #     "Object": [box_spk, box_spk_ratio]}
-                    #
+
                 self.do_spike_elimination_all_grubbs(filetype=filetype)
                 self.fast_track_std = True
                 self.counter_fast_track_std += 1
@@ -1765,13 +1748,7 @@ class PySILLS(tk.Frame):
                     self.container_measurements["RAW"][filename_short]["Time"] = times.tolist()
                     self.container_measurements["EDITED"][filename_short]["Time"] = times.tolist()
                     self.container_measurements["SELECTED"][filename_short]["Time"] = times.tolist()
-                    #
-                    # self.container_helper["limits SPK"][filename_long]["ID"].append(spk_id)
-                    # self.container_helper["limits SPK"][filename_long]["type"].append("custom")
-                    # self.container_helper["limits SPK"][filename_long]["info"].append([isotope, spk_id])
-                    # self.container_helper["positions"]["SPK"][filename_short].append(
-                    #     [round(start_time, 4), round(end_time, 4)])
-                    #
+
                     for isotope in self.container_lists["ISOTOPES"]:
                         self.container_measurements["RAW"][filename_short][isotope] = df_data[isotope].tolist()
                         self.container_measurements["EDITED"][filename_short][isotope] = {}
@@ -1806,18 +1783,15 @@ class PySILLS(tk.Frame):
                         #
                         self.spikes_isotopes["SMPL"][filename_short][isotope] = []
                         self.spikes_isotopes["SMPL"][filename_short][isotope].append([start_index, end_index])
-                        # self.container_helper["SMPL"][filename_short]["SPK"][isotope] = {}
-                        # self.container_helper["SMPL"][filename_short]["SPK"][isotope][spk_id] = {
-                        #     "Times": [round(start_time, 4), round(end_time, 4)],
-                        #     "Positions": [start_index, end_index],
-                        #     "Object": [box_spk, box_spk_ratio]}
-                    #
+
                 self.do_spike_elimination_all_grubbs(filetype=filetype)
                 self.fast_track_smpl = True
                 self.counter_fast_track_smpl += 1
                 self.container_var["Spike Elimination"]["SMPL"]["State"] = True
                 #
-                if self.pysills_mode == "FI":
+                if self.pysills_mode == "MA":
+                    self.frm_09f.config(background=self.sign_green, bd=1)
+                elif self.pysills_mode == "FI":
                     if self.container_var["fi_setting"]["Spike Elimination Inclusion"].get() == 1:
                         self.frm_09f.config(background=self.sign_green, bd=1)
                     elif self.container_var["fi_setting"]["Spike Elimination Inclusion"].get() == 2:
@@ -4575,11 +4549,12 @@ class PySILLS(tk.Frame):
         if len(self.container_lists["ISOTOPES"]) == 0:
             self.container_lists["ISOTOPES"] = list_keys
             #
-            self.palette_complete = sns.color_palette(
-                "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            self.isotope_colors = {}
-            for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                self.isotope_colors[isotope] = self.palette_complete[index]
+            self.define_isotope_colors()
+            # self.palette_complete = sns.color_palette(
+            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            # self.isotope_colors = {}
+            # for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #     self.isotope_colors[isotope] = self.palette_complete[index]
         #
         icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
         y_max = np.amax(icp_measurements)
@@ -9046,13 +9021,14 @@ class PySILLS(tk.Frame):
             elif self.pysills_mode == "MI":
                 pass
             #
-            self.palette_complete = sns.color_palette(
-                "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            self.isotope_colors = {}
-            #
-            for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                self.isotope_colors[isotope] = self.palette_complete[index]
-                self.container_files["SRM"][isotope] = tk.StringVar()
+            self.define_isotope_colors()
+            # self.palette_complete = sns.color_palette(
+            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            # self.isotope_colors = {}
+            # #
+            # for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #     self.isotope_colors[isotope] = self.palette_complete[index]
+            #     self.container_files["SRM"][isotope] = tk.StringVar()
             #
             self.file_loaded = True
             self.demo_mode = False
@@ -10567,12 +10543,14 @@ class PySILLS(tk.Frame):
             self.list_isotopes = list(df_exmpl.columns.values)
             self.list_isotopes.pop(0)
             self.container_lists["ISOTOPES"] = self.list_isotopes
-            self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            if bool(self.container_files["SRM"]) == False:
-                self.isotope_colors = {}
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                    self.container_files["SRM"][isotope] = tk.StringVar()
-                    self.isotope_colors[isotope] = self.palette_complete[index]
+
+            self.define_isotope_colors()
+            # self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            # if bool(self.container_files["SRM"]) == False:
+            #     self.isotope_colors = {}
+            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #         self.container_files["SRM"][isotope] = tk.StringVar()
+            #         self.isotope_colors[isotope] = self.palette_complete[index]
         except:
             #
             path = os.getcwd()
@@ -10608,12 +10586,14 @@ class PySILLS(tk.Frame):
             self.list_isotopes = list(df_exmpl.columns.values)
             self.list_isotopes.pop(0)
             self.container_lists["ISOTOPES"] = self.list_isotopes
-            self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            if bool(self.container_files["SRM"]) == False:
-                self.isotope_colors = {}
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                    self.container_files["SRM"][isotope] = tk.StringVar()
-                    self.isotope_colors[isotope] = self.palette_complete[index]
+
+            self.define_isotope_colors()
+            # self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            # if bool(self.container_files["SRM"]) == False:
+            #     self.isotope_colors = {}
+            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #         self.container_files["SRM"][isotope] = tk.StringVar()
+            #         self.isotope_colors[isotope] = self.palette_complete[index]
             #
             self.demo_view = False
         #
@@ -12588,12 +12568,15 @@ class PySILLS(tk.Frame):
                 filetype = "STD"
             elif filename in self.container_lists["SMPL"]["Short"]:
                 filetype = "SMPL"
-            #
+
+            var_index = self.container_lists[filetype]["Short"].index(filename)
+            filename_long = self.container_lists[filetype]["Long"][var_index]
+
             t_start = dataset[mode]["Start"]
             t_end = dataset[mode]["End"]
             index_start = dataset[mode]["Index"][0]
             index_end = dataset[mode]["Index"][1]
-            #
+
             if self.pysills_mode == "MA23":
                 self.container_helper[filetype][filename][mode][1] = {
                     "Times": [t_start, t_end],
@@ -12604,6 +12587,8 @@ class PySILLS(tk.Frame):
                     "Times": [t_start, t_end], "Indices": [index_start, index_end], "Object": None}
                 self.container_helper[filetype][filename][mode]["ID"] += 1
                 self.container_helper[filetype][filename][mode]["Indices"].append(1)
+
+            self.container_var[filetype][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
     #
     def internal_standard_concentration_setup(self):
         try:
@@ -14198,12 +14183,22 @@ class PySILLS(tk.Frame):
             self.list_isotopes = list(df_exmpl.columns.values)
             self.list_isotopes.pop(0)
             self.container_lists["ISOTOPES"] = self.list_isotopes
-            self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            if bool(self.container_files["SRM"]) == False:
-                self.isotope_colors = {}
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                    self.container_files["SRM"][isotope] = tk.StringVar()
-                    self.isotope_colors[isotope] = self.palette_complete[index]
+
+            self.define_isotope_colors()
+            # #self.palette_complete = sns.color_palette(
+            # #    "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            #
+            # cmap = plt.get_cmap("nipy_spectral", len(self.container_lists["ISOTOPES"]))
+            # colors_mpl = []
+            # for i in range(cmap.N):
+            #     rgba = cmap(i)
+            #     colors_mpl.append(mpl.colors.rgb2hex(rgba))
+            # if bool(self.container_files["SRM"]) == False:
+            #     self.isotope_colors = {}
+            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #         self.container_files["SRM"][isotope] = tk.StringVar()
+            #         #self.isotope_colors[isotope] = self.palette_complete[index]
+            #         self.isotope_colors[isotope] = colors_mpl[index]
         #
         ## Window Settings
         window_width = 1260
@@ -15103,17 +15098,17 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_imported_files)
-        btn_std = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_smpl - 2,
-            column_id=n_col_header + 1 + n_col_files - 6,
-            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
-            bg=self.colors_fi["Medium"]).create_simple_button(
-            text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        btn_smpl = SE(
-            parent=self.subwindow_ma_settings, row_id=n_rows - 2, column_id=n_col_header + 1 + n_col_files - 6,
-            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
-            bg=self.colors_fi["Medium"]).create_simple_button(
-            text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        # btn_std = SE(
+        #     parent=self.subwindow_ma_settings, row_id=start_row_smpl - 2,
+        #     column_id=n_col_header + 1 + n_col_files - 6,
+        #     n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
+        #     bg=self.colors_fi["Medium"]).create_simple_button(
+        #     text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        # btn_smpl = SE(
+        #     parent=self.subwindow_ma_settings, row_id=n_rows - 2, column_id=n_col_header + 1 + n_col_files - 6,
+        #     n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
+        #     bg=self.colors_fi["Medium"]).create_simple_button(
+        #     text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         #
         ## RADIOBUTTONS
         rb_03a = SE(
@@ -15391,6 +15386,19 @@ class PySILLS(tk.Frame):
         #     self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
         #     self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
         #     self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+
+    def define_isotope_colors(self, var_cm="nipy_spectral"):
+        var_n = len(self.container_lists["ISOTOPES"])
+        cmap = plt.get_cmap(var_cm, var_n)
+        colors_mpl = []
+        for i in range(cmap.N):
+            rgba = cmap(i)
+            colors_mpl.append(mpl.colors.rgb2hex(rgba))
+        if bool(self.container_files["SRM"]) == False:
+            self.isotope_colors = {}
+            for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                self.container_files["SRM"][isotope] = tk.StringVar()
+                self.isotope_colors[isotope] = colors_mpl[index]
 
     def build_container_helper(self, mode):
         """Creates and defines some important helper variables.
@@ -16035,8 +16043,10 @@ class PySILLS(tk.Frame):
         btn_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
             fg=self.colors_fi["Dark Font"], bg=self.accent_color).create_simple_button(
-            text="Confirm and Update \nData", bg_active=self.bg_colors["Dark"],
-            fg_active=self.bg_colors["Light Font"])
+            text="Confirm and Close", bg_active=self.bg_colors["Dark"],
+            fg_active=self.bg_colors["Light Font"],
+            command=lambda var_parent=self.subwindow_ma_checkfile, var_type=var_type, var_file_long=var_file:
+            self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
         #
         ## RADIOBUTTONS
         rb_02a = SE(
@@ -16203,7 +16213,11 @@ class PySILLS(tk.Frame):
         ## INITIALIZATION
         #
         self.ma_show_time_signal_diagram(var_file=var_file, var_type=var_type)
-    #
+
+    def confirm_specific_file_setup(self, var_parent, var_type, var_file_long):
+        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+        var_parent.destroy()
+
     def ma_show_time_signal_diagram(self, var_file, var_type, var_lb_state=True):
         #
         parts = var_file.split("/")
@@ -18180,26 +18194,29 @@ class PySILLS(tk.Frame):
             self.list_isotopes = list(df_exmpl.columns.values)
             self.list_isotopes.pop(0)
             self.container_lists["ISOTOPES"] = self.list_isotopes
-            self.palette_complete = sns.color_palette(
-                "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            #
-            if bool(self.container_files["SRM"]) == False:
-                self.isotope_colors = {}
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                    self.container_files["SRM"][isotope] = tk.StringVar()
-                    self.isotope_colors[isotope] = self.palette_complete[index]
+
+            self.define_isotope_colors()
+            # self.palette_complete = sns.color_palette(
+            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            # #
+            # if bool(self.container_files["SRM"]) == False:
+            #     self.isotope_colors = {}
+            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #         self.container_files["SRM"][isotope] = tk.StringVar()
+            #         self.isotope_colors[isotope] = self.palette_complete[index]
         else:
             self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
             self.fi_current_file_smpl = self.container_lists["SMPL"]["Long"][0]
 
-            self.palette_complete = sns.color_palette(
-                "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-
-            if bool(self.container_files["SRM"]) == False:
-                self.isotope_colors = {}
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                    self.container_files["SRM"][isotope] = tk.StringVar()
-                    self.isotope_colors[isotope] = self.palette_complete[index]
+            self.define_isotope_colors()
+            # self.palette_complete = sns.color_palette(
+            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
+            #
+            # if bool(self.container_files["SRM"]) == False:
+            #     self.isotope_colors = {}
+            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            #         self.container_files["SRM"][isotope] = tk.StringVar()
+            #         self.isotope_colors[isotope] = self.palette_complete[index]
         #
         ## Window Settings
         window_width = 1260
@@ -22125,6 +22142,11 @@ class PySILLS(tk.Frame):
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is)
 
+            if self.container_var["IS"]["Default STD"].get() == "Select IS":
+                self.container_var["IS"]["Default STD"].set(var_is)
+                for file_std in self.container_lists["STD"]["Long"]:
+                    self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
+
     def fi_select_is_default(self, var_opt, mode="STD"):
         if mode == "STD":
             var_is = var_opt
@@ -22568,11 +22590,14 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Remove Interval", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short: self.fi_remove_interval(var_type, var_file_short))
+            command=lambda var_type=var_type, var_file_short=var_file_short:
+            self.fi_remove_interval(var_type, var_file_short))
         btn_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
             fg=self.colors_fi["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
-            text="Confirm and Update \nData", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"])
+            text="Confirm and Update \nData", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"],
+            command=lambda var_parent=self.subwindow_fi_checkfile, var_type=var_type, var_file_long=var_file:
+            self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
         #
         ## RADIOBUTTONS
         rb_02a = SE(
@@ -25601,10 +25626,10 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
                 text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda mode="SMPL": self.custom_spike_check(mode))
-            btn_09g = SE(
-                parent=var_parent, row_id=start_row + 7, column_id=7, n_rows=1, n_columns=11,
-                fg=self.colors_fi["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
-                text="Confirm all spikes", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            # btn_09g = SE(
+            #     parent=var_parent, row_id=start_row + 7, column_id=7, n_rows=1, n_columns=11,
+            #     fg=self.colors_fi["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
+            #     text="Confirm all spikes", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             #
             # Frames
             self.frm_09e = SE(
