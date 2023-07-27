@@ -23,11 +23,20 @@ construction sites in the code, but I would like to know which ones are the most
 different users have different ideas how a mineral or fluid inclusion analysis project should be done. I have developed 
 PySILLS with my workflow in my mind. Now, the goal is to make it also applicable for your workflow.
 
-Let's catch the bugs and smash them! 👊🪲🪳
+Let's catch the bugs and smash them! 👊
 
 ## 🚀 Installation
 
-Coming soon ...
+It is planned that PySILLS will be able to install via PyPi and conda, since all required dependencies will then be 
+installed automatically.
+
+Alternatively, it is possible to run PySILLS by a manual installation of Python and - if not already installed - the 
+following packages:
+
+* numpy
+* scipy
+* pandas
+* matplotlib
 
 ## 💻 Resources
 
