@@ -1582,8 +1582,8 @@ class PySILLS(tk.Frame):
                                             var_key = "RAW"
                                         #
                                         try:
-                                            value_02["BG"] = list(self.container_measurements[var_key][filename][key_02][
-                                                interval[0]:interval[1] + 1])
+                                            value_02["BG"] = list(self.container_measurements[var_key][filename][
+                                                                      key_02][interval[0]:interval[1] + 1])
                                         except:
                                             value_02["BG"].extend(list(np.ones(1000)))
                                 for interval in merged_intervals_sig:
@@ -1602,21 +1602,13 @@ class PySILLS(tk.Frame):
                                             var_key = "RAW"
                                         #
                                         try:
-                                            value_02["SIG"] = list(self.container_measurements[var_key][filename][key_02][
-                                                interval[0]:interval[1] + 1])
+                                            value_02["SIG"] = list(self.container_measurements[var_key][filename][
+                                                                       key_02][interval[0]:interval[1] + 1])
                                         except:
                                             value_02["SIG"].extend(list(np.ones(1000)))
-                #
+
                 self.container_var[filetype][file_smpl]["Frame"].config(bg=self.sign_green)
-                #
-        #
-        # for key01, value01 in self.container_measurements.items():
-        #     print("key01:", key01)
-        #     for key02, value02 in value01.items():
-        #         print("key02:", key02)
-        #         for key03, value03 in value02.items():
-        #             print("key03_", key03)
-        #             print(value03)
+
     def build_srm_database(self):
         for key, item in self.container_var["SRM"].items():
             if key != "default":
@@ -1637,8 +1629,6 @@ class PySILLS(tk.Frame):
         if len(helper_list) > 0:
             for var_srm in helper_list:
                 self.fill_srm_values(var_srm=var_srm)
-
-        print(self.srm_actual)
 
     def update_significance_level(self, var_entry, event):
         self.container_var["settings"]["SE Alpha"].set(var_entry.get())
