@@ -5,8 +5,8 @@
 
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
-# Version:	1.0
-# Date:		25.07.2023
+# Version:	pre-release
+# Date:		27.07.2023
 
 #-----------------------------------------------
 
@@ -237,8 +237,11 @@ class GrubbsTestAlternative(object):
         :return: the index of the outlier if one if found; None otherwise
         """
         target_index, value = self._target(data)
-
-        g = value / data.std()
+        var_std = data.std()
+        if var_std > 0:
+            g = value/var_std
+        else:
+            g = 0
         g_test = self._get_g_test(data, alpha)
         return target_index if g > g_test else None
 
