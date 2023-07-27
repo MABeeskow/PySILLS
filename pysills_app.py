@@ -725,6 +725,8 @@ class PySILLS(tk.Frame):
         self.container_lists["Selected Salts"] = []
         self.container_lists["SRM Data"] = {}
         self.container_lists["SRM"] = []
+        self.container_lists["SRM Files"] = {}
+        self.container_lists["SRM Isotopes"] = {}
         self.container_lists["IS"] = []
         self.container_lists["ID"] = []
         self.container_lists["Possible IS"] = []
@@ -1615,7 +1617,29 @@ class PySILLS(tk.Frame):
         #         for key03, value03 in value02.items():
         #             print("key03_", key03)
         #             print(value03)
-    #
+    def build_srm_database(self):
+        for key, item in self.container_var["SRM"].items():
+            if key != "default":
+                if key in self.container_lists["ISOTOPES"]:
+                    self.container_lists["SRM Isotopes"][key] = item.get()
+                else:
+                    key_short = key.split("/")[-1]
+                    self.container_lists["SRM Files"][key_short] = item.get()
+
+        self.collect_srm_data()
+
+    def collect_srm_data(self):
+        helper_list = []
+        for var_srm in self.container_lists["SRM Files"].values():
+            if var_srm not in helper_list and var_srm != "Select SRM":
+                helper_list.append(var_srm)
+
+        if len(helper_list) > 0:
+            for var_srm in helper_list:
+                self.fill_srm_values(var_srm=var_srm)
+
+        print(self.srm_actual)
+
     def update_significance_level(self, var_entry, event):
         self.container_var["settings"]["SE Alpha"].set(var_entry.get())
     #
@@ -2185,318 +2209,6 @@ class PySILLS(tk.Frame):
         #                                  filename=self.filename_short, ratio_mode=True:
         #     self.onclick(var, filename, ratio_mode, event))
 
-    #
-    def sub_mineralanalysis_reduction(self):
-        ## Cleaning
-        categories = ["SRM", "ma_setting", "ma_dataexploration", "plotting", "PSE", "ma_datareduction_files"]
-        for category in categories:
-            if len(self.container_elements[category]["Label"]) > 0:
-                for item in self.container_elements[category]["Label"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Button"]) > 0:
-                for item in self.container_elements[category]["Button"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Option Menu"]) > 0:
-                for item in self.container_elements[category]["Option Menu"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Entry"]) > 0:
-                for item in self.container_elements[category]["Entry"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Frame"]) > 0:
-                for item in self.container_elements[category]["Frame"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Radiobutton"]) > 0:
-                for item in self.container_elements[category]["Radiobutton"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Checkbox"]) > 0:
-                for item in self.container_elements[category]["Checkbox"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Listbox"]) > 0:
-                for item in self.container_elements[category]["Listbox"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Radiobutton"]) > 0:
-                for item in self.container_elements[category]["Radiobutton"]:
-                    item.grid_remove()
-        try:
-            self.fig.clf()
-            self.ax.cla()
-            self.canvas.get_tk_widget().grid_remove()
-            self.toolbarFrame.grid_remove()
-        except AttributeError:
-            pass
-        try:
-            if self.canvas:
-                self.canvas.destroy()
-            if self.toolbarFrame:
-                self.toolbarFrame.destroy()
-        except AttributeError:
-            pass
-        #
-        categories = ["Label", "Entry", "Button", "Frame"]
-        for category in categories:
-            if len(self.gui_elements["ma_setting"][category]["Specific"]) > 0:
-                for gui_item in self.gui_elements["ma_setting"][category]["Specific"]:
-                    gui_item.grid_remove()
-        #
-        ## Reconstruction
-        try:
-            for lbl_item in self.container_elements["ma_datareduction"]["Label"]:
-                lbl_item.grid()
-            for btn_item in self.container_elements["ma_datareduction"]["Button"]:
-                btn_item.grid()
-            for optmen_item in self.container_elements["ma_datareduction"]["Option Menu"]:
-                optmen_item.grid()
-            for entr_item in self.container_elements["ma_datareduction"]["Entry"]:
-                entr_item.grid()
-            for entr_item in self.container_elements["ma_datareduction"]["Frame"]:
-                entr_item.grid()
-            for rb_item in self.container_elements["ma_datareduction"]["Radiobutton"]:
-                rb_item.grid()
-            #
-        except:
-            print("Error! Reconstruction 'Data Reduction' failed!")
-        #
-        subcategories_01 = ["Label", "Button", "Option Menu", "Entry", "Frame", "Radiobutton", "Checkbox", "Listbox"]
-        subcategories_02 = ["General", "Specific"]
-        #
-        for subcategory_01 in subcategories_01:
-            for subcategory_02 in subcategories_02:
-                if len(self.gui_elements["ma_datareduction"][subcategory_01][subcategory_02]) > 0:
-                    for gui_item in self.gui_elements["ma_datareduction"][subcategory_01][subcategory_02]:
-                        gui_item.grid()
-        #
-        try:
-            self.canvas_datareduction.get_tk_widget().grid()
-            self.toolbarFrame_datareduction.grid()
-        except:
-            print("Reconstruction of diagram failed!")
-        #
-        self.container_lists["SRM"].clear()
-        self.container_lists["IS"].clear()
-        self.container_lists["ID"].clear()
-        self.container_lists["ID Files"].clear()
-        list_files = ["All Standard Files", "All Sample Files"]
-        #
-        for key, value in self.container_files["SRM"].items():
-            if value.get() not in self.container_lists["SRM"] and value.get() in self.list_srm:
-                self.container_lists["SRM"].append(value.get())
-                self.fill_srm_values(var_srm=value.get())
-        #
-        for key, value in self.container_files["STD"].items():
-            self.container_lists["IS"].append(value["IS"].get())
-        for key, value in self.container_files["SMPL"].items():
-            self.container_lists["IS"].append(value["IS"].get())
-        self.container_lists["IS"] = list(dict.fromkeys(self.container_lists["IS"]))
-        #
-        for filename, item in self.container_files["SMPL"].items():
-            if item["ID"].get() not in self.container_lists["ID"]:
-                self.container_lists["ID"].append(item["ID"].get())
-                self.container_lists["ID Files"][item["ID"].get()] = [filename]
-                list_files.append(str(item["ID"].get()) + " Files")
-            elif item["ID"].get() in self.container_lists["ID"] and item["ID"].get() in self.container_lists["ID Files"]:
-                self.container_lists["ID Files"][item["ID"].get()].append(filename)
-        #
-        ## LABELS
-        if len(self.container_elements["ma_datareduction"]["Label"]) == 0:
-            lbl_01 = SE(
-                parent=self.parent, row_id=0, column_id=21, n_rows=2, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Internal Standard", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_02 = SE(
-                parent=self.parent, row_id=3, column_id=21, n_rows=2, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Data Selection", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_03 = SE(
-                parent=self.parent, row_id=7, column_id=21, n_rows=2, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="File Selection", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_04 = SE(
-                parent=self.parent, row_id=12, column_id=21, n_rows=2, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Results", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_05 = SE(
-                parent=self.parent, row_id=0, column_id=31, n_rows=2, n_columns=3, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Isotope", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_datareduction"]["Label"]["General"].extend(
-                [lbl_01, lbl_02, lbl_03, lbl_04, lbl_05])
-            self.container_elements["ma_datareduction"]["Label"].extend(
-                [lbl_01, lbl_02, lbl_03, lbl_04, lbl_05])
-            #
-            for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                ## LABELS
-                lbl_isotope = SE(
-                    parent=self.parent, row_id=2+index, column_id=31, n_rows=1, n_columns=3, fg=self.green_light,
-                    bg=self.green_medium).create_simple_label(
-                    text=isotope, relief=tk.GROOVE, fontsize="sans 10 bold")
-                #
-                self.container_elements["ma_datareduction"]["Label"].append(lbl_isotope)
-                self.gui_elements["ma_datareduction"]["Label"]["General"].append(lbl_isotope)
-            #
-            ## RADIOBUTTONS
-            rb_raw = SE(
-                parent=self.parent, row_id=5, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.yellow_dark).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][0], value_rb=0, color_bg=self.green_medium,
-                fg=self.green_light, text="RAW Data", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][0], init_routine=False:
-                self.select_datareduction_datatype(var_rb, init_routine))
-            rb_smoothed = SE(
-                parent=self.parent, row_id=6, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.yellow_dark).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][0], value_rb=1, color_bg=self.green_medium,
-                fg=self.green_light, text="SMOOTHED Data", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][0], init_routine=False:
-                self.select_datareduction_datatype(var_rb, init_routine))
-            rb_std = SE(
-                parent=self.parent, row_id=9, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1], value_rb=0, color_bg=self.green_medium,
-                fg=self.green_light, text="All Standard Files", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1], init_routine=False:
-                self.select_datareduction_filetype(var_rb, init_routine))
-            rb_smpl = SE(
-                parent=self.parent, row_id=10, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1], value_rb=1, color_bg=self.green_medium,
-                fg=self.green_light, text="All Sample Files", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1], init_routine=False:
-                self.select_datareduction_filetype(var_rb, init_routine))
-            rb_assemblage = SE(
-                parent=self.parent, row_id=11, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1], value_rb=2, color_bg=self.green_medium,
-                fg=self.green_light, text="Assemblage", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1], init_routine=False:
-                self.select_datareduction_filetype(var_rb, init_routine))
-            rb_results_concentration = SE(
-                parent=self.parent, row_id=14, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2], value_rb=0, color_bg=self.green_medium,
-                fg=self.green_light, text="Concentration", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2]:
-                self.show_datareduction_tables(var_rb))
-            rb_results_intensity = SE(
-                parent=self.parent, row_id=15, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2], value_rb=1, color_bg=self.green_medium,
-                fg=self.green_light, text="Intensity", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2]:
-                self.show_datareduction_tables(var_rb))
-            rb_results_sensitivity = SE(
-                parent=self.parent, row_id=16, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2], value_rb=2, color_bg=self.green_medium,
-                fg=self.green_light, text="Sensitivity", sticky="nesw", relief=tk.GROOVE,
-                command=lambda var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2]:
-                self.show_datareduction_tables(var_rb))
-            #
-            self.container_elements["ma_datareduction"]["Radiobutton"].extend(
-                [rb_raw, rb_smoothed, rb_std, rb_smpl, rb_assemblage, rb_results_concentration, rb_results_intensity,
-                 rb_results_sensitivity])
-            #
-            for index, srm in enumerate(self.container_lists["SRM"]):
-                rb_srm = SE(
-                    parent=self.parent, row_id=21 + index, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                    bg=self.yellow_dark).create_radiobutton(
-                    var_rb=self.container_var["ma_datareduction"]["Radiobutton"][4], value_rb=index,
-                    color_bg=self.green_medium, fg=self.green_light, text=srm, sticky="nesw", relief=tk.GROOVE)
-                #
-                self.container_elements["ma_datareduction"]["Radiobutton"].append(rb_srm)
-            #
-            ## OPTION MENUS
-            self.container_var["ma_datareduction"]["Option IS"].set(self.container_lists["IS"][0])
-            self.container_var["ma_datareduction"]["Option Drift"].set(self.container_lists["ISOTOPES"][0])
-            #
-            opt_menu_is = SE(
-                parent=self.parent, row_id=2, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_option_isotope(
-                var_iso=self.container_var["ma_datareduction"]["Option IS"], option_list=self.container_lists["IS"],
-                text_set=self.container_lists["IS"][0], fg_active=self.green_dark, bg_active=self.red_dark)
-            self.opt_menu_id = SE(
-                parent=self.parent, row_id=11, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_simple_optionmenu(
-                var_opt=self.container_var["ma_datareduction"]["Option ID"],
-                var_default=self.container_var["ma_datareduction"]["Option ID"].get(),
-                var_list=list(self.container_lists["ID Files"].keys()), fg_active=self.green_dark,
-                bg_active=self.red_dark, command=lambda var_opt=self.container_var["ma_datareduction"]["Option ID"]:
-                self.select_assemblage(var_opt))
-            #
-            self.container_elements["ma_datareduction"]["Option Menu"].extend([opt_menu_is, self.opt_menu_id])
-            #
-            ## BUTTONS
-            btn_export = SE(
-                parent=self.parent, row_id=17, column_id=21, n_rows=2, n_columns=9, fg=self.green_dark,
-                bg=self.red_dark).create_simple_button(
-                text="Export Calculation Report", bg_active=self.green_dark, fg_active=self.green_light,
-                command=lambda file_type=self.container_var["ma_datareduction"]["Option ID"],
-                               data_type=self.container_var["ma_datareduction"]["Radiobutton"][0].get():
-                self.export_calculation_report(file_type, data_type))
-            #
-            self.container_elements["ma_datareduction"]["Button"].extend([btn_export])
-            #
-        else:
-            self.opt_menu_id.destroy()
-            #
-            self.opt_menu_id = SE(
-                parent=self.parent, row_id=11, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_simple_optionmenu(
-                var_opt=self.container_var["ma_datareduction"]["Option ID"],
-                var_default=self.container_var["ma_datareduction"]["Option ID"].get(),
-                var_list=list(self.container_lists["ID Files"].keys()), fg_active=self.green_dark,
-                bg_active=self.red_dark, command=lambda var_opt=self.container_var["ma_datareduction"]["Option ID"]:
-                self.select_assemblage(var_opt))
-            #
-            self.container_elements["ma_datareduction"]["Option Menu"].extend([self.opt_menu_id])
-            #
-        #
-        ## Initializing
-        self.container_var["ma_datareduction"]["Radiobutton"][0].set(0) # RAW
-        self.container_var["ma_datareduction"]["Radiobutton"][1].set(1) # SMPL
-        self.container_var["ma_datareduction"]["Radiobutton"][2].set(0) # Concentration
-        #
-        self.select_datareduction_datatype(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][0])
-        self.select_datareduction_filetype(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][1])
-        #
-        self.results_data = MineralAnalysis(
-            container_measurements=self.container_measurements, container_lists=self.container_lists,
-            container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-            var_filetype="SMPL", var_datatype="RAW",
-            var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-            xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        self.results_data_std_raw = MineralAnalysis(
-            container_measurements=self.container_measurements, container_lists=self.container_lists,
-            container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-            var_filetype="STD", var_datatype="RAW",
-            var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-            xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        self.results_data_std_smoothed = MineralAnalysis(
-            container_measurements=self.container_measurements, container_lists=self.container_lists,
-            container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-            var_filetype="STD", var_datatype="SMOOTHED",
-            var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-            xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        self.results_data_smpl_raw = MineralAnalysis(
-            container_measurements=self.container_measurements, container_lists=self.container_lists,
-            container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-            var_filetype="SMPL", var_datatype="RAW",
-            var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-            xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        self.results_data_smpl_smoothed = MineralAnalysis(
-            container_measurements=self.container_measurements, container_lists=self.container_lists,
-            container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-            var_filetype="SMPL", var_datatype="SMOOTHED",
-            var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-            xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        self.show_datareduction_tables(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2])
-        #
-    #
     def select_datareduction_datatype(self, var_rb, init_routine=True):
         #
         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
@@ -4482,9 +4194,9 @@ class PySILLS(tk.Frame):
                         self.container_var["SRM"][file].set(var_srm)
                     except:
                         print(file, self.container_var["SRM"][file])
-        #
+
         self.fill_srm_values(var_srm=var_srm)
-    #
+
     def quick_plot_file(self, var_filetype, event):
         if var_filetype == "STD":
             click_id = self.lb_std.curselection()
@@ -5191,159 +4903,7 @@ class PySILLS(tk.Frame):
             #
         else:
             pass
-    #
-    def sub_mineralanalysis_exploration(self):
-        #
-        ## Cleaning
-        categories = ["SRM", "plotting", "PSE", "ma_setting", "ma_datareduction", "ma_datareduction_files"]
-        for category in categories:
-            if len(self.container_elements[category]["Label"]) > 0:
-                for item in self.container_elements[category]["Label"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Button"]) > 0:
-                for item in self.container_elements[category]["Button"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Option Menu"]) > 0:
-                for item in self.container_elements[category]["Option Menu"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Entry"]) > 0:
-                for item in self.container_elements[category]["Entry"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Frame"]) > 0:
-                for item in self.container_elements[category]["Frame"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Radiobutton"]) > 0:
-                for item in self.container_elements[category]["Radiobutton"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Checkbox"]) > 0:
-                for item in self.container_elements[category]["Checkbox"]:
-                    item.grid_remove()
-            if len(self.container_elements[category]["Listbox"]) > 0:
-                for item in self.container_elements[category]["Listbox"]:
-                    item.grid_remove()
-            #
-            for key, values in self.gui_elements[category].items():
-                for gui_item in values["Specific"]:
-                    gui_item.grid_remove()
-        #
-        try:
-            self.canvas.get_tk_widget().grid_forget()
-            self.toolbarFrame.grid_forget()
-        except AttributeError:
-            pass
-        try:
-            self.canvas_drift.get_tk_widget().grid_forget()
-            self.toolbarFrame_drift.grid_forget()
-        except AttributeError:
-            pass
-        #
-        self.container_lists["SRM"].clear()
-        self.container_lists["IS"].clear()
-        for key, value in self.container_files["SRM"].items():
-            if value.get() not in self.container_lists["SRM"] and value.get() in self.list_srm:
-                self.container_lists["SRM"].append(value.get())
-                self.fill_srm_values(var_srm=value.get())
-        #
-        for key_01, value_01 in self.container_files["STD"].items():
-            for key_02, value_02 in value_01.items():
-                if key_02 not in ["Plot", "Time Signal Plot", "Histogram Plot", "Scatter Plot", "BG limits",
-                                  "SIG limits", "BG", "SIG", "SPK", "Time Ratio Plot"]:
-                    if value_02.get() not in self.container_lists["IS"] and value_02.get() in self.container_lists["ISOTOPES"]:
-                        self.container_lists["IS"].append(value_02.get())
-        for key_01, value_01 in self.container_files["SMPL"].items():
-            for key_02, value_02 in value_01.items():
-                if key_02 not in ["Plot", "Time Signal Plot", "Histogram Plot", "Scatter Plot", "BG limits",
-                                  "SIG limits", "BG", "SIG", "SPK", "Time Ratio Plot"]:
-                    if value_02.get() not in self.container_lists["IS"] and value_02.get() in self.container_lists["ISOTOPES"]:
-                        self.container_lists["IS"].append(value_02.get())
-        #
-        ## LABELS
-        lbl_01 = SE(
-                parent=self.parent, row_id=0, column_id=21, n_rows=2, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Exploration Mode", relief=tk.GROOVE, fontsize="sans 10 bold")
-        #
-        self.gui_elements["ma_dataexploration"]["Label"]["General"].extend([lbl_01])
-        self.container_elements["ma_dataexploration"]["Label"].extend([lbl_01])
-        #
-        ## RADIOBUTTONS
-        rb_mode_01 = SE(
-            parent=self.parent, row_id=2, column_id=21, n_rows=1, n_columns=9, fg=self.green_light,
-            bg=self.green_medium).create_radiobutton(
-            var_rb=self.container_var["ma_dataexploration"]["Exploration Mode"], value_rb=0,
-            color_bg=self.green_medium, fg=self.green_light, text="File Analysis", sticky="nesw", relief=tk.GROOVE,
-            command=self.select_exploration_mode_ma)
-        rb_mode_02 = SE(
-            parent=self.parent, row_id=3, column_id=21, n_rows=1, n_columns=9, fg=self.green_light,
-            bg=self.green_medium).create_radiobutton(
-            var_rb=self.container_var["ma_dataexploration"]["Exploration Mode"], value_rb=1,
-            color_bg=self.green_medium, fg=self.green_light, text="Isotope Analysis", sticky="nesw", relief=tk.GROOVE,
-            command=self.select_exploration_mode_ma)
-        #
-        self.gui_elements["ma_dataexploration"]["Radiobutton"]["General"].extend([rb_mode_01, rb_mode_02])
-        self.container_elements["ma_dataexploration"]["Radiobutton"].extend([rb_mode_01, rb_mode_02])
-    #
-    def select_exploration_mode_ma(self):
-        for key, values in self.gui_elements["ma_dataexploration"].items():
-            for gui_item in values["Specific"]:
-                gui_item.grid_remove()
-            #
-            values["Specific"].clear()
-        #
-        if self.container_var["ma_dataexploration"]["Exploration Mode"].get() == 0:
-            ## LABELS
-            lbl_01 = SE(
-                parent=self.parent, row_id=4, column_id=21, n_rows=1, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_02 = SE(
-                parent=self.parent, row_id=6, column_id=21, n_rows=1, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_dataexploration"]["Label"]["Specific"].extend([lbl_01, lbl_02])
-            #
-            ## OPTION MENUS
-            list_std = self.container_lists["STD"]["Short"]
-            list_smpl = self.container_lists["SMPL"]["Short"]
-            #
-            opt_std = SE(
-                parent=self.parent, row_id=5, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_simple_optionmenu(
-                var_opt=self.container_var["ma_dataexploration"]["STD File"],
-                var_default=self.container_var["ma_dataexploration"]["STD File"].get(), var_list=list_std,
-                fg_active=self.green_dark, bg_active=self.red_dark)
-            opt_smpl = SE(
-                parent=self.parent, row_id=7, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_simple_optionmenu(
-                var_opt=self.container_var["ma_dataexploration"]["SMPL File"],
-                var_default=self.container_var["ma_dataexploration"]["SMPL File"].get(), var_list=list_smpl,
-                fg_active=self.green_dark, bg_active=self.red_dark)
-            #
-            self.gui_elements["ma_dataexploration"]["Option Menu"]["Specific"].extend([opt_std, opt_smpl])
-            #
-        elif self.container_var["ma_dataexploration"]["Exploration Mode"].get() == 1:
-            ## LABELS
-            lbl_01 = SE(
-                parent=self.parent, row_id=4, column_id=21, n_rows=1, n_columns=9, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Isotope", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_dataexploration"]["Label"]["Specific"].extend([lbl_01])
-            #
-            ## OPTION MENUS
-            list_iso = self.container_lists["ISOTOPES"]
-            #
-            opt_iso = SE(
-                parent=self.parent, row_id=5, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-                bg=self.green_medium).create_simple_optionmenu(
-                var_opt=self.container_var["ma_dataexploration"]["Isotope"],
-                var_default=self.container_var["ma_dataexploration"]["Isotope"].get(), var_list=list_iso,
-                fg_active=self.green_dark, bg_active=self.red_dark)
-            #
-            self.gui_elements["ma_dataexploration"]["Option Menu"]["Specific"].extend([opt_iso])
-            #
-    #
+
     def check_functionality(self, functions):
         for key, value in functions.items():
             print(key)
@@ -15249,9 +14809,9 @@ class PySILLS(tk.Frame):
         opt_02c = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_02 + 3, column_id=n_col_category - 4, n_rows=1,
             n_columns=n_col_category - 2, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_menu(
-            var_opt=self.container_var["IS"]["Default STD"], text_set=var_text_std_is, option_list=self.container_lists["ISOTOPES"],
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var["IS"]["Default STD"], mode="STD":
+            var_opt=self.container_var["IS"]["Default STD"], text_set=var_text_std_is,
+            option_list=self.container_lists["ISOTOPES"], fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color, command=lambda var_opt=self.container_var["IS"]["Default STD"], mode="STD":
             self.ma_select_is_default(var_opt, mode))
         opt_02c.grid(row=start_row_02 + 3, column=n_col_category - 4, rowspan=1, columnspan=n_col_category - 2)
         opt_02c["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
@@ -15369,6 +14929,8 @@ class PySILLS(tk.Frame):
         self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
         self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
         self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+        self.build_srm_database()
+
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
@@ -15871,6 +15433,12 @@ class PySILLS(tk.Frame):
                                 self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
                                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(round(
                                     oxide_weight*is_concentration, 4))
+
+                        if self.container_var["IS"]["Default STD"].get() == "Select IS":
+                            self.container_var["IS"]["Default STD"].set(var_opt)
+                            for file_std in self.container_lists["STD"]["Long"]:
+                                if self.container_var["STD"][file_std]["IS Data"]["IS"].get() == "Select IS":
+                                    self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_opt)
                     else:
                         if self.container_var["IS"]["Default SMPL"].get() == "Select IS":
                             self.container_var["IS"]["Default SMPL"].set(var_opt)
@@ -15911,21 +15479,21 @@ class PySILLS(tk.Frame):
             for isotope in self.container_lists["ISOTOPES"]:
                 self.container_var["SRM"][isotope].set(var_opt)
         #
-        if var_opt not in self.srm_actual:
+        if var_opt not in self.srm_actual and var_opt != "Select SRM":
             self.srm_actual[var_opt] = {}
             ESRM().place_srm_values(srm_name=var_opt, srm_dict=self.srm_actual)
-        #
-        self.fill_srm_values(var_srm=var_opt)
-        #
-        if mode == "STD":
-            for file_std in self.container_lists["STD"]["Long"]:
-                var_srm = self.container_var["SRM"][file_std].get()
-                var_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
-                key = re.search("(\D+)(\d*)", var_is)
-                element_is = key.group(1)
-                if var_srm != "Select SRM" and element_is != "Select IS":
-                    self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(
-                        self.srm_actual[var_srm][element_is])
+
+            self.fill_srm_values(var_srm=var_opt)
+
+            if mode == "STD":
+                for file_std in self.container_lists["STD"]["Long"]:
+                    var_srm = self.container_var["SRM"][file_std].get()
+                    var_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
+                    key = re.search("(\D+)(\d*)", var_is)
+                    element_is = key.group(1)
+                    if var_srm != "Select SRM" and element_is != "Select IS":
+                        self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(
+                            self.srm_actual[var_srm][element_is])
 
     def ma_select_id_default(self, var_opt):
         var_id = var_opt
@@ -17487,21 +17055,23 @@ class PySILLS(tk.Frame):
             if var_filetype == "STD":
                 var_srm_file = self.container_var["SRM"][var_file_long].get()
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                var_concentration_is = float(
-                    self.container_var[var_filetype][var_file_long]["IS Data"]["Concentration"].get())
+                key_element_is = re.search("(\D+)(\d+)", var_is)
+                element_is = key_element_is.group(1)
+                #var_concentration_is = float(
+                #    self.container_var[var_filetype][var_file_long]["IS Data"]["Concentration"].get())
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
-
                 for isotope in self.container_lists["ISOTOPES"]:
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     if var_srm_i == var_srm_file:
+                        var_concentration_is = self.srm_actual[var_srm_i][element_is]
+
                         key_element = re.search("(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         var_concentration_i = self.srm_actual[var_srm_i][element]
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                            "MAT"][isotope]
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
                         var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
-
                         self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
             else:
