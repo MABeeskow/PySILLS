@@ -7727,7 +7727,7 @@ class PySILLS(tk.Frame):
             #
             save_file.write("\n")
             #
-            ## Save information about 'Matrix Settings'
+            ## Save information about 'Sample Settings'
             save_file.write("MATRIX SETTINGS" + "\n")
             for var_file in self.container_lists["SMPL"]["Long"]:
                 info_file = var_file
@@ -13779,7 +13779,7 @@ class PySILLS(tk.Frame):
         lbl_03 = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_03, column_id=0, n_rows=1, n_columns=n_col_header,
             fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Matrix Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Sample Settings", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03a = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_03 + 4, column_id=0, n_rows=1,
             n_columns=n_col_category - 4, fg=self.bg_colors["Very Dark"],
@@ -13925,12 +13925,13 @@ class PySILLS(tk.Frame):
                 if file_std not in self.container_lists["STD"]["Long"]:
                     self.container_lists["STD"]["Long"].append(file_std)
                     self.container_lists["STD"]["Short"].append(file_std_short)
-                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
+                if file_std_short not in self.container_var["ma_setting"]["Data Type Plot"]["STD"]:
+                    self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+                    self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
+                    self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+                    self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+                    self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short] = {}
+                    self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
             #
             if self.file_loaded is False:
                 if "Si29" in self.container_lists["ISOTOPES"]:
@@ -13983,38 +13984,24 @@ class PySILLS(tk.Frame):
                 self.create_container_results(var_filetype="STD", var_file_short=file_std_short)
 
             if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
-                self.container_helper["STD"][file_std_short] = {}
-                self.container_helper["STD"][file_std_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                      "Indices": []}
-                self.container_helper["STD"][file_std_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                       "Indices": []}
-                self.container_helper["STD"][file_std_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                       "Indices": []}
-
                 self.build_container_helper(mode="STD")
 
-                self.container_helper["limits SPK"][file_std] = {}
-                self.container_helper["limits SPK"][file_std]["ID"] = []
-                self.container_helper["limits SPK"][file_std]["type"] = []
-                self.container_helper["limits SPK"][file_std]["info"] = []
-                self.container_helper["positions"]["SPK"][file_std_short] = []
+                if "BG" not in self.container_helper["STD"][file_std_short]:
+                    self.container_helper["STD"][file_std_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["STD"][file_std_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
                 self.spikes_isotopes["STD"][file_std_short] = {}
             elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == False:
-                self.container_helper["STD"][file_std_short] = {}
-                self.container_helper["STD"][file_std_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                      "Indices": []}
-                self.container_helper["STD"][file_std_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                       "Indices": []}
-                self.container_helper["STD"][file_std_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                       "Indices": []}
-
                 self.build_container_helper(mode="STD")
-                #
-                self.container_helper["limits SPK"][file_std] = {}
-                self.container_helper["limits SPK"][file_std]["ID"] = []
-                self.container_helper["limits SPK"][file_std]["type"] = []
-                self.container_helper["limits SPK"][file_std]["info"] = []
-                self.container_helper["positions"]["SPK"][file_std_short] = []
+
+                if "BG" not in self.container_helper["STD"][file_std_short]:
+                    self.container_helper["STD"][file_std_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["STD"][file_std_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
                 self.spikes_isotopes["STD"][file_std_short] = {}
             elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == True:
                 for item_01 in ["BG", "MAT"]:
@@ -14081,7 +14068,8 @@ class PySILLS(tk.Frame):
                 var_text = "Select IS"
             #
             opt_is_i = tk.OptionMenu(
-                frm_std, self.container_var["STD"][file_std]["IS Data"]["IS"], var_text, *self.container_lists["ISOTOPES"])
+                frm_std, self.container_var["STD"][file_std]["IS Data"]["IS"], var_text,
+                *self.container_lists["ISOTOPES"])
             opt_is_i["menu"].config(
                 fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color)
@@ -14228,43 +14216,24 @@ class PySILLS(tk.Frame):
                 self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short)
             #
             if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
-                self.container_helper["SMPL"][file_smpl_short] = {}
-                self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                        "Indices": []}
-                self.container_helper["SMPL"][file_smpl_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                         "Indices": []}
-                self.container_helper["SMPL"][file_smpl_short]["INCL"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                          "Indices": []}
-                self.container_helper["SMPL"][file_smpl_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                         "Indices": []}
-
                 self.build_container_helper(mode="SMPL")
 
-                self.container_helper["limits SPK"][file_smpl] = {}
-                self.container_helper["limits SPK"][file_smpl]["ID"] = []
-                self.container_helper["limits SPK"][file_smpl]["type"] = []
-                self.container_helper["limits SPK"][file_smpl]["info"] = []
-                self.container_helper["positions"]["SPK"][file_smpl_short] = []
+                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
+                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-                #
             elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
-                self.container_helper["SMPL"][file_smpl_short] = {}
-                self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                        "Indices": []}
-                self.container_helper["SMPL"][file_smpl_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                         "Indices": []}
-                self.container_helper["SMPL"][file_smpl_short]["INCL"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                          "Indices": []}
-                self.container_helper["SMPL"][file_smpl_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-                                                                         "Indices": []}
-
                 self.build_container_helper(mode="SMPL")
 
-                self.container_helper["limits SPK"][file_smpl] = {}
-                self.container_helper["limits SPK"][file_smpl]["ID"] = []
-                self.container_helper["limits SPK"][file_smpl]["type"] = []
-                self.container_helper["limits SPK"][file_smpl]["info"] = []
-                self.container_helper["positions"]["SPK"][file_smpl_short] = []
+                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
+                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
             elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == True:
                 for item_01 in ["BG", "MAT"]:
@@ -14290,7 +14259,7 @@ class PySILLS(tk.Frame):
             categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
             for category in categories:
                 self.diagrams_setup["SMPL"][file_smpl_short][category] = {}
-            categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
+            categories = ["BG", "MAT"]
             for category in categories:
                 self.container_listboxes["SMPL"][file_smpl_short][category] = None
             #
@@ -14523,7 +14492,7 @@ class PySILLS(tk.Frame):
             text_iso.insert("end", "\n")
         #
         ## BUTTONS
-        # Matrix Settings
+        # Sample Settings
         btn_03a = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_03 + 5, column_id=0, n_rows=1,
             n_columns=n_col_header,
@@ -14869,11 +14838,6 @@ class PySILLS(tk.Frame):
                     var_method = "Grubbs"
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
-        # else:
-        #     self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #     self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #     self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        #     self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
     def build_checkbutton_isotope_visibility(self, var_mode, var_filetype, var_filename_short, var_isotope):
         self.container_var[var_mode]["Display RAW"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
@@ -14898,10 +14862,8 @@ class PySILLS(tk.Frame):
 
     def build_container_helper(self, mode):
         """Creates and defines some important helper variables.
-
         Args:
             mode (str): It defines the file type ("STD" vs. "SMPL").
-
         Returns:
         """
 
@@ -14949,7 +14911,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
         #
         subwindow_ma_matrix_concentration = tk.Toplevel(self.parent)
-        subwindow_ma_matrix_concentration.title("MINERAL ANALYSIS - Matrix Concentration Setup")
+        subwindow_ma_matrix_concentration.title("MINERAL ANALYSIS - Sample Concentration Setup")
         subwindow_ma_matrix_concentration.geometry(var_geometry)
         subwindow_ma_matrix_concentration.resizable(False, False)
         subwindow_ma_matrix_concentration["bg"] = self.bg_colors["Super Dark"]
@@ -15605,7 +15567,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 27, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["MAT"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=1,
-            color_bg=self.colors_intervals["MAT"], fg=self.bg_colors["Light Font"], text="Matrix Interval",
+            color_bg=self.colors_intervals["MAT"], fg=self.bg_colors["Light Font"], text="Sample Interval",
             sticky="nesw",
             relief=tk.GROOVE)
         rb_08 = SE(
@@ -16502,7 +16464,10 @@ class PySILLS(tk.Frame):
                                     isotope]
                                 #
                                 if value >= value_lod_i:
-                                    n_digits = self.ma_determine_ndigits(var_value=value)
+                                    if var_filetype == "SMPL":
+                                        n_digits = self.ma_determine_ndigits(var_value=value)
+                                    else:
+                                        n_digits = 1
                                     entries_category.append(f"{value:.{n_digits}f}")
                                     helper_values[isotope].append(value)
                                 else:
@@ -20162,7 +20127,10 @@ class PySILLS(tk.Frame):
                             value = self.container_concentration[var_filetype][var_datatype][var_file][var_focus][
                                 isotope]
                             value_lod = self.container_lod[var_filetype][var_datatype][var_file][var_focus][isotope]
-                            n_digits = self.ma_determine_ndigits(var_value=value)
+                            if var_filetype == "SMPL":
+                                n_digits = self.ma_determine_ndigits(var_value=value)
+                            else:
+                                n_digits = 1
                             #
                             if value >= value_lod:
                                 entries_container.append(f"{value:.{n_digits}f}")
