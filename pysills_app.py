@@ -13632,6 +13632,8 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
 #
     def ma_settings(self):
+        """Main settings window of a mineral analysis project."""
+
         ## COLORS
         bg_light = self.bg_colors["Very Light"]
         bg_medium = self.bg_colors["Light"]
@@ -13743,109 +13745,36 @@ class PySILLS(tk.Frame):
         start_row_std = start_row_01  # Standard Files Setup
         start_row_smpl = start_row_05  # Sample Files Setup
         start_row_iso = start_row_01  # Measured Isotopes
+        var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_standard_reference_material = {"Row start": 3, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 13, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 15, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 17, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_smpl_setup = {"Row start": 21, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 25, "Column start": 0, "N rows": 1, "N columns": 18}
         #
         ## Static
-        lbl_01 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_01, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Project Information", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_01a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_01 + 1, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Author", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_01a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_01 + 2, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Source ID", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_02 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Standard Reference Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_02a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02 + 1, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4, fg=self.bg_colors["Very Dark"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_02b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02 + 2, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4, fg=self.bg_colors["Very Dark"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="Isotopes", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_02c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02 + 3, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Internal Standard", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_03 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Sample Settings", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_03a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 4, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4, fg=self.bg_colors["Very Dark"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="Internal Standard", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_04 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_04, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Quantification Method", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_05 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_05, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Assemblage Settings", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_05a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_05 + 1, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_06 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_06, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=bg_light, bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Dwell Time Settings", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_06 + 1, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Isotope Dwell Times", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_07 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Default Time Window (Background)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_07a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07 + 1, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Start", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_07b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07 + 2, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="End", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_07c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07 + 3, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Auto-Detection", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_08 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Default Time Window (Matrix)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_08a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08 + 1, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Start", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_08b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08 + 2, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="End", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_08c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08 + 3, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Auto-Detection", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_09 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_09, column_id=0, n_rows=1, n_columns=n_col_header,
-            fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Spike Elimination", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_09b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_09 + 1, column_id=0, n_rows=1,
-            n_columns=n_col_header - 9,
-            fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Calculation Method", relief=tk.GROOVE, fontsize="sans 10 bold")
+        # Build section 'Project Information'
+        self.place_project_information(var_geometry_info=var_project_information)
+        # Build section 'Standard Reference Material'
+        self.place_standard_reference_material(var_geometry_info=var_standard_reference_material)
+        # Build section 'Standard Reference Material'
+        self.place_sample_settings(var_geometry_info=var_sample_settings)
+        # Build section 'Quantification Method'
+        self.place_quantification_method(var_geometry_info=var_quantification_method)
+        # Build section 'Assemblage Setup'
+        self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
+        # Build section 'Dwell Time Setup'
+        self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
+        # Build section 'Calculation Window (Background) Setup'
+        self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
+        # Build section 'Calculation Window (Sample) Setup'
+        self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_smpl_setup)
+        # Build section 'Spike Elimination Setup'
+        self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
+
         lbl_10 = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_10, column_id=n_col_header + n_col_files + 2, n_rows=1,
             n_columns=n_col_header, fg=self.colors_fi["Light Font"],
@@ -13949,6 +13878,8 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
                     self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
             else:
+                self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
+                self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
                 self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
@@ -14060,25 +13991,7 @@ class PySILLS(tk.Frame):
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
             text_std.window_create("end", window=opt_srm_i)
             text_std.insert("end", "\t")
-            #
-            if self.container_var["STD"][file_std]["IS Data"]["IS"].get() != "Select IS":
-                var_text = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
-                #
-            else:
-                var_text = "Select IS"
-            #
-            opt_is_i = tk.OptionMenu(
-                frm_std, self.container_var["STD"][file_std]["IS Data"]["IS"], var_text,
-                *self.container_lists["ISOTOPES"])
-            opt_is_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_is_i.config(
-                bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_std.window_create("end", window=opt_is_i)
-            text_std.insert("end", "\t")
-            #
+
             btn_i = tk.Button(
                 master=frm_std, text="Setup", bg=bg_medium, fg=self.bg_colors["Very Dark"],
                 activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
@@ -14138,6 +14051,8 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
                     self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
             else:
+                self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
+                self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
                 self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
@@ -14177,12 +14092,13 @@ class PySILLS(tk.Frame):
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
                     self.container_lists["SMPL"]["Long"].append(file_smpl)
                     self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+                if file_smpl_short not in self.container_var["ma_setting"]["Data Type Plot"]["SMPL"]:
+                    self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                    self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+                    self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                    self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+                    self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
+                    self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
             #
             if self.file_loaded == True:
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
@@ -14315,28 +14231,7 @@ class PySILLS(tk.Frame):
             text_smpl.insert("end", "\n")
             #
             self.container_var["SMPL"][file_smpl]["Frame"] = frm_i
-        #
-        # Isotopes
-        if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-            var_text_std = self.container_var["SRM"]["default"][0].get()
-        else:
-            if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
-                var_text_std = self.container_var["General Settings"]["Default SRM"].get()
-            else:
-                var_text_std = "Select SRM"
-        #
-        self.container_var["SRM"]["default"][0].set(var_text_std)
-        #
-        if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-            var_text_iso = self.container_var["SRM"]["default"][1].get()
-        else:
-            if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
-                var_text_iso = self.container_var["General Settings"]["Default SRM"].get()
-            else:
-                var_text_iso = "Select SRM"
-        #
-        self.container_var["SRM"]["default"][1].set(var_text_iso)
-        #
+
         frm_iso = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_iso + 1, column_id=n_col_header + n_col_files + 2,
             n_rows=n_rows - 10, n_columns=n_col_iso, fg=self.bg_colors["Dark Font"],
@@ -14365,6 +14260,7 @@ class PySILLS(tk.Frame):
                     self.build_checkbutton_isotope_visibility(
                         var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
                         var_isotope=isotope)
+
                     if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
@@ -14373,6 +14269,7 @@ class PySILLS(tk.Frame):
                         self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
                         self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
                             file_std_short] = {}
+
                     self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
                     self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
@@ -14384,6 +14281,7 @@ class PySILLS(tk.Frame):
                     self.build_checkbutton_isotope_visibility(
                         var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
                         var_isotope=isotope)
+
                     if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
@@ -14392,6 +14290,7 @@ class PySILLS(tk.Frame):
                         self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
                         self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
                             file_smpl_short] = {}
+
                     self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
                     self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
@@ -14404,6 +14303,7 @@ class PySILLS(tk.Frame):
                     self.build_checkbutton_isotope_visibility(
                         var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
                         var_isotope=isotope)
+
                     if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
@@ -14412,6 +14312,7 @@ class PySILLS(tk.Frame):
                         self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
                         self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
                             file_std_short] = {}
+
                     self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
                     self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
@@ -14423,6 +14324,7 @@ class PySILLS(tk.Frame):
                     self.build_checkbutton_isotope_visibility(
                         var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
                         var_isotope=isotope)
+
                     if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
@@ -14432,6 +14334,7 @@ class PySILLS(tk.Frame):
                         self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
                         self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
                             file_smpl_short] = {}
+
                     self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
                     self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
@@ -14492,37 +14395,6 @@ class PySILLS(tk.Frame):
             text_iso.insert("end", "\n")
         #
         ## BUTTONS
-        # Sample Settings
-        btn_03a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 5, column_id=0, n_rows=1,
-            n_columns=n_col_header,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="IS Concentration Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.ma_matrix_concentration_setup)  # Host - Concentration Setup
-        # Quantification Methods
-        btn_04b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_04 + 2, column_id=n_col_category, n_rows=1,
-            n_columns=n_col_category - 6, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        btn_04b.configure(state='disabled')
-        btn_06a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_06 + 1, column_id=n_col_category, n_rows=1,
-            n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.create_dwell_time_window)
-        btn_07c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07 + 3, column_id=n_col_category, n_rows=1,
-            n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda mode="BG": self.detect_signal_interval(mode))
-        btn_08c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08 + 3, column_id=n_col_category, n_rows=1,
-            n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda mode="MAT": self.detect_signal_interval(mode))
         btn_10a = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_10 + 1,
             column_id=n_col_header + n_col_files + 2 + n_col_category, n_rows=1, n_columns=6,
@@ -14553,257 +14425,8 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_imported_files)
-        # btn_std = SE(
-        #     parent=self.subwindow_ma_settings, row_id=start_row_smpl - 2,
-        #     column_id=n_col_header + 1 + n_col_files - 6,
-        #     n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
-        #     bg=self.colors_fi["Medium"]).create_simple_button(
-        #     text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        # btn_smpl = SE(
-        #     parent=self.subwindow_ma_settings, row_id=n_rows - 2, column_id=n_col_header + 1 + n_col_files - 6,
-        #     n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
-        #     bg=self.colors_fi["Medium"]).create_simple_button(
-        #     text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        #
-        ## RADIOBUTTONS
-        rb_03a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 1, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4,
-            fg=bg_light, bg=bg_medium).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=1, color_bg=bg_medium,
-            fg=self.bg_colors["Very Dark"], text="Oxide (in wt.%)", sticky="nesw", relief=tk.GROOVE)
-        rb_03b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 2, column_id=0, n_rows=1,
-            n_columns=n_col_category - 4,
-            fg=bg_light, bg=bg_medium).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=2, color_bg=bg_medium,
-            fg=self.bg_colors["Very Dark"], text="Element (in ppm)", sticky="nesw", relief=tk.GROOVE)
-        rb_03c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 3, column_id=0, n_rows=1,
-            n_columns=n_col_category + 6,
-            fg=bg_light, bg=bg_medium).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=3, color_bg=bg_medium,
-            fg=self.bg_colors["Very Dark"], text="Experimental Data", sticky="nesw", relief=tk.GROOVE)
-        # Quantification Methods
-        rb_04a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_04 + 1, column_id=0, n_rows=1,
-            n_columns=n_col_category + 6, fg=bg_light, bg=bg_medium).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Quantification Method"], value_rb=1, color_bg=bg_medium,
-            fg=self.bg_colors["Very Dark"], text="Sensitivity-based (SILLS)", sticky="nesw", relief=tk.GROOVE)
-        rb_04b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_04 + 2, column_id=0, n_rows=1, n_columns=n_col_category,
-            fg=bg_light, bg=bg_medium).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Quantification Method"], value_rb=3, color_bg=bg_medium,
-            fg=self.bg_colors["Very Dark"], text="Plugin-based Methods", sticky="nesw", relief=tk.GROOVE)
-        rb_04b.configure(state="disabled")
-        #
-        ## ENTRIES
-        self.container_var["ma_setting"]["Author"].set(self.container_var["General Settings"]["Default Author"].get())
-        var_entr_01a_default = self.container_var["ma_setting"]["Author"].get()
-        var_entr_01b_default = self.container_var["ma_setting"]["Source ID"].get()
-        var_entr_03a_default = self.container_var["ma_setting"]["Oxide Concentration"].get()
-        var_entr_03b_default = self.container_var["ma_setting"]["Element Concentration"].get()
-        var_entr_07a_default = self.container_var["ma_setting"]["Time BG Start"].get()
-        var_entr_07b_default = self.container_var["ma_setting"]["Time BG End"].get()
-        var_entr_08a_default = self.container_var["ma_setting"]["Time MAT Start"].get()
-        var_entr_08b_default = self.container_var["ma_setting"]["Time MAT End"].get()
-        #
-        entr_01a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_01 + 1, column_id=n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Author"], text_default=var_entr_01a_default)
-        entr_01b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_01 + 2, column_id=n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Source ID"], text_default=var_entr_01b_default)
-        entr_03a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 1, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 8,
-            fg=bg_light, bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Oxide Concentration"], text_default=var_entr_03a_default)
-        entr_03b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 2, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 8,
-            fg=bg_light, bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Element Concentration"], text_default=var_entr_03b_default)
-        # Default Background Intervals
-        entr_07a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07 + 1, column_id=n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Time BG Start"], text_default=var_entr_07a_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG Start"], var_key="Start",
-                           mode="default", var_interval="BG":
-            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
-        entr_07b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_07 + 2, column_id=n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Time BG End"], text_default=var_entr_07b_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG End"], var_key="End",
-                           mode="default", var_interval="BG":
-            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
-        # Default Matrix Intervals
-        entr_08a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08 + 1, column_id=n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Time MAT Start"], text_default=var_entr_08a_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT Start"], var_key="Start",
-                           mode="default", var_interval="MAT":
-            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
-        entr_08b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_08 + 2, column_id=n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_entry(
-            var=self.container_var["ma_setting"]["Time MAT End"], text_default=var_entr_08b_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT End"], var_key="End",
-                           mode="default", var_interval="MAT":
-            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
-        #
+
         ## OPTION MENUS
-        opt_02a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02 + 1, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 2, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_srm(
-            var_srm=self.container_var["SRM"]["default"][0], text_set=var_text_std, fg_active=self.bg_colors["Dark Font"],
-            bg_active=self.accent_color, command=lambda var_srm=self.container_var["SRM"]["default"][0]:
-            self.change_srm_default(var_srm))
-        opt_02a["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_02a.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        opt_02b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02 + 2, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 2, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_srm(
-            var_srm=self.container_var["SRM"]["default"][1], text_set=var_text_iso, fg_active=self.bg_colors["Dark Font"],
-            bg_active=self.accent_color, command=lambda var_srm=self.container_var["SRM"]["default"][1]:
-            self.change_srm_default(var_srm, key="isotope"))
-        opt_02b["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_02b.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        if self.container_var["IS"]["Default STD"].get() != "Select IS":
-            var_text_std_is = self.container_var["IS"]["Default STD"].get()
-        else:
-            if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-                var_srm = self.container_var["SRM"]["default"][0].get()
-                srm_default_std = {}
-                srm_default_std[var_srm] = {}
-                ESRM().place_srm_values(srm_name=var_srm, srm_dict=srm_default_std)
-                element_max = max(srm_default_std[var_srm], key=srm_default_std[var_srm].get)
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    #
-                    if element == element_max:
-                        var_text_std_is = isotope
-                        break
-                #
-            else:
-                var_text_std_is = "Select IS"
-        #
-        opt_02c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_02 + 3, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 2, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_menu(
-            var_opt=self.container_var["IS"]["Default STD"], text_set=var_text_std_is,
-            option_list=self.container_lists["ISOTOPES"], fg_active=self.bg_colors["Dark Font"],
-            bg_active=self.accent_color, command=lambda var_opt=self.container_var["IS"]["Default STD"], mode="STD":
-            self.ma_select_is_default(var_opt, mode))
-        opt_02c.grid(row=start_row_02 + 3, column=n_col_category - 4, rowspan=1, columnspan=n_col_category - 2)
-        opt_02c["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_02c.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        if self.container_var["ma_setting"]["Oxide"].get() != "Select Oxide":
-            var_text = self.container_var["ma_setting"]["Oxide"].get()
-        else:
-            var_text = "Select Oxide"
-        #
-        opt_03a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 1, column_id=n_col_category, n_rows=1,
-            n_columns=n_col_category - 6, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_isotope(
-            var_iso=self.container_var["ma_setting"]["Oxide"], option_list=self.container_lists["Oxides"],
-            text_set=var_text, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-        opt_03a["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_03a.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        if self.container_var["ma_setting"]["Element"].get() != "Select Element":
-            var_text = self.container_var["ma_setting"]["Element"].get()
-        else:
-            var_text = "Select Element"
-        opt_03b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 2, column_id=n_col_category, n_rows=1,
-            n_columns=n_col_category - 6, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_isotope(
-            var_iso=self.container_var["ma_setting"]["Element"], option_list=self.container_lists["Elements"],
-            text_set=var_text, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-        opt_03b["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_03b.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        if self.container_var["IS"]["Default SMPL"].get() != "Select IS":
-            var_text_std_is = self.container_var["IS"]["Default SMPL"].get()
-        else:
-            if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-                var_srm = self.container_var["SRM"]["default"][0].get()
-                srm_default_std = {}
-                srm_default_std[var_srm] = {}
-                ESRM().place_srm_values(srm_name=var_srm, srm_dict=srm_default_std)
-                element_max = max(srm_default_std[var_srm], key=srm_default_std[var_srm].get)
-                for isotope in self.container_lists["ISOTOPES"]:
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    if element == element_max:
-                        var_text_std_is = isotope
-                        break
-            else:
-                var_text_std_is = "Select IS"
-        opt_03c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_03 + 4, column_id=n_col_category - 4, n_rows=1,
-            n_columns=n_col_category - 2, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_menu(
-            var_opt=self.container_var["IS"]["Default SMPL"], text_set=var_text_std_is, option_list=self.container_lists["ISOTOPES"],
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var["IS"]["Default SMPL"], mode="SMPL":
-            self.ma_select_is_default(var_opt, mode))
-        opt_03c.grid(row=start_row_03 + 4, column=n_col_category - 4, rowspan=1, columnspan=n_col_category - 2)
-        opt_03c["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_03c.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        if self.container_var["ID"]["Default SMPL"].get() != "Select ID":
-            var_text = self.container_var["ID"]["Default SMPL"].get()
-        else:
-            var_text = "Select ID"
-        opt_06a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_05 + 1, column_id=n_col_category, n_rows=1,
-            n_columns=n_col_category - 6, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_isotope(
-            var_iso=self.container_var["ID"]["Default SMPL"], option_list=self.list_alphabet, text_set=var_text,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var["ID"]["Default SMPL"]: self.fi_select_id_default(var_opt))
-        opt_06a["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_06a.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        if self.container_var["Spike Elimination Method"].get() != "Select Method":
-            var_text = self.container_var["Spike Elimination Method"].get()
-        else:
-            var_text = "Select Method"
-        opt_09b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_09 + 1, column_id=n_col_header - 9, n_rows=1,
-            n_columns=n_col_header - 9, fg=self.bg_colors["Very Dark"], bg=bg_medium).create_option_isotope(
-            var_iso=self.container_var["Spike Elimination Method"], option_list=self.list_se_methods, text_set=var_text,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var["Spike Elimination Method"], start_row=start_row_09:
-            self.select_spike_elimination(var_opt, start_row))
-        opt_09b["menu"].config(fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                               activebackground=self.accent_color)
-        opt_09b.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                       activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
         list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
         opt_laser = SE(
             parent=self.subwindow_ma_settings, row_id=n_rows - 9, column_id=n_col_header + n_col_files + 14,
@@ -14818,7 +14441,8 @@ class PySILLS(tk.Frame):
         #
         ## INITIALIZATION
         self.select_spike_elimination(
-            var_opt=self.container_var["Spike Elimination Method"].get(), start_row=start_row_09, mode="MA")
+            var_opt=self.container_var["Spike Elimination Method"].get(),
+            start_row=var_spike_elimination_setup["Row start"], mode="MA")
         #
         self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
         self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
@@ -14838,6 +14462,466 @@ class PySILLS(tk.Frame):
                     var_method = "Grubbs"
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+
+    def place_project_information(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Project Information'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_01 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.colors_fi["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Project Information", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_01a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Author", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_01a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Source ID", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Entries
+        self.container_var["ma_setting"]["Author"].set(self.container_var["General Settings"]["Default Author"].get())
+        var_entr_01a_default = self.container_var["ma_setting"]["Author"].get()
+        var_entr_01b_default = self.container_var["ma_setting"]["Source ID"].get()
+
+        entr_01a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=1,
+            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+            var=self.container_var["ma_setting"]["Author"], text_default=var_entr_01a_default)
+        entr_01b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=1,
+            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+            var=self.container_var["ma_setting"]["Source ID"], text_default=var_entr_01b_default)
+
+    def place_standard_reference_material(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Standard Reference Material'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_02 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.colors_fi["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Standard Reference Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n - 4, fg=self.bg_colors["Very Dark"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Standard Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_02b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n - 4, fg=self.bg_colors["Very Dark"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Isotopes", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Option Menus
+        if self.container_var["SRM"]["default"][0].get() != "Select SRM":
+            var_text_std = self.container_var["SRM"]["default"][0].get()
+        else:
+            if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
+                var_text_std = self.container_var["General Settings"]["Default SRM"].get()
+            else:
+                var_text_std = "Select SRM"
+
+        self.container_var["SRM"]["default"][0].set(var_text_std)
+
+        if self.container_var["SRM"]["default"][1].get() != "Select SRM":
+            var_text_iso = self.container_var["SRM"]["default"][1].get()
+        else:
+            if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
+                var_text_iso = self.container_var["General Settings"]["Default SRM"].get()
+            else:
+                var_text_iso = "Select SRM"
+
+        self.container_var["SRM"]["default"][1].set(var_text_iso)
+
+        opt_02a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n - 4, n_rows=var_row_n,
+            n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_srm(
+            var_srm=self.container_var["SRM"]["default"][0], text_set=var_text_std,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_srm=self.container_var["SRM"]["default"][0]: self.change_srm_default(var_srm))
+        opt_02a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_02a.config(
+            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+
+        opt_02b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n - 4, n_rows=var_row_n,
+            n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_srm(
+            var_srm=self.container_var["SRM"]["default"][1], text_set=var_text_iso,
+            fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color, command=lambda var_srm=self.container_var["SRM"]["default"][1]:
+            self.change_srm_default(var_srm, key="isotope"))
+        opt_02b["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_02b.config(
+            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+
+    def place_sample_settings(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Sample Settings'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_03 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Sample Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Internal Standard Setup", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_03a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_header_n - 9, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.ma_matrix_concentration_setup)
+
+        # Radiobuttons
+        rb_03a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n - 9,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=1, color_bg=self.bg_colors["Light"],
+            fg=self.bg_colors["Very Dark"], text="Oxide Calculation", sticky="nesw", relief=tk.GROOVE)
+        rb_03b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n - 9,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=2, color_bg=self.bg_colors["Light"],
+            fg=self.bg_colors["Very Dark"], text="Element Calculation", sticky="nesw", relief=tk.GROOVE)
+        rb_03c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=3, color_bg=self.bg_colors["Light"],
+            fg=self.bg_colors["Very Dark"], text="Experimental Data", sticky="nesw", relief=tk.GROOVE)
+        rb_03c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Host Setup Selection"], value_rb=4,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], text="Custom Data", sticky="nesw",
+            relief=tk.GROOVE)
+
+    def place_quantification_method(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Quantification Method'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_04 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Quantification Method", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_04b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_04b.configure(state='disabled')
+
+        # Radiobuttons
+        rb_04a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n + 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Quantification Method"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Sensitivity-based (SILLS)",
+            sticky="nesw", relief=tk.GROOVE)
+        rb_04b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Quantification Method"], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
+            sticky="nesw", relief=tk.GROOVE)
+        rb_04b.configure(state="disabled")
+
+    def place_assemblage_setup(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Assemblage Setup'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_05 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Assemblage Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_05a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Sample Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Option Menus
+        if self.container_var["ID"]["Default SMPL"].get() != "Select ID":
+            var_text = self.container_var["ID"]["Default SMPL"].get()
+        else:
+            var_text = "Select ID"
+        opt_05a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["ID"]["Default SMPL"], option_list=self.list_alphabet, text_set=var_text,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["ID"]["Default SMPL"]: self.fi_select_id_default(var_opt))
+        opt_05a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_05a.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+
+    def place_dwell_time_setup(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Dwell Time Setup'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_06 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Dwell Time Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_06a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Isotope Dwell Times", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_06a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.create_dwell_time_window)
+
+    def place_calculation_window_bg(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Calculation Window (Background) Setup'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_07 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Default Time Window (Background)", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_07a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Start", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_07b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="End", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_07c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Auto-Detection", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_07c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=1,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="BG": self.detect_signal_interval(mode))
+
+        # Entries
+        var_entr_07a_default = self.container_var["ma_setting"]["Time BG Start"].get()
+        var_entr_07b_default = self.container_var["ma_setting"]["Time BG End"].get()
+
+        entr_07a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_entry(
+            var=self.container_var["ma_setting"]["Time BG Start"], text_default=var_entr_07a_default,
+            command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG Start"], var_key="Start",
+                           mode="default", var_interval="BG":
+            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
+        entr_07b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_entry(
+            var=self.container_var["ma_setting"]["Time BG End"], text_default=var_entr_07b_default,
+            command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG End"], var_key="End",
+                           mode="default", var_interval="BG":
+            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
+
+    def place_calculation_window_smpl(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Calculation Window (Sample) Setup'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_08 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Default Time Window (Sample)", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_08a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Start", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_08b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="End", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_08c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Auto-Detection", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_08c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="MAT": self.detect_signal_interval(mode))
+
+        # Entries
+        var_entr_08a_default = self.container_var["ma_setting"]["Time MAT Start"].get()
+        var_entr_08b_default = self.container_var["ma_setting"]["Time MAT End"].get()
+
+        entr_08a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_entry(
+            var=self.container_var["ma_setting"]["Time MAT Start"], text_default=var_entr_08a_default,
+            command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT Start"], var_key="Start",
+                           mode="default", var_interval="MAT":
+            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
+        entr_08b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_entry(
+            var=self.container_var["ma_setting"]["Time MAT End"], text_default=var_entr_08b_default,
+            command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT End"], var_key="End",
+                           mode="default", var_interval="MAT":
+            self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
+
+    def place_spike_elimination_setup(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Spike Elimination Setup'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_09 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Spike Elimination", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_09b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Calculation Method", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Option Menus
+        if self.container_var["Spike Elimination Method"].get() != "Select Method":
+            var_text = self.container_var["Spike Elimination Method"].get()
+        else:
+            var_text = "Select Method"
+
+        opt_09b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Spike Elimination Method"], option_list=self.list_se_methods, text_set=var_text,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["Spike Elimination Method"], start_row=var_row_start:
+            self.select_spike_elimination(var_opt, start_row))
+        opt_09b["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_09b.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
     def build_checkbutton_isotope_visibility(self, var_mode, var_filetype, var_filename_short, var_isotope):
         self.container_var[var_mode]["Display RAW"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
@@ -14941,6 +15025,9 @@ class PySILLS(tk.Frame):
         elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 3:
             var_text_02 = "Experimental data"
             var_key = "experiments"
+        elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 4:
+            var_text_02 = "Custom data"
+            var_key = "custom"
         #
         lbl_01 = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1,
@@ -14951,9 +15038,14 @@ class PySILLS(tk.Frame):
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
             n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=var_text_02, relief=tk.FLAT, fontsize="sans 10 bold")
-        if self.container_var["ma_setting"]["Host Setup Selection"].get() != 3:
+        if self.container_var["ma_setting"]["Host Setup Selection"].get() not in [3, 4]:
             lbl_03 = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 3, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+        if self.container_var["ma_setting"]["Host Setup Selection"].get() == 4:
+            lbl_03 = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
         #
@@ -15018,8 +15110,42 @@ class PySILLS(tk.Frame):
                 n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda parent=subwindow_ma_matrix_concentration, mode="MA": self.import_is_data(parent, mode))
+        elif var_key == "custom":
+            var_opt_is_default = self.container_var["IS"]["Default SMPL"]
+            var_opt_is_list = self.container_lists["ISOTOPES"]
+
+            if var_opt_is_default.get() != "Select IS":
+                var_opt_is_default_text = var_opt_is_default.get()
+            else:
+                var_opt_is_default_text = "Select IS"
+
+            self.opt_02b = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=var_opt_is_default, option_list=var_opt_is_list, text_set=var_opt_is_default_text,
+                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                command=lambda var_opt=var_opt_is_default, var_file=None, state_default=True:
+                self.ma_change_is_smpl(var_opt, var_file, state_default))
+            self.opt_02b["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            self.opt_02b.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
+
+            var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
+            var_entr_is_default_text = self.container_var["IS"]["Default SMPL Concentration"].get()
+
+            entr_02b = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                var=var_entr_is_default, text_default=var_entr_is_default_text,
+                command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
+                self.ma_change_is_concentration(var_entr, var_file, state_default, event))
         #
-        if var_key != "experiments":
+        if var_key != "experiments" and var_key != "custom":
             var_opt_is_default = self.container_var["IS"]["Default SMPL"]
             var_opt_is_list = self.container_lists["ISOTOPES"]
             var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
@@ -15151,7 +15277,7 @@ class PySILLS(tk.Frame):
                     var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
                 else:
                     var_entr_is_default = "1000000"
-            elif var_key == "experiments":  # Experimental Data Selection
+            elif var_key in ["experiments", "custom"]:  # Experimental Data Selection
                 var_list_is = self.container_lists["ISOTOPES"]
                 var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
                 var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"]
@@ -15169,7 +15295,7 @@ class PySILLS(tk.Frame):
                     var_entr_is_default = "1000000"
 
             var_entr_is_i.set(var_entr_is_default)
-            if var_key != "experiments":
+            if var_key != "experiments" and var_key != "custom":
                 var_entr_i.set(var_entr_i_default)
                 var_opt_comp_i.set(var_opt_i_default)
                 opt_comp_i = tk.OptionMenu(
@@ -15223,12 +15349,22 @@ class PySILLS(tk.Frame):
                 file_long = self.container_lists["SMPL"]["Long"][file_id]
                 self.container_var["SMPL"][file_long]["IS Data"]["IS"].set(df_expdata["isotope"][index])
                 self.container_var["SMPL"][file_long]["IS Data"]["Concentration"].set(df_expdata["value"][index])
+                if self.container_var["IS"]["Default STD"].get() == "Select IS":
+                    self.container_var["IS"]["Default STD"].set(df_expdata["isotope"][index])
+                    for file_std in self.container_lists["STD"]["Long"]:
+                        if self.container_var["STD"][file_std]["IS Data"]["IS"].get() == "Select IS":
+                            self.container_var["STD"][file_std]["IS Data"]["IS"].set(df_expdata["isotope"][index])
         elif mode in ["FI", "MI"]:
             for index, file in enumerate(df_expdata["file"]):
                 file_id = self.container_lists["SMPL"]["Short"].index(file)
                 file_long = self.container_lists["SMPL"]["Long"][file_id]
                 self.container_var["SMPL"][file_long]["IS Data"]["IS"].set(df_expdata["isotope"][index])
                 self.container_var["SMPL"][file_long]["IS Data"]["Concentration"].set(df_expdata["value"][index])
+                if self.container_var["IS"]["Default STD"].get() == "Select IS":
+                    self.container_var["IS"]["Default STD"].set(df_expdata["isotope"][index])
+                    for file_std in self.container_lists["STD"]["Long"]:
+                        if self.container_var["STD"][file_std]["IS Data"]["IS"].get() == "Select IS":
+                            self.container_var["STD"][file_std]["IS Data"]["IS"].set(df_expdata["isotope"][index])
 
     def ma_change_matrix_compound(self, var_opt, var_file=None, state_default=False):
         if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
@@ -15284,8 +15420,10 @@ class PySILLS(tk.Frame):
     def ma_change_is_smpl(self, var_opt, var_file=None, state_default=False):
         if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
             var_key = "Oxide"
-        else:
+        elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 2:
             var_key = "Element"
+        elif self.container_var["ma_setting"]["Host Setup Selection"].get() == 4:
+            var_key = "custom"
         #
         self.container_var["IS"]["Default SMPL"].set(var_opt)
         #
@@ -15351,6 +15489,12 @@ class PySILLS(tk.Frame):
                     self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
                     self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(
                         round(oxide_weight*is_concentration, 4))
+
+                    if self.container_var["IS"]["Default STD"].get() == "Select IS":
+                        self.container_var["IS"]["Default STD"].set(var_opt)
+                        for file_std in self.container_lists["STD"]["Long"]:
+                            if self.container_var["STD"][file_std]["IS Data"]["IS"].get() == "Select IS":
+                                self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_opt)
         else:
             self.container_var["SMPL"][var_file]["IS Data"]["IS"].set(var_opt)
             self.container_var["SMPL"][var_file]["IS"].set(var_opt)
@@ -16859,7 +17003,10 @@ class PySILLS(tk.Frame):
     def ma_get_intensity_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, 
                                     mode="Specific"):
         if mode == "Specific":
-            var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+            if var_filetype == "STD":
+                var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+            elif var_filetype == "SMPL":
+                var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
             #
             if var_focus == "MAT":
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
@@ -16950,15 +17097,16 @@ class PySILLS(tk.Frame):
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
     def ma_get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long,
-                                           mode="Specific"):
+                                           mode="Specific", var_is_smpl=None):
         if mode == "Specific":
             if var_filetype == "STD":
                 var_srm_file = self.container_var["SRM"][var_file_long].get()
-                var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                if var_is_smpl == None:
+                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                else:
+                    var_is = var_is_smpl
                 key_element_is = re.search("(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
-                #var_concentration_is = float(
-                #    self.container_var[var_filetype][var_file_long]["IS Data"]["Concentration"].get())
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
                 for isotope in self.container_lists["ISOTOPES"]:
@@ -16979,6 +17127,7 @@ class PySILLS(tk.Frame):
                 xi_opt = {}
                 xi_std_helper = {}
                 list_valid_std = []
+                var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 #
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
@@ -16987,7 +17136,7 @@ class PySILLS(tk.Frame):
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.ma_get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
-                            var_file_long=file_std)
+                            var_file_long=file_std, var_is_smpl=var_is_smpl)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         #
