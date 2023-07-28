@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.07.2023
+# Date:		28.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +15,6 @@
 import os, pathlib, sys, re, datetime, csv, string, math
 import numpy as np
 import pandas as pd
-#import seaborn as sns
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -245,6 +244,8 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["Default Author"].set("J. Doe")
         self.container_var["General Settings"]["Default SRM"] = tk.StringVar()
         self.container_var["General Settings"]["Default SRM"].set("Select SRM")
+        self.container_var["General Settings"]["Colormap"] = tk.StringVar()
+        self.container_var["General Settings"]["Colormap"].set("turbo")
         self.container_var["General Settings"]["Default IS MA"] = tk.StringVar()
         self.container_var["General Settings"]["Default IS MA"].set("Select IS")
         self.container_var["General Settings"]["Default IS FI"] = tk.StringVar()
@@ -4250,14 +4251,8 @@ class PySILLS(tk.Frame):
         #
         if len(self.container_lists["ISOTOPES"]) == 0:
             self.container_lists["ISOTOPES"] = list_keys
-            #
             self.define_isotope_colors()
-            # self.palette_complete = sns.color_palette(
-            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            # self.isotope_colors = {}
-            # for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #     self.isotope_colors[isotope] = self.palette_complete[index]
-        #
+
         icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
         y_max = np.amax(icp_measurements)
         #
@@ -8570,16 +8565,9 @@ class PySILLS(tk.Frame):
 
             elif self.pysills_mode == "MI":
                 pass
-            #
+
             self.define_isotope_colors()
-            # self.palette_complete = sns.color_palette(
-            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            # self.isotope_colors = {}
-            # #
-            # for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #     self.isotope_colors[isotope] = self.palette_complete[index]
-            #     self.container_files["SRM"][isotope] = tk.StringVar()
-            #
+
             self.file_loaded = True
             self.demo_mode = False
         #
@@ -10095,14 +10083,7 @@ class PySILLS(tk.Frame):
             self.container_lists["ISOTOPES"] = self.list_isotopes
 
             self.define_isotope_colors()
-            # self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            # if bool(self.container_files["SRM"]) == False:
-            #     self.isotope_colors = {}
-            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #         self.container_files["SRM"][isotope] = tk.StringVar()
-            #         self.isotope_colors[isotope] = self.palette_complete[index]
         except:
-            #
             path = os.getcwd()
             parent = os.path.dirname(path)
             fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
@@ -10113,9 +10094,6 @@ class PySILLS(tk.Frame):
                     path_raw = pathlib.PureWindowsPath(path_complete)
                     fi_demo_files["ALL"].append(str(path_raw.as_posix()))
             fi_demo_files["ALL"].sort()
-            # fi_demo_files["STD"].extend(fi_demo_files["ALL"][:2])
-            # fi_demo_files["STD"].extend(fi_demo_files["ALL"][-2:])
-            # fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:-2])
             fi_demo_files["STD"].extend(fi_demo_files["ALL"][:1])
             fi_demo_files["STD"].extend(fi_demo_files["ALL"][-1:])
             fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:4])
@@ -10138,15 +10116,8 @@ class PySILLS(tk.Frame):
             self.container_lists["ISOTOPES"] = self.list_isotopes
 
             self.define_isotope_colors()
-            # self.palette_complete = sns.color_palette("nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            # if bool(self.container_files["SRM"]) == False:
-            #     self.isotope_colors = {}
-            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #         self.container_files["SRM"][isotope] = tk.StringVar()
-            #         self.isotope_colors[isotope] = self.palette_complete[index]
-            #
             self.demo_view = False
-        #
+
         ## Labels
         start_col_settings = 21
         start_col_std = 39
@@ -12139,6 +12110,7 @@ class PySILLS(tk.Frame):
                 self.container_helper[filetype][filename][mode]["Indices"].append(1)
 
             self.container_var[filetype][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
+            self.container_var[filetype][filename_long]["Sign Color"].set(self.sign_yellow)
     #
     def internal_standard_concentration_setup(self):
         try:
@@ -12503,7 +12475,7 @@ class PySILLS(tk.Frame):
     #
     def subwindow_general_settings(self):
         ## Window Settings
-        window_width = 540
+        window_width = 740
         window_heigth = 375
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
@@ -12529,25 +12501,8 @@ class PySILLS(tk.Frame):
         # Columns
         for i in range(0, n_columns):
             subwindow_generalsettings.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ###########################################################
-        #
-        ## Frames
-        # frm_01 = SE(
-        #     parent=subwindow_generalsettings, row_id=0, column_id=1, n_rows=n_rows, n_columns=1,
-        #     fg=self.green_light, bg=self.accent_color).create_frame(relief=tk.FLAT)
-        # frm_02 = SE(
-        #     parent=subwindow_generalsettings, row_id=17, column_id=0, n_rows=1, n_columns=n_columns,
-        #     fg=self.green_light, bg=self.accent_color).create_frame(relief=tk.FLAT)
-        # frm_03 = SE(
-        #     parent=subwindow_generalsettings, row_id=0, column_id=0, n_rows=n_rows, n_columns=1,
-        #     fg=self.green_light, bg=self.bg_colors["Super Dark"]).create_frame(relief=tk.FLAT)
-        # frm_04 = SE(
-        #     parent=subwindow_generalsettings, row_id=20, column_id=1, n_rows=1, n_columns=n_columns,
-        #     fg=self.green_light, bg=self.bg_colors["Super Dark"]).create_frame(relief=tk.FLAT)
-        # #
-        # self.gui_elements["general_settings"]["Frame"]["General"].extend([frm_01, frm_02, frm_03, frm_04])
-        #
         start_row = 0
         start_column = 0
         #
@@ -12576,9 +12531,13 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=10, column_id=start_column + 10, n_rows=2, n_columns=16,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Offset Automatic Interval Detection", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_08 = SE(
+            parent=subwindow_generalsettings, row_id=0, column_id=start_column + 27, n_rows=2, n_columns=9,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Colormap", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07])
+            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08])
         #
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=9,
@@ -12588,18 +12547,6 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=6, column_id=start_column, n_rows=1, n_columns=9,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Default SRM", relief=tk.GROOVE, fontsize="sans 10 bold")
-        # lbl_04a = SE(
-        #     parent=subwindow_generalsettings, row_id=10, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-        #     text="Intensity Analysis", relief=tk.GROOVE, fontsize="sans 10 bold")
-        # lbl_04b = SE(
-        #     parent=subwindow_generalsettings, row_id=12, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-        #     text="Sensitivity Analysis", relief=tk.GROOVE, fontsize="sans 10 bold")
-        # lbl_04c = SE(
-        #     parent=subwindow_generalsettings, row_id=14, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-        #     text="Concentration Analysis", relief=tk.GROOVE, fontsize="sans 10 bold")
         lbl_05a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column + 10, n_rows=1, n_columns=16,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
@@ -12616,9 +12563,13 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=13, column_id=start_column + 10, n_rows=1, n_columns=6,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Signal", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_08a = SE(
+            parent=subwindow_generalsettings, row_id=2, column_id=start_column + 27, n_rows=1, n_columns=9,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b])
+            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b, lbl_08a])
         #
         ## Entries
         entr_01a = SE(
@@ -12626,21 +12577,6 @@ class PySILLS(tk.Frame):
             fg=self.green_light, bg=self.green_dark).create_simple_entry(
             var=self.container_var["General Settings"]["Default Author"],
             text_default=self.container_var["General Settings"]["Default Author"].get(), command=None)
-        # entr_04a = SE(
-        #     parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.green_light, bg=self.green_dark).create_simple_entry(
-        #     var=self.container_var["General Settings"]["Accuracy Intensity"],
-        #     text_default=self.container_var["General Settings"]["Accuracy Intensity"].get(), command=None)
-        # entr_04b = SE(
-        #     parent=subwindow_generalsettings, row_id=13, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.green_light, bg=self.green_dark).create_simple_entry(
-        #     var=self.container_var["General Settings"]["Accuracy Sensitivity"],
-        #     text_default=self.container_var["General Settings"]["Accuracy Sensitivity"].get(), command=None)
-        # entr_04c = SE(
-        #     parent=subwindow_generalsettings, row_id=15, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.green_light, bg=self.green_dark).create_simple_entry(
-        #     var=self.container_var["General Settings"]["Accuracy Concentration"],
-        #     text_default=self.container_var["General Settings"]["Accuracy Concentration"].get(), command=None)
         entr_07a = SE(
             parent=subwindow_generalsettings, row_id=12, column_id=start_column + 16, n_rows=1, n_columns=5,
             fg=self.green_light, bg=self.green_dark).create_simple_entry(
@@ -12668,15 +12604,27 @@ class PySILLS(tk.Frame):
         ## Option Menus
         list_srm = list(np.sort(self.list_srm))
         list_srm.insert(0, "Select SRM")
-        #
+        list_colormaps = [
+            "turbo", "rainbow", "gist_rainbow", "jet", "nipy_spectral", "gnuplot", "gist_earth", "ocean", "hsv",
+            "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
+            "cividis", "brg"]
+        list_colormaps.sort()
+
         opt_srm = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=9,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["Default SRM"],
             var_default=self.container_var["General Settings"]["Default SRM"].get(), var_list=list_srm,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_colormaps = SE(
+            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 27, n_rows=1, n_columns=9,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["Colormap"],
+            var_default=self.container_var["General Settings"]["Colormap"].get(), var_list=list_colormaps,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["General Settings"]["Colormap"]: self.change_colormap(var_opt))
         #
-        self.gui_elements["general_settings"]["Option Menu"]["General"].extend([opt_srm])
+        self.gui_elements["general_settings"]["Option Menu"]["General"].extend([opt_srm, opt_colormaps])
         #
         ## Radiobuttons
         rb_04a = SE(
@@ -12728,7 +12676,10 @@ class PySILLS(tk.Frame):
             command=self.confirm_general_settings)
         #
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
-    #
+
+    def change_colormap(self, var_opt):
+        self.container_var["General Settings"]["Colormap"].set(var_opt)
+
     def confirm_general_settings(self):
         path_pysills = os.path.dirname(os.path.realpath(__file__))
         filename = os.path.join(path_pysills, "user_settings.txt")
@@ -13735,21 +13686,7 @@ class PySILLS(tk.Frame):
             self.container_lists["ISOTOPES"] = self.list_isotopes
 
             self.define_isotope_colors()
-            # #self.palette_complete = sns.color_palette(
-            # #    "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            #
-            # cmap = plt.get_cmap("nipy_spectral", len(self.container_lists["ISOTOPES"]))
-            # colors_mpl = []
-            # for i in range(cmap.N):
-            #     rgba = cmap(i)
-            #     colors_mpl.append(mpl.colors.rgb2hex(rgba))
-            # if bool(self.container_files["SRM"]) == False:
-            #     self.isotope_colors = {}
-            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #         self.container_files["SRM"][isotope] = tk.StringVar()
-            #         #self.isotope_colors[isotope] = self.palette_complete[index]
-            #         self.isotope_colors[isotope] = colors_mpl[index]
-        #
+
         ## Window Settings
         window_width = 1260
         window_heigth = 950
@@ -13785,6 +13722,8 @@ class PySILLS(tk.Frame):
             #
             if element not in self.container_lists["Elements"]:
                 self.container_lists["Elements"].append(element)
+
+        self.define_isotope_colors()
         #
         ## LABELS
         n_col_header = 18
@@ -13996,16 +13935,18 @@ class PySILLS(tk.Frame):
             if self.file_loaded is False:
                 if "Si29" in self.container_lists["ISOTOPES"]:
                     possible_is = "Si29"
-                self.container_var["STD"][file_std] = {}
-                self.container_var["STD"][file_std]["IS"] = tk.StringVar()
-                self.container_var["STD"][file_std]["IS"].set(possible_is)
-                self.container_var["STD"][file_std]["IS Data"] = {
-                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                self.container_var["STD"][file_std]["IS Data"]["IS"].set(possible_is)
-                self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
-                self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
-                self.container_var["STD"][file_std]["Checkbox"].set(1)
-                #
+                if file_std not in self.container_var["STD"]:
+                    self.container_var["STD"][file_std] = {}
+                    self.container_var["STD"][file_std]["IS"] = tk.StringVar()
+                    self.container_var["STD"][file_std]["IS"].set(possible_is)
+                    self.container_var["STD"][file_std]["IS Data"] = {
+                        "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+                    self.container_var["STD"][file_std]["IS Data"]["IS"].set(possible_is)
+                    self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
+                    self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
+                    self.container_var["STD"][file_std]["Checkbox"].set(1)
+                    self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
+                    self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
             else:
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
@@ -14156,9 +14097,10 @@ class PySILLS(tk.Frame):
                 command=lambda var_file=file_std, var_type="STD": self.ma_check_specific_file(var_file, var_type))
             text_std.window_create("end", window=btn_i)
             text_std.insert("end", "\t")
-            #
-            frm_i = tk.Frame(frm_std, bg=self.sign_red, relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
+
+            var_frm_color = self.container_var["STD"][file_std]["Sign Color"].get()
+            frm_i = tk.Frame(
+                frm_std, bg=var_frm_color, relief=tk.SOLID, height=15, width=15, highlightbackground="black", bd=1)
             text_std.window_create("end", window=frm_i)
             text_std.insert("end", "\n")
             #
@@ -14183,28 +14125,30 @@ class PySILLS(tk.Frame):
             if self.file_loaded is False:
                 if "Si29" in self.container_lists["ISOTOPES"]:
                     possible_is = "Si29"
-                self.container_var["SMPL"][file_smpl] = {}
-                self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
-                self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
-                self.container_var["SMPL"][file_smpl]["IS Data"] = {
-                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
-                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
-                    "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                    "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                    "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("0.0")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
-                self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
-                self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
-                self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
-                self.container_var["SMPL"][file_smpl]["ID"].set("A")
-                #
+                if file_smpl not in self.container_var["SMPL"]:
+                    self.container_var["SMPL"][file_smpl] = {}
+                    self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
+                    self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
+                    self.container_var["SMPL"][file_smpl]["IS Data"] = {
+                        "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
+                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("0.0")
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+                    self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
+                    self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
+                    self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
+                    self.container_var["SMPL"][file_smpl]["ID"].set("A")
+                    self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
+                    self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
             else:
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
@@ -14394,8 +14338,9 @@ class PySILLS(tk.Frame):
                 command=lambda var_file=file_smpl, var_type="SMPL": self.ma_check_specific_file(var_file, var_type))
             text_smpl.window_create("end", window=btn_i)
             text_smpl.insert("end", "\t")
-            #
-            frm_i = tk.Frame(frm_smpl, bg=self.sign_red, relief=tk.SOLID, height=15, width=15,
+
+            var_frm_color = self.container_var["SMPL"][file_smpl]["Sign Color"].get()
+            frm_i = tk.Frame(frm_smpl, bg=var_frm_color, relief=tk.SOLID, height=15, width=15,
                              highlightbackground="black", bd=1)
             text_smpl.window_create("end", window=frm_i)
             text_smpl.insert("end", "\n")
@@ -14448,11 +14393,9 @@ class PySILLS(tk.Frame):
                 self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
                 #
                 for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short][isotope].set(1)
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
-                    #
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
+                        var_isotope=isotope)
                     if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
@@ -14469,11 +14412,9 @@ class PySILLS(tk.Frame):
                         "RAW": None, "SMOOTHED": None}
                 #
                 for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
-                    #
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
+                        var_isotope=isotope)
                     if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
@@ -14491,11 +14432,9 @@ class PySILLS(tk.Frame):
             #
             if self.file_loaded == True:
                 for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short][isotope].set(1)
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
-                    #
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
+                        var_isotope=isotope)
                     if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
@@ -14512,12 +14451,9 @@ class PySILLS(tk.Frame):
                         "RAW": None, "SMOOTHED": None}
                 #
                 for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][
-                        isotope] = tk.IntVar()
-                    self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
-                    #
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
+                        var_isotope=isotope)
                     if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
                         self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
                         self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
@@ -14534,7 +14470,7 @@ class PySILLS(tk.Frame):
                     self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
                         isotope] = {
                         "RAW": None, "SMOOTHED": None}
-            #
+
             frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
                              highlightbackground="black", bd=1)
             text_iso.window_create("end", window=frm_i)
@@ -14939,18 +14875,26 @@ class PySILLS(tk.Frame):
         #     self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
         #     self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
-    def define_isotope_colors(self, var_cm="nipy_spectral"):
+    def build_checkbutton_isotope_visibility(self, var_mode, var_filetype, var_filename_short, var_isotope):
+        self.container_var[var_mode]["Display RAW"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
+        self.container_var[var_mode]["Display SMOOTHED"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
+        self.container_var[var_mode]["Display RAW"][var_filetype][var_filename_short][var_isotope].set(1)
+        self.container_var[var_mode]["Display SMOOTHED"][var_filetype][var_filename_short][var_isotope].set(0)
+
+    def define_isotope_colors(self):
         var_n = len(self.container_lists["ISOTOPES"])
+        var_cm = self.container_var["General Settings"]["Colormap"].get()
         cmap = plt.get_cmap(var_cm, var_n)
         colors_mpl = []
+
         for i in range(cmap.N):
             rgba = cmap(i)
             colors_mpl.append(mpl.colors.rgb2hex(rgba))
-        if bool(self.container_files["SRM"]) == False:
-            self.isotope_colors = {}
-            for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                self.container_files["SRM"][isotope] = tk.StringVar()
-                self.isotope_colors[isotope] = colors_mpl[index]
+
+        self.isotope_colors = {}
+        for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            self.container_files["SRM"][isotope] = tk.StringVar()
+            self.isotope_colors[isotope] = colors_mpl[index]
 
     def build_container_helper(self, mode):
         """Creates and defines some important helper variables.
@@ -15737,11 +15681,11 @@ class PySILLS(tk.Frame):
                              highlightbackground="black", bd=1)
             text_iso.window_create("end", window=frm_i)
             text_iso.insert("end", "")
-            #
+
             lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_iso.window_create("end", window=lbl_i)
             text_iso.insert("end", "\t")
-            #
+
             cb_raw_i = tk.Checkbutton(
                 frm_iso,
                 variable=self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope],
@@ -15751,7 +15695,7 @@ class PySILLS(tk.Frame):
                                                                                    var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_raw_i)
             text_iso.insert("end", "\t")
-            #
+
             cb_smoothed_i = tk.Checkbutton(
                 frm_iso, variable=self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][
                     isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
@@ -15783,6 +15727,7 @@ class PySILLS(tk.Frame):
 
     def confirm_specific_file_setup(self, var_parent, var_type, var_file_long):
         self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
         var_parent.destroy()
 
     def ma_show_time_signal_diagram(self, var_file, var_type, var_lb_state=True):
@@ -17763,30 +17708,12 @@ class PySILLS(tk.Frame):
             self.list_isotopes = list(df_exmpl.columns.values)
             self.list_isotopes.pop(0)
             self.container_lists["ISOTOPES"] = self.list_isotopes
-
             self.define_isotope_colors()
-            # self.palette_complete = sns.color_palette(
-            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            # #
-            # if bool(self.container_files["SRM"]) == False:
-            #     self.isotope_colors = {}
-            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #         self.container_files["SRM"][isotope] = tk.StringVar()
-            #         self.isotope_colors[isotope] = self.palette_complete[index]
         else:
             self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
             self.fi_current_file_smpl = self.container_lists["SMPL"]["Long"][0]
-
             self.define_isotope_colors()
-            # self.palette_complete = sns.color_palette(
-            #     "nipy_spectral", n_colors=len(self.container_lists["ISOTOPES"])).as_hex()
-            #
-            # if bool(self.container_files["SRM"]) == False:
-            #     self.isotope_colors = {}
-            #     for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            #         self.container_files["SRM"][isotope] = tk.StringVar()
-            #         self.isotope_colors[isotope] = self.palette_complete[index]
-        #
+
         ## Window Settings
         window_width = 1260
         window_heigth = 950
@@ -22980,25 +22907,31 @@ class PySILLS(tk.Frame):
             if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
                     len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) < 2:
                 self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
             else:
                 if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
                         len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0:
                     self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
                 else:
                     self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
             #
         else:
             if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
                     len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) + \
                     len(self.container_helper[var_type][var_file_short]["INCL"]["Content"]) < 3:
                 self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
             else:
                 if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
                         len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0 and \
                         len(self.container_helper[var_type][var_file_short]["INCL"]["Content"]) > 0:
                     self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
                 else:
                     self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
     #
     def fi_change_interval_visibility(self, var_key, var_type, var_file_short):
         if self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short][
