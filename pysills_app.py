@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		28.07.2023
+# Date:		31.07.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -246,6 +246,10 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["Default SRM"].set("Select SRM")
         self.container_var["General Settings"]["Colormap"] = tk.StringVar()
         self.container_var["General Settings"]["Colormap"].set("turbo")
+        self.container_var["General Settings"]["File type"] = tk.StringVar()
+        self.container_var["General Settings"]["File type"].set("*.csv")
+        self.container_var["General Settings"]["Delimiter"] = tk.StringVar()
+        self.container_var["General Settings"]["Delimiter"].set("comma")
         self.container_var["General Settings"]["Default IS MA"] = tk.StringVar()
         self.container_var["General Settings"]["Default IS MA"].set("Select IS")
         self.container_var["General Settings"]["Default IS FI"] = tk.StringVar()
@@ -6969,11 +6973,23 @@ class PySILLS(tk.Frame):
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
         #
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
+        var_file_extension_pre = self.container_var["General Settings"]["File type"].get()
+        if var_file_extension_pre == "*.csv":
+            var_file_extension = ".csv"
+        elif var_file_extension_pre == "*.txt":
+            var_file_extension = ".txt"
+
+        var_delimiter_pre = self.container_var["General Settings"]["Delimiter"].get()
+        if var_delimiter_pre == "comma":
+            var_delimiter = ","
+        elif var_delimiter_pre == "semicolon":
+            var_delimiter = ";"
+
+        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename = export_file.name
         #
         with open(filename, "w", newline="") as report_file:
-            writer = csv.DictWriter(report_file, fieldnames=header, delimiter=";")
+            writer = csv.DictWriter(report_file, fieldnames=header, delimiter=var_delimiter)
             report_file.write("CALCULATION REPORT\n")
             report_file.write("\n")
             report_file.write("AUTHOR:;" + str(self.container_var["ma_setting"]["Author"].get()) + "\n")
@@ -12475,7 +12491,7 @@ class PySILLS(tk.Frame):
     #
     def subwindow_general_settings(self):
         ## Window Settings
-        window_width = 740
+        window_width = 760
         window_heigth = 375
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
@@ -12532,12 +12548,16 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Offset Automatic Interval Detection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08 = SE(
-            parent=subwindow_generalsettings, row_id=0, column_id=start_column + 27, n_rows=2, n_columns=9,
+            parent=subwindow_generalsettings, row_id=0, column_id=start_column + 27, n_rows=2, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Colormap", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_09 = SE(
+            parent=subwindow_generalsettings, row_id=5, column_id=start_column + 27, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Report File", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08])
+            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09])
         #
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=9,
@@ -12564,12 +12584,20 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Signal", relief=tk.GROOVE, fontsize="sans 10 bold")
         lbl_08a = SE(
-            parent=subwindow_generalsettings, row_id=2, column_id=start_column + 27, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=2, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_09a = SE(
+            parent=subwindow_generalsettings, row_id=6, column_id=start_column + 27, n_rows=1, n_columns=5,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="File type", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_09b = SE(
+                parent=subwindow_generalsettings, row_id=7, column_id=start_column + 27, n_rows=1, n_columns=5,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+                text="Delimiter", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b, lbl_08a])
+            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b, lbl_08a, lbl_09a, lbl_09b])
         #
         ## Entries
         entr_01a = SE(
@@ -12609,6 +12637,10 @@ class PySILLS(tk.Frame):
             "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
             "cividis", "brg"]
         list_colormaps.sort()
+        list_filetypes = ["*.csv", "*.txt"]
+        list_filetypes.sort()
+        list_delimiter = ["comma", "semicolon"]
+        list_delimiter.sort()
 
         opt_srm = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=9,
@@ -12617,14 +12649,29 @@ class PySILLS(tk.Frame):
             var_default=self.container_var["General Settings"]["Default SRM"].get(), var_list=list_srm,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
         opt_colormaps = SE(
-            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 27, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["Colormap"],
             var_default=self.container_var["General Settings"]["Colormap"].get(), var_list=list_colormaps,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["General Settings"]["Colormap"]: self.change_colormap(var_opt))
+        opt_filetype = SE(
+            parent=subwindow_generalsettings, row_id=6, column_id=start_column + 32, n_rows=1, n_columns=5,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["File type"],
+            var_default=self.container_var["General Settings"]["File type"].get(), var_list=list_filetypes,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["General Settings"]["File type"]: self.change_filetype(var_opt))
+        opt_delimiter = SE(
+            parent=subwindow_generalsettings, row_id=7, column_id=start_column + 32, n_rows=1, n_columns=5,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["Delimiter"],
+            var_default=self.container_var["General Settings"]["Delimiter"].get(), var_list=list_delimiter,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["General Settings"]["Delimiter"]: self.change_delimiter(var_opt))
         #
-        self.gui_elements["general_settings"]["Option Menu"]["General"].extend([opt_srm, opt_colormaps])
+        self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
+            [opt_srm, opt_colormaps, opt_filetype, opt_delimiter])
         #
         ## Radiobuttons
         rb_04a = SE(
@@ -12679,6 +12726,12 @@ class PySILLS(tk.Frame):
 
     def change_colormap(self, var_opt):
         self.container_var["General Settings"]["Colormap"].set(var_opt)
+
+    def change_filetype(self, var_opt):
+        self.container_var["General Settings"]["File type"].set(var_opt)
+
+    def change_delimiter(self, var_opt):
+        self.container_var["General Settings"]["Delimiter"].set(var_opt)
 
     def confirm_general_settings(self):
         path_pysills = os.path.dirname(os.path.realpath(__file__))
