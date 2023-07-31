@@ -249,7 +249,7 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["File type"] = tk.StringVar()
         self.container_var["General Settings"]["File type"].set("*.csv")
         self.container_var["General Settings"]["Delimiter"] = tk.StringVar()
-        self.container_var["General Settings"]["Delimiter"].set("comma")
+        self.container_var["General Settings"]["Delimiter"].set("semicolon")
         self.container_var["General Settings"]["Default IS MA"] = tk.StringVar()
         self.container_var["General Settings"]["Default IS MA"].set("Select IS")
         self.container_var["General Settings"]["Default IS FI"] = tk.StringVar()
@@ -7044,6 +7044,7 @@ class PySILLS(tk.Frame):
                     #
                     report_file.write("\n")
                     #
+                    report_file.write("INTENSITY ANALYSIS\n")
                     report_file.write("Intensity (Matrix)\n")  # Intensity
                     report_file.write("(cps)\n")
                     writer.writeheader()
@@ -7066,6 +7067,7 @@ class PySILLS(tk.Frame):
                     #
                     report_file.write("\n")
                     #
+                    report_file.write("SENSITIVITY ANALYSIS\n")
                     report_file.write("Analytical Sensitivity\n")  # Analytical Sensitivity
                     report_file.write("(1)\n")
                     writer.writeheader()
@@ -13743,7 +13745,7 @@ class PySILLS(tk.Frame):
             self.define_isotope_colors()
 
         ## Window Settings
-        window_width = 1260
+        window_width = 1220
         window_heigth = 950
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
@@ -13783,7 +13785,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         n_col_header = 18
         n_col_category = 12
-        n_col_files = 24
+        n_col_files = 22
         n_col_iso = 18
         start_row_01 = 0  # Project Information
         start_row_02 = 3  # Standard Reference Material
@@ -13795,9 +13797,9 @@ class PySILLS(tk.Frame):
         start_row_08 = 24  # Default Time Window (Matrix)
         start_row_09 = 28  # Spike Elimination
         start_row_10 = 31  # Check-Up
-        start_row_std = start_row_01  # Standard Files Setup
-        start_row_smpl = start_row_05  # Sample Files Setup
-        start_row_iso = start_row_01  # Measured Isotopes
+        start_row_std = 0  # Standard Files Setup
+        start_row_smpl = 17  # Sample Files Setup
+        start_row_iso = 0  # Measured Isotopes
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
         var_standard_reference_material = {"Row start": 3, "Column start": 0, "N rows": 1, "N columns": 18}
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
@@ -13807,6 +13809,9 @@ class PySILLS(tk.Frame):
         var_calculation_window_bg_setup = {"Row start": 17, "Column start": 0, "N rows": 1, "N columns": 18}
         var_calculation_window_smpl_setup = {"Row start": 21, "Column start": 0, "N rows": 1, "N columns": 18}
         var_spike_elimination_setup = {"Row start": 25, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_acquisition_times_check = {"Row start": 17, "Column start": 42, "N rows": 1, "N columns": 18}
+        var_time_signal_diagram_check = {"Row start": 25, "Column start": 42, "N rows": 1, "N columns": 18}
         #
         ## Static
         # Build section 'Project Information'
@@ -13827,37 +13832,13 @@ class PySILLS(tk.Frame):
         self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_smpl_setup)
         # Build section 'Spike Elimination Setup'
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
+        # Build section 'Check-Up'
+        self.place_checkup_feature(var_geometry_info=var_checkup)
+        # Build section 'Acquisition Times'
+        self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
+        # Build section 'Time-Signal Diagram Checker'
+        self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
 
-        lbl_10 = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10, column_id=n_col_header + n_col_files + 2, n_rows=1,
-            n_columns=n_col_header, fg=self.colors_fi["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Check-Up", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_10a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 1, column_id=n_col_header + n_col_files + 2,
-            n_rows=1,
-            n_columns=n_col_category, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Standard Reference Material", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_10b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 2, column_id=n_col_header + n_col_files + 2,
-            n_rows=1,
-            n_columns=n_col_category, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Internal Standard", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_10c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 3, column_id=n_col_header + n_col_files + 2,
-            n_rows=1,
-            n_columns=n_col_category, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Calculation Intervals", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_10d = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 4, column_id=n_col_header + n_col_files + 2,
-            n_rows=1,
-            n_columns=n_col_category, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Acquisition Times", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_10e = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 5, column_id=n_col_header + n_col_files + 2,
-            n_rows=1,
-            n_columns=n_col_category, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Imported Files", relief=tk.GROOVE, fontsize="sans 10 bold")
         lbl_std = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_std, column_id=n_col_header + 1, n_rows=1,
             n_columns=n_col_files, fg=self.colors_fi["Light Font"],
@@ -13877,7 +13858,7 @@ class PySILLS(tk.Frame):
         # Standard Files
         frm_std = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_std + 1, column_id=n_col_header + 1,
-            n_rows=start_row_smpl - 3, n_columns=n_col_files, fg=bg_light,
+            n_rows=start_row_smpl - 2, n_columns=n_col_files, fg=bg_light,
             bg=self.bg_colors["Very Light"]).create_frame()
         vsb_std = tk.Scrollbar(master=frm_std, orient="vertical")
         text_std = tk.Text(
@@ -14046,7 +14027,7 @@ class PySILLS(tk.Frame):
             text_std.insert("end", "\t")
 
             btn_i = tk.Button(
-                master=frm_std, text="Setup", bg=bg_medium, fg=self.bg_colors["Very Dark"],
+                master=frm_std, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
                 command=lambda var_file=file_std, var_type="STD": self.ma_check_specific_file(var_file, var_type))
             text_std.window_create("end", window=btn_i)
@@ -14271,7 +14252,7 @@ class PySILLS(tk.Frame):
             text_smpl.insert("end", "\t")
             #
             btn_i = tk.Button(
-                master=frm_smpl, text="Setup", bg=bg_medium, fg=self.bg_colors["Very Dark"],
+                master=frm_smpl, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
                 command=lambda var_file=file_smpl, var_type="SMPL": self.ma_check_specific_file(var_file, var_type))
             text_smpl.window_create("end", window=btn_i)
@@ -14287,7 +14268,7 @@ class PySILLS(tk.Frame):
 
         frm_iso = SE(
             parent=self.subwindow_ma_settings, row_id=start_row_iso + 1, column_id=n_col_header + n_col_files + 2,
-            n_rows=n_rows - 10, n_columns=n_col_iso, fg=self.bg_colors["Dark Font"],
+            n_rows=n_rows - 23, n_columns=n_col_iso, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
         vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
         text_iso = tk.Text(
@@ -14448,41 +14429,23 @@ class PySILLS(tk.Frame):
             text_iso.insert("end", "\n")
         #
         ## BUTTONS
-        btn_10a = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 1,
-            column_id=n_col_header + n_col_files + 2 + n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.check_srm_settings)  # Check-Up - SRM Settings
-        btn_10b = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 2,
-            column_id=n_col_header + n_col_files + 2 + n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.internal_standard_concentration_setup)  # Check-Up - Internal Standard Settings
-        btn_10c = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 3,
-            column_id=n_col_header + n_col_files + 2 + n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.check_interval_settings)  # Check-Up - Calculation Interval Settings
-        btn_10d = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 4,
-            column_id=n_col_header + n_col_files + 2 + n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.check_acquisition_times)  # Check-Up - Acquisition Times
-        btn_10e = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_10 + 5,
-            column_id=n_col_header + n_col_files + 2 + n_col_category, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Very Dark"], bg=bg_medium).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.check_imported_files)
+        btn_std_conf = SE(
+            parent=self.subwindow_ma_settings, row_id=start_row_smpl - 1,
+            column_id=n_col_header + 17, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Confirm all files", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
+        btn_smpl_conf = SE(
+            parent=self.subwindow_ma_settings, row_id=n_rows - 2,
+            column_id=n_col_header + 17, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Confirm all files", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
 
         ## OPTION MENUS
         list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
         opt_laser = SE(
-            parent=self.subwindow_ma_settings, row_id=n_rows - 9, column_id=n_col_header + n_col_files + 14,
+            parent=self.subwindow_ma_settings, row_id=n_rows - 22, column_id=n_col_header + n_col_files + 14,
             n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=bg_medium).create_option_isotope(
             var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
@@ -14976,6 +14939,177 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
+    def place_checkup_feature(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Check-Up'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_10 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.colors_fi["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Check-Up", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_10a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Standard Reference Material", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_10b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Internal Standard", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_10c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Calculation Intervals", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_10d = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 4, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Acquisition Times", relief=tk.GROOVE, fontsize="sans 10 bold")
+        lbl_10e = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 5, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Imported Files", relief=tk.GROOVE, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_10a = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start + var_category_n,
+            n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.check_srm_settings)  # Check-Up - SRM Settings
+        btn_10b = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start + var_category_n,
+            n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.internal_standard_concentration_setup)  # Check-Up - Internal Standard Settings
+        btn_10c = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start + var_category_n,
+            n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.check_interval_settings)  # Check-Up - Calculation Interval Settings
+        btn_10d = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 4, column_id=var_columm_start + var_category_n,
+            n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.check_acquisition_times)  # Check-Up - Acquisition Times
+        btn_10e = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 5, column_id=var_columm_start + var_category_n,
+            n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.check_imported_files)
+
+    def place_acquisition_times_check(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Acquisition Times'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_01 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Acquisition Times", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # Treeviews
+        frm_02 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start,
+            n_rows=7, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_02 = tk.Scrollbar(master=frm_02, orient="vertical")
+        text_02 = tk.Text(
+            master=frm_02, width=25, height=25, yscrollcommand=vsb_02.set, bg=self.bg_colors["Very Light"])
+        vsb_02.config(command=text_02.yview)
+        vsb_02.pack(side="right", fill="y")
+        text_02.pack(side="left", fill="both", expand=True)
+
+        self.get_acquisition_times(var_filetype="STD")
+        self.get_acquisition_times(var_filetype="SMPL")
+
+        lbl_i = tk.Label(
+                frm_02, text="Standard Files", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_02.window_create("end", window=lbl_i)
+        text_02.insert("end", "\n")
+        for var_file_short in self.container_lists["STD"]["Short"]:
+            lbl_i = tk.Label(
+                frm_02, text=var_file_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            text_02.window_create("end", window=lbl_i)
+            text_02.insert("end", "\t")
+
+            entr_i = tk.Entry(
+                frm_02, textvariable=self.container_var["acquisition times"]["STD"][var_file_short])
+            text_02.window_create("insert", window=entr_i)
+            text_02.insert("end", "\n")
+
+        lbl_i = tk.Label(
+                frm_02, text="Sample Files", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_02.window_create("end", window=lbl_i)
+        text_02.insert("end", "\n")
+        for var_file_short in self.container_lists["SMPL"]["Short"]:
+            lbl_i = tk.Label(
+                frm_02, text=var_file_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            text_02.window_create("end", window=lbl_i)
+            text_02.insert("end", "\t")
+
+            entr_i = tk.Entry(
+                frm_02, textvariable=self.container_var["acquisition times"]["SMPL"][var_file_short])
+            text_02.window_create("insert", window=entr_i)
+            text_02.insert("end", "\n")
+
+    def get_acquisition_times(self, var_filetype):
+        for var_file_long in self.container_lists[var_filetype]["Long"]:
+            parts = var_file_long.split("/")
+            var_file_short = parts[-1]
+            dates, times = Data(filename=var_file_long).import_as_list()
+
+            if var_file_short not in self.container_var["acquisition times"][var_filetype]:
+                self.container_var["acquisition times"][var_filetype][var_file_short] = tk.StringVar()
+                self.container_var["acquisition times"][var_filetype][var_file_short].set(
+                    times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+
+    def place_time_signal_plot_checker(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Time-Signal Diagram Checker'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_01 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Time-Signal Diagram Checker", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # Frames
+        frm_02 = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start,
+            n_rows=11, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
+
     def build_checkbutton_isotope_visibility(self, var_mode, var_filetype, var_filename_short, var_isotope):
         self.container_var[var_mode]["Display RAW"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
         self.container_var[var_mode]["Display SMOOTHED"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
@@ -15034,6 +15168,11 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][var_file]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
             self.container_var["SMPL"][var_file]["Matrix Setup"]["Element"]["Name"].set("Select Element")
             self.container_var["SMPL"][var_file]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+
+    def confirm_all_files_2(self, var_filetype):
+        for var_file_long in self.container_lists[var_filetype]["Long"]:
+            self.container_var[var_filetype][var_file_long]["Sign Color"].set(self.sign_green)
+            self.container_var[var_filetype][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
 
     ## MATRIX SETTINGS #################################################################################################
     def ma_matrix_concentration_setup(self):
@@ -25229,7 +25368,7 @@ class PySILLS(tk.Frame):
         #
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
-            var_row_correction = -1
+            var_row_correction = -2
             var_alpha = self.container_var["ma_setting"]["SE Alpha"]
             var_threshold = self.container_var["ma_setting"]["SE Threshold"]
         elif self.pysills_mode == "FI":
