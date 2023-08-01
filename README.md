@@ -54,7 +54,7 @@ Coming soon ...
 
 ## 💎 Mineral Analysis
 
-PySILLS allows a major, minor and trace element analysis of minerals and glasses. The calculations are based on the 
+PySILLS allows the major, minor and trace element analysis of minerals and glasses. The calculations are based on the 
 measured intensity signals and sensitivities of the ICP-MS instrument.
 
 ### Top Features
@@ -83,17 +83,18 @@ On the left side of the settings window, you can define some default parameters 
 dataset, for example a spike elimination.
 
 2. Select a default standard reference material (SRM) for the standard files and isotopes below the header "Standard 
-Reference Material (SRM)". It is also necessary to define an internal standard for the standard files.
-3. Define the concentration of the internal standard within the mineral. For this purpose, it is possible to calculate
-the concentration value based on the amount of a specific oxide, for example 100 % of SiO2, on the amount of an element 
-or by importing a csv-file that contains those information.
+Reference Material (SRM)".
+3. Define the concentration of the internal standard. For this purpose, it is possible to calculate the concentration 
+value based on the amount of a specific oxide, for example 100 % of SiO2, on the amount of an element, by importing 
+a csv-file containing the needed information or by defining the internal standard and its concentration manually.
 4. Click on "Run" behind "Auto-Detection" below "Default Time Window (Background)" and "Default Time Window (Matrix)" in
-order to get automatically detected calculation intervals for the background and matrix signal.
+order to get automatically detected calculation intervals for the background and matrix signal. If you are very sure 
+when the laser started and ended, you can also define manually the time limits of the calculation windows.
 5. Click on "Apply to all" for the standard and sample files in order to apply a spike elimination on all files.
 
-In theory, all mandatory settings were defined now but it is of course possible to change some parameters now if this is 
-needed. We also recommend to check if the automatically set calculation intervals for the background and matrix signal 
-were set correctly.
+In theory, all mandatory settings were defined now, but it is of course possible to change some parameters if this is 
+necessary. We also recommend to check if the automatically set calculation intervals for the background and matrix 
+signal were set correctly.
 
 #### Project results
 After all settings were defined, it is now finally possible to calculate the results of this mineral analysis project.
@@ -149,4 +150,15 @@ Coming soon ...
 
 ## 📚 References
 
-Coming soon ...
+* Heinrich, C.A., et al., 2003, "Quantitative multi-element analysis of minerals, fluid and melt inclusions by 
+laser-ablation inductively-coupled-plasma mass-spectrometry", Geochimica et Cosmochimica Acta, 67, pp. 3473-3496, 
+[Link](https://www.sciencedirect.com/science/article/pii/S001670370300084X)
+* Guillong, M., et al., 2008, "SILLS: A MATLAB-based program for the reduction of Laser ablation ICP-MS data of 
+homogenous materials and inclusions", Mineralogical Association of Canada Short Course, 40, pp. 323-333, [Link](
+https://ethz.ch/content/dam/ethz/special-interest/erdw/geopetro/mineralsystems-dam/documents/MAC_SC_40_Sills_description.pdf)
+* Longerich, H.P., et al., 1996, "Laser Ablation Inductively Coupled Plasma Mass Spectrometric Transient Signal Data 
+Acquisition and Analyte Concentration Calculation", Journal of Analytical Atomic Spectrometry, 11, pp. 899-904, [Link](
+https://www.scopus.com/record/display.uri?eid=2-s2.0-0030245362&origin=inward&txGid=a8ec37914d0f3f4ed5d97cd7db187e41)
+* Pettke, T., et al., 2012, "Recent developments in element concentration and isotope ratio analysis of individual fluid 
+inclusions by laser ablation single and multiple collector ICP-MS", Ore Geology Reviews, 44, pp. 10-38, [Link](
+https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
