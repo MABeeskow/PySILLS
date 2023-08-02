@@ -2214,120 +2214,120 @@ class PySILLS(tk.Frame):
         #                                  filename=self.filename_short, ratio_mode=True:
         #     self.onclick(var, filename, ratio_mode, event))
 
-    def select_datareduction_datatype(self, var_rb, init_routine=True):
-        #
-        if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
-            var_filetype = "STD"
-        elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1:
-            var_filetype = "SMPL"
-        #
-        if var_rb.get() == 0:
-            self.var_datatype = "RAW"
-            #
-        elif var_rb.get() == 1:
-            self.var_datatype = "SMOOTHED"
-        #
-        if init_routine == False:
-            #
-            self.results_data = MineralAnalysis(
-                container_measurements=self.container_measurements, container_lists=self.container_lists,
-                container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-                var_filetype=var_filetype, var_datatype=self.var_datatype,
-                var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-                xi_std_time=self.xi_std_time).calculate_all_parameters()
-            #
-            self.show_datareduction_tables(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2])
+    # def select_datareduction_datatype(self, var_rb, init_routine=True):
+    #     #
+    #     if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
+    #         var_filetype = "STD"
+    #     elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1:
+    #         var_filetype = "SMPL"
+    #     #
+    #     if var_rb.get() == 0:
+    #         self.var_datatype = "RAW"
+    #         #
+    #     elif var_rb.get() == 1:
+    #         self.var_datatype = "SMOOTHED"
+    #     #
+    #     if init_routine == False:
+    #         #
+    #         self.results_data = MineralAnalysis(
+    #             container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #             container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
+    #             var_filetype=var_filetype, var_datatype=self.var_datatype,
+    #             var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
+    #             xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #         #
+    #         self.show_datareduction_tables(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2])
     #
-    def select_datareduction_filetype(self, var_rb, init_routine=True):
-        self.container_var["ma_datareduction"]["Option ID"].set("Select Assemblage")
-        #
-        if var_rb.get() == 0:   # Standard Files
-            #
-            ## CLEANING
-            if len(self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]) > 0:
-                for rb_item in self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]:
-                    rb_item.grid_remove()
-            #
-            for index, file_std in enumerate(self.container_lists["STD"]["Short"]):
-                rb_std_file = SE(
-                    parent=self.parent, row_id=22 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
-                    n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
-                    var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index,
-                    color_bg=self.green_medium,
-                    fg=self.green_light, text=file_std, sticky="nesw", relief=tk.GROOVE)
-                #
-                self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_std_file)
-            #
-            rb_std_all = SE(
-                parent=self.parent, row_id=23 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
-                n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index + 1,
-                color_bg=self.green_medium,
-                fg=self.green_light, text="All Standard Files", sticky="nesw", relief=tk.GROOVE)
-            #
-            self.container_var["ma_datareduction"]["Radiobutton"][3].set(len(self.container_lists["STD"]["Short"]))
-            #
-            self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_std_all)
-            #
-            if self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 0:
-                var_datatype = "RAW"
-            elif self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 1:
-                var_datatype = "SMOOTHED"
-            #
-            self.results_data = MineralAnalysis(
-                container_measurements=self.container_measurements, container_lists=self.container_lists,
-                container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-                var_filetype="STD", var_datatype=var_datatype,
-                var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-                xi_std_time=self.xi_std_time).calculate_all_parameters()
-            #
-        elif var_rb.get() == 1: # Sample Files
-            #
-            ## CLEANING
-            if len(self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]) > 0:
-                for rb_item in self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]:
-                    rb_item.grid_remove()
-            #
-            for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
-                rb_smpl_file = SE(
-                    parent=self.parent, row_id=22 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
-                    n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
-                    var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index,
-                    color_bg=self.green_medium,
-                    fg=self.green_light, text=file_smpl, sticky="nesw", relief=tk.GROOVE)
-                #
-                self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_smpl_file)
-            #
-            rb_smpl_all = SE(
-                parent=self.parent, row_id=23 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
-                n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
-                var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index + 1,
-                color_bg=self.green_medium,
-                fg=self.green_light, text="All Sample Files", sticky="nesw", relief=tk.GROOVE)
-            #
-            self.container_var["ma_datareduction"]["Radiobutton"][3].set(len(self.container_lists["SMPL"]["Short"]))
-            #
-            self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_smpl_all)
-        #
-        if init_routine == False:
-            #
-            if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
-                var_filetype = "STD"
-            elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1:
-                var_filetype = "SMPL"
-            if self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 0:
-                var_datatype = "RAW"
-            elif self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 1:
-                var_datatype = "SMOOTHED"
-            #
-            self.results_data = MineralAnalysis(
-                container_measurements=self.container_measurements, container_lists=self.container_lists,
-                container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-                var_filetype=var_filetype, var_datatype=var_datatype,
-                var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-                xi_std_time=self.xi_std_time).calculate_all_parameters()
-            #
-            self.show_datareduction_tables(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2])
+    # def select_datareduction_filetype(self, var_rb, init_routine=True):
+    #     self.container_var["ma_datareduction"]["Option ID"].set("Select Assemblage")
+    #     #
+    #     if var_rb.get() == 0:   # Standard Files
+    #         #
+    #         ## CLEANING
+    #         if len(self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]) > 0:
+    #             for rb_item in self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]:
+    #                 rb_item.grid_remove()
+    #         #
+    #         for index, file_std in enumerate(self.container_lists["STD"]["Short"]):
+    #             rb_std_file = SE(
+    #                 parent=self.parent, row_id=22 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
+    #                 n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
+    #                 var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index,
+    #                 color_bg=self.green_medium,
+    #                 fg=self.green_light, text=file_std, sticky="nesw", relief=tk.GROOVE)
+    #             #
+    #             self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_std_file)
+    #         #
+    #         rb_std_all = SE(
+    #             parent=self.parent, row_id=23 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
+    #             n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
+    #             var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index + 1,
+    #             color_bg=self.green_medium,
+    #             fg=self.green_light, text="All Standard Files", sticky="nesw", relief=tk.GROOVE)
+    #         #
+    #         self.container_var["ma_datareduction"]["Radiobutton"][3].set(len(self.container_lists["STD"]["Short"]))
+    #         #
+    #         self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_std_all)
+    #         #
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 0:
+    #             var_datatype = "RAW"
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 1:
+    #             var_datatype = "SMOOTHED"
+    #         #
+    #         self.results_data = MineralAnalysis(
+    #             container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #             container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
+    #             var_filetype="STD", var_datatype=var_datatype,
+    #             var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
+    #             xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #         #
+    #     elif var_rb.get() == 1: # Sample Files
+    #         #
+    #         ## CLEANING
+    #         if len(self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]) > 0:
+    #             for rb_item in self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"]:
+    #                 rb_item.grid_remove()
+    #         #
+    #         for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
+    #             rb_smpl_file = SE(
+    #                 parent=self.parent, row_id=22 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
+    #                 n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
+    #                 var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index,
+    #                 color_bg=self.green_medium,
+    #                 fg=self.green_light, text=file_smpl, sticky="nesw", relief=tk.GROOVE)
+    #             #
+    #             self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_smpl_file)
+    #         #
+    #         rb_smpl_all = SE(
+    #             parent=self.parent, row_id=23 + len(self.container_lists["SRM"]) + index, column_id=21, n_rows=1,
+    #             n_columns=9, fg=self.green_dark, bg=self.green_medium).create_radiobutton(
+    #             var_rb=self.container_var["ma_datareduction"]["Radiobutton"][3], value_rb=index + 1,
+    #             color_bg=self.green_medium,
+    #             fg=self.green_light, text="All Sample Files", sticky="nesw", relief=tk.GROOVE)
+    #         #
+    #         self.container_var["ma_datareduction"]["Radiobutton"][3].set(len(self.container_lists["SMPL"]["Short"]))
+    #         #
+    #         self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_smpl_all)
+    #     #
+    #     if init_routine == False:
+    #         #
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
+    #             var_filetype = "STD"
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1:
+    #             var_filetype = "SMPL"
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 0:
+    #             var_datatype = "RAW"
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][0].get() == 1:
+    #             var_datatype = "SMOOTHED"
+    #         #
+    #         self.results_data = MineralAnalysis(
+    #             container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #             container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
+    #             var_filetype=var_filetype, var_datatype=var_datatype,
+    #             var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
+    #             xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #         #
+    #         self.show_datareduction_tables(var_rb=self.container_var["ma_datareduction"]["Radiobutton"][2])
     #
     def select_assemblage(self, var_opt):
         self.list_assemblage = {}
@@ -2365,1217 +2365,1217 @@ class PySILLS(tk.Frame):
         self.gui_elements["ma_datareduction"]["Radiobutton"]["Specific"].append(rb_assemblage_all)
         #
     #
-    def show_datareduction_tables(self, var_rb):
-        #
-        ## CLEANING
-        try:
-            self.canvas_drift.get_tk_widget().grid_remove()
-            self.toolbarFrame_drift.grid_remove()
-        except AttributeError:
-            pass
-        #
-        if var_rb.get() == 0:   # Concentration
-            ## CLEANING
-            if len(self.gui_elements["ma_datareduction"]["Label"]["Specific"]) > 0:
-                for lb_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
-                    lb_item.grid_remove()
-            if len(self.gui_elements["ma_datareduction"]["Entry"]["Specific"]) > 0:
-                for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
-                    entr_item.grid_remove()
-            #
-            ## LABELS
-            lbl_concentration = SE(
-                parent=self.parent, row_id=0, column_id=34, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Concentration C(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_concentration_mean = SE(
-                parent=self.parent, row_id=1, column_id=34, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_concentration_error = SE(
-                parent=self.parent, row_id=1, column_id=40, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_concentration_ratio = SE(
-                parent=self.parent, row_id=0, column_id=46, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Concentration Ratio C(i)/C(IS)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_concentration_ratio_mean = SE(
-                parent=self.parent, row_id=1, column_id=46, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_concentration_ratio_error = SE(
-                parent=self.parent, row_id=1, column_id=52, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_lod = SE(
-                parent=self.parent, row_id=0, column_id=58, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Limit of Detection LoD(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_lod_mean = SE(
-                parent=self.parent, row_id=1, column_id=58, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_lod_error = SE(
-                parent=self.parent, row_id=1, column_id=64, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_datareduction"]["Label"]["Specific"].extend(
-                [lbl_concentration, lbl_concentration_mean, lbl_concentration_error, lbl_concentration_ratio,
-                 lbl_concentration_ratio_mean, lbl_concentration_ratio_error, lbl_lod, lbl_lod_mean, lbl_lod_error])
-            #
-            ## ENTRIES
-            list_std = ["All Standard Files"]
-            list_smpl = ["All Sample Files"]
-            list_assemblage = [self.container_var["ma_datareduction"]["Option ID"].get()+str(" Files")]
-            if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
-                list_std.extend(self.container_lists["STD"]["Short"])
-            elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1:
-                list_smpl.extend(self.container_lists["SMPL"]["Short"])
-            elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 2:
-                list_assemblage.extend(
-                    self.container_lists["ID Files"][self.container_var["ma_datareduction"]["Option ID"].get()])
-            #
-            categories = ["Concentration", "Concentration Ratio", "LOD"]
-            subcategories = ["Mean", "Error"]
-            for index_category, category in enumerate(categories):
-                self.container_var["ma_datareduction"][category] = {}
-                for index_subcategory, subcategory in enumerate(subcategories):
-                    self.container_var["ma_datareduction"][category][subcategory] = {}
-                    for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                        self.container_var["ma_datareduction"][category][subcategory][isotope] = tk.StringVar()
-                        #
-                        entr = SE(
-                            parent=self.parent, row_id=2 + index_isotope,
-                            column_id=34 + index_category*12 + index_subcategory*6, n_rows=1, n_columns=6,
-                            fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                            var=self.container_var["ma_datareduction"][category][subcategory][isotope],
-                            text_default="0.0")
-                        #
-                        self.gui_elements["ma_datareduction"]["Entry"]["Specific"].append(entr)
-        #
-        elif var_rb.get() == 1: # Intensity
-            ## CLEANING
-            if len(self.gui_elements["ma_datareduction"]["Label"]["Specific"]) > 0:
-                for lb_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
-                    lb_item.grid_remove()
-            if len(self.gui_elements["ma_datareduction"]["Entry"]["Specific"]) > 0:
-                for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
-                    entr_item.grid_remove()
-            #
-            lbl_intensity = SE(
-                parent=self.parent, row_id=0, column_id=34, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Intensity I(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_mean = SE(
-                parent=self.parent, row_id=1, column_id=34, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_error = SE(
-                parent=self.parent, row_id=1, column_id=40, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_ratio = SE(
-                parent=self.parent, row_id=0, column_id=46, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Intensity Ratio I(i)/I(IS)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_ratio_mean = SE(
-                parent=self.parent, row_id=1, column_id=46, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_ratio_error = SE(
-                parent=self.parent, row_id=1, column_id=52, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_bg = SE(
-                parent=self.parent, row_id=0, column_id=58, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Intensity Background I(i,BG)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_bg_mean = SE(
-                parent=self.parent, row_id=1, column_id=58, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_intensity_bg_error = SE(
-                parent=self.parent, row_id=1, column_id=64, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_datareduction"]["Label"]["Specific"].extend(
-                [lbl_intensity, lbl_intensity_mean, lbl_intensity_error, lbl_intensity_ratio, lbl_intensity_ratio_mean,
-                 lbl_intensity_ratio_error, lbl_intensity_bg, lbl_intensity_bg_mean, lbl_intensity_bg_error])
-            #
-            ## ENTRIES
-            categories = ["Intensity", "Intensity Ratio", "Intensity BG"]
-            subcategories = ["Mean", "Error"]
-            for index_category, category in enumerate(categories):
-                self.container_var["ma_datareduction"][category] = {}
-                for index_subcategory, subcategory in enumerate(subcategories):
-                    self.container_var["ma_datareduction"][category][subcategory] = {}
-                    for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                        self.container_var["ma_datareduction"][category][subcategory][isotope] = tk.StringVar()
-                        #
-                        entr = SE(
-                            parent=self.parent, row_id=2 + index_isotope,
-                            column_id=34 + index_category * 12 + index_subcategory * 6, n_rows=1, n_columns=6,
-                            fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                            var=self.container_var["ma_datareduction"][category][subcategory][isotope],
-                            text_default="0.0")
-                        #
-                        self.gui_elements["ma_datareduction"]["Entry"]["Specific"].append(entr)
-        #
-        elif var_rb.get() == 2: # Sensitivity
-            ## CLEANING
-            if len(self.gui_elements["ma_datareduction"]["Label"]["Specific"]) > 0:
-                for lb_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
-                    lb_item.grid_remove()
-            if len(self.gui_elements["ma_datareduction"]["Entry"]["Specific"]) > 0:
-                for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
-                    entr_item.grid_remove()
-            #
-            lbl_sensitivity = SE(
-                parent=self.parent, row_id=0, column_id=34, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Analytical Sensitivity \u03BE(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_sensitivity_mean = SE(
-                parent=self.parent, row_id=1, column_id=34, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_sensitivity_error = SE(
-                parent=self.parent, row_id=1, column_id=40, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_rsf = SE(
-                parent=self.parent, row_id=0, column_id=46, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Relative Sensitivity Factor RSF(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_rsf_mean = SE(
-                parent=self.parent, row_id=1, column_id=46, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_rsf_error = SE(
-                parent=self.parent, row_id=1, column_id=52, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_s = SE(
-                parent=self.parent, row_id=0, column_id=58, n_rows=1, n_columns=12, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Normalized Sensitivity S(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_s_mean = SE(
-                parent=self.parent, row_id=1, column_id=58, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
-            lbl_s_error = SE(
-                parent=self.parent, row_id=1, column_id=64, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_label(
-                text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
-            #
-            self.gui_elements["ma_datareduction"]["Label"]["Specific"].extend(
-                [lbl_sensitivity, lbl_sensitivity_mean, lbl_sensitivity_error, lbl_rsf, lbl_rsf_mean, lbl_rsf_error,
-                 lbl_s, lbl_s_mean, lbl_s_error])
-            #
-            ## ENTRIES
-            categories = ["Sensitivity", "RSF", "Normalized Sensitivity"]
-            subcategories = ["Mean", "Error"]
-            for index_category, category in enumerate(categories):
-                self.container_var["ma_datareduction"][category] = {}
-                for index_subcategory, subcategory in enumerate(subcategories):
-                    self.container_var["ma_datareduction"][category][subcategory] = {}
-                    for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
-                        self.container_var["ma_datareduction"][category][subcategory][isotope] = tk.StringVar()
-                        #
-                        entr = SE(
-                            parent=self.parent, row_id=2 + index_isotope,
-                            column_id=34 + index_category * 12 + index_subcategory * 6, n_rows=1, n_columns=6,
-                            fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                            var=self.container_var["ma_datareduction"][category][subcategory][isotope],
-                            text_default="0.0")
-                        #
-                        self.gui_elements["ma_datareduction"]["Entry"]["Specific"].append(entr)
-        #
-        opt_menu_drift = SE(
-            parent=self.parent, row_id=20, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-            bg=self.green_medium).create_option_isotope(
-            var_iso=self.container_var["ma_datareduction"]["Option Drift"],
-            option_list=self.container_lists["ISOTOPES"],
-            text_set=self.container_var["ma_datareduction"]["Option Drift"].get(), fg_active=self.green_dark,
-            bg_active=self.red_dark)
-        #
-        self.container_elements["ma_datareduction"]["Option Menu"].append(opt_menu_drift)
-        #
-        self.fill_tables()
+    # def show_datareduction_tables(self, var_rb):
+    #     #
+    #     ## CLEANING
+    #     try:
+    #         self.canvas_drift.get_tk_widget().grid_remove()
+    #         self.toolbarFrame_drift.grid_remove()
+    #     except AttributeError:
+    #         pass
+    #     #
+    #     if var_rb.get() == 0:   # Concentration
+    #         ## CLEANING
+    #         if len(self.gui_elements["ma_datareduction"]["Label"]["Specific"]) > 0:
+    #             for lb_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
+    #                 lb_item.grid_remove()
+    #         if len(self.gui_elements["ma_datareduction"]["Entry"]["Specific"]) > 0:
+    #             for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
+    #                 entr_item.grid_remove()
+    #         #
+    #         ## LABELS
+    #         lbl_concentration = SE(
+    #             parent=self.parent, row_id=0, column_id=34, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Concentration C(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_concentration_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=34, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_concentration_error = SE(
+    #             parent=self.parent, row_id=1, column_id=40, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_concentration_ratio = SE(
+    #             parent=self.parent, row_id=0, column_id=46, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Concentration Ratio C(i)/C(IS)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_concentration_ratio_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=46, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_concentration_ratio_error = SE(
+    #             parent=self.parent, row_id=1, column_id=52, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_lod = SE(
+    #             parent=self.parent, row_id=0, column_id=58, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Limit of Detection LoD(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_lod_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=58, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_lod_error = SE(
+    #             parent=self.parent, row_id=1, column_id=64, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         #
+    #         self.gui_elements["ma_datareduction"]["Label"]["Specific"].extend(
+    #             [lbl_concentration, lbl_concentration_mean, lbl_concentration_error, lbl_concentration_ratio,
+    #              lbl_concentration_ratio_mean, lbl_concentration_ratio_error, lbl_lod, lbl_lod_mean, lbl_lod_error])
+    #         #
+    #         ## ENTRIES
+    #         list_std = ["All Standard Files"]
+    #         list_smpl = ["All Sample Files"]
+    #         list_assemblage = [self.container_var["ma_datareduction"]["Option ID"].get()+str(" Files")]
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
+    #             list_std.extend(self.container_lists["STD"]["Short"])
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1:
+    #             list_smpl.extend(self.container_lists["SMPL"]["Short"])
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 2:
+    #             list_assemblage.extend(
+    #                 self.container_lists["ID Files"][self.container_var["ma_datareduction"]["Option ID"].get()])
+    #         #
+    #         categories = ["Concentration", "Concentration Ratio", "LOD"]
+    #         subcategories = ["Mean", "Error"]
+    #         for index_category, category in enumerate(categories):
+    #             self.container_var["ma_datareduction"][category] = {}
+    #             for index_subcategory, subcategory in enumerate(subcategories):
+    #                 self.container_var["ma_datareduction"][category][subcategory] = {}
+    #                 for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
+    #                     self.container_var["ma_datareduction"][category][subcategory][isotope] = tk.StringVar()
+    #                     #
+    #                     entr = SE(
+    #                         parent=self.parent, row_id=2 + index_isotope,
+    #                         column_id=34 + index_category*12 + index_subcategory*6, n_rows=1, n_columns=6,
+    #                         fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                         var=self.container_var["ma_datareduction"][category][subcategory][isotope],
+    #                         text_default="0.0")
+    #                     #
+    #                     self.gui_elements["ma_datareduction"]["Entry"]["Specific"].append(entr)
+    #     #
+    #     elif var_rb.get() == 1: # Intensity
+    #         ## CLEANING
+    #         if len(self.gui_elements["ma_datareduction"]["Label"]["Specific"]) > 0:
+    #             for lb_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
+    #                 lb_item.grid_remove()
+    #         if len(self.gui_elements["ma_datareduction"]["Entry"]["Specific"]) > 0:
+    #             for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
+    #                 entr_item.grid_remove()
+    #         #
+    #         lbl_intensity = SE(
+    #             parent=self.parent, row_id=0, column_id=34, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Intensity I(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=34, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_error = SE(
+    #             parent=self.parent, row_id=1, column_id=40, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_ratio = SE(
+    #             parent=self.parent, row_id=0, column_id=46, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Intensity Ratio I(i)/I(IS)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_ratio_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=46, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_ratio_error = SE(
+    #             parent=self.parent, row_id=1, column_id=52, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_bg = SE(
+    #             parent=self.parent, row_id=0, column_id=58, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Intensity Background I(i,BG)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_bg_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=58, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_intensity_bg_error = SE(
+    #             parent=self.parent, row_id=1, column_id=64, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         #
+    #         self.gui_elements["ma_datareduction"]["Label"]["Specific"].extend(
+    #             [lbl_intensity, lbl_intensity_mean, lbl_intensity_error, lbl_intensity_ratio, lbl_intensity_ratio_mean,
+    #              lbl_intensity_ratio_error, lbl_intensity_bg, lbl_intensity_bg_mean, lbl_intensity_bg_error])
+    #         #
+    #         ## ENTRIES
+    #         categories = ["Intensity", "Intensity Ratio", "Intensity BG"]
+    #         subcategories = ["Mean", "Error"]
+    #         for index_category, category in enumerate(categories):
+    #             self.container_var["ma_datareduction"][category] = {}
+    #             for index_subcategory, subcategory in enumerate(subcategories):
+    #                 self.container_var["ma_datareduction"][category][subcategory] = {}
+    #                 for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
+    #                     self.container_var["ma_datareduction"][category][subcategory][isotope] = tk.StringVar()
+    #                     #
+    #                     entr = SE(
+    #                         parent=self.parent, row_id=2 + index_isotope,
+    #                         column_id=34 + index_category * 12 + index_subcategory * 6, n_rows=1, n_columns=6,
+    #                         fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                         var=self.container_var["ma_datareduction"][category][subcategory][isotope],
+    #                         text_default="0.0")
+    #                     #
+    #                     self.gui_elements["ma_datareduction"]["Entry"]["Specific"].append(entr)
+    #     #
+    #     elif var_rb.get() == 2: # Sensitivity
+    #         ## CLEANING
+    #         if len(self.gui_elements["ma_datareduction"]["Label"]["Specific"]) > 0:
+    #             for lb_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
+    #                 lb_item.grid_remove()
+    #         if len(self.gui_elements["ma_datareduction"]["Entry"]["Specific"]) > 0:
+    #             for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
+    #                 entr_item.grid_remove()
+    #         #
+    #         lbl_sensitivity = SE(
+    #             parent=self.parent, row_id=0, column_id=34, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Analytical Sensitivity \u03BE(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_sensitivity_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=34, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_sensitivity_error = SE(
+    #             parent=self.parent, row_id=1, column_id=40, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_rsf = SE(
+    #             parent=self.parent, row_id=0, column_id=46, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Relative Sensitivity Factor RSF(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_rsf_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=46, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_rsf_error = SE(
+    #             parent=self.parent, row_id=1, column_id=52, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_s = SE(
+    #             parent=self.parent, row_id=0, column_id=58, n_rows=1, n_columns=12, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Normalized Sensitivity S(i)", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_s_mean = SE(
+    #             parent=self.parent, row_id=1, column_id=58, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Mean \u03BC", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         lbl_s_error = SE(
+    #             parent=self.parent, row_id=1, column_id=64, n_rows=1, n_columns=6, fg=self.green_light,
+    #             bg=self.green_dark).create_simple_label(
+    #             text="Error \u03C3", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #         #
+    #         self.gui_elements["ma_datareduction"]["Label"]["Specific"].extend(
+    #             [lbl_sensitivity, lbl_sensitivity_mean, lbl_sensitivity_error, lbl_rsf, lbl_rsf_mean, lbl_rsf_error,
+    #              lbl_s, lbl_s_mean, lbl_s_error])
+    #         #
+    #         ## ENTRIES
+    #         categories = ["Sensitivity", "RSF", "Normalized Sensitivity"]
+    #         subcategories = ["Mean", "Error"]
+    #         for index_category, category in enumerate(categories):
+    #             self.container_var["ma_datareduction"][category] = {}
+    #             for index_subcategory, subcategory in enumerate(subcategories):
+    #                 self.container_var["ma_datareduction"][category][subcategory] = {}
+    #                 for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
+    #                     self.container_var["ma_datareduction"][category][subcategory][isotope] = tk.StringVar()
+    #                     #
+    #                     entr = SE(
+    #                         parent=self.parent, row_id=2 + index_isotope,
+    #                         column_id=34 + index_category * 12 + index_subcategory * 6, n_rows=1, n_columns=6,
+    #                         fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                         var=self.container_var["ma_datareduction"][category][subcategory][isotope],
+    #                         text_default="0.0")
+    #                     #
+    #                     self.gui_elements["ma_datareduction"]["Entry"]["Specific"].append(entr)
+    #     #
+    #     opt_menu_drift = SE(
+    #         parent=self.parent, row_id=20, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
+    #         bg=self.green_medium).create_option_isotope(
+    #         var_iso=self.container_var["ma_datareduction"]["Option Drift"],
+    #         option_list=self.container_lists["ISOTOPES"],
+    #         text_set=self.container_var["ma_datareduction"]["Option Drift"].get(), fg_active=self.green_dark,
+    #         bg_active=self.red_dark)
+    #     #
+    #     self.container_elements["ma_datareduction"]["Option Menu"].append(opt_menu_drift)
+    #     #
+    #     self.fill_tables()
     #
-    def fill_tables(self):
-        n_digits_intensity = self.container_var["General Settings"]["Accuracy Intensity"].get()
-        n_digits_sensitivity = self.container_var["General Settings"]["Accuracy Sensitivity"].get()
-        n_digits_concentration = self.container_var["General Settings"]["Accuracy Concentration"].get()
-        n_digits_concentration_ratio = 2*n_digits_concentration
-        n_digits_rsf = n_digits_sensitivity
-        n_digits_lod = n_digits_rsf
-        n_digits_s = n_digits_sensitivity
-        #
-        var_category = self.container_var["ma_datareduction"]["Radiobutton"][2].get()
-        var_file = self.container_var["ma_datareduction"]["Radiobutton"][3].get()
-        var_is = self.container_var["ma_datareduction"]["Option IS"].get()
-        var_filetype = self.container_var["ma_datareduction"]["Radiobutton"][1].get()   # STD vs. SMPL
-        if var_filetype == 0:
-            var_filetype_key = "STD"
-        elif var_filetype == 1 or self.container_var["ma_datareduction"]["Option ID"].get() != "Select Assemblage":
-            var_filetype_key = "SMPL"
-        var_datatype = self.container_var["ma_datareduction"]["Radiobutton"][0].get()   # RAW vs. SMOOTHED
-        if var_datatype == 0:
-            var_datatype_key = "RAW"
-        elif var_datatype == 1:
-            var_datatype_key = "SMOOTHED"
-        #
-        self.results_data = MineralAnalysis(
-            container_measurements=self.container_measurements, container_lists=self.container_lists,
-            container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-            var_filetype=var_filetype_key, var_datatype=var_datatype_key,
-            var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
-            xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        # for key, value in self.results_data["LOD"].items():
-        #     print(key, value)
-        #
-        list_srm_order = np.array(list(self.container_lists["STD"]["SRM"].values()))
-        #
-        if var_category == 0:   # Concentration
-            for isotope in self.container_lists["ISOTOPES"]:
-                var_srm_i = self.container_files["SRM"][isotope].get()
-                indices_srm = np.where(list_srm_order == var_srm_i)[0]
-                #
-                if var_file < len(self.results_data["concentration"][isotope]):
-                    concentration_i_mean = self.results_data["concentration"][isotope][var_file]
-                    concentration_i_error = 0.0
-                else:
-                    concentration_i_mean = np.nanmean(
-                        self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1])
-                    concentration_i_error = np.nanstd(
-                        self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1], ddof=1)
-                    #
-                    if math.isnan(concentration_i_mean) == True:
-                        concentration_i_mean = 0.0
-                        concentration_i_error = 0.0
-                #
-                if var_file < len(self.results_data["concentration"][isotope]):
-                    concentration_ratio_i_mean = self.results_data["concentration"][isotope][var_file]/\
-                                                 self.results_data["concentration"][var_is][var_file]
-                    concentration_ratio_i_error = 0.0
-                else:
-                    if concentration_i_mean > 0:
-                        concentration_ratio_i_mean = np.nanmean(
-                            np.array(self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1])/np.array(
-                                self.results_data["concentration"][var_is][indices_srm[0]:indices_srm[-1] + 1]))
-                        concentration_ratio_i_error = np.nanstd(
-                            np.array(self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1])/np.array(
-                                self.results_data["concentration"][var_is][indices_srm[0]:indices_srm[-1] + 1]), ddof=1)
-                    else:
-                        concentration_ratio_i_mean = 0.0
-                        concentration_ratio_i_error = 0.0
-                #
-                if var_file < len(self.results_data["LOD"][isotope]):
-                    lod_i_mean = self.results_data["LOD"][isotope][var_file]
-                    lod_i_error = 0.0
-                else:
-                    lod_i_mean = np.nanmean(
-                        self.results_data["LOD"][isotope][indices_srm[0]:indices_srm[-1] + 1])
-                    lod_i_error = np.nanstd(
-                        self.results_data["LOD"][isotope][indices_srm[0]:indices_srm[-1] + 1], ddof=1)
-                #
-                ## Concentration
-                self.container_var["ma_datareduction"]["Concentration"]["Mean"][isotope].set(
-                    round(concentration_i_mean, n_digits_concentration))
-                self.container_var["ma_datareduction"]["Concentration"]["Error"][isotope].set(
-                    round(concentration_i_error, n_digits_concentration))
-                ## Concentration Ratio
-                self.container_var["ma_datareduction"]["Concentration Ratio"]["Mean"][isotope].set(
-                    f"{concentration_ratio_i_mean:.{n_digits_concentration}E}")
-                self.container_var["ma_datareduction"]["Concentration Ratio"]["Error"][isotope].set(
-                    f"{concentration_ratio_i_error:.{n_digits_concentration}E}")
-                ## Limit of Detection
-                self.container_var["ma_datareduction"]["LOD"]["Mean"][isotope].set(
-                    round(lod_i_mean, n_digits_lod))
-                self.container_var["ma_datareduction"]["LOD"]["Error"][isotope].set(
-                    round(lod_i_error, n_digits_lod))
-        #
-        elif var_category == 1: # Intensity
-            for isotope in self.container_lists["ISOTOPES"]:
-                if var_filetype == 0:
-                    if var_file < len(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope]):
-                        intensity_i_mean = self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope][var_file]
-                        intensity_i_error = 0.0
-                    else:
-                        intensity_i_mean = np.nanmean(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope])
-                        intensity_i_error = np.nanstd(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope],
-                                                   ddof=1)
-                    #
-                    if var_file < len(self.results_data["intensity"]["STD"]["BACKGROUND"][isotope]):
-                        intensity_bg_i_mean = self.results_data["intensity"]["STD"]["BACKGROUND"][isotope][var_file]
-                        intensity_bg_i_error = 0.0
-                    else:
-                        intensity_bg_i_mean = np.nanmean(self.results_data["intensity"]["STD"]["BACKGROUND"][isotope])
-                        intensity_bg_i_error = np.nanstd(self.results_data["intensity"]["STD"]["BACKGROUND"][isotope],
-                                                   ddof=1)
-                    #
-                    if var_file < len(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope]):
-                        intensity_ratio_i_mean = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][
-                            isotope][var_file]
-                        intensity_ratio_i_error = 0.0
-                    else:
-                        intensity_ratio_i_mean = np.nanmean(
-                            self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope])
-                        intensity_ratio_i_error = np.nanstd(
-                            self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope], ddof=1)
-                else:
-                    if var_file < len(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope]):
-                        intensity_i_mean = self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope][var_file]
-                        intensity_i_error = 0.0
-                    else:
-                        intensity_i_mean = np.nanmean(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope])
-                        intensity_i_error = np.nanstd(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope],
-                                                   ddof=1)
-                    #
-                    if var_file < len(self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope]):
-                        intensity_bg_i_mean = self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope][var_file]
-                        intensity_bg_i_error = 0.0
-                    else:
-                        intensity_bg_i_mean = np.nanmean(self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope])
-                        intensity_bg_i_error = np.nanstd(self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope],
-                                                      ddof=1)
-                    #
-                    if var_file < len(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope]):
-                        intensity_ratio_i_mean = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope][
-                            var_file]
-                        intensity_ratio_i_error = 0.0
-                    else:
-                        intensity_ratio_i_mean = np.nanmean(
-                            self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope])
-                        intensity_ratio_i_error = np.nanstd(
-                            self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope], ddof=1)
-                #
-                ## Intensity Signal Corrected
-                self.container_var["ma_datareduction"]["Intensity"]["Mean"][isotope].set(
-                    round(intensity_i_mean, n_digits_intensity))
-                self.container_var["ma_datareduction"]["Intensity"]["Error"][isotope].set(
-                    round(intensity_i_error, n_digits_intensity))
-                ## Intensity Ratio
-                self.container_var["ma_datareduction"]["Intensity Ratio"]["Mean"][isotope].set(
-                    f"{intensity_ratio_i_mean:.{n_digits_intensity}E}")
-                self.container_var["ma_datareduction"]["Intensity Ratio"]["Error"][isotope].set(
-                    f"{intensity_ratio_i_error:.2E}")
-                ## Intensity Background
-                self.container_var["ma_datareduction"]["Intensity BG"]["Mean"][isotope].set(
-                    round(intensity_bg_i_mean, n_digits_intensity))
-                self.container_var["ma_datareduction"]["Intensity BG"]["Error"][isotope].set(
-                    round(intensity_bg_i_error, n_digits_intensity))
-                #
-        elif var_category == 2: # Sensitivity
-            for isotope in self.container_lists["ISOTOPES"]:
-                if var_file < len(self.results_data["sensitivity"][isotope]):
-                    sensitivity_i_mean = self.results_data["sensitivity"][isotope][var_file]
-                    sensitivity_i_error = 0.0
-                else:
-                    sensitivity_i_mean = np.nanmean(self.results_data["sensitivity"][isotope])
-                    sensitivity_i_error = np.nanstd(self.results_data["sensitivity"][isotope], ddof=1)
-                #
-                if var_file < len(self.results_data["RSF"][isotope]):
-                    rsf_i_mean = self.results_data["RSF"][isotope][var_file]
-                    rsf_i_error = 0.0
-                else:
-                    rsf_i_mean = np.nanmean(self.results_data["RSF"][isotope])
-                    rsf_i_error = np.nanstd(self.results_data["RSF"][isotope], ddof=1)
-                #
-                if var_file < len(self.results_data["sensitivity normalized"][isotope]):
-                    s_i_mean = self.results_data["sensitivity normalized"][isotope][var_file]
-                    s_i_error = 0.0
-                else:
-                    s_i_mean = np.nanmean(self.results_data["sensitivity normalized"][isotope])
-                    s_i_error = np.nanstd(self.results_data["sensitivity normalized"][isotope], ddof=1)
-                #
-                ## Sensitivity
-                self.container_var["ma_datareduction"]["Sensitivity"]["Mean"][isotope].set(
-                    round(sensitivity_i_mean, n_digits_sensitivity))
-                self.container_var["ma_datareduction"]["Sensitivity"]["Error"][isotope].set(
-                    round(sensitivity_i_error, n_digits_sensitivity))
-                ## Relative Sensitivity Factor
-                self.container_var["ma_datareduction"]["RSF"]["Mean"][isotope].set(
-                    round(rsf_i_mean, n_digits_rsf))
-                self.container_var["ma_datareduction"]["RSF"]["Error"][isotope].set(
-                    round(rsf_i_error, n_digits_rsf))
-                ## Normalized Sensitivity
-                self.container_var["ma_datareduction"]["Normalized Sensitivity"]["Mean"][isotope].set(
-                    round(s_i_mean, n_digits_s))
-                self.container_var["ma_datareduction"]["Normalized Sensitivity"]["Error"][isotope].set(
-                    round(s_i_error, n_digits_s))
-        #
-        # if var_filetype == 0:
-        #     self.datareduction(filetype="All Standard Files")
-        # elif var_filetype == 1:
-        #     self.datareduction(filetype="All Sample Files")
-        #
-        self.show_datareduction_diagram(var_category=var_category)
+    # def fill_tables(self):
+    #     n_digits_intensity = self.container_var["General Settings"]["Accuracy Intensity"].get()
+    #     n_digits_sensitivity = self.container_var["General Settings"]["Accuracy Sensitivity"].get()
+    #     n_digits_concentration = self.container_var["General Settings"]["Accuracy Concentration"].get()
+    #     n_digits_concentration_ratio = 2*n_digits_concentration
+    #     n_digits_rsf = n_digits_sensitivity
+    #     n_digits_lod = n_digits_rsf
+    #     n_digits_s = n_digits_sensitivity
+    #     #
+    #     var_category = self.container_var["ma_datareduction"]["Radiobutton"][2].get()
+    #     var_file = self.container_var["ma_datareduction"]["Radiobutton"][3].get()
+    #     var_is = self.container_var["ma_datareduction"]["Option IS"].get()
+    #     var_filetype = self.container_var["ma_datareduction"]["Radiobutton"][1].get()   # STD vs. SMPL
+    #     if var_filetype == 0:
+    #         var_filetype_key = "STD"
+    #     elif var_filetype == 1 or self.container_var["ma_datareduction"]["Option ID"].get() != "Select Assemblage":
+    #         var_filetype_key = "SMPL"
+    #     var_datatype = self.container_var["ma_datareduction"]["Radiobutton"][0].get()   # RAW vs. SMOOTHED
+    #     if var_datatype == 0:
+    #         var_datatype_key = "RAW"
+    #     elif var_datatype == 1:
+    #         var_datatype_key = "SMOOTHED"
+    #     #
+    #     self.results_data = MineralAnalysis(
+    #         container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #         container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
+    #         var_filetype=var_filetype_key, var_datatype=var_datatype_key,
+    #         var_is=self.container_var["ma_datareduction"]["Option IS"].get(),
+    #         xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #     #
+    #     # for key, value in self.results_data["LOD"].items():
+    #     #     print(key, value)
+    #     #
+    #     list_srm_order = np.array(list(self.container_lists["STD"]["SRM"].values()))
+    #     #
+    #     if var_category == 0:   # Concentration
+    #         for isotope in self.container_lists["ISOTOPES"]:
+    #             var_srm_i = self.container_files["SRM"][isotope].get()
+    #             indices_srm = np.where(list_srm_order == var_srm_i)[0]
+    #             #
+    #             if var_file < len(self.results_data["concentration"][isotope]):
+    #                 concentration_i_mean = self.results_data["concentration"][isotope][var_file]
+    #                 concentration_i_error = 0.0
+    #             else:
+    #                 concentration_i_mean = np.nanmean(
+    #                     self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1])
+    #                 concentration_i_error = np.nanstd(
+    #                     self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1], ddof=1)
+    #                 #
+    #                 if math.isnan(concentration_i_mean) == True:
+    #                     concentration_i_mean = 0.0
+    #                     concentration_i_error = 0.0
+    #             #
+    #             if var_file < len(self.results_data["concentration"][isotope]):
+    #                 concentration_ratio_i_mean = self.results_data["concentration"][isotope][var_file]/\
+    #                                              self.results_data["concentration"][var_is][var_file]
+    #                 concentration_ratio_i_error = 0.0
+    #             else:
+    #                 if concentration_i_mean > 0:
+    #                     concentration_ratio_i_mean = np.nanmean(
+    #                         np.array(self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1])/np.array(
+    #                             self.results_data["concentration"][var_is][indices_srm[0]:indices_srm[-1] + 1]))
+    #                     concentration_ratio_i_error = np.nanstd(
+    #                         np.array(self.results_data["concentration"][isotope][indices_srm[0]:indices_srm[-1] + 1])/np.array(
+    #                             self.results_data["concentration"][var_is][indices_srm[0]:indices_srm[-1] + 1]), ddof=1)
+    #                 else:
+    #                     concentration_ratio_i_mean = 0.0
+    #                     concentration_ratio_i_error = 0.0
+    #             #
+    #             if var_file < len(self.results_data["LOD"][isotope]):
+    #                 lod_i_mean = self.results_data["LOD"][isotope][var_file]
+    #                 lod_i_error = 0.0
+    #             else:
+    #                 lod_i_mean = np.nanmean(
+    #                     self.results_data["LOD"][isotope][indices_srm[0]:indices_srm[-1] + 1])
+    #                 lod_i_error = np.nanstd(
+    #                     self.results_data["LOD"][isotope][indices_srm[0]:indices_srm[-1] + 1], ddof=1)
+    #             #
+    #             ## Concentration
+    #             self.container_var["ma_datareduction"]["Concentration"]["Mean"][isotope].set(
+    #                 round(concentration_i_mean, n_digits_concentration))
+    #             self.container_var["ma_datareduction"]["Concentration"]["Error"][isotope].set(
+    #                 round(concentration_i_error, n_digits_concentration))
+    #             ## Concentration Ratio
+    #             self.container_var["ma_datareduction"]["Concentration Ratio"]["Mean"][isotope].set(
+    #                 f"{concentration_ratio_i_mean:.{n_digits_concentration}E}")
+    #             self.container_var["ma_datareduction"]["Concentration Ratio"]["Error"][isotope].set(
+    #                 f"{concentration_ratio_i_error:.{n_digits_concentration}E}")
+    #             ## Limit of Detection
+    #             self.container_var["ma_datareduction"]["LOD"]["Mean"][isotope].set(
+    #                 round(lod_i_mean, n_digits_lod))
+    #             self.container_var["ma_datareduction"]["LOD"]["Error"][isotope].set(
+    #                 round(lod_i_error, n_digits_lod))
+    #     #
+    #     elif var_category == 1: # Intensity
+    #         for isotope in self.container_lists["ISOTOPES"]:
+    #             if var_filetype == 0:
+    #                 if var_file < len(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope]):
+    #                     intensity_i_mean = self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope][var_file]
+    #                     intensity_i_error = 0.0
+    #                 else:
+    #                     intensity_i_mean = np.nanmean(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope])
+    #                     intensity_i_error = np.nanstd(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope],
+    #                                                ddof=1)
+    #                 #
+    #                 if var_file < len(self.results_data["intensity"]["STD"]["BACKGROUND"][isotope]):
+    #                     intensity_bg_i_mean = self.results_data["intensity"]["STD"]["BACKGROUND"][isotope][var_file]
+    #                     intensity_bg_i_error = 0.0
+    #                 else:
+    #                     intensity_bg_i_mean = np.nanmean(self.results_data["intensity"]["STD"]["BACKGROUND"][isotope])
+    #                     intensity_bg_i_error = np.nanstd(self.results_data["intensity"]["STD"]["BACKGROUND"][isotope],
+    #                                                ddof=1)
+    #                 #
+    #                 if var_file < len(self.results_data["intensity"]["STD"]["SIGNAL CORRECTED"][isotope]):
+    #                     intensity_ratio_i_mean = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][
+    #                         isotope][var_file]
+    #                     intensity_ratio_i_error = 0.0
+    #                 else:
+    #                     intensity_ratio_i_mean = np.nanmean(
+    #                         self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope])
+    #                     intensity_ratio_i_error = np.nanstd(
+    #                         self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope], ddof=1)
+    #             else:
+    #                 if var_file < len(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope]):
+    #                     intensity_i_mean = self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope][var_file]
+    #                     intensity_i_error = 0.0
+    #                 else:
+    #                     intensity_i_mean = np.nanmean(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope])
+    #                     intensity_i_error = np.nanstd(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope],
+    #                                                ddof=1)
+    #                 #
+    #                 if var_file < len(self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope]):
+    #                     intensity_bg_i_mean = self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope][var_file]
+    #                     intensity_bg_i_error = 0.0
+    #                 else:
+    #                     intensity_bg_i_mean = np.nanmean(self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope])
+    #                     intensity_bg_i_error = np.nanstd(self.results_data["intensity"]["SMPL"]["BACKGROUND"][isotope],
+    #                                                   ddof=1)
+    #                 #
+    #                 if var_file < len(self.results_data["intensity"]["SMPL"]["SIGNAL CORRECTED"][isotope]):
+    #                     intensity_ratio_i_mean = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope][
+    #                         var_file]
+    #                     intensity_ratio_i_error = 0.0
+    #                 else:
+    #                     intensity_ratio_i_mean = np.nanmean(
+    #                         self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope])
+    #                     intensity_ratio_i_error = np.nanstd(
+    #                         self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope], ddof=1)
+    #             #
+    #             ## Intensity Signal Corrected
+    #             self.container_var["ma_datareduction"]["Intensity"]["Mean"][isotope].set(
+    #                 round(intensity_i_mean, n_digits_intensity))
+    #             self.container_var["ma_datareduction"]["Intensity"]["Error"][isotope].set(
+    #                 round(intensity_i_error, n_digits_intensity))
+    #             ## Intensity Ratio
+    #             self.container_var["ma_datareduction"]["Intensity Ratio"]["Mean"][isotope].set(
+    #                 f"{intensity_ratio_i_mean:.{n_digits_intensity}E}")
+    #             self.container_var["ma_datareduction"]["Intensity Ratio"]["Error"][isotope].set(
+    #                 f"{intensity_ratio_i_error:.2E}")
+    #             ## Intensity Background
+    #             self.container_var["ma_datareduction"]["Intensity BG"]["Mean"][isotope].set(
+    #                 round(intensity_bg_i_mean, n_digits_intensity))
+    #             self.container_var["ma_datareduction"]["Intensity BG"]["Error"][isotope].set(
+    #                 round(intensity_bg_i_error, n_digits_intensity))
+    #             #
+    #     elif var_category == 2: # Sensitivity
+    #         for isotope in self.container_lists["ISOTOPES"]:
+    #             if var_file < len(self.results_data["sensitivity"][isotope]):
+    #                 sensitivity_i_mean = self.results_data["sensitivity"][isotope][var_file]
+    #                 sensitivity_i_error = 0.0
+    #             else:
+    #                 sensitivity_i_mean = np.nanmean(self.results_data["sensitivity"][isotope])
+    #                 sensitivity_i_error = np.nanstd(self.results_data["sensitivity"][isotope], ddof=1)
+    #             #
+    #             if var_file < len(self.results_data["RSF"][isotope]):
+    #                 rsf_i_mean = self.results_data["RSF"][isotope][var_file]
+    #                 rsf_i_error = 0.0
+    #             else:
+    #                 rsf_i_mean = np.nanmean(self.results_data["RSF"][isotope])
+    #                 rsf_i_error = np.nanstd(self.results_data["RSF"][isotope], ddof=1)
+    #             #
+    #             if var_file < len(self.results_data["sensitivity normalized"][isotope]):
+    #                 s_i_mean = self.results_data["sensitivity normalized"][isotope][var_file]
+    #                 s_i_error = 0.0
+    #             else:
+    #                 s_i_mean = np.nanmean(self.results_data["sensitivity normalized"][isotope])
+    #                 s_i_error = np.nanstd(self.results_data["sensitivity normalized"][isotope], ddof=1)
+    #             #
+    #             ## Sensitivity
+    #             self.container_var["ma_datareduction"]["Sensitivity"]["Mean"][isotope].set(
+    #                 round(sensitivity_i_mean, n_digits_sensitivity))
+    #             self.container_var["ma_datareduction"]["Sensitivity"]["Error"][isotope].set(
+    #                 round(sensitivity_i_error, n_digits_sensitivity))
+    #             ## Relative Sensitivity Factor
+    #             self.container_var["ma_datareduction"]["RSF"]["Mean"][isotope].set(
+    #                 round(rsf_i_mean, n_digits_rsf))
+    #             self.container_var["ma_datareduction"]["RSF"]["Error"][isotope].set(
+    #                 round(rsf_i_error, n_digits_rsf))
+    #             ## Normalized Sensitivity
+    #             self.container_var["ma_datareduction"]["Normalized Sensitivity"]["Mean"][isotope].set(
+    #                 round(s_i_mean, n_digits_s))
+    #             self.container_var["ma_datareduction"]["Normalized Sensitivity"]["Error"][isotope].set(
+    #                 round(s_i_error, n_digits_s))
+    #     #
+    #     # if var_filetype == 0:
+    #     #     self.datareduction(filetype="All Standard Files")
+    #     # elif var_filetype == 1:
+    #     #     self.datareduction(filetype="All Sample Files")
+    #     #
+    #     self.show_datareduction_diagram(var_category=var_category)
     #
-    def show_datareduction_diagram(self, var_category):
-        #
-        ## CLEANING
-        try:
-            self.fig_datareduction.clf()
-            self.ax_datareduction.cla()
-            self.canvas_datareduction.get_tk_widget().grid_remove()
-            self.toolbarFrame_datareduction.grid_remove()
-        except AttributeError:
-            pass
-        #
-        ## DIAGRAM
-        self.fig_datareduction, self.ax_datareduction = plt.subplots(
-            ncols=1, nrows=2, dpi=100, facecolor=self.green_light)
-        #
-        x_data_bar = self.container_lists["ISOTOPES"]
-        y_data_bar = []
-        var_is = self.container_var["ma_datareduction"]["Option IS"].get()
-        var_isotope = self.container_var["ma_datareduction"]["Option Drift"].get()
-        #
-        if var_category == 0:   # Concentration
-            for isotope in x_data_bar:
-                y_data_bar.append(np.mean(self.results_data["concentration"][isotope]))
-            #
-            bar_plot = self.ax_datareduction[0].bar(
-                x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
-            bar_plot[x_data_bar.index(var_isotope)].set_color(
-                self.red_dark)
-            bar_plot[x_data_bar.index(var_isotope)].set_edgecolor(
-                "black")
-            #
-            self.ax_datareduction[0].set_xticks(x_data_bar)
-            self.ax_datareduction[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
-            if len(x_data_bar) > 20:
-                for label in self.ax_datareduction[0].xaxis.get_ticklabels()[::2]:
-                    label.set_visible(False)
-            #
-            self.ax_datareduction[0].set_yscale("log")
-            self.ax_datareduction[0].grid(True)
-            self.ax_datareduction[0].set_axisbelow(True)
-            self.ax_datareduction[0].set_title("Concentration C", fontsize=9)
-            self.ax_datareduction[0].set_xlabel("Measured Isotopes", fontsize=9)
-            self.ax_datareduction[0].set_ylabel("Concentration C (ppm)", fontsize=9)
-            #
-            x_data_sct = self.results_data["concentration"][var_is]
-            y_data_sct = self.results_data["concentration"][var_isotope]
-            #
-            sct = self.ax_datareduction[1].scatter(
-                x_data_sct, y_data_sct, label=var_isotope, color=self.red_dark, edgecolor="black", visible=True,
-                marker="o", s=100)
-            #
-            self.ax_datareduction[1].set_xlim(left=0, right=1.05*max(x_data_sct))
-            self.ax_datareduction[1].set_ylim(bottom=0, top=1.05*max(y_data_sct))
-            self.ax_datareduction[1].set_title("Concentration Comparison", fontsize=9)
-            self.ax_datareduction[1].set_xlabel("Concentration C "+str(var_is)+" (ppm)", fontsize=9)
-            self.ax_datareduction[1].set_ylabel("Concentration C "+str(var_isotope)+" (ppm)", fontsize=9)
-            #
-        elif var_category == 1: # Intensity
-            for isotope in x_data_bar:
-                y_data_bar.append(np.mean(self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope]))
-            #
-            bar_plot = self.ax_datareduction[0].bar(
-                x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
-            bar_plot[x_data_bar.index(var_isotope)].set_color(
-                self.red_dark)
-            bar_plot[x_data_bar.index(var_isotope)].set_edgecolor(
-                "black")
-            #
-            self.ax_datareduction[0].set_xticks(x_data_bar)
-            self.ax_datareduction[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
-            if len(x_data_bar) > 20:
-                for label in self.ax_datareduction[0].xaxis.get_ticklabels()[::2]:
-                    label.set_visible(False)
-            #
-            self.ax_datareduction[0].set_yscale("log")
-            self.ax_datareduction[0].grid(True)
-            self.ax_datareduction[0].set_axisbelow(True)
-            self.ax_datareduction[0].set_title("Intensity Ratio I(i)/I(IS)", fontsize=9)
-            self.ax_datareduction[0].set_xlabel("Measured Isotopes", fontsize=9)
-            self.ax_datareduction[0].set_ylabel("Intensity Ratio I(i)/I(IS) (1)", fontsize=9)
-            #
-            x_data_sct = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][var_is]
-            y_data_sct = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][var_isotope]
-            #
-            sct = self.ax_datareduction[1].scatter(
-                x_data_sct, y_data_sct, label=var_isotope, color=self.red_dark, edgecolor="black", visible=True,
-                marker="o", s=100)
-            #
-            self.ax_datareduction[1].set_xlim(left=0, right=1.05 * max(x_data_sct))
-            self.ax_datareduction[1].set_ylim(bottom=0, top=1.05 * max(y_data_sct))
-            self.ax_datareduction[1].set_title("Intensity Ratio Comparison", fontsize=9)
-            self.ax_datareduction[1].set_xlabel("Intensity Ratio I(" + str(var_is) + ")/I(IS) (1)", fontsize=9)
-            self.ax_datareduction[1].set_ylabel("Intensity Ratio I(" + str(var_isotope) + ")/I(IS) (1)", fontsize=9)
-            plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
-            #
-        elif var_category == 2: # Sensitivity
-            if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
-                var_filetype = "STD"
-            elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1 \
-                    or self.container_var["ma_datareduction"]["Option ID"].get() != "Select Assemblage":
-                var_filetype = "SMPL"
-            #
-            for isotope in x_data_bar:
-                if var_filetype == "STD":
-                    y_data_bar.append(np.mean(self.results_data["sensitivity"][isotope]))
-                else:
-                    y_data_bar.append(self.results_data["sensitivity"]["Drift Change"][isotope])
-            #
-            bar_plot = self.ax_datareduction[0].bar(
-                x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
-            bar_plot[x_data_bar.index(var_isotope)].set_color(self.red_dark)
-            bar_plot[x_data_bar.index(var_isotope)].set_edgecolor("black")
-            #
-            self.ax_datareduction[0].set_xticks(x_data_bar)
-            self.ax_datareduction[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
-            if len(x_data_bar) > 20:
-                for label in self.ax_datareduction[0].xaxis.get_ticklabels()[::2]:
-                    label.set_visible(False)
-            #
-            if var_filetype == "STD":
-                self.ax_datareduction[0].set_yscale("log")
-            #
-            self.ax_datareduction[0].grid(True)
-            self.ax_datareduction[0].set_axisbelow(True)
-            if var_filetype == "STD":
-                self.ax_datareduction[0].set_title("Analytical Sensitivity \u03BE", fontsize=9)
-                self.ax_datareduction[0].set_ylabel("Analytical Sensitivity \u03BE (1)", fontsize=9)
-            else:
-                self.ax_datareduction[0].set_title("% Drift in Analytical Sensitivity \u03BE", fontsize=9)
-                self.ax_datareduction[0].set_ylabel("% Drift in Analytical Sensitivity \u03BE (1)", fontsize=9)
-            self.ax_datareduction[0].set_xlabel("Measured Isotopes", fontsize=9)
-            #
-            std_times = self.results_data["sensitivity"]["Times"]["STD"]
-            x_times = []
-            for index, (key, item) in enumerate(std_times.items()):
-                cb_file = self.container_var["STD"][self.container_lists["STD"]["Long"][index]]["Checkbox"].get()
-                if type(cb_file) == str:
-                    cb_file = int(cb_file)
-                #
-                if cb_file == 1:
-                    if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                        x_times.append(item["Delta"])
-                    else:
-                        x_times.append(item["Start"])
-            #
-            x_times.sort()
-            x_data = np.array(x_times)
-            #
-            if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1 \
-                    or self.container_var["ma_datareduction"]["Option ID"].get() != "Select Assemblage":
-                smpl_times = self.results_data["sensitivity"]["Times"]["SMPL"]
-                xi_optimized = self.results_data["sensitivity"]["Optimized"]
-                #
-                x_smpl = []
-                var_id = self.container_var["ma_datareduction"]["Option ID"].get()
-                #
-                if var_filetype == "SMPL":
-                    if var_id != "Select Assemblage":
-                        list_files = self.container_lists["ID Files"][var_id]
-                    else:
-                        list_files = self.container_lists[var_filetype]["Short"]
-                #
-                for index, (key, item) in enumerate(smpl_times.items()):
-                    file_long = self.container_lists["SMPL"]["Long"][index]
-                    parts = file_long.split("/")
-                    file_short = parts[-1]
-                    if file_short in list_files:
-                        cb_file = self.container_var["SMPL"][self.container_lists["SMPL"]["Long"][index]][
-                            "Checkbox"].get()
-                        if type(cb_file) == str:
-                            cb_file = int(cb_file)
-                        #
-                        if cb_file == 1:
-                            if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                                x_times.append(item["Delta"])
-                                x_smpl.append(item["Delta"])
-                            else:
-                                x_times.append(item["Start"])
-                                x_smpl.append(item["Start"])
-                #
-                y_data = xi_optimized[var_isotope][0]*x_data + xi_optimized[var_isotope][1]
-            elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
-                y_data = np.array(self.results_data["sensitivity"][var_isotope])
-            #
-            x_max = max(x_data)
-            x_min = min(x_data)
-            #
-            if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                if max(x_data) < 100:
-                    x_max = round(max(x_data) + 10, -1)
-                elif 100 <= max(x_data) < 1000:
-                    x_max = round(max(x_data) + 50, -2)
-                elif max(x_data) >= 1000:
-                    x_max = round(max(x_data) + 100, -2)
-            else:
-                x_max = round(max(x_data) + 0.05, 1)
-                x_min = round(min(x_data) - 0.05, 1)
-            #
-            y_max = max(y_data)
-            x_std = []
-            y_std = []
-            for index, file in enumerate(self.container_lists["STD"]["Short"]):
-                var_file_long = self.container_lists["STD"]["Short"][index]
-                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_lists["STD"]["SRM"][file]
-                var_srm_isotope = self.container_files["SRM"][var_isotope].get()
-                if var_srm_file == var_srm_isotope:
-                    cb_file = self.container_var["STD"][self.container_lists["STD"]["Long"][index]]["Checkbox"].get()
-                    if type(cb_file) == str:
-                        cb_file = int(cb_file)
-                    #
-                    if cb_file == 1:
-                        x_std.append(self.xi_std_time[file][var_isotope][0])
-                        y_std.append(self.xi_std_time[file][var_isotope][1])
-            #
-            y_smpl = []
-            y_smpl.extend(self.results_data["sensitivity"][var_isotope])
-            #
-            if self.container_var["ma_datareduction"]["Radiobutton"][1].get() in [1, 2]:
-                ln = self.ax_datareduction[1].plot(
-                    x_data, y_data, label="Sensitivity Fit", color=self.red_dark, visible=True,
-                    linewidth=3, linestyle="dashed", zorder=1)
-            sct = self.ax_datareduction[1].scatter(
-                x_std, y_std, label="Standard", color=self.green_medium, edgecolor="black", visible=True,
-                marker="o", s=100, zorder=2)
-            if self.container_var["ma_datareduction"]["Radiobutton"][1].get() in [1, 2]:
-                sct = self.ax_datareduction[1].scatter(
-                    x_smpl, y_smpl, label="Sample", color=self.red_dark, edgecolor="black", visible=True,
-                    marker="s", s=100, zorder=2)
-            #
-            self.ax_datareduction[1].set_title("Sensitivity Drift of " + str(var_isotope) + " over Time", fontsize=9)
-            if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                self.ax_datareduction[1].set_xlabel("Time (s)", fontsize=9)
-            else:
-                self.ax_datareduction[1].set_xlabel("Decimal Time (h)", fontsize=9)
-            self.ax_datareduction[1].set_ylabel("Sensitivity \u03BE (1)", fontsize=9)
-            if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                self.ax_datareduction[1].set_xlim(left=0, right=x_max)
-                self.ax_datareduction[1].set_xticks(np.linspace(0, x_max, 6))
-            else:
-                self.ax_datareduction[1].set_xlim(left=x_min, right=x_max)
-                self.ax_datareduction[1].set_xticks(np.linspace(x_min, x_max, 6))
-        #
-        self.ax_datareduction[1].grid(True)
-        self.ax_datareduction[1].set_axisbelow(True)
-        #
-        handles, labels = self.ax_datareduction[1].get_legend_handles_labels()
-        self.leg = self.fig_datareduction.legend(handles, labels, loc="lower center", ncol=3)
-        self.leg.set_in_layout(False)
-        self.fig_datareduction.subplots_adjust(bottom=0.1, top=0.9, left=0.2, right=0.9, hspace=0.5)
-        #
-        plt.rcParams["savefig.facecolor"] = "white"
-        plt.rcParams["savefig.dpi"] = 300
-        #
-        self.canvas_datareduction = FigureCanvasTkAgg(self.fig_datareduction, master=self.parent)
-        self.canvas_datareduction.get_tk_widget().grid(row=0, column=70, rowspan=38, columnspan=20, sticky="nesw")
-        self.toolbarFrame_datareduction = tk.Frame(master=self.parent)
-        self.toolbarFrame_datareduction.grid(row=38, column=70, rowspan=2, columnspan=20, sticky="w")
-        self.toolbar_datareduction = NavigationToolbar2Tk(
-            self.canvas_datareduction, self.toolbarFrame_datareduction)
-        self.toolbar_datareduction.config(background=self.green_light)
-        self.toolbar_datareduction._message_label.config(background=self.green_light)
-        self.toolbar_datareduction.winfo_children()[-2].config(background=self.green_light)
-        #
-        self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].extend(
-            [self.canvas_datareduction, self.toolbarFrame_datareduction])
+    # def show_datareduction_diagram(self, var_category):
+    #     #
+    #     ## CLEANING
+    #     try:
+    #         self.fig_datareduction.clf()
+    #         self.ax_datareduction.cla()
+    #         self.canvas_datareduction.get_tk_widget().grid_remove()
+    #         self.toolbarFrame_datareduction.grid_remove()
+    #     except AttributeError:
+    #         pass
+    #     #
+    #     ## DIAGRAM
+    #     self.fig_datareduction, self.ax_datareduction = plt.subplots(
+    #         ncols=1, nrows=2, dpi=100, facecolor=self.green_light)
+    #     #
+    #     x_data_bar = self.container_lists["ISOTOPES"]
+    #     y_data_bar = []
+    #     var_is = self.container_var["ma_datareduction"]["Option IS"].get()
+    #     var_isotope = self.container_var["ma_datareduction"]["Option Drift"].get()
+    #     #
+    #     if var_category == 0:   # Concentration
+    #         for isotope in x_data_bar:
+    #             y_data_bar.append(np.mean(self.results_data["concentration"][isotope]))
+    #         #
+    #         bar_plot = self.ax_datareduction[0].bar(
+    #             x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
+    #         bar_plot[x_data_bar.index(var_isotope)].set_color(
+    #             self.red_dark)
+    #         bar_plot[x_data_bar.index(var_isotope)].set_edgecolor(
+    #             "black")
+    #         #
+    #         self.ax_datareduction[0].set_xticks(x_data_bar)
+    #         self.ax_datareduction[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
+    #         if len(x_data_bar) > 20:
+    #             for label in self.ax_datareduction[0].xaxis.get_ticklabels()[::2]:
+    #                 label.set_visible(False)
+    #         #
+    #         self.ax_datareduction[0].set_yscale("log")
+    #         self.ax_datareduction[0].grid(True)
+    #         self.ax_datareduction[0].set_axisbelow(True)
+    #         self.ax_datareduction[0].set_title("Concentration C", fontsize=9)
+    #         self.ax_datareduction[0].set_xlabel("Measured Isotopes", fontsize=9)
+    #         self.ax_datareduction[0].set_ylabel("Concentration C (ppm)", fontsize=9)
+    #         #
+    #         x_data_sct = self.results_data["concentration"][var_is]
+    #         y_data_sct = self.results_data["concentration"][var_isotope]
+    #         #
+    #         sct = self.ax_datareduction[1].scatter(
+    #             x_data_sct, y_data_sct, label=var_isotope, color=self.red_dark, edgecolor="black", visible=True,
+    #             marker="o", s=100)
+    #         #
+    #         self.ax_datareduction[1].set_xlim(left=0, right=1.05*max(x_data_sct))
+    #         self.ax_datareduction[1].set_ylim(bottom=0, top=1.05*max(y_data_sct))
+    #         self.ax_datareduction[1].set_title("Concentration Comparison", fontsize=9)
+    #         self.ax_datareduction[1].set_xlabel("Concentration C "+str(var_is)+" (ppm)", fontsize=9)
+    #         self.ax_datareduction[1].set_ylabel("Concentration C "+str(var_isotope)+" (ppm)", fontsize=9)
+    #         #
+    #     elif var_category == 1: # Intensity
+    #         for isotope in x_data_bar:
+    #             y_data_bar.append(np.mean(self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope]))
+    #         #
+    #         bar_plot = self.ax_datareduction[0].bar(
+    #             x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
+    #         bar_plot[x_data_bar.index(var_isotope)].set_color(
+    #             self.red_dark)
+    #         bar_plot[x_data_bar.index(var_isotope)].set_edgecolor(
+    #             "black")
+    #         #
+    #         self.ax_datareduction[0].set_xticks(x_data_bar)
+    #         self.ax_datareduction[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
+    #         if len(x_data_bar) > 20:
+    #             for label in self.ax_datareduction[0].xaxis.get_ticklabels()[::2]:
+    #                 label.set_visible(False)
+    #         #
+    #         self.ax_datareduction[0].set_yscale("log")
+    #         self.ax_datareduction[0].grid(True)
+    #         self.ax_datareduction[0].set_axisbelow(True)
+    #         self.ax_datareduction[0].set_title("Intensity Ratio I(i)/I(IS)", fontsize=9)
+    #         self.ax_datareduction[0].set_xlabel("Measured Isotopes", fontsize=9)
+    #         self.ax_datareduction[0].set_ylabel("Intensity Ratio I(i)/I(IS) (1)", fontsize=9)
+    #         #
+    #         x_data_sct = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][var_is]
+    #         y_data_sct = self.results_data["intensity ratio"]["SIGNAL CORRECTED"][var_isotope]
+    #         #
+    #         sct = self.ax_datareduction[1].scatter(
+    #             x_data_sct, y_data_sct, label=var_isotope, color=self.red_dark, edgecolor="black", visible=True,
+    #             marker="o", s=100)
+    #         #
+    #         self.ax_datareduction[1].set_xlim(left=0, right=1.05 * max(x_data_sct))
+    #         self.ax_datareduction[1].set_ylim(bottom=0, top=1.05 * max(y_data_sct))
+    #         self.ax_datareduction[1].set_title("Intensity Ratio Comparison", fontsize=9)
+    #         self.ax_datareduction[1].set_xlabel("Intensity Ratio I(" + str(var_is) + ")/I(IS) (1)", fontsize=9)
+    #         self.ax_datareduction[1].set_ylabel("Intensity Ratio I(" + str(var_isotope) + ")/I(IS) (1)", fontsize=9)
+    #         plt.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
+    #         #
+    #     elif var_category == 2: # Sensitivity
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
+    #             var_filetype = "STD"
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1 \
+    #                 or self.container_var["ma_datareduction"]["Option ID"].get() != "Select Assemblage":
+    #             var_filetype = "SMPL"
+    #         #
+    #         for isotope in x_data_bar:
+    #             if var_filetype == "STD":
+    #                 y_data_bar.append(np.mean(self.results_data["sensitivity"][isotope]))
+    #             else:
+    #                 y_data_bar.append(self.results_data["sensitivity"]["Drift Change"][isotope])
+    #         #
+    #         bar_plot = self.ax_datareduction[0].bar(
+    #             x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
+    #         bar_plot[x_data_bar.index(var_isotope)].set_color(self.red_dark)
+    #         bar_plot[x_data_bar.index(var_isotope)].set_edgecolor("black")
+    #         #
+    #         self.ax_datareduction[0].set_xticks(x_data_bar)
+    #         self.ax_datareduction[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
+    #         if len(x_data_bar) > 20:
+    #             for label in self.ax_datareduction[0].xaxis.get_ticklabels()[::2]:
+    #                 label.set_visible(False)
+    #         #
+    #         if var_filetype == "STD":
+    #             self.ax_datareduction[0].set_yscale("log")
+    #         #
+    #         self.ax_datareduction[0].grid(True)
+    #         self.ax_datareduction[0].set_axisbelow(True)
+    #         if var_filetype == "STD":
+    #             self.ax_datareduction[0].set_title("Analytical Sensitivity \u03BE", fontsize=9)
+    #             self.ax_datareduction[0].set_ylabel("Analytical Sensitivity \u03BE (1)", fontsize=9)
+    #         else:
+    #             self.ax_datareduction[0].set_title("% Drift in Analytical Sensitivity \u03BE", fontsize=9)
+    #             self.ax_datareduction[0].set_ylabel("% Drift in Analytical Sensitivity \u03BE (1)", fontsize=9)
+    #         self.ax_datareduction[0].set_xlabel("Measured Isotopes", fontsize=9)
+    #         #
+    #         std_times = self.results_data["sensitivity"]["Times"]["STD"]
+    #         x_times = []
+    #         for index, (key, item) in enumerate(std_times.items()):
+    #             cb_file = self.container_var["STD"][self.container_lists["STD"]["Long"][index]]["Checkbox"].get()
+    #             if type(cb_file) == str:
+    #                 cb_file = int(cb_file)
+    #             #
+    #             if cb_file == 1:
+    #                 if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #                     x_times.append(item["Delta"])
+    #                 else:
+    #                     x_times.append(item["Start"])
+    #         #
+    #         x_times.sort()
+    #         x_data = np.array(x_times)
+    #         #
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 1 \
+    #                 or self.container_var["ma_datareduction"]["Option ID"].get() != "Select Assemblage":
+    #             smpl_times = self.results_data["sensitivity"]["Times"]["SMPL"]
+    #             xi_optimized = self.results_data["sensitivity"]["Optimized"]
+    #             #
+    #             x_smpl = []
+    #             var_id = self.container_var["ma_datareduction"]["Option ID"].get()
+    #             #
+    #             if var_filetype == "SMPL":
+    #                 if var_id != "Select Assemblage":
+    #                     list_files = self.container_lists["ID Files"][var_id]
+    #                 else:
+    #                     list_files = self.container_lists[var_filetype]["Short"]
+    #             #
+    #             for index, (key, item) in enumerate(smpl_times.items()):
+    #                 file_long = self.container_lists["SMPL"]["Long"][index]
+    #                 parts = file_long.split("/")
+    #                 file_short = parts[-1]
+    #                 if file_short in list_files:
+    #                     cb_file = self.container_var["SMPL"][self.container_lists["SMPL"]["Long"][index]][
+    #                         "Checkbox"].get()
+    #                     if type(cb_file) == str:
+    #                         cb_file = int(cb_file)
+    #                     #
+    #                     if cb_file == 1:
+    #                         if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #                             x_times.append(item["Delta"])
+    #                             x_smpl.append(item["Delta"])
+    #                         else:
+    #                             x_times.append(item["Start"])
+    #                             x_smpl.append(item["Start"])
+    #             #
+    #             y_data = xi_optimized[var_isotope][0]*x_data + xi_optimized[var_isotope][1]
+    #         elif self.container_var["ma_datareduction"]["Radiobutton"][1].get() == 0:
+    #             y_data = np.array(self.results_data["sensitivity"][var_isotope])
+    #         #
+    #         x_max = max(x_data)
+    #         x_min = min(x_data)
+    #         #
+    #         if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #             if max(x_data) < 100:
+    #                 x_max = round(max(x_data) + 10, -1)
+    #             elif 100 <= max(x_data) < 1000:
+    #                 x_max = round(max(x_data) + 50, -2)
+    #             elif max(x_data) >= 1000:
+    #                 x_max = round(max(x_data) + 100, -2)
+    #         else:
+    #             x_max = round(max(x_data) + 0.05, 1)
+    #             x_min = round(min(x_data) - 0.05, 1)
+    #         #
+    #         y_max = max(y_data)
+    #         x_std = []
+    #         y_std = []
+    #         for index, file in enumerate(self.container_lists["STD"]["Short"]):
+    #             var_file_long = self.container_lists["STD"]["Short"][index]
+    #             var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_lists["STD"]["SRM"][file]
+    #             var_srm_isotope = self.container_files["SRM"][var_isotope].get()
+    #             if var_srm_file == var_srm_isotope:
+    #                 cb_file = self.container_var["STD"][self.container_lists["STD"]["Long"][index]]["Checkbox"].get()
+    #                 if type(cb_file) == str:
+    #                     cb_file = int(cb_file)
+    #                 #
+    #                 if cb_file == 1:
+    #                     x_std.append(self.xi_std_time[file][var_isotope][0])
+    #                     y_std.append(self.xi_std_time[file][var_isotope][1])
+    #         #
+    #         y_smpl = []
+    #         y_smpl.extend(self.results_data["sensitivity"][var_isotope])
+    #         #
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() in [1, 2]:
+    #             ln = self.ax_datareduction[1].plot(
+    #                 x_data, y_data, label="Sensitivity Fit", color=self.red_dark, visible=True,
+    #                 linewidth=3, linestyle="dashed", zorder=1)
+    #         sct = self.ax_datareduction[1].scatter(
+    #             x_std, y_std, label="Standard", color=self.green_medium, edgecolor="black", visible=True,
+    #             marker="o", s=100, zorder=2)
+    #         if self.container_var["ma_datareduction"]["Radiobutton"][1].get() in [1, 2]:
+    #             sct = self.ax_datareduction[1].scatter(
+    #                 x_smpl, y_smpl, label="Sample", color=self.red_dark, edgecolor="black", visible=True,
+    #                 marker="s", s=100, zorder=2)
+    #         #
+    #         self.ax_datareduction[1].set_title("Sensitivity Drift of " + str(var_isotope) + " over Time", fontsize=9)
+    #         if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #             self.ax_datareduction[1].set_xlabel("Time (s)", fontsize=9)
+    #         else:
+    #             self.ax_datareduction[1].set_xlabel("Decimal Time (h)", fontsize=9)
+    #         self.ax_datareduction[1].set_ylabel("Sensitivity \u03BE (1)", fontsize=9)
+    #         if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #             self.ax_datareduction[1].set_xlim(left=0, right=x_max)
+    #             self.ax_datareduction[1].set_xticks(np.linspace(0, x_max, 6))
+    #         else:
+    #             self.ax_datareduction[1].set_xlim(left=x_min, right=x_max)
+    #             self.ax_datareduction[1].set_xticks(np.linspace(x_min, x_max, 6))
+    #     #
+    #     self.ax_datareduction[1].grid(True)
+    #     self.ax_datareduction[1].set_axisbelow(True)
+    #     #
+    #     handles, labels = self.ax_datareduction[1].get_legend_handles_labels()
+    #     self.leg = self.fig_datareduction.legend(handles, labels, loc="lower center", ncol=3)
+    #     self.leg.set_in_layout(False)
+    #     self.fig_datareduction.subplots_adjust(bottom=0.1, top=0.9, left=0.2, right=0.9, hspace=0.5)
+    #     #
+    #     plt.rcParams["savefig.facecolor"] = "white"
+    #     plt.rcParams["savefig.dpi"] = 300
+    #     #
+    #     self.canvas_datareduction = FigureCanvasTkAgg(self.fig_datareduction, master=self.parent)
+    #     self.canvas_datareduction.get_tk_widget().grid(row=0, column=70, rowspan=38, columnspan=20, sticky="nesw")
+    #     self.toolbarFrame_datareduction = tk.Frame(master=self.parent)
+    #     self.toolbarFrame_datareduction.grid(row=38, column=70, rowspan=2, columnspan=20, sticky="w")
+    #     self.toolbar_datareduction = NavigationToolbar2Tk(
+    #         self.canvas_datareduction, self.toolbarFrame_datareduction)
+    #     self.toolbar_datareduction.config(background=self.green_light)
+    #     self.toolbar_datareduction._message_label.config(background=self.green_light)
+    #     self.toolbar_datareduction.winfo_children()[-2].config(background=self.green_light)
+    #     #
+    #     self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].extend(
+    #         [self.canvas_datareduction, self.toolbarFrame_datareduction])
     #
-    def show_drift_correction_diagram(self, var_isotope):
-        #
-        ## CLEANING
-        try:
-            self.fig_drift.clf()
-            self.ax_drift.cla()
-            self.canvas_drift.get_tk_widget().grid_remove()
-            self.toolbarFrame_drift.grid_remove()
-        except AttributeError:
-            pass
-        #
-        std_times = self.results_data["sensitivity"]["Times"]["STD"]
-        smpl_times = self.results_data["sensitivity"]["Times"]["SMPL"]
-        xi_optimized = self.results_data["sensitivity"]["Optimized"]
-        #
-        ## DIAGRAM
-        self.fig_drift, self.ax_drift = plt.subplots(ncols=1, nrows=2, dpi=100, facecolor=self.green_light)
-        #
-        x_times = []
-        x_smpl = []
-        for key, item in std_times.items():
-            x_times.append(item["Delta"])
-        for key, item in smpl_times.items():
-            x_times.append(item["Delta"])
-            x_smpl.append(item["Delta"])
-        x_times.sort()
-        x_data = np.array(x_times)
-        y_data = xi_optimized[var_isotope][0] * x_data + xi_optimized[var_isotope][1]
-        x_max = max(x_data)
-        # if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-        #
-        if max(x_data) < 100:
-            x_max = round(max(x_data)+10, -1)
-        elif 100 <= max(x_data) < 1000:
-            x_max = round(max(x_data)+50, -2)
-        elif max(x_data) >= 1000:
-            x_max = round(max(x_data)+100, -2)
-        #
-        y_max = max(y_data)
-        x_std = []
-        y_std = []
-        for file in self.container_lists["STD"]["Short"]:
-            x_std.append(self.xi_std_time[file][var_isotope][0])
-            y_std.append(self.xi_std_time[file][var_isotope][1])
-        y_smpl = []
-        y_smpl.extend(self.results_data["sensitivity"][var_isotope])
-        #
-        x_data_bar = self.container_lists["ISOTOPES"]
-        y_data_bar = []
-        for isotope in x_data_bar:
-            y_data_bar.append(np.mean(self.results_data["sensitivity"][isotope]))
-        #
-        bar_plot = self.ax_drift[0].bar(x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
-        bar_plot[x_data_bar.index(self.container_var["ma_datareduction"]["Option IS"].get())].set_color(
-            self.red_dark)
-        bar_plot[x_data_bar.index(self.container_var["ma_datareduction"]["Option IS"].get())].set_edgecolor("black")
-        self.ax_drift[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
-        self.ax_drift[0].set_yscale("log")
-        self.ax_drift[0].grid(True)
-        self.ax_drift[0].set_axisbelow(True)
-        self.ax_drift[0].set_title("Sensitivity \u03BE", fontsize=9)
-        self.ax_drift[0].set_xlabel("Measured Isotopes", fontsize=9)
-        self.ax_drift[0].set_ylabel("Sensitivity \u03BE (1)", fontsize=9)
-        #
-        # sct = self.ax_drift[1].scatter(
-        #     x_std, y_std, label="Standard", color=self.isotope_colors[var_isotope], edgecolor="black", visible=True,
-        #     marker="o", s=100)
-        # sct = self.ax_drift[1].scatter(
-        #     x_smpl, y_smpl, label="Sample", color=self.isotope_colors[var_isotope], edgecolor="black", visible=True,
-        #     marker="s", s=100)
-        # ln = self.ax_drift[1].plot(
-        #     x_data, y_data, label="Sensitivity Fit", color=self.isotope_colors[var_isotope], visible=True, linewidth=3,
-        #     linestyle="dashed")
-        sct = self.ax_drift[1].scatter(
-            x_std, y_std, label="Standard", color=self.green_medium, edgecolor="black", visible=True,
-            marker="o", s=100)
-        sct = self.ax_drift[1].scatter(
-            x_smpl, y_smpl, label="Sample", color=self.red_dark, edgecolor="black", visible=True,
-            marker="s", s=100)
-        ln = self.ax_drift[1].plot(
-            x_data, y_data, label="Sensitivity Fit", color=self.red_medium, visible=True, linewidth=3,
-            linestyle="dashed")
-        self.ax_drift[1].grid(True)
-        self.ax_drift[1].set_xlim(left=0, right=x_max)
-        self.ax_drift[1].set_xticks(np.linspace(0, x_max, 6))
-        self.ax_drift[1].set_axisbelow(True)
-        self.ax_drift[1].set_title("Sensitivity Drift of "+str(var_isotope)+" over Time", fontsize=9)
-        self.ax_drift[1].set_xlabel("Time (s)", fontsize=9)
-        self.ax_drift[1].set_ylabel("Sensitivity \u03BE (1)", fontsize=9)
-        #
-        #self.fig_drift.suptitle("\n")
-        handles, labels = self.ax_drift[1].get_legend_handles_labels()
-        self.leg = self.fig_drift.legend(handles, labels, loc="lower center", ncol=3)
-        self.leg.set_in_layout(False)
-        self.fig_drift.subplots_adjust(bottom=0.1, top=0.9, left=0.2, right=0.9, hspace=0.5)
-        #
-        plt.rcParams["savefig.facecolor"] = "white"
-        plt.rcParams["savefig.dpi"] = 300
-        #
-        self.canvas_drift = FigureCanvasTkAgg(self.fig_drift, master=self.parent)
-        self.canvas_drift.get_tk_widget().grid(row=0, column=70, rowspan=38, columnspan=20, sticky="nesw")
-        self.toolbarFrame_drift = tk.Frame(master=self.parent)
-        self.toolbarFrame_drift.grid(row=38, column=70, rowspan=2, columnspan=20, sticky="w")
-        self.toolbar_drift = NavigationToolbar2Tk(self.canvas_drift, self.toolbarFrame_drift)
-        self.toolbar_drift.config(background=self.green_light)
-        self.toolbar_drift._message_label.config(background=self.green_light)
-        self.toolbar_drift.winfo_children()[-2].config(background=self.green_light)
-        #
-        self.gui_elements["ma_datareduction"]["Frame"]["Specific"].extend([self.toolbarFrame_drift])
-        self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].extend([self.canvas_drift])
+    # def show_drift_correction_diagram(self, var_isotope):
+    #     #
+    #     ## CLEANING
+    #     try:
+    #         self.fig_drift.clf()
+    #         self.ax_drift.cla()
+    #         self.canvas_drift.get_tk_widget().grid_remove()
+    #         self.toolbarFrame_drift.grid_remove()
+    #     except AttributeError:
+    #         pass
+    #     #
+    #     std_times = self.results_data["sensitivity"]["Times"]["STD"]
+    #     smpl_times = self.results_data["sensitivity"]["Times"]["SMPL"]
+    #     xi_optimized = self.results_data["sensitivity"]["Optimized"]
+    #     #
+    #     ## DIAGRAM
+    #     self.fig_drift, self.ax_drift = plt.subplots(ncols=1, nrows=2, dpi=100, facecolor=self.green_light)
+    #     #
+    #     x_times = []
+    #     x_smpl = []
+    #     for key, item in std_times.items():
+    #         x_times.append(item["Delta"])
+    #     for key, item in smpl_times.items():
+    #         x_times.append(item["Delta"])
+    #         x_smpl.append(item["Delta"])
+    #     x_times.sort()
+    #     x_data = np.array(x_times)
+    #     y_data = xi_optimized[var_isotope][0] * x_data + xi_optimized[var_isotope][1]
+    #     x_max = max(x_data)
+    #     # if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #     #
+    #     if max(x_data) < 100:
+    #         x_max = round(max(x_data)+10, -1)
+    #     elif 100 <= max(x_data) < 1000:
+    #         x_max = round(max(x_data)+50, -2)
+    #     elif max(x_data) >= 1000:
+    #         x_max = round(max(x_data)+100, -2)
+    #     #
+    #     y_max = max(y_data)
+    #     x_std = []
+    #     y_std = []
+    #     for file in self.container_lists["STD"]["Short"]:
+    #         x_std.append(self.xi_std_time[file][var_isotope][0])
+    #         y_std.append(self.xi_std_time[file][var_isotope][1])
+    #     y_smpl = []
+    #     y_smpl.extend(self.results_data["sensitivity"][var_isotope])
+    #     #
+    #     x_data_bar = self.container_lists["ISOTOPES"]
+    #     y_data_bar = []
+    #     for isotope in x_data_bar:
+    #         y_data_bar.append(np.mean(self.results_data["sensitivity"][isotope]))
+    #     #
+    #     bar_plot = self.ax_drift[0].bar(x_data_bar, y_data_bar, color=self.green_medium, edgecolor="black")
+    #     bar_plot[x_data_bar.index(self.container_var["ma_datareduction"]["Option IS"].get())].set_color(
+    #         self.red_dark)
+    #     bar_plot[x_data_bar.index(self.container_var["ma_datareduction"]["Option IS"].get())].set_edgecolor("black")
+    #     self.ax_drift[0].set_xticklabels(x_data_bar, rotation=45, ha="right", rotation_mode="anchor")
+    #     self.ax_drift[0].set_yscale("log")
+    #     self.ax_drift[0].grid(True)
+    #     self.ax_drift[0].set_axisbelow(True)
+    #     self.ax_drift[0].set_title("Sensitivity \u03BE", fontsize=9)
+    #     self.ax_drift[0].set_xlabel("Measured Isotopes", fontsize=9)
+    #     self.ax_drift[0].set_ylabel("Sensitivity \u03BE (1)", fontsize=9)
+    #     #
+    #     # sct = self.ax_drift[1].scatter(
+    #     #     x_std, y_std, label="Standard", color=self.isotope_colors[var_isotope], edgecolor="black", visible=True,
+    #     #     marker="o", s=100)
+    #     # sct = self.ax_drift[1].scatter(
+    #     #     x_smpl, y_smpl, label="Sample", color=self.isotope_colors[var_isotope], edgecolor="black", visible=True,
+    #     #     marker="s", s=100)
+    #     # ln = self.ax_drift[1].plot(
+    #     #     x_data, y_data, label="Sensitivity Fit", color=self.isotope_colors[var_isotope], visible=True, linewidth=3,
+    #     #     linestyle="dashed")
+    #     sct = self.ax_drift[1].scatter(
+    #         x_std, y_std, label="Standard", color=self.green_medium, edgecolor="black", visible=True,
+    #         marker="o", s=100)
+    #     sct = self.ax_drift[1].scatter(
+    #         x_smpl, y_smpl, label="Sample", color=self.red_dark, edgecolor="black", visible=True,
+    #         marker="s", s=100)
+    #     ln = self.ax_drift[1].plot(
+    #         x_data, y_data, label="Sensitivity Fit", color=self.red_medium, visible=True, linewidth=3,
+    #         linestyle="dashed")
+    #     self.ax_drift[1].grid(True)
+    #     self.ax_drift[1].set_xlim(left=0, right=x_max)
+    #     self.ax_drift[1].set_xticks(np.linspace(0, x_max, 6))
+    #     self.ax_drift[1].set_axisbelow(True)
+    #     self.ax_drift[1].set_title("Sensitivity Drift of "+str(var_isotope)+" over Time", fontsize=9)
+    #     self.ax_drift[1].set_xlabel("Time (s)", fontsize=9)
+    #     self.ax_drift[1].set_ylabel("Sensitivity \u03BE (1)", fontsize=9)
+    #     #
+    #     #self.fig_drift.suptitle("\n")
+    #     handles, labels = self.ax_drift[1].get_legend_handles_labels()
+    #     self.leg = self.fig_drift.legend(handles, labels, loc="lower center", ncol=3)
+    #     self.leg.set_in_layout(False)
+    #     self.fig_drift.subplots_adjust(bottom=0.1, top=0.9, left=0.2, right=0.9, hspace=0.5)
+    #     #
+    #     plt.rcParams["savefig.facecolor"] = "white"
+    #     plt.rcParams["savefig.dpi"] = 300
+    #     #
+    #     self.canvas_drift = FigureCanvasTkAgg(self.fig_drift, master=self.parent)
+    #     self.canvas_drift.get_tk_widget().grid(row=0, column=70, rowspan=38, columnspan=20, sticky="nesw")
+    #     self.toolbarFrame_drift = tk.Frame(master=self.parent)
+    #     self.toolbarFrame_drift.grid(row=38, column=70, rowspan=2, columnspan=20, sticky="w")
+    #     self.toolbar_drift = NavigationToolbar2Tk(self.canvas_drift, self.toolbarFrame_drift)
+    #     self.toolbar_drift.config(background=self.green_light)
+    #     self.toolbar_drift._message_label.config(background=self.green_light)
+    #     self.toolbar_drift.winfo_children()[-2].config(background=self.green_light)
+    #     #
+    #     self.gui_elements["ma_datareduction"]["Frame"]["Specific"].extend([self.toolbarFrame_drift])
+    #     self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].extend([self.canvas_drift])
     #
-    def show_drift_correction(self):
-        ## Cleaning
-        gui_categories = ["Label", "Entry"]
-        for gui_category in gui_categories:
-            if len(self.gui_elements["ma_datareduction"][gui_category]["Specific"]) > 0:
-                for item in self.gui_elements["ma_datareduction"][gui_category]["Specific"]:
-                    item.grid_remove()
-        #
-        ## OPTION MENU
-        self.container_var["ma_datareduction"]["Option Drift"] = tk.StringVar()
-        self.container_var["ma_datareduction"]["Option Drift Relativity"] = tk.StringVar()
-        opt_menu_iso = SE(
-            parent=self.parent, row_id=13, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-            bg=self.green_medium).create_option_isotope(
-            var_iso=self.container_var["ma_datareduction"]["Option Drift"], option_list=self.container_lists["ISOTOPES"],
-            text_set="Select Isotope", fg_active=self.green_dark, bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["ma_datareduction"]["Option Drift"]:
-            self.create_drift_correction_diagram(var_opt))
-        opt_menu_driftrelativity = SE(
-            parent=self.parent, row_id=14, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
-            bg=self.green_medium).create_option_isotope(
-            var_iso=self.container_var["ma_datareduction"]["Option Drift Relativity"], option_list=self.container_lists["ISOTOPES"],
-            text_set=self.container_lists["IS"][0], fg_active=self.green_dark, bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["ma_datareduction"]["Option Drift"]:
-            self.create_drift_correction_diagram(var_opt))
-        self.container_elements["ma_datareduction"]["Option Menu"].extend([opt_menu_iso, opt_menu_driftrelativity])
-        self.gui_elements["ma_datareduction"]["Option Menu"]["Specific"].extend([opt_menu_iso, opt_menu_driftrelativity])
+    # def show_drift_correction(self):
+    #     ## Cleaning
+    #     gui_categories = ["Label", "Entry"]
+    #     for gui_category in gui_categories:
+    #         if len(self.gui_elements["ma_datareduction"][gui_category]["Specific"]) > 0:
+    #             for item in self.gui_elements["ma_datareduction"][gui_category]["Specific"]:
+    #                 item.grid_remove()
+    #     #
+    #     ## OPTION MENU
+    #     self.container_var["ma_datareduction"]["Option Drift"] = tk.StringVar()
+    #     self.container_var["ma_datareduction"]["Option Drift Relativity"] = tk.StringVar()
+    #     opt_menu_iso = SE(
+    #         parent=self.parent, row_id=13, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
+    #         bg=self.green_medium).create_option_isotope(
+    #         var_iso=self.container_var["ma_datareduction"]["Option Drift"], option_list=self.container_lists["ISOTOPES"],
+    #         text_set="Select Isotope", fg_active=self.green_dark, bg_active=self.red_dark,
+    #         command=lambda var_opt=self.container_var["ma_datareduction"]["Option Drift"]:
+    #         self.create_drift_correction_diagram(var_opt))
+    #     opt_menu_driftrelativity = SE(
+    #         parent=self.parent, row_id=14, column_id=21, n_rows=1, n_columns=9, fg=self.green_dark,
+    #         bg=self.green_medium).create_option_isotope(
+    #         var_iso=self.container_var["ma_datareduction"]["Option Drift Relativity"], option_list=self.container_lists["ISOTOPES"],
+    #         text_set=self.container_lists["IS"][0], fg_active=self.green_dark, bg_active=self.red_dark,
+    #         command=lambda var_opt=self.container_var["ma_datareduction"]["Option Drift"]:
+    #         self.create_drift_correction_diagram(var_opt))
+    #     self.container_elements["ma_datareduction"]["Option Menu"].extend([opt_menu_iso, opt_menu_driftrelativity])
+    #     self.gui_elements["ma_datareduction"]["Option Menu"]["Specific"].extend([opt_menu_iso, opt_menu_driftrelativity])
     #
-    def show_results_table(self):
-        ## Cleaning
-        gui_categories = ["Option Menu"]
-        for gui_category in gui_categories:
-            if len(self.gui_elements["ma_datareduction"][gui_category]["Specific"]) > 0:
-                for item in self.gui_elements["ma_datareduction"][gui_category]["Specific"]:
-                    item.grid_remove()
-        #
-        try:
-            self.fig_drift.clf()
-            self.ax_drift.cla()
-            self.ax_drift_02.cla()
-            self.canvas_drift.get_tk_widget().grid_remove()
-            self.toolbarFrame_drift.grid_remove()
-        except AttributeError:
-            pass
-        ## Reconstruction
-        try:
-            for entr_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
-                entr_item.grid()
-            for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
-                entr_item.grid()
-        except:
-            print("Error!")
+    # def show_results_table(self):
+    #     ## Cleaning
+    #     gui_categories = ["Option Menu"]
+    #     for gui_category in gui_categories:
+    #         if len(self.gui_elements["ma_datareduction"][gui_category]["Specific"]) > 0:
+    #             for item in self.gui_elements["ma_datareduction"][gui_category]["Specific"]:
+    #                 item.grid_remove()
+    #     #
+    #     try:
+    #         self.fig_drift.clf()
+    #         self.ax_drift.cla()
+    #         self.ax_drift_02.cla()
+    #         self.canvas_drift.get_tk_widget().grid_remove()
+    #         self.toolbarFrame_drift.grid_remove()
+    #     except AttributeError:
+    #         pass
+    #     ## Reconstruction
+    #     try:
+    #         for entr_item in self.gui_elements["ma_datareduction"]["Label"]["Specific"]:
+    #             entr_item.grid()
+    #         for entr_item in self.gui_elements["ma_datareduction"]["Entry"]["Specific"]:
+    #             entr_item.grid()
+    #     except:
+    #         print("Error!")
     #
-    def create_drift_correction_diagram(self, var_opt):
-        #
-        try:
-            self.fig_drift.clf()
-            self.ax_drift.cla()
-            self.ax_drift_02.cla()
-            self.canvas_drift.get_tk_widget().grid_remove()
-            self.toolbarFrame_drift.grid_remove()
-        except AttributeError:
-            pass
-        try:
-            if self.canvas_drift:
-                self.canvas_drift.destroy()
-            if self.toolbarFrame_drift:
-                self.toolbarFrame_drift.destroy()
-        except AttributeError:
-            pass
-        self.gui_elements["ma_datareduction"]["Frame"]["Specific"].clear()
-        self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].clear()
-        #
-        var_is = self.container_var["ma_datareduction"]["Option IS"].get()
-        var_i = self.container_var["ma_datareduction"]["Option Drift"].get()
-        ## DIAGRAM
-        self.fig_drift = Figure(figsize=(10, 5), facecolor=self.green_light)
-        self.ax_drift = self.fig_drift.add_subplot(211)
-        self.ax_drift_02 = self.fig_drift.add_subplot(212)
-
-        if var_opt == self.container_var["ma_datareduction"]["Option Drift"]:
-            isotope = var_opt
-        else:
-            isotope = self.container_var["ma_datareduction"]["Option Drift"].get()
-        x_times = []
-        x_smpl = []
-        for key, item in self.std_times.items():
-            x_times.append(item["Delta"])
-        for key, item in self.smpl_times.items():
-            x_times.append(item["Delta"])
-            x_smpl.append(item["Delta"])
-        x_times.sort()
-        x_data = np.array(x_times)
-        y_data = self.xi_opt[isotope][0]*x_data + self.xi_opt[isotope][1]
-        y_data = self.results_data["sensitivity"]["Optimized"][isotope][0] * x_data + self.results_data["sensitivity"]["Optimized"][isotope][1]
-        x_max = max(x_data)
-        if max(x_data) < 100:
-            x_max = round(max(x_data)+10, -1)
-        elif 100 <= max(x_data) < 1000:
-            x_max = round(max(x_data)+50, -2)
-        elif max(x_data) >= 1000:
-            x_max = round(max(x_data)+100, -2)
-        y_max = max(y_data)
-        x_std = []
-        y_std = []
-        for file in self.container_lists["STD"]["Short"]:
-            x_std.append(self.xi_std_time[file][isotope][0])
-            y_std.append(self.xi_std_time[file][isotope][1])
-        y_smpl = []
-        key_id = re.search("(\D+)( Files)", self.container_var["ma_datareduction"]["Option File"].get())
-        var_id = key_id.group(1)
-        for index, file in enumerate(self.container_lists["SMPL"]["Short"]):
-            if var_id not in ["All Standard", "All Sample"]:
-                if file in self.container_lists["ID Files"][var_id]:
-                    #y_smpl.append(self.container_results["SMPL"]["SMOOTHED"][isotope]["Sensitivity"][index])
-                    y_smpl.append(self.results_data["sensitivity"][isotope][index])
-            else:
-                #y_smpl.append(self.container_results["SMPL"]["SMOOTHED"][isotope]["Sensitivity"][index])
-                y_smpl.append(self.results_data["sensitivity"][isotope][index])
-
-        sct = self.ax_drift.scatter(
-            x_std, y_std, label="Standard", color=self.isotope_colors[isotope], edgecolor="black", visible=True,
-            marker="o", s=100)
-        sct = self.ax_drift.scatter(
-            x_smpl, y_smpl, label="Sample", color=self.isotope_colors[isotope], edgecolor="black", visible=True,
-            marker="s", s=100)
-        ln = self.ax_drift.plot(
-            x_data, y_data, label="Sensitivity Fit", color=self.isotope_colors[isotope], visible=True, linewidth=3)
-        #self.lines["raw"][isotope] = ln
-        self.ax_drift.grid(True)
-        self.ax_drift.set_xlim(left=0, right=x_max)
-        self.ax_drift.set_xticks(np.linspace(0, x_max, 11))
-        #self.ax_drift.set_ylim(top=1.5*y_max)
-        self.ax_drift.set_axisbelow(True)
-        self.ax_drift.set_xlabel("Time (s)", labelpad=0.5)
-        self.ax_drift.set_ylabel("Sensitivity", labelpad=0.5)
-
-        self.fig_drift.subplots_adjust(bottom=0.125, top=0.975, left=0.075, right=0.975)
-
-        legend = self.ax_drift.legend(fontsize="x-small", framealpha=1.0, loc="best", prop={'size': 10})
-
-        x_data_02 = self.container_results["SMPL"]["SMOOTHED"][var_i]["Concentration"]
-        y_data_02 = self.container_results["SMPL"]["SMOOTHED"][isotope]["Concentration"]
-        sct = self.ax_drift_02.scatter(
-            x_data_02, y_data_02, label=isotope, color=self.isotope_colors[isotope], edgecolor="black", visible=True,
-            marker="s", s=100)
-        self.ax_drift_02.set_xlim(left=0, right=1.05*max(x_data_02))
-        self.ax_drift_02.set_ylim(bottom=0, top=1.05*max(y_data_02))
-        self.ax_drift_02.grid(True)
-        self.ax_drift_02.set_axisbelow(True)
-        self.ax_drift_02.set_xlabel("Concentration "+str(var_i)+" (ppm)", labelpad=0.5)
-        self.ax_drift_02.set_ylabel("Concentration "+str(isotope)+" (ppm)", labelpad=0.5)
-
-        plt.rcParams["savefig.facecolor"] = "white"
-        plt.rcParams["savefig.dpi"] = 300
-
-        self.canvas_drift = FigureCanvasTkAgg(self.fig_drift, master=self.parent)
-        self.canvas_drift.get_tk_widget().grid(row=0, column=60, rowspan=30, columnspan=30, sticky="nesw")
-        self.toolbarFrame_drift = tk.Frame(master=self.parent)
-        self.toolbarFrame_drift.grid(row=32, column=60, rowspan=2, columnspan=30, sticky="w")
-        self.toolbar_drift = NavigationToolbar2Tk(self.canvas_drift, self.toolbarFrame_drift)
-        self.toolbar_drift.config(background=self.green_light)
-        self.toolbar_drift._message_label.config(background=self.green_light)
-        self.toolbar_drift.winfo_children()[-2].config(background=self.green_light)
-        #
-        self.gui_elements["ma_datareduction"]["Frame"]["Specific"].extend([self.toolbarFrame_drift])
-        self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].extend([self.canvas_drift])
+    # def create_drift_correction_diagram(self, var_opt):
+    #     #
+    #     try:
+    #         self.fig_drift.clf()
+    #         self.ax_drift.cla()
+    #         self.ax_drift_02.cla()
+    #         self.canvas_drift.get_tk_widget().grid_remove()
+    #         self.toolbarFrame_drift.grid_remove()
+    #     except AttributeError:
+    #         pass
+    #     try:
+    #         if self.canvas_drift:
+    #             self.canvas_drift.destroy()
+    #         if self.toolbarFrame_drift:
+    #             self.toolbarFrame_drift.destroy()
+    #     except AttributeError:
+    #         pass
+    #     self.gui_elements["ma_datareduction"]["Frame"]["Specific"].clear()
+    #     self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].clear()
+    #     #
+    #     var_is = self.container_var["ma_datareduction"]["Option IS"].get()
+    #     var_i = self.container_var["ma_datareduction"]["Option Drift"].get()
+    #     ## DIAGRAM
+    #     self.fig_drift = Figure(figsize=(10, 5), facecolor=self.green_light)
+    #     self.ax_drift = self.fig_drift.add_subplot(211)
+    #     self.ax_drift_02 = self.fig_drift.add_subplot(212)
     #
-    def extract_data_times(self):
-        self.std_times = {}
-        dates_0, times_0 = Data(filename=self.list_std[0]).import_as_list()
-        if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-                t_start_0 = datetime.timedelta(
-                    hours=int(times_0[0][0]), minutes=int(times_0[0][1]), seconds=int(times_0[0][2]))
-            else:
-                t_start_0 = datetime.timedelta(
-                    hours=int(times_0[0][0]), minutes=int(times_0[0][1]), seconds=int(0))
-        else:
-            t_start_0 = int(times_0[0][0]) + int(times_0[0][1])/60
-        #
-        for file in self.list_std:
-            parts = file.split("/")
-            self.std_times[parts[-1]] = {}
-            dates, times = Data(filename=file).import_as_list()
-            if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-                    t_start = datetime.timedelta(
-                        hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
-                else:
-                    t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(0))
-                t_delta_0 = (t_start - t_start_0).total_seconds()
-                self.std_times[parts[-1]]["Start"] = t_start.total_seconds()
-                self.std_times[parts[-1]]["Delta"] = t_delta_0
-            else:
-                t_start = int(times[0][0]) + int(times[0][1])/60
-                t_delta_0 = t_start - t_start_0
-                self.std_times[parts[-1]]["Start"] = round(t_start, 4)
-                self.std_times[parts[-1]]["Delta"] = round(t_delta_0, 4)
-        #
-        self.smpl_times = {}
-        for file in self.list_smpl:
-            parts = file.split("/")
-            self.smpl_times[parts[-1]] = {}
-            dates, times = Data(filename=file).import_as_list()
-            if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
-                if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-                    t_start = datetime.timedelta(
-                        hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
-                else:
-                    t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(0))
-                t_delta_0 = (t_start - t_start_0).total_seconds()
-                self.smpl_times[parts[-1]]["Start"] = t_start.total_seconds()
-                self.smpl_times[parts[-1]]["Delta"] = t_delta_0
-            else:
-                t_start = int(times[0][0]) + int(times[0][1])/60
-                t_delta_0 = t_start - t_start_0
-                self.smpl_times[parts[-1]]["Start"] = round(t_start, 4)
-                self.smpl_times[parts[-1]]["Delta"] = round(t_delta_0, 4)
+    #     if var_opt == self.container_var["ma_datareduction"]["Option Drift"]:
+    #         isotope = var_opt
+    #     else:
+    #         isotope = self.container_var["ma_datareduction"]["Option Drift"].get()
+    #     x_times = []
+    #     x_smpl = []
+    #     for key, item in self.std_times.items():
+    #         x_times.append(item["Delta"])
+    #     for key, item in self.smpl_times.items():
+    #         x_times.append(item["Delta"])
+    #         x_smpl.append(item["Delta"])
+    #     x_times.sort()
+    #     x_data = np.array(x_times)
+    #     y_data = self.xi_opt[isotope][0]*x_data + self.xi_opt[isotope][1]
+    #     y_data = self.results_data["sensitivity"]["Optimized"][isotope][0] * x_data + self.results_data["sensitivity"]["Optimized"][isotope][1]
+    #     x_max = max(x_data)
+    #     if max(x_data) < 100:
+    #         x_max = round(max(x_data)+10, -1)
+    #     elif 100 <= max(x_data) < 1000:
+    #         x_max = round(max(x_data)+50, -2)
+    #     elif max(x_data) >= 1000:
+    #         x_max = round(max(x_data)+100, -2)
+    #     y_max = max(y_data)
+    #     x_std = []
+    #     y_std = []
+    #     for file in self.container_lists["STD"]["Short"]:
+    #         x_std.append(self.xi_std_time[file][isotope][0])
+    #         y_std.append(self.xi_std_time[file][isotope][1])
+    #     y_smpl = []
+    #     key_id = re.search("(\D+)( Files)", self.container_var["ma_datareduction"]["Option File"].get())
+    #     var_id = key_id.group(1)
+    #     for index, file in enumerate(self.container_lists["SMPL"]["Short"]):
+    #         if var_id not in ["All Standard", "All Sample"]:
+    #             if file in self.container_lists["ID Files"][var_id]:
+    #                 #y_smpl.append(self.container_results["SMPL"]["SMOOTHED"][isotope]["Sensitivity"][index])
+    #                 y_smpl.append(self.results_data["sensitivity"][isotope][index])
+    #         else:
+    #             #y_smpl.append(self.container_results["SMPL"]["SMOOTHED"][isotope]["Sensitivity"][index])
+    #             y_smpl.append(self.results_data["sensitivity"][isotope][index])
     #
-    def change_id_option_results(self, var_id):
-        print("Selected ID:", var_id)
-        print("Related Files:", self.container_lists["ID Files"][var_id])
+    #     sct = self.ax_drift.scatter(
+    #         x_std, y_std, label="Standard", color=self.isotope_colors[isotope], edgecolor="black", visible=True,
+    #         marker="o", s=100)
+    #     sct = self.ax_drift.scatter(
+    #         x_smpl, y_smpl, label="Sample", color=self.isotope_colors[isotope], edgecolor="black", visible=True,
+    #         marker="s", s=100)
+    #     ln = self.ax_drift.plot(
+    #         x_data, y_data, label="Sensitivity Fit", color=self.isotope_colors[isotope], visible=True, linewidth=3)
+    #     #self.lines["raw"][isotope] = ln
+    #     self.ax_drift.grid(True)
+    #     self.ax_drift.set_xlim(left=0, right=x_max)
+    #     self.ax_drift.set_xticks(np.linspace(0, x_max, 11))
+    #     #self.ax_drift.set_ylim(top=1.5*y_max)
+    #     self.ax_drift.set_axisbelow(True)
+    #     self.ax_drift.set_xlabel("Time (s)", labelpad=0.5)
+    #     self.ax_drift.set_ylabel("Sensitivity", labelpad=0.5)
     #
-    def datareduction(self, filetype, datatype=None, fill_entry=False):
-        n_digits_intensity = 4
-        n_digits_sensitivity = 4
-        n_digits_concentration = 4
-        n_digits_rsf = 4
-        n_digits_lod = 4
-        #
-        if datatype == None:
-            var_datatype = self.container_var["ma_datareduction"]["Radiobutton"][0].get()
-        else:
-            var_datatype = datatype
-        #
-        if var_datatype == 0:
-            var_datatype_key = "RAW"
-        else:
-            var_datatype_key = "SMOOTHED"
-        #
-        var_is = self.container_var["ma_datareduction"]["Option IS"].get()
-        key_element = re.search("(\D+)(\d+)", var_is)
-        var_is_element = key_element.group(1)
-        var_filetype = {"STD": 0, "SMPL": 0}
-        if len(filetype) == 7:
-            key_id = re.search("(\D+)( Files)", filetype)
-            var_id = key_id.group(1)
-            for file in self.container_lists["ID Files"][var_id]:
-                if file in self.container_lists["STD"]["Short"]:
-                    var_filetype["STD"] += 1
-                elif file in self.container_lists["SMPL"]["Short"]:
-                    var_filetype["SMPL"] += 1
-            if var_filetype["STD"] > 0:
-                var_filetype["Result"] = "STD"
-            elif var_filetype["SMPL"] > 0:
-                var_filetype["Result"] = "SMPL"
-        #
-        if filetype == "All Standard Files":
-            self.results_data = MineralAnalysis(
-                container_measurements=self.container_measurements, container_lists=self.container_lists,
-                container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-                var_filetype="STD", var_datatype=var_datatype_key, var_is=var_is,
-                xi_std_time=self.xi_std_time).calculate_all_parameters()
-        elif filetype == "All Sample Files":
-            self.results_data = MineralAnalysis(
-                container_measurements=self.container_measurements, container_lists=self.container_lists,
-                container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
-                var_filetype="SMPL", var_datatype=var_datatype_key, var_is=var_is,
-                xi_std_time=self.xi_std_time).calculate_all_parameters()
-        else:
-            if var_filetype["Result"] == "STD":
-                self.results_data = MineralAnalysis(
-                    container_measurements=self.container_measurements, container_lists=self.container_lists,
-                    container_files=self.container_files, container_var=self.container_var,
-                    srm_data=self.srm_actual, var_filetype="STD",  var_datatype=var_datatype_key, var_is=var_is,
-                    xi_std_time=self.xi_std_time).calculate_all_parameters()
-            elif var_filetype["Result"] == "SMPL":
-                self.results_data = MineralAnalysis(
-                    container_measurements=self.container_measurements, container_lists=self.container_lists,
-                    container_files=self.container_files, container_var=self.container_var,
-                    srm_data=self.srm_actual, var_filetype="SMPL", var_datatype=var_datatype_key, var_is=var_is,
-                    xi_std_time=self.xi_std_time).calculate_all_parameters()
-        #
-        for isotope in self.container_lists["ISOTOPES"]:
-            ## Intensity Ratio
-            if fill_entry == True:
-                self.container_var["ma_datareduction"][isotope][0].set(
-                    round(np.mean(self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope]),
-                          n_digits_intensity))
-                self.container_var["ma_datareduction"][isotope][1].set(
-                    round(np.std(self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope], ddof=1),
-                          n_digits_intensity))
-            if var_datatype == 0:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["RAW"][isotope]["Intensity Ratio"] = self.results_data[
-                        "intensity ratio"]["SIGNAL CORRECTED"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["RAW"][isotope]["Intensity Ratio"] = self.results_data[
-                        "intensity ratio"]["SIGNAL CORRECTED"][isotope]
-            elif var_datatype == 1:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["SMOOTHED"][isotope]["Intensity Ratio"] = self.results_data[
-                        "intensity ratio"]["SIGNAL CORRECTED"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["SMOOTHED"][isotope]["Intensity Ratio"] = self.results_data[
-                        "intensity ratio"]["SIGNAL CORRECTED"][isotope]
-            #
-            ## Sensitivity
-            if fill_entry == True:
-                self.container_var["ma_datareduction"][isotope][2].set(
-                    round(np.mean(self.results_data["sensitivity"][isotope]), n_digits_sensitivity))
-                self.container_var["ma_datareduction"][isotope][3].set(
-                    round(np.std(self.results_data["sensitivity"][isotope], ddof=1), n_digits_sensitivity))
-            if var_datatype == 0:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["RAW"][isotope]["Sensitivity"] = self.results_data[
-                        "sensitivity"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["RAW"][isotope]["Sensitivity"] = self.results_data[
-                        "sensitivity"][isotope]
-            elif var_datatype == 1:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["SMOOTHED"][isotope]["Sensitivity"] = self.results_data[
-                        "sensitivity"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["SMOOTHED"][isotope]["Sensitivity"] = self.results_data[
-                        "sensitivity"][isotope]
-            #
-            ## Concentration
-            if fill_entry == True:
-                self.container_var["ma_datareduction"][isotope][4].set(
-                    round(np.mean(self.results_data["concentration"][isotope]), n_digits_concentration))
-                self.container_var["ma_datareduction"][isotope][5].set(
-                    round(np.std(self.results_data["concentration"][isotope], ddof=1), n_digits_concentration))
-            if var_datatype == 0:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["RAW"][isotope]["Concentration"] = self.results_data[
-                        "concentration"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["RAW"][isotope]["Concentration"] = self.results_data[
-                        "concentration"][isotope]
-            elif var_datatype == 1:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["SMOOTHED"][isotope]["Concentration"] = self.results_data[
-                        "concentration"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["SMOOTHED"][isotope]["Concentration"] = self.results_data[
-                        "concentration"][isotope]
-            #
-            ## Relative Sensitivity Factor
-            if fill_entry == True:
-                self.container_var["ma_datareduction"][isotope][6].set(
-                    round(np.mean(self.results_data["RSF"][isotope]), n_digits_rsf))
-                self.container_var["ma_datareduction"][isotope][7].set(
-                    round(np.std(self.results_data["RSF"][isotope], ddof=1), n_digits_rsf))
-            if var_datatype == 0:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["RAW"][isotope]["RSF"] = self.results_data["RSF"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["RAW"][isotope]["RSF"] = self.results_data["RSF"][isotope]
-            elif var_datatype == 1:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["SMOOTHED"][isotope]["RSF"] = self.results_data["RSF"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["SMOOTHED"][isotope]["RSF"] = self.results_data["RSF"][isotope]
-            #
-            ## Limit of Detection
-            if fill_entry == True:
-                self.container_var["ma_datareduction"][isotope][8].set(
-                    round(np.mean(self.results_data["LOD"][isotope]), n_digits_lod))
-                self.container_var["ma_datareduction"][isotope][9].set(
-                    round(np.std(self.results_data["LOD"][isotope], ddof=1), n_digits_lod))
-            if var_datatype == 0:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["RAW"][isotope]["LOD"] = self.results_data["LOD"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["RAW"][isotope]["LOD"] = self.results_data["LOD"][isotope]
-            elif var_datatype == 1:
-                if filetype == "All Standard Files":
-                    self.container_results["STD"]["SMOOTHED"][isotope]["LOD"] = self.results_data["LOD"][isotope]
-                elif filetype == "All Sample Files":
-                    self.container_results["SMPL"]["SMOOTHED"][isotope]["LOD"] = self.results_data["LOD"][isotope]
+    #     self.fig_drift.subplots_adjust(bottom=0.125, top=0.975, left=0.075, right=0.975)
+    #
+    #     legend = self.ax_drift.legend(fontsize="x-small", framealpha=1.0, loc="best", prop={'size': 10})
+    #
+    #     x_data_02 = self.container_results["SMPL"]["SMOOTHED"][var_i]["Concentration"]
+    #     y_data_02 = self.container_results["SMPL"]["SMOOTHED"][isotope]["Concentration"]
+    #     sct = self.ax_drift_02.scatter(
+    #         x_data_02, y_data_02, label=isotope, color=self.isotope_colors[isotope], edgecolor="black", visible=True,
+    #         marker="s", s=100)
+    #     self.ax_drift_02.set_xlim(left=0, right=1.05*max(x_data_02))
+    #     self.ax_drift_02.set_ylim(bottom=0, top=1.05*max(y_data_02))
+    #     self.ax_drift_02.grid(True)
+    #     self.ax_drift_02.set_axisbelow(True)
+    #     self.ax_drift_02.set_xlabel("Concentration "+str(var_i)+" (ppm)", labelpad=0.5)
+    #     self.ax_drift_02.set_ylabel("Concentration "+str(isotope)+" (ppm)", labelpad=0.5)
+    #
+    #     plt.rcParams["savefig.facecolor"] = "white"
+    #     plt.rcParams["savefig.dpi"] = 300
+    #
+    #     self.canvas_drift = FigureCanvasTkAgg(self.fig_drift, master=self.parent)
+    #     self.canvas_drift.get_tk_widget().grid(row=0, column=60, rowspan=30, columnspan=30, sticky="nesw")
+    #     self.toolbarFrame_drift = tk.Frame(master=self.parent)
+    #     self.toolbarFrame_drift.grid(row=32, column=60, rowspan=2, columnspan=30, sticky="w")
+    #     self.toolbar_drift = NavigationToolbar2Tk(self.canvas_drift, self.toolbarFrame_drift)
+    #     self.toolbar_drift.config(background=self.green_light)
+    #     self.toolbar_drift._message_label.config(background=self.green_light)
+    #     self.toolbar_drift.winfo_children()[-2].config(background=self.green_light)
+    #     #
+    #     self.gui_elements["ma_datareduction"]["Frame"]["Specific"].extend([self.toolbarFrame_drift])
+    #     self.gui_elements["ma_datareduction"]["Canvas"]["Specific"].extend([self.canvas_drift])
+    #
+    # def extract_data_times(self):
+    #     self.std_times = {}
+    #     dates_0, times_0 = Data(filename=self.list_std[0]).import_as_list()
+    #     if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #         if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+    #             t_start_0 = datetime.timedelta(
+    #                 hours=int(times_0[0][0]), minutes=int(times_0[0][1]), seconds=int(times_0[0][2]))
+    #         else:
+    #             t_start_0 = datetime.timedelta(
+    #                 hours=int(times_0[0][0]), minutes=int(times_0[0][1]), seconds=int(0))
+    #     else:
+    #         t_start_0 = int(times_0[0][0]) + int(times_0[0][1])/60
+    #     #
+    #     for file in self.list_std:
+    #         parts = file.split("/")
+    #         self.std_times[parts[-1]] = {}
+    #         dates, times = Data(filename=file).import_as_list()
+    #         if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #             if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+    #                 t_start = datetime.timedelta(
+    #                     hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+    #             else:
+    #                 t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(0))
+    #             t_delta_0 = (t_start - t_start_0).total_seconds()
+    #             self.std_times[parts[-1]]["Start"] = t_start.total_seconds()
+    #             self.std_times[parts[-1]]["Delta"] = t_delta_0
+    #         else:
+    #             t_start = int(times[0][0]) + int(times[0][1])/60
+    #             t_delta_0 = t_start - t_start_0
+    #             self.std_times[parts[-1]]["Start"] = round(t_start, 4)
+    #             self.std_times[parts[-1]]["Delta"] = round(t_delta_0, 4)
+    #     #
+    #     self.smpl_times = {}
+    #     for file in self.list_smpl:
+    #         parts = file.split("/")
+    #         self.smpl_times[parts[-1]] = {}
+    #         dates, times = Data(filename=file).import_as_list()
+    #         if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
+    #             if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+    #                 t_start = datetime.timedelta(
+    #                     hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+    #             else:
+    #                 t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(0))
+    #             t_delta_0 = (t_start - t_start_0).total_seconds()
+    #             self.smpl_times[parts[-1]]["Start"] = t_start.total_seconds()
+    #             self.smpl_times[parts[-1]]["Delta"] = t_delta_0
+    #         else:
+    #             t_start = int(times[0][0]) + int(times[0][1])/60
+    #             t_delta_0 = t_start - t_start_0
+    #             self.smpl_times[parts[-1]]["Start"] = round(t_start, 4)
+    #             self.smpl_times[parts[-1]]["Delta"] = round(t_delta_0, 4)
+    #
+    # def change_id_option_results(self, var_id):
+    #     print("Selected ID:", var_id)
+    #     print("Related Files:", self.container_lists["ID Files"][var_id])
+    #
+    # def datareduction(self, filetype, datatype=None, fill_entry=False):
+    #     n_digits_intensity = 4
+    #     n_digits_sensitivity = 4
+    #     n_digits_concentration = 4
+    #     n_digits_rsf = 4
+    #     n_digits_lod = 4
+    #     #
+    #     if datatype == None:
+    #         var_datatype = self.container_var["ma_datareduction"]["Radiobutton"][0].get()
+    #     else:
+    #         var_datatype = datatype
+    #     #
+    #     if var_datatype == 0:
+    #         var_datatype_key = "RAW"
+    #     else:
+    #         var_datatype_key = "SMOOTHED"
+    #     #
+    #     var_is = self.container_var["ma_datareduction"]["Option IS"].get()
+    #     key_element = re.search("(\D+)(\d+)", var_is)
+    #     var_is_element = key_element.group(1)
+    #     var_filetype = {"STD": 0, "SMPL": 0}
+    #     if len(filetype) == 7:
+    #         key_id = re.search("(\D+)( Files)", filetype)
+    #         var_id = key_id.group(1)
+    #         for file in self.container_lists["ID Files"][var_id]:
+    #             if file in self.container_lists["STD"]["Short"]:
+    #                 var_filetype["STD"] += 1
+    #             elif file in self.container_lists["SMPL"]["Short"]:
+    #                 var_filetype["SMPL"] += 1
+    #         if var_filetype["STD"] > 0:
+    #             var_filetype["Result"] = "STD"
+    #         elif var_filetype["SMPL"] > 0:
+    #             var_filetype["Result"] = "SMPL"
+    #     #
+    #     if filetype == "All Standard Files":
+    #         self.results_data = MineralAnalysis(
+    #             container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #             container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
+    #             var_filetype="STD", var_datatype=var_datatype_key, var_is=var_is,
+    #             xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #     elif filetype == "All Sample Files":
+    #         self.results_data = MineralAnalysis(
+    #             container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #             container_files=self.container_files, container_var=self.container_var, srm_data=self.srm_actual,
+    #             var_filetype="SMPL", var_datatype=var_datatype_key, var_is=var_is,
+    #             xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #     else:
+    #         if var_filetype["Result"] == "STD":
+    #             self.results_data = MineralAnalysis(
+    #                 container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #                 container_files=self.container_files, container_var=self.container_var,
+    #                 srm_data=self.srm_actual, var_filetype="STD",  var_datatype=var_datatype_key, var_is=var_is,
+    #                 xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #         elif var_filetype["Result"] == "SMPL":
+    #             self.results_data = MineralAnalysis(
+    #                 container_measurements=self.container_measurements, container_lists=self.container_lists,
+    #                 container_files=self.container_files, container_var=self.container_var,
+    #                 srm_data=self.srm_actual, var_filetype="SMPL", var_datatype=var_datatype_key, var_is=var_is,
+    #                 xi_std_time=self.xi_std_time).calculate_all_parameters()
+    #     #
+    #     for isotope in self.container_lists["ISOTOPES"]:
+    #         ## Intensity Ratio
+    #         if fill_entry == True:
+    #             self.container_var["ma_datareduction"][isotope][0].set(
+    #                 round(np.mean(self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope]),
+    #                       n_digits_intensity))
+    #             self.container_var["ma_datareduction"][isotope][1].set(
+    #                 round(np.std(self.results_data["intensity ratio"]["SIGNAL CORRECTED"][isotope], ddof=1),
+    #                       n_digits_intensity))
+    #         if var_datatype == 0:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["RAW"][isotope]["Intensity Ratio"] = self.results_data[
+    #                     "intensity ratio"]["SIGNAL CORRECTED"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["RAW"][isotope]["Intensity Ratio"] = self.results_data[
+    #                     "intensity ratio"]["SIGNAL CORRECTED"][isotope]
+    #         elif var_datatype == 1:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["SMOOTHED"][isotope]["Intensity Ratio"] = self.results_data[
+    #                     "intensity ratio"]["SIGNAL CORRECTED"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["SMOOTHED"][isotope]["Intensity Ratio"] = self.results_data[
+    #                     "intensity ratio"]["SIGNAL CORRECTED"][isotope]
+    #         #
+    #         ## Sensitivity
+    #         if fill_entry == True:
+    #             self.container_var["ma_datareduction"][isotope][2].set(
+    #                 round(np.mean(self.results_data["sensitivity"][isotope]), n_digits_sensitivity))
+    #             self.container_var["ma_datareduction"][isotope][3].set(
+    #                 round(np.std(self.results_data["sensitivity"][isotope], ddof=1), n_digits_sensitivity))
+    #         if var_datatype == 0:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["RAW"][isotope]["Sensitivity"] = self.results_data[
+    #                     "sensitivity"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["RAW"][isotope]["Sensitivity"] = self.results_data[
+    #                     "sensitivity"][isotope]
+    #         elif var_datatype == 1:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["SMOOTHED"][isotope]["Sensitivity"] = self.results_data[
+    #                     "sensitivity"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["SMOOTHED"][isotope]["Sensitivity"] = self.results_data[
+    #                     "sensitivity"][isotope]
+    #         #
+    #         ## Concentration
+    #         if fill_entry == True:
+    #             self.container_var["ma_datareduction"][isotope][4].set(
+    #                 round(np.mean(self.results_data["concentration"][isotope]), n_digits_concentration))
+    #             self.container_var["ma_datareduction"][isotope][5].set(
+    #                 round(np.std(self.results_data["concentration"][isotope], ddof=1), n_digits_concentration))
+    #         if var_datatype == 0:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["RAW"][isotope]["Concentration"] = self.results_data[
+    #                     "concentration"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["RAW"][isotope]["Concentration"] = self.results_data[
+    #                     "concentration"][isotope]
+    #         elif var_datatype == 1:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["SMOOTHED"][isotope]["Concentration"] = self.results_data[
+    #                     "concentration"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["SMOOTHED"][isotope]["Concentration"] = self.results_data[
+    #                     "concentration"][isotope]
+    #         #
+    #         ## Relative Sensitivity Factor
+    #         if fill_entry == True:
+    #             self.container_var["ma_datareduction"][isotope][6].set(
+    #                 round(np.mean(self.results_data["RSF"][isotope]), n_digits_rsf))
+    #             self.container_var["ma_datareduction"][isotope][7].set(
+    #                 round(np.std(self.results_data["RSF"][isotope], ddof=1), n_digits_rsf))
+    #         if var_datatype == 0:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["RAW"][isotope]["RSF"] = self.results_data["RSF"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["RAW"][isotope]["RSF"] = self.results_data["RSF"][isotope]
+    #         elif var_datatype == 1:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["SMOOTHED"][isotope]["RSF"] = self.results_data["RSF"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["SMOOTHED"][isotope]["RSF"] = self.results_data["RSF"][isotope]
+    #         #
+    #         ## Limit of Detection
+    #         if fill_entry == True:
+    #             self.container_var["ma_datareduction"][isotope][8].set(
+    #                 round(np.mean(self.results_data["LOD"][isotope]), n_digits_lod))
+    #             self.container_var["ma_datareduction"][isotope][9].set(
+    #                 round(np.std(self.results_data["LOD"][isotope], ddof=1), n_digits_lod))
+    #         if var_datatype == 0:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["RAW"][isotope]["LOD"] = self.results_data["LOD"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["RAW"][isotope]["LOD"] = self.results_data["LOD"][isotope]
+    #         elif var_datatype == 1:
+    #             if filetype == "All Standard Files":
+    #                 self.container_results["STD"]["SMOOTHED"][isotope]["LOD"] = self.results_data["LOD"][isotope]
+    #             elif filetype == "All Sample Files":
+    #                 self.container_results["SMPL"]["SMOOTHED"][isotope]["LOD"] = self.results_data["LOD"][isotope]
     #
     def calculate_regression(self, data, isotope, file_data):
         x_data = []
@@ -6934,54 +6934,66 @@ class PySILLS(tk.Frame):
                         value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_decimals_concentration)
-                        value_mean = self.container_concentration[var_filetype][var_datatype][isotope]
-                        report_concentration[var_key][isotope] = round(value_mean, n_decimals_concentration)
+                        # value_mean = self.container_concentration[var_filetype][var_datatype][isotope]
+                        # report_concentration[var_key][isotope] = round(value_mean, n_decimals_concentration)
                         # Concentration Ratio
                         value_i = self.container_concentration_ratio[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
-                        report_concentration_ratio[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
-                            value_i)
-                        value_mean = self.container_concentration_ratio[var_filetype][var_datatype][isotope]
-                        report_concentration_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
+                        try:
+                            report_concentration_ratio[var_filetype][var_datatype][file_short][
+                                isotope] = "{:0.5e}".format(value_i)
+                        except:
+                            report_concentration_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
+                        # value_mean = self.container_concentration_ratio[var_filetype][var_datatype][isotope]
+                        # report_concentration_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
                         # Limit of Detection
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         report_lod[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_decimals_concentration)
-                        value_mean = self.container_lod[var_filetype][var_datatype][isotope]
-                        report_lod[var_key][isotope] = round(value_mean, n_decimals_concentration)
+                        # value_mean = self.container_lod[var_filetype][var_datatype][isotope]
+                        # report_lod[var_key][isotope] = round(value_mean, n_decimals_concentration)
                         # Intensity
                         value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
                         report_intensity[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_decimals_intensity)
-                        value_mean = self.container_intensity_corrected[var_filetype][var_datatype][isotope]
-                        report_intensity[var_key][isotope] = round(value_mean, n_decimals_intensity)
+                        # value_mean = self.container_intensity_corrected[var_filetype][var_datatype][isotope]
+                        # report_intensity[var_key][isotope] = round(value_mean, n_decimals_intensity)
                         # Intensity Ratio
                         value_i = self.container_intensity_ratio[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        report_intensity_ratio[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
-                            value_i)
-                        value_mean = self.container_intensity_ratio[var_filetype][var_datatype][isotope]
-                        report_intensity_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
+                        try:
+                            report_intensity_ratio[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
+                                value_i)
+                        except:
+                            report_intensity_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
+                        # value_mean = self.container_intensity_ratio[var_filetype][var_datatype][isotope]
+                        # report_intensity_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
                         # Analytical Sensitivity
                         value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
-                        report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_decimals_sensitivity)
-                        value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
-                        report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
+                        try:
+                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_sensitivity)
+                        except:
+                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "---"
+                        # value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
+                        # report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
                         # Normalized Sensitivity
                         value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
                         report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_decimals_sensitivity)
-                        value_mean = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
-                        report_normalized_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
+                        # value_mean = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
+                        # report_normalized_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
                         # Relative Sensitivity Factor
                         value_i = self.container_rsf[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        report_rsf[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_decimals_sensitivity)
-                        value_mean = self.container_rsf[var_filetype][var_datatype][isotope]
-                        report_rsf[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
+                        try:
+                            report_rsf[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_sensitivity)
+                        except:
+                            report_rsf[var_filetype][var_datatype][file_short][isotope] = "---"
+                        # value_mean = self.container_rsf[var_filetype][var_datatype][isotope]
+                        # report_rsf[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
 
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
@@ -7035,28 +7047,29 @@ class PySILLS(tk.Frame):
                     #
                     report_file.write("\n")
                     #
-                    report_file.write("Concentration Ratio\n")      # Concentration Ratio
-                    report_file.write("(1)\n")
-                    writer.writeheader()
-                    #
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_concentration_ratio[var_key])
-                    #
-                    report_file.write("\n")
-                    #
-                    report_file.write("Limit of Detection\n")  # Limit of Detection
-                    report_file.write("(ppm)\n")
-                    writer.writeheader()
-                    #
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_lod[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_lod[var_key])
-                    #
-                    report_file.write("\n")
-                    #
+                    if var_filetype == "SMPL":
+                        report_file.write("Concentration Ratio\n")      # Concentration Ratio
+                        report_file.write("(1)\n")
+                        writer.writeheader()
+                        #
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
+                        #
+                        writer.writerow(report_concentration_ratio[var_key])
+                        #
+                        report_file.write("\n")
+                        #
+                        report_file.write("Limit of Detection\n")  # Limit of Detection
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+                        #
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lod[var_filetype][var_datatype][file_short])
+                        #
+                        writer.writerow(report_lod[var_key])
+                        #
+                        report_file.write("\n")
+                        #
                     report_file.write("INTENSITY ANALYSIS\n")
                     report_file.write("Intensity (Matrix)\n")  # Intensity
                     report_file.write("(cps)\n")
@@ -7069,17 +7082,18 @@ class PySILLS(tk.Frame):
                     #
                     report_file.write("\n")
                     #
-                    report_file.write("Intensity Ratio (Matrix)\n")  # Intensity Ratio
-                    report_file.write("(1)\n")
-                    writer.writeheader()
-                    #
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_ratio[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_intensity_ratio[var_key])
-                    #
-                    report_file.write("\n")
-                    #
+                    if var_filetype == "SMPL":
+                        report_file.write("Intensity Ratio (Matrix)\n")  # Intensity Ratio
+                        report_file.write("(1)\n")
+                        writer.writeheader()
+                        #
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_ratio[var_filetype][var_datatype][file_short])
+                        #
+                        writer.writerow(report_intensity_ratio[var_key])
+                        #
+                        report_file.write("\n")
+                        #
                     report_file.write("SENSITIVITY ANALYSIS\n")
                     report_file.write("Analytical Sensitivity\n")  # Analytical Sensitivity
                     report_file.write("(1)\n")
@@ -7103,17 +7117,18 @@ class PySILLS(tk.Frame):
                     #
                     report_file.write("\n")
                     #
-                    report_file.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
-                    report_file.write("(1)\n")
-                    writer.writeheader()
-                    #
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_rsf[var_key])
-                    #
-                    report_file.write("\n")
-                    #
+                    if var_filetype == "SMPL":
+                        report_file.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
+                        report_file.write("(1)\n")
+                        writer.writeheader()
+                        #
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+                        #
+                        writer.writerow(report_rsf[var_key])
+                        #
+                        report_file.write("\n")
+                        #
     #
     def fi_export_calculation_report(self):
         header = ["filename", "ID"]
@@ -17042,11 +17057,13 @@ class PySILLS(tk.Frame):
             self.rb_conc_ratio.configure(state="disabled")
             self.rb_int_ratio.configure(state="disabled")
             self.rb_rsf.configure(state="disabled")
+            self.rb_lod.configure(state="disabled")
         elif self.container_var["ma_datareduction_files"]["File Type"].get() == 1:
             var_filetype = "SMPL"
             self.rb_conc_ratio.configure(state="normal")
             self.rb_int_ratio.configure(state="normal")
             self.rb_rsf.configure(state="normal")
+            self.rb_lod.configure(state="normal")
 
         if self.container_var["ma_datareduction_files"]["Data Type"].get() == 0:
             var_datatype = "RAW"
@@ -17075,32 +17092,36 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
-                        #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            try:
-                                value = self.container_concentration[var_filetype][var_datatype][file_short][
-                                    var_focus][isotope]
-                                value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
-                                    isotope]
-                                #
-                                if value >= value_lod_i:
-                                    if var_filetype == "SMPL":
-                                        n_digits = self.ma_determine_ndigits(var_value=value)
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                try:
+                                    value = self.container_concentration[var_filetype][var_datatype][file_short][
+                                        var_focus][isotope]
+                                    value_lod_i = self.container_lod[var_filetype][var_datatype][file_short][var_focus][
+                                        isotope]
+
+                                    if value >= value_lod_i:
+                                        if var_filetype == "SMPL":
+                                            n_digits = self.ma_determine_ndigits(var_value=value)
+                                        else:
+                                            n_digits = 1
+                                        entries_category.append(f"{value:.{n_digits}f}")
+                                        helper_values[isotope].append(value)
                                     else:
-                                        n_digits = 1
-                                    entries_category.append(f"{value:.{n_digits}f}")
-                                    helper_values[isotope].append(value)
-                                else:
-                                    entries_category.append("< LoD")
-                            except:
-                                entries_category.append(None)
-                        #
+                                        entries_category.append("< LoD")
+                                except:
+                                    entries_category.append(None)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
-                        #
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
                             if isotope not in helper_values:
@@ -17116,17 +17137,22 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
-                        #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{4}E}")
-                            helper_values[isotope].append(value)
-                        #
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                value = self.container_concentration_ratio[var_filetype][var_datatype][file_short][
+                                    var_focus][isotope]
+                                entries_category.append(f"{value:.{4}E}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17143,17 +17169,22 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
-                        #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
-                            n_digits = self.ma_determine_ndigits(var_value=value)
-                            entries_category.append(f"{value:.{n_digits}f}")
-                            helper_values[isotope].append(value)
-                        #
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                value = self.container_lod[var_filetype][var_datatype][file_short][var_focus][isotope]
+                                n_digits = self.ma_determine_ndigits(var_value=value)
+                                entries_category.append(f"{value:.{n_digits}f}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17170,18 +17201,24 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            n_digits = self.ma_determine_ndigits(var_value=value)
-                            entries_category.append(f"{value:.{n_digits}f}")
-                            helper_values[isotope].append(value)
-                        #
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                value = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
+                                    var_focus][isotope]
+                                n_digits = self.ma_determine_ndigits(var_value=value)
+                                entries_category.append(f"{value:.{n_digits}f}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17198,17 +17235,23 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            entries_category.append(f"{value:.{4}E}")
-                            helper_values[isotope].append(value)
-                        #
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                value = self.container_intensity_ratio[var_filetype][var_datatype][file_short][
+                                    var_focus][isotope]
+                                entries_category.append(f"{value:.{4}E}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17225,21 +17268,34 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
+                        var_is_file = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var[var_filetype][var_file_long]["SRM"].get()
+                        var_is_file = None
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
-                        #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            try:
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
                                 value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
                                     var_focus][isotope]
                                 n_digits = self.ma_determine_ndigits(var_value=value)
                                 entries_category.append(f"{value:.{n_digits}f}")
                                 helper_values[isotope].append(value)
-                            except:
-                                entries_category.append("---")
-                        #
+                            else:
+                                value_is = self.container_analytical_sensitivity["STD"][var_datatype][file_short][
+                                    "MAT"][isotope]
+                                if value_is == 1:
+                                    value = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                        file_short][var_focus][isotope]
+                                    n_digits = self.ma_determine_ndigits(var_value=value)
+                                    entries_category.append(f"{value:.{n_digits}f}")
+                                    helper_values[isotope].append(value)
+                                else:
+                                    entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17256,18 +17312,23 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
-                        #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            n_digits = self.ma_determine_ndigits(var_value=value)
-                            entries_category.append(f"{value:.{n_digits}f}")
-                            helper_values[isotope].append(value)
-                        #
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                value = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                                    var_focus][isotope]
+                                n_digits = self.ma_determine_ndigits(var_value=value)
+                                entries_category.append(f"{value:.{n_digits}f}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17284,16 +17345,21 @@ class PySILLS(tk.Frame):
                 if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                     if var_filetype == "SMPL":
                         var_id_i = self.container_var[var_filetype][var_file_long]["ID"].get()
+                        var_srm_file = None
                     else:
                         var_id_i = None
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                     if var_id_i == var_id or var_filetype == "STD":
                         entries_category = [file_short]
-                        #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
-                            entries_category.append(f"{value:.{4}E}")
-                            helper_values[isotope].append(value)
-                        #
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            if var_srm_file == None or var_srm_file == var_srm_i:
+                                value = self.container_rsf[var_filetype][var_datatype][file_short][var_focus][isotope]
+                                entries_category.append(f"{value:.{4}E}")
+                                helper_values[isotope].append(value)
+                            else:
+                                entries_category.append("---")
+
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
                         for isotope in self.container_lists["ISOTOPES"]:
@@ -17605,6 +17671,10 @@ class PySILLS(tk.Frame):
                         var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
                         self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
+                        if var_is_smpl != None:
+                            var_result_is = 1.0
+                            self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                                var_is] = var_result_is
             else:
                 self.calculate_acquisition_time_deltas()
                 xi_opt = {}
@@ -17614,7 +17684,7 @@ class PySILLS(tk.Frame):
 
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
-                    var_srm_file = self.container_var["STD"][file_std]["SRM"].get() #self.container_var["SRM"][file_std].get()
+                    var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.ma_get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
@@ -17661,7 +17731,8 @@ class PySILLS(tk.Frame):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 if var_filetype == "STD":
-                                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_var["SRM"][var_file_long].get()
+                                    print("Hallo STD")
+                                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                                     if var_srm_i == var_srm_file:
                                         self.ma_get_analytical_sensitivity(
                                             var_filetype=var_filetype, var_datatype=var_datatype,
@@ -18131,7 +18202,7 @@ class PySILLS(tk.Frame):
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=1,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Concentration Ratio", sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
-        rb_05c = SE(
+        self.rb_lod = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 13, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=2,
@@ -18196,20 +18267,20 @@ class PySILLS(tk.Frame):
         ## BUTTONS
         btn_06a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 20, column_id=start_column, n_rows=2,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_button(
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Export Results", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
             command=self.ma_export_calculation_report)
         #
         btn_07a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Concentration Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_concentration)
         btn_07a.configure(state="disabled")
         #
         btn_07b = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Intensity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_intensity)
         btn_07b.configure(state="disabled")
@@ -21083,7 +21154,12 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
         #
         self.subwindow_fi_graphical_sensitivity = tk.Toplevel(self.parent)
-        self.subwindow_fi_graphical_sensitivity.title("FLUID INCLUSION ANALYSIS - Sensitivity Results")
+        if self.pysills_mode == "MA":
+            self.subwindow_fi_graphical_sensitivity.title("MINERAL ANALYSIS - Sensitivity Results")
+        elif self.pysills_mode == "FI":
+            self.subwindow_fi_graphical_sensitivity.title("FLUID INCLUSION ANALYSIS - Sensitivity Results")
+        elif self.pysills_mode == "MI":
+            self.subwindow_fi_graphical_sensitivity.title("MELT INCLUSION ANALYSIS - Sensitivity Results")
         self.subwindow_fi_graphical_sensitivity.geometry(var_geometry)
         self.subwindow_fi_graphical_sensitivity.resizable(False, False)
         self.subwindow_fi_graphical_sensitivity["bg"] = self.bg_colors["Very Light"]
