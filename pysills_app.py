@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		01.08.2023
+# Date:		02.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -6553,7 +6553,8 @@ class PySILLS(tk.Frame):
                                 self.container_measurements["RAW"][file_std][isotope]
                         else:
                             pass
-                    #
+            # Fill container_spike_values
+            self.helper_fill_container_spike_values(mode=filetype)
         elif filetype == "SMPL":
             for file_smpl in self.container_lists["SMPL"]["Short"]:
                 isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl]]
@@ -6631,7 +6632,8 @@ class PySILLS(tk.Frame):
                                 self.container_measurements["RAW"][file_smpl][isotope]
                         else:
                             pass
-                    #
+            # Fill container_spike_values
+            self.helper_fill_container_spike_values(mode=filetype)
     #
     def do_spike_elimination_all(self, file_type, settings="settings"):
         if file_type == "STD":
@@ -25926,6 +25928,45 @@ class PySILLS(tk.Frame):
 
         return helper_list
 
+    def helper_spike_values(self, var_file_short, var_isotope, var_value_raw, var_value_smoothed, mode=None):
+        if var_file_short not in self.container_spike_values:
+            self.container_spike_values[var_file_short] = {}
+        if var_isotope not in self.container_spike_values[var_file_short]:
+            self.container_spike_values[var_file_short][var_isotope] = {
+                "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+
+        if var_value_raw not in self.container_spike_values[var_file_short][var_isotope]["RAW"]:
+            self.container_spike_values[var_file_short][var_isotope]["RAW"].append(var_value_raw)
+        if var_value_smoothed not in self.container_spike_values[var_file_short][var_isotope]["SMOOTHED"]:
+            self.container_spike_values[var_file_short][var_isotope]["SMOOTHED"].append(var_value_smoothed)
+        if var_value_smoothed not in self.container_spike_values[var_file_short][var_isotope]["Current"]:
+            self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_smoothed)
+
+        if mode != None:
+            for var_file_short in self.container_lists[mode]["Short"]:
+                if var_file_short not in self.container_spike_values:
+                    self.container_spike_values[var_file_short] = {}
+                list_spk_isotopes = self.check_spikes_isotope(var_file=var_file_short)
+                for var_isotope in list_spk_isotopes:
+                    if var_isotope not in self.container_spike_values[var_file_short]:
+                        self.container_spike_values[var_file_short][var_isotope] = {
+                            "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+                    for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
+                        val_id = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_id]
+                        self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
+
+    def helper_fill_container_spike_values(self, mode="SMPL"):
+        for var_file_short in self.container_lists[mode]["Short"]:
+            for var_isotope in self.container_lists["ISOTOPES"]:
+                list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
+                if len(list_indices) > 0:
+                    for var_index in list_indices:
+                        value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][var_index]
+                        value_smoothed = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_index]
+                        self.helper_spike_values(
+                            var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
+                            var_value_smoothed=value_smoothed, mode=mode)
+
     def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
         var_file = self.currest_file_spk
@@ -25951,30 +25992,9 @@ class PySILLS(tk.Frame):
         self.lbl_03b.configure(text=self.current_suggested_value)
         self.lbl_03c.configure(text=self.current_current_value)
 
-        if var_file not in self.container_spike_values:
-            self.container_spike_values[var_file] = {}
-        if var_isotope not in self.container_spike_values[var_file]:
-            self.container_spike_values[var_file][var_isotope] = {"RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
-        if self.current_original_value not in self.container_spike_values[var_file][var_isotope]["RAW"]:
-            self.container_spike_values[var_file][var_isotope]["RAW"].append(self.current_original_value)
-        if self.current_suggested_value not in self.container_spike_values[var_file][var_isotope]["SMOOTHED"]:
-            self.container_spike_values[var_file][var_isotope]["SMOOTHED"].append(self.current_suggested_value)
-        if self.current_suggested_value not in self.container_spike_values[var_file][var_isotope]["Current"]:
-            self.container_spike_values[var_file][var_isotope]["Current"].append(self.current_current_value)
-
-        if mode != None:
-            for var_file in self.container_lists[mode]["Short"]:
-                if var_file not in self.container_spike_values:
-                    self.container_spike_values[var_file] = {}
-                list_spk_isotopes = self.check_spikes_isotope(var_file=var_file)
-                for var_isotope in list_spk_isotopes:
-                    if var_isotope not in self.container_spike_values[var_file]:
-                        self.container_spike_values[var_file][var_isotope] = {
-                            "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
-                    for var_id in self.container_spikes[var_file][var_isotope]["Indices"]:
-                        val_id = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id]
-                        self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
-
+        self.helper_spike_values(
+            var_file_short=var_file, var_isotope=var_isotope, var_value_raw=self.current_original_value,
+            var_value_smoothed=self.current_suggested_value, mode=mode)
         self.show_spike_diagram()
 
     def change_spk_isotope(self, var_opt_iso):
