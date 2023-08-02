@@ -107,7 +107,7 @@ class PySILLS(tk.Frame):
         # General Settings
         self.parent = parent
         self.parent.tk.call("tk", "scaling", var_scaling)
-        self.parent.title("PySILLS")
+        self.parent.title("PySILLS - LA-ICP-MS data redcution")
         var_geometry = ""
         # var_window_width = int(round(0.94*int(var_screen_width), -2))
         # if var_window_width > 1800:
@@ -928,7 +928,11 @@ class PySILLS(tk.Frame):
         img = tk.Label(self.parent, image=pysills_logo, bg=self.bg_colors["Super Dark"])
         img.image = pysills_logo
         img.grid(row=0, column=0, rowspan=2, columnspan=20, sticky="nesw")
-        #
+
+        ## Icon
+        pysills_icon = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Icon.png"))
+        self.parent.iconphoto(False, pysills_icon)
+
         ## Radiobuttons
         self.pysills_mode = None
         self.demo_mode = True
@@ -1625,7 +1629,9 @@ class PySILLS(tk.Frame):
                     self.container_lists["SRM Isotopes"][key] = item.get()
                 else:
                     key_short = key.split("/")[-1]
-                    self.container_lists["SRM Files"][key_short] = item.get()
+                    var_srm_file = self.container_var["STD"][key]["SRM"].get()
+                    self.container_lists["SRM Files"][key_short] = var_srm_file
+                    #self.container_lists["SRM Files"][key_short] = item.get()
 
         self.collect_srm_data()
 
@@ -3012,7 +3018,8 @@ class PySILLS(tk.Frame):
             x_std = []
             y_std = []
             for index, file in enumerate(self.container_lists["STD"]["Short"]):
-                var_srm_file = self.container_lists["STD"]["SRM"][file]
+                var_file_long = self.container_lists["STD"]["Short"][index]
+                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_lists["STD"]["SRM"][file]
                 var_srm_isotope = self.container_files["SRM"][var_isotope].get()
                 if var_srm_file == var_srm_isotope:
                     cb_file = self.container_var["STD"][self.container_lists["STD"]["Long"][index]]["Checkbox"].get()
@@ -7706,11 +7713,13 @@ class PySILLS(tk.Frame):
                 if file_std in self.container_var["STD"]:
                     info_srm = self.container_var["SRM"][file_std].get()
                     info_cb_state = self.container_var["STD"][file_std]["Checkbox"].get()
+                    info_sign_color = self.container_var["STD"][file_std]["Sign Color"].get()
                 else:
                     info_srm = "Select SRM"
                     info_cb_state = 1
+                    info_sign_color = self.sign_red
 
-                str_std = str(info_file) + ";" + str(info_srm) + ";" + str(info_cb_state)
+                str_std = str(info_file) + ";" + str(info_srm) + ";" + str(info_cb_state) + ";" + str(info_sign_color)
 
                 str_std += "\n"
                 save_file.write(str_std)
@@ -7725,12 +7734,15 @@ class PySILLS(tk.Frame):
                     info_is = self.container_var["SMPL"][var_file]["IS Data"]["IS"].get()
                     info_assemblage = self.container_var["SMPL"][var_file]["ID"].get()
                     info_cb_state = self.container_var["SMPL"][var_file]["Checkbox"].get()
+                    info_sign_color = self.container_var["SMPL"][var_file]["Sign Color"].get()
                 else:
                     info_is = "Select IS"
                     info_assemblage = "A"
                     info_cb_state = 1
+                    info_sign_color = self.sign_red
 
-                str_smpl = str(info_file) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
+                str_smpl = (str(info_file) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
+                            + ";" + str(info_sign_color))
 
                 str_smpl += "\n"
                 save_file.write(str_smpl)
@@ -8157,15 +8169,16 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][var_file_short] = {"SRM": tk.StringVar()}
                     self.container_var["STD"][var_file_long] = {
                         "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Checkbox": tk.IntVar()}
+                        "Checkbox": tk.IntVar(), "Sign Color": tk.StringVar(), "SRM": tk.StringVar()}
 
                     self.lb_std.insert(tk.END, str(var_file_short))
                     self.list_std.append(var_file_long)
                     self.container_lists["STD"]["Long"].append(var_file_long)
                     self.container_lists["STD"]["Short"].append(var_file_short)
-                    self.container_files["STD"][var_file_short]["SRM"].set(splitted_std[1])
-                    #self.container_var["STD"][var_file_long]["IS Data"]["IS"].set(splitted_std[2])
+                    #self.container_files["STD"][var_file_short]["SRM"].set(splitted_std[1])
+                    self.container_var["STD"][var_file_long]["SRM"].set(splitted_std[1])
                     self.container_var["STD"][var_file_long]["Checkbox"].set(splitted_std[2])
+                    self.container_var["STD"][var_file_long]["Sign Color"].set(splitted_std[3])
                     #
                     self.ma_current_file_std = self.list_std[0]
                     #
@@ -8180,8 +8193,7 @@ class PySILLS(tk.Frame):
                     #
                     self.container_var["SMPL"][var_file_long] = {
                         "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Checkbox": tk.IntVar(),
-                        "ID": tk.StringVar()}
+                        "Checkbox": tk.IntVar(), "ID": tk.StringVar(), "Sign Color": tk.StringVar()}
                     #
                     self.lb_smpl.insert(tk.END, str(var_file_short))
                     self.list_smpl.append(var_file_long)
@@ -8193,6 +8205,7 @@ class PySILLS(tk.Frame):
                         self.container_lists["Possible IS"].append(splitted_std[1])
                     self.container_var["SMPL"][var_file_long]["ID"].set(splitted_std[2])
                     self.container_var["SMPL"][var_file_long]["Checkbox"].set(splitted_std[3])
+                    self.container_var["SMPL"][var_file_long]["Sign Color"].set(splitted_std[4])
                     #
                     self.ma_current_file_smpl = self.list_smpl[0]
                     #
@@ -12831,7 +12844,7 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            var_srm_i = self.container_files["STD"][file_std]["SRM"].get()
+            var_srm_i = self.container_var["STD"][var_file]["SRM"].get() #self.container_files["STD"][file_std]["SRM"].get()
             #
             if var_srm_i not in list_srm:
                 list_srm.append(var_srm_i)
@@ -13885,7 +13898,7 @@ class PySILLS(tk.Frame):
         for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
             parts = file_std.split("/")
             file_std_short = parts[-1]
-            #
+
             dataset_std_i = Data(filename=file_std)
             df_std_i = dataset_std_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
             times_std_i = df_std_i.iloc[:, 0]
@@ -13926,9 +13939,9 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][file_std]["Checkbox"].set(1)
                     self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
                     self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
+                    self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
+                    self.container_var["STD"][file_std]["SRM"].set("Select SRM")
             else:
-                self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
-                self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
                 self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
@@ -14018,19 +14031,19 @@ class PySILLS(tk.Frame):
                 anchor=tk.CENTER, highlightthickness=0, bd=0)
             text_std.window_create("end", window=cb_i)
             text_std.insert("end", "\t")
-            #
-            if self.container_var["SRM"][file_std].get() != "Select SRM":
-                var_text = self.container_var["SRM"][file_std].get()
+
+            if self.container_var["STD"][file_std]["SRM"].get() != "Select SRM":
+                var_text = self.container_var["STD"][file_std]["SRM"].get()
                 self.container_files["STD"][file_std_short]["SRM"].set(var_text)
             else:
                 if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
                     var_text = self.container_var["General Settings"]["Default SRM"].get()
-                    self.container_var["SRM"][file_std].set(var_text)
+                    self.container_var["STD"][file_std]["SRM"].set(var_text)
                     self.container_files["STD"][file_std_short]["SRM"].set(var_text)
             #
             opt_srm_i = tk.OptionMenu(
-                frm_std, self.container_var["SRM"][file_std], *np.sort(self.list_srm),
-                command=lambda var_opt=self.container_var["SRM"][file_std], var_indiv=file_std, mode="STD":
+                frm_std, self.container_var["STD"][file_std]["SRM"], *np.sort(self.list_srm),
+                command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.ma_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
                 fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
@@ -14100,8 +14113,6 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
                     self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
             else:
-                self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
-                self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                 self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
                 self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
@@ -14475,11 +14486,11 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
         #
-        self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-        self.build_srm_database()
+        #self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+        #self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+        #self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+        #self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+        #self.build_srm_database()
 
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
@@ -14493,6 +14504,13 @@ class PySILLS(tk.Frame):
                     var_method = "Grubbs"
                 #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+        else:
+            self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+            self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+
+        self.build_srm_database()
 
     def place_project_information(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Project Information'
@@ -15950,7 +15968,7 @@ class PySILLS(tk.Frame):
         if mode == "STD":
             for file_std in self.list_std:
                 parts = file_std.split("/")
-                self.container_var["SRM"][file_std].set(var_opt)
+                self.container_var["STD"][file_std]["SRM"].set(var_opt)
                 self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
         elif mode == "ISOTOPES":
             for isotope in self.container_lists["ISOTOPES"]:
@@ -15960,15 +15978,6 @@ class PySILLS(tk.Frame):
             self.srm_actual[var_opt] = {}
             ESRM().place_srm_values(srm_name=var_opt, srm_dict=self.srm_actual)
             self.fill_srm_values(var_srm=var_opt)
-            # if mode == "STD":
-            #     for file_std in self.container_lists["STD"]["Long"]:
-            #         var_srm = self.container_var["SRM"][file_std].get()
-            #         var_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
-            #         key = re.search("(\D+)(\d*)", var_is)
-            #         element_is = key.group(1)
-            #         if var_srm != "Select SRM" and element_is != "Select IS":
-            #             self.container_var["STD"][file_std]["IS Data"]["Concentration"].set(
-            #                 self.srm_actual[var_srm][element_is])
 
     def ma_select_id_default(self, var_opt):
         var_id = var_opt
@@ -15978,17 +15987,16 @@ class PySILLS(tk.Frame):
     def ma_change_srm_individual(self, var_opt, var_indiv, mode="STD"):
         if mode == "STD":
             parts = var_indiv.split("/")
-            #
-            self.container_var["SRM"][var_indiv].set(var_opt)
+            self.container_var["STD"][var_indiv]["SRM"].set(var_opt)
             self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
         elif mode == "ISOTOPES":
             self.container_var["SRM"][var_indiv].set(var_opt)
             self.container_files["SRM"][var_indiv].set(var_opt)
-        #
+
         if var_opt not in self.srm_actual:
             self.srm_actual[var_opt] = {}
             ESRM().place_srm_values(srm_name=var_opt, srm_dict=self.srm_actual)
-        #
+
         self.fill_srm_values(var_srm=var_opt)
     #
     ## FILE-SPECIFIC ANALYSIS ##########################################################################################
@@ -16579,7 +16587,17 @@ class PySILLS(tk.Frame):
         #
         ## TREEVIEWS
         list_categories = ["Category"]
-        list_categories.extend(self.container_lists["ISOTOPES"])
+        if var_type == "STD":
+            var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+            list_considered_isotopes = []
+            for isotope in self.container_lists["ISOTOPES"]:
+                var_srm_i = self.container_var["SRM"][isotope].get()
+                if var_srm_i == var_srm_file:
+                    list_considered_isotopes.append(isotope)
+            list_categories.extend(list_considered_isotopes)
+        else:
+            list_considered_isotopes = self.container_lists["ISOTOPES"]
+            list_categories.extend(list_considered_isotopes)
         list_width = list(85*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
         list_width[0] = 175
@@ -16607,7 +16625,9 @@ class PySILLS(tk.Frame):
             self.ma_get_intensity_corrected(
                 var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                 mode="Specific")
+            var_srm_file = self.container_var["STD"][var_file]["SRM"].get() #self.container_var["SRM"][var_file].get()
         else:
+            var_srm_file = None
             for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
                 file_std_long = self.container_lists["STD"]["Long"][index]
                 self.ma_get_intensity(
@@ -16654,31 +16674,41 @@ class PySILLS(tk.Frame):
         entries_concentration_ratio_i = ["Concentration Ratio"]
         entries_lod_i = ["Limit of Detection"]
         #
-        for isotope in self.container_lists["ISOTOPES"]:
+        for isotope in list_considered_isotopes:
+            var_srm_i = self.container_var["SRM"][isotope].get()
             # Intensity Results
             intensity_bg_i = self.container_intensity[var_type]["RAW"][var_file_short]["BG"][isotope]
             intensity_mat_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["MAT"][isotope]
-            intensity_ratio_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short]["MAT"][isotope]
             # Sensitivity Results
             analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short]["MAT"][
                 isotope]
             normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short]["MAT"][
                 isotope]
-            rsf_i = self.container_rsf[var_type]["RAW"][var_file_short]["MAT"][isotope]
             # Concentration Results
             concentration_i = self.container_concentration[var_type]["RAW"][var_file_short]["MAT"][isotope]
-            concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short]["MAT"][isotope]
             lod_i = self.container_lod[var_type]["RAW"][var_file_short]["MAT"][isotope]
-            #
-            entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
-            entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
-            #entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{3}E}")
-            entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{3}f}")
-            entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{3}f}")
-            #entries_rsf_i.append(f"{rsf_i:.{3}f}")
-            entries_concentration_i.append(f"{concentration_i:.{3}f}")
-            #entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{3}E}")
-            entries_lod_i.append(f"{lod_i:.{3}f}")
+
+            if var_type == "SMPL":
+                intensity_ratio_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short]["MAT"][isotope]
+                rsf_i = self.container_rsf[var_type]["RAW"][var_file_short]["MAT"][isotope]
+                concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short]["MAT"][
+                    isotope]
+
+            if var_srm_file == None or var_srm_file == var_srm_i:
+                entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
+                entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
+                entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{3}f}")
+                entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{3}f}")
+                entries_concentration_i.append(f"{concentration_i:.{3}f}")
+                entries_lod_i.append(f"{lod_i:.{3}f}")
+            else:
+                entries_intensity_bg_i.append("---")
+                entries_intensity_mat_i.append("---")
+                entries_analytical_sensitivity_i.append("---")
+                entries_normalized_sensitivity_i.append("---")
+                entries_concentration_i.append("---")
+                entries_lod_i.append("---")
+
             if var_type == "SMPL":
                 entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{3}E}")
                 entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{3}E}")
@@ -17201,11 +17231,14 @@ class PySILLS(tk.Frame):
                         entries_category = [file_short]
                         #
                         for isotope in self.container_lists["ISOTOPES"]:
-                            value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
-                                var_focus][isotope]
-                            n_digits = self.ma_determine_ndigits(var_value=value)
-                            entries_category.append(f"{value:.{n_digits}f}")
-                            helper_values[isotope].append(value)
+                            try:
+                                value = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short][
+                                    var_focus][isotope]
+                                n_digits = self.ma_determine_ndigits(var_value=value)
+                                entries_category.append(f"{value:.{n_digits}f}")
+                                helper_values[isotope].append(value)
+                            except:
+                                entries_category.append("---")
                         #
                         self.tv_results_files.insert("", tk.END, values=entries_category)
                     else:
@@ -17550,7 +17583,7 @@ class PySILLS(tk.Frame):
                                            mode="Specific", var_is_smpl=None):
         if mode == "Specific":
             if var_filetype == "STD":
-                var_srm_file = self.container_var["SRM"][var_file_long].get()
+                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                 if var_is_smpl == None:
                     var_is = self.container_lists["Possible IS"][0]
                 else:
@@ -17581,7 +17614,7 @@ class PySILLS(tk.Frame):
 
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
-                    var_srm_file = self.container_var["SRM"][file_std].get()
+                    var_srm_file = self.container_var["STD"][file_std]["SRM"].get() #self.container_var["SRM"][file_std].get()
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.ma_get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
@@ -17628,7 +17661,7 @@ class PySILLS(tk.Frame):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 if var_filetype == "STD":
-                                    var_srm_file = self.container_var["SRM"][var_file_long].get()
+                                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_var["SRM"][var_file_long].get()
                                     if var_srm_i == var_srm_file:
                                         self.ma_get_analytical_sensitivity(
                                             var_filetype=var_filetype, var_datatype=var_datatype,
@@ -19822,7 +19855,7 @@ class PySILLS(tk.Frame):
     def fi_get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
         if mode == "Specific":
             if var_filetype == "STD":
-                var_srm_file = self.container_var["SRM"][var_file_long].get()
+                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_var["SRM"][var_file_long].get()
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 var_srm_is = self.container_var["SRM"][var_is].get()
                 #
@@ -19854,7 +19887,7 @@ class PySILLS(tk.Frame):
                 list_valid_std = []
                 #
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
-                    var_srm_file = self.container_var["SRM"][file_std].get()
+                    var_srm_file = self.container_var["STD"][file_std]["SRM"].get() #self.container_var["SRM"][file_std].get()
                     file_std_short = self.container_lists["STD"]["Short"][index]
                     #
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
@@ -19905,7 +19938,7 @@ class PySILLS(tk.Frame):
                         var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if var_filetype == "STD":
-                                var_srm_file = self.container_var["SRM"][var_file_long].get()
+                                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_var["SRM"][var_file_long].get()
                                 if var_srm_i == var_srm_file:
                                     if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                         var_file_short = self.container_lists[var_filetype]["Short"][index]
@@ -26341,6 +26374,7 @@ class PySILLS(tk.Frame):
     #
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("PySILLS - LA-ICP-MS data reduction")
     #
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
