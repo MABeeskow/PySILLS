@@ -732,6 +732,7 @@ class PySILLS(tk.Frame):
         self.container_lists["Selected Salts"] = []
         self.container_lists["SRM Data"] = {}
         self.container_lists["SRM"] = []
+        self.container_lists["SRM Library"] = []
         self.container_lists["SRM Files"] = {}
         self.container_lists["SRM Isotopes"] = {}
         self.container_lists["IS"] = []
@@ -807,7 +808,8 @@ class PySILLS(tk.Frame):
         # Calculation Report
         self.container_report = {}
         categories_01 = ["Total STD", "Total SMPL"]
-        categories_02 = ["intensity bg", "intensity sig corr", "intensity ratio", "sensitivity", "concentration", "RSF", "LOD"]
+        categories_02 = ["intensity bg", "intensity sig corr", "intensity ratio", "sensitivity", "concentration", "RSF",
+                         "LOD"]
         for category_01 in categories_01:
             self.container_report[category_01] = {}
             self.container_report[category_01]["Mean"] = {}
@@ -826,6 +828,47 @@ class PySILLS(tk.Frame):
              ["USGS GSD-1G (GeoReM)"], ["USGS GSE-1G (GeoReM)"], ["B6"], ["Durango Apatite"], ["Scapolite 17"],
              ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
              ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0]
+        self.path_pysills = os.getcwd()
+        helper_srm_library = []
+        helper_srm_library = os.listdir(self.path_pysills+str("/lib/"))
+        helper_srm_library.remove("__init__.py")
+        helper_srm_library.remove(".DS_Store")
+        helper_srm_library.sort()
+        for var_srm in helper_srm_library:
+            var_srm_new = var_srm.replace("_", " ")
+            if "GeoReM" in var_srm_new:
+                var_srm_new = var_srm_new.replace("GeoReM", "(GeoReM)")
+            if "Spandler" in var_srm_new:
+                var_srm_new = var_srm_new.replace("Spandler", "(Spandler)")
+            if "BAM 376" in var_srm_new:
+                var_srm_new = var_srm_new.replace("BAM 376", "BAM-376")
+            if "BCR 2G" in var_srm_new:
+                var_srm_new = var_srm_new.replace("BCR 2G", "BCR-2G")
+            if "BL Q" in var_srm_new:
+                var_srm_new = var_srm_new.replace("BL Q", "BL-Q")
+            if "Br Glass" in var_srm_new:
+                var_srm_new = var_srm_new.replace("Br Glass", "Br-Glass")
+            if " 1G" in var_srm_new:
+                var_srm_new = var_srm_new.replace(" 1G", "-1G")
+            if " 2G" in var_srm_new:
+                var_srm_new = var_srm_new.replace(" 2G", "-2G")
+            if " 2B2" in var_srm_new:
+                var_srm_new = var_srm_new.replace(" 2B2", "-2B2")
+            if "HAL O" in var_srm_new:
+                var_srm_new = var_srm_new.replace("HAL O", "HAL-O")
+            if "K Br" in var_srm_new:
+                var_srm_new = var_srm_new.replace("K Br", "K-Br")
+            if "MACS 3" in var_srm_new:
+                var_srm_new = var_srm_new.replace("MACS 3", "MACS-3")
+            if "BCR2G" in var_srm_new:
+                var_srm_new = var_srm_new.replace("BCR2G", "BCR-2G")
+            if "GSD1G" in var_srm_new:
+                var_srm_new = var_srm_new.replace("GSD1G", "GSD-1G")
+            if "GSE1G" in var_srm_new:
+                var_srm_new = var_srm_new.replace("GSE1G", "GSE-1G")
+
+            self.container_lists["SRM Library"].append(var_srm_new)
+
         self.srm_window_checker = tk.IntVar()
         self.srm_window_checker.set(0)
         self.previous_std_list = []
@@ -4171,6 +4214,7 @@ class PySILLS(tk.Frame):
         if key == "STD":
             for file in self.list_std:
                 parts = file.split("/")
+                self.container_var["STD"][file]["SRM"].set(var_srm)
                 self.container_files["STD"][parts[-1]]["SRM"].set(var_srm)
                 try:
                     self.container_var["SRM"][file].set(var_srm)
@@ -4195,6 +4239,7 @@ class PySILLS(tk.Frame):
                 self.container_var["SRM"]["default"][0].set(var_srm)
                 for file in self.list_std:
                     parts = file.split("/")
+                    self.container_var["STD"][file]["SRM"].set(var_srm)
                     self.container_files["STD"][parts[-1]]["SRM"].set(var_srm)
                     try:
                         self.container_var["SRM"][file].set(var_srm)
@@ -14057,7 +14102,8 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][file_std_short]["SRM"].set(var_text)
             #
             opt_srm_i = tk.OptionMenu(
-                frm_std, self.container_var["STD"][file_std]["SRM"], *np.sort(self.list_srm),
+                frm_std, self.container_var["STD"][file_std]["SRM"],
+                *np.sort(self.container_lists["SRM Library"]),
                 command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.ma_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
@@ -14436,7 +14482,7 @@ class PySILLS(tk.Frame):
                     var_text = "Select SRM"
             #
             opt_srm_i = tk.OptionMenu(
-                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.list_srm),
+                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
                 command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
                 self.ma_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
@@ -14491,21 +14537,17 @@ class PySILLS(tk.Frame):
             var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["LASER"]: self.change_carrier_gas(var_opt))
-        opt_laser["menu"].config(fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                                 activebackground=self.accent_color)
-        opt_laser.config(bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                         activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+        opt_laser["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_laser.config(
+            bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
         #
         ## INITIALIZATION
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
-        #
-        #self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        #self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-        #self.build_srm_database()
 
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
@@ -14618,12 +14660,40 @@ class PySILLS(tk.Frame):
 
         self.container_var["SRM"]["default"][1].set(var_text_iso)
 
+        # opt_02a = SE(
+        #     parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n - 4, n_rows=var_row_n,
+        #     n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
+        #     bg=self.bg_colors["Light"]).create_option_isotope(
+        #     var_iso=self.container_var["SRM"]["default"][0], option_list=self.container_lists["SRM Library"],
+        #     text_set=var_text_std, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+        #     command=lambda var_srm=self.container_var["SRM"]["default"][0]: self.change_srm_default(var_srm))
+        # opt_02a["menu"].config(
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+        #     activebackground=self.accent_color)
+        # opt_02a.config(
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
+        #     activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+        #
+        # opt_02b = SE(
+        #     parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n - 4, n_rows=var_row_n,
+        #     n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
+        #     bg=self.bg_colors["Light"]).create_option_isotope(
+        #     var_iso=self.container_var["SRM"]["default"][1], option_list=self.container_lists["SRM Library"],
+        #     text_set=var_text_iso, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+        #     command=lambda var_srm=self.container_var["SRM"]["default"][1]:
+        #     self.change_srm_default(var_srm, key="isotope"))
+        # opt_02b["menu"].config(
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+        #     activebackground=self.accent_color)
+        # opt_02b.config(
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
+        #     activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
         opt_02a = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n - 4, n_rows=var_row_n,
             n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_srm(
             var_srm=self.container_var["SRM"]["default"][0], text_set=var_text_std,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color, option_list=self.container_lists["SRM Library"],
             command=lambda var_srm=self.container_var["SRM"]["default"][0]: self.change_srm_default(var_srm))
         opt_02a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
@@ -14637,7 +14707,7 @@ class PySILLS(tk.Frame):
             n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_srm(
             var_srm=self.container_var["SRM"]["default"][1], text_set=var_text_iso,
-            fg_active=self.bg_colors["Dark Font"],
+            fg_active=self.bg_colors["Dark Font"], option_list=self.container_lists["SRM Library"],
             bg_active=self.accent_color, command=lambda var_srm=self.container_var["SRM"]["default"][1]:
             self.change_srm_default(var_srm, key="isotope"))
         opt_02b["menu"].config(
@@ -14853,16 +14923,21 @@ class PySILLS(tk.Frame):
             text="End", relief=var_relief, fontsize="sans 10 bold")
         lbl_07c = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
 
         # Buttons
         btn_07c = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=1,
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n - 6, n_rows=1,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="BG": self.detect_signal_interval(mode))
+        btn_07cd = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=1,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         # Entries
         var_entr_07a_default = self.container_var["ma_setting"]["Time BG Start"].get()
@@ -14915,17 +14990,22 @@ class PySILLS(tk.Frame):
             text="End", relief=var_relief, fontsize="sans 10 bold")
         lbl_08c = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-            n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
 
         # Buttons
         btn_08c = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n - 6, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="MAT": self.detect_signal_interval(mode))
+        btn_08cd = SE(
+            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+            n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         # Entries
         var_entr_08a_default = self.container_var["ma_setting"]["Time MAT Start"].get()

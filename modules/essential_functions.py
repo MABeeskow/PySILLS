@@ -1,22 +1,24 @@
 #!/usr/bin/env python
 # -*-coding: utf-8 -*-
-# ----------------------
-# essential_functions.py
-# Maximilian Beeskow
-# 24.07.2023
-# ----------------------
-#
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Name:		essential_functions.py
+# Author:	Maximilian A. Beeskow
+# Version:	pre-release
+# Date:		02.08.2023
+
+#-----------------------------------------------------------------------------------------------------------------------
+
 ## MODULES
-#
 import re, os
 import tkinter as tk
 import numpy as np
 from modules import data
 import tkinter.filedialog as fd
 from modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
-#
+
 ## CLASSES
-#
 class EssentialDataProcessing:
     #
     def __init__(self, parent):
@@ -353,6 +355,9 @@ class EssentialsSRM:
             data_srm = data.general().importSRM(filename=path+str("/lib/Po_724.csv"))
         elif srm_name == "STDGL-2B2":
             data_srm = data.general().importSRM(filename=path+str("/lib/STDGL_2B2.csv"))
+        else:
+            srm_name_new = srm_name.replace(" ", "_")
+            data_srm = data.general().importSRM(filename=path+str("/lib/"+srm_name_new))
         #
         for item in data_srm:
             srm_dict[srm_name][item[0]] = round(item[1], 4)
