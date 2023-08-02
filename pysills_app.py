@@ -107,7 +107,7 @@ class PySILLS(tk.Frame):
         # General Settings
         self.parent = parent
         self.parent.tk.call("tk", "scaling", var_scaling)
-        self.parent.title("PySILLS - LA-ICP-MS data redcution")
+        self.parent.title("PySILLS - LA-ICP-MS data reduction")
         var_geometry = ""
         # var_window_width = int(round(0.94*int(var_screen_width), -2))
         # if var_window_width > 1800:
@@ -836,6 +836,7 @@ class PySILLS(tk.Frame):
         helper_srm_library.sort()
         for var_srm in helper_srm_library:
             var_srm_new = var_srm.replace("_", " ")
+            var_srm_new = var_srm_new.replace(".csv", "")
             if "GeoReM" in var_srm_new:
                 var_srm_new = var_srm_new.replace("GeoReM", "(GeoReM)")
             if "Spandler" in var_srm_new:
@@ -979,17 +980,18 @@ class PySILLS(tk.Frame):
         ## Radiobuttons
         self.pysills_mode = None
         self.demo_mode = True
-        var_rb_main = tk.IntVar()
-        var_rb_main.set(0)
-        self.container_var["main"]["Radiobutton"].append(var_rb_main)
+        #var_rb_main = tk.IntVar()
+        #var_rb_main.set(0)
+        #self.container_var["main"]["Radiobutton"].append(var_rb_main)
         list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
+        self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
             rb_mode = SE(
                 parent=self.parent, row_id=5 + index, column_id=11, n_rows=1, n_columns=10, fg=self.green_medium,
                 bg=self.green_dark).create_radiobutton(
-                var_rb=var_rb_main, value_rb=index, color_bg=self.bg_colors["Medium"], fg=self.bg_colors["Dark Font"],
-                text=mode, sticky="NESW", relief=tk.FLAT, font="sans 10 bold",
-                command=lambda var_rb=var_rb_main: self.select_experiment(var_rb))
+                var_rb=self.var_rb_mode, value_rb=index, color_bg=self.bg_colors["Medium"],
+                fg=self.bg_colors["Dark Font"], text=mode, sticky="NESW", relief=tk.FLAT, font="sans 10 bold",
+                command=lambda var_rb=self.var_rb_mode: self.select_experiment(var_rb))
             #
             if mode in ["Melt Inclusions", "Output Analysis"]:
                 rb_mode.configure(state="disabled")
@@ -1079,7 +1081,7 @@ class PySILLS(tk.Frame):
             text="Quit", bg_active=self.red_dark, fg_active=self.green_dark, command=self.parent.quit)
         #
         ## Initialization
-        self.select_experiment(var_rb=var_rb_main)
+        self.select_experiment(var_rb=self.var_rb_mode)
     #
     def clean_result_lists(self, var_list, var_list_new):
         for item in var_list:
@@ -8174,21 +8176,10 @@ class PySILLS(tk.Frame):
         try:
             file_loaded = open(str(filename), "r")
             loaded_lines = file_loaded.readlines()
-            #
             n_settings = 0
-            index = 0
-            #
-            if self.pysills_mode == "MA":
-                strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
-                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
-            else:
-                strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "INCLUSION SETTINGS",
-                           "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                           "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
-            #
+            strings = ["PROJECT INFORMATION", "STANDARD FILES"]
             index_container = {}
-            #
+
             while n_settings < len(strings):
                 index_container[strings[n_settings]] = 0
                 index = 0
@@ -8199,13 +8190,55 @@ class PySILLS(tk.Frame):
                         break
                     else:
                         index += 1
-                #
                 if flag == 0:
                     pass
                 else:
                     index_container[strings[n_settings]] += index
                     n_settings += 1
-            #
+
+            for i in range(index_container["PROJECT INFORMATION"] + 1, index_container["STANDARD FILES"] - 1):
+                line_std = str(loaded_lines[i].strip())
+                splitted_line = line_std.split(";")
+                var_mode = splitted_line[0]
+                if var_mode == "Mineral Analysis":
+                    self.pysills_mode = "MA"
+                    self.var_rb_mode.set(0)
+                elif var_mode == "Fluid Inclusion Analysis":
+                    self.pysills_mode = "FI"
+                    self.var_rb_mode.set(1)
+                elif var_mode == "Melt Inclusion Analysis":
+                    self.pysills_mode = "MI"
+                    self.var_rb_mode.set(2)
+                break
+            self.select_experiment(var_rb=self.var_rb_mode)
+
+            n_settings = 0
+            if self.pysills_mode == "MA":
+                strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
+                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+            else:
+                strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "INCLUSION SETTINGS",
+                           "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                           "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
+                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+
+            index_container = {}
+            while n_settings < len(strings):
+                index_container[strings[n_settings]] = 0
+                index = 0
+                flag = 0
+                for line in open(str(filename), "r"):
+                    if strings[n_settings] in line:
+                        flag = 1
+                        break
+                    else:
+                        index += 1
+                if flag == 0:
+                    pass
+                else:
+                    index_container[strings[n_settings]] += index
+                    n_settings += 1
+
             if self.pysills_mode == "MA":
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
@@ -18680,7 +18713,8 @@ class PySILLS(tk.Frame):
                 self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
                 self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
                 self.container_var["STD"][file_std]["Checkbox"].set(1)
-                #
+                self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
+                self.container_var["STD"][file_std]["SRM"].set("Select SRM")
             else:
                 self.container_measurements["EDITED"][file_std_short] = {}
                 self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
@@ -18845,9 +18879,9 @@ class PySILLS(tk.Frame):
                 anchor=tk.CENTER, highlightthickness=0, bd=0)
             text_std.window_create("end", window=cb_i)
             text_std.insert("end", "\t")
-            #
-            if self.container_var["SRM"][file_std].get() != "Select SRM":
-                var_text = self.container_var["SRM"][file_std].get()
+
+            if self.container_var["STD"][file_std]["SRM"].get() != "Select SRM":
+                var_text = self.container_var["STD"][file_std]["SRM"].get()
                 self.container_files["STD"][file_std_short]["SRM"].set(var_text)
             else:
                 if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
@@ -18856,8 +18890,8 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][file_std_short]["SRM"].set(var_text)
             #
             opt_srm_i = tk.OptionMenu(
-                frm_std, self.container_var["SRM"][file_std], *np.sort(self.list_srm),
-                command=lambda var_opt=self.container_var["SRM"][file_std], var_indiv=file_std, mode="STD":
+                frm_std, self.container_var["SRM"][file_std], *np.sort(self.container_lists["SRM Library"]),
+                command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.fi_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
@@ -19270,7 +19304,7 @@ class PySILLS(tk.Frame):
                     var_text = "Select SRM"
             #
             opt_srm_i = tk.OptionMenu(
-                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.list_srm),
+                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
                 command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
                 self.fi_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
@@ -19532,7 +19566,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_settings, row_id=start_row_02 + 1, column_id=n_col_category - 4, n_rows=1,
             n_columns=n_col_category - 2, fg=self.bg_colors["Dark Font"], bg=bg_medium).create_option_srm(
             var_srm=self.container_var["SRM"]["default"][0], text_set=var_text_std,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color, option_list=self.container_lists["SRM Library"],
             command=lambda var_srm=self.container_var["SRM"]["default"][0]: self.change_srm_default(var_srm))
         opt_02a["menu"].config(fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
                                activebackground=self.accent_color)
@@ -19543,7 +19577,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_settings, row_id=start_row_02 + 2, column_id=n_col_category - 4, n_rows=1,
             n_columns=n_col_category - 2, fg=self.bg_colors["Dark Font"], bg=bg_medium).create_option_srm(
             var_srm=self.container_var["SRM"]["default"][1], text_set=var_text_iso,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color, option_list=self.container_lists["SRM Library"],
             command=lambda var_srm=self.container_var["SRM"]["default"][1]:
             self.change_srm_default(var_srm, key="isotope"))
         opt_02b["menu"].config(fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
