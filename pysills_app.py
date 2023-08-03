@@ -12963,7 +12963,10 @@ class PySILLS(tk.Frame):
             #
             key_element = re.search("(\D+)(\d+)", isotope)
             element = key_element.group(1)
-            var_isotope_concentration = self.srm_actual[var_srm_i][element]
+            if element in self.srm_actual[var_srm_i]:
+                var_isotope_concentration = self.srm_actual[var_srm_i][element]
+            else:
+                var_isotope_concentration = 0.0
             #
             entry_isotope = [isotope, var_srm_i, var_isotope_concentration]
             #
@@ -14021,15 +14024,15 @@ class PySILLS(tk.Frame):
                     self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
             #
             if self.file_loaded is False:
-                if "Si29" in self.container_lists["ISOTOPES"]:
-                    possible_is = "Si29"
+                #if "Si29" in self.container_lists["ISOTOPES"]:
+                #    possible_is = "Si29"
                 if file_std not in self.container_var["STD"]:
                     self.container_var["STD"][file_std] = {}
-                    self.container_var["STD"][file_std]["IS"] = tk.StringVar()
-                    self.container_var["STD"][file_std]["IS"].set(possible_is)
+                    #self.container_var["STD"][file_std]["IS"] = tk.StringVar()
+                    #self.container_var["STD"][file_std]["IS"].set(possible_is)
                     self.container_var["STD"][file_std]["IS Data"] = {
                         "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                    self.container_var["STD"][file_std]["IS Data"]["IS"].set(possible_is)
+                    self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
                     self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
                     self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
                     self.container_var["STD"][file_std]["Checkbox"].set(1)
@@ -14183,15 +14186,17 @@ class PySILLS(tk.Frame):
             file_smpl_short = parts[-1]
             #
             if self.file_loaded is False:
-                if "Si29" in self.container_lists["ISOTOPES"]:
-                    possible_is = "Si29"
+                #if "Si29" in self.container_lists["ISOTOPES"]:
+                #    possible_is = "Si29"
                 if file_smpl not in self.container_var["SMPL"]:
                     self.container_var["SMPL"][file_smpl] = {}
                     self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
+                    self.container_var["SMPL"][file_smpl]["IS"].set("Select IS")
+                    #self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
                     self.container_var["SMPL"][file_smpl]["IS Data"] = {
                         "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
+                    #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
                     self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
                     self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
                         "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
@@ -16085,6 +16090,12 @@ class PySILLS(tk.Frame):
         else:
             self.container_var["SMPL"][var_file]["IS Data"]["IS"].set(var_opt)
             self.container_var["SMPL"][var_file]["IS"].set(var_opt)
+
+        self.container_lists["Possible IS"].clear()
+        for var_file, var_content in self.container_var["SMPL"].items():
+            var_is = var_content["IS Data"]["IS"].get()
+            if var_is not in self.container_lists["Possible IS"]:
+                self.container_lists["Possible IS"].append(var_is)
     #
     def ma_change_is_concentration(self, var_entr, var_file, state_default, event):
         if state_default == True:
@@ -17720,12 +17731,13 @@ class PySILLS(tk.Frame):
                     #
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
-                    var_concentration_i = self.srm_actual[var_srm_i][element]
-                    #
-                    var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                        "MAT"][isotope]
-                    #
-                    var_result_i = var_intensity_i/var_concentration_i
+                    if element in self.srm_actual[var_srm_i]:
+                        var_concentration_i = self.srm_actual[var_srm_i][element]
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
+                            "MAT"][isotope]
+                        var_result_i = var_intensity_i/var_concentration_i
+                    else:
+                        var_result_i = 0.0
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
                     #
@@ -17781,10 +17793,13 @@ class PySILLS(tk.Frame):
 
                         key_element = re.search("(\D+)(\d+)", isotope)
                         element = key_element.group(1)
-                        var_concentration_i = self.srm_actual[var_srm_i][element]
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
-                        var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                        if element in self.srm_actual[var_srm_i]:
+                            var_concentration_i = self.srm_actual[var_srm_i][element]
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                        else:
+                            var_result_i = 0.0
                         self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
                         if var_is_smpl != None:
@@ -17911,7 +17926,10 @@ class PySILLS(tk.Frame):
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
-                    var_concentration_i = self.srm_actual[var_srm_i][element]
+                    if element in self.srm_actual[var_srm_i]:
+                        var_concentration_i = self.srm_actual[var_srm_i][element]
+                    else:
+                        var_concentration_i = 0.0
                     #
                     var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][isotope]
                     #
@@ -17963,8 +17981,10 @@ class PySILLS(tk.Frame):
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
-                    #
-                    var_result_i = self.srm_actual[var_srm_i][element]
+                    if element in self.srm_actual[var_srm_i]:
+                        var_result_i = self.srm_actual[var_srm_i][element]
+                    else:
+                        var_result_i = 0.0
                     self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
                 #
@@ -17979,8 +17999,10 @@ class PySILLS(tk.Frame):
                         "MAT"][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
-
-                    var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
+                    if var_sensitivity_i > 0:
+                        var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
+                    else:
+                        var_result_i = 0.0
                     self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
             #
@@ -18150,10 +18172,12 @@ class PySILLS(tk.Frame):
                         var_sensitivity_i = \
                         self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
                             "MAT"][isotope]
-                        #
-                        var_result_i = (3.29*(
-                                var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
-                                var_n_mat*var_tau_i*var_sensitivity_i)*(var_concentration_is/var_intensity_is)
+                        if var_sensitivity_i > 0:
+                            var_result_i = (3.29*(
+                                    var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
+                                    var_n_mat*var_tau_i*var_sensitivity_i)*(var_concentration_is/var_intensity_is)
+                        else:
+                            var_result_i = 0.0
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
                         #
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
