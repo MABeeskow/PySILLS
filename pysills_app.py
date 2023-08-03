@@ -7776,7 +7776,7 @@ class PySILLS(tk.Frame):
             for file_std in self.container_lists["STD"]["Long"]:
                 info_file = file_std
                 if file_std in self.container_var["STD"]:
-                    info_srm = self.container_var["SRM"][file_std].get()
+                    info_srm = self.container_var["STD"][file_std]["SRM"].get()
                     info_cb_state = self.container_var["STD"][file_std]["Checkbox"].get()
                     info_sign_color = self.container_var["STD"][file_std]["Sign Color"].get()
                 else:
@@ -12940,7 +12940,7 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            var_srm_i = self.container_var["STD"][var_file]["SRM"].get() #self.container_files["STD"][file_std]["SRM"].get()
+            var_srm_i = self.container_var["STD"][var_file]["SRM"].get()
             #
             if var_srm_i not in list_srm:
                 list_srm.append(var_srm_i)
@@ -17624,7 +17624,7 @@ class PySILLS(tk.Frame):
                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][isotope]
                 var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope]
-                #
+
                 var_result = var_intensity_mat_i - var_intensity_bg_i
                 #
                 if var_result < 0:
@@ -18125,10 +18125,13 @@ class PySILLS(tk.Frame):
                         var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                             isotope]
                         var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                        #
-                        var_result_i = (3.29*(
-                                var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
-                                var_n_mat*var_tau_i)*(var_concentration_i/var_intensity_i)
+                        parameter_list = [var_n_bg, var_n_mat, var_tau_i, var_intensity_i]
+                        if any(v == 0 for v in parameter_list) == False:
+                            var_result_i = (3.29*(
+                                    var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
+                                    var_n_mat*var_tau_i)*(var_concentration_i/var_intensity_i)
+                        else:
+                            var_result_i = 0.0
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
                         #
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
