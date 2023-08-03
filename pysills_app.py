@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		02.08.2023
+# Date:		03.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -832,7 +832,10 @@ class PySILLS(tk.Frame):
         helper_srm_library = []
         helper_srm_library = os.listdir(self.path_pysills+str("/lib/"))
         helper_srm_library.remove("__init__.py")
-        helper_srm_library.remove(".DS_Store")
+        try:
+            helper_srm_library.remove(".DS_Store")
+        except:
+            pass
         helper_srm_library.sort()
         for var_srm in helper_srm_library:
             var_srm_new = var_srm.replace("_", " ")
