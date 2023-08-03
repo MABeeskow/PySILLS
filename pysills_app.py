@@ -12240,19 +12240,17 @@ class PySILLS(tk.Frame):
             index_start = dataset[mode]["Index"][0]
             index_end = dataset[mode]["Index"][1]
 
-            if self.pysills_mode == "MA23":
-                self.container_helper[filetype][filename][mode][1] = {
-                    "Times": [t_start, t_end],
-                    "Positions": [index_start, index_end],
-                    "Object": [None, None]}
-            else:
-                self.container_helper[filetype][filename][mode]["Content"][1] = {
-                    "Times": [t_start, t_end], "Indices": [index_start, index_end], "Object": None}
-                self.container_helper[filetype][filename][mode]["ID"] += 1
-                self.container_helper[filetype][filename][mode]["Indices"].append(1)
+            self.container_helper[filetype][filename][mode]["Content"][1] = {
+                "Times": [t_start, t_end], "Indices": [index_start, index_end], "Object": None}
+            self.container_helper[filetype][filename][mode]["ID"] += 1
+            self.container_helper[filetype][filename][mode]["Indices"].append(1)
 
             self.container_var[filetype][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
             self.container_var[filetype][filename_long]["Sign Color"].set(self.sign_yellow)
+
+            if self.pysills_mode == "MA":
+                self.temp_lines_checkup2[filetype][filename] = 0
+                self.show_time_signal_diagram_checker()
     #
     def internal_standard_concentration_setup(self):
         try:
@@ -15323,20 +15321,6 @@ class PySILLS(tk.Frame):
             self.fig_time_signal_checker, master=self.subwindow_ma_settings)
         self.canvas_time_signal_checker.get_tk_widget().grid(
             row=var_row_start + 2, column=var_columm_start, rowspan=10, columnspan=var_header_n, sticky="nesw")
-        # STD
-        # self.fig_time_signal_checker_std = Figure(
-        #     figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
-        # self.canvas_time_signal_checker_std = FigureCanvasTkAgg(
-        #     self.fig_time_signal_checker_std, master=self.subwindow_ma_settings)
-        # self.canvas_time_signal_checker_std.get_tk_widget().grid(
-        #     row=var_row_start + 2, column=var_columm_start, rowspan=10, columnspan=var_header_n, sticky="nesw")
-        # # SMPL
-        # self.fig_time_signal_checker_smpl = Figure(
-        #     figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
-        # self.canvas_time_signal_checker_smpl = FigureCanvasTkAgg(
-        #     self.fig_time_signal_checker_smpl, master=self.subwindow_ma_settings)
-        # self.canvas_time_signal_checker_smpl.get_tk_widget().grid(
-        #     row=var_row_start + 2, column=var_columm_start, rowspan=10, columnspan=var_header_n, sticky="nesw")
 
         self.temp_axes_checkup2 = {"STD": {}, "SMPL": {}}
         self.temp_lines_checkup2 = {"STD": {}, "SMPL": {}}
@@ -17017,12 +17001,13 @@ class PySILLS(tk.Frame):
                         var_entr.set("End value set!")
                         var_time = x_nearest
                         var_index = dataset_time.index(var_time)
-                        #
+
                         self.container_helper[var_type][var_file_short][var_interval]["Content"][1]["Times"][
                             1] = var_time
                         self.container_helper[var_type][var_file_short][var_interval]["Content"][1]["Indices"][
                             1] = var_index
-                    #
+                        self.temp_lines_checkup2[var_type][var_file_short] = 0
+                        self.show_time_signal_diagram_checker()
         elif mode in self.container_lists["STD"]["Long"]:
             var_file = mode
             df_data = self.load_and_assign_data(filename=var_file)
@@ -18745,6 +18730,8 @@ class PySILLS(tk.Frame):
                 self.container_var["STD"][file_std]["Checkbox"].set(1)
                 self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
                 self.container_var["STD"][file_std]["SRM"].set("Select SRM")
+                self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
+                self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
             else:
                 self.container_measurements["EDITED"][file_std_short] = {}
                 self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
@@ -19003,6 +18990,8 @@ class PySILLS(tk.Frame):
                 self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
                 self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
                 self.container_var["SMPL"][file_smpl]["ID"].set("A")
+                self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
+                self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
                 self.container_var["SMPL"][file_smpl]["Host Only Tracer"] = {
                     "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(), "Amount": tk.StringVar()}
                 self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Name"].set("Select Isotope")
