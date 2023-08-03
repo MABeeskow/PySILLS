@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 25.07.2021
+# 03.08.2023
 # ----------------------
 #
 ## MODULES
@@ -26,10 +26,14 @@ class Data:
         self.skip_footer = skip_footer
         self.names = names
         #
-        data = pd.read_csv(self.filename, sep=self.delimter, header=self.skip_header, skipfooter=self.skip_footer,
+        dataframe = pd.read_csv(self.filename, sep=self.delimter, header=self.skip_header, skipfooter=self.skip_footer,
                            names=self.names, engine="python")
+        blank_df = dataframe.loc[dataframe.isnull().all(1)]
+        if len(blank_df) > 0:
+            first_blank_index = blank_df.index[0]
+            dataframe = dataframe[:first_blank_index]
         #
-        return data
+        return dataframe
     #
     def import_as_list(self, skip_header=0, skip_footer=0, delimiter=","):
         #
