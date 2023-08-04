@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		03.08.2023
+# Date:		04.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -6692,93 +6692,93 @@ class PySILLS(tk.Frame):
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
     #
-    def do_spike_elimination_all(self, file_type, settings="settings"):
-        if file_type == "STD":
-            for file_short in self.container_lists["STD"]["Short"]:
-                #
-                isotopes_spiked_list = [*self.spikes_isotopes[file_type][file_short]]
-                corrected_isotopes = []
-                not_corrected_isotopes = []
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    if bool(self.spikes_isotopes[file_type][file_short]) == True:
-                        for isotope_spiked, intervals in self.spikes_isotopes[file_type][file_short].items():
-                            if isotope in isotopes_spiked_list:
-                                if isotope not in corrected_isotopes:
-                                    corrected_isotopes.append(isotope)
-                                    spike_intervals = np.array(intervals)
-                                    merged_intervals = ES(variable=spike_intervals).merge_times()
-                                    for interval in merged_intervals:
-                                        data_smoothed, indices_outl = ES(
-                                            variable=self.container_measurements["RAW"][file_short][isotope][
-                                                     interval[0]:interval[1]]).find_outlier(
-                                            limit=float(self.container_var[settings]["SE Deviation"].get()),
-                                            threshold=float(self.container_var[settings]["SE Threshold"].get()),
-                                            interval=interval,
-                                            data_total=self.container_measurements["RAW"][file_short],
-                                            isotope=isotope)
-                                        self.container_measurements["EDITED"][file_short][
-                                            isotope] = data_smoothed
-                                else:
-                                    pass
-                            else:
-                                if isotope not in not_corrected_isotopes:
-                                    not_corrected_isotopes.append(isotope)
-                                    self.container_measurements["EDITED"][file_short][isotope] = \
-                                        self.container_measurements["RAW"][file_short][isotope]
-                                else:
-                                    pass
-                    else:
-                        if isotope not in not_corrected_isotopes:
-                            not_corrected_isotopes.append(isotope)
-                            self.container_measurements["EDITED"][file_short][isotope] = \
-                                self.container_measurements["RAW"][file_short][isotope]
-                        else:
-                            pass
-                #
-        elif file_type == "SMPL":
-            for file_short in self.container_lists["SMPL"]["Short"]:
-                #
-                isotopes_spiked_list = [*self.spikes_isotopes[file_type][file_short]]
-                corrected_isotopes = []
-                not_corrected_isotopes = []
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    if bool(self.spikes_isotopes[file_type][file_short]) == True:
-                        for isotope_spiked, intervals in self.spikes_isotopes[file_type][file_short].items():
-                            if isotope in isotopes_spiked_list:
-                                if isotope not in corrected_isotopes:
-                                    corrected_isotopes.append(isotope)
-                                    spike_intervals = np.array(intervals)
-                                    merged_intervals = ES(variable=spike_intervals).merge_times()
-                                    for interval in merged_intervals:
-                                        data_smoothed, indices_outl = ES(
-                                            variable=self.container_measurements["RAW"][file_short][isotope][
-                                                     interval[0]:interval[1]]).find_outlier(
-                                            limit=float(self.container_var[settings]["SE Deviation"].get()),
-                                            threshold=float(self.container_var[settings]["SE Threshold"].get()),
-                                            interval=interval,
-                                            data_total=self.container_measurements["RAW"][file_short],
-                                            isotope=isotope)
-                                        self.container_measurements["EDITED"][file_short][
-                                            isotope] = data_smoothed
-                                else:
-                                    pass
-                            else:
-                                if isotope not in not_corrected_isotopes:
-                                    not_corrected_isotopes.append(isotope)
-                                    self.container_measurements["EDITED"][file_short][isotope] = \
-                                        self.container_measurements["RAW"][file_short][isotope]
-                                else:
-                                    pass
-                    else:
-                        if isotope not in not_corrected_isotopes:
-                            not_corrected_isotopes.append(isotope)
-                            self.container_measurements["EDITED"][file_short][isotope] = \
-                                self.container_measurements["RAW"][file_short][isotope]
-                        else:
-                            pass
-                #
+    # def do_spike_elimination_all(self, file_type, settings="settings"):
+    #     if file_type == "STD":
+    #         for file_short in self.container_lists["STD"]["Short"]:
+    #             #
+    #             isotopes_spiked_list = [*self.spikes_isotopes[file_type][file_short]]
+    #             corrected_isotopes = []
+    #             not_corrected_isotopes = []
+    #             #
+    #             for isotope in self.container_lists["ISOTOPES"]:
+    #                 if bool(self.spikes_isotopes[file_type][file_short]) == True:
+    #                     for isotope_spiked, intervals in self.spikes_isotopes[file_type][file_short].items():
+    #                         if isotope in isotopes_spiked_list:
+    #                             if isotope not in corrected_isotopes:
+    #                                 corrected_isotopes.append(isotope)
+    #                                 spike_intervals = np.array(intervals)
+    #                                 merged_intervals = ES(variable=spike_intervals).merge_times()
+    #                                 for interval in merged_intervals:
+    #                                     data_smoothed, indices_outl = ES(
+    #                                         variable=self.container_measurements["RAW"][file_short][isotope][
+    #                                                  interval[0]:interval[1]]).find_outlier(
+    #                                         limit=float(self.container_var[settings]["SE Deviation"].get()),
+    #                                         threshold=float(self.container_var[settings]["SE Threshold"].get()),
+    #                                         interval=interval,
+    #                                         data_total=self.container_measurements["RAW"][file_short],
+    #                                         isotope=isotope)
+    #                                     self.container_measurements["EDITED"][file_short][
+    #                                         isotope] = data_smoothed
+    #                             else:
+    #                                 pass
+    #                         else:
+    #                             if isotope not in not_corrected_isotopes:
+    #                                 not_corrected_isotopes.append(isotope)
+    #                                 self.container_measurements["EDITED"][file_short][isotope] = \
+    #                                     self.container_measurements["RAW"][file_short][isotope]
+    #                             else:
+    #                                 pass
+    #                 else:
+    #                     if isotope not in not_corrected_isotopes:
+    #                         not_corrected_isotopes.append(isotope)
+    #                         self.container_measurements["EDITED"][file_short][isotope] = \
+    #                             self.container_measurements["RAW"][file_short][isotope]
+    #                     else:
+    #                         pass
+    #             #
+    #     elif file_type == "SMPL":
+    #         for file_short in self.container_lists["SMPL"]["Short"]:
+    #             #
+    #             isotopes_spiked_list = [*self.spikes_isotopes[file_type][file_short]]
+    #             corrected_isotopes = []
+    #             not_corrected_isotopes = []
+    #             #
+    #             for isotope in self.container_lists["ISOTOPES"]:
+    #                 if bool(self.spikes_isotopes[file_type][file_short]) == True:
+    #                     for isotope_spiked, intervals in self.spikes_isotopes[file_type][file_short].items():
+    #                         if isotope in isotopes_spiked_list:
+    #                             if isotope not in corrected_isotopes:
+    #                                 corrected_isotopes.append(isotope)
+    #                                 spike_intervals = np.array(intervals)
+    #                                 merged_intervals = ES(variable=spike_intervals).merge_times()
+    #                                 for interval in merged_intervals:
+    #                                     data_smoothed, indices_outl = ES(
+    #                                         variable=self.container_measurements["RAW"][file_short][isotope][
+    #                                                  interval[0]:interval[1]]).find_outlier(
+    #                                         limit=float(self.container_var[settings]["SE Deviation"].get()),
+    #                                         threshold=float(self.container_var[settings]["SE Threshold"].get()),
+    #                                         interval=interval,
+    #                                         data_total=self.container_measurements["RAW"][file_short],
+    #                                         isotope=isotope)
+    #                                     self.container_measurements["EDITED"][file_short][
+    #                                         isotope] = data_smoothed
+    #                             else:
+    #                                 pass
+    #                         else:
+    #                             if isotope not in not_corrected_isotopes:
+    #                                 not_corrected_isotopes.append(isotope)
+    #                                 self.container_measurements["EDITED"][file_short][isotope] = \
+    #                                     self.container_measurements["RAW"][file_short][isotope]
+    #                             else:
+    #                                 pass
+    #                 else:
+    #                     if isotope not in not_corrected_isotopes:
+    #                         not_corrected_isotopes.append(isotope)
+    #                         self.container_measurements["EDITED"][file_short][isotope] = \
+    #                             self.container_measurements["RAW"][file_short][isotope]
+    #                     else:
+    #                         pass
+    #             #
     #
     def do_spike_elimination(self, var_setting="settings"):
         #
@@ -8385,10 +8385,11 @@ class PySILLS(tk.Frame):
                                index_container["END"] - 2):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
-                    #
                     if index == 0:
-                        self.container_var["Spike Elimination"]["STD"]["State"] = bool(splitted_std[1])
-                        self.container_var["Spike Elimination"]["SMPL"]["State"] = bool(splitted_std[3])
+                        self.container_var["Spike Elimination"]["STD"]["State"] = self.convert_true_false_string(
+                            splitted_std[1])
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] = self.convert_true_false_string(
+                            splitted_std[3])
                         self.container_var["Spike Elimination Method"].set(splitted_std[4])
                         self.container_var["ma_setting"]["SE Alpha"].set(splitted_std[5])
                         self.container_var["ma_setting"]["SE Threshold"].set(int(splitted_std[6]))
@@ -8711,6 +8712,10 @@ class PySILLS(tk.Frame):
         #
         except FileNotFoundError:
             pass
+
+    def convert_true_false_string(self, var_str):
+        d = {"True": True, "False": False}
+        return d.get(var_str, var_str)
     #
     def export_calculation_report(self, file_type="Sample Files", data_type="SMOOTHED"):
         #
@@ -14587,7 +14592,6 @@ class PySILLS(tk.Frame):
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
-
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
@@ -26182,10 +26186,15 @@ class PySILLS(tk.Frame):
         if var_value_smoothed not in self.container_spike_values[var_file_short][var_isotope]["SMOOTHED"]:
             self.container_spike_values[var_file_short][var_isotope]["SMOOTHED"].append(var_value_smoothed)
         if var_value_smoothed not in self.container_spike_values[var_file_short][var_isotope]["Current"]:
-            self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_smoothed)
+            if len(self.container_spike_values[var_file_short][var_isotope]["Save"]) == 0 or self.file_loaded == False:
+                self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_smoothed)
+            else:
+                for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
+                    var_value_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
+                    self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_saved)
 
         if mode != None:
-            for var_file_short in self.container_lists[mode]["Short"]:
+            for index_file, var_file_short in enumerate(self.container_lists[mode]["Short"]):
                 if var_file_short not in self.container_spike_values:
                     self.container_spike_values[var_file_short] = {}
                 list_spk_isotopes = self.check_spikes_isotope(var_file=var_file_short)
@@ -26195,7 +26204,8 @@ class PySILLS(tk.Frame):
                             "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
                     for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
                         val_id = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_id]
-                        self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
+                        if self.file_loaded == False:
+                            self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
 
     def helper_fill_container_spike_values(self, mode="SMPL"):
         for var_file_short in self.container_lists[mode]["Short"]:
@@ -26229,7 +26239,13 @@ class PySILLS(tk.Frame):
         value_0 = self.list_indices[0]
         self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
         self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
-        self.current_current_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
+        if value_0 in self.container_spike_values[var_file][var_isotope]["Save"]:
+            value_current = self.container_spike_values[var_file][var_isotope]["Save"][value_0]
+            self.current_current_value = value_current
+            if value_current == self.current_original_value:
+                self.replace_spike_value(mode="RAW")
+        else:
+            self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][value_0]
         self.lbl_03a.configure(text=self.current_original_value)
         self.lbl_03b.configure(text=self.current_suggested_value)
         self.lbl_03c.configure(text=self.current_current_value)
