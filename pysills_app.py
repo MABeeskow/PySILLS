@@ -16492,12 +16492,10 @@ class PySILLS(tk.Frame):
         #
         df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
-        # df_data = self.load_and_assign_data(filename=var_file)
-        # self.dataset_time = list(df_data.iloc[:, 0])
         x_max = max(self.dataset_time)
         icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
         y_max = np.amax(icp_measurements)
-        #
+
         ## DIAGRAMS
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Signal": ax}
@@ -17587,7 +17585,6 @@ class PySILLS(tk.Frame):
             if var_focus in ["BG", "MAT"]:
                 for isotope in self.container_lists["ISOTOPES"]:
                     helper_results = []
-                    #
                     for key, items in self.container_helper[var_filetype][var_file_short][var_focus]["Content"].items():
                         var_indices = items["Indices"]
                         var_key = "Data " + str(var_datatype)
