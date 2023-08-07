@@ -18553,7 +18553,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 25, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_show_diagrams_sensitivity)
+            command=self.show_diagrams_sensitivity)
         #
         ## FRAMES
         frm_a = SE(
@@ -20278,7 +20278,7 @@ class PySILLS(tk.Frame):
                         var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if var_filetype == "STD":
-                                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get() #self.container_var["SRM"][var_file_long].get()
+                                var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                                 if var_srm_i == var_srm_file:
                                     if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                         var_file_short = self.container_lists[var_filetype]["Short"][index]
@@ -21411,7 +21411,7 @@ class PySILLS(tk.Frame):
     def fi_show_diagrams_intensity(self):
         pass
     #
-    def fi_show_diagrams_sensitivity(self):
+    def show_diagrams_sensitivity(self):
         ## Window Settings
         window_width = 900
         window_heigth = 800
@@ -21554,10 +21554,10 @@ class PySILLS(tk.Frame):
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
         #
         ## INITIALIZATION
-        self.fi_show_sensitivity_drift_diagram()
-        self.fi_show_normalized_sensitivity_scatter()
+        self.show_sensitivity_drift_diagram()
+        self.show_normalized_sensitivity_scatter()
         #
-    def fi_show_sensitivity_drift_diagram(self, mode=None):
+    def show_sensitivity_drift_diagram(self, mode=None):
         if self.var_rb_01.get() == 0:
             var_filetype = "STD"
         else:
@@ -21602,47 +21602,81 @@ class PySILLS(tk.Frame):
             #
             if self.container_var[var_filetype_2][var_file_long]["Checkbox"].get() == 1:
                 if var_filetype == "STD" and var_file in self.container_lists[var_filetype]["Short"]:
-                    x_value = value
-                    y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][var_iso_01]
-
-                    x_values.append(x_value)
-
-                    self.ax_sensitivity_03a.scatter(
-                        x=x_value, y=y_value, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
-                elif var_filetype == "SMPL":
-                    x_value = value
-                    x_values.append(x_value)
-                    if (var_file in self.container_analytical_sensitivity["STD"][var_datatype]
-                            and var_file in self.container_lists["STD"]["Short"]):
+                    var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
+                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                    if var_srm_isotope == var_srm_file:
+                        x_value = value
                         y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
                             var_iso_01]
-                        dot_color = self.bg_colors["Dark"]
+                        x_values.append(x_value)
                         self.ax_sensitivity_03a.scatter(
-                            x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
+                            x=x_value, y=y_value, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
+                elif var_filetype == "SMPL":
+                    #x_value = value
+                    #x_values.append(x_value)
+                    if (var_file in self.container_analytical_sensitivity["STD"][var_datatype]
+                            and var_file in self.container_lists["STD"]["Short"]):
+                        var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                        if var_srm_isotope == var_srm_file:
+                            x_value = value
+                            x_values.append(x_value)
+                            y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
+                                var_iso_01]
+                            dot_color = self.bg_colors["Dark"]
+                            self.ax_sensitivity_03a.scatter(
+                                x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                     elif (var_file in self.container_analytical_sensitivity["SMPL"][var_datatype]
                           and var_file in self.container_lists["SMPL"]["Short"]):
+                        x_value = value
+                        x_values.append(x_value)
                         y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["MAT"][
                             var_iso_01]
                         dot_color = self.bg_colors["Light"]
                         self.ax_sensitivity_03a.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="D")
-                if var_datatype == "RAW":
-                    y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*x_value + \
-                              self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
-                elif var_datatype == "SMOOTHED":
-                    y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["a"]*x_value + \
-                              self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
-                y_values.append(y_value)
+                if var_file in self.container_lists["SMPL"]["Short"]:
+                    if var_datatype == "RAW":
+                        y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*x_value + \
+                                  self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
+                    elif var_datatype == "SMOOTHED":
+                        y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["a"]*x_value + \
+                                  self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
+                    y_values.append(y_value)
+                else:
+                    if var_srm_isotope == var_srm_file:
+                        if var_datatype == "RAW":
+                            y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
+                                          "a"]*x_value + \
+                                      self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
+                        elif var_datatype == "SMOOTHED":
+                            y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
+                                          "a"]*x_value + \
+                                      self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
+                                          "b"]
+                        y_values.append(y_value)
         #
-        zipped_lists = zip(x_values, y_values)
-        sorted_zipped_lists = sorted(zipped_lists)
-        x_data = []
-        y_data = []
-        for element in sorted_zipped_lists:
-            x_data.append(element[0])
-            y_data.append(element[1])
-        #
-        self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+        if var_file in self.container_lists["SMPL"]["Short"]:
+            zipped_lists = zip(x_values, y_values)
+            sorted_zipped_lists = sorted(zipped_lists)
+            x_data = []
+            y_data = []
+            for element in sorted_zipped_lists:
+                x_data.append(element[0])
+                y_data.append(element[1])
+            #
+            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+        else:
+            if var_srm_isotope == var_srm_file:
+                zipped_lists = zip(x_values, y_values)
+                sorted_zipped_lists = sorted(zipped_lists)
+                x_data = []
+                y_data = []
+                for element in sorted_zipped_lists:
+                    x_data.append(element[0])
+                    y_data.append(element[1])
+                #
+                self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
         #
         self.ax_sensitivity_03a.grid(True)
         self.ax_sensitivity_03a.grid(which="major", linestyle="-", linewidth=1)
@@ -21695,77 +21729,94 @@ class PySILLS(tk.Frame):
             #
             if self.container_var[var_filetype_2][var_file_long]["Checkbox"].get() == 1:
                 if var_filetype == "STD" and var_file in self.container_lists[var_filetype]["Short"]:
-                    x_value_std = value
-                    y_value_std = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
-                            var_iso_01]
-                    #
-                    self.ax_sensitivity_03a.scatter(
-                        x=x_value_std, y=y_value_std, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
-                    #
-                    x_value = value
-                    if var_datatype == "RAW":
-                        y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*x_value + self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
-                    elif var_datatype == "SMOOTHED":
-                        y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["a"]*x_value + self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
-                    # y_value = self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["a"]*x_value + \
-                    #           self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["b"]
-                    x_values.append(x_value)
-                    y_values.append(y_value)
-                    #
+                    var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
+                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                    if var_srm_isotope == var_srm_file:
+                        x_value_std = value
+                        y_value_std = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
+                                var_iso_01]
+                        self.ax_sensitivity_03a.scatter(
+                            x=x_value_std, y=y_value_std, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
+                        x_value = value
+                        if var_datatype == "RAW":
+                            y_value = (self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*
+                                       x_value + self.container_lists["Analytical Sensitivity Regression RAW"][
+                                           var_iso_01]["b"])
+                        elif var_datatype == "SMOOTHED":
+                            y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
+                                          "a"]*x_value + self.container_lists[
+                                "Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
+                        x_values.append(x_value)
+                        y_values.append(y_value)
                 elif var_filetype == "SMPL":
-                    x_value = value
-                    #x_values.append(x_value)
+                    #x_value = value
                     if (var_file in self.container_analytical_sensitivity["STD"][var_datatype]
                             and var_file in self.container_lists["STD"]["Short"]):
-                        y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
-                            var_iso_01]
-                        dot_color = self.bg_colors["Dark"]
-                        self.ax_sensitivity_03a.scatter(
-                            x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
+                        var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
+                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                        if var_srm_isotope == var_srm_file:
+                            x_value = value
+                            y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
+                                var_iso_01]
+                            dot_color = self.bg_colors["Dark"]
+                            self.ax_sensitivity_03a.scatter(
+                                x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                     elif (var_file in self.container_analytical_sensitivity["SMPL"][var_datatype]
                           and var_file in self.container_lists["SMPL"]["Short"]):
+                        x_value = value
                         y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["MAT"][
                             var_iso_01]
                         dot_color = self.bg_colors["Light"]
                         self.ax_sensitivity_03a.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="D")
-                    # x_value = value
-                    # #
-                    # try:
-                    #     y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
-                    #         var_iso_01]
-                    #     dot_color = self.bg_colors["Dark"]
-                    #     #
-                    #     self.ax_sensitivity_03a.scatter(x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80,
-                    #                                     marker="o")
-                    #     #
-                    # except:
-                    #     y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["MAT"][
-                    #         var_iso_01]
-                    #     dot_color = self.bg_colors["Light"]
-                    #     #
-                    #     self.ax_sensitivity_03a.scatter(x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80,
-                    #                                     marker="D")
-                    #
-                    if var_datatype == "RAW":
-                        y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*x_value + self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
-                    elif var_datatype == "SMOOTHED":
-                        y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["a"]*x_value + self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
-                    # y_value = self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["a"]*x_value + \
-                    #           self.container_lists["Analytical Sensitivity Regression"][var_iso_01]["b"]
-                    #
-                    x_values.append(x_value)
-                    y_values.append(y_value)
-        #
-        zipped_lists = zip(x_values, y_values)
-        sorted_zipped_lists = sorted(zipped_lists)
-        x_data = []
-        y_data = []
-        for element in sorted_zipped_lists:
-            x_data.append(element[0])
-            y_data.append(element[1])
-        #
-        self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+                    if var_file in self.container_lists["SMPL"]["Short"]:
+                        if var_datatype == "RAW":
+                            y_value = (self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*
+                                       x_value + self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
+                                           "b"])
+                        elif var_datatype == "SMOOTHED":
+                            y_value = (self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["a"]*
+                                       x_value + self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                           var_iso_01]["b"])
+                        x_values.append(x_value)
+                        y_values.append(y_value)
+                    else:
+                        if var_srm_isotope == var_srm_file:
+                            if var_datatype == "RAW":
+                                y_value = (self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
+                                               "a"]*
+                                           x_value +
+                                           self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
+                                               "b"])
+                            elif var_datatype == "SMOOTHED":
+                                y_value = (self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                               var_iso_01]["a"]*
+                                           x_value + self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                               var_iso_01]["b"])
+                            x_values.append(x_value)
+                            y_values.append(y_value)
+
+        if var_file in self.container_lists["SMPL"]["Short"]:
+            zipped_lists = zip(x_values, y_values)
+            sorted_zipped_lists = sorted(zipped_lists)
+            x_data = []
+            y_data = []
+            for element in sorted_zipped_lists:
+                x_data.append(element[0])
+                y_data.append(element[1])
+            #
+            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+        else:
+            if var_srm_isotope == var_srm_file:
+                zipped_lists = zip(x_values, y_values)
+                sorted_zipped_lists = sorted(zipped_lists)
+                x_data = []
+                y_data = []
+                for element in sorted_zipped_lists:
+                    x_data.append(element[0])
+                    y_data.append(element[1])
+                #
+                self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
         #
         self.ax_sensitivity_03a.grid(True)
         self.ax_sensitivity_03a.grid(which="major", linestyle="-", linewidth=1)
@@ -21783,7 +21834,7 @@ class PySILLS(tk.Frame):
         #
         self.fi_change_normalized_sensitivity_scatter()
     #
-    def fi_show_normalized_sensitivity_scatter(self, mode=None):
+    def show_normalized_sensitivity_scatter(self, mode=None):
         if self.var_rb_01.get() == 0:
             var_filetype = "STD"
         else:
@@ -21823,23 +21874,46 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists[var_filetype]["Short"]):
             var_file_long = self.container_lists[var_filetype]["Long"][index]
             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                x_values_02 = [0]
-                y_values_02 = [0]
-                dot_color = self.bg_colors["Dark"]
-                x_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
-                    var_iso_01]
-                y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
-                    var_iso_02]
-                #
-                x_values_02.append(x_value)
-                y_values_02.append(y_value)
-                x_all.append(x_value)
-                y_all.append(y_value)
-                #
-                self.ax_sensitivity_03a2.scatter(
-                    x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
-                self.ax_sensitivity_03a2.plot(
-                    x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                if var_filetype == "SMPL":
+                    x_values_02 = [0]
+                    y_values_02 = [0]
+                    dot_color = self.bg_colors["Dark"]
+                    x_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                        var_iso_01]
+                    y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                        var_iso_02]
+                    #
+                    x_values_02.append(x_value)
+                    y_values_02.append(y_value)
+                    x_all.append(x_value)
+                    y_all.append(y_value)
+                    #
+                    self.ax_sensitivity_03a2.scatter(
+                        x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
+                    self.ax_sensitivity_03a2.plot(
+                        x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                else:
+                    var_srm_isotope_01 = self.container_var["SRM"][var_iso_01].get()
+                    var_srm_isotope_02 = self.container_var["SRM"][var_iso_02].get()
+                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                    if var_srm_isotope_01 == var_srm_file and var_srm_isotope_02 == var_srm_file:
+                        x_values_02 = [0]
+                        y_values_02 = [0]
+                        dot_color = self.bg_colors["Dark"]
+                        x_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                            var_iso_01]
+                        y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                            var_iso_02]
+                        #
+                        x_values_02.append(x_value)
+                        y_values_02.append(y_value)
+                        x_all.append(x_value)
+                        y_all.append(y_value)
+                        #
+                        self.ax_sensitivity_03a2.scatter(
+                            x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
+                        self.ax_sensitivity_03a2.plot(
+                            x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
         #
         self.ax_sensitivity_03a2.grid(True)
         self.ax_sensitivity_03a2.set_xlim(left=0, right=1.1*max(x_all))
@@ -21889,23 +21963,47 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists[var_filetype]["Short"]):
             var_file_long = self.container_lists[var_filetype]["Long"][index]
             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                x_values_02 = [0]
-                y_values_02 = [0]
-                dot_color = self.bg_colors["Dark"]
-                x_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
-                    var_iso_01]
-                y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
-                    var_iso_02]
-                #
-                x_values_02.append(x_value)
-                y_values_02.append(y_value)
-                x_all.append(x_value)
-                y_all.append(y_value)
-                #
-                self.ax_sensitivity_03a2.scatter(
-                    x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
-                self.ax_sensitivity_03a2.plot(
-                    x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                if var_filetype == "SMPL":
+                    x_values_02 = [0]
+                    y_values_02 = [0]
+                    dot_color = self.bg_colors["Dark"]
+                    x_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                        var_iso_01]
+                    y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                        var_iso_02]
+                    #
+                    x_values_02.append(x_value)
+                    y_values_02.append(y_value)
+                    x_all.append(x_value)
+                    y_all.append(y_value)
+                    #
+                    self.ax_sensitivity_03a2.scatter(
+                        x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
+                    self.ax_sensitivity_03a2.plot(
+                        x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                else:
+                    var_srm_isotope_01 = self.container_var["SRM"][var_iso_01].get()
+                    var_srm_isotope_02 = self.container_var["SRM"][var_iso_02].get()
+                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                    if var_srm_isotope_02 == var_srm_file:
+                        x_values_02 = [0]
+                        y_values_02 = [0]
+                        dot_color = self.bg_colors["Dark"]
+                        x_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                            var_iso_01]
+                        y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
+                            var_iso_02]
+                        print(x_value, y_value)
+                        #
+                        x_values_02.append(x_value)
+                        y_values_02.append(y_value)
+                        x_all.append(x_value)
+                        y_all.append(y_value)
+                        #
+                        self.ax_sensitivity_03a2.scatter(
+                            x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
+                        self.ax_sensitivity_03a2.plot(
+                            x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
         #
         self.ax_sensitivity_03a2.grid(True)
         self.ax_sensitivity_03a2.set_xlim(left=0, right=1.1*max(x_all))
@@ -22180,7 +22278,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 28, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
             text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_show_diagrams_sensitivity)
+            command=self.show_diagrams_sensitivity)
         #
         ## FRAMES
         frm_a = SE(
