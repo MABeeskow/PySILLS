@@ -7008,21 +7008,24 @@ class PySILLS(tk.Frame):
                         if var_filetype == "SMPL":
                             value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                                 isotope]
+                            value_lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         else:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
                             if var_srm_i == var_srm_file:
                                 value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                                     isotope]
+                                value_lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             else:
                                 value_i = None
                         if value_i != None:
-                            report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
-                                value_i, n_decimals_concentration)
+                            if value_i >= value_lod_i:
+                                report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_i, n_decimals_concentration)
+                            else:
+                                report_concentration[var_filetype][var_datatype][file_short][isotope] = "<LoD"
                         else:
                             report_concentration[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_concentration[var_filetype][var_datatype][isotope]
-                        # report_concentration[var_key][isotope] = round(value_mean, n_decimals_concentration)
 
                         # Concentration Ratio
                         value_i = self.container_concentration_ratio[var_filetype][var_datatype][file_short]["MAT"][
@@ -7032,15 +7035,12 @@ class PySILLS(tk.Frame):
                                 isotope] = "{:0.5e}".format(value_i)
                         except:
                             report_concentration_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_concentration_ratio[var_filetype][var_datatype][isotope]
-                        # report_concentration_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
 
                         # Limit of Detection
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         report_lod[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_decimals_concentration)
-                        # value_mean = self.container_lod[var_filetype][var_datatype][isotope]
-                        # report_lod[var_key][isotope] = round(value_mean, n_decimals_concentration)
+
                         ## Intensity Results
                         # Intensity
                         if var_filetype == "SMPL":
@@ -7059,8 +7059,6 @@ class PySILLS(tk.Frame):
                                 value_i, n_decimals_intensity)
                         else:
                             report_intensity[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_intensity_corrected[var_filetype][var_datatype][isotope]
-                        # report_intensity[var_key][isotope] = round(value_mean, n_decimals_intensity)
 
                         # Intensity Ratio
                         value_i = self.container_intensity_ratio[var_filetype][var_datatype][file_short]["MAT"][isotope]
@@ -7069,8 +7067,6 @@ class PySILLS(tk.Frame):
                                 value_i)
                         except:
                             report_intensity_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_intensity_ratio[var_filetype][var_datatype][isotope]
-                        # report_intensity_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
 
                         ## Sensitivity Results
                         # Analytical Sensitivity
@@ -7081,8 +7077,6 @@ class PySILLS(tk.Frame):
                                 value_i, n_decimals_sensitivity)
                         except:
                             report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
-                        # report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
 
                         # Normalized Sensitivity
                         if var_filetype == "SMPL":
@@ -7101,8 +7095,6 @@ class PySILLS(tk.Frame):
                                 value_i, n_decimals_sensitivity)
                         else:
                             report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
-                        # report_normalized_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
 
                         # Relative Sensitivity Factor
                         value_i = self.container_rsf[var_filetype][var_datatype][file_short]["MAT"][isotope]
@@ -7111,8 +7103,6 @@ class PySILLS(tk.Frame):
                                 value_i, n_decimals_sensitivity)
                         except:
                             report_rsf[var_filetype][var_datatype][file_short][isotope] = "---"
-                        # value_mean = self.container_rsf[var_filetype][var_datatype][isotope]
-                        # report_rsf[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
 
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
@@ -7139,115 +7129,82 @@ class PySILLS(tk.Frame):
             report_file.write("AUTHOR:;" + str(self.container_var["ma_setting"]["Author"].get()) + "\n")
             report_file.write("SOURCE ID:;" + str(self.container_var["ma_setting"]["Source ID"].get()) + "\n")
             report_file.write("\n")
-            #
             for var_datatype in ["SMOOTHED", "RAW"]:
                 report_file.write("DATA TYPE:;" + str(var_datatype) + str(" DATA") + "\n")
                 report_file.write("\n")
-                #
                 for var_filetype in ["SMPL", "STD"]:
                     if var_filetype == "SMPL":
                         report_file.write("SAMPLE FILES\n")
                     elif var_filetype == "STD":
                         report_file.write("STANDARD FILES\n")
-                    #
                     var_key = "Total " + str(var_filetype)
                     report_file.write("\n")
-                    #
+
                     ## COMPOSITIONAL ANALYSIS
                     report_file.write("COMPOSITIONAL ANALYSIS\n")
+
                     report_file.write("Concentration\n")            # Concentration
                     report_file.write("(ppm)\n")
                     writer.writeheader()
-                    #
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_concentration[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_concentration[var_key])
-                    #
                     report_file.write("\n")
-                    #
+
                     if var_filetype == "SMPL":
                         report_file.write("Concentration Ratio\n")      # Concentration Ratio
                         report_file.write("(1)\n")
                         writer.writeheader()
-                        #
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_concentration_ratio[var_key])
-                        #
                         report_file.write("\n")
-                        #
+
                         report_file.write("Limit of Detection\n")  # Limit of Detection
                         report_file.write("(ppm)\n")
                         writer.writeheader()
-                        #
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_lod[var_key])
-                        #
                         report_file.write("\n")
-                        #
+
                     report_file.write("INTENSITY ANALYSIS\n")
+
                     report_file.write("Intensity (Matrix)\n")  # Intensity
                     report_file.write("(cps)\n")
                     writer.writeheader()
-                    #
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_intensity[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_intensity[var_key])
-                    #
                     report_file.write("\n")
-                    #
+
                     if var_filetype == "SMPL":
                         report_file.write("Intensity Ratio (Matrix)\n")  # Intensity Ratio
                         report_file.write("(1)\n")
                         writer.writeheader()
-                        #
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_intensity_ratio[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_intensity_ratio[var_key])
-                        #
                         report_file.write("\n")
-                        #
+
                     report_file.write("SENSITIVITY ANALYSIS\n")
+
                     report_file.write("Analytical Sensitivity\n")  # Analytical Sensitivity
                     report_file.write("(1)\n")
                     writer.writeheader()
-                    #
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_analytical_sensitivity[var_key])
-                    #
                     report_file.write("\n")
-                    #
+
                     report_file.write("Normalized Sensitivity\n")  # Normalized Sensitivity
                     report_file.write("(cps)/(ppm)\n")
                     writer.writeheader()
-                    #
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_normalized_sensitivity[var_key])
-                    #
                     report_file.write("\n")
-                    #
+
                     if var_filetype == "SMPL":
                         report_file.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
                         report_file.write("(1)\n")
                         writer.writeheader()
-                        #
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_rsf[var_key])
-                        #
                         report_file.write("\n")
-                        #
     #
     def fi_export_calculation_report(self):
         header = ["filename", "ID"]
@@ -18594,7 +18551,7 @@ class PySILLS(tk.Frame):
         #
         btn_07c = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 25, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_sensitivity)
         #
