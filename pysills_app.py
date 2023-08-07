@@ -6952,14 +6952,13 @@ class PySILLS(tk.Frame):
                 #
                 for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     file_long = self.container_lists[var_filetype]["Long"][index]
-                    #
+                    ## Compositional Results
                     report_concentration[var_filetype][var_datatype][file_short] = {}
                     report_concentration[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_concentration_ratio[var_filetype][var_datatype][file_short] = {}
                     report_concentration_ratio[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_lod[var_filetype][var_datatype][file_short] = {}
                     report_lod[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    #
                     if var_filetype == "STD":
                         report_concentration[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_concentration_ratio[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -6971,12 +6970,11 @@ class PySILLS(tk.Frame):
                             var_filetype][file_long]["ID"].get()
                         report_lod[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
                             file_long]["ID"].get()
-                    #
+                    ## Intensity Results
                     report_intensity[var_filetype][var_datatype][file_short] = {}
                     report_intensity[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_intensity_ratio[var_filetype][var_datatype][file_short] = {}
                     report_intensity_ratio[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    #
                     if var_filetype == "STD":
                         report_intensity[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_intensity_ratio[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -6985,14 +6983,13 @@ class PySILLS(tk.Frame):
                             var_filetype][file_long]["ID"].get()
                         report_intensity_ratio[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
-                    #
+                    ## Sensitivity Results
                     report_analytical_sensitivity[var_filetype][var_datatype][file_short] = {}
                     report_analytical_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_normalized_sensitivity[var_filetype][var_datatype][file_short] = {}
                     report_normalized_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_rsf[var_filetype][var_datatype][file_short] = {}
                     report_rsf[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    #
                     if var_filetype == "STD":
                         report_analytical_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_normalized_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -7006,12 +7003,27 @@ class PySILLS(tk.Frame):
                             file_long]["ID"].get()
                     #
                     for isotope in self.container_lists["ISOTOPES"]:
+                        ## Compositional Results
                         # Concentration
-                        value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_decimals_concentration)
+                        if var_filetype == "SMPL":
+                            value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
+                                isotope]
+                        else:
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+                            if var_srm_i == var_srm_file:
+                                value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
+                                    isotope]
+                            else:
+                                value_i = None
+                        if value_i != None:
+                            report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_concentration)
+                        else:
+                            report_concentration[var_filetype][var_datatype][file_short][isotope] = "---"
                         # value_mean = self.container_concentration[var_filetype][var_datatype][isotope]
                         # report_concentration[var_key][isotope] = round(value_mean, n_decimals_concentration)
+
                         # Concentration Ratio
                         value_i = self.container_concentration_ratio[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
@@ -7022,19 +7034,34 @@ class PySILLS(tk.Frame):
                             report_concentration_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
                         # value_mean = self.container_concentration_ratio[var_filetype][var_datatype][isotope]
                         # report_concentration_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
+
                         # Limit of Detection
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         report_lod[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_decimals_concentration)
                         # value_mean = self.container_lod[var_filetype][var_datatype][isotope]
                         # report_lod[var_key][isotope] = round(value_mean, n_decimals_concentration)
+                        ## Intensity Results
                         # Intensity
-                        value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["MAT"][
-                            isotope]
-                        report_intensity[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_decimals_intensity)
+                        if var_filetype == "SMPL":
+                            value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["MAT"][
+                                isotope]
+                        else:
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+                            if var_srm_i == var_srm_file:
+                                value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
+                                    "MAT"][isotope]
+                            else:
+                                value_i = None
+                        if value_i != None:
+                            report_intensity[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_intensity)
+                        else:
+                            report_intensity[var_filetype][var_datatype][file_short][isotope] = "---"
                         # value_mean = self.container_intensity_corrected[var_filetype][var_datatype][isotope]
                         # report_intensity[var_key][isotope] = round(value_mean, n_decimals_intensity)
+
                         # Intensity Ratio
                         value_i = self.container_intensity_ratio[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         try:
@@ -7044,6 +7071,8 @@ class PySILLS(tk.Frame):
                             report_intensity_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
                         # value_mean = self.container_intensity_ratio[var_filetype][var_datatype][isotope]
                         # report_intensity_ratio[var_key][isotope] = "{:0.5e}".format(value_mean)
+
+                        ## Sensitivity Results
                         # Analytical Sensitivity
                         value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
@@ -7054,13 +7083,27 @@ class PySILLS(tk.Frame):
                             report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "---"
                         # value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
                         # report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
+
                         # Normalized Sensitivity
-                        value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
-                            isotope]
-                        report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_decimals_sensitivity)
+                        if var_filetype == "SMPL":
+                            value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                                "MAT"][isotope]
+                        else:
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+                            if var_srm_i == var_srm_file:
+                                value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                                    "MAT"][isotope]
+                            else:
+                                value_i = None
+                        if value_i != None:
+                            report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_sensitivity)
+                        else:
+                            report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = "---"
                         # value_mean = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
                         # report_normalized_sensitivity[var_key][isotope] = round(value_mean, n_decimals_sensitivity)
+
                         # Relative Sensitivity Factor
                         value_i = self.container_rsf[var_filetype][var_datatype][file_short]["MAT"][isotope]
                         try:
