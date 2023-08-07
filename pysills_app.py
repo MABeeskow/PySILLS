@@ -10037,20 +10037,7 @@ class PySILLS(tk.Frame):
         #
         start_column = 0
         start_row = 0
-        #
-        if self.pysills_mode == "MA":
-            accent_bg = self.colors_ma["Dark"]
-            accent_fg = self.colors_ma["Light Font"]
-        elif self.pysills_mode == "FI":
-            accent_bg = self.colors_fi["Dark"]
-            accent_fg = self.colors_fi["Light Font"]
-        elif self.pysills_mode == "MI":
-            accent_bg = self.colors_mi["Dark"]
-            accent_fg = self.colors_mi["Light Font"]
-        elif self.pysills_mode == "OA":
-            accent_bg = self.bg_colors["Dark"]
-            accent_fg = self.bg_colors["Light Font"]
-        #
+
         ## LABELS
         lbl_std = SE(
             parent=subwindow_srm_checkup, row_id=start_row, column_id=start_column, n_rows=1, n_columns=17,
@@ -10075,12 +10062,12 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            var_srm_i = self.container_var["STD"][var_file]["SRM"].get()
+            var_srm_file_i = self.container_var["STD"][var_file]["SRM"].get()
             #
-            if var_srm_i not in list_srm:
-                list_srm.append(var_srm_i)
+            if var_srm_file_i not in list_srm:
+                list_srm.append(var_srm_file_i)
             #
-            entry_std = [file_std, var_srm_i]
+            entry_std = [file_std, var_srm_file_i]
             #
             tv_std.insert("", tk.END, values=entry_std)
         #
@@ -16017,13 +16004,8 @@ class PySILLS(tk.Frame):
         for index, file_std in enumerate(self.list_std):
             parts = file_std.split("/")
             file_std_short = parts[-1]
-
             df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             times_std_i = DE().get_times(dataframe=df_std_i)
-            # dataset_std_i = Data(filename=file_std)
-            # df_std_i = dataset_std_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
-            # times_std_i = df_std_i.iloc[:, 0]
-            #
             if file_std not in self.container_lists["STD"]["Long"]:
                 self.container_lists["STD"]["Long"].append(file_std)
                 self.container_lists["STD"]["Short"].append(file_std_short)
@@ -16232,24 +16214,7 @@ class PySILLS(tk.Frame):
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
             text_std.window_create("end", window=opt_srm_i)
             text_std.insert("end", "\t")
-            #
-            if self.container_var["STD"][file_std]["IS Data"]["IS"].get() != "Select IS":
-                var_text = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
-                #
-            else:
-                var_text = "Select IS"
-            #
-            opt_is_i = tk.OptionMenu(
-                frm_std, self.container_var["STD"][file_std]["IS Data"]["IS"], *self.container_lists["ISOTOPES"])
-            opt_is_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_is_i.config(
-                bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_std.window_create("end", window=opt_is_i)
-            text_std.insert("end", "\t")
-            #
+
             btn_i = tk.Button(
                 master=frm_std, text="Setup", bg=bg_medium, fg=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
@@ -17040,8 +17005,6 @@ class PySILLS(tk.Frame):
         if self.file_loaded == False:
             self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-            #self.change_srm_default(var_srm=self.container_var["SRM"]["default"][0].get())
-            #self.change_srm_default(var_srm=self.container_var["SRM"]["default"][1].get(), key="isotope")
             self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
             #
@@ -17054,12 +17017,7 @@ class PySILLS(tk.Frame):
                     var_method = "Grubbs"
                     #
                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
-        #
-        #if self.file_loaded == True:
-        #    self.spike_elimination_all(filetype, algorithm)
-        #    self.spike_elimination_all(filetype, algorithm)
-        #
-    #
+
     def change_rb_inclusion_setup(self):
         if self.container_var["fi_setting"]["Inclusion Setup Selection"].get() == 1:
             self.btn_setup_massbalance.configure(state="normal")
@@ -19851,8 +19809,8 @@ class PySILLS(tk.Frame):
         if mode == "STD":
             for file_std in self.list_std:
                 parts = file_std.split("/")
-                #
-                self.container_var["SRM"][file_std].set(var_opt)
+                self.container_var["STD"][file_std]["SRM"].set(var_opt)
+                #self.container_var["SRM"][file_std].set(var_opt)
                 self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
         elif mode == "ISOTOPES":
             for isotope in self.container_lists["ISOTOPES"]:
