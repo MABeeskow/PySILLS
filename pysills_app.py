@@ -21544,7 +21544,7 @@ class PySILLS(tk.Frame):
                 n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.var_opt_iso_05, option_list=self.container_lists["ISOTOPES"],
             text_set=self.var_opt_iso_05.get(), fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=self.fi_change_normalized_sensitivity_scatter)
+            command=self.change_normalized_sensitivity_scatter)
         opt_05a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
             activeforeground=self.bg_colors["Dark Font"],
@@ -21832,7 +21832,7 @@ class PySILLS(tk.Frame):
         #
         self.canvas_sensitivity_03a.draw()
         #
-        self.fi_change_normalized_sensitivity_scatter()
+        self.change_normalized_sensitivity_scatter()
     #
     def show_normalized_sensitivity_scatter(self, mode=None):
         if self.var_rb_01.get() == 0:
@@ -21932,7 +21932,7 @@ class PySILLS(tk.Frame):
         #
         self.canvas_sensitivity_03a2.draw()
     #
-    def fi_change_normalized_sensitivity_scatter(self, mode=None):
+    def change_normalized_sensitivity_scatter(self, mode=None):
         try:
             self.ax_sensitivity_03a2.clear()
         except AttributeError:
@@ -21993,13 +21993,12 @@ class PySILLS(tk.Frame):
                             var_iso_01]
                         y_value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
                             var_iso_02]
-                        print(x_value, y_value)
-                        #
+
                         x_values_02.append(x_value)
                         y_values_02.append(y_value)
                         x_all.append(x_value)
                         y_all.append(y_value)
-                        #
+
                         self.ax_sensitivity_03a2.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                         self.ax_sensitivity_03a2.plot(
