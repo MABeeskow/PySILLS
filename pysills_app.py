@@ -251,7 +251,7 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["Colormap"] = tk.StringVar()
         self.container_var["General Settings"]["Colormap"].set("turbo")
         self.container_var["General Settings"]["Line width"] = tk.StringVar()
-        self.container_var["General Settings"]["Line width"].set("1.5")
+        self.container_var["General Settings"]["Line width"].set("1.0")
         self.container_var["General Settings"]["File type"] = tk.StringVar()
         self.container_var["General Settings"]["File type"].set("*.csv")
         self.container_var["General Settings"]["Delimiter"] = tk.StringVar()
@@ -1097,7 +1097,7 @@ class PySILLS(tk.Frame):
         btn_docu = SE(
             parent=self.parent, row_id=13, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Documentation", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="About", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_docu.configure(state="disabled")
         SE(
             parent=self.parent, row_id=15, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
@@ -1174,6 +1174,13 @@ class PySILLS(tk.Frame):
             self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
             self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
             self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
+
+            if self.pysills_mode == "MA":
+                self.subwindow_ma_settings.destroy()
+                self.ma_settings()
+            elif self.pysills_mode == "FI":
+                self.subwindow_fi_settings.destroy()
+                self.fi_settings()
 
     def select_experiment(self, var_rb):
         start_row = 9
@@ -8381,345 +8388,345 @@ class PySILLS(tk.Frame):
         #
         return results
 
-    def save_settings(self):
-        save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
-        #
-        ## STANDARD FILES
-        save_file.write("STANDARD FILES (LONG)"+"\n")
-        for file_std in self.list_std:
-            filename_std_short = file_std.split("/")[-1]
-            str_std = str(file_std)+";"+str(self.container_files["STD"][filename_std_short]["SRM"].get())+";"\
-                      +str(self.container_files["STD"][filename_std_short]["IS"].get())+";"\
-                      +str(self.container_files["STD"][filename_std_short]["CB ID"].get())+";"+str("BG")+";"
-            for key, item in self.container_helper["STD"][filename_std_short]["BG"].items():
-                str_std += str(key)+";"
-                str_std += str(item["Times"])+";"+str(item["Positions"])+";"
-            str_std += str("SIG") + ";"
-            for key, item in self.container_helper["STD"][filename_std_short]["SIG"].items():
-                str_std += str(key)+";"
-                str_std += str(item["Times"])+";"+str(item["Positions"])+";"
-            str_std += str("SPK") + ";"
-            for isotope, item_isotope in self.container_helper["STD"][filename_std_short]["SPK"].items():
-                str_std += str(isotope) + ";"
-                for id_key, id_item in item_isotope.items():
-                    str_std += str(id_key)+";"
-                    str_std += str(id_item["Times"])+";"+str(id_item["Positions"])+";"
-            str_std += "\n"
-            save_file.write(str_std)
-        save_file.write("\n")
-        #
-        ## SAMPLE FILES
-        save_file.write("SAMPLE FILES (LONG)"+"\n")
-        if len(self.list_smpl) > 0:
-            for file_smpl in self.list_smpl:
-                filename_smpl_short = file_smpl.split("/")[-1]
-                str_smpl = str(file_smpl) + ";" + str(self.container_files["SMPL"][filename_smpl_short]["SRM"].get()) \
-                           + ";" + str(self.container_files["SMPL"][filename_smpl_short]["IS"].get()) + ";" \
-                           + str(self.container_files["SMPL"][filename_smpl_short]["ID"].get()) + ";" \
-                           + str(self.container_files["SMPL"][filename_smpl_short]["CB ID"].get()) + ";" + str("BG") \
-                           + ";"
-                for key, item in self.container_helper["SMPL"][filename_smpl_short]["BG"].items():
-                    str_smpl += str(key) + ";"
-                    str_smpl += str(item["Times"]) + ";" + str(item["Positions"]) + ";"
-                str_smpl += str("SIG") + ";"
-                for key, item in self.container_helper["SMPL"][filename_smpl_short]["SIG"].items():
-                    str_smpl += str(key) + ";"
-                    str_smpl += str(item["Times"]) + ";" + str(item["Positions"]) + ";"
-                str_smpl += str("SPK") + ";"
-                for isotope, item_isotope in self.container_helper["SMPL"][filename_smpl_short]["SPK"].items():
-                    str_smpl += str(isotope) + ";"
-                    for id_key, id_item in item_isotope.items():
-                        str_smpl += str(id_key) + ";"
-                        str_smpl += str(id_item["Times"]) + ";" + str(id_item["Positions"]) + ";"
-                str_smpl += "\n"
-                save_file.write(str_smpl)
-        else:
-            save_file.write(str(None)+"\n")
-        save_file.write("\n")
-        #
-        ## ISOTOPES
-        save_file.write("ISOTOPES" + "\n")
-        for key, item in self.container_files["SRM"].items():
-            save_file.write(str(key)+";"+str(item.get())+"\n")
-        save_file.write("\n")
-        #
-        ## SETTINGS
-        save_file.write("SETTINGS" + "\n")
-        save_file.write(str("Mineral") + ";" + str(self.container_var["mineral"].get()) + "\n")
-        if self.var_mode_ma == True:
-            save_file.write(str("IS CONCENTRATION") + ";" + str(
-                self.container_var["settings"]["IS Concentration"].get()) + "\n")
-        save_file.write(str("Default SRM STD") + ";" + str(self.container_var["SRM"]["default"][0].get()) + "\n")
-        save_file.write(str("Default SRM SMPL") + ";" + str(self.container_var["SRM"]["default"][1].get()) + "\n")
-        save_file.write(str("Default IS STD") + ";" + str(self.container_var["IS"]["Default STD"].get()) + "\n")
-        save_file.write(str("Default IS SMPL") + ";" + str(self.container_var["IS"]["Default SMPL"].get()) + "\n")
-        save_file.write(str("Default BG Start")+";"+str(self.container_var["settings"]["Time BG Start"].get())+"\n")
-        save_file.write(str("Default BG End")+";"+str(self.container_var["settings"]["Time BG End"].get())+"\n")
-        save_file.write(str("Default SIG Start")+";"+str(self.container_var["settings"]["Time SIG Start"].get())+"\n")
-        save_file.write(str("Default SIG End")+";"+str(self.container_var["settings"]["Time SIG End"].get())+"\n")
-        save_file.write(str("Author")+";"+str(self.container_var["settings"]["Author"].get())+"\n")
-        save_file.write(str("Source ID")+";"+str(self.container_var["settings"]["Source ID"].get())+"\n")
-        save_file.write(str("SPK ELIMINATION STD") + ";" + str(self.fast_track_std) + "\n")
-        save_file.write(str("SPK ELIMINATION SMPL") + ";" + str(self.fast_track_smpl) + "\n")
-        save_file.write(str("SPK ELIMINATION ALPHA") + ";" + str(
-            self.container_var["settings"]["SE Alpha"].get()) + "\n")
-        save_file.write(str("SPK ELIMINATION THRESHOLD") + ";" + str(
-            self.container_var["settings"]["SE Threshold"].get()) + "\n")
-        save_file.write("\n")
-        #
-        ## END
-        save_file.write("END")
-        #
-        save_file.close()
+    # def save_settings(self):
+    #     save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
+    #     #
+    #     ## STANDARD FILES
+    #     save_file.write("STANDARD FILES (LONG)"+"\n")
+    #     for file_std in self.list_std:
+    #         filename_std_short = file_std.split("/")[-1]
+    #         str_std = str(file_std)+";"+str(self.container_files["STD"][filename_std_short]["SRM"].get())+";"\
+    #                   +str(self.container_files["STD"][filename_std_short]["IS"].get())+";"\
+    #                   +str(self.container_files["STD"][filename_std_short]["CB ID"].get())+";"+str("BG")+";"
+    #         for key, item in self.container_helper["STD"][filename_std_short]["BG"].items():
+    #             str_std += str(key)+";"
+    #             str_std += str(item["Times"])+";"+str(item["Positions"])+";"
+    #         str_std += str("SIG") + ";"
+    #         for key, item in self.container_helper["STD"][filename_std_short]["SIG"].items():
+    #             str_std += str(key)+";"
+    #             str_std += str(item["Times"])+";"+str(item["Positions"])+";"
+    #         str_std += str("SPK") + ";"
+    #         for isotope, item_isotope in self.container_helper["STD"][filename_std_short]["SPK"].items():
+    #             str_std += str(isotope) + ";"
+    #             for id_key, id_item in item_isotope.items():
+    #                 str_std += str(id_key)+";"
+    #                 str_std += str(id_item["Times"])+";"+str(id_item["Positions"])+";"
+    #         str_std += "\n"
+    #         save_file.write(str_std)
+    #     save_file.write("\n")
+    #     #
+    #     ## SAMPLE FILES
+    #     save_file.write("SAMPLE FILES (LONG)"+"\n")
+    #     if len(self.list_smpl) > 0:
+    #         for file_smpl in self.list_smpl:
+    #             filename_smpl_short = file_smpl.split("/")[-1]
+    #             str_smpl = str(file_smpl) + ";" + str(self.container_files["SMPL"][filename_smpl_short]["SRM"].get()) \
+    #                        + ";" + str(self.container_files["SMPL"][filename_smpl_short]["IS"].get()) + ";" \
+    #                        + str(self.container_files["SMPL"][filename_smpl_short]["ID"].get()) + ";" \
+    #                        + str(self.container_files["SMPL"][filename_smpl_short]["CB ID"].get()) + ";" + str("BG") \
+    #                        + ";"
+    #             for key, item in self.container_helper["SMPL"][filename_smpl_short]["BG"].items():
+    #                 str_smpl += str(key) + ";"
+    #                 str_smpl += str(item["Times"]) + ";" + str(item["Positions"]) + ";"
+    #             str_smpl += str("SIG") + ";"
+    #             for key, item in self.container_helper["SMPL"][filename_smpl_short]["SIG"].items():
+    #                 str_smpl += str(key) + ";"
+    #                 str_smpl += str(item["Times"]) + ";" + str(item["Positions"]) + ";"
+    #             str_smpl += str("SPK") + ";"
+    #             for isotope, item_isotope in self.container_helper["SMPL"][filename_smpl_short]["SPK"].items():
+    #                 str_smpl += str(isotope) + ";"
+    #                 for id_key, id_item in item_isotope.items():
+    #                     str_smpl += str(id_key) + ";"
+    #                     str_smpl += str(id_item["Times"]) + ";" + str(id_item["Positions"]) + ";"
+    #             str_smpl += "\n"
+    #             save_file.write(str_smpl)
+    #     else:
+    #         save_file.write(str(None)+"\n")
+    #     save_file.write("\n")
+    #     #
+    #     ## ISOTOPES
+    #     save_file.write("ISOTOPES" + "\n")
+    #     for key, item in self.container_files["SRM"].items():
+    #         save_file.write(str(key)+";"+str(item.get())+"\n")
+    #     save_file.write("\n")
+    #     #
+    #     ## SETTINGS
+    #     save_file.write("SETTINGS" + "\n")
+    #     save_file.write(str("Mineral") + ";" + str(self.container_var["mineral"].get()) + "\n")
+    #     if self.var_mode_ma == True:
+    #         save_file.write(str("IS CONCENTRATION") + ";" + str(
+    #             self.container_var["settings"]["IS Concentration"].get()) + "\n")
+    #     save_file.write(str("Default SRM STD") + ";" + str(self.container_var["SRM"]["default"][0].get()) + "\n")
+    #     save_file.write(str("Default SRM SMPL") + ";" + str(self.container_var["SRM"]["default"][1].get()) + "\n")
+    #     save_file.write(str("Default IS STD") + ";" + str(self.container_var["IS"]["Default STD"].get()) + "\n")
+    #     save_file.write(str("Default IS SMPL") + ";" + str(self.container_var["IS"]["Default SMPL"].get()) + "\n")
+    #     save_file.write(str("Default BG Start")+";"+str(self.container_var["settings"]["Time BG Start"].get())+"\n")
+    #     save_file.write(str("Default BG End")+";"+str(self.container_var["settings"]["Time BG End"].get())+"\n")
+    #     save_file.write(str("Default SIG Start")+";"+str(self.container_var["settings"]["Time SIG Start"].get())+"\n")
+    #     save_file.write(str("Default SIG End")+";"+str(self.container_var["settings"]["Time SIG End"].get())+"\n")
+    #     save_file.write(str("Author")+";"+str(self.container_var["settings"]["Author"].get())+"\n")
+    #     save_file.write(str("Source ID")+";"+str(self.container_var["settings"]["Source ID"].get())+"\n")
+    #     save_file.write(str("SPK ELIMINATION STD") + ";" + str(self.fast_track_std) + "\n")
+    #     save_file.write(str("SPK ELIMINATION SMPL") + ";" + str(self.fast_track_smpl) + "\n")
+    #     save_file.write(str("SPK ELIMINATION ALPHA") + ";" + str(
+    #         self.container_var["settings"]["SE Alpha"].get()) + "\n")
+    #     save_file.write(str("SPK ELIMINATION THRESHOLD") + ";" + str(
+    #         self.container_var["settings"]["SE Threshold"].get()) + "\n")
+    #     save_file.write("\n")
+    #     #
+    #     ## END
+    #     save_file.write("END")
+    #     #
+    #     save_file.close()
     #
-    def load_settings(self):
-        filename = filedialog.askopenfilename()
-        #
-        try:
-            file_loaded = open(str(filename), "r")
-            loaded_lines = file_loaded.readlines()
-            #
-            n_settings = 0
-            index = 0
-            strings = ["STANDARD FILES (LONG)", "SAMPLE FILES (LONG)", "ISOTOPES", "SETTINGS", "END"]
-            index_container = {}
-            while n_settings < len(strings):
-                index_container[strings[n_settings]] = 0
-                index = 0
-                flag = 0
-                for line in open(str(filename), "r"):
-                    if strings[n_settings] in line:
-                        flag = 1
-                        break
-                    else:
-                        index += 1
-                #
-                if flag == 0:
-                    pass
-                else:
-                    index_container[strings[n_settings]] += index
-                    n_settings += 1
-            #
-            ## STANDARD FILES (STD)
-            for i in range(index_container["STANDARD FILES (LONG)"]+1, index_container["SAMPLE FILES (LONG)"]-1):
-                line_std = str(loaded_lines[i].strip())
-                splitted_std = line_std.split(";")
-                #
-                list_bg_data = self.find_dataset_in_list(a=splitted_std, low="BG", high="SIG")
-                list_bg_data.pop(0)
-                n_bg = int(len(list_bg_data)/3)
-                list_sig_data = self.find_dataset_in_list(a=splitted_std, low="SIG", high="SPK")
-                list_sig_data.pop(0)
-                n_sig = int(len(list_sig_data) / 3)
-                #
-                filename_std = str(splitted_std[0])
-                filename_std_short = filename_std.split("/")[-1]
-                srm_std = str(splitted_std[1])
-                is_std = str(splitted_std[2])
-                cb_id_std = str(splitted_std[3])
-                #
-                self.container_helper["STD"][filename_std_short] = {}
-                self.container_helper["STD"][filename_std_short]["BG"] = {}
-                self.container_helper["STD"][filename_std_short]["SIG"] = {}
-                self.container_helper["STD"][filename_std_short]["SPK"] = {}
-                self.container_helper["positions"]["BG STD"][filename_std_short]= []
-                self.container_helper["positions"]["SIG STD"][filename_std_short] = []
-                self.container_lists["IS"].append(is_std)
-                #
-                index_bg = 0
-                while index_bg < n_bg:
-                    bg_id = int(list_bg_data[int(3*index_bg)])
-                    list_times = list_bg_data[int(3*index_bg + 1)]
-                    list_positions = list_bg_data[int(3*index_bg + 2)]
-                    splitted_times = list_times.split(",")
-                    splitted_positions = list_positions.split(",")
-                    #
-                    self.container_helper["STD"][filename_std_short]["BG"][bg_id] = {
-                        "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
-                        "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
-                        "Object": [None, None]}
-                    self.container_helper["positions"]["BG STD"][filename_std_short].append(
-                        [list_times[0], list_times[1], list_positions[0], list_positions[1], bg_id])
-                    #
-                    index_bg += 1
-                #
-                index_sig = 0
-                while index_sig < n_sig:
-                    sig_id = int(list_sig_data[int(3*index_sig)])
-                    list_times = list_sig_data[int(3*index_sig + 1)]
-                    list_positions = list_sig_data[int(3*index_sig + 2)]
-                    splitted_times = list_times.split(",")
-                    splitted_positions = list_positions.split(",")
-                    #
-                    self.container_helper["STD"][filename_std_short]["SIG"][sig_id] = {
-                        "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
-                        "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
-                        "Object": [None, None]}
-                    self.container_helper["positions"]["SIG STD"][filename_std_short].append(
-                        [list_times[0], list_times[1], list_positions[0], list_positions[1], sig_id])
-                    #
-                    index_sig += 1
-                #
-                self.list_std.append(filename_std)
-                self.lb_std.insert(tk.END, str(filename_std_short))
-                self.container_var["SRM"][filename_std] = tk.StringVar()
-                self.container_var["SRM"][filename_std].set(srm_std)
-                self.container_var["STD"][filename_std] = {}
-                self.container_var["STD"][filename_std]["IS"] = tk.StringVar()
-                self.container_var["STD"][filename_std]["IS"].set(is_std)
-                self.container_var["STD"][filename_std]["Checkbox"] = tk.StringVar()
-                self.container_var["STD"][filename_std]["Checkbox"].set(cb_id_std)
-            #
-            ## SAMPLE FILES (SMPL)
-            for i in range(index_container["SAMPLE FILES (LONG)"]+1, index_container["ISOTOPES"]-1):
-                line_smpl = str(loaded_lines[i].strip())
-                splitted_smpl = line_smpl.split(";")
-                #
-                list_bg_data = self.find_dataset_in_list(a=splitted_smpl, low="BG", high="SIG")
-                list_bg_data.pop(0)
-                n_bg = int(len(list_bg_data) / 3)
-                list_sig_data = self.find_dataset_in_list(a=splitted_smpl, low="SIG", high="SPK")
-                list_sig_data.pop(0)
-                n_sig = int(len(list_sig_data) / 3)
-                #
-                filename_smpl = str(splitted_smpl[0])
-                filename_smpl_short = filename_smpl.split("/")[-1]
-                is_smpl = str(splitted_smpl[2])
-                id_smpl = str(splitted_smpl[3])
-                cb_id_smpl = str(splitted_smpl[4])
-                is_conc_smpl = str(splitted_smpl[2])
-                #
-                self.container_helper["SMPL"][filename_smpl_short] = {}
-                self.container_helper["SMPL"][filename_smpl_short]["BG"] = {}
-                self.container_helper["SMPL"][filename_smpl_short]["SIG"] = {}
-                self.container_helper["SMPL"][filename_smpl_short]["SPK"] = {}
-                self.container_helper["positions"]["BG SMPL"][filename_smpl_short] = []
-                self.container_helper["positions"]["SIG SMPL"][filename_smpl_short] = []
-                self.container_lists["IS"].append(is_smpl)
-                #
-                index_bg = 0
-                while index_bg < n_bg:
-                    bg_id = int(list_bg_data[int(3 * index_bg)])
-                    list_times = list_bg_data[int(3 * index_bg + 1)]
-                    list_positions = list_bg_data[int(3 * index_bg + 2)]
-                    splitted_times = list_times.split(",")
-                    splitted_positions = list_positions.split(",")
-                    #
-                    self.container_helper["SMPL"][filename_smpl_short]["BG"][bg_id] = {
-                        "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
-                        "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
-                        "Object": [None, None]}
-                    self.container_helper["positions"]["BG SMPL"][filename_smpl_short].append(
-                        [list_times[0], list_times[1], list_positions[0], list_positions[1], bg_id])
-                    #
-                    index_bg += 1
-                #
-                index_sig = 0
-                while index_sig < n_sig:
-                    sig_id = int(list_sig_data[int(3 * index_sig)])
-                    list_times = list_sig_data[int(3 * index_sig + 1)]
-                    list_positions = list_sig_data[int(3 * index_sig + 2)]
-                    splitted_times = list_times.split(",")
-                    splitted_positions = list_positions.split(",")
-                    #
-                    self.container_helper["SMPL"][filename_smpl_short]["SIG"][sig_id] = {
-                        "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
-                        "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
-                        "Object": [None, None]}
-                    self.container_helper["positions"]["SIG SMPL"][filename_smpl_short].append(
-                        [list_times[0], list_times[1], list_positions[0], list_positions[1], sig_id])
-                    #
-                    index_sig += 1
-                #
-                self.list_smpl.append(filename_smpl)
-                self.lb_smpl.insert(tk.END, str(filename_smpl_short))
-                self.container_var["SMPL"][filename_smpl] = {}
-                self.container_var["SMPL"][filename_smpl]["IS"] = tk.StringVar()
-                self.container_var["SMPL"][filename_smpl]["IS"].set(is_smpl)
-                self.container_var["SMPL"][filename_smpl]["ID"] = tk.StringVar()
-                self.container_var["SMPL"][filename_smpl]["ID"].set(id_smpl)
-                self.container_var["SMPL"][filename_smpl]["Checkbox"] = tk.StringVar()
-                self.container_var["SMPL"][filename_smpl]["Checkbox"].set(cb_id_smpl)
-                self.container_lists["IS"].append(is_smpl)
-            #
-            ## ISOTOPES (ISO)
-            for i in range(index_container["ISOTOPES"]+1, index_container["SETTINGS"]-1):
-                line_iso = str(loaded_lines[i].strip())
-                splitted_iso = line_iso.split(";")
-                isotope = str(splitted_iso[0])
-                srm_iso = str(splitted_iso[1])
-                self.container_var["SRM"][isotope] = tk.StringVar()
-                self.container_var["SRM"][isotope].set(srm_iso)
-                #
-                self.container_lists["ISOTOPES"].append(isotope)
-            #
-            ## SETTINGS
-            for i in range(index_container["SETTINGS"] + 1, index_container["END"] - 1):
-                line_setup = str(loaded_lines[i].strip())
-                splitted_setup = line_setup.split(";")
-                if splitted_setup[0] == "Mineral":
-                    self.container_var["mineral"].set(splitted_setup[1])
-                elif splitted_setup[0] == "IS CONCENTRATION":
-                    self.container_var["settings"]["IS Concentration"].set(splitted_setup[1])
-                elif splitted_setup[0] == "Default SRM STD":
-                    self.container_var["SRM"]["default"][0].set(splitted_setup[1])
-                elif splitted_setup[0] == "Default SRM SMPL":
-                    self.container_var["SRM"]["default"][1].set(splitted_setup[1])
-                elif splitted_setup[0] == "Default IS STD":
-                    self.container_var["IS"]["Default STD"].set(splitted_setup[1])
-                elif splitted_setup[0] == "Default IS SMPL":
-                    self.container_var["IS"]["Default SMPL"].set(splitted_setup[1])
-                elif splitted_setup[0] == "Default BG Start":
-                    self.container_var["settings"]["Time BG Start"].set(splitted_setup[1])
-                    self.container_settings["MA"]["Start BG"].set(splitted_setup[1])
-                    try:
-                        self.container_helper["Default BG"]["Times"][0] = float(splitted_setup[1])
-                    except:
-                        self.container_helper["Default BG"]["Times"][0] = splitted_setup[1]
-                elif splitted_setup[0] == "Default BG End":
-                    self.container_var["settings"]["Time BG End"].set(splitted_setup[1])
-                    self.container_settings["MA"]["End BG"].set(splitted_setup[1])
-                    try:
-                        self.container_helper["Default BG"]["Times"][1] = float(splitted_setup[1])
-                    except:
-                        self.container_helper["Default BG"]["Times"][1] = splitted_setup[1]
-                elif splitted_setup[0] == "Default SIG Start":
-                    self.container_var["settings"]["Time SIG Start"].set(splitted_setup[1])
-                    self.container_settings["MA"]["Start SIG"].set(splitted_setup[1])
-                    try:
-                        self.container_helper["Default SIG"]["Times"][0] = float(splitted_setup[1])
-                    except:
-                        self.container_helper["Default SIG"]["Times"][0] = splitted_setup[1]
-                elif splitted_setup[0] == "Default SIG End":
-                    self.container_var["settings"]["Time SIG End"].set(splitted_setup[1])
-                    self.container_settings["MA"]["End SIG"].set(splitted_setup[1])
-                    try:
-                        self.container_helper["Default SIG"]["Times"][1] = float(splitted_setup[1])
-                    except:
-                        self.container_helper["Default SIG"]["Times"][1] = splitted_setup[1]
-                elif splitted_setup[0] == "Author":
-                    self.container_var["settings"]["Author"].set(splitted_setup[1])
-                elif splitted_setup[0] == "Source ID":
-                    self.container_var["settings"]["Source ID"].set(splitted_setup[1])
-                elif splitted_setup[0] == "SPK ELIMINATION STD":
-                    self.fast_track_std = eval(splitted_setup[1])
-                elif splitted_setup[0] == "SPK ELIMINATION SMPL":
-                    self.fast_track_smpl = eval(splitted_setup[1])
-                elif splitted_setup[0] == "SPK ELIMINATION ALPHA":
-                    self.container_var["settings"]["SE Alpha"] = tk.StringVar()
-                    self.container_var["settings"]["SE Alpha"].set(eval(splitted_setup[1]))
-                elif splitted_setup[0] == "SPK ELIMINATION THRESHOLD":
-                    self.container_var["settings"]["SE Threshold"] = tk.StringVar()
-                    self.container_var["settings"]["SE Threshold"].set(eval(splitted_setup[1]))
-            #
-            file_loaded.close()
-            self.file_loaded = True
-            #
-            self.container_lists["IS"] = list(dict.fromkeys(self.container_lists["IS"]))
-            #
-        #
-        except FileNotFoundError:
-            pass
+    # def load_settings(self):
+    #     filename = filedialog.askopenfilename()
+    #     #
+    #     try:
+    #         file_loaded = open(str(filename), "r")
+    #         loaded_lines = file_loaded.readlines()
+    #         #
+    #         n_settings = 0
+    #         index = 0
+    #         strings = ["STANDARD FILES (LONG)", "SAMPLE FILES (LONG)", "ISOTOPES", "SETTINGS", "END"]
+    #         index_container = {}
+    #         while n_settings < len(strings):
+    #             index_container[strings[n_settings]] = 0
+    #             index = 0
+    #             flag = 0
+    #             for line in open(str(filename), "r"):
+    #                 if strings[n_settings] in line:
+    #                     flag = 1
+    #                     break
+    #                 else:
+    #                     index += 1
+    #             #
+    #             if flag == 0:
+    #                 pass
+    #             else:
+    #                 index_container[strings[n_settings]] += index
+    #                 n_settings += 1
+    #         #
+    #         ## STANDARD FILES (STD)
+    #         for i in range(index_container["STANDARD FILES (LONG)"]+1, index_container["SAMPLE FILES (LONG)"]-1):
+    #             line_std = str(loaded_lines[i].strip())
+    #             splitted_std = line_std.split(";")
+    #             #
+    #             list_bg_data = self.find_dataset_in_list(a=splitted_std, low="BG", high="SIG")
+    #             list_bg_data.pop(0)
+    #             n_bg = int(len(list_bg_data)/3)
+    #             list_sig_data = self.find_dataset_in_list(a=splitted_std, low="SIG", high="SPK")
+    #             list_sig_data.pop(0)
+    #             n_sig = int(len(list_sig_data) / 3)
+    #             #
+    #             filename_std = str(splitted_std[0])
+    #             filename_std_short = filename_std.split("/")[-1]
+    #             srm_std = str(splitted_std[1])
+    #             is_std = str(splitted_std[2])
+    #             cb_id_std = str(splitted_std[3])
+    #             #
+    #             self.container_helper["STD"][filename_std_short] = {}
+    #             self.container_helper["STD"][filename_std_short]["BG"] = {}
+    #             self.container_helper["STD"][filename_std_short]["SIG"] = {}
+    #             self.container_helper["STD"][filename_std_short]["SPK"] = {}
+    #             self.container_helper["positions"]["BG STD"][filename_std_short]= []
+    #             self.container_helper["positions"]["SIG STD"][filename_std_short] = []
+    #             self.container_lists["IS"].append(is_std)
+    #             #
+    #             index_bg = 0
+    #             while index_bg < n_bg:
+    #                 bg_id = int(list_bg_data[int(3*index_bg)])
+    #                 list_times = list_bg_data[int(3*index_bg + 1)]
+    #                 list_positions = list_bg_data[int(3*index_bg + 2)]
+    #                 splitted_times = list_times.split(",")
+    #                 splitted_positions = list_positions.split(",")
+    #                 #
+    #                 self.container_helper["STD"][filename_std_short]["BG"][bg_id] = {
+    #                     "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
+    #                     "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
+    #                     "Object": [None, None]}
+    #                 self.container_helper["positions"]["BG STD"][filename_std_short].append(
+    #                     [list_times[0], list_times[1], list_positions[0], list_positions[1], bg_id])
+    #                 #
+    #                 index_bg += 1
+    #             #
+    #             index_sig = 0
+    #             while index_sig < n_sig:
+    #                 sig_id = int(list_sig_data[int(3*index_sig)])
+    #                 list_times = list_sig_data[int(3*index_sig + 1)]
+    #                 list_positions = list_sig_data[int(3*index_sig + 2)]
+    #                 splitted_times = list_times.split(",")
+    #                 splitted_positions = list_positions.split(",")
+    #                 #
+    #                 self.container_helper["STD"][filename_std_short]["SIG"][sig_id] = {
+    #                     "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
+    #                     "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
+    #                     "Object": [None, None]}
+    #                 self.container_helper["positions"]["SIG STD"][filename_std_short].append(
+    #                     [list_times[0], list_times[1], list_positions[0], list_positions[1], sig_id])
+    #                 #
+    #                 index_sig += 1
+    #             #
+    #             self.list_std.append(filename_std)
+    #             self.lb_std.insert(tk.END, str(filename_std_short))
+    #             self.container_var["SRM"][filename_std] = tk.StringVar()
+    #             self.container_var["SRM"][filename_std].set(srm_std)
+    #             self.container_var["STD"][filename_std] = {}
+    #             self.container_var["STD"][filename_std]["IS"] = tk.StringVar()
+    #             self.container_var["STD"][filename_std]["IS"].set(is_std)
+    #             self.container_var["STD"][filename_std]["Checkbox"] = tk.StringVar()
+    #             self.container_var["STD"][filename_std]["Checkbox"].set(cb_id_std)
+    #         #
+    #         ## SAMPLE FILES (SMPL)
+    #         for i in range(index_container["SAMPLE FILES (LONG)"]+1, index_container["ISOTOPES"]-1):
+    #             line_smpl = str(loaded_lines[i].strip())
+    #             splitted_smpl = line_smpl.split(";")
+    #             #
+    #             list_bg_data = self.find_dataset_in_list(a=splitted_smpl, low="BG", high="SIG")
+    #             list_bg_data.pop(0)
+    #             n_bg = int(len(list_bg_data) / 3)
+    #             list_sig_data = self.find_dataset_in_list(a=splitted_smpl, low="SIG", high="SPK")
+    #             list_sig_data.pop(0)
+    #             n_sig = int(len(list_sig_data) / 3)
+    #             #
+    #             filename_smpl = str(splitted_smpl[0])
+    #             filename_smpl_short = filename_smpl.split("/")[-1]
+    #             is_smpl = str(splitted_smpl[2])
+    #             id_smpl = str(splitted_smpl[3])
+    #             cb_id_smpl = str(splitted_smpl[4])
+    #             is_conc_smpl = str(splitted_smpl[2])
+    #             #
+    #             self.container_helper["SMPL"][filename_smpl_short] = {}
+    #             self.container_helper["SMPL"][filename_smpl_short]["BG"] = {}
+    #             self.container_helper["SMPL"][filename_smpl_short]["SIG"] = {}
+    #             self.container_helper["SMPL"][filename_smpl_short]["SPK"] = {}
+    #             self.container_helper["positions"]["BG SMPL"][filename_smpl_short] = []
+    #             self.container_helper["positions"]["SIG SMPL"][filename_smpl_short] = []
+    #             self.container_lists["IS"].append(is_smpl)
+    #             #
+    #             index_bg = 0
+    #             while index_bg < n_bg:
+    #                 bg_id = int(list_bg_data[int(3 * index_bg)])
+    #                 list_times = list_bg_data[int(3 * index_bg + 1)]
+    #                 list_positions = list_bg_data[int(3 * index_bg + 2)]
+    #                 splitted_times = list_times.split(",")
+    #                 splitted_positions = list_positions.split(",")
+    #                 #
+    #                 self.container_helper["SMPL"][filename_smpl_short]["BG"][bg_id] = {
+    #                     "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
+    #                     "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
+    #                     "Object": [None, None]}
+    #                 self.container_helper["positions"]["BG SMPL"][filename_smpl_short].append(
+    #                     [list_times[0], list_times[1], list_positions[0], list_positions[1], bg_id])
+    #                 #
+    #                 index_bg += 1
+    #             #
+    #             index_sig = 0
+    #             while index_sig < n_sig:
+    #                 sig_id = int(list_sig_data[int(3 * index_sig)])
+    #                 list_times = list_sig_data[int(3 * index_sig + 1)]
+    #                 list_positions = list_sig_data[int(3 * index_sig + 2)]
+    #                 splitted_times = list_times.split(",")
+    #                 splitted_positions = list_positions.split(",")
+    #                 #
+    #                 self.container_helper["SMPL"][filename_smpl_short]["SIG"][sig_id] = {
+    #                     "Times": [float(splitted_times[0][1:]), float(splitted_times[1][:-1])],
+    #                     "Positions": [int(splitted_positions[0][1:]), int(splitted_positions[1][:-1])],
+    #                     "Object": [None, None]}
+    #                 self.container_helper["positions"]["SIG SMPL"][filename_smpl_short].append(
+    #                     [list_times[0], list_times[1], list_positions[0], list_positions[1], sig_id])
+    #                 #
+    #                 index_sig += 1
+    #             #
+    #             self.list_smpl.append(filename_smpl)
+    #             self.lb_smpl.insert(tk.END, str(filename_smpl_short))
+    #             self.container_var["SMPL"][filename_smpl] = {}
+    #             self.container_var["SMPL"][filename_smpl]["IS"] = tk.StringVar()
+    #             self.container_var["SMPL"][filename_smpl]["IS"].set(is_smpl)
+    #             self.container_var["SMPL"][filename_smpl]["ID"] = tk.StringVar()
+    #             self.container_var["SMPL"][filename_smpl]["ID"].set(id_smpl)
+    #             self.container_var["SMPL"][filename_smpl]["Checkbox"] = tk.StringVar()
+    #             self.container_var["SMPL"][filename_smpl]["Checkbox"].set(cb_id_smpl)
+    #             self.container_lists["IS"].append(is_smpl)
+    #         #
+    #         ## ISOTOPES (ISO)
+    #         for i in range(index_container["ISOTOPES"]+1, index_container["SETTINGS"]-1):
+    #             line_iso = str(loaded_lines[i].strip())
+    #             splitted_iso = line_iso.split(";")
+    #             isotope = str(splitted_iso[0])
+    #             srm_iso = str(splitted_iso[1])
+    #             self.container_var["SRM"][isotope] = tk.StringVar()
+    #             self.container_var["SRM"][isotope].set(srm_iso)
+    #             #
+    #             self.container_lists["ISOTOPES"].append(isotope)
+    #         #
+    #         ## SETTINGS
+    #         for i in range(index_container["SETTINGS"] + 1, index_container["END"] - 1):
+    #             line_setup = str(loaded_lines[i].strip())
+    #             splitted_setup = line_setup.split(";")
+    #             if splitted_setup[0] == "Mineral":
+    #                 self.container_var["mineral"].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "IS CONCENTRATION":
+    #                 self.container_var["settings"]["IS Concentration"].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "Default SRM STD":
+    #                 self.container_var["SRM"]["default"][0].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "Default SRM SMPL":
+    #                 self.container_var["SRM"]["default"][1].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "Default IS STD":
+    #                 self.container_var["IS"]["Default STD"].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "Default IS SMPL":
+    #                 self.container_var["IS"]["Default SMPL"].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "Default BG Start":
+    #                 self.container_var["settings"]["Time BG Start"].set(splitted_setup[1])
+    #                 self.container_settings["MA"]["Start BG"].set(splitted_setup[1])
+    #                 try:
+    #                     self.container_helper["Default BG"]["Times"][0] = float(splitted_setup[1])
+    #                 except:
+    #                     self.container_helper["Default BG"]["Times"][0] = splitted_setup[1]
+    #             elif splitted_setup[0] == "Default BG End":
+    #                 self.container_var["settings"]["Time BG End"].set(splitted_setup[1])
+    #                 self.container_settings["MA"]["End BG"].set(splitted_setup[1])
+    #                 try:
+    #                     self.container_helper["Default BG"]["Times"][1] = float(splitted_setup[1])
+    #                 except:
+    #                     self.container_helper["Default BG"]["Times"][1] = splitted_setup[1]
+    #             elif splitted_setup[0] == "Default SIG Start":
+    #                 self.container_var["settings"]["Time SIG Start"].set(splitted_setup[1])
+    #                 self.container_settings["MA"]["Start SIG"].set(splitted_setup[1])
+    #                 try:
+    #                     self.container_helper["Default SIG"]["Times"][0] = float(splitted_setup[1])
+    #                 except:
+    #                     self.container_helper["Default SIG"]["Times"][0] = splitted_setup[1]
+    #             elif splitted_setup[0] == "Default SIG End":
+    #                 self.container_var["settings"]["Time SIG End"].set(splitted_setup[1])
+    #                 self.container_settings["MA"]["End SIG"].set(splitted_setup[1])
+    #                 try:
+    #                     self.container_helper["Default SIG"]["Times"][1] = float(splitted_setup[1])
+    #                 except:
+    #                     self.container_helper["Default SIG"]["Times"][1] = splitted_setup[1]
+    #             elif splitted_setup[0] == "Author":
+    #                 self.container_var["settings"]["Author"].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "Source ID":
+    #                 self.container_var["settings"]["Source ID"].set(splitted_setup[1])
+    #             elif splitted_setup[0] == "SPK ELIMINATION STD":
+    #                 self.fast_track_std = eval(splitted_setup[1])
+    #             elif splitted_setup[0] == "SPK ELIMINATION SMPL":
+    #                 self.fast_track_smpl = eval(splitted_setup[1])
+    #             elif splitted_setup[0] == "SPK ELIMINATION ALPHA":
+    #                 self.container_var["settings"]["SE Alpha"] = tk.StringVar()
+    #                 self.container_var["settings"]["SE Alpha"].set(eval(splitted_setup[1]))
+    #             elif splitted_setup[0] == "SPK ELIMINATION THRESHOLD":
+    #                 self.container_var["settings"]["SE Threshold"] = tk.StringVar()
+    #                 self.container_var["settings"]["SE Threshold"].set(eval(splitted_setup[1]))
+    #         #
+    #         file_loaded.close()
+    #         self.file_loaded = True
+    #         #
+    #         self.container_lists["IS"] = list(dict.fromkeys(self.container_lists["IS"]))
+    #         #
+    #     #
+    #     except FileNotFoundError:
+    #         pass
     #
     def find_dataset_in_list(self, a, low, high):
         i = a.index(low)
@@ -9982,7 +9989,9 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=10, column_id=start_column + 32, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
             var=self.container_var["General Settings"]["Line width"],
-            text_default=self.container_var["General Settings"]["Line width"].get(), command=None)
+            text_default=self.container_var["General Settings"]["Line width"].get(),
+            command=lambda event, var_entr=self.container_var["General Settings"]["Line width"]:
+            self.check_lw_value(var_entr, event))
         #
         self.gui_elements["general_settings"]["Entry"]["General"].extend(
             [entr_01a, entr_07a, entr_07b, entr_07c, entr_07d, entr_10a])
@@ -10076,11 +10085,19 @@ class PySILLS(tk.Frame):
         ## Buttons
         btn_01 = SE(
             parent=subwindow_generalsettings, row_id=13, column_id=start_column, n_rows=1, n_columns=9,
-            fg=self.green_dark, bg=self.red_dark).create_simple_button(
-            text="Save Settings", bg_active=self.accent_color, fg_active=self.green_dark,
+            fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Save Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.confirm_general_settings)
         #
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
+
+        self.check_lw_value(var_entr=self.container_var["General Settings"]["Line width"], event="")
+
+    def check_lw_value(self, var_entr, event):
+        if float(var_entr.get()) < 0:
+            var_entr.set("0.5")
+        elif float(var_entr.get()) > 2:
+            var_entr.set("2.0")
 
     def change_colormap(self, var_opt):
         self.container_var["General Settings"]["Colormap"].set(var_opt)
@@ -12590,11 +12607,15 @@ class PySILLS(tk.Frame):
         var_file_long = self.container_lists[var_filetype]["Long"][self.current_file_id_checker]
         var_file_short = self.container_lists[var_filetype]["Short"][self.current_file_id_checker]
 
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         if self.temp_lines_checkup2[var_filetype][var_file_short] == 0:
             df_data = DE(filename_long=var_file_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file_long)
-            # dataset_time = list(df_data.iloc[:, 0])
             x_max = max(dataset_time)
             icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
             y_max = np.amax(icp_measurements)
@@ -12608,7 +12629,7 @@ class PySILLS(tk.Frame):
 
             for isotope in self.container_lists["ISOTOPES"]:
                 ln_raw = ax.plot(
-                    dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope], linewidth=1,
+                    dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
                     visible=True)
 
             # Background window
