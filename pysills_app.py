@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		07.08.2023
+# Date:		08.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -250,6 +250,8 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["Default SRM"].set("Select SRM")
         self.container_var["General Settings"]["Colormap"] = tk.StringVar()
         self.container_var["General Settings"]["Colormap"].set("turbo")
+        self.container_var["General Settings"]["Line width"] = tk.StringVar()
+        self.container_var["General Settings"]["Line width"].set("1.5")
         self.container_var["General Settings"]["File type"] = tk.StringVar()
         self.container_var["General Settings"]["File type"].set("*.csv")
         self.container_var["General Settings"]["Delimiter"] = tk.StringVar()
@@ -998,7 +1000,7 @@ class PySILLS(tk.Frame):
             rb_mode = SE(
                 parent=self.parent, row_id=5 + index, column_id=11, n_rows=1, n_columns=10, fg=self.green_medium,
                 bg=self.green_dark).create_radiobutton(
-                var_rb=self.var_rb_mode, value_rb=index, color_bg=self.bg_colors["Medium"],
+                var_rb=self.var_rb_mode, value_rb=index, color_bg=self.bg_colors["Light"],
                 fg=self.bg_colors["Dark Font"], text=mode, sticky="NESW", relief=tk.FLAT, font="sans 10 bold",
                 command=lambda var_rb=self.var_rb_mode: self.select_experiment(var_rb))
             #
@@ -1042,52 +1044,65 @@ class PySILLS(tk.Frame):
         #
         # Data Import
         SE(
-            parent=self.parent, row_id=19, column_id=0, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Add", bg_active=self.red_dark, fg_active=self.green_dark,
+            parent=self.parent, row_id=19, column_id=0, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Add", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda datatype="STD": self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=19, column_id=5, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Delete", bg_active=self.red_dark, fg_active=self.green_dark,
+            parent=self.parent, row_id=19, column_id=3, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Copy", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda filetype="STD": self.copy_file(filetype))
+        SE(
+            parent=self.parent, row_id=19, column_id=6, n_rows=2, n_columns=4, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Delete", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_lb=self.lb_std, var_list=self.list_std: self.delete_csv(var_lb, var_list))
         SE(
-            parent=self.parent, row_id=19, column_id=11, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Add", bg_active=self.red_dark, fg_active=self.green_dark,
+            parent=self.parent, row_id=19, column_id=11, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Add", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda datatype="SMPL": self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=19, column_id=16, n_rows=2, n_columns=5, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Delete", bg_active=self.red_dark, fg_active=self.green_dark,
+            parent=self.parent, row_id=19, column_id=14, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Copy", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda filetype="SMPL": self.copy_file(filetype))
+        SE(
+            parent=self.parent, row_id=19, column_id=17, n_rows=2, n_columns=4, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Delete", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_lb=self.lb_smpl, var_list=self.list_smpl: self.delete_csv(var_lb, var_list))
         #
         SE(
             parent=self.parent, row_id=5, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="New Project", bg_active=self.red_dark, fg_active=self.green_dark, command=self.restart_pysills)
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="New Project", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.restart_pysills)
         SE(
             parent=self.parent, row_id=7, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Load Project", bg_active=self.red_dark, fg_active=self.green_dark, command=self.open_project)
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Load Project", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.open_project)
         SE(
             parent=self.parent, row_id=9, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Save Project", bg_active=self.red_dark, fg_active=self.green_dark, command=self.save_project)
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Save Project", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.save_project)
         SE(
             parent=self.parent, row_id=11, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="General Settings", bg_active=self.red_dark, fg_active=self.green_dark,
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="General Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.subwindow_general_settings)
         btn_docu = SE(
             parent=self.parent, row_id=13, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Documentation", bg_active=self.red_dark, fg_active=self.green_dark)
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Documentation", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_docu.configure(state="disabled")
         SE(
             parent=self.parent, row_id=15, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Quit", bg_active=self.red_dark, fg_active=self.green_dark, command=self.parent.quit)
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Quit", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"], command=self.parent.quit)
         #
         ## Initialization
         self.select_experiment(var_rb=self.var_rb_mode)
@@ -1096,7 +1111,70 @@ class PySILLS(tk.Frame):
         for item in var_list:
             if type(item) in [float, int]:
                 var_list_new.append(item)
-    #
+
+    def copy_file(self, filetype):
+        if filetype == "STD":
+            var_lb = self.lb_std
+            var_list = self.list_std
+        elif filetype == "SMPL":
+            var_lb = self.lb_smpl
+            var_list = self.list_smpl
+
+        item = var_lb.curselection()
+        var_file_long = var_list[item[0]]
+        var_file_long_parts = var_file_long.split(".")
+        var_file_extension = var_file_long_parts[-1]
+        var_file_long_copy = var_file_long_parts[0] + "_copy" + "." + var_file_extension
+
+        with open(var_file_long, "r") as file:
+            content = file.read()
+
+        with open(var_file_long_copy, "w") as copied_file:
+            copied_file.write(content)
+
+        if var_file_long_copy not in var_list:
+            var_list.append(var_file_long_copy)
+            file_parts_copy = var_file_long_copy.split("/")
+            var_file_short_copy = file_parts_copy[-1]
+            var_lb.insert(tk.END, var_file_short_copy)
+            #
+            if var_file_long_copy not in self.container_lists[filetype]["Long"]:
+                self.container_lists[filetype]["Long"].append(var_file_long_copy)
+                self.container_lists[filetype]["Short"].append(var_file_short_copy)
+
+            self.container_var["ma_setting"]["Data Type Plot"][filetype][var_file_short_copy] = tk.IntVar()
+            self.container_var["ma_setting"]["Data Type Plot"][filetype][var_file_short_copy].set(0)
+            self.container_var["ma_setting"]["Analyse Mode Plot"][filetype][var_file_short_copy] = tk.IntVar()
+            self.container_var["ma_setting"]["Analyse Mode Plot"][filetype][var_file_short_copy].set(0)
+            self.container_var["ma_setting"]["Display RAW"][filetype][var_file_short_copy] = {}
+            self.container_var["ma_setting"]["Display SMOOTHED"][filetype][var_file_short_copy] = {}
+
+            if var_file_short_copy not in self.container_var["ma_setting"]["Time-Signal Lines"][filetype]:
+                self.container_var["ma_setting"]["Time-Signal Lines"][filetype][var_file_short_copy] = {}
+                self.container_var["ma_setting"]["Time-Ratio Lines"][filetype][var_file_short_copy] = {}
+                self.container_var["ma_setting"]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy] = {}
+                self.container_var["ma_setting"]["Calculation Interval"][filetype][
+                    var_file_short_copy] = tk.IntVar()
+                self.container_var["ma_setting"]["Calculation Interval"][filetype][var_file_short_copy].set(3)
+                self.container_var["ma_setting"]["Calculation Interval Visibility"][filetype][
+                    var_file_short_copy] = {}
+
+            for isotope in self.container_lists["ISOTOPES"]:
+                self.build_checkbutton_isotope_visibility(
+                    var_mode="ma_setting", var_filetype=filetype, var_filename_short=var_file_short_copy,
+                    var_isotope=isotope)
+
+                self.container_var["ma_setting"]["Time-Signal Lines"][filetype][var_file_short_copy][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+                self.container_var["ma_setting"]["Time-Ratio Lines"][filetype][var_file_short_copy][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+                self.container_var["ma_setting"]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy][
+                    isotope] = {"RAW": None, "SMOOTHED": None}
+
+            self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
+            self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
+            self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
+
     def select_experiment(self, var_rb):
         start_row = 9
         start_column = 11
@@ -1121,18 +1199,18 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Settings", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Results", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03.configure(state="disabled")
             #
@@ -1158,18 +1236,18 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Settings", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Results", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_datareduction_files)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03.configure(state="disabled")
             #
@@ -1195,16 +1273,16 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Settings", bg_active=self.red_dark, fg_active=self.green_dark)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Results", bg_active=self.red_dark, fg_active=self.green_dark)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03.configure(state="disabled")
             #
@@ -1230,16 +1308,16 @@ class PySILLS(tk.Frame):
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Settings", bg_active=self.red_dark, fg_active=self.green_dark)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Results", bg_active=self.red_dark, fg_active=self.green_dark)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-                text="Extras", bg_active=self.red_dark, fg_active=self.green_dark,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03.configure(state="disabled")
             #
@@ -3002,7 +3080,6 @@ class PySILLS(tk.Frame):
             text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
 
         df_data = DE(filename_long=var_file_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
-        # df_data = self.load_and_assign_data(filename=var_file_long)
         list_keys = list(df_data.columns.values)
         del list_keys[0]
         dataset_time = list(df_data.iloc[:, 0])
@@ -3049,9 +3126,16 @@ class PySILLS(tk.Frame):
             "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
         #
         self.temp_lines = {}
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         for isotope in self.container_lists["ISOTOPES"]:
             ln = var_ax.plot(dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                         linewidth=1, visible=True)
+                         linewidth=var_lw, visible=True)
             self.temp_lines[isotope] = ln
         #
         if var_file_short in self.container_helper[var_filetype]:
@@ -9816,9 +9900,13 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=5, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Report File", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_10 = SE(
+            parent=subwindow_generalsettings, row_id=9, column_id=start_column + 27, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Plotting Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09])
+            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10])
         #
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=9,
@@ -9856,9 +9944,13 @@ class PySILLS(tk.Frame):
                 parent=subwindow_generalsettings, row_id=7, column_id=start_column + 27, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
                 text="Delimiter", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_10a = SE(
+            parent=subwindow_generalsettings, row_id=10, column_id=start_column + 27, n_rows=1, n_columns=5,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Line width", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b, lbl_08a, lbl_09a, lbl_09b])
+            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b, lbl_08a, lbl_09a, lbl_09b, lbl_10a])
         #
         ## Entries
         entr_01a = SE(
@@ -9886,9 +9978,14 @@ class PySILLS(tk.Frame):
             fg=self.green_light, bg=self.green_dark).create_simple_entry(
             var=self.container_var["General Settings"]["MAT Offset End"],
             text_default=self.container_var["General Settings"]["MAT Offset End"].get(), command=None)
+        entr_10a = SE(
+            parent=subwindow_generalsettings, row_id=10, column_id=start_column + 32, n_rows=1, n_columns=5,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
+            var=self.container_var["General Settings"]["Line width"],
+            text_default=self.container_var["General Settings"]["Line width"].get(), command=None)
         #
         self.gui_elements["general_settings"]["Entry"]["General"].extend(
-            [entr_01a, entr_07a, entr_07b, entr_07c, entr_07d])
+            [entr_01a, entr_07a, entr_07b, entr_07c, entr_07d, entr_10a])
         #
         ## Option Menus
         list_srm = list(np.sort(self.list_srm))
@@ -10957,8 +11054,9 @@ class PySILLS(tk.Frame):
                 for file in demo_files:
                     if file.startswith("demo_ma"):
                         path_complete = os.path.join(path + str("/demo_files/"), file)
-                        path_raw = pathlib.PureWindowsPath(path_complete)
-                        ma_demo_files["ALL"].append(str(path_raw.as_posix()))
+                        if "_copy" not in  path_complete:
+                            path_raw = pathlib.PureWindowsPath(path_complete)
+                            ma_demo_files["ALL"].append(str(path_raw.as_posix()))
                 ma_demo_files["ALL"].sort()
                 ma_demo_files["STD"].extend(ma_demo_files["ALL"][:3])
                 ma_demo_files["STD"].extend(ma_demo_files["ALL"][-3:])
@@ -13590,16 +13688,22 @@ class PySILLS(tk.Frame):
         ## DIAGRAMS
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Signal": ax}
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         for isotope in self.container_lists["ISOTOPES"]:
             ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                             linewidth=1, visible=True)
+                             linewidth=var_lw, visible=True)
             self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope]["RAW"] = ln_raw
             #
             if "Uncut" in self.container_measurements["EDITED"][var_file_short][isotope]:
                 ln_smoothed = ax.plot(
                     self.dataset_time, self.container_measurements["EDITED"][var_file_short][isotope]["Uncut"],
-                    label=isotope, color=self.isotope_colors[isotope], linewidth=1, visible=True)
+                    label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "SMOOTHED"] = ln_smoothed
                 self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
@@ -13785,15 +13889,19 @@ class PySILLS(tk.Frame):
         #
         df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
-        # df_data = self.load_and_assign_data(filename=var_file)
-        # self.dataset_time = list(df_data.iloc[:, 0])
         x_max = max(self.dataset_time)
         icp_measurements = np.array([[df_data[isotope]/df_data[var_is] for isotope in self.container_lists["ISOTOPES"]]])
         y_max = np.amax(icp_measurements)
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         for isotope in self.container_lists["ISOTOPES"]:
             ln_raw = ax_ratio.plot(self.dataset_time, df_data[isotope]/df_data[var_is], label=isotope,
-                                   color=self.isotope_colors[isotope], linewidth=1, visible=True)
+                                   color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
         #
         ax_ratio.grid(True)
         ax_ratio.set_yscale("log")
@@ -18793,7 +18901,13 @@ class PySILLS(tk.Frame):
                                       self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
                                           "b"]
                         y_values.append(y_value)
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         if var_file in self.container_lists["SMPL"]["Short"]:
             zipped_lists = zip(x_values, y_values)
             sorted_zipped_lists = sorted(zipped_lists)
@@ -18803,7 +18917,7 @@ class PySILLS(tk.Frame):
                 x_data.append(element[0])
                 y_data.append(element[1])
             #
-            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
         else:
             if var_srm_isotope == var_srm_file:
                 zipped_lists = zip(x_values, y_values)
@@ -18814,7 +18928,8 @@ class PySILLS(tk.Frame):
                     x_data.append(element[0])
                     y_data.append(element[1])
                 #
-                self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+                self.ax_sensitivity_03a.plot(
+                    x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
         #
         self.ax_sensitivity_03a.grid(True)
         self.ax_sensitivity_03a.grid(which="major", linestyle="-", linewidth=1)
@@ -18934,6 +19049,12 @@ class PySILLS(tk.Frame):
                             x_values.append(x_value)
                             y_values.append(y_value)
 
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         if var_file in self.container_lists["SMPL"]["Short"]:
             zipped_lists = zip(x_values, y_values)
             sorted_zipped_lists = sorted(zipped_lists)
@@ -18943,7 +19064,7 @@ class PySILLS(tk.Frame):
                 x_data.append(element[0])
                 y_data.append(element[1])
             #
-            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
         else:
             if var_srm_isotope == var_srm_file:
                 zipped_lists = zip(x_values, y_values)
@@ -18954,7 +19075,8 @@ class PySILLS(tk.Frame):
                     x_data.append(element[0])
                     y_data.append(element[1])
                 #
-                self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=2, linestyle="dashed")
+                self.ax_sensitivity_03a.plot(
+                    x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
         #
         self.ax_sensitivity_03a.grid(True)
         self.ax_sensitivity_03a.grid(which="major", linestyle="-", linewidth=1)
@@ -19008,7 +19130,13 @@ class PySILLS(tk.Frame):
         #
         x_all = []
         y_all = []
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         for index, var_file in enumerate(self.container_lists[var_filetype]["Short"]):
             var_file_long = self.container_lists[var_filetype]["Long"][index]
             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
@@ -19029,7 +19157,7 @@ class PySILLS(tk.Frame):
                     self.ax_sensitivity_03a2.scatter(
                         x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                     self.ax_sensitivity_03a2.plot(
-                        x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                        x_values_02, y_values_02, color=self.accent_color, linewidth=var_lw, linestyle="--")
                 else:
                     var_srm_isotope_01 = self.container_var["SRM"][var_iso_01].get()
                     var_srm_isotope_02 = self.container_var["SRM"][var_iso_02].get()
@@ -19051,7 +19179,7 @@ class PySILLS(tk.Frame):
                         self.ax_sensitivity_03a2.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                         self.ax_sensitivity_03a2.plot(
-                            x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                            x_values_02, y_values_02, color=self.accent_color, linewidth=var_lw, linestyle="--")
         #
         self.ax_sensitivity_03a2.grid(True)
         self.ax_sensitivity_03a2.set_xlim(left=0, right=1.1*max(x_all))
@@ -19097,7 +19225,13 @@ class PySILLS(tk.Frame):
             var_iso_02 = self.var_opt_iso_05.get()
         except:
             var_iso_02 = self.var_opt_iso_05
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         for index, var_file in enumerate(self.container_lists[var_filetype]["Short"]):
             var_file_long = self.container_lists[var_filetype]["Long"][index]
             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
@@ -19118,7 +19252,7 @@ class PySILLS(tk.Frame):
                     self.ax_sensitivity_03a2.scatter(
                         x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                     self.ax_sensitivity_03a2.plot(
-                        x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                        x_values_02, y_values_02, color=self.accent_color, linewidth=var_lw, linestyle="--")
                 else:
                     var_srm_isotope_01 = self.container_var["SRM"][var_iso_01].get()
                     var_srm_isotope_02 = self.container_var["SRM"][var_iso_02].get()
@@ -19140,7 +19274,7 @@ class PySILLS(tk.Frame):
                         self.ax_sensitivity_03a2.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                         self.ax_sensitivity_03a2.plot(
-                            x_values_02, y_values_02, color=self.accent_color, linewidth=2, linestyle="--")
+                            x_values_02, y_values_02, color=self.accent_color, linewidth=var_lw, linestyle="--")
         #
         self.ax_sensitivity_03a2.grid(True)
         self.ax_sensitivity_03a2.set_xlim(left=0, right=1.1*max(x_all))
@@ -20535,25 +20669,29 @@ class PySILLS(tk.Frame):
 
         df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
-        # df_data = self.load_and_assign_data(filename=var_file)
-        # self.dataset_time = list(df_data.iloc[:, 0])
         x_max = max(self.dataset_time)
         icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
         y_max = np.amax(icp_measurements)
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         ## DIAGRAMS
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Signal": ax}
         #
         for isotope in self.container_lists["ISOTOPES"]:
             ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                             linewidth=1, visible=True)
+                             linewidth=var_lw, visible=True)
             self.container_var["fi_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope]["RAW"] = ln_raw
             #
             if "Uncut" in self.container_measurements["EDITED"][var_file_short][isotope]:
                 ln_smoothed = ax.plot(
                     self.dataset_time, self.container_measurements["EDITED"][var_file_short][isotope]["Uncut"],
-                    label=isotope, color=self.isotope_colors[isotope], linewidth=1, visible=True)
+                    label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
                 self.container_var["fi_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "SMOOTHED"] = ln_smoothed
                 self.container_var["fi_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
@@ -20738,17 +20876,21 @@ class PySILLS(tk.Frame):
 
         df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
-        # df_data = self.load_and_assign_data(filename=var_file)
-        # self.dataset_time = list(df_data.iloc[:, 0])
         x_max = max(self.dataset_time)
         icp_measurements = np.array(
             [[df_data[isotope]/df_data[var_key_isotope] for isotope in self.container_lists["ISOTOPES"]]])
         y_max = np.amax(icp_measurements)
-        #
+
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0:
+            var_lw = 0.5
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
         for isotope in self.container_lists["ISOTOPES"]:
             ln_raw = ax_ratio.plot(
                 self.dataset_time, df_data[isotope]/df_data[var_key_isotope], label=isotope,
-                color=self.isotope_colors[isotope], linewidth=1, visible=True)
+                color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
             self.container_var["fi_setting"]["Time-Ratio Lines"][var_type][var_file_short][isotope]["RAW"] = ln_raw
         #
         ax_ratio.grid(True)
