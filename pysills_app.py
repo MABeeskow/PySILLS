@@ -136,15 +136,15 @@ class PySILLS(tk.Frame):
             default_font = font.nametofont("TkDefaultFont")
             default_font.configure(family="Ubuntu", size=10, weight=font.BOLD)
             self.parent.option_add("*Font", default_font)
-            #
+            mpl.rcParams["backend"] = "TkAgg"
         elif var_os == "darwin":
             self.defaultFont = font.nametofont("TkDefaultFont")
             default_font = font.nametofont("TkDefaultFont")
-            #default_font.configure(family="Helvetica", size=10, weight=font.BOLD)
             self.parent.option_add("*Font", default_font)
-            #
+            mpl.rcParams["backend"] = "MacOSX"
         else:
-            pass
+            print("Hello Windows!")
+            mpl.rcParams["backend"] = "TkAgg"
         #
         ## Data Container
         self.container_elements = {}
@@ -3123,16 +3123,9 @@ class PySILLS(tk.Frame):
             cb_i.select()
         #
         ## DIAGRAMS
-        var_fig = Figure(tight_layout=True, facecolor=self.bg_colors["Very Light"])
-        #var_fig = Figure(figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        var_fig = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         var_ax = var_fig.add_subplot(label=np.random.uniform())
-        #var_canvas = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
-        #var_toolbarFrame = tk.Frame(master=subwindow_quickplotter)
-        #var_toolbar = NavigationToolbar2Tk(var_canvas, var_toolbarFrame)
-        #
-        #self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short] = {
-        #    "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
-        #
+
         self.temp_lines = {}
 
         var_lw = float(self.container_var["General Settings"]["Line width"].get())
@@ -3174,14 +3167,16 @@ class PySILLS(tk.Frame):
         var_canvas = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
         var_canvas.get_tk_widget().grid(
             row=row_start + 1, column=column_start, rowspan=n_rows - 3, columnspan=40, sticky="nesw")
-
         # Toolbar
         var_toolbarFrame = tk.Frame(master=subwindow_quickplotter)
+        var_toolbarFrame.grid(row=n_rows - 2, column=0, rowspan=2, columnspan=40, sticky="ew")
         var_toolbar = NavigationToolbar2Tk(var_canvas, var_toolbarFrame)
-        var_toolbarFrame.grid(row=n_rows - 2, column=0, rowspan=2, columnspan=40, sticky="w")
-        var_toolbar.config(background=self.bg_colors["Very Light"])
-        var_toolbar._message_label.config(background=self.bg_colors["Very Light"])
-        var_toolbar.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
+        var_toolbar.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        var_toolbar._message_label.config(
+            background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12 bold")
+        var_toolbar.winfo_children()[-2].config(background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
 
         self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short] = {
             "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
@@ -3189,13 +3184,13 @@ class PySILLS(tk.Frame):
         ## BUTTONS
         btn_01 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2, column_id=column_start + 40, n_rows=2, n_columns=5,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-            text="Show All", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Show All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_file_short=var_file_short: self.show_all_lines(var_file_short))
         btn_02 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2, column_id=column_start + 45, n_rows=2, n_columns=5,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-            text="Hide All", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Hide All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_file_short=var_file_short: self.hide_all_lines(var_file_short))
     #
     def show_line(self, var_isotope, var_file_short):
@@ -13523,9 +13518,9 @@ class PySILLS(tk.Frame):
             relief=tk.GROOVE)
         rb_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
-            n_columns=26, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            n_columns=26, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=3,
-            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="No Selection",
+            color_bg=self.bg_colors["Super Dark"], fg=self.bg_colors["Light Font"], text="No Selection",
             sticky="nesw", relief=tk.GROOVE)
         #
         ## CHECKBOXES
@@ -13566,13 +13561,13 @@ class PySILLS(tk.Frame):
         #
         entr_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=7, n_rows=1, n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_start, text_default=var_entr_start.get(),
             command=lambda event, var_entr=var_entr_start, var_key="Start", mode=var_file, var_interval=None:
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
         entr_04b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=7, n_rows=1, n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_end, text_default=var_entr_end.get(),
             command=lambda event, var_entr=var_entr_end, var_key="End", mode=var_file, var_interval=None:
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
@@ -13671,12 +13666,16 @@ class PySILLS(tk.Frame):
         self.canvas_specific = FigureCanvasTkAgg(self.fig_specific, master=self.subwindow_ma_checkfile)
         self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
         self.toolbarFrame_specific = tk.Frame(master=self.subwindow_ma_checkfile)
-        self.toolbarFrame_specific.grid(row=20, column=14, rowspan=2, columnspan=39, sticky="w")
+        self.toolbarFrame_specific.grid(row=20, column=14, rowspan=2, columnspan=39, sticky="ew")
         self.toolbar_specific = NavigationToolbar2Tk(self.canvas_specific, self.toolbarFrame_specific)
-        self.toolbar_specific.config(background=self.bg_colors["Very Light"])
-        self.toolbar_specific._message_label.config(background=self.bg_colors["Very Light"])
-        self.toolbar_specific.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
-        #
+        self.toolbar_specific.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        self.toolbar_specific._message_label.config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12 bold")
+        self.toolbar_specific.winfo_children()[-2].config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+
         self.container_helper[var_type][var_file_short]["FIGURE"] = self.fig_specific
         self.container_helper[var_type][var_file_short]["CANVAS"] = self.canvas_specific
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME"] = self.toolbarFrame_specific
