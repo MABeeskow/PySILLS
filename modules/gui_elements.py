@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 05.04.2023
+# 08.08.2023
 # ----------------------
 #
 ## MODULES
@@ -238,7 +238,7 @@ class SimpleElements:
     #
     def create_simple_entry(self, var, command=None, text_default=0.0):
         var.set(text_default)
-        entry = tk.Entry(self.parent, textvariable=var)
+        entry = tk.Entry(self.parent, textvariable=var, fg=self.fg, bg=self.bg, highlightthickness=0)
         entry.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
                    sticky="nesw")
         if command != None:
@@ -249,8 +249,7 @@ class SimpleElements:
     def create_simple_entries(self, command=None, text_default=0.0):
         var = tk.StringVar()
         var.set(text_default)
-        #entry = tk.Entry(self.parent, textvariable=var, command=command)
-        entry = tk.Entry(self.parent, textvariable=var)
+        entry = tk.Entry(self.parent, textvariable=var, fg=self.fg, bg=self.bg, highlightthickness=0)
         entry.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
                    sticky="nesw")
         if command != None:
@@ -660,9 +659,10 @@ class SimpleElements:
         scrollbar_y = tk.Scrollbar(frame_lb, orient="vertical")
         if include_scrb_x == True:
             scrollbar_x = tk.Scrollbar(frame_lb, orient="horizontal")
-            listbox = tk.Listbox(frame_lb, bg=self.bg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
+            listbox = tk.Listbox(
+                frame_lb, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
         else:
-            listbox = tk.Listbox(frame_lb, bg=self.bg, yscrollcommand=scrollbar_y.set)
+            listbox = tk.Listbox(frame_lb, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set)
         #
         scrollbar_y.config(command=listbox.yview)
         if include_scrb_x == True:

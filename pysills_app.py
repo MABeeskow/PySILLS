@@ -977,23 +977,23 @@ class PySILLS(tk.Frame):
             print("There is no user_settings file!")
         #
         ## Logo
-        self.path_pysills = os.getcwd()
-        pysills_logo = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Logo.png"))
-        pysills_logo = pysills_logo.subsample(1, 1)
-        img = tk.Label(self.parent, image=pysills_logo, bg=self.bg_colors["Super Dark"])
-        img.image = pysills_logo
-        img.grid(row=0, column=0, rowspan=2, columnspan=20, sticky="nesw")
+        try:
+            self.path_pysills = os.getcwd()
+            pysills_logo = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Logo.png"))
+            pysills_logo = pysills_logo.subsample(1, 1)
+            img = tk.Label(self.parent, image=pysills_logo, bg=self.bg_colors["Super Dark"])
+            img.image = pysills_logo
+            img.grid(row=0, column=0, rowspan=2, columnspan=20, sticky="nesw")
 
-        ## Icon
-        pysills_icon = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Icon.png"))
-        self.parent.iconphoto(False, pysills_icon)
+            ## Icon
+            pysills_icon = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Icon.png"))
+            self.parent.iconphoto(False, pysills_icon)
+        except:
+            pass
 
         ## Radiobuttons
         self.pysills_mode = None
         self.demo_mode = True
-        #var_rb_main = tk.IntVar()
-        #var_rb_main.set(0)
-        #self.container_var["main"]["Radiobutton"].append(var_rb_main)
         list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
@@ -1035,10 +1035,10 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=21, column_id=11, n_rows=16, n_columns=10, fg=self.green_dark,
             bg=self.bg_colors["Very Light"]).create_simple_listbox()
         #
-        self.quick_plot_figure_std = Figure(figsize=(10, 5), dpi=150, tight_layout=True,
-                                            facecolor=self.bg_colors["Very Light"])
-        self.quick_plot_figure_smpl = Figure(figsize=(10, 5), dpi=150, tight_layout=True,
-                                             facecolor=self.bg_colors["Very Light"])
+        self.quick_plot_figure_std = Figure(
+            figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        self.quick_plot_figure_smpl = Figure(
+            figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.lb_std.bind("<Double-1>", lambda event, var_filetype="STD": self.quick_plot_file(var_filetype, event))
         self.lb_smpl.bind("<Double-1>", lambda event, var_filetype="SMPL": self.quick_plot_file(var_filetype, event))
         #
@@ -3123,14 +3123,15 @@ class PySILLS(tk.Frame):
             cb_i.select()
         #
         ## DIAGRAMS
-        var_fig = Figure(figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        var_fig = Figure(tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        #var_fig = Figure(figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
         var_ax = var_fig.add_subplot(label=np.random.uniform())
-        var_canvas = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
-        var_toolbarFrame = tk.Frame(master=subwindow_quickplotter)
-        var_toolbar = NavigationToolbar2Tk(var_canvas, var_toolbarFrame)
+        #var_canvas = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
+        #var_toolbarFrame = tk.Frame(master=subwindow_quickplotter)
+        #var_toolbar = NavigationToolbar2Tk(var_canvas, var_toolbarFrame)
         #
-        self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short] = {
-            "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
+        #self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short] = {
+        #    "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
         #
         self.temp_lines = {}
 
@@ -3168,16 +3169,23 @@ class PySILLS(tk.Frame):
         var_ax.set_ylabel("Signal (cps)", labelpad=0.5, fontsize=8)
         var_ax.xaxis.set_tick_params(labelsize=8)
         var_ax.yaxis.set_tick_params(labelsize=8)
-        #
+
         # Canvas
-        var_canvas.get_tk_widget().grid(row=row_start + 1, column=column_start, rowspan=n_rows - 3, columnspan=40,
-                                        sticky="nesw")
+        var_canvas = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
+        var_canvas.get_tk_widget().grid(
+            row=row_start + 1, column=column_start, rowspan=n_rows - 3, columnspan=40, sticky="nesw")
+
         # Toolbar
+        var_toolbarFrame = tk.Frame(master=subwindow_quickplotter)
+        var_toolbar = NavigationToolbar2Tk(var_canvas, var_toolbarFrame)
         var_toolbarFrame.grid(row=n_rows - 2, column=0, rowspan=2, columnspan=40, sticky="w")
         var_toolbar.config(background=self.bg_colors["Very Light"])
         var_toolbar._message_label.config(background=self.bg_colors["Very Light"])
         var_toolbar.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
-        #
+
+        self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short] = {
+            "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
+
         ## BUTTONS
         btn_01 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2, column_id=column_start + 40, n_rows=2, n_columns=5,
@@ -9293,7 +9301,9 @@ class PySILLS(tk.Frame):
             text_dwell.insert("end", "\t")
 
             entr_i = tk.Entry(
-                frm_dwell, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope])
+                frm_dwell, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"])
             text_dwell.window_create("insert", window=entr_i)
             text_dwell.insert("end", "\n")
 
@@ -9593,7 +9603,9 @@ class PySILLS(tk.Frame):
                     var_txt_smpl_i = "0.0"
                 self.container_var["SMPL"][file]["IS Data"]["Concentration"].set(var_txt_smpl_i)
                 entr_i = tk.Entry(
-                    frm_iso, textvariable=self.container_var["SMPL"][file]["IS Data"]["Concentration"])
+                    frm_iso, textvariable=self.container_var["SMPL"][file]["IS Data"]["Concentration"],
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                    highlightbackground=self.bg_colors["Very Light"])
                 text_iso.window_create("insert", window=entr_i)
                 text_iso.insert("end", "\n")
 
@@ -9619,8 +9631,8 @@ class PySILLS(tk.Frame):
                 var_txt_default_smpl = "0.0"
             #
             entr_smpl_def = SE(
-                parent=window_issetup, row_id=16, column_id=14, n_rows=1, n_columns=6, fg=self.green_light,
-                bg=self.green_dark).create_simple_entry(
+                parent=window_issetup, row_id=16, column_id=14, n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var["IS SMPL Default"], text_default=var_txt_default_smpl,
                 command=lambda event, var_entr=self.container_var["IS SMPL Default"]:
                 self.change_is_value_default(var_entr, event))
@@ -10562,7 +10574,7 @@ class PySILLS(tk.Frame):
 
         entr_std = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 1, column_id=start_column + 17, n_rows=2,
-            n_columns=8, fg=self.green_dark, bg=self.green_medium).create_simple_entry(
+            n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.var_entr_std_time, text_default=self.var_entr_std_time.get(),
             command=lambda event, filetype="STD": self.change_value_acquisition(filetype, event))
 
@@ -10571,7 +10583,7 @@ class PySILLS(tk.Frame):
 
         entr_smpl = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 17, column_id=start_column + 17, n_rows=2,
-            n_columns=8, fg=self.green_dark, bg=self.green_medium).create_simple_entry(
+            n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.var_entr_smpl_time, text_default=self.var_entr_smpl_time.get(),
             command=lambda event, filetype="SMPL": self.change_value_acquisition(filetype, event))
 
@@ -11108,12 +11120,6 @@ class PySILLS(tk.Frame):
             df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             self.times = DE().get_times(dataframe=df_exmpl)
             self.container_lists["ISOTOPES"] = DE().get_isotopes(dataframe=df_exmpl)
-            # dataset_exmpl = Data(filename=self.list_std[0])
-            # df_exmpl = dataset_exmpl.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
-            # self.times = df_exmpl.iloc[:, 0]
-            # self.list_isotopes = list(df_exmpl.columns.values)
-            # self.list_isotopes.pop(0)
-            # self.container_lists["ISOTOPES"] = self.list_isotopes
 
             self.define_isotope_colors()
 
@@ -11246,10 +11252,7 @@ class PySILLS(tk.Frame):
 
             df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             times_std_i = DE().get_times(dataframe=df_std_i)
-            # dataset_std_i = Data(filename=file_std)
-            # df_std_i = dataset_std_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
-            # times_std_i = df_std_i.iloc[:, 0]
-            #
+
             if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
                 self.container_lists["STD"]["Long"].append(file_std)
                 self.container_lists["STD"]["Short"].append(file_std_short)
@@ -11272,12 +11275,8 @@ class PySILLS(tk.Frame):
                     self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
             #
             if self.file_loaded is False:
-                #if "Si29" in self.container_lists["ISOTOPES"]:
-                #    possible_is = "Si29"
                 if file_std not in self.container_var["STD"]:
                     self.container_var["STD"][file_std] = {}
-                    #self.container_var["STD"][file_std]["IS"] = tk.StringVar()
-                    #self.container_var["STD"][file_std]["IS"].set(possible_is)
                     self.container_var["STD"][file_std]["IS Data"] = {
                         "IS": tk.StringVar(), "Concentration": tk.StringVar()}
                     self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
@@ -11394,18 +11393,19 @@ class PySILLS(tk.Frame):
                 command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.ma_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color)
             opt_srm_i.config(
-                bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
             text_std.window_create("end", window=opt_srm_i)
             text_std.insert("end", "\t")
 
             btn_i = tk.Button(
                 master=frm_std, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
-                command=lambda var_file=file_std, var_type="STD": self.ma_check_specific_file(var_file, var_type))
+                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"], command=lambda var_file=file_std, var_type="STD":
+                self.ma_check_specific_file(var_file, var_type))
             text_std.window_create("end", window=btn_i)
             text_std.insert("end", "\t")
 
@@ -11434,16 +11434,12 @@ class PySILLS(tk.Frame):
             file_smpl_short = parts[-1]
             #
             if self.file_loaded is False:
-                #if "Si29" in self.container_lists["ISOTOPES"]:
-                #    possible_is = "Si29"
                 if file_smpl not in self.container_var["SMPL"]:
                     self.container_var["SMPL"][file_smpl] = {}
                     self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
                     self.container_var["SMPL"][file_smpl]["IS"].set("Select IS")
-                    #self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
                     self.container_var["SMPL"][file_smpl]["IS Data"] = {
                         "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                    #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
                     self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
                     self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
                     self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
@@ -11487,10 +11483,7 @@ class PySILLS(tk.Frame):
             #
             df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             times_smpl_i = DE().get_times(dataframe=df_smpl_i)
-            # dataset_smpl_i = Data(filename=file_smpl)
-            # df_smpl_i = dataset_smpl_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
-            # times_smpl_i = df_smpl_i.iloc[:, 0]
-            #
+
             if file_smpl not in self.container_lists["SMPL"]["Long"] and self.demo_mode == True:
                 self.container_lists["SMPL"]["Long"].append(file_smpl)
                 self.container_lists["SMPL"]["Short"].append(file_smpl_short)
@@ -11598,41 +11591,48 @@ class PySILLS(tk.Frame):
                 anchor=tk.CENTER, highlightthickness=0, bd=0)
             text_smpl.window_create("end", window=cb_i)
             text_smpl.insert("end", "\t")
-            #
+
             if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
                 var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
                 #
             else:
                 var_text = "Select IS"
-            #
-            opt_is_i = tk.OptionMenu(frm_smpl, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], var_text,
-                                     *self.container_lists["ISOTOPES"])
+                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
+
+            opt_is_i = tk.OptionMenu(
+                frm_smpl, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"],
+                *self.container_lists["ISOTOPES"])
             opt_is_i["menu"].config(
                 fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_is_i.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+                activebackground=self.accent_color, bd=0)
+            opt_is_i.config(
+                bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0, bd=0)
             text_smpl.window_create("end", window=opt_is_i)
             text_smpl.insert("end", "\t")
-            #
+
             if self.container_var["SMPL"][file_smpl]["ID"].get() != "A":
                 var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
             else:
                 var_text = "A"
+
             opt_id_i = tk.OptionMenu(frm_smpl, self.container_var["SMPL"][file_smpl]["ID"],
                                      *np.sort(self.list_alphabet))
             opt_id_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_id_i.config(bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, bd=0)
+            opt_id_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"], bd=0)
             text_smpl.window_create("end", window=opt_id_i)
             text_smpl.insert("end", "\t")
             #
             btn_i = tk.Button(
                 master=frm_smpl, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
-                command=lambda var_file=file_smpl, var_type="SMPL": self.ma_check_specific_file(var_file, var_type))
+                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"], command=lambda var_file=file_smpl, var_type="SMPL":
+                self.ma_check_specific_file(var_file, var_type))
             text_smpl.window_create("end", window=btn_i)
             text_smpl.insert("end", "\t")
 
@@ -11854,10 +11854,13 @@ class PySILLS(tk.Frame):
         else:
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-            self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            #self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
         self.build_srm_database()
+
+    def change_is_smpl(self, var_opt):
+        print("Selected IS:", var_opt)
 
     def place_project_information(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Project Information'
@@ -11893,11 +11896,11 @@ class PySILLS(tk.Frame):
 
         entr_01a = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=1,
-            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ma_setting"]["Author"], text_default=var_entr_01a_default)
         entr_01b = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=1,
-            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ma_setting"]["Source ID"], text_default=var_entr_01b_default)
 
     def place_standard_reference_material(self, var_geometry_info):
@@ -11950,34 +11953,6 @@ class PySILLS(tk.Frame):
 
         self.container_var["SRM"]["default"][1].set(var_text_iso)
 
-        # opt_02a = SE(
-        #     parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n - 4, n_rows=var_row_n,
-        #     n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
-        #     bg=self.bg_colors["Light"]).create_option_isotope(
-        #     var_iso=self.container_var["SRM"]["default"][0], option_list=self.container_lists["SRM Library"],
-        #     text_set=var_text_std, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-        #     command=lambda var_srm=self.container_var["SRM"]["default"][0]: self.change_srm_default(var_srm))
-        # opt_02a["menu"].config(
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-        #     activebackground=self.accent_color)
-        # opt_02a.config(
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
-        #     activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
-        # opt_02b = SE(
-        #     parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n - 4, n_rows=var_row_n,
-        #     n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
-        #     bg=self.bg_colors["Light"]).create_option_isotope(
-        #     var_iso=self.container_var["SRM"]["default"][1], option_list=self.container_lists["SRM Library"],
-        #     text_set=var_text_iso, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-        #     command=lambda var_srm=self.container_var["SRM"]["default"][1]:
-        #     self.change_srm_default(var_srm, key="isotope"))
-        # opt_02b["menu"].config(
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-        #     activebackground=self.accent_color)
-        # opt_02b.config(
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activebackground=self.accent_color,
-        #     activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
         opt_02a = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n - 4, n_rows=var_row_n,
             n_columns=var_category_n - 2, fg=self.bg_colors["Dark Font"],
@@ -12236,7 +12211,7 @@ class PySILLS(tk.Frame):
         entr_07a = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_entry(
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ma_setting"]["Time BG Start"], text_default=var_entr_07a_default,
             command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG Start"], var_key="Start",
                            mode="default", var_interval="BG":
@@ -12244,7 +12219,7 @@ class PySILLS(tk.Frame):
         entr_07b = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_entry(
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ma_setting"]["Time BG End"], text_default=var_entr_07b_default,
             command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG End"], var_key="End",
                            mode="default", var_interval="BG":
@@ -12304,7 +12279,7 @@ class PySILLS(tk.Frame):
         entr_08a = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_entry(
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ma_setting"]["Time MAT Start"], text_default=var_entr_08a_default,
             command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT Start"], var_key="Start",
                            mode="default", var_interval="MAT":
@@ -12312,7 +12287,7 @@ class PySILLS(tk.Frame):
         entr_08b = SE(
             parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_entry(
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ma_setting"]["Time MAT End"], text_default=var_entr_08b_default,
             command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT End"], var_key="End",
                            mode="default", var_interval="MAT":
@@ -12478,7 +12453,8 @@ class PySILLS(tk.Frame):
             text_02.insert("end", "\t")
 
             entr_i = tk.Entry(
-                frm_02, textvariable=self.container_var["acquisition times"]["STD"][var_file_short])
+                frm_02, textvariable=self.container_var["acquisition times"]["STD"][var_file_short],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
@@ -12493,7 +12469,8 @@ class PySILLS(tk.Frame):
             text_02.insert("end", "\t")
 
             entr_i = tk.Entry(
-                frm_02, textvariable=self.container_var["acquisition times"]["SMPL"][var_file_short])
+                frm_02, textvariable=self.container_var["acquisition times"]["SMPL"][var_file_short],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
@@ -12967,7 +12944,7 @@ class PySILLS(tk.Frame):
 
             entr_02b = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_entr_is_default, text_default=var_entr_is_default_text,
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
@@ -13019,13 +12996,13 @@ class PySILLS(tk.Frame):
             ## ENTRIES
             entr_02a = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_entr_default, text_default=var_entr_default_text,
                 command=lambda event, var_entr=var_entr_default, var_file=None, state_default=True:
                 self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
             entr_02b = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 5, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_entr_is_default, text_default=var_entr_is_default_text,
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
@@ -13138,7 +13115,9 @@ class PySILLS(tk.Frame):
                 text_smpl.window_create("end", window=opt_comp_i)
                 text_smpl.insert("end", " \t")
 
-                entr_i = tk.Entry(frm_smpl, textvariable=var_entr_i, width=15)
+                entr_i = tk.Entry(
+                    frm_smpl, textvariable=var_entr_i, width=15, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["White"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"])
                 entr_i.bind(
                     "<Return>", lambda event, var_entr=var_entr_i, var_file=file_smpl, state_default=False:
                     self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
@@ -13158,7 +13137,9 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=opt_is_i)
             text_smpl.insert("end", " \t")
             #
-            entr_is_i = tk.Entry(frm_smpl, textvariable=var_entr_is_i, width=15)
+            entr_is_i = tk.Entry(
+                frm_smpl, textvariable=var_entr_is_i, width=15, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["White"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"])
             entr_is_i.bind(
                 "<Return>", lambda event, var_entr=var_entr_is_i, var_file=file_smpl, state_default=False:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
@@ -23490,12 +23471,12 @@ class PySILLS(tk.Frame):
             var_entr_09c_default = "0.05"
             entr_09c = SE(
                 parent=var_parent, row_id=start_row + 3, column_id=7, n_rows=1, n_columns=11,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_alpha, text_default=var_entr_09c_default)
             var_entr_09d_default = "1000"
             entr_09d = SE(
                 parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_threshold, text_default=var_entr_09d_default)
             #
             # Buttons
