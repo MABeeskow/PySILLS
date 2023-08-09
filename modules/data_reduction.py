@@ -13,11 +13,104 @@
 ## MODULES -------------------------------------------------------------------------------------------------------------
 import pandas as pd
 import numpy as np
+import os, time
 
 ## CLASSES -------------------------------------------------------------------------------------------------------------
 class DataExtraction:
     def __init__(self, filename_long=None):
         self.filename_long = filename_long
+
+    def find_header(self):
+        file_content = open(self.filename_long[0])
+        found_delimiter = False
+        common_header_elements = ["Time", "Li7", "Na23", "Mg24", "Si29", "S32", "Cl35", "K39", "Ca44"]
+        set_common = set(common_header_elements)
+        for index, line in enumerate(file_content):
+            if len(line) > 100 and found_delimiter == False:
+                var_delimiter = self.get_delimiter(var_str=line)
+                index_header = index
+                line_header = line
+                possible_header_elements = line_header.split(var_delimiter)
+                if "\n" in possible_header_elements[-1]:
+                    possible_header_elements[-1] = possible_header_elements[-1].replace("\n", "")
+                set_possible = set(possible_header_elements)
+                set_intersection = list(set_common & set_possible)
+                if len(set_intersection) > 0:
+                    found_delimiter = True
+            else:
+                set_intersection = []
+            if len(set_intersection) > 0:
+                break
+
+        return index_header, possible_header_elements, var_delimiter
+
+    def get_delimiter(self, var_str):
+        possible_delimiter = [",", ";", " "]
+        n_str = len(var_str)
+        condition = False
+        while condition == False:
+            for delimiter in possible_delimiter:
+                for element in var_str.split(delimiter):
+                    n_element = len(element)
+                    if n_element != n_str:
+                        delimiter_working = delimiter
+                        condition = True
+                    if condition == True:
+                        break
+                if condition == True:
+                    break
+
+        return delimiter_working
+
+    def find_dataset_end(self, var_delimiter, var_index_header):
+        file_content = open(self.filename_long[0])
+        last_data_line = 0
+        for index, line in enumerate(file_content):
+            if index > var_index_header:
+                line_elements = line.split(var_delimiter)
+                if len(line_elements) > 0:
+                    if len(line_elements) > 2:
+                        last_data_line = index
+                    else:
+                        break
+                else:
+                    break
+
+        return last_data_line
+
+    def get_file_creation_time(self, var_delimiter, meta_data=False):
+        if meta_data == False:
+            file_content = open(self.filename_long[0])
+            common_date_keys = [
+                "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Mon", "Tue", "Wed",
+                "Thu", "Fri", "Sat", "Sun", "Acquired", "Printed", "Created", "January", "February", "March", "April",
+                "May", "June", "July", "August", "September", "October", "November", "December"]
+            set_common = set(common_date_keys)
+            for index, line in enumerate(file_content):
+                if len(line) < 100:
+                    line_elements = line.split(var_delimiter)
+                    if "\n" in line_elements[-1]:
+                        line_elements[-1] = line_elements[-1].replace("\n", "")
+                    set_possible = set(line_elements)
+                    set_intersection = list(set_common & set_possible)
+                    print(line_elements)
+                    print("Intersection", set_intersection)
+                    if len(set_intersection) > 0:
+                        break
+                    else:
+                        for common_key in common_date_keys:
+                            if common_key in line_elements:
+                                print(common_key)
+        else:
+            path = self.filename_long[0]
+            time_creation = os.stat(path).st_birthtime
+            time_creation_converted = time.ctime(time_creation)
+            t_obj = time.strptime(time_creation_converted)
+            t_stamp = time.strftime("%H:%M:%S", t_obj)
+            print(time_creation_converted, t_stamp)
+
+        print("Creation elements:", line_elements)
+        return line_elements
 
     def get_measurements(self, delimiter, skip_header, skip_footer):
         self.delimiter = delimiter
