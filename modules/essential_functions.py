@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		02.08.2023
+# Date:		09.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -151,36 +151,38 @@ class Essentials:
         for index, value in enumerate(dataset_complete):
             if value > threshold:
                 if index in outlier_indices:
-                    if index >= 3:
-                        lower_limit = index - 3
-                    elif index == 2:
-                        lower_limit = index - 2
-                    elif index == 1:
-                        lower_limit = index - 1
-                    elif index == 0:
-                        lower_limit = index
-
-                    if index <= len(dataset_complete) - 4:
-                        upper_limit = index + 3
-                    elif index < len(dataset_complete) - 3:
-                        upper_limit = index + 2
-                    elif index < len(dataset_complete) - 2:
-                        upper_limit = index + 1
-                    elif index < len(dataset_complete) - 1:
-                        upper_limit = index
-
-                    average_dataset = dataset_complete[lower_limit:upper_limit]
-                    var_index = average_dataset.index(value)
-                    value_popped = average_dataset.pop(var_index)
-                    value_corrected = np.mean(average_dataset)
-                    data_smoothed.append(value_corrected)
+                    average_dataset_new = self.determine_surrounded_values(
+                        dataset_complete=dataset_complete, index=index)
+                    if value in average_dataset_new["All"]:
+                        var_index = average_dataset_new["All"].index(value)
+                        value_popped = average_dataset_new["All"].pop(var_index)
+                        value_corrected = np.mean(average_dataset_new["SP"])
+                        data_smoothed.append(value_corrected)
                 else:
                     data_smoothed.append(value)
             else:
                 data_smoothed.append(value)
         #
         return data_smoothed, outlier_indices
-    #
+
+    def determine_surrounded_values(self, dataset_complete, index, stepsize=4):
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = dataset_complete[index]
+        helper_values["POI"] = val_poi
+        helper_values["All"].append(val_poi)
+
+        for step in range(1, stepsize):
+            step_before = index - step
+            step_after = index + step
+            if step_before >= 0:
+                helper_values["SP"].append(dataset_complete[step_before])
+                helper_values["All"].append(dataset_complete[step_before])
+            if step_after < len(dataset_complete):
+                helper_values["SP"].append(dataset_complete[step_after])
+                helper_values["All"].append(dataset_complete[step_after])
+
+        return helper_values
+
     def find_outlier(self, limit, interval, data_total, isotope, threshold=1000):
         data = self.variable
         n_outl = 0

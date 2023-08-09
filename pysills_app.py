@@ -13593,8 +13593,9 @@ class PySILLS(tk.Frame):
         text_iso.pack(side="left", fill="both", expand=True)
         #
         for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
+            frm_i = tk.Frame(
+                frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                highlightbackground="black", bd=1)
             text_iso.window_create("end", window=frm_i)
             text_iso.insert("end", "")
 

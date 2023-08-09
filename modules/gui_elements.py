@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 08.08.2023
+# 09.08.2023
 # ----------------------
 #
 ## MODULES
@@ -679,9 +679,10 @@ class SimpleElements:
         scrollbar_y = tk.Scrollbar(self.parent, orient="vertical")
         if include_scrb_x == True:
             scrollbar_x = tk.Scrollbar(self.parent, orient="horizontal")
-            listbox = tk.Listbox(self.parent, bg=self.bg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
+            listbox = tk.Listbox(
+                self.parent, bg=self.bg, fg=self.fg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
         else:
-            listbox = tk.Listbox(self.parent, bg=self.bg, yscrollcommand=scrollbar_y.set)
+            listbox = tk.Listbox(self.parent, bg=self.bg, fg=self.fg, yscrollcommand=scrollbar_y.set)
         #
         scrollbar_y.config(command=listbox.yview)
         if include_scrb_x == True:
