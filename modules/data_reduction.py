@@ -6,12 +6,13 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		04.08.2023
+# Date:		09.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES -------------------------------------------------------------------------------------------------------------
 import pandas as pd
+import numpy as np
 
 ## CLASSES -------------------------------------------------------------------------------------------------------------
 class DataExtraction:
@@ -50,6 +51,77 @@ class IntensityQuantification:
         self.dataframe = dataframe
         self.internal_standard = internal_standard
         self.mode = mode
+
+    def prepare_calculation_intervals(self, interval_bg=None, interval_mat=None, interval_incl=None):
+        if interval_bg != None:
+            condensed_interval = self.combine_all_intervals(interval_set=interval_bg)
+        elif interval_mat != None:
+            condensed_interval = self.combine_all_intervals(interval_set=interval_mat)
+        elif interval_incl != None:
+            condensed_interval = self.combine_all_intervals(interval_set=interval_incl)
+
+        return condensed_interval
+
+    def check_if_intervals_isolated(self, intervals_list_01, intervals_list_02=None):
+        helper_isolated = []
+        helper_overlapped = []
+        if intervals_list_02 == None:
+            intervals_list_02 = intervals_list_01
+        for index_01, interval_01 in enumerate(intervals_list_01):
+            for index_02, interval_02 in enumerate(intervals_list_02):
+                if interval_02 != interval_01:
+                    set_01 = set(range(interval_01[0], interval_01[1]))
+                    set_02 = set(range(interval_02[0], interval_02[1]))
+                    set_intersection = list(set_01 & set_02)
+                    if len(set_intersection) > 0:
+                        print("Overlap between:", interval_01, interval_02)
+                    else:
+                        print("No overlap between:", interval_01, interval_02)
+
+    def combine_all_intervals(self, interval_set):
+        condensed_intervals = {}
+        if len(interval_set) > 1:
+            helper_intervals = []
+            for key, item in interval_set.items():
+                helper_intervals.append(item["Indices"])
+            helper_intervals.sort()
+            for index, interval in enumerate(helper_intervals):
+                indices_interval = list(range(interval[0], interval[1] + 1))
+                if index == 0:
+                    all_indices = indices_interval
+                all_indices = sorted(np.unique(all_indices + indices_interval))
+            all_indices = np.array(all_indices)
+            diff_indices = []
+            for index, value in enumerate(all_indices):
+                if index == 0:
+                    diff_indices.append(1)
+                else:
+                    diff_indices.append(value - all_indices[index - 1])
+            indices_jump = [index for index, value in enumerate(diff_indices) if value != 1]
+            if len(indices_jump) > 0:
+                if len(indices_jump) > 1:
+                    for index, value in enumerate(indices_jump):
+                        if index == 0:
+                            condensed_intervals[index + 1] = [all_indices[0], all_indices[value - 1]]
+                            next_start = all_indices[value]
+                        else:
+                            if index == len(indices_jump) - 1:
+                                condensed_intervals[index + 1] = [next_start, all_indices[value - 1]]
+                                condensed_intervals[index + 2] = [all_indices[value], all_indices[-1]]
+                            else:
+                                condensed_intervals[index + 1] = [next_start, all_indices[value - 1]]
+                                condensed_intervals[index + 2] = [all_indices[value - 1], all_indices[value]]
+                                next_start = all_indices[value]
+                else:
+                    condensed_intervals[1] = [all_indices[0], all_indices[indices_jump[0] - 1]]
+                    condensed_intervals[2] = [all_indices[indices_jump[0]], all_indices[-1]]
+            else:
+                condensed_intervals[1] = [all_indices[0], all_indices[-1]]
+        else:
+            for key, item in interval_set.items():
+                condensed_intervals[key] = item["Indices"]
+
+        return condensed_intervals
 
     def get_intensity(self, interval_bg, interval_min, interval_incl=None):
         if self.mode == "specific":

@@ -14788,35 +14788,56 @@ class PySILLS(tk.Frame):
             #
         self.tv_results_files.insert("", tk.END, values=entries_mean)
         self.tv_results_files.insert("", tk.END, values=entries_std)
-    #
+
     def ma_get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific", check=False):
         if mode == "Specific":
             if var_focus in ["BG", "MAT"]:
-                for isotope in self.container_lists["ISOTOPES"]:
+                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
                     helper_results = []
-                    for key, items in self.container_helper[var_filetype][var_file_short][var_focus]["Content"].items():
-                        var_indices = items["Indices"]
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
+                    for key, items in condensed_intervals.items():
+                        # if var_focus == "BG":
+                        #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
+                        #         interval_bg=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+                        # else:
+                        #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
+                        #         interval_mat=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
+                    # for key, items in self.container_helper[var_filetype][var_file_short][var_focus]["Content"].items():
+                    #     var_indices = items["Indices"]
+                    #for key, items in condensed_intervals.items():
+                        #var_indices = items["Indices"]
+                        var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
                                    var_indices[0]:var_indices[1] + 1]
                         helper_results.append(np.mean(var_data))
-                    #
                     var_result = round(np.mean(helper_results), 3)
                     self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
                         isotope] = var_result
-                #
             else:
-                for var_focus in ["BG", "MAT"]:
-                    for isotope in self.container_lists["ISOTOPES"]:
+                for index_focus, var_focus in enumerate(["BG", "MAT"]):
+                    for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
                         helper_results = []
-                        for key, items in self.container_helper[var_filetype][var_file_short][var_focus][
-                            "Content"].items():
-                            var_indices = items["Indices"]
+                        if index_isotope == 0:
+                            condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                                interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
+                            # if var_focus == "BG":
+                            #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
+                            #         interval_bg=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+                            # else:
+                            #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
+                            #         interval_mat=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
+                        #for key, items in self.container_helper[var_filetype][var_file_short][var_focus][
+                        #    "Content"].items():
+                        for key, items in condensed_intervals.items():
+                            #var_indices = items["Indices"]
+                            var_indices = items
                             var_key = "Data " + str(var_datatype)
                             var_data = self.container_spikes[var_file_short][isotope][var_key][
                                        var_indices[0]:var_indices[1] + 1]
                             helper_results.append(np.mean(var_data))
-                        #
                         var_result = round(np.mean(helper_results), 3)
                         self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = var_result
@@ -15406,22 +15427,32 @@ class PySILLS(tk.Frame):
         #
         if mode == "Specific":
             if var_filetype == "STD":
-                for isotope in self.container_lists["ISOTOPES"]:
+                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
                     var_n_bg = 0
                     var_n_mat = 0
                     helper_sigma_i = []
 
-                    for key, items in self.container_helper[var_filetype][var_file_short]["BG"]["Content"].items():
-                        var_indices = items["Indices"]
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+                    for key, items in condensed_intervals.items():
+                    #for key, items in self.container_helper[var_filetype][var_file_short]["BG"]["Content"].items():
+                        #var_indices = items["Indices"]
+                        var_indices = items
                         var_key = "Data " + str(var_datatype)
-                        var_data = self.container_spikes[var_file_short][isotope][var_key][var_indices[0]:var_indices[1]]
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][var_indices[0]:var_indices[1] + 1]
                         var_n_bg += len(var_data)
                         helper_sigma_i.append(np.std(var_data, ddof=1))
                     #
-                    for key, items in self.container_helper[var_filetype][var_file_short]["MAT"]["Content"].items():
-                        var_indices = items["Indices"]
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
+                    for key, items in condensed_intervals.items():
+                    #for key, items in self.container_helper[var_filetype][var_file_short]["MAT"]["Content"].items():
+                        #var_indices = items["Indices"]
+                        var_indices = items
                         var_key = "Data " + str(var_datatype)
-                        var_data = self.container_spikes[var_file_short][isotope][var_key][var_indices[0]:var_indices[1]]
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][var_indices[0]:var_indices[1] + 1]
                         var_n_mat += len(var_data)
                     #
                     var_concentration_i = self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
@@ -15450,21 +15481,31 @@ class PySILLS(tk.Frame):
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
                     #
             elif var_filetype == "SMPL":
-                for isotope in self.container_lists["ISOTOPES"]:
+                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
                     var_n_bg = 0
                     var_n_mat = 0
                     helper_sigma_i = []
-                    #
-                    for key, items in self.container_helper[var_filetype][var_file_short]["BG"]["Content"].items():
-                        var_indices = items["Indices"]
+
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+                    for key, items in condensed_intervals.items():
+                    #for key, items in self.container_helper[var_filetype][var_file_short]["BG"]["Content"].items():
+                        #var_indices = items["Indices"]
+                        var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
                                    var_indices[0]:var_indices[1] + 1]
                         var_n_bg += len(var_data)
                         helper_sigma_i.append(np.std(var_data, ddof=1))
-                    #
-                    for key, items in self.container_helper[var_filetype][var_file_short]["MAT"]["Content"].items():
-                        var_indices = items["Indices"]
+
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
+                    for key, items in condensed_intervals.items():
+                    #for key, items in self.container_helper[var_filetype][var_file_short]["MAT"]["Content"].items():
+                        #var_indices = items["Indices"]
+                        var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
                                    var_indices[0]:var_indices[1] + 1]
