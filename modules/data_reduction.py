@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		09.08.2023
+# Date:		10.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -93,8 +93,6 @@ class DataExtraction:
                         line_elements[-1] = line_elements[-1].replace("\n", "")
                     set_possible = set(line_elements)
                     set_intersection = list(set_common & set_possible)
-                    print(line_elements)
-                    print("Intersection", set_intersection)
                     if len(set_intersection) > 0:
                         break
                     else:
@@ -107,9 +105,7 @@ class DataExtraction:
             time_creation_converted = time.ctime(time_creation)
             t_obj = time.strptime(time_creation_converted)
             t_stamp = time.strftime("%H:%M:%S", t_obj)
-            print(time_creation_converted, t_stamp)
 
-        print("Creation elements:", line_elements)
         return line_elements
 
     def get_measurements(self, delimiter, skip_header, skip_footer):

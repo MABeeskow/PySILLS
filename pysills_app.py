@@ -6,12 +6,13 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		09.08.2023
+# Date:		10.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES
 # external
+from datetime import date
 import os, pathlib, sys, re, datetime, csv, string, math
 import numpy as np
 import pandas as pd
@@ -300,7 +301,9 @@ class PySILLS(tk.Frame):
         self.container_var["Spike Elimination"] = {"STD": {"State": False}, "SMPL": {"State": False}}
         #
         self.container_var["Initialization"] = {"STD": False, "SMPL": False, "ISOTOPES": False}
-        #
+
+        self.container_icpms = {"name": None, "skipheader": 1, "skipfooter": 0, "timestamp": 0}
+
         self.list_std_changed = False
         self.list_smpl_changed = False
         self.list_std_previous = []
@@ -748,6 +751,7 @@ class PySILLS(tk.Frame):
         self.container_lists["SRM Data"] = {}
         self.container_lists["SRM"] = []
         self.container_lists["SRM Library"] = []
+        self.container_lists["ICPMS Library"] = []
         self.container_lists["SRM Files"] = {}
         self.container_lists["SRM Isotopes"] = {}
         self.container_lists["IS"] = []
@@ -845,7 +849,7 @@ class PySILLS(tk.Frame):
              ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0]
         self.path_pysills = os.getcwd()
         helper_srm_library = []
-        helper_srm_library = os.listdir(self.path_pysills+str("/lib/"))
+        helper_srm_library = os.listdir(self.path_pysills+str("/lib/srm/"))
         helper_srm_library.remove("__init__.py")
         try:
             helper_srm_library.remove(".DS_Store")
@@ -887,6 +891,19 @@ class PySILLS(tk.Frame):
                 var_srm_new = var_srm_new.replace("GSE1G", "GSE-1G")
 
             self.container_lists["SRM Library"].append(var_srm_new)
+
+        helper_icpms_library = []
+        helper_icpms_library = os.listdir(self.path_pysills + str("/lib/icpms/"))
+        helper_icpms_library.remove("__init__.py")
+        try:
+            helper_icpms_library.remove(".DS_Store")
+        except:
+            pass
+        helper_icpms_library.sort()
+        for var_icpms in helper_icpms_library:
+            var_icpms_new = var_icpms.replace("_", " ")
+            var_icpms_new = var_icpms_new.replace(".csv", "")
+            self.container_lists["ICPMS Library"].append(var_icpms_new)
 
         self.srm_window_checker = tk.IntVar()
         self.srm_window_checker.set(0)
@@ -982,170 +999,226 @@ class PySILLS(tk.Frame):
                     pass
         except:
             print("There is no user_settings file!")
-        #
-        ## Logo
-        try:
-            self.path_pysills = os.getcwd()
-            pysills_logo = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Logo.png"))
-            pysills_logo = pysills_logo.subsample(1, 1)
-            img = tk.Label(self.parent, image=pysills_logo, bg=self.bg_colors["Super Dark"])
-            img.image = pysills_logo
-            img.grid(row=0, column=0, rowspan=2, columnspan=20, sticky="nesw")
 
-            ## Icon
-            pysills_icon = tk.PhotoImage(file=self.path_pysills+str("/documentation/images/PySILLS_Icon.png"))
-            self.parent.iconphoto(False, pysills_icon)
-        except:
-            pass
-
-        ## Radiobuttons
+        ## GUI
         self.pysills_mode = None
         self.demo_mode = True
-        list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
-        self.var_rb_mode = tk.IntVar()
-        for index, mode in enumerate(list_mode):
-            rb_mode = SE(
-                parent=self.parent, row_id=5 + index, column_id=11, n_rows=1, n_columns=10, fg=self.green_medium,
-                bg=self.green_dark).create_radiobutton(
-                var_rb=self.var_rb_mode, value_rb=index, color_bg=self.bg_colors["Light"],
-                fg=self.bg_colors["Dark Font"], text=mode, sticky="NESW", relief=tk.FLAT, font="sans 10 bold",
-                command=lambda var_rb=self.var_rb_mode: self.select_experiment(var_rb))
-            #
-            if mode in ["Melt Inclusions", "Output Analysis"]:
-                rb_mode.configure(state="disabled")
-            #
-            self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
-        #
-        ## Labels
-        lbl_01 = SE(
-            parent=self.parent, row_id=3, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="PySILLS", relief=tk.FLAT, fontsize="sans 16 bold")
-        lbl_01 = SE(
-            parent=self.parent, row_id=3, column_id=11, n_rows=2, n_columns=10, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Select Mode", relief=tk.FLAT, fontsize="sans 16 bold")
-        lbl_02 = SE(
-            parent=self.parent, row_id=22, column_id=0, n_rows=1, n_columns=10, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Standard Files", relief=tk.FLAT, fontsize="sans 16 bold")
-        lbl_03 = SE(
-            parent=self.parent, row_id=22, column_id=11, n_rows=1, n_columns=10, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 16 bold")
-        lbl_04 = SE(
-            parent=self.parent, row_id=17, column_id=0, n_rows=2, n_columns=21, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="ICP-MS File Setup", relief=tk.FLAT, fontsize="sans 16 bold")
-        lbl_04a = SE(
-            parent=self.parent, row_id=19, column_id=0, n_rows=1, n_columns=10, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Get time from ...", relief=tk.FLAT, fontsize="sans 12 bold")
-        lbl_04b = SE(
-            parent=self.parent, row_id=19, column_id=10, n_rows=1, n_columns=7, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Skip n header rows", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
-        lbl_04c = SE(
-            parent=self.parent, row_id=20, column_id=10, n_rows=1, n_columns=7, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Skip n footer rows", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
-        lbl_04d = SE(
-            parent=self.parent, row_id=21, column_id=10, n_rows=1, n_columns=7, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Delimiter", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
 
-        ## RADIOBUTTONS
-        rb_04a = SE(
-                parent=self.parent, row_id=20, column_id=0, n_rows=1, n_columns=10, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Dark"]).create_radiobutton(
-                var_rb=self.var_rb_timestamp, value_rb=0, color_bg=self.bg_colors["Dark"],
-                fg=self.bg_colors["Light Font"], text="file content", sticky="NESW", relief=tk.FLAT, font="sans 11 bold")
-        rb_04b = SE(
-                parent=self.parent, row_id=21, column_id=0, n_rows=1, n_columns=10, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Dark"]).create_radiobutton(
-                var_rb=self.var_rb_timestamp, value_rb=1, color_bg=self.bg_colors["Dark"],
-                fg=self.bg_colors["Light Font"], text="meta data", sticky="NESW", relief=tk.FLAT, font="sans 11 bold")
+        self.place_main_window_static_elements()
 
-        ## Listboxes
-        self.lb_std = SE(
-            parent=self.parent, row_id=25, column_id=0, n_rows=self.n_rows - 26, n_columns=10, fg=self.green_dark,
-            bg=self.bg_colors["Very Light"]).create_simple_listbox()
-        self.lb_smpl = SE(
-            parent=self.parent, row_id=25, column_id=11, n_rows=self.n_rows - 26, n_columns=10, fg=self.green_dark,
-            bg=self.bg_colors["Very Light"]).create_simple_listbox()
-        #
+        ## Initialization
         self.quick_plot_figure_std = Figure(
             figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.quick_plot_figure_smpl = Figure(
             figsize=(10, 5), dpi=150, tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.lb_std.bind("<Double-1>", lambda event, var_filetype="STD": self.quick_plot_file(var_filetype, event))
         self.lb_smpl.bind("<Double-1>", lambda event, var_filetype="SMPL": self.quick_plot_file(var_filetype, event))
-        #
-        # Data Import
+        self.select_experiment(var_rb=self.var_rb_mode)
+
+    def place_main_window_static_elements(self):
+        # Initial constants
+        start_row = 3
+        start_column = 0
+        n_rows_header = 2
+        common_n_rows = 1
+        common_n_columns = 10
+        n_columns_button = 3
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_header = self.bg_colors["Super Dark"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_listbox = self.bg_colors["Very Light"]
+        accent_color = self.accent_color
+        font_header = "sans 14 bold"
+        font_elements = "sans 10 bold"
+
+        ## Logo
+        try:
+            self.path_pysills = os.getcwd()
+            pysills_logo = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Logo.png"))
+            pysills_logo = pysills_logo.subsample(1, 1)
+            img = tk.Label(self.parent, image=pysills_logo, bg=background_color_header)
+            img.image = pysills_logo
+            img.grid(
+                row=start_row - 3, column=start_column, rowspan=n_rows_header, columnspan=common_n_columns + 10,
+                sticky="nesw")
+
+            ## Icon
+            pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Icon.png"))
+            self.parent.iconphoto(False, pysills_icon)
+        except:
+            pass
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.parent, row_id=start_row, column_id=start_column, n_rows=n_rows_header,
+            n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
+            text="PySILLS", relief=tk.RAISED, fontsize=font_header)
+        lbl_01 = SE(
+            parent=self.parent, row_id=start_row, column_id=start_column + 11, n_rows=n_rows_header,
+            n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
+            text="Select Mode", relief=tk.RAISED, fontsize=font_header)
+        lbl_02 = SE(
+            parent=self.parent, row_id=start_row + 18, column_id=start_column, n_rows=n_rows_header,
+            n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
+            text="Standard Files", relief=tk.RAISED, fontsize=font_header)
+        lbl_03 = SE(
+            parent=self.parent, row_id=start_row + 18, column_id=start_column + 11, n_rows=n_rows_header,
+            n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
+            text="Sample Files", relief=tk.RAISED, fontsize=font_header)
+        lbl_04 = SE(
+            parent=self.parent, row_id=start_row + 14, column_id=start_column, n_rows=n_rows_header,
+            n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
+            text="ICP-MS File Setup", relief=tk.RAISED, fontsize=font_header)
+        lbl_04b = SE(
+            parent=self.parent, row_id=start_row + 16, column_id=start_column + 8, n_rows=common_n_rows,
+            n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text="Select ICP-MS", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_04c = SE(
+            parent=self.parent, row_id=start_row + 17, column_id=start_column + 8, n_rows=common_n_rows,
+            n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text="Define ICP-MS", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        today = date.today()
+        today = today.strftime("%d/%m/%Y")
+        today = today + " - " + str(round(np.random.random(), 4))
+        lbl_version = SE(
+            parent=self.parent, row_id=self.n_rows - 1, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
+            text="Version: pre-release " + today, relief=tk.FLAT, fontsize="sans 8")
+        lbl_dev = SE(
+            parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
+            text="developed by: Maximilian Alexander Beeskow", relief=tk.FLAT, fontsize="sans 8", sticky="news")
+
+        # LISTBOXES
+        self.lb_std = SE(
+            parent=self.parent, row_id=start_row + 22, column_id=start_column, n_rows=self.n_rows - 26,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
+        self.lb_smpl = SE(
+            parent=self.parent, row_id=start_row + 22, column_id=start_column + 11, n_rows=self.n_rows - 26,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
+
+        # RADIOBUTTONS
+        list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
+        self.var_rb_mode = tk.IntVar()
+        for index, mode in enumerate(list_mode):
+            rb_mode = SE(
+                parent=self.parent, row_id=start_row + 2 + index, column_id=start_column + 11, n_rows=common_n_rows,
+                n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+                var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
+                text=mode, sticky="NESW", relief=tk.FLAT, font=font_elements, command=lambda var_rb=self.var_rb_mode:
+                self.select_experiment(var_rb))
+            if mode in ["Melt Inclusions", "Output Analysis"]:
+                rb_mode.configure(state="disabled")
+
+            self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
+
+        rb_04a = SE(
+            parent=self.parent, row_id=start_row + 16, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_timestamp, value_rb=0, color_bg=background_color_elements,
+            fg=font_color_dark, text="Original data", sticky="NESW", relief=tk.FLAT, font=font_elements)
+        rb_04b = SE(
+            parent=self.parent, row_id=start_row + 17, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_timestamp, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
+            text="Pre-processed data", sticky="NESW", relief=tk.FLAT, font=font_elements)
+
+        # BUTTONS
         SE(
-            parent=self.parent, row_id=23, column_id=0, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Add", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda datatype="STD": self.open_csv(datatype))
+            parent=self.parent, row_id=start_row + 20, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=n_columns_button, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text="Add", bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="STD":
+            self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=23, column_id=3, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Copy", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda filetype="STD": self.copy_file(filetype))
+            parent=self.parent, row_id=start_row + 20, column_id=3, n_rows=common_n_rows + 1,
+            n_columns=n_columns_button, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text="Copy", bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="STD":
+            self.copy_file(filetype))
         SE(
-            parent=self.parent, row_id=23, column_id=6, n_rows=2, n_columns=4, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Delete", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            parent=self.parent, row_id=start_row + 20, column_id=6, n_rows=common_n_rows + 1,
+            n_columns=n_columns_button + 1, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text="Delete", bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_std, var_list=self.list_std: self.delete_csv(var_lb, var_list))
         SE(
-            parent=self.parent, row_id=23, column_id=11, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Add", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda datatype="SMPL": self.open_csv(datatype))
+            parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows + 1,
+            n_columns=n_columns_button, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text="Add", bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="SMPL":
+            self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=23, column_id=14, n_rows=2, n_columns=3, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Copy", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda filetype="SMPL": self.copy_file(filetype))
+            parent=self.parent, row_id=start_row + 20, column_id=14, n_rows=common_n_rows + 1,
+            n_columns=n_columns_button, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text="Copy", bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="SMPL":
+            self.copy_file(filetype))
         SE(
-            parent=self.parent, row_id=23, column_id=17, n_rows=2, n_columns=4, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Delete", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            parent=self.parent, row_id=start_row + 20, column_id=17, n_rows=common_n_rows + 1,
+            n_columns=n_columns_button + 1, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text="Delete", bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_smpl, var_list=self.list_smpl: self.delete_csv(var_lb, var_list))
         #
         SE(
-            parent=self.parent, row_id=5, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="New Project", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.restart_pysills)
+            parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="New Project", bg_active=accent_color, fg_active=font_color_dark, command=self.restart_pysills)
         SE(
-            parent=self.parent, row_id=7, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Load Project", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.open_project)
+            parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Load Project", bg_active=accent_color, fg_active=font_color_dark, command=self.open_project)
         SE(
-            parent=self.parent, row_id=9, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Save Project", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.save_project)
+            parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Save Project", bg_active=accent_color, fg_active=font_color_dark, command=self.save_project)
         SE(
-            parent=self.parent, row_id=11, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="General Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            parent=self.parent, row_id=start_row + 8, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="General Settings", bg_active=accent_color, fg_active=font_color_dark,
             command=self.subwindow_general_settings)
         btn_docu = SE(
-            parent=self.parent, row_id=13, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="About", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="About", bg_active=accent_color, fg_active=font_color_dark)
         btn_docu.configure(state="disabled")
         SE(
-            parent=self.parent, row_id=15, column_id=0, n_rows=2, n_columns=10, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Quit", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"], command=self.parent.quit)
-        #
-        ## Initialization
-        self.select_experiment(var_rb=self.var_rb_mode)
-    #
+            parent=self.parent, row_id=start_row + 12, column_id=start_column, n_rows=common_n_rows + 1,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Quit", bg_active=accent_color, fg_active=font_color_dark, command=self.parent.quit)
+        btn_icp = SE(
+            parent=self.parent, row_id=start_row + 17, column_id=start_column + 13, n_rows=common_n_rows,
+            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Setup", bg_active=accent_color, fg_active=font_color_dark)
+        btn_icp.configure(state="disabled")
+
+        # OPTION MENUS
+        self.var_opt_icp = tk.StringVar()
+        self.var_opt_icp.set("Select ICP-MS")
+        opt_icp = SE(
+            parent=self.parent, row_id=start_row + 16, column_id=start_column + 13, n_rows=common_n_rows,
+            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
+            var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
+            var_list=self.container_lists["ICPMS Library"], fg_active=font_color_dark, bg_active=accent_color,
+            command=lambda var_opt=self.var_opt_icp: self.select_icp_ms(var_opt))
+
+    def select_icp_ms(self, var_opt):
+        path = os.getcwd()
+        var_instrument = var_opt.replace(" ", "_")
+        file_long = path + str("/lib/icpms/" + var_instrument + ".csv")
+        file_content = open(file_long)
+
+        for index, line in enumerate(file_content):
+            line_parts = line.split(",")
+            if "\n" in line_parts[-1]:
+                line_parts[-1] = line_parts[-1].replace("\n", "")
+            try:
+                self.container_icpms[line_parts[0]] = int(line_parts[-1])
+            except:
+                self.container_icpms[line_parts[0]] = line_parts[-1]
+
     def clean_result_lists(self, var_list, var_list_new):
         for item in var_list:
             if type(item) in [float, int]:
@@ -1238,7 +1311,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Mineral Analysis", relief=tk.FLAT, fontsize="sans 16 bold")
+                text="Mineral Analysis", relief=tk.RAISED, fontsize="sans 16 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1275,7 +1348,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Fluid Inclusions", relief=tk.FLAT, fontsize="sans 16 bold")
+                text="Fluid Inclusions", relief=tk.RAISED, fontsize="sans 16 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1312,7 +1385,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Melt Inclusions", relief=tk.FLAT, fontsize="sans 16 bold")
+                text="Melt Inclusions", relief=tk.RAISED, fontsize="sans 16 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1347,7 +1420,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Output Analysis", relief=tk.FLAT, fontsize="sans 16 bold")
+                text="Output Analysis", relief=tk.RAISED, fontsize="sans 16 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1377,11 +1450,15 @@ class PySILLS(tk.Frame):
         if self.fast_track_std == False or file_loaded == True:
             for file_std in self.container_lists["STD"]["Long"]:
                 filename = file_std.split("/")[-1]
-                df_data = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data = DE(filename_long=file_std).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data = DE(filename_long=file_std).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
                 times = DE().get_times(dataframe=df_data)
-                # df_data = self.load_and_assign_data(filename=file_std)
-                # times = df_data.iloc[:, 0]
-                #
                 if self.container_helper["Default BG"]["Positions"] == [0, 0] \
                         and "auto-detection used" not in self.container_helper["Default BG"]["Times"] \
                         and "auto-detection used" not in self.container_helper["Default SIG"]["Times"]:
@@ -1487,10 +1564,15 @@ class PySILLS(tk.Frame):
         if self.fast_track_smpl == False or file_loaded == True:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 filename = file_smpl.split("/")[-1]
-                df_data = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data = DE(filename_long=file_smpl).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data = DE(filename_long=file_smpl).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
                 times = DE().get_times(dataframe=df_data)
-                # df_data = self.load_and_assign_data(filename=file_smpl)
-                # times = df_data.iloc[:, 0]
                 if self.container_helper["Default BG"]["Positions"] == [0, 0] \
                         and "auto-detection used" not in self.container_helper["Default BG"]["Times"] \
                         and "auto-detection used" not in self.container_helper["Default SIG"]["Times"]:
@@ -1603,11 +1685,15 @@ class PySILLS(tk.Frame):
                 #
                 if self.container_helper["Default BG"]["Positions"] == [0, 0] \
                         or len(self.container_helper["STD"][filename]["BG"]) == 0:
-                    df_data = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                     times = DE().get_times(dataframe=df_data)
-                    # df_data = self.load_and_assign_data(filename=file_std)
-                    # times = df_data.iloc[:, 0]
-                    #
                     if self.autodetection_bg == False:
                         if self.container_helper["Default BG"]["Times"][0] != "Set start time":
                             t_start = min(times, key=lambda x: abs(x - self.container_helper["Default BG"]["Times"][0]))
@@ -1714,11 +1800,15 @@ class PySILLS(tk.Frame):
                 filename = file_smpl.split("/")[-1]
                 #
                 if self.container_helper["Default BG"]["Positions"] == [0, 0]:
-                    df_data = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                     times = DE().get_times(dataframe=df_data)
-                    # df_data = self.load_and_assign_data(filename=file_smpl)
-                    # times = df_data.iloc[:, 0]
-                    #
                     t_start = min(times, key=lambda x: abs(x - self.container_helper["Default BG"]["Times"][0]))
                     t_end = min(times, key=lambda x: abs(x - self.container_helper["Default BG"]["Times"][1]))
                     index_start = np.where(times == t_start)[0][0]
@@ -1787,11 +1877,15 @@ class PySILLS(tk.Frame):
                                             value_02["BG"].extend(list(np.ones(1000)))
                                 for interval in merged_intervals_sig:
                                     if file_smpl == self.container_lists["SMPL"]["Long"][0]:
-                                        df_data = DE(filename_long=file_smpl).get_measurements(
-                                            delimiter=",", skip_header=3, skip_footer=1)
+                                        if self.container_icpms["name"] != None:
+                                            var_skipheader = self.container_icpms["skipheader"]
+                                            var_skipfooter = self.container_icpms["skipfooter"]
+                                            df_data = DE(filename_long=file_smpl).get_measurements(
+                                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                                        else:
+                                            df_data = DE(filename_long=file_smpl).get_measurements(
+                                                delimiter=",", skip_header=3, skip_footer=1)
                                         times = DE().get_times(dataframe=df_data)
-                                        # df_data = self.load_and_assign_data(filename=file_smpl)
-                                        # times = df_data.iloc[:, 0]
                                         dataset = self.container_measurements["RAW"][filename][key_02][
                                             interval[0]:interval[1] + 1]
                                     if key_01 == "RAW":
@@ -1864,11 +1958,15 @@ class PySILLS(tk.Frame):
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG_RATIO"].add_subplot()
 
-                    df_data = DE(filename_long=filename_long).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=filename_long).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=filename_long).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                     times = DE().get_times(dataframe=df_data)
-                    # df_data = self.load_and_assign_data(filename=filename_long)
-                    # times = df_data.iloc[:, 0]
                     start_time = times.iloc[0]
                     end_time = times.iloc[-1]
                     start_index = times[times == start_time].index[0]
@@ -1951,11 +2049,15 @@ class PySILLS(tk.Frame):
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG_RATIO"].add_subplot()
 
-                    df_data = DE(filename_long=filename_long).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=filename_long).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=filename_long).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                     times = DE().get_times(dataframe=df_data)
-                    # df_data = self.load_and_assign_data(filename=filename_long)
-                    # times = df_data.iloc[:, 0]
                     start_time = times.iloc[0]
                     end_time = times.iloc[-1]
                     start_index = times[times == start_time].index[0]
@@ -2742,7 +2844,15 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
 
-        df_data = DE(filename_long=var_file_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+        if self.container_icpms["name"] != None:
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_data = DE(filename_long=var_file_long).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        else:
+            df_data = DE(filename_long=var_file_long).get_measurements(
+                delimiter=",", skip_header=3, skip_footer=1)
+
         list_keys = list(df_data.columns.values)
         del list_keys[0]
         dataset_time = list(df_data.iloc[:, 0])
@@ -8767,7 +8877,9 @@ class PySILLS(tk.Frame):
             var_listbox = self.lb_smpl
 
         filename = filedialog.askopenfilenames(
-            parent=self.parent, filetypes=(("csv files", "*.csv"), ("all files", "*.*")), initialdir=os.getcwd())
+            parent=self.parent,
+            filetypes=(("LA-ICP-MS files", "*.csv *.xl *.txt"), ("csv files", "*.csv"), ("xl files", "*.xl"),
+                       ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
 
         # index_header, names_header, var_delimiter = DE(filename_long=filename).find_header()
         # index_data_end = DE(filename_long=filename).find_dataset_end(
@@ -8797,20 +8909,19 @@ class PySILLS(tk.Frame):
     #
     def import_concentration_data(self):
         filename = filedialog.askopenfilenames(
-            parent=self.parent, filetypes=(("csv files", "*.csv"), ("all files", "*.*")), initialdir=os.getcwd())
+            parent=self.parent,
+            filetypes=(("Delimiter separated files", "*.csv *.xl *.txt"), ("csv files", "*.csv"), ("xl files", "*.xl"),
+                       ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
         df = pd.read_csv(filename[0], sep=";", header=0, engine="python")
         data_concentration = dict(zip(df.element, df.concentration))
         #
         self.container_var["isotopes"]["default"].set("Select IS")
-        #self.var_entr_09.set(0.0)
-        #self.container_var["settings"]["IS Concentration"].set(0.0)
         if len(self.container_var["mineralchemistry"]) > 0:
             self.container_var["mineralchemistry"].clear()
         self.container_var["mineralchemistry"].extend(list(data_concentration.keys()))
         self.container_var["mineralchemistry"].sort()
         #
         possible_is = []
-        #self.mineral_chem = {}
         self.mineral_chem["Unknown"] = {}
         for element in self.container_var["mineralchemistry"]:
             for isotope in self.container_lists["ISOTOPES"]:
@@ -9000,7 +9111,14 @@ class PySILLS(tk.Frame):
         list_files.extend(self.container_lists["SMPL"]["Long"])
         #
         for file_long in list_files:
-            df_data = DE(filename_long=file_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=file_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=file_long).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
             file_short = file_long.split("/")[-1]
             #
@@ -10516,10 +10634,15 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             dates, times = Data(filename=var_file).import_as_list()
             #
             entry_std = [file_std, len(list(df_data.keys())[1:]), dataset_time[0], dataset_time[-1],
@@ -10539,10 +10662,15 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = var_file.split("/")
             file_smpl = parts[-1]
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             dates, times = Data(filename=var_file).import_as_list()
             #
             entry_smpl = [file_smpl, len(list(df_data.keys())[1:]), dataset_time[0], dataset_time[-1],
@@ -10593,10 +10721,15 @@ class PySILLS(tk.Frame):
             self.fi_current_file_smpl = var_file
         #
         if self.temp_lines_checkup[filetype][var_file_short] == 0:
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             x_max = max(dataset_time)
             icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
             y_max = np.amax(icp_measurements)
@@ -10791,8 +10924,15 @@ class PySILLS(tk.Frame):
                     self.container_lists["SMPL"]["Short"].append(file_parts[-1])
                 if self.demo_mode == True:
                     self.lb_smpl.insert(tk.END, file_parts[-1])
-            #
-            df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             self.times = DE().get_times(dataframe=df_exmpl)
             self.container_lists["ISOTOPES"] = DE().get_isotopes(dataframe=df_exmpl)
 
@@ -12141,12 +12281,18 @@ class PySILLS(tk.Frame):
         for var_file_long in self.container_lists[var_filetype]["Long"]:
             parts = var_file_long.split("/")
             var_file_short = parts[-1]
-            dates, times = Data(filename=var_file_long).import_as_list()
-
-            if var_file_short not in self.container_var["acquisition times"][var_filetype]:
-                self.container_var["acquisition times"][var_filetype][var_file_short] = tk.StringVar()
-                self.container_var["acquisition times"][var_filetype][var_file_short].set(
-                    times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+            if self.container_icpms["timestamp"] != "undefined":
+                dates, times = Data(filename=var_file_long).import_as_list()
+                if var_file_short not in self.container_var["acquisition times"][var_filetype]:
+                    self.container_var["acquisition times"][var_filetype][var_file_short] = tk.StringVar()
+                    self.container_var["acquisition times"][var_filetype][var_file_short].set(
+                        times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+            else:
+                times = [["00", "00", "00"]]
+                if var_file_short not in self.container_var["acquisition times"][var_filetype]:
+                    self.container_var["acquisition times"][var_filetype][var_file_short] = tk.StringVar()
+                    self.container_var["acquisition times"][var_filetype][var_file_short].set(
+                        times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
     def place_time_signal_plot_checker(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Time-Signal Diagram Checker'
@@ -12254,7 +12400,14 @@ class PySILLS(tk.Frame):
             var_lw = 2.5
 
         if self.temp_lines_checkup2[var_filetype][var_file_short] == 0:
-            df_data = DE(filename_long=var_file_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file_long).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
             x_max = max(dataset_time)
             icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
@@ -12817,7 +12970,9 @@ class PySILLS(tk.Frame):
 
     def import_is_data(self, parent, mode="MA"):
         filename = filedialog.askopenfilenames(
-            parent=parent, filetypes=(("csv files", "*.csv"), ("all files", "*.*")), initialdir=os.getcwd())
+            parent=parent,
+            filetypes=(("LA-ICP-MS files", "*.csv *.xl *.txt"), ("csv files", "*.csv"), ("xl files", "*.xl"),
+                       ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
         df_expdata = pd.read_csv(filename[0])
 
         if mode == "MA":
@@ -13349,7 +13504,14 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["CANVAS"] = self.canvas_specific
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME"] = self.toolbarFrame_specific
         #
-        df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+        if self.container_icpms["name"] != None:
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        else:
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
@@ -13558,7 +13720,14 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["CANVAS RATIO"] = self.canvas_specific_ratio
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"] = self.toolbarFrame_specific_ratio
         #
-        df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+        if self.container_icpms["name"] != None:
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        else:
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         icp_measurements = np.array([[df_data[isotope]/df_data[var_is] for isotope in self.container_lists["ISOTOPES"]]])
@@ -13896,10 +14065,15 @@ class PySILLS(tk.Frame):
             #
             for var_type in ["STD", "SMPL"]:
                 for var_file in self.container_lists[var_type]["Long"]:
-                    df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=var_file).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=var_file).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                     dataset_time = list(DE().get_times(dataframe=df_data))
-                    # df_data = self.load_and_assign_data(filename=var_file)
-                    # dataset_time = list(df_data.iloc[:, 0])
                     var_file_short = var_file.split("/")[-1]
                     #
                     if 1 not in self.container_helper[var_type][var_file_short][var_interval]["Content"]:
@@ -13931,10 +14105,15 @@ class PySILLS(tk.Frame):
                         self.show_time_signal_diagram_checker()
         elif mode in self.container_lists["STD"]["Long"]:
             var_file = mode
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             var_file_short = var_file.split("/")[-1]
             #
             if self.container_var["ma_setting"]["Calculation Interval"]["STD"][var_file_short].get() == 0:
@@ -13990,10 +14169,15 @@ class PySILLS(tk.Frame):
             #
         elif mode in self.container_lists["SMPL"]["Long"]:
             var_file = mode
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             var_file_short = var_file.split("/")[-1]
             #
             if self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][var_file_short].get() == 0:
@@ -20379,7 +20563,14 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["CANVAS"] = self.canvas_specific
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME"] = self.toolbarFrame
 
-        df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+        if self.container_icpms["name"] != None:
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        else:
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
@@ -20587,7 +20778,14 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["CANVAS RATIO"] = self.canvas_specific_ratio
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"] = self.toolbarFrame_specific_ratio
 
-        df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+        if self.container_icpms["name"] != None:
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        else:
+            df_data = DE(filename_long=var_file).get_measurements(
+                delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         icp_measurements = np.array(
@@ -21052,10 +21250,15 @@ class PySILLS(tk.Frame):
             #
             for var_type in ["STD", "SMPL"]:
                 for var_file in self.container_lists[var_type]["Long"]:
-                    df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=var_file).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=var_file).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                     dataset_time = list(DE().get_times(dataframe=df_data))
-                    # df_data = self.load_and_assign_data(filename=var_file)
-                    # dataset_time = list(df_data.iloc[:, 0])
                     var_file_short = var_file.split("/")[-1]
                     #
                     if 1 not in self.container_helper[var_type][var_file_short]["BG"]["Content"]:
@@ -21082,10 +21285,15 @@ class PySILLS(tk.Frame):
                     #
         elif mode in self.container_lists["STD"]["Long"]:
             var_file = mode
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             var_file_short = var_file.split("/")[-1]
             #
             if self.container_var["fi_setting"]["Calculation Interval"]["STD"][var_file_short].get() == 0:
@@ -21141,10 +21349,15 @@ class PySILLS(tk.Frame):
             #
         elif mode in self.container_lists["SMPL"]["Long"]:
             var_file = mode
-            df_data = DE(filename_long=var_file).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            # df_data = self.load_and_assign_data(filename=var_file)
-            # dataset_time = list(df_data.iloc[:, 0])
             var_file_short = var_file.split("/")[-1]
             #
             if self.container_var["fi_setting"]["Calculation Interval"]["SMPL"][var_file_short].get() == 0:
