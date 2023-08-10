@@ -250,6 +250,8 @@ class PySILLS(tk.Frame):
         self.container_var["IS SMPL Default"] = tk.StringVar()
         self.container_var["IS SMPL Default"].set("0.0")
         self.container_var["General Settings"] = {}                                 # General Settings
+        self.container_var["General Settings"]["Language"] = tk.StringVar()
+        self.container_var["General Settings"]["Language"].set("English")
         self.container_var["General Settings"]["Default Author"] = tk.StringVar()
         self.container_var["General Settings"]["Default Author"].set("J. Doe")
         self.container_var["General Settings"]["Default SRM"] = tk.StringVar()
@@ -1078,13 +1080,12 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 17, column_id=start_column + 8, n_rows=common_n_rows,
             n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text="Define ICP-MS", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
-        today = date.today()
-        today = today.strftime("%d/%m/%Y")
-        today = today + " - " + str(round(np.random.random(), 4))
+        now = datetime.datetime.now()
+        now = now.strftime("%Y/%m/%d-%H%M")
         lbl_version = SE(
             parent=self.parent, row_id=self.n_rows - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Version: pre-release " + today, relief=tk.FLAT, fontsize="sans 8")
+            text="Version: pre-release " + now, relief=tk.FLAT, fontsize="sans 8")
         lbl_dev = SE(
             parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
@@ -2022,7 +2023,7 @@ class PySILLS(tk.Frame):
                 self.counter_fast_track_std += 1
                 self.container_var["Spike Elimination"]["STD"]["State"] = True
                 #
-                self.frm_09e.config(background=self.sign_green, bd=1)
+                self.frm_spk_std.config(background=self.sign_green, bd=1)
                 #
             elif filetype == "SMPL":
                 for filename_long in self.list_smpl:
@@ -2116,15 +2117,15 @@ class PySILLS(tk.Frame):
                 self.container_var["Spike Elimination"]["SMPL"]["State"] = True
                 #
                 if self.pysills_mode == "MA":
-                    self.frm_09f.config(background=self.sign_green, bd=1)
+                    self.frm_spk_smpl.config(background=self.sign_green, bd=1)
                 elif self.pysills_mode == "FI":
                     if self.container_var["fi_setting"]["Spike Elimination Inclusion"].get() == 1:
-                        self.frm_09f.config(background=self.sign_green, bd=1)
+                        self.frm_spk_smpl.config(background=self.sign_green, bd=1)
                     elif self.container_var["fi_setting"]["Spike Elimination Inclusion"].get() == 2:
                         if len(self.container_helper["SMPL"][filename_short]["INCL"]["Content"]) == 0:
-                            self.frm_09f.config(background=self.sign_yellow, bd=1)
+                            self.frm_spk_smpl.config(background=self.sign_yellow, bd=1)
                         else:
-                            self.frm_09f.config(background=self.sign_green, bd=1)
+                            self.frm_spk_smpl.config(background=self.sign_green, bd=1)
 
     def select_assemblage(self, var_opt):
         self.list_assemblage = {}
@@ -9716,9 +9717,13 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=9, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Plotting Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_11 = SE(
+            parent=subwindow_generalsettings, row_id=12, column_id=start_column + 27, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Language Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10])
+            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
         #
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=9,
@@ -9767,32 +9772,32 @@ class PySILLS(tk.Frame):
         ## Entries
         entr_01a = SE(
             parent=subwindow_generalsettings, row_id=3, column_id=start_column, n_rows=1, n_columns=9,
-            fg=self.green_light, bg=self.green_dark).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["Default Author"],
             text_default=self.container_var["General Settings"]["Default Author"].get(), command=None)
         entr_07a = SE(
             parent=subwindow_generalsettings, row_id=12, column_id=start_column + 16, n_rows=1, n_columns=5,
-            fg=self.green_light, bg=self.green_dark).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["BG Offset Start"],
             text_default=self.container_var["General Settings"]["BG Offset Start"].get(), command=None)
         entr_07b = SE(
             parent=subwindow_generalsettings, row_id=12, column_id=start_column + 21, n_rows=1, n_columns=5,
-            fg=self.green_light, bg=self.green_dark).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["BG Offset End"],
             text_default=self.container_var["General Settings"]["BG Offset End"].get(), command=None)
         entr_07c = SE(
             parent=subwindow_generalsettings, row_id=13, column_id=start_column + 16, n_rows=1, n_columns=5,
-            fg=self.green_light, bg=self.green_dark).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["MAT Offset Start"],
             text_default=self.container_var["General Settings"]["MAT Offset Start"].get(), command=None)
         entr_07d = SE(
             parent=subwindow_generalsettings, row_id=13, column_id=start_column + 21, n_rows=1, n_columns=5,
-            fg=self.green_light, bg=self.green_dark).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["MAT Offset End"],
             text_default=self.container_var["General Settings"]["MAT Offset End"].get(), command=None)
         entr_10a = SE(
             parent=subwindow_generalsettings, row_id=10, column_id=start_column + 32, n_rows=1, n_columns=5,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["Line width"],
             text_default=self.container_var["General Settings"]["Line width"].get(),
             command=lambda event, var_entr=self.container_var["General Settings"]["Line width"]:
@@ -9808,11 +9813,13 @@ class PySILLS(tk.Frame):
             "turbo", "rainbow", "gist_rainbow", "jet", "nipy_spectral", "gnuplot", "gist_earth", "ocean", "hsv",
             "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
             "cividis", "brg"]
+        list_languages = ["English"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
         list_delimiter = ["comma", "semicolon"]
         list_delimiter.sort()
+        list_languages.sort()
 
         opt_srm = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=9,
@@ -9841,9 +9848,15 @@ class PySILLS(tk.Frame):
             var_default=self.container_var["General Settings"]["Delimiter"].get(), var_list=list_delimiter,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["General Settings"]["Delimiter"]: self.change_delimiter(var_opt))
+        opt_language = SE(
+            parent=subwindow_generalsettings, row_id=13, column_id=start_column + 27, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["Language"],
+            var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
         #
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
-            [opt_srm, opt_colormaps, opt_filetype, opt_delimiter])
+            [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
         #
         ## Radiobuttons
         rb_04a = SE(
@@ -12668,12 +12681,22 @@ class PySILLS(tk.Frame):
                 parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+
+        list_possible_elements = []
+        for isotope in self.container_var["SRM"]:
+            if isotope in self.container_lists["ISOTOPES"]:
+                var_srm_i = self.container_var["SRM"][isotope].get()
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+                if element in self.srm_actual[var_srm_i]:
+                    var_isotope_concentration = self.srm_actual[var_srm_i][element]
+                    if var_isotope_concentration > 0:
+                        list_possible_elements.append(isotope)
         ## OPTION MENUS
         if var_key == "oxides":
             list_elements = []
             list_compound = []
-            for isotope in self.container_lists["ISOTOPES"]:
+            for isotope in list_possible_elements:
                 key = re.search("(\D+)(\d*)", isotope)
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
@@ -12701,7 +12724,7 @@ class PySILLS(tk.Frame):
         elif var_key == "elements":
             list_elements = []
             list_compound = []
-            for isotope in self.container_lists["ISOTOPES"]:
+            for isotope in list_possible_elements:
                 key = re.search("(\D+)(\d*)", isotope)
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
@@ -12732,7 +12755,7 @@ class PySILLS(tk.Frame):
                 command=lambda parent=subwindow_ma_matrix_concentration, mode="MA": self.import_is_data(parent, mode))
         elif var_key == "custom":
             var_opt_is_default = self.container_var["IS"]["Default SMPL"]
-            var_opt_is_list = self.container_lists["ISOTOPES"]
+            var_opt_is_list = list_possible_elements
 
             if var_opt_is_default.get() != "Select IS":
                 var_opt_is_default_text = var_opt_is_default.get()
@@ -12767,7 +12790,7 @@ class PySILLS(tk.Frame):
         #
         if var_key != "experiments" and var_key != "custom":
             var_opt_is_default = self.container_var["IS"]["Default SMPL"]
-            var_opt_is_list = self.container_lists["ISOTOPES"]
+            var_opt_is_list = list_possible_elements
             var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
             #
             if var_opt_is_default.get() != "Select IS":
@@ -12842,7 +12865,7 @@ class PySILLS(tk.Frame):
             text_smpl.insert("end", "\t")
             #
             if var_key == "oxides":     # Oxide Selection
-                var_list_is = self.container_lists["ISOTOPES"]
+                var_list_is = list_possible_elements #self.container_lists["ISOTOPES"]
                 var_list_comp = self.container_lists["Oxides"]
                 var_opt_comp_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"]
                 var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
@@ -12870,7 +12893,7 @@ class PySILLS(tk.Frame):
                     var_entr_is_default = "1000000"
                 #
             elif var_key == "elements":  # Element Selection
-                var_list_is = self.container_lists["ISOTOPES"]
+                var_list_is = list_possible_elements #self.container_lists["ISOTOPES"]
                 var_list_comp = self.container_lists["Elements"]
                 var_opt_comp_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"]
                 var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
@@ -12898,7 +12921,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_entr_is_default = "1000000"
             elif var_key in ["experiments", "custom"]:  # Experimental Data Selection
-                var_list_is = self.container_lists["ISOTOPES"]
+                var_list_is = list_possible_elements #self.container_lists["ISOTOPES"]
                 var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
                 var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"]
                 var_entr_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"]
@@ -13194,6 +13217,7 @@ class PySILLS(tk.Frame):
         parts = var_file.split("/")
         var_file_short = parts[-1]
         self.helper_intervals = {"BG": [], "MAT": []}
+        self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short].set(0)
         #
         ## Window Settings
         window_width = 1060
@@ -13435,6 +13459,10 @@ class PySILLS(tk.Frame):
                 command=lambda var_type=var_type, var_file_short=var_file_short, var_datatype="SMOOTHED",
                                var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
                                                                                    var_datatype, var_isotope))
+            if self.container_var["Spike Elimination"][var_type]["State"] == False:
+                cb_smoothed_i.configure(state="disabled")
+            else:
+                cb_smoothed_i.configure(state="normal")
             text_iso.window_create("end", window=cb_smoothed_i)
             text_iso.insert("end", "\n")
         #
@@ -23426,14 +23454,14 @@ class PySILLS(tk.Frame):
                 command=lambda mode="SMPL": self.custom_spike_check(mode))
 
             # Frames
-            self.frm_09e = SE(
+            self.frm_spk_std = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=17, n_rows=1, n_columns=1,
                 fg=self.bg_colors["Very Dark"], bg=self.sign_red).create_frame(relief=tk.SOLID)
-            self.frm_09e.config(highlightbackground="black", bd=1)
-            self.frm_09f = SE(
+            self.frm_spk_std.config(highlightbackground="black", bd=1)
+            self.frm_spk_smpl = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=17, n_rows=1, n_columns=1,
                 fg=self.bg_colors["Very Dark"], bg=self.sign_red).create_frame(relief=tk.SOLID)
-            self.frm_09f.config(highlightbackground="black", bd=1)
+            self.frm_spk_smpl.config(highlightbackground="black", bd=1)
 
     def custom_spike_check(self, mode="SMPL"):
         ## Window Settings
