@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		10.08.2023
+# Date:		11.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -7740,6 +7740,7 @@ class PySILLS(tk.Frame):
             path = os.getcwd()
             parent = os.path.dirname(path)
             if self.demo_mode == True:
+                self.var_opt_icp.set("Agilent 7900s")
                 ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
                 for file in demo_files:
@@ -8856,7 +8857,8 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=1,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="BG": self.clear_all_calculation_intervals(mode))
 
         # Entries
         var_entr_07a_default = self.container_var["ma_setting"]["Time BG Start"].get()
@@ -8924,7 +8926,8 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="MAT": self.clear_all_calculation_intervals(mode))
 
         # Entries
         var_entr_08a_default = self.container_var["ma_setting"]["Time MAT Start"].get()
@@ -19466,6 +19469,29 @@ class PySILLS(tk.Frame):
                 pass
 
             print(key, variable.get())
+
+    def clear_all_calculation_intervals(self, mode):
+        if mode == "INCL":
+            file_type_list = ["SMPL"]
+        else:
+            file_type_list = ["STD", "SMPL"]
+
+        for var_file_type in file_type_list:
+            for var_file_short in self.container_lists[var_file_type]["Short"]:
+                self.container_helper[var_file_type][var_file_short][mode]["Content"].clear()
+
+                if self.pysills_mode == "MA":
+                    self.temp_lines_checkup2[var_file_type][var_file_short] = 0
+                    self.show_time_signal_diagram_checker()
+
+        if mode == "BG":
+            self.container_var["ma_setting"]["Time BG Start"].set("Set start time")
+            self.container_var["ma_setting"]["Time BG End"].set("Set end time")
+            self.autodetection_bg = False
+        elif mode == "MAT":
+            self.container_var["ma_setting"]["Time MAT Start"].set("Set start time")
+            self.container_var["ma_setting"]["Time MAT End"].set("Set end time")
+            self.autodetection_sig = False
 
     ## SPIKE ELIMINATION
     def select_spike_elimination(self, var_opt, start_row, var_relief=tk.FLAT, mode="FI"):

@@ -17,6 +17,27 @@ Maximilian Alexander Beeskow in the work group of Prof. Dr. Thomas Wagner and
 Dr. Tobias Fusswinkel at RWTH Aachen University.
 PySILLS was inspired conceptionally by the widely-used data reduction tool SILLS.
 
+### Top Features
+The following list shows some of the main features that differentiate PySILLS from alternative data reduction tools.
+* works on all common computer systems that can run Python
+* use of multiple standard reference materials in one project file
+* use of multiple internal standards in one project file
+* consideration of isotope-specific standard reference materials
+* assemblage definition
+* file-specific quick analysis
+* intuitive, fast and flexible workflow
+* multiple check-up possibilities
+* export of processed LA-ICP-MS data (e.g. intensity ratios, analytical sensitivities, etc.) for external calculations
+* many quality-of-life features
+
+### Planned Features
+The following features extend PySILLS and do not replace already existing features.
+* more outlier detection algorithms
+* replacement of scattered intensity values by regression curves
+* extended language support
+* in-built geothermometry analysis
+* Jupyter notebooks for a browser-based data reduction of LA-ICP-MS experiments
+
 ---
 
 ## ⚠️ Pre-release comment / disclaimer
@@ -76,16 +97,6 @@ Coming soon ...
 PySILLS allows the major, minor and trace element analysis of minerals and glasses. The calculations are based on the 
 measured intensity signals and sensitivities of the ICP-MS instrument.
 
-### Top Features
-
-* use of multiple standard reference materials in one project file
-* use of multiple internal standards in one project file
-* consideration of isotope-specific standard reference materials
-* assemblage definition
-* file-specific quick analysis
-* intuitive, fast and flexible workflow
-* multiple check-up possibilities
-
 ### Short Step-by-Step Manual
 
 In addition to a more detailed manual, I would like to describe briefly here which steps are necessary for 
@@ -134,10 +145,6 @@ Coming soon ...
 ---
 
 ## 💎 Fluid Inclusion Analysis
-
-Coming soon ...
-
-### Top Features
 
 Coming soon ...
 
