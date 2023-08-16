@@ -19,7 +19,12 @@ modules/__pycache__/*.pyc
 notebooks/.ipynb_checkpoints/
 tests/.ipynb_checkpoints/
 
+# idea
+.idea
 .idea/
+*.xml
+
+# github
 .git/
 .github/
 

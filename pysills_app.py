@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.08.2023
+# Date:		16.08.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -47,9 +47,10 @@ class PySILLS(tk.Frame):
         tk.Frame.__init__(self, parent)
         var_screen_width = var_screen_width
         var_screen_height = var_screen_height
-        var_scaling = round(1920/var_screen_width, 2)
-        if var_scaling == 1.0:
-            var_scaling = 1.25
+        var_scaling_horizontal = round(1920/var_screen_width, 2)
+        var_scaling_vertical = round(1080/var_screen_height, 2)
+        if var_scaling_horizontal == 1.0 and var_scaling_vertical == 1.0:
+            var_scaling = 1.3
         #
         ## Colors
         self.green_dark = "#282D28"
@@ -111,7 +112,7 @@ class PySILLS(tk.Frame):
         #
         # General Settings
         self.parent = parent
-        self.parent.tk.call("tk", "scaling", var_scaling)
+        #self.parent.tk.call("tk", "scaling", var_scaling)
         self.parent.title("PySILLS - LA-ICP-MS data reduction")
         var_geometry = ""
         # var_window_width = int(round(0.94*int(var_screen_width), -2))
@@ -125,7 +126,8 @@ class PySILLS(tk.Frame):
         var_geometry += str(var_window_height)
         var_geometry += "+0+0"
         self.parent.geometry(var_geometry)
-        self.parent.resizable(False, False)
+        #self.parent.resizable(False, False)
+        self.parent.resizable(True, True)
         self.parent["bg"] = self.bg_colors["Very Light"]
         #
         self.list_alphabet = list(string.ascii_uppercase)
@@ -140,16 +142,13 @@ class PySILLS(tk.Frame):
             default_font = font.nametofont("TkDefaultFont")
             default_font.configure(family="Ubuntu", size=10, weight=font.BOLD)
             self.parent.option_add("*Font", default_font)
-            #mpl.rcParams["backend"] = "TkAgg"
             mpl.use("TkAgg")
         elif var_os == "darwin":
             self.defaultFont = font.nametofont("TkDefaultFont")
             default_font = font.nametofont("TkDefaultFont")
             self.parent.option_add("*Font", default_font)
-            #mpl.rcParams["backend"] = "MacOSX"
             mpl.use("MacOSX")
         else:
-            #mpl.rcParams["backend"] = "TkAgg"
             mpl.use("TkAgg")
         #
         ## Data Container
