@@ -115,18 +115,13 @@ class PySILLS(tk.Frame):
         #self.parent.tk.call("tk", "scaling", var_scaling)
         self.parent.title("PySILLS - LA-ICP-MS data reduction")
         var_geometry = ""
-        # var_window_width = int(round(0.94*int(var_screen_width), -2))
-        # if var_window_width > 1800:
         var_window_width = int(440)
         var_geometry += str(var_window_width)
         var_geometry += "x"
-        # var_window_height = int(round(0.82*int(var_screen_height), -2))
-        # if var_window_height > 1000:
         var_window_height = int(950)
         var_geometry += str(var_window_height)
         var_geometry += "+0+0"
         self.parent.geometry(var_geometry)
-        #self.parent.resizable(False, False)
         self.parent.resizable(True, True)
         self.parent["bg"] = self.bg_colors["Very Light"]
         #
@@ -149,6 +144,9 @@ class PySILLS(tk.Frame):
             self.parent.option_add("*Font", default_font)
             mpl.use("MacOSX")
         else:
+            self.defaultFont = font.nametofont("TkDefaultFont")
+            #default_font = font.nametofont("TkDefaultFont")
+            #self.parent.option_add("*Font", default_font)
             mpl.use("TkAgg")
         #
         ## Data Container
@@ -8309,167 +8307,9 @@ class PySILLS(tk.Frame):
             #
             self.container_var["SMPL"][file_smpl]["Frame"] = frm_i
 
-        frm_iso = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_iso + 1, column_id=n_col_header + n_col_files + 2,
-            n_rows=n_rows - 23, n_columns=n_col_iso, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
-        text_iso = tk.Text(
-            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
-        vsb_iso.config(command=text_iso.yview)
-        vsb_iso.pack(side="right", fill="y")
-        text_iso.pack(side="left", fill="both", expand=True)
-        #
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            if self.container_var["LASER"].get() != "Select Gas":
-                var_text = self.container_var["LASER"].get()
-            else:
-                var_text = "Select Gas"
-            #
-            if isotope not in self.container_var["SRM"]:
-                self.container_var["SRM"][isotope] = tk.StringVar()
-                self.container_var["SRM"][isotope].set("Select SRM")
-                #
-                self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
-                self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
-                #
-                for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
-                        var_isotope=isotope)
-
-                    if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
-                            file_std_short] = {}
-
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                #
-                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
-                        var_isotope=isotope)
-
-                    if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
-                            file_smpl_short] = {}
-
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-            #
-            if self.file_loaded == True:
-                for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
-                        var_isotope=isotope)
-
-                    if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
-                            file_std_short] = {}
-
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                #
-                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
-                        var_isotope=isotope)
-
-                    if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][
-                            file_smpl_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
-                            file_smpl_short] = {}
-
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
-                        isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-
-            frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_iso.window_create("end", window=frm_i)
-            text_iso.insert("end", "")
-            lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Very Dark"])
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\t")
-            #
-            if self.container_var["SRM"][isotope].get() != "Select SRM":
-                var_text = self.container_var["SRM"][isotope].get()
-            else:
-                if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-                    var_text = self.container_var["SRM"]["default"][1].get()
-                    self.container_var["SRM"][isotope].set(var_text)
-                else:
-                    var_text = "Select SRM"
-            #
-            opt_srm_i = tk.OptionMenu(
-                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
-                command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
-                self.ma_change_srm_individual(var_opt, var_indiv, mode))
-            opt_srm_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_srm_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_iso.window_create("end", window=opt_srm_i)
-            text_iso.insert("end", "\t")
-            #
-            key_element = re.search("(\D+)(\d+)", isotope)
-            element = key_element.group(1)
-            self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
-            #
-            if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
-                    and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
-                                                                                   element]):
-                self.container_var["charge"][isotope]["textvar"].set("2+ charged")
-                charge_fg = self.accent_color
-            else:
-                self.container_var["charge"][isotope]["textvar"].set("1+ charged")
-                charge_fg = self.bg_colors["Very Dark"]
-            #
-            lbl_i = tk.Label(
-                frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
-                textvariable=self.container_var["charge"][isotope]["textvar"], bg=self.bg_colors["Very Light"],
-                fg=charge_fg)
-            self.container_var["charge"][isotope]["labelvar"] = lbl_i
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\n")
+        # Build section 'Measured Isotopes'
+        var_measured_isotopes = {"Row start": 1, "Column start": 42, "N rows": 15, "N columns": 18}
+        self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
         #
         ## BUTTONS
         btn_std_conf = SE(
@@ -8485,21 +8325,6 @@ class PySILLS(tk.Frame):
             text="Confirm all files", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
 
-        ## OPTION MENUS
-        list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
-        opt_laser = SE(
-            parent=self.subwindow_ma_settings, row_id=n_rows - 22, column_id=n_col_header + n_col_files + 14,
-            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=bg_medium).create_option_isotope(
-            var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var["LASER"]: self.change_carrier_gas(var_opt))
-        opt_laser["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        opt_laser.config(
-            bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
         ## INITIALIZATION
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
@@ -9300,6 +9125,204 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_imported_files)
+
+    def place_measured_isotopes_overview(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Measured Isotopes'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+        if self.pysills_mode == "MA":
+            var_parent = self.subwindow_ma_settings
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_parent = self.subwindow_fi_settings
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_parent = self.subwindow_mi_settings
+            var_setting_key = "mi_setting"
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 11
+
+        # Labels
+        frm_iso = SE(
+            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
+        text_iso = tk.Text(
+            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
+        vsb_iso.config(command=text_iso.yview)
+        vsb_iso.pack(side="right", fill="y")
+        text_iso.pack(side="left", fill="both", expand=True)
+        #
+        for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+            if self.container_var["LASER"].get() != "Select Gas":
+                var_text = self.container_var["LASER"].get()
+            else:
+                var_text = "Select Gas"
+            #
+            if isotope not in self.container_var["SRM"]:
+                self.container_var["SRM"][isotope] = tk.StringVar()
+                self.container_var["SRM"][isotope].set("Select SRM")
+                #
+                self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
+                self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
+                #
+                for file_std_short in self.container_lists["STD"]["Short"]:
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
+                        var_isotope=isotope)
+
+                    if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
+                        self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                        self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
+                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
+                            file_std_short] = {}
+
+                    self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                #
+                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
+                        var_isotope=isotope)
+
+                    if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
+                        self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
+                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
+                            file_smpl_short] = {}
+
+                    self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+            #
+            if self.file_loaded == True:
+                for file_std_short in self.container_lists["STD"]["Short"]:
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
+                        var_isotope=isotope)
+
+                    if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
+                        self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                        self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
+                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
+                            file_std_short] = {}
+
+                    self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                #
+                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
+                    self.build_checkbutton_isotope_visibility(
+                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
+                        var_isotope=isotope)
+
+                    if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
+                        self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][
+                            file_smpl_short] = tk.IntVar()
+                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
+                            file_smpl_short] = {}
+
+                    self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
+                        isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+
+            frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                             highlightbackground="black", bd=1)
+            text_iso.window_create("end", window=frm_i)
+            text_iso.insert("end", "")
+            lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Very Dark"])
+            text_iso.window_create("end", window=lbl_i)
+            text_iso.insert("end", "\t")
+            #
+            if self.container_var["SRM"][isotope].get() != "Select SRM":
+                var_text = self.container_var["SRM"][isotope].get()
+            else:
+                if self.container_var["SRM"]["default"][1].get() != "Select SRM":
+                    var_text = self.container_var["SRM"]["default"][1].get()
+                    self.container_var["SRM"][isotope].set(var_text)
+                else:
+                    var_text = "Select SRM"
+            #
+            opt_srm_i = tk.OptionMenu(
+                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
+                command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
+                self.ma_change_srm_individual(var_opt, var_indiv, mode))
+            opt_srm_i["menu"].config(
+                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+            opt_srm_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+            text_iso.window_create("end", window=opt_srm_i)
+            text_iso.insert("end", "\t")
+            #
+            key_element = re.search("(\D+)(\d+)", isotope)
+            element = key_element.group(1)
+            self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
+            #
+            if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
+                    and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
+                                                                                   element]):
+                self.container_var["charge"][isotope]["textvar"].set("2+ charged")
+                charge_fg = self.accent_color
+            else:
+                self.container_var["charge"][isotope]["textvar"].set("1+ charged")
+                charge_fg = self.bg_colors["Very Dark"]
+            #
+            lbl_i = tk.Label(
+                frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
+                textvariable=self.container_var["charge"][isotope]["textvar"], bg=self.bg_colors["Very Light"],
+                fg=charge_fg)
+            self.container_var["charge"][isotope]["labelvar"] = lbl_i
+            text_iso.window_create("end", window=lbl_i)
+            text_iso.insert("end", "\n")
+
+        # Option Menus
+        list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
+        opt_laser = SE(
+            parent=var_parent, row_id=var_row_start + 15, column_id=var_columm_start + 11, n_rows=1,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["LASER"]: self.change_carrier_gas(var_opt))
+        opt_laser["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_laser.config(
+            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
     def place_acquisition_times_check(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Acquisition Times'
@@ -11460,6 +11483,8 @@ class PySILLS(tk.Frame):
             self.rb_int_ratio.configure(state="disabled")
             self.rb_rsf.configure(state="disabled")
             self.rb_lod.configure(state="disabled")
+            if self.container_var["ma_datareduction_files"]["Result Category"].get() not in [0, 3, 5, 6]:
+                self.container_var["ma_datareduction_files"]["Result Category"].set(0)
         elif self.container_var["ma_datareduction_files"]["File Type"].get() == 1:
             var_filetype = "SMPL"
             self.rb_conc_ratio.configure(state="normal")
@@ -12933,6 +12958,7 @@ class PySILLS(tk.Frame):
             path = os.getcwd()
             parent = os.path.dirname(path)
             if self.demo_mode == True:
+                self.var_opt_icp.set("Agilent 7900s")
                 fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
                 for file in demo_files:
@@ -15049,7 +15075,8 @@ class PySILLS(tk.Frame):
             self.rb_05e.configure(state="disabled")
             self.rb_05f.configure(state="disabled")
             self.rb_05h.configure(state="disabled")
-            #
+            if self.container_var["fi_datareduction_files"]["Result Category"].get() not in [0, 6, 8, 9]:
+                self.container_var["fi_datareduction_files"]["Result Category"].set(0)
         elif self.container_var["fi_datareduction_files"]["File Type"].get() == 1:
             var_filetype = "SMPL"
             #
