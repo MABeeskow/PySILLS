@@ -39,9 +39,7 @@ Planned Features
    :doc:`Installation <getting_started/installation>` | :doc:`Contributing <getting_started/contributing>` |
    :doc:`What is what <getting_started/whatiswhat>` |
    :doc:`Tutorials 'Mineral Analysis' <getting_started/tutorial_ma/index>` |
-   :doc:`Tutorials 'Fluid Inclusion Analysis' <getting_started/tutorial_fi/index>` |
-   :doc:`Examples 'Mineral Analysis' <getting_started/example_ma/index>` |
-   :doc:`Examples 'Fluid Inclusion Analysis' <getting_started/example_fi/index>` |
+   :doc:`Tutorials 'Fluid Inclusion Analysis' <getting_started/tutorial_fi/index>`
 
 .. toctree::
    :hidden:
@@ -58,8 +56,6 @@ Planned Features
    getting_started/whatiswhat/index
    getting_started/tutorial_ma/index
    getting_started/tutorial_fi/index
-   getting_started/example_ma/index
-   getting_started/example_fi/index
 
    :caption: API Reference
    :glob:
