@@ -39,9 +39,8 @@ Planned Features
 
    :doc:`About PySILLS <getting_started/about>` | :doc:`Authors <getting_started/authors>` |
    :doc:`Installation <getting_started/installation>` | :doc:`Contributing <getting_started/contributing>` |
-   :doc:`What is what <getting_started/whatiswhat>` |
-   :doc:`Tutorials 'Mineral Analysis' <getting_started/tutorial_ma/index>` |
-   :doc:`Tutorials 'Fluid Inclusion Analysis' <getting_started/tutorial_fi/index>`
+   :doc:`Tutorials 'Mineral Analysis' <getting_started/minerals/index>` |
+   :doc:`Tutorials 'Fluid Inclusion Analysis' <getting_started/fluid_inclusions/index>`
 
 .. toctree::
    :hidden:
@@ -55,9 +54,8 @@ Planned Features
    getting_started/contributing
 
 
-   getting_started/whatiswhat/index
-   getting_started/tutorial_ma/index
-   getting_started/tutorial_fi/index
+   getting_started/minerals/index
+   getting_started/fluid_inclusions/index
 
    :caption: API Reference
    :glob:
