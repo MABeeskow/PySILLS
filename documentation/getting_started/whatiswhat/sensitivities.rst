@@ -1,10 +1,6 @@
-.. _whatiswhat_ref:
+.. _sensitivities_ref:
 
-LA-ICP-MS in a nutshell
+Sensitivity parameters
 ===========================================================
 
-This sections gives a short overview about the wide field of LA-ICP-MS experiments with a focus on geosciences.
-
-.. toctree::
-    :maxdepth: 1
-    :caption: Examples
+Blabla
