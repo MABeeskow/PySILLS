@@ -37,6 +37,7 @@ The following features extend PySILLS and do not replace already existing featur
 * extended language support
 * in-built geothermometry analysis
 * Jupyter notebooks for a browser-based data reduction of LA-ICP-MS experiments
+* production of a video course on YouTube
 
 ---
 
