@@ -1,9 +1,9 @@
-.. _examples_ref:
+.. _whatiswhat_ref:
 
-Example Models
+LA-ICP-MS in a nutshell
 ===========================================================
 
-There is a series of examples available for PySILLS.
+This sections gives a short overview about the wide field of LA-ICP-MS experiments with a focus on geosciences.
 
 .. toctree::
     :maxdepth: 1
