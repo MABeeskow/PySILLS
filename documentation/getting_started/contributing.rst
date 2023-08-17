@@ -29,3 +29,10 @@ major, minor and trace element analysis of mineral compositions as well as of fl
    getting_started/whatiswhat/index
    getting_started/tutorial/index
    getting_started/example/index
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
