@@ -1,5 +1,7 @@
 .. _about_ref:
 
+.. image:: /images/PySILLS_Logo_Header.png
+
 About
 ===========================================================
 

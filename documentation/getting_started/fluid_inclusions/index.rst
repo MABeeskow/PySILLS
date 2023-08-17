@@ -11,4 +11,5 @@ This section gives a short overview about the analysis of fluid inclusions based
 
     theory
     applications
+    pypitzer
     example_01

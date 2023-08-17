@@ -2,8 +2,6 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: /documentation/getting_started/images/PySILLS_Logo_Header.png
-
 Welcome to the documentation of PySILLS |version|!
 ===========================================================
 
