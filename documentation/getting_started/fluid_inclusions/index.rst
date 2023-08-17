@@ -6,9 +6,9 @@ Fluid Inclusion Analysis
 This section gives a short overview about the analysis of fluid inclusions based on LA-ICP-MS experiments.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 3
     :caption: Fluid Inclusion Analysis
 
     theory
-    example_01
     applications
+    example_01
