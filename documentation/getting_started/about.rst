@@ -3,6 +3,28 @@
 About
 ===========================================================
 
+.. |contributors| image:: https://img.shields.io/github/contributors/mabeeskow/pysills.svg?logo=python&logoColor=white
+   :target: https://github.com/mabeeskow/pysills/graphs/contributors/
+
+.. |stars| image:: https://img.shields.io/github/stars/mabeeskow/pysills?style=social&label=Stars
+   :target: https://github.com/mabeeskow/pysills/
+   :alt: GitHub
+
+.. |license| image:: https://img.shields.io/github/license/mabeeskow/pysills
+   :target: http://www.gnu.org/licenses/lgpl-3.0.en.html
+
+.. |documentation| image:: https://readthedocs.org/projects/pysills/badge/?version=latest
+   :target: https://pysills.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+
++----------------------+----------------------------------------+
+| GitHub               | |contributors| |stars|                 |
++----------------------+----------------------------------------+
+| License              | |license|                              |
++----------------------+----------------------------------------+
+| Documentation        | |documentation|                        |
++----------------------+----------------------------------------+
+
 PySILLS is a newly developed Python-based, open source tool for a modern data reduction of LA-ICP-MS experiments. It is
 focused on the major, minor and trace element analysis of mineral compositions as well as of fluid and melt inclusion
 compositions. PySILLS, which was initially part of a M.Sc. thesis project, is developed by Maximilian Alexander Beeskow
@@ -36,10 +58,6 @@ Content
 This documentation page contains information about the developer and authors of PySILLS, how it can be installed and,
 most importantly, how it can be used based on tutorials and example projects.
 
-This documentation page consists of a ``Getting Started`` section with information about :ref:`authors_ref`, how the
-:ref:`installation_ref` of GemGIS works, which Data Types are supported and which packages are included in GemGIS and
-most importantly for new users :ref:`tutorials_ref` and Examples.
-
 Video Tutorials
 ~~~~~~~~~~~~~~~
 It is planned to create a short educational video course on YouTube which will extend and support this documentation
@@ -55,25 +73,3 @@ Citing PySILLS
 ~~~~~~~~~~~~~
 If you are using PySILLS for your scientific research, please remember to cite our work. The citation is provided in the
 :ref:`authors_ref` section.
-
-.. |contributors| image:: https://img.shields.io/github/contributors/mabeeskow/pysills.svg?logo=python&logoColor=white
-   :target: https://github.com/mabeeskow/pysills/graphs/contributors/
-
-.. |stars| image:: https://img.shields.io/github/stars/mabeeskow/pysills?style=social&label=Stars
-   :target: https://github.com/mabeeskow/pysills/
-   :alt: GitHub
-
-.. |license| image:: https://img.shields.io/github/license/mabeeskow/pysills
-   :target: http://www.gnu.org/licenses/lgpl-3.0.en.html
-
-.. |documentation| image:: https://readthedocs.org/projects/pysills/badge/?version=latest
-   :target: https://pysills.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
-
-+----------------------+----------------------------------------+
-| GitHub               | |contributors| |stars|                 |
-+----------------------+----------------------------------------+
-| License              | |license|                              |
-+----------------------+----------------------------------------+
-| Documentation        | |documentation|                        |
-+----------------------+----------------------------------------+
