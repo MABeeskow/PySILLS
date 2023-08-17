@@ -6,4 +6,4 @@ Tutorials - Mineral Analysis
 Blabla
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
