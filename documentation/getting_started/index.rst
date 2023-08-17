@@ -1,14 +1,15 @@
-.. _whatiswhat_ref:
-
-What is what?
+Index
 ===========================================================
 
-
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
+   :caption: Getting Started
 
-   vector
-   raster
-   mesh
-   projections
-   interpolations
+   about
+   authors
+   installation
+   contributing
+
+   whatiswhat/index
+   tutorial_ma/index
+   tutorial_fi/index
