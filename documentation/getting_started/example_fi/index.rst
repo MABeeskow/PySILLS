@@ -1,6 +1,6 @@
-.. _examples_ref:
+.. _examples_fi_ref:
 
-Example Models
+Example Projects - Fluid Inclusion Analysis
 ===========================================================
 
 There is a series of examples available for PySILLS.

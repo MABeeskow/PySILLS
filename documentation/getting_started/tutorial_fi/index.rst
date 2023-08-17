@@ -1,6 +1,6 @@
-.. _tutorials_ref:
+.. _tutorials_fi_ref:
 
-Tutorials and Basic Usage
+Tutorials - Fluid Inclusion Analysis
 ===========================================================
 
 Blabla

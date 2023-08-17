@@ -1,6 +1,6 @@
-.. _examples_ref:
+.. _examples_ma_ref:
 
-Example Models
+Example Projects - Mineral Analysis
 ===========================================================
 
 There is a series of examples available for PySILLS.
