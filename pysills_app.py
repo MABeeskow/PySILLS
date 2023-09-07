@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		06.09.2023
+# Date:		07.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -97,7 +97,15 @@ class PySILLS(tk.Frame):
         self.sign_yellow = "#FFDE00"
         self.sign_green = "#B0D8A4"
         sign_dict = {"Green": self.sign_green, "Red": self.sign_red, "Yellow": self.sign_yellow}
-        #
+
+        style = ttk.Style()
+        style.theme_use("default")
+        style.configure(
+            "Vertical.TScrollbar", bg=self.bg_colors["Very Light"], bordercolor=self.bg_colors["Very Dark"],
+            arrowcolor=self.bg_colors["Dark"])
+        style.configure(
+            "Horizontal.TScrollbar", bg=self.bg_colors["Very Light"], bordercolor=self.bg_colors["Very Dark"],
+            arrowcolor=self.bg_colors["Dark"])
         ## Constants
         self.list_std = []
         self.list_smpl = []
@@ -2060,7 +2068,7 @@ class PySILLS(tk.Frame):
         frm_isotopes = SE(
             parent=subwindow_quickplotter, row_id=row_start + 1, column_id=column_start + 40, n_rows=n_rows - 3,
             n_columns=20, fg=self.green_light, bg=self.bg_colors["Very Light"]).create_frame()
-        vsb = tk.Scrollbar(master=frm_isotopes, orient="vertical")
+        vsb = ttk.Scrollbar(master=frm_isotopes, orient="vertical")
         text = tk.Text(master=frm_isotopes, width=30, height=15, yscrollcommand=vsb.set, bg=self.bg_colors["Very Light"])
         vsb.config(command=text.yview)
         vsb.pack(side="right", fill="y")
@@ -5949,7 +5957,7 @@ class PySILLS(tk.Frame):
         frm_dwell = SE(
             parent=window_dwell, row_id=2, column_id=0, n_rows=15, n_columns=14, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_dwell = tk.Scrollbar(master=frm_dwell, orient="vertical")
+        vsb_dwell = ttk.Scrollbar(master=frm_dwell, orient="vertical")
         text_dwell = tk.Text(
             master=frm_dwell, width=30, height=25, yscrollcommand=vsb_dwell.set, bg=self.bg_colors["Very Light"])
         vsb_dwell.config(command=text_dwell.yview)
@@ -6238,7 +6246,7 @@ class PySILLS(tk.Frame):
             frm_iso = SE(
                 parent=window_issetup, row_id=1, column_id=0, n_rows=15, n_columns=20, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Very Light"]).create_frame()
-            vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
+            vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
             text_iso = tk.Text(
                 master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
             vsb_iso.config(command=text_iso.yview)
@@ -7926,7 +7934,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_settings, row_id=start_row_std + 1, column_id=n_col_header + 1,
             n_rows=start_row_smpl - 2, n_columns=n_col_files, fg=bg_light,
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_std = tk.Scrollbar(master=frm_std, orient="vertical")
+        vsb_std = ttk.Scrollbar(frm_std, orient="vertical")
         text_std = tk.Text(
             master=frm_std, width=30, height=25, yscrollcommand=vsb_std.set, bg=self.bg_colors["Very Light"])
         vsb_std.config(command=text_std.yview)
@@ -8114,7 +8122,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_settings, row_id=start_row_smpl + 1, column_id=n_col_header + 1,
             n_rows=n_rows - start_row_smpl - 3, n_columns=n_col_files, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -9188,7 +9196,7 @@ class PySILLS(tk.Frame):
         frm_iso = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
+        vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
             master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
         vsb_iso.config(command=text_iso.yview)
@@ -9394,7 +9402,7 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start,
             n_rows=7, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_02 = tk.Scrollbar(master=frm_02, orient="vertical")
+        vsb_02 = ttk.Scrollbar(frm_02, orient="vertical")
         text_02 = tk.Text(
             master=frm_02, width=25, height=25, yscrollcommand=vsb_02.set, bg=self.bg_colors["Very Light"])
         vsb_02.config(command=text_02.yview)
@@ -10027,7 +10035,7 @@ class PySILLS(tk.Frame):
         frm_smpl = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column, n_rows=16,
             n_columns=29, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -10640,7 +10648,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_checkfile, row_id=start_row + 1, column_id=start_column, n_rows=14,
             n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
+        vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
             master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
         vsb_iso.config(command=text_iso.yview)
@@ -12002,7 +12010,9 @@ class PySILLS(tk.Frame):
     def ma_get_intensity_corrected(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                         mode="Specific"):
         if mode == "Specific":
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
+            #for isotope in self.container_lists["ISOTOPES"]:
                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][isotope]
                 var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope]
@@ -12016,17 +12026,21 @@ class PySILLS(tk.Frame):
                 for var_focus in ["MAT"]:
                     if var_focus not in self.container_intensity_corrected[var_filetype][var_datatype]:
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus] = {}
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
+                        var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
+                            var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                self.ma_get_intensity_corrected(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_file_long=var_file_long)
-                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
+                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                if isotope in file_isotopes and var_srm_i == var_srm_file:
+                                    self.ma_get_intensity_corrected(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                    var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                        var_file_short][var_focus][isotope]
+                                    helper_results.append(var_result_i)
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
@@ -12035,30 +12049,33 @@ class PySILLS(tk.Frame):
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["MAT"]:
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                    #for isotope in self.container_lists["ISOTOPES"]:
                         helper_results = []
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                if var_filetype == "SMPL":
-                                    var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                                    var_id_selected = self.container_var["ID"]["Results Files"].get()
-                                    #
-                                    if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                if isotope in file_isotopes:
+                                    if var_filetype == "SMPL":
+                                        var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                        var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                        #
+                                        if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                            self.ma_get_intensity_corrected(
+                                                var_filetype=var_filetype, var_datatype=var_datatype,
+                                                var_file_short=var_file_short, var_file_long=var_file_long)
+                                            var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                                var_file_short][var_focus][isotope]
+                                            helper_results.append(var_result_i)
+                                    else:
                                         self.ma_get_intensity_corrected(
                                             var_filetype=var_filetype, var_datatype=var_datatype,
-                                            var_file_short=var_file_short, var_file_long=var_file_long)
+                                            var_file_short=var_file_short,
+                                            var_file_long=var_file_long)
                                         var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                             var_file_short][var_focus][isotope]
                                         helper_results.append(var_result_i)
-                                else:
-                                    self.ma_get_intensity_corrected(
-                                        var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short,
-                                        var_file_long=var_file_long)
-                                    var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short][var_focus][isotope]
-                                    helper_results.append(var_result_i)
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -12195,7 +12212,9 @@ class PySILLS(tk.Frame):
                 element_is = key_element_is.group(1)
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
-                for isotope in self.container_lists["ISOTOPES"]:
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for isotope in file_isotopes:
+                #for isotope in self.container_lists["ISOTOPES"]:
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     if var_srm_i == var_srm_file:
                         if element_is in self.srm_actual[var_srm_i]:
@@ -12227,6 +12246,7 @@ class PySILLS(tk.Frame):
 
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
+                    file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                     var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.ma_get_analytical_sensitivity(
@@ -12234,7 +12254,8 @@ class PySILLS(tk.Frame):
                             var_file_long=file_std, var_is_smpl=var_is_smpl)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
-                        for isotope in self.container_lists["ISOTOPES"]:
+                        for isotope in file_isotopes:
+                        #for isotope in self.container_lists["ISOTOPES"]:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             if var_srm_i == var_srm_file:
                                 if file_std_short not in list_valid_std:
@@ -12246,13 +12267,16 @@ class PySILLS(tk.Frame):
                                     file_std_short]["MAT"][isotope]
 
                                 xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                #for isotope in self.container_lists["ISOTOPES"]:
                     xi_regr = self.calculate_regression(
                         data=xi_std_helper, isotope=isotope, file_data=list_valid_std)
                     xi_opt[isotope].extend(xi_regr)
                 for file_smpl in self.container_lists["SMPL"]["Short"]:
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl]
                     delta_i = self.container_lists["Acquisition Times Delta"][file_smpl]
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in file_isotopes:
+                    #for isotope in self.container_lists["ISOTOPES"]:
                         var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
                         self.container_lists["Analytical Sensitivity Regression"][isotope] = {
                             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
@@ -12267,29 +12291,32 @@ class PySILLS(tk.Frame):
         else:
             for var_filetype in ["SMPL"]:
                 for var_focus in ["MAT"]:
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                    #for isotope in self.container_lists["ISOTOPES"]:
                         helper_results = []
                         var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                                if var_filetype == "STD":
-                                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
-                                    if var_srm_i == var_srm_file or self.var_init_ma_datareduction == True:
+                            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                            if isotope in file_isotopes:
+                                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                    if var_filetype == "STD":
+                                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                                        if var_srm_i == var_srm_file or self.var_init_ma_datareduction == True:
+                                            self.ma_get_analytical_sensitivity(
+                                                var_filetype=var_filetype, var_datatype=var_datatype,
+                                                var_file_short=var_file_short, var_file_long=var_file_long,
+                                                var_is_smpl=var_is_smpl)
+                                            var_result_i = self.container_analytical_sensitivity[var_filetype][
+                                                var_datatype][var_file_short][var_focus][isotope]
+                                            helper_results.append(var_result_i)
+                                    else:
                                         self.ma_get_analytical_sensitivity(
                                             var_filetype=var_filetype, var_datatype=var_datatype,
-                                            var_file_short=var_file_short, var_file_long=var_file_long,
-                                            var_is_smpl=var_is_smpl)
-                                        var_result_i = self.container_analytical_sensitivity[var_filetype][
-                                            var_datatype][var_file_short][var_focus][isotope]
+                                            var_file_short=var_file_short, var_file_long=var_file_long)
+                                        var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                            var_file_short][var_focus][isotope]
                                         helper_results.append(var_result_i)
-                                else:
-                                    self.ma_get_analytical_sensitivity(
-                                        var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_file_long=var_file_long)
-                                    var_result_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                        var_file_short][var_focus][isotope]
-                                    helper_results.append(var_result_i)
 
                         var_result_i = np.mean(helper_results)
                         self.container_analytical_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
@@ -12329,8 +12356,9 @@ class PySILLS(tk.Frame):
                                                  "Concentration"].get())
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
+
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                #for isotope in self.container_lists["ISOTOPES"]:
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
                     #
@@ -12341,9 +12369,8 @@ class PySILLS(tk.Frame):
                         var_concentration_i = self.srm_actual[var_srm_i][element]
                     else:
                         var_concentration_i = 0.0
-                    #
                     var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][isotope]
-                    #
+
                     var_result_i = var_sensitivity_i*(var_concentration_i/var_intensity_i)*\
                                    (var_intensity_is/var_concentration_is)
                     self.container_rsf[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
@@ -13190,7 +13217,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_settings, row_id=start_row_std + 1, column_id=n_col_header + 1,
             n_rows=start_row_smpl - 2, n_columns=n_col_files, fg=bg_light,
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_std = tk.Scrollbar(master=frm_std, orient="vertical")
+        vsb_std = ttk.Scrollbar(master=frm_std, orient="vertical")
         text_std = tk.Text(
             master=frm_std, width=30, height=25, yscrollcommand=vsb_std.set, bg=self.bg_colors["Very Light"])
         vsb_std.config(command=text_std.yview)
@@ -13488,7 +13515,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_settings, row_id=start_row_smpl + 1, column_id=n_col_header + 1,
             n_rows=n_rows - start_row_smpl - 3, n_columns=n_col_files, fg=bg_light,
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -13815,7 +13842,7 @@ class PySILLS(tk.Frame):
         frm_iso = SE(
             parent=self.subwindow_fi_settings, row_id=start_row_iso + 1, column_id=n_col_header + n_col_files + 2,
             n_rows=n_rows - 24, n_columns=n_col_iso, fg=bg_light, bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
+        vsb_iso = ttk.Scrollbar(master=frm_iso, orient="vertical")
         text_iso = tk.Text(
             master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
         vsb_iso.config(command=text_iso.yview)
@@ -16616,7 +16643,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 6, column_id=start_column,
             n_rows=n_rows - 7, n_columns=25, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=25, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -16749,7 +16776,7 @@ class PySILLS(tk.Frame):
         frm_smpl = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 4, column_id=start_column,
             n_rows=10, n_columns=20, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -17048,7 +17075,7 @@ class PySILLS(tk.Frame):
         frm_iso = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 1, column_id=start_column, n_rows=14, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_iso = tk.Scrollbar(master=frm_iso, orient="vertical")
+        vsb_iso = ttk.Scrollbar(master=frm_iso, orient="vertical")
         text_iso = tk.Text(
             master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
         vsb_iso.config(command=text_iso.yview)
@@ -18161,7 +18188,7 @@ class PySILLS(tk.Frame):
         frm_smpl = SE(
             parent=subwindow_fi_matrix_concentration, row_id=start_row + 1, column_id=start_column, n_rows=16,
             n_columns=24, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -19179,7 +19206,7 @@ class PySILLS(tk.Frame):
             parent=subwindow_fi_inclusion_chargebalance, row_id=start_row + 1, column_id=start_column + 26,
             n_rows=n_rows - 3, n_columns=24, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -19377,7 +19404,7 @@ class PySILLS(tk.Frame):
             parent=subwindow_fi_inclusion_massbalance, row_id=start_row + 1, column_id=start_column + 26,
             n_rows=n_rows - 3, n_columns=24, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = tk.Scrollbar(master=frm_smpl, orient="vertical")
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
             master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
         vsb_smpl.config(command=text_smpl.yview)
@@ -19521,7 +19548,7 @@ class PySILLS(tk.Frame):
         frm_incl_is = SE(
             parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column + 11, n_rows=8,
             n_columns=21, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_incl_is = tk.Scrollbar(master=frm_incl_is, orient="vertical")
+        vsb_incl_is = ttk.Scrollbar(master=frm_incl_is, orient="vertical")
         text_incl_is = tk.Text(
             master=frm_incl_is, width=30, height=25, yscrollcommand=vsb_incl_is.set, bg=self.bg_colors["Very Light"])
         vsb_incl_is.config(command=text_incl_is.yview)
@@ -20315,10 +20342,10 @@ class PySILLS(tk.Frame):
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("PySILLS - LA-ICP-MS data reduction")
-    #
+
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
-    #
+
     PySILLS(parent=root, var_screen_width=screen_width, var_screen_height=screen_height)
-    #
+
     root.mainloop()
