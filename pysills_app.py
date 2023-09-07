@@ -11887,9 +11887,11 @@ class PySILLS(tk.Frame):
     def ma_calculate_statistics_table(self, var_data, ratio=False):
         entries_mean = ["Arithmetic Mean"]
         entries_std = ["Standard Deviation"]
-        #
-        for isotope in self.container_lists["ISOTOPES"]:
+        entries_chrg = ["Charge"]
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
             value = np.mean(var_data[isotope])
+            var_charge_complete = self.container_var["charge"][isotope]["textvar"].get()
+            var_charge = var_charge_complete[:2]
             if len(var_data[isotope]) > 1:
                 value_std = np.std(var_data[isotope], ddof=1)
             else:
@@ -11904,12 +11906,15 @@ class PySILLS(tk.Frame):
                 else:
                     entries_mean.append(f"{value:.{4}E}")
                     entries_std.append(f"{value_std:.{4}E}")
+                entries_chrg.append(var_charge)
             else:
                 entries_mean.append("---")
                 entries_std.append("---")
+                entries_chrg.append("---")
             #
         self.tv_results_files.insert("", tk.END, values=entries_mean)
         self.tv_results_files.insert("", tk.END, values=entries_std)
+        self.tv_results_files.insert("", tk.END, values=entries_chrg)
 
     def ma_get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific", check=False):
         if mode == "Specific":
@@ -11949,7 +11954,7 @@ class PySILLS(tk.Frame):
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["BG", "MAT"]:
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
@@ -11989,7 +11994,6 @@ class PySILLS(tk.Frame):
         if mode == "Specific":
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-            #for isotope in self.container_lists["ISOTOPES"]:
                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][isotope]
                 var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope]
@@ -12027,7 +12031,6 @@ class PySILLS(tk.Frame):
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["MAT"]:
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                    #for isotope in self.container_lists["ISOTOPES"]:
                         helper_results = []
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
@@ -12070,8 +12073,9 @@ class PySILLS(tk.Frame):
             else:
                 var_intensity_is = self.container_intensity[var_filetype][var_datatype][var_file_short][
                     var_focus][var_is]
-            #
-            for isotope in self.container_lists["ISOTOPES"]:
+
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 if var_focus == "MAT":
                     var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         var_focus][isotope]
@@ -12086,53 +12090,54 @@ class PySILLS(tk.Frame):
         else:
             for var_filetype in ["SMPL"]:
                 for var_focus in ["BG", "MAT"]:
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            if var_filetype == "SMPL":
-                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                                var_id_selected = self.container_var["ID"]["Results Files"].get()
-                                #
-                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                            if isotope in file_isotopes:
+                                if var_filetype == "SMPL":
+                                    var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                    var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                    #
+                                    if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                        self.ma_get_intensity_ratio(
+                                            var_filetype=var_filetype, var_datatype=var_datatype,
+                                            var_file_short=var_file_short, var_file_long=var_file_long,
+                                            var_focus=var_focus)
+                                        var_result_i = self.container_intensity_ratio[var_filetype][var_datatype][
+                                            var_file_short][var_focus][isotope]
+                                        helper_results.append(var_result_i)
+                                else:
                                     self.ma_get_intensity_ratio(
                                         var_filetype=var_filetype, var_datatype=var_datatype,
                                         var_file_short=var_file_short, var_file_long=var_file_long, var_focus=var_focus)
                                     var_result_i = self.container_intensity_ratio[var_filetype][var_datatype][
                                         var_file_short][var_focus][isotope]
                                     helper_results.append(var_result_i)
-                            else:
-                                self.ma_get_intensity_ratio(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_file_long=var_file_long, var_focus=var_focus)
-                                var_result_i = \
-                                self.container_intensity_ratio[var_filetype][var_datatype][var_file_short][
-                                    var_focus][isotope]
-                                helper_results.append(var_result_i)
-                            #
+
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_ratio[var_filetype][var_datatype][isotope] = var_result_i
     #
     def ma_get_normalized_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                            mode="Specific"):
         if mode == "Specific":
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 if var_filetype == "STD":
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    #
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     if element in self.srm_actual[var_srm_i]:
                         var_concentration_i = self.srm_actual[var_srm_i][element]
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                            "MAT"][isotope]
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
                         var_result_i = var_intensity_i/var_concentration_i
                     else:
                         var_result_i = 0.0
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
-                    #
                 else:
                     sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
                         "MAT"][isotope]
@@ -12141,38 +12146,38 @@ class PySILLS(tk.Frame):
                         "MAT"][var_is]
                     concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
                                                  "Concentration"].get())
-                    #
                     var_result_i = sensitivity_i*(intensity_is/concentration_is)
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
-            #
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["MAT"]:
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            if var_filetype == "SMPL":
-                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                                var_id_selected = self.container_var["ID"]["Results Files"].get()
-                                #
-                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                            if isotope in file_isotopes:
+                                if var_filetype == "SMPL":
+                                    var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                    var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                    #
+                                    if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                        self.ma_get_normalized_sensitivity(
+                                            var_filetype=var_filetype, var_datatype=var_datatype,
+                                            var_file_short=var_file_short, var_file_long=var_file_long)
+                                        var_result_i = self.container_normalized_sensitivity[var_filetype][
+                                            var_datatype][var_file_short][var_focus][isotope]
+                                        helper_results.append(var_result_i)
+                                else:
                                     self.ma_get_normalized_sensitivity(
                                         var_filetype=var_filetype, var_datatype=var_datatype,
                                         var_file_short=var_file_short, var_file_long=var_file_long)
                                     var_result_i = self.container_normalized_sensitivity[var_filetype][var_datatype][
                                         var_file_short][var_focus][isotope]
                                     helper_results.append(var_result_i)
-                            else:
-                                self.ma_get_normalized_sensitivity(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_file_long=var_file_long)
-                                var_result_i = self.container_normalized_sensitivity[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
-                            #
+
                         var_result_i = np.mean(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -12191,7 +12196,6 @@ class PySILLS(tk.Frame):
                     "MAT"][var_is]
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                 for isotope in file_isotopes:
-                #for isotope in self.container_lists["ISOTOPES"]:
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     if var_srm_i == var_srm_file:
                         if element_is in self.srm_actual[var_srm_i]:
@@ -12232,7 +12236,6 @@ class PySILLS(tk.Frame):
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         for isotope in file_isotopes:
-                        #for isotope in self.container_lists["ISOTOPES"]:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             if var_srm_i == var_srm_file:
                                 if file_std_short not in list_valid_std:
@@ -12245,7 +12248,6 @@ class PySILLS(tk.Frame):
 
                                 xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                #for isotope in self.container_lists["ISOTOPES"]:
                     xi_regr = self.calculate_regression(
                         data=xi_std_helper, isotope=isotope, file_data=list_valid_std)
                     xi_opt[isotope].extend(xi_regr)
@@ -12253,7 +12255,6 @@ class PySILLS(tk.Frame):
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl]
                     delta_i = self.container_lists["Acquisition Times Delta"][file_smpl]
                     for isotope in file_isotopes:
-                    #for isotope in self.container_lists["ISOTOPES"]:
                         var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
                         self.container_lists["Analytical Sensitivity Regression"][isotope] = {
                             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
@@ -12269,7 +12270,6 @@ class PySILLS(tk.Frame):
             for var_filetype in ["SMPL"]:
                 for var_focus in ["MAT"]:
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                    #for isotope in self.container_lists["ISOTOPES"]:
                         helper_results = []
                         var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
@@ -12322,23 +12322,20 @@ class PySILLS(tk.Frame):
         #
         if mode == "Specific":
             if var_filetype == "STD":
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for isotope in file_isotopes:
                     var_result_i = 1
                     self.container_rsf[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
-                #
             elif var_filetype == "SMPL":
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
                                                  "Concentration"].get())
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
-
-                for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                #for isotope in self.container_lists["ISOTOPES"]:
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for isotope in file_isotopes:
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
-                    #
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
@@ -12351,33 +12348,34 @@ class PySILLS(tk.Frame):
                     var_result_i = var_sensitivity_i*(var_concentration_i/var_intensity_i)*\
                                    (var_intensity_is/var_concentration_is)
                     self.container_rsf[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
-            #
         else:
             for var_filetype in ["STD", "SMPL"]:
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     helper_results = []
                     #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        if var_filetype == "SMPL":
-                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                            var_id_selected = self.container_var["ID"]["Results Files"].get()
-                            #
-                            if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                        if isotope in file_isotopes:
+                            if var_filetype == "SMPL":
+                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                #
+                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                    self.ma_get_rsf(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                    var_result_i = self.container_rsf[var_filetype][var_datatype][var_file_short][
+                                        "MAT"][isotope]
+                                    helper_results.append(var_result_i)
+                            else:
                                 self.ma_get_rsf(
                                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                     var_file_long=var_file_long)
                                 var_result_i = self.container_rsf[var_filetype][var_datatype][var_file_short]["MAT"][
                                     isotope]
                                 helper_results.append(var_result_i)
-                        else:
-                            self.ma_get_rsf(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long)
-                            var_result_i = self.container_rsf[var_filetype][var_datatype][var_file_short]["MAT"][
-                                isotope]
-                            helper_results.append(var_result_i)
-                    #
+
                     var_result_i = np.mean(helper_results)
                     self.container_rsf[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -12403,7 +12401,8 @@ class PySILLS(tk.Frame):
         #
         if mode == "Specific":
             if var_filetype == "STD":
-                for isotope in self.container_lists["ISOTOPES"]:
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for isotope in file_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
@@ -12415,7 +12414,8 @@ class PySILLS(tk.Frame):
                         isotope] = var_result_i
                 #
             elif var_filetype == "SMPL":
-                for isotope in self.container_lists["ISOTOPES"]:
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for isotope in file_isotopes:
                     var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                     var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
                                                      "Concentration"].get())
@@ -12434,31 +12434,32 @@ class PySILLS(tk.Frame):
             #
         else:
             for var_filetype in ["STD", "SMPL"]:
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     helper_results = []
                     #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        if var_filetype == "SMPL":
-                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                            var_id_selected = self.container_var["ID"]["Results Files"].get()
-                            #
-                            if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                        if isotope in file_isotopes:
+                            if var_filetype == "SMPL":
+                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                #
+                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                    self.ma_get_concentration(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                    var_result_i = self.container_concentration[var_filetype][var_datatype][
+                                        var_file_short]["MAT"][isotope]
+                                    helper_results.append(var_result_i)
+                            else:
                                 self.ma_get_concentration(
                                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                     var_file_long=var_file_long)
-                                var_result_i = self.container_concentration[var_filetype][var_datatype][
-                                    var_file_short]["MAT"][isotope]
+                                var_result_i = self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "MAT"][isotope]
                                 helper_results.append(var_result_i)
-                        else:
-                            self.ma_get_concentration(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long)
-                            var_result_i = \
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                                isotope]
-                            helper_results.append(var_result_i)
-                        #
+
                     var_result_i = np.mean(helper_results)
                     self.container_concentration[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -12487,42 +12488,40 @@ class PySILLS(tk.Frame):
             var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
             var_concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                 var_is]
-            #
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 var_concentration_i = self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope]
-                #
                 var_result_i = var_concentration_i/var_concentration_is
                 self.container_concentration_ratio[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope] = var_result_i
-            #
         else:
             for var_filetype in ["SMPL"]:
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     helper_results = []
-                    #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        if var_filetype == "SMPL":
-                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                            var_id_selected = self.container_var["ID"]["Results Files"].get()
-                            #
-                            if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                        if isotope in file_isotopes:
+                            if var_filetype == "SMPL":
+                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                #
+                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                    self.ma_get_concentration_ratio(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                    var_result_i = self.container_concentration_ratio[var_filetype][var_datatype][
+                                        var_file_short]["MAT"][isotope]
+                                    helper_results.append(var_result_i)
+                            else:
                                 self.ma_get_concentration_ratio(
                                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                     var_file_long=var_file_long)
-                                var_result_i = self.container_concentration_ratio[var_filetype][var_datatype][var_file_short][
-                                    "MAT"][isotope]
+                                var_result_i = self.container_concentration_ratio[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
                                 helper_results.append(var_result_i)
-                        else:
-                            self.ma_get_concentration_ratio(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long)
-                            var_result_i = \
-                            self.container_concentration_ratio[var_filetype][var_datatype][var_file_short][
-                                "MAT"][isotope]
-                            helper_results.append(var_result_i)
-                        #
+
                     var_result_i = np.mean(helper_results)
                     self.container_concentration_ratio[var_filetype][var_datatype][isotope] = var_result_i
     #
@@ -12548,7 +12547,8 @@ class PySILLS(tk.Frame):
         #
         if mode == "Specific":
             if var_filetype == "STD":
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for index, isotope in enumerate(file_isotopes):
                     var_n_bg = 0
                     var_n_mat = 0
                     helper_sigma_i = []
@@ -12557,8 +12557,6 @@ class PySILLS(tk.Frame):
                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
                             interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
                     for key, items in condensed_intervals.items():
-                    #for key, items in self.container_helper[var_filetype][var_file_short]["BG"]["Content"].items():
-                        #var_indices = items["Indices"]
                         var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][var_indices[0]:var_indices[1] + 1]
@@ -12569,8 +12567,6 @@ class PySILLS(tk.Frame):
                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
                             interval_set=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
                     for key, items in condensed_intervals.items():
-                    #for key, items in self.container_helper[var_filetype][var_file_short]["MAT"]["Content"].items():
-                        #var_indices = items["Indices"]
                         var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][var_indices[0]:var_indices[1] + 1]
@@ -12602,7 +12598,8 @@ class PySILLS(tk.Frame):
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
                     #
             elif var_filetype == "SMPL":
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for index, isotope in enumerate(file_isotopes):
                     var_n_bg = 0
                     var_n_mat = 0
                     helper_sigma_i = []
@@ -12611,8 +12608,6 @@ class PySILLS(tk.Frame):
                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
                             interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
                     for key, items in condensed_intervals.items():
-                    #for key, items in self.container_helper[var_filetype][var_file_short]["BG"]["Content"].items():
-                        #var_indices = items["Indices"]
                         var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
@@ -12624,8 +12619,6 @@ class PySILLS(tk.Frame):
                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
                             interval_set=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
                     for key, items in condensed_intervals.items():
-                    #for key, items in self.container_helper[var_filetype][var_file_short]["MAT"]["Content"].items():
-                        #var_indices = items["Indices"]
                         var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
@@ -12661,33 +12654,32 @@ class PySILLS(tk.Frame):
                         var_result_i = (3*var_sigma_bg_i*var_concentration_is)/(var_sensitivity_i*var_intensity_is)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
-            #
         else:
             for var_filetype in ["STD", "SMPL"]:
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     helper_results = []
-                    #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        if var_filetype == "SMPL":
-                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                            var_id_selected = self.container_var["ID"]["Results Files"].get()
-                            #
-                            if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                        if isotope in file_isotopes:
+                            if var_filetype == "SMPL":
+                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                    self.ma_get_lod(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                    var_result_i = self.container_lod[var_filetype][var_datatype][var_file_short][
+                                        "MAT"][isotope]
+                                    helper_results.append(var_result_i)
+                            else:
                                 self.ma_get_lod(
                                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                                     var_file_long=var_file_long)
                                 var_result_i = self.container_lod[var_filetype][var_datatype][var_file_short][
                                     "MAT"][isotope]
                                 helper_results.append(var_result_i)
-                        else:
-                            self.ma_get_lod(
-                                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                var_file_long=var_file_long)
-                            var_result_i = self.container_lod[var_filetype][var_datatype][var_file_short][
-                                "MAT"][isotope]
-                            helper_results.append(var_result_i)
-                        #
+
                     var_result_i = np.mean(helper_results)
                     self.container_lod[var_filetype][var_datatype][isotope] = var_result_i
 
