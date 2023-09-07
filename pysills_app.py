@@ -11914,22 +11914,13 @@ class PySILLS(tk.Frame):
     def ma_get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific", check=False):
         if mode == "Specific":
             if var_focus in ["BG", "MAT"]:
-                for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for index, isotope in enumerate(file_isotopes):
                     helper_results = []
                     if index == 0:
                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
                             interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
                     for key, items in condensed_intervals.items():
-                        # if var_focus == "BG":
-                        #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
-                        #         interval_bg=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
-                        # else:
-                        #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
-                        #         interval_mat=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
-                    # for key, items in self.container_helper[var_filetype][var_file_short][var_focus]["Content"].items():
-                    #     var_indices = items["Indices"]
-                    #for key, items in condensed_intervals.items():
-                        #var_indices = items["Indices"]
                         var_indices = items
                         var_key = "Data " + str(var_datatype)
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
@@ -11940,21 +11931,13 @@ class PySILLS(tk.Frame):
                         isotope] = var_result
             else:
                 for index_focus, var_focus in enumerate(["BG", "MAT"]):
-                    for index_isotope, isotope in enumerate(self.container_lists["ISOTOPES"]):
+                    file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                    for index_isotope, isotope in enumerate(file_isotopes):
                         helper_results = []
                         if index_isotope == 0:
                             condensed_intervals = IQ(dataframe=None).combine_all_intervals(
                                 interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
-                            # if var_focus == "BG":
-                            #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
-                            #         interval_bg=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
-                            # else:
-                            #     condensed_intervals = IQ(dataframe=None).prepare_calculation_intervals(
-                            #         interval_mat=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
-                        #for key, items in self.container_helper[var_filetype][var_file_short][var_focus][
-                        #    "Content"].items():
                         for key, items in condensed_intervals.items():
-                            #var_indices = items["Indices"]
                             var_indices = items
                             var_key = "Data " + str(var_datatype)
                             var_data = self.container_spikes[var_file_short][isotope][var_key][
@@ -11963,42 +11946,36 @@ class PySILLS(tk.Frame):
                         var_result = round(np.mean(helper_results), 3)
                         self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = var_result
-            #
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["BG", "MAT"]:
                     for isotope in self.container_lists["ISOTOPES"]:
                         helper_results = []
-                        #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
-                            #
+                            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                                if var_filetype == "SMPL":
-                                    var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                                    var_id_selected = self.container_var["ID"]["Results Files"].get()
-                                    #
-                                    if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                if isotope in file_isotopes:
+                                    if var_filetype == "SMPL":
+                                        var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                        var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                        if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                            self.ma_get_intensity(
+                                                var_filetype=var_filetype, var_datatype=var_datatype,
+                                                var_file_short=var_file_short, var_focus=var_focus)
+                                            var_result_i = self.container_intensity[var_filetype][var_datatype][
+                                                var_file_short][var_focus][isotope]
+                                            helper_results.append(var_result_i)
+                                    else:
                                         self.ma_get_intensity(
                                             var_filetype=var_filetype, var_datatype=var_datatype,
                                             var_file_short=var_file_short, var_focus=var_focus)
                                         var_result_i = self.container_intensity[var_filetype][var_datatype][
                                             var_file_short][var_focus][isotope]
                                         helper_results.append(var_result_i)
-                                    #
-                                else:
-                                    self.ma_get_intensity(
-                                        var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_focus=var_focus)
-                                    #
-                                    var_result_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                        var_focus][isotope]
-                                    #
-                                    helper_results.append(var_result_i)
-                            #
                         var_result_i = np.mean(helper_results)
                         self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
-        #
+
         ## CHECK
         if check == True:
             for key_01, item_01 in self.container_intensity.items():
