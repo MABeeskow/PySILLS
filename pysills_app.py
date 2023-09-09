@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		08.09.2023
+# Date:		09.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -9594,7 +9594,9 @@ class PySILLS(tk.Frame):
                     delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
             x_max = max(dataset_time)
-            icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["Measured Isotopes"]["All"] if isotope in df_data]])
+            icp_measurements = np.array(
+                [[df_data[isotope] for isotope in self.container_lists["Measured Isotopes"]["All"]
+                  if isotope in df_data]])
             y_max = np.amax(icp_measurements)
 
             if var_filetype == "STD":
@@ -13140,9 +13142,6 @@ class PySILLS(tk.Frame):
                     if file_std not in self.container_lists["STD"]["Long"]:
                         self.container_lists["STD"]["Long"].append(file_std)
                         self.container_lists["STD"]["Short"].append(file_parts[-1])
-                    #if self.demo_mode == True:
-                    #    self.lb_std.insert(tk.END, file_parts[-1])
-                    #
                     for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
                                  "Results Sensitivity", "SE STD", "SE SMPL"]:
                         self.container_var["Subwindows"][self.pysills_mode][item] = {}
@@ -13152,8 +13151,6 @@ class PySILLS(tk.Frame):
                     if file_smpl not in self.container_lists["SMPL"]["Long"]:
                         self.container_lists["SMPL"]["Long"].append(file_smpl)
                         self.container_lists["SMPL"]["Short"].append(file_parts[-1])
-                    #if self.demo_mode == True:
-                    #    self.lb_smpl.insert(tk.END, file_parts[-1])
 
             self.fi_current_file_std = self.list_std[0]
             self.fi_current_file_smpl = self.list_smpl[0]
@@ -13167,7 +13164,10 @@ class PySILLS(tk.Frame):
             #
             df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             self.times = DE().get_times(dataframe=df_exmpl)
-            self.container_lists["ISOTOPES"] = DE().get_isotopes(dataframe=df_exmpl)
+            df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+            self.container_lists["ISOTOPES"] = df_isotopes
+            self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+            self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
             self.define_isotope_colors()
         else:
             self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
@@ -13296,7 +13296,14 @@ class PySILLS(tk.Frame):
             parts = file_std.split("/")
             file_std_short = parts[-1]
             df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            df_isotopes = DE().get_isotopes(dataframe=df_std_i)
+            self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
             times_std_i = DE().get_times(dataframe=df_std_i)
+
+            for isotope in df_isotopes:
+                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
+
             if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
                 self.container_lists["STD"]["Long"].append(file_std)
                 self.container_lists["STD"]["Short"].append(file_std_short)
@@ -13318,16 +13325,6 @@ class PySILLS(tk.Frame):
                     self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short] = {}
                     self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
 
-            # if file_std not in self.container_lists["STD"]["Long"]:
-            #     self.container_lists["STD"]["Long"].append(file_std)
-            #     self.container_lists["STD"]["Short"].append(file_std_short)
-            #     self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-            #     self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-            #     self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-            #     self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-            #     self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short] = {}
-            #     self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-            #
             if self.file_loaded is False:
                 self.container_var["STD"][file_std] = {}
                 self.container_var["STD"][file_std]["IS Data"] = {
@@ -13346,7 +13343,7 @@ class PySILLS(tk.Frame):
                 #
                 self.spikes_isotopes["STD"][file_std_short] = {}
                 #
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in df_isotopes:
                     self.container_measurements["EDITED"][file_std_short][isotope] = {}
                     self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
                     self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
@@ -13381,7 +13378,7 @@ class PySILLS(tk.Frame):
                 self.container_var["fi_setting"]["Calculation Interval Visibility"]["STD"][
                     file_std_short] = {}
                 #
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in df_isotopes:
                     self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
                     self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
                     self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short][isotope].set(1)
@@ -13422,7 +13419,7 @@ class PySILLS(tk.Frame):
                 #
                 self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
                 #
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in df_isotopes:
                     self.container_measurements["EDITED"][file_std_short][isotope] = {}
                     self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
                     self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
@@ -13465,60 +13462,6 @@ class PySILLS(tk.Frame):
                             elif item_02 == "Indices":
                                 self.container_helper["STD"][file_std_short][item_01][item_02] = []
 
-            # if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
-            #     self.container_helper["STD"][file_std_short] = {}
-            #     self.container_helper["STD"][file_std_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                           "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                            "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["INCL"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                             "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                            "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["FIGURE"] = None
-            #     self.container_helper["STD"][file_std_short]["CANVAS"] = None
-            #     self.container_helper["STD"][file_std_short]["TOOLBARFRAME"] = None
-            #     self.container_helper["STD"][file_std_short]["AXES"] = {}
-            #     self.container_helper["STD"][file_std_short]["RESULTS FRAME"] = None
-            #     self.container_helper["STD"][file_std_short]["FIGURE RATIO"] = None
-            #     self.container_helper["STD"][file_std_short]["CANVAS RATIO"] = None
-            #     self.container_helper["STD"][file_std_short]["TOOLBARFRAME RATIO"] = None
-            #     self.container_helper["STD"][file_std_short]["AXES RATIO"] = {}
-            #     #
-            #     self.container_helper["limits SPK"][file_std] = {}
-            #     self.container_helper["limits SPK"][file_std]["ID"] = []
-            #     self.container_helper["limits SPK"][file_std]["type"] = []
-            #     self.container_helper["limits SPK"][file_std]["info"] = []
-            #     self.container_helper["positions"]["SPK"][file_std_short] = []
-            #     self.spikes_isotopes["STD"][file_std_short] = {}
-            #     #
-            # elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == False:
-            #     self.container_helper["STD"][file_std_short] = {}
-            #     self.container_helper["STD"][file_std_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                           "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                            "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["INCL"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                             "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                            "Indices": []}
-            #     self.container_helper["STD"][file_std_short]["FIGURE"] = None
-            #     self.container_helper["STD"][file_std_short]["CANVAS"] = None
-            #     self.container_helper["STD"][file_std_short]["TOOLBARFRAME"] = None
-            #     self.container_helper["STD"][file_std_short]["AXES"] = {}
-            #     self.container_helper["STD"][file_std_short]["RESULTS FRAME"] = None
-            #     self.container_helper["STD"][file_std_short]["FIGURE RATIO"] = None
-            #     self.container_helper["STD"][file_std_short]["CANVAS RATIO"] = None
-            #     self.container_helper["STD"][file_std_short]["TOOLBARFRAME RATIO"] = None
-            #     self.container_helper["STD"][file_std_short]["AXES RATIO"] = {}
-            #     #
-            #     self.container_helper["limits SPK"][file_std] = {}
-            #     self.container_helper["limits SPK"][file_std]["ID"] = []
-            #     self.container_helper["limits SPK"][file_std]["type"] = []
-            #     self.container_helper["limits SPK"][file_std]["info"] = []
-            #     self.container_helper["positions"]["SPK"][file_std_short] = []
-            #     self.spikes_isotopes["STD"][file_std_short] = {}
-            #
             categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
                           "TOOLBARFRAME_RATIO"]
             self.container_diagrams["STD"][file_std_short] = {}
@@ -13565,8 +13508,9 @@ class PySILLS(tk.Frame):
             text_std.insert("end", "\t")
 
             btn_i = tk.Button(
-                master=frm_std, text="Setup", bg=bg_medium, fg=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                master=frm_std, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"],
                 command=lambda var_file=file_std, var_type="STD": self.fi_check_specific_file(var_file, var_type))
             text_std.window_create("end", window=btn_i)
             text_std.insert("end", "\t")
@@ -13593,9 +13537,18 @@ class PySILLS(tk.Frame):
         for index, file_smpl in enumerate(self.list_smpl):
             parts = file_smpl.split("/")
             file_smpl_short = parts[-1]
-            #
+
+            df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
+            self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
+            times_smpl_i = DE().get_times(dataframe=df_smpl_i)
+
+            for isotope in df_isotopes:
+                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
+
             if self.file_loaded is False:
-                if "Na23" in self.container_lists["ISOTOPES"]:
+                if "Na23" in df_isotopes:
                     possible_is = "Na23"
                 self.container_var["SMPL"][file_smpl] = {}
                 self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
@@ -13657,7 +13610,7 @@ class PySILLS(tk.Frame):
                 self.container_var["fi_setting"]["Calculation Interval Visibility"]["SMPL"][
                     file_smpl_short] = {}
                 #
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in df_isotopes:
                     self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
                     self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
                     self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
@@ -13669,16 +13622,7 @@ class PySILLS(tk.Frame):
                         "RAW": None, "SMOOTHED": None}
                     self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-            #
-            parts = file_smpl.split("/")
-            file_smpl_short = parts[-1]
-            #
-            df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
-            times_smpl_i = DE().get_times(dataframe=df_smpl_i)
-            # dataset_smpl_i = Data(filename=file_smpl)
-            # df_smpl_i = dataset_smpl_i.import_data_to_pandas(delimiter=",", skip_header=3, skip_footer=1)
-            # times_smpl_i = df_smpl_i.iloc[:, 0]
-            #
+
             if file_smpl not in self.container_lists["STD"]["Long"] and self.file_loaded == False:
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
                     self.container_lists["SMPL"]["Long"].append(file_smpl)
@@ -13703,7 +13647,7 @@ class PySILLS(tk.Frame):
                 #
                 self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
                 #
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in df_isotopes:
                     self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
                     self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
                     self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
@@ -13715,7 +13659,7 @@ class PySILLS(tk.Frame):
                 #
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
                 #
-                for isotope in self.container_lists["ISOTOPES"]:
+                for isotope in df_isotopes:
                     self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
                     self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
                     self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
@@ -13760,60 +13704,6 @@ class PySILLS(tk.Frame):
                             elif item_02 == "Indices":
                                 self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = []
 
-            # if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
-            #     self.container_helper["SMPL"][file_smpl_short] = {}
-            #     self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                             "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                              "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["INCL"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                               "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                              "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["FIGURE"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["CANVAS"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["AXES"] = {}
-            #     self.container_helper["SMPL"][file_smpl_short]["RESULTS FRAME"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["FIGURE RATIO"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["CANVAS RATIO"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME RATIO"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["AXES RATIO"] = {}
-            #     #
-            #     self.container_helper["limits SPK"][file_smpl] = {}
-            #     self.container_helper["limits SPK"][file_smpl]["ID"] = []
-            #     self.container_helper["limits SPK"][file_smpl]["type"] = []
-            #     self.container_helper["limits SPK"][file_smpl]["info"] = []
-            #     self.container_helper["positions"]["SPK"][file_smpl_short] = []
-            #     self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-            #     #
-            # elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
-            #     self.container_helper["SMPL"][file_smpl_short] = {}
-            #     self.container_helper["SMPL"][file_smpl_short]["BG"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                             "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["MAT"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                              "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["INCL"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                               "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["SPK"] = {"Listbox": None, "Content": {}, "ID": 0,
-            #                                                              "Indices": []}
-            #     self.container_helper["SMPL"][file_smpl_short]["FIGURE"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["CANVAS"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["AXES"] = {}
-            #     self.container_helper["SMPL"][file_smpl_short]["RESULTS FRAME"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["FIGURE RATIO"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["CANVAS RATIO"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME RATIO"] = None
-            #     self.container_helper["SMPL"][file_smpl_short]["AXES RATIO"] = {}
-            #     #
-            #     self.container_helper["limits SPK"][file_smpl] = {}
-            #     self.container_helper["limits SPK"][file_smpl]["ID"] = []
-            #     self.container_helper["limits SPK"][file_smpl]["type"] = []
-            #     self.container_helper["limits SPK"][file_smpl]["info"] = []
-            #     self.container_helper["positions"]["SPK"][file_smpl_short] = []
-            #     self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-            #
             categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
                           "TOOLBARFRAME_RATIO"]
             self.container_diagrams["SMPL"][file_smpl_short] = {}
@@ -13836,16 +13726,11 @@ class PySILLS(tk.Frame):
                 anchor=tk.CENTER, highlightthickness=0, bd=0)
             text_smpl.window_create("end", window=cb_i)
             text_smpl.insert("end", "\t")
-            #
-            #if self.container_var["SMPL"][file_smpl]["IS"].get() != "Select IS":
+
             if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
                 var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                #self.container_files["SMPL"][file_smpl_short]["IS"].set(var_text)
-                #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_text)
-                #
             else:
                 var_text = "Select IS"
-            # before: self.container_var["SMPL"][file_smpl]["IS"]
             opt_is_i = tk.OptionMenu(
                 frm_smpl, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *self.container_lists["ISOTOPES"])
             opt_is_i["menu"].config(
@@ -13861,20 +13746,21 @@ class PySILLS(tk.Frame):
                 var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
             else:
                 var_text = "A"
-            opt_id_i = tk.OptionMenu(frm_smpl, self.container_var["SMPL"][file_smpl]["ID"],
-                                     *np.sort(self.list_alphabet))
+            opt_id_i = tk.OptionMenu(
+                frm_smpl, self.container_var["SMPL"][file_smpl]["ID"], *np.sort(self.list_alphabet))
             opt_id_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
+                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
             opt_id_i.config(
-                bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
             text_smpl.window_create("end", window=opt_id_i)
             text_smpl.insert("end", "\t")
             #
             btn_i = tk.Button(
-                master=frm_smpl, text="Setup", bg=bg_medium, fg=self.bg_colors["Very Dark"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                master=frm_smpl, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
+                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"],
                 command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
             text_smpl.window_create("end", window=btn_i)
             text_smpl.insert("end", "\t")
@@ -14214,7 +14100,8 @@ class PySILLS(tk.Frame):
     #
     def fi_get_intensity_corrected(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific"):
         if mode == "Specific":
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                     isotope]
                 var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
@@ -14269,20 +14156,21 @@ class PySILLS(tk.Frame):
                     if var_focus not in self.container_intensity_corrected[var_filetype][var_datatype]:
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus] = {}
                         #
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                #
-                                self.fi_get_intensity_corrected(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_focus=var_focus)
-                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
-                                #
+                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                if isotope in file_isotopes:
+                                    self.fi_get_intensity_corrected(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_focus=var_focus)
+                                    var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                        var_file_short][var_focus][isotope]
+                                    helper_results.append(var_result_i)
+
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
                             isotope] = var_result_i
@@ -14293,20 +14181,21 @@ class PySILLS(tk.Frame):
                     if var_focus not in self.container_intensity_corrected[var_filetype][var_datatype]:
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus] = {}
                         #
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                #
-                                self.fi_get_intensity_corrected(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_focus=var_focus)
-                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
-                                #
+                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                if isotope in file_isotopes:
+                                    self.fi_get_intensity_corrected(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_focus=var_focus)
+                                    var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                        var_file_short][var_focus][isotope]
+                                    helper_results.append(var_result_i)
+
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
@@ -14318,25 +14207,26 @@ class PySILLS(tk.Frame):
                     if var_focus not in self.container_intensity_corrected[var_filetype][var_datatype]:
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus] = {}
                         #
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         #
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                #
-                                self.fi_get_intensity_corrected(
-                                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                                    var_focus=var_focus)
-                                var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short][var_focus][isotope]
-                                helper_results.append(var_result_i)
-                                #
+                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                if isotope in file_isotopes:
+                                    self.fi_get_intensity_corrected(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_focus=var_focus)
+                                    var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                        var_file_short][var_focus][isotope]
+                                    helper_results.append(var_result_i)
+
                         var_result_i = np.mean(helper_results)
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
                             isotope] = var_result_i
-    #
+
     def fi_get_intensity_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus,
                                     mode="Specific"):
         if mode == "Specific":
