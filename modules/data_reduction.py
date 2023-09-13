@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		10.08.2023
+# Date:		13.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -120,6 +120,9 @@ class DataExtraction:
         if len(dataframe_blank) > 0:
             first_blank_index = dataframe_blank.index[0]
             dataframe = dataframe[:first_blank_index]
+        var_columns = dataframe.columns
+        for column in var_columns:
+            dataframe[column] = dataframe[column].astype(float)
 
         return dataframe
 
