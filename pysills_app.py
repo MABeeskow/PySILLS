@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		13.09.2023
+# Date:		14.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -1522,7 +1522,8 @@ class PySILLS(tk.Frame):
                     self.container_measurements["EDITED"][filename_short]["Time"] = times.tolist()
                     self.container_measurements["SELECTED"][filename_short]["Time"] = times.tolist()
 
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    df_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                    for isotope in df_isotopes:
                         self.container_measurements["RAW"][filename_short][isotope] = df_data[isotope].tolist()
                         self.container_measurements["EDITED"][filename_short][isotope] = {}
                         self.container_measurements["SELECTED"][filename_short]["RAW"][isotope] = {}
@@ -3394,11 +3395,12 @@ class PySILLS(tk.Frame):
                 corrected_isotopes = []
                 not_corrected_isotopes = []
                 self.container_spikes[file_std] = {}
-                #
+
                 if file_std not in self.container_spikes["Selection"]:
                     self.container_spikes["Selection"][file_std] = {}
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
+
+                file_isotopes = self.container_lists["Measured Isotopes"][file_std]
+                for isotope in file_isotopes:
                     if bool(self.spikes_isotopes[filetype][file_std]) == True:
                         for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_std].items():
                             #
@@ -11062,7 +11064,8 @@ class PySILLS(tk.Frame):
             var_is = self.container_lists["Possible IS"][0]
             var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
             list_considered_isotopes = []
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 var_srm_i = self.container_var["SRM"][isotope].get()
                 if var_srm_i == var_srm_file:
                     list_considered_isotopes.append(isotope)
@@ -11076,7 +11079,7 @@ class PySILLS(tk.Frame):
             else:
                 stop_calculation = True
         else:
-            list_considered_isotopes = self.container_lists["ISOTOPES"]
+            list_considered_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             list_categories.extend(list_considered_isotopes)
             stop_calculation = False
         list_width = list(85*np.ones(len(list_categories)))
@@ -11161,11 +11164,15 @@ class PySILLS(tk.Frame):
                 # Intensity Results
                 intensity_bg_i = self.container_intensity[var_type]["RAW"][var_file_short]["BG"][isotope]
                 intensity_mat_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["MAT"][isotope]
+                if isinstance(intensity_bg_i, np.floating) == False:
+                    print(var_file_short, isotope, "BG:", intensity_bg_i)
+                if isinstance(intensity_mat_i, np.floating) == False:
+                    print(var_file_short, isotope, "MAT:", intensity_mat_i)
                 # Sensitivity Results
-                analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short]["MAT"][
-                    isotope]
-                normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short]["MAT"][
-                    isotope]
+                analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short][
+                    "MAT"][isotope]
+                normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short][
+                    "MAT"][isotope]
                 # Concentration Results
                 concentration_i = self.container_concentration[var_type]["RAW"][var_file_short]["MAT"][isotope]
                 lod_i = self.container_lod[var_type]["RAW"][var_file_short]["MAT"][isotope]
@@ -11211,12 +11218,14 @@ class PySILLS(tk.Frame):
     #
     def ma_show_all_lines(self, var_type, var_file_short):
         if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "RAW"][0].set_visible(True)
                 self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(1)
         elif self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 1:
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "SMOOTHED"][0].set_visible(True)
                 self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
@@ -11226,12 +11235,14 @@ class PySILLS(tk.Frame):
     #
     def ma_hide_all_lines(self, var_type, var_file_short):
         if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "RAW"][0].set_visible(False)
                 self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(0)
         elif self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 1:
-            for isotope in self.container_lists["ISOTOPES"]:
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+            for isotope in file_isotopes:
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "SMOOTHED"][0].set_visible(False)
                 self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
@@ -12324,11 +12335,13 @@ class PySILLS(tk.Frame):
                 xi_opt = {}
                 xi_std_helper = {}
                 list_valid_std = []
+                list_valid_isotopes = []
                 var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                file_isotopes_smpl = self.container_lists["Measured Isotopes"][var_file_short]
 
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
-                    file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_std_short]
                     var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.ma_get_analytical_sensitivity(
@@ -12339,6 +12352,8 @@ class PySILLS(tk.Frame):
                         for isotope in file_isotopes:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             if var_srm_i == var_srm_file:
+                                if isotope not in list_valid_isotopes:
+                                    list_valid_isotopes.append(isotope)
                                 if file_std_short not in list_valid_std:
                                     list_valid_std.append(file_std_short)
                                 if isotope not in xi_opt:
@@ -12348,25 +12363,41 @@ class PySILLS(tk.Frame):
                                     file_std_short]["MAT"][isotope]
 
                                 xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
-                for isotope in self.container_lists["Measured Isotopes"]["All"]:
+
+                for isotope in file_isotopes_smpl:
                     xi_regr = self.calculate_regression(
                         data=xi_std_helper, isotope=isotope, file_data=list_valid_std)
                     xi_opt[isotope].extend(xi_regr)
-                for file_smpl in self.container_lists["SMPL"]["Short"]:
-                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl]
-                    delta_i = self.container_lists["Acquisition Times Delta"][file_smpl]
-                    for isotope in file_isotopes:
-                        var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
-                        self.container_lists["Analytical Sensitivity Regression"][isotope] = {
+
+                delta_i = self.container_lists["Acquisition Times Delta"][var_file_short]
+                for isotope in file_isotopes_smpl:
+                    var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
+                    self.container_lists["Analytical Sensitivity Regression"][isotope] = {
+                        "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
+                    if var_datatype == "RAW":
+                        self.container_lists["Analytical Sensitivity Regression RAW"][isotope] = {
                             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
-                        if var_datatype == "RAW":
-                            self.container_lists["Analytical Sensitivity Regression RAW"][isotope] = {
+                    elif var_datatype == "SMOOTHED":
+                        self.container_lists["Analytical Sensitivity Regression SMOOTHED"][isotope] = {
                             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
-                        elif var_datatype == "SMOOTHED":
-                            self.container_lists["Analytical Sensitivity Regression SMOOTHED"][isotope] = {
-                            "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
-                        self.container_analytical_sensitivity[var_filetype][var_datatype][file_smpl]["MAT"][
-                            isotope] = var_result_i
+                    self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                        isotope] = var_result_i
+
+                # for file_smpl in self.container_lists["SMPL"]["Short"]:
+                #     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl]
+                #     delta_i = self.container_lists["Acquisition Times Delta"][file_smpl]
+                #     for isotope in file_isotopes:
+                #         var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
+                #         self.container_lists["Analytical Sensitivity Regression"][isotope] = {
+                #             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
+                #         if var_datatype == "RAW":
+                #             self.container_lists["Analytical Sensitivity Regression RAW"][isotope] = {
+                #             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
+                #         elif var_datatype == "SMOOTHED":
+                #             self.container_lists["Analytical Sensitivity Regression SMOOTHED"][isotope] = {
+                #             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
+                #         self.container_analytical_sensitivity[var_filetype][var_datatype][file_smpl]["MAT"][
+                #             isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
                 for var_focus in ["MAT"]:
@@ -19942,6 +19973,7 @@ class PySILLS(tk.Frame):
         self.lbl_04a2.configure(text=self.current_nspikes)
 
         value_0 = self.list_indices[0]
+        current_id = self.scl_01.get()
         self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
         self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
         if value_0 in self.container_spike_values[var_file][var_isotope]["Save"]:
@@ -19950,7 +19982,12 @@ class PySILLS(tk.Frame):
             if value_current == self.current_original_value:
                 self.replace_spike_value(mode="RAW")
         else:
-            self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][value_0]
+            #self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][value_0]
+            if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
+                self.current_current_value = val_corrected
+            else:
+                self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][
+                    current_id - 1]
         self.lbl_03a.configure(text=self.current_original_value)
         self.lbl_03b.configure(text=self.current_suggested_value)
         self.lbl_03c.configure(text=self.current_current_value)
