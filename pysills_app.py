@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		14.09.2023
+# Date:		15.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -19976,6 +19976,7 @@ class PySILLS(tk.Frame):
         current_id = self.scl_01.get()
         self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
         self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
+        val_corrected = self.current_suggested_value
         if value_0 in self.container_spike_values[var_file][var_isotope]["Save"]:
             value_current = self.container_spike_values[var_file][var_isotope]["Save"][value_0]
             self.current_current_value = value_current
