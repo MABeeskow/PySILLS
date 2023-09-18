@@ -1216,7 +1216,18 @@ class PySILLS(tk.Frame):
 
     def select_icp_ms(self, var_opt):
         path = os.getcwd()
-        var_instrument = var_opt.replace(" ", "_")
+        if self.file_loaded == False:
+            if self.demo_mode == True:
+                try:
+                    var_instrument_raw = var_opt.get()
+                except:
+                    var_instrument_raw = var_opt
+                var_instrument = var_instrument_raw.replace(" ", "_")
+            else:
+                var_instrument = var_opt.replace(" ", "_")
+        else:
+            var_instrument_raw = var_opt.get()
+            var_instrument = var_instrument_raw.replace(" ", "_")
         file_long = path + str("/lib/icpms/" + var_instrument + ".csv")
         file_content = open(file_long)
 
@@ -4864,8 +4875,9 @@ class PySILLS(tk.Frame):
             info_author = self.container_var["ma_setting"]["Author"].get()
             info_source = self.container_var["ma_setting"]["Source ID"].get()
             info_carrier_gas = self.container_var["LASER"].get()
+            info_icpms = self.var_opt_icp.get()
             #
-            str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas)
+            str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms)
             str_proj += "\n"
             #
             save_file.write(str_proj)
@@ -5039,8 +5051,9 @@ class PySILLS(tk.Frame):
             info_author = self.container_var["fi_setting"]["Author"].get()
             info_source = self.container_var["fi_setting"]["Source ID"].get()
             info_carrier_gas = self.container_var["LASER"].get()
+            info_icpms = self.var_opt_icp.get()
             #
-            str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas)
+            str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms)
             str_proj += "\n"
             #
             save_file.write(str_proj)
@@ -5353,6 +5366,7 @@ class PySILLS(tk.Frame):
                     self.container_var["ma_setting"]["Author"].set(splitted_std[0])
                     self.container_var["ma_setting"]["Source ID"].set(splitted_std[1])
                     self.container_var["LASER"].set(splitted_std[2])
+                    self.var_opt_icp.set(splitted_std[3])
                     #
                 ## STANDARD FILES
                 for i in range(index_container["STANDARD FILES"] + 1,
@@ -5818,6 +5832,7 @@ class PySILLS(tk.Frame):
             #self.define_isotope_colors()
             self.file_loaded = True
             self.demo_mode = False
+            self.select_icp_ms(var_opt=self.var_opt_icp)
 
             if self.pysills_mode == "MA":
                 self.ma_settings()
@@ -7805,6 +7820,7 @@ class PySILLS(tk.Frame):
             parent = os.path.dirname(path)
             if self.demo_mode == True:
                 self.var_opt_icp.set("Agilent 7900s")
+                self.select_icp_ms(var_opt=self.var_opt_icp)
                 ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
                 for file in demo_files:

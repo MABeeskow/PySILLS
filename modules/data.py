@@ -58,6 +58,26 @@ class Data:
                 time_file = [str(var_hour), str(var_minute), str(var_second)]
                 dates = [date_file, date_file]
                 times = [time_file, time_file]
+            elif icpms == "Agilent 7900s":
+                line_time_start = imported_data[2]
+                line_time_end = imported_data[-1]
+                if "Printed" not in line_time_end:
+                    line_time_end = imported_data[-2]
+
+                key_start = re.search(
+                    "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)",
+                    line_time_start)
+                if key_start:
+                    date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
+                    time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
+
+                key_end = re.search("\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
+                if key_end:
+                    date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
+                    time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]
+
+                dates = [date_start, date_end]
+                times = [time_start, time_end]
         else:
             line_time_start = imported_data[2]
             line_time_end = imported_data[-1]
