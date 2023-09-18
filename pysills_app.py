@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		15.09.2023
+# Date:		18.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -7295,7 +7295,12 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            dates, times = Data(filename=var_file).import_as_list()
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+            dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
 
             if index == 0:
                 t_start_0 = datetime.timedelta(
@@ -7334,8 +7339,12 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = var_file.split("/")
             file_smpl = parts[-1]
-
-            dates, times = Data(filename=var_file).import_as_list()
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+            dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
             t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
             t_delta_0 = (t_start - t_start_0).total_seconds()
             self.container_lists["Acquisition Times Delta"][file_smpl] = t_delta_0
@@ -7352,8 +7361,12 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
-            #
-            dates, times = Data(filename=var_file).import_as_list()
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+            dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
             #
             if index == 0:
                 if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
@@ -7387,8 +7400,12 @@ class PySILLS(tk.Frame):
         for index, var_file in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = var_file.split("/")
             file_smpl = parts[-1]
-            #
-            dates, times = Data(filename=var_file).import_as_list()
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+            dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
             #
             if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
                 if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
@@ -7540,7 +7557,12 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            dates, times = Data(filename=var_file).import_as_list()
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+            dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
             #
             entry_std = [file_std, len(list(df_data.keys())[1:]), dataset_time[0], dataset_time[-1],
                          times[0][0]+":"+times[0][1]+":"+times[0][2], dates[0][0]+"/"+dates[0][1]+"/"+dates[0][2]]
@@ -7568,7 +7590,12 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
-            dates, times = Data(filename=var_file).import_as_list()
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+            dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
             #
             entry_smpl = [file_smpl, len(list(df_data.keys())[1:]), dataset_time[0], dataset_time[-1],
                          times[0][0] + ":" + times[0][1] + ":" + times[0][2],
@@ -7946,8 +7973,10 @@ class PySILLS(tk.Frame):
         for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
             parts = file_std.split("/")
             file_std_short = parts[-1]
-
-            df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_std_i = DE(filename_long=file_std).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
             df_isotopes = DE().get_isotopes(dataframe=df_std_i)
             self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
             times_std_i = DE().get_times(dataframe=df_std_i)
@@ -8182,8 +8211,11 @@ class PySILLS(tk.Frame):
                     self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
                 #
                 self.create_container_results(var_filetype="STD", var_file_short=file_smpl_short)
-            #
-            df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_smpl_i = DE(filename_long=file_smpl).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
             df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
             self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
             times_smpl_i = DE().get_times(dataframe=df_smpl_i)
@@ -9451,7 +9483,12 @@ class PySILLS(tk.Frame):
             parts = var_file_long.split("/")
             var_file_short = parts[-1]
             if self.container_icpms["timestamp"] != "undefined":
-                dates, times = Data(filename=var_file_long).import_as_list()
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter= self.container_icpms["skipfooter"]
+                var_timestamp = self.container_icpms["timestamp"]
+                var_icpms = self.container_icpms["name"]
+                dates, times = Data(filename=var_file_long).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
                 if var_file_short not in self.container_var["acquisition times"][var_filetype]:
                     self.container_var["acquisition times"][var_filetype][var_file_short] = tk.StringVar()
                     self.container_var["acquisition times"][var_filetype][var_file_short].set(

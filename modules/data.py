@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 13.09.2023
+# 18.09.2023
 # ----------------------
 #
 ## MODULES
@@ -35,29 +35,49 @@ class Data:
         #
         return dataframe
     #
-    def import_as_list(self, skip_header=0, skip_footer=0, delimiter=","):
+    def import_as_list(self, skip_header=0, skip_footer=0, timestamp=None, delimiter=",", icpms=None):
         #
         f = open(self.filename, 'r')
         imported_data = f.readlines()
-        line_time_start = imported_data[2]
-        line_time_end = imported_data[-1]
-        if "Printed" not in line_time_end:
-            line_time_end = imported_data[-2]
 
-        key_start = re.search(
-            "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)", line_time_start)
-        if key_start:
-            date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
-            time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
+        if timestamp != None and icpms != None:
+            line_time = imported_data[timestamp]
+            if icpms == "Finnigan MAT ELEMENT":
+                key_time = re.search("(\w+)\,\s+(\w+)\s+(\d+)\,\s+(\d+)\s+(\d+)\:(\d+)\:(\d+)", line_time)
+                dict_months = {
+                    "January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
+                    "July": "07", "August": "08", "September": "09", "October": "10", "November": "11",
+                    "December": "12"}
+                var_month = dict_months[key_time.group(2)]
+                var_day = key_time.group(3)
+                var_year = key_time.group(4)
+                var_hour = key_time.group(5)
+                var_minute = key_time.group(6)
+                var_second = key_time.group(7)
+                date_file = [str(var_day), str(var_month), str(var_year)]
+                time_file = [str(var_hour), str(var_minute), str(var_second)]
+                dates = [date_file, date_file]
+                times = [time_file, time_file]
+        else:
+            line_time_start = imported_data[2]
+            line_time_end = imported_data[-1]
+            if "Printed" not in line_time_end:
+                line_time_end = imported_data[-2]
 
-        key_end = re.search("\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
-        if key_end:
-            date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
-            time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]
+            key_start = re.search(
+                "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)", line_time_start)
+            if key_start:
+                date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
+                time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
 
-        dates = [date_start, date_end]
-        times = [time_start, time_end]
-        #
+            key_end = re.search("\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
+            if key_end:
+                date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
+                time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]
+
+            dates = [date_start, date_end]
+            times = [time_start, time_end]
+
         return dates, times
 #
 class Import:
