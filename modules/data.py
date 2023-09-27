@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 18.09.2023
+# 27.09.2023
 # ----------------------
 #
 ## MODULES
@@ -58,14 +58,15 @@ class Data:
                 time_file = [str(var_hour), str(var_minute), str(var_second)]
                 dates = [date_file, date_file]
                 times = [time_file, time_file]
-            elif icpms == "Agilent 7900s":
+            elif icpms in ["Agilent 7900s", "Agilent 8900"]:
                 line_time_start = imported_data[2]
                 line_time_end = imported_data[-1]
+
                 if "Printed" not in line_time_end:
                     line_time_end = imported_data[-2]
 
                 key_start = re.search(
-                    "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)",
+                    "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( AM)?( PM)?( using Batch )(\w+)",
                     line_time_start)
                 if key_start:
                     date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
