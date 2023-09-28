@@ -7933,14 +7933,6 @@ class PySILLS(tk.Frame):
             #
             if element not in self.container_lists["Elements"]:
                 self.container_lists["Elements"].append(element)
-        #
-        ## LABELS
-        n_col_header = 18
-        n_col_files = 22
-        n_col_iso = 18
-        start_row_std = 0  # Standard Files Setup
-        start_row_smpl = 17  # Sample Files Setup
-        start_row_iso = 0  # Measured Isotopes
 
         ## Static
         # Build section 'Project Information'
@@ -7976,471 +7968,19 @@ class PySILLS(tk.Frame):
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 17, "Column start": 42, "N rows": 1, "N columns": 18}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
-        # # Build section 'Time-Signal Diagram Checker'
-        # var_time_signal_diagram_check = {"Row start": 25, "Column start": 42, "N rows": 1, "N columns": 18}
-        # self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
-
-        lbl_std = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_std, column_id=n_col_header + 1, n_rows=1,
-            n_columns=n_col_files, fg=self.colors_fi["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Standard Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_smpl = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_smpl, column_id=n_col_header + 1, n_rows=1,
-            n_columns=n_col_files, fg=self.colors_fi["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Sample Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_iso = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_iso, column_id=n_col_header + n_col_files + 2, n_rows=1,
-            n_columns=n_col_iso, fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        ## Dynamic
-        # Standard Files
-        frm_std = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_std + 1, column_id=n_col_header + 1,
-            n_rows=start_row_smpl - 2, n_columns=n_col_files, fg=bg_light,
-            bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_std = ttk.Scrollbar(frm_std, orient="vertical")
-        text_std = tk.Text(
-            master=frm_std, width=30, height=25, yscrollcommand=vsb_std.set, bg=self.bg_colors["Very Light"])
-        vsb_std.config(command=text_std.yview)
-        vsb_std.pack(side="right", fill="y")
-        text_std.pack(side="left", fill="both", expand=True)
-
-        for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
-            parts = file_std.split("/")
-            file_std_short = parts[-1]
-            var_skipheader = self.container_icpms["skipheader"]
-            var_skipfooter = self.container_icpms["skipfooter"]
-            df_std_i = DE(filename_long=file_std).get_measurements(
-                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-            df_isotopes = DE().get_isotopes(dataframe=df_std_i)
-            self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
-            times_std_i = DE().get_times(dataframe=df_std_i)
-            for isotope in df_isotopes:
-                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
-
-            if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
-                self.container_lists["STD"]["Long"].append(file_std)
-                self.container_lists["STD"]["Short"].append(file_std_short)
-                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-            else:
-                if file_std not in self.container_lists["STD"]["Long"]:
-                    self.container_lists["STD"]["Long"].append(file_std)
-                    self.container_lists["STD"]["Short"].append(file_std_short)
-                if file_std_short not in self.container_var["ma_setting"]["Data Type Plot"]["STD"]:
-                    self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                    self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                    self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-            #
-            if self.file_loaded is False:
-                if file_std not in self.container_var["STD"]:
-                    self.container_var["STD"][file_std] = {}
-                    self.container_var["STD"][file_std]["IS Data"] = {
-                        "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                    self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
-                    self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
-                    self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
-                    self.container_var["STD"][file_std]["Checkbox"].set(1)
-                    self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
-                    self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
-                    self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
-                    self.container_var["STD"][file_std]["SRM"].set("Select SRM")
-            else:
-                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-
-                self.build_container_helper(mode="STD")
-
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-                #
-                self.spikes_isotopes["STD"][file_std_short] = {}
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
-                #
-                self.create_container_results(var_filetype="STD", var_file_short=file_std_short)
-
-            if file_std not in self.container_var["SRM"]:
-                self.container_var["SRM"][file_std] = tk.StringVar()
-                self.container_var["SRM"][file_std].set("Select SRM")
-
-            if file_std_short not in self.container_files["STD"]:
-                self.container_files["STD"][file_std_short] = {}
-                self.container_files["STD"][file_std_short]["SRM"] = tk.StringVar()
-                self.container_files["STD"][file_std_short]["IS"] = tk.StringVar()
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-                #
-                self.create_container_results(var_filetype="STD", var_file_short=file_std_short)
-
-            if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
-                self.build_container_helper(mode="STD")
-
-                if "BG" not in self.container_helper["STD"][file_std_short]:
-                    self.container_helper["STD"][file_std_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["STD"][file_std_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["STD"][file_std_short] = {}
-            elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == False:
-                self.build_container_helper(mode="STD")
-
-                if "BG" not in self.container_helper["STD"][file_std_short]:
-                    self.container_helper["STD"][file_std_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["STD"][file_std_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["STD"][file_std_short] = {}
-            elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == True:
-                for item_01 in ["BG", "MAT"]:
-                    for item_02 in ["Listbox", "Content", "ID", "Indices"]:
-                        if item_02 not in self.container_helper["STD"][file_std_short][item_01]:
-                            if item_02 == "Listbox":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = None
-                            elif item_02 == "Content":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = {}
-                            elif item_02 == "ID":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = 0
-                            elif item_02 == "Indices":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = []
-            #
-            categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
-                          "TOOLBARFRAME_RATIO"]
-            self.container_diagrams["STD"][file_std_short] = {}
-            self.container_listboxes["STD"][file_std_short] = {}
-            self.diagrams_setup["STD"][file_std_short] = {}
-            for category in categories:
-                self.container_diagrams["STD"][file_std_short][category] = None
-                self.diagrams_setup["STD"][file_std_short][category] = None
-            categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
-            for category in categories:
-                self.diagrams_setup["STD"][file_std_short][category] = {}
-            categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
-            for category in categories:
-                self.container_listboxes["STD"][file_std_short][category] = None
-            #
-            cb_i = tk.Checkbutton(
-                master=frm_std, text=file_std_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["STD"][file_std]["Checkbox"], onvalue=1, offvalue=0, selectcolor=bg_light,
-                activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
-                anchor=tk.CENTER, highlightthickness=0, bd=0)
-            text_std.window_create("end", window=cb_i)
-            text_std.insert("end", "\t")
-
-            if self.container_var["STD"][file_std]["SRM"].get() != "Select SRM":
-                var_text = self.container_var["STD"][file_std]["SRM"].get()
-                self.container_files["STD"][file_std_short]["SRM"].set(var_text)
-            else:
-                if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
-                    var_text = self.container_var["General Settings"]["Default SRM"].get()
-                    self.container_var["STD"][file_std]["SRM"].set(var_text)
-                    self.container_files["STD"][file_std_short]["SRM"].set(var_text)
-            #
-            opt_srm_i = tk.OptionMenu(
-                frm_std, self.container_var["STD"][file_std]["SRM"],
-                *np.sort(self.container_lists["SRM Library"]),
-                command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
-                self.ma_change_srm_individual(var_opt, var_indiv, mode))
-            opt_srm_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_srm_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_std.window_create("end", window=opt_srm_i)
-            text_std.insert("end", "\t")
-
-            btn_i = tk.Button(
-                master=frm_std, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
-                highlightbackground=self.bg_colors["Very Light"], command=lambda var_file=file_std, var_type="STD":
-                self.ma_check_specific_file(var_file, var_type))
-            text_std.window_create("end", window=btn_i)
-            text_std.insert("end", "\t")
-
-            var_frm_color = self.container_var["STD"][file_std]["Sign Color"].get()
-            frm_i = tk.Frame(
-                frm_std, bg=var_frm_color, relief=tk.SOLID, height=15, width=15, highlightbackground="black", bd=1)
-            text_std.window_create("end", window=frm_i)
-            text_std.insert("end", "\n")
-            #
-            self.container_var["STD"][file_std]["Frame"] = frm_i
-        #
-        # Sample Files
-        frm_smpl = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_smpl + 1, column_id=n_col_header + 1,
-            n_rows=n_rows - start_row_smpl - 3, n_columns=n_col_files, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = ttk.Scrollbar(frm_smpl, orient="vertical")
-        text_smpl = tk.Text(
-            master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
-        vsb_smpl.config(command=text_smpl.yview)
-        vsb_smpl.pack(side="right", fill="y")
-        text_smpl.pack(side="left", fill="both", expand=True)
-        #
-        for index, file_smpl in enumerate(self.container_lists["SMPL"]["Long"]):
-            parts = file_smpl.split("/")
-            file_smpl_short = parts[-1]
-            #
-            if self.file_loaded is False:
-                if file_smpl not in self.container_var["SMPL"]:
-                    self.container_var["SMPL"][file_smpl] = {}
-                    self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["IS"].set("Select IS")
-                    self.container_var["SMPL"][file_smpl]["IS Data"] = {
-                        "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
-                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("0.0")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
-                    self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
-                    self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
-                    self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["ID"].set("A")
-                    self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
-            else:
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-
-                self.build_matrix_setup_variables()
-                self.build_container_helper(mode="SMPL")
-                #
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-                #
-                self.spikes_isotopes["STD"][file_smpl_short] = {}
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
-                #
-                self.create_container_results(var_filetype="STD", var_file_short=file_smpl_short)
-
-            var_skipheader = self.container_icpms["skipheader"]
-            var_skipfooter = self.container_icpms["skipfooter"]
-            df_smpl_i = DE(filename_long=file_smpl).get_measurements(
-                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-            df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
-            self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
-            times_smpl_i = DE().get_times(dataframe=df_smpl_i)
-            for isotope in df_isotopes:
-                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
-
-            if file_smpl not in self.container_lists["SMPL"]["Long"] and self.demo_mode == True:
-                self.container_lists["SMPL"]["Long"].append(file_smpl)
-                self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-            else:
-                if file_smpl not in self.container_lists["SMPL"]["Long"]:
-                    self.container_lists["SMPL"]["Long"].append(file_smpl)
-                    self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                if file_smpl_short not in self.container_var["ma_setting"]["Data Type Plot"]["SMPL"]:
-                    self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                    self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                    self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                    self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                    self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                    self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-            #
-            if self.file_loaded == True:
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["ma_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["ma_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var["ma_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-                #
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
-                #
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-                #
-                for isotope in self.container_lists["ISOTOPES"]:
-                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
-                #
-                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short)
-            #
-            if file_smpl_short not in self.container_files["SMPL"]:
-                self.container_files["SMPL"][file_smpl_short] = {}
-                self.container_files["SMPL"][file_smpl_short]["IS"] = tk.StringVar()
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"] = tk.StringVar()
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set("0.0")
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
-                #
-                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short)
-            #
-            if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
-                self.build_container_helper(mode="SMPL")
-
-                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
-                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-            elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
-                self.build_container_helper(mode="SMPL")
-
-                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
-                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-            elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == True:
-                for item_01 in ["BG", "MAT"]:
-                    for item_02 in ["Listbox", "Content", "ID", "Indices"]:
-                        if item_02 not in self.container_helper["SMPL"][file_smpl_short][item_01]:
-                            if item_02 == "Listbox":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = None
-                            elif item_02 == "Content":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = {}
-                            elif item_02 == "ID":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = 0
-                            elif item_02 == "Indices":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = []
-            #
-            categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
-                          "TOOLBARFRAME_RATIO"]
-            self.container_diagrams["SMPL"][file_smpl_short] = {}
-            self.container_listboxes["SMPL"][file_smpl_short] = {}
-            self.diagrams_setup["SMPL"][file_smpl_short] = {}
-            for category in categories:
-                self.container_diagrams["SMPL"][file_smpl_short][category] = None
-                self.diagrams_setup["SMPL"][file_smpl_short][category] = None
-            categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
-            for category in categories:
-                self.diagrams_setup["SMPL"][file_smpl_short][category] = {}
-            categories = ["BG", "MAT"]
-            for category in categories:
-                self.container_listboxes["SMPL"][file_smpl_short][category] = None
-            #
-            cb_i = tk.Checkbutton(
-                master=frm_smpl, text=file_smpl_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["SMPL"][file_smpl]["Checkbox"], onvalue=1, offvalue=0, selectcolor=bg_light,
-                activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
-                anchor=tk.CENTER, highlightthickness=0, bd=0)
-            text_smpl.window_create("end", window=cb_i)
-            text_smpl.insert("end", "\t")
-
-            if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
-                var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                #
-            else:
-                var_text = "Select IS"
-                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
-
-            opt_is_i = tk.OptionMenu(
-                frm_smpl, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"],
-                *self.container_lists["ISOTOPES"])
-            opt_is_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_is_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_smpl.window_create("end", window=opt_is_i)
-            text_smpl.insert("end", "\t")
-
-            if self.container_var["SMPL"][file_smpl]["ID"].get() != "A":
-                var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
-            else:
-                var_text = "A"
-
-            opt_id_i = tk.OptionMenu(frm_smpl, self.container_var["SMPL"][file_smpl]["ID"],
-                                     *np.sort(self.list_alphabet))
-            opt_id_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_id_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_smpl.window_create("end", window=opt_id_i)
-            text_smpl.insert("end", "\t")
-            #
-            btn_i = tk.Button(
-                master=frm_smpl, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
-                highlightbackground=self.bg_colors["Very Light"], command=lambda var_file=file_smpl, var_type="SMPL":
-                self.ma_check_specific_file(var_file, var_type))
-            text_smpl.window_create("end", window=btn_i)
-            text_smpl.insert("end", "\t")
-
-            var_frm_color = self.container_var["SMPL"][file_smpl]["Sign Color"].get()
-            frm_i = tk.Frame(frm_smpl, bg=var_frm_color, relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_smpl.window_create("end", window=frm_i)
-            text_smpl.insert("end", "\n")
-            #
-            self.container_var["SMPL"][file_smpl]["Frame"] = frm_i
-
-        self.define_isotope_colors()
+        # Build section 'Standard Files'
+        var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 15, "N columns": 22}
+        self.place_standard_files_table(var_geometry_info=var_standard_files)
+        # Build section 'Sample Files'
+        var_sample_files = {"Row start": 17, "Column start": 19, "N rows": 18, "N columns": 22}
+        self.place_sample_files_table(var_geometry_info=var_sample_files)
         # Build section 'Time-Signal Diagram Checker'
+        self.define_isotope_colors()
         var_time_signal_diagram_check = {"Row start": 25, "Column start": 42, "N rows": 1, "N columns": 18}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
         # Build section 'Measured Isotopes'
         var_measured_isotopes = {"Row start": 1, "Column start": 42, "N rows": 15, "N columns": 18}
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
-        #
-        ## BUTTONS
-        btn_std_conf = SE(
-            parent=self.subwindow_ma_settings, row_id=start_row_smpl - 1,
-            column_id=n_col_header + 17, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-            text="Confirm all files", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
-        btn_smpl_conf = SE(
-            parent=self.subwindow_ma_settings, row_id=n_rows - 2,
-            column_id=n_col_header + 17, n_rows=1, n_columns=6,
-            fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-            text="Confirm all files", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
 
         ## INITIALIZATION
         self.select_spike_elimination(
@@ -8461,7 +8001,6 @@ class PySILLS(tk.Frame):
         else:
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-            #self.ma_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
         self.build_srm_database()
@@ -8785,30 +8324,55 @@ class PySILLS(tk.Frame):
                 n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
                 text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-            self.btn_setup_quantification_plugin.configure(state='disabled')
+            self.btn_setup_quantification_plugin.configure(state="disabled")
 
             # Radiobuttons
-            rb_04a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=1,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Mass Balance", sticky="nesw",
-                relief=tk.GROOVE, command=self.change_rb_inclusion_setup)
-            rb_04b = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=2,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Charge Balance", sticky="nesw",
-                relief=tk.GROOVE, command=self.change_rb_inclusion_setup)
-            rb_04c = SE(
-                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=3,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
-                sticky="nesw", relief=tk.GROOVE, command=self.change_rb_inclusion_setup)
+            if self.pysills_mode == "FI":
+                rb_04a = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_radiobutton(
+                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=1,
+                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Mass Balance",
+                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_inclusion_setup)
+                rb_04b = SE(
+                    parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_radiobutton(
+                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=2,
+                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Charge Balance",
+                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_inclusion_setup)
+                rb_04c = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_radiobutton(
+                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=3,
+                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
+                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_inclusion_setup)
+            elif self.pysills_mode == "MI":
+                rb_04a = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_radiobutton(
+                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=1,
+                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data",
+                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=None)
+                rb_04b = SE(
+                    parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_radiobutton(
+                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=2,
+                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Halter et al. (2004)",
+                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=None)
+                rb_04b.configure(state="disabled")
+                rb_04c = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_radiobutton(
+                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=3,
+                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Borisova et al. (2021)",
+                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=None)
+                rb_04c.configure(state="disabled")
 
             if self.container_var[var_setting_key]["Inclusion Setup Selection"].get() == 1:
                 self.btn_setup_massbalance.configure(state="normal")
@@ -8829,21 +8393,21 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=1,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Matrix-only Tracer",
-                sticky="nesw", relief=tk.GROOVE, command=self.change_rb_quantification_setup)
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_quantification_setup)
             rb_05b = SE(
                 parent=var_parent, row_id=var_row_start + 6, column_id=var_columm_start, n_rows=var_row_n,
                 n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=2,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="2nd Internal Standard",
-                sticky="nesw", relief=tk.GROOVE, command=self.change_rb_quantification_setup)
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_quantification_setup)
             rb_05c = SE(
                 parent=var_parent, row_id=var_row_start + 7, column_id=var_columm_start, n_rows=var_row_n,
                 n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=3,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
-                sticky="nesw", relief=tk.GROOVE, command=self.change_rb_quantification_setup)
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_quantification_setup)
             rb_05c.configure(state="disabled")
 
             if self.container_var[var_setting_key]["Quantification Method"].get() == 1:
@@ -9154,14 +8718,14 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Spike Elimination Inclusion"], value_rb=1,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Include Inclusion",
-                sticky="nesw", relief=tk.GROOVE)
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_09b = SE(
                 parent=var_parent, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=1,
                 n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Spike Elimination Inclusion"], value_rb=2,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Exclude Inclusion",
-                sticky="nesw", relief=tk.GROOVE)
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
     def place_checkup_feature(self, var_geometry_info, var_relief=tk.FLAT):
         """Creates and places the necessary tkinter widgets for the section: 'Check-Up'
@@ -9265,6 +8829,11 @@ class PySILLS(tk.Frame):
         var_category_n = var_column_n - 11
 
         # Labels
+        lbl_iso = SE(
+            parent=var_parent, row_id=var_row_start - 1, column_id=var_columm_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         frm_iso = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
@@ -9290,88 +8859,88 @@ class PySILLS(tk.Frame):
                 #
                 for file_std_short in self.container_lists["STD"]["Short"]:
                     self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
+                        var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
                         var_isotope=isotope)
 
-                    if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
+                    if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
                             file_std_short] = {}
 
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
                 #
                 for file_smpl_short in self.container_lists["SMPL"]["Short"]:
                     self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
+                        var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
                         var_isotope=isotope)
 
-                    if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
+                    if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
+                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
                             file_smpl_short] = {}
 
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
             #
             if self.file_loaded == True:
                 for file_std_short in self.container_lists["STD"]["Short"]:
                     self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="STD", var_filename_short=file_std_short,
+                        var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
                         var_isotope=isotope)
 
-                    if file_std_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["STD"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["STD"][
+                    if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
                             file_std_short] = {}
 
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
                 #
                 for file_smpl_short in self.container_lists["SMPL"]["Short"]:
                     self.build_checkbutton_isotope_visibility(
-                        var_mode="ma_setting", var_filetype="SMPL", var_filename_short=file_smpl_short,
+                        var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
                         var_isotope=isotope)
 
-                    if file_smpl_short not in self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"]:
-                        self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][
+                    if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
                             file_smpl_short] = tk.IntVar()
-                        self.container_var["ma_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var["ma_setting"]["Calculation Interval Visibility"]["SMPL"][
+                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
                             file_smpl_short] = {}
 
-                    self.container_var["ma_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
-                    self.container_var["ma_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
                         isotope] = {
                         "RAW": None, "SMOOTHED": None}
 
@@ -9429,7 +8998,7 @@ class PySILLS(tk.Frame):
         # Option Menus
         list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
         opt_laser = SE(
-            parent=var_parent, row_id=var_row_start + 15, column_id=var_columm_start + 11, n_rows=1,
+            parent=var_parent, row_id=var_row_start + var_row_n, column_id=var_columm_start + 11, n_rows=1,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
@@ -9771,6 +9340,592 @@ class PySILLS(tk.Frame):
                 self.canvas_time_signal_checker.draw()
             else:
                 self.canvas_time_signal_checker.draw()
+
+    def place_standard_files_table(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Standard Files'
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
+        if self.pysills_mode == "MA":
+            var_parent = self.subwindow_ma_settings
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_parent = self.subwindow_fi_settings
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_parent = self.subwindow_mi_settings
+            var_setting_key = "mi_setting"
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_header = SE(
+            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=1, n_columns=var_header_n,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Standard Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_confirm = SE(
+            parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_columm_start + var_header_n - 6,
+            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
+
+        # Frames
+        frm_files = SE(
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_files = ttk.Scrollbar(master=frm_files, orient="vertical")
+        text_files = tk.Text(
+            master=frm_files, width=30, height=25, yscrollcommand=vsb_files.set, bg=self.bg_colors["Very Light"])
+        vsb_files.config(command=text_files.yview)
+        vsb_files.pack(side="right", fill="y")
+        text_files.pack(side="left", fill="both", expand=True)
+
+        for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
+            parts = file_std.split("/")
+            file_std_short = parts[-1]
+            df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            df_isotopes = DE().get_isotopes(dataframe=df_std_i)
+            self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
+            times_std_i = DE().get_times(dataframe=df_std_i)
+
+            for isotope in df_isotopes:
+                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
+
+            if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
+                self.container_lists["STD"]["Long"].append(file_std)
+                self.container_lists["STD"]["Short"].append(file_std_short)
+                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+                self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+                self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
+            else:
+                if file_std not in self.container_lists["STD"]["Long"]:
+                    self.container_lists["STD"]["Long"].append(file_std)
+                    self.container_lists["STD"]["Short"].append(file_std_short)
+                if file_std_short not in self.container_var["ma_setting"]["Data Type Plot"]["STD"]:
+                    self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+                    self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+                    self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+                    self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+                    self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+                    self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
+
+            if self.file_loaded is False:
+                self.container_var["STD"][file_std] = {}
+                self.container_var["STD"][file_std]["IS Data"] = {
+                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+                self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
+                self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
+                self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
+                self.container_var["STD"][file_std]["Checkbox"].set(1)
+                self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
+                self.container_var["STD"][file_std]["SRM"].set("Select SRM")
+                self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
+                self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
+            else:
+                self.container_measurements["EDITED"][file_std_short] = {}
+                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+
+                self.spikes_isotopes["STD"][file_std_short] = {}
+
+                for isotope in df_isotopes:
+                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
+                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
+                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
+                    self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
+
+                self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
+
+                file_std_short = parts[-1]
+
+                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+                self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+                self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
+
+                self.container_helper["STD"][file_std_short]["FIGURE"] = None
+                self.container_helper["STD"][file_std_short]["CANVAS"] = None
+                self.container_helper["STD"][file_std_short]["TOOLBARFRAME"] = None
+                self.container_helper["STD"][file_std_short]["AXES"] = {}
+                self.container_helper["STD"][file_std_short]["RESULTS FRAME"] = None
+                self.container_helper["STD"][file_std_short]["FIGURE RATIO"] = None
+                self.container_helper["STD"][file_std_short]["CANVAS RATIO"] = None
+                self.container_helper["STD"][file_std_short]["TOOLBARFRAME RATIO"] = None
+                self.container_helper["STD"][file_std_short]["AXES RATIO"] = {}
+
+                self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+                self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
+                    file_std_short] = {}
+
+                for isotope in df_isotopes:
+                    self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
+                    self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
+                    self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short][isotope].set(1)
+                    self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
+                    #
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+
+                if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                    self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                    self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+                    self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
+                        file_std_short] = {}
+                self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+                self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+
+            if file_std not in self.container_var["SRM"]:
+                self.container_var["SRM"][file_std] = tk.StringVar()
+                self.container_var["SRM"][file_std].set("Select SRM")
+
+            if file_std_short not in self.container_files["STD"]:
+                self.container_files["STD"][file_std_short] = {}
+                self.container_files["STD"][file_std_short]["SRM"] = tk.StringVar()
+                self.container_files["STD"][file_std_short]["IS"] = tk.StringVar()
+                self.container_measurements["EDITED"][file_std_short] = {}
+                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+
+                self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
+
+                for isotope in df_isotopes:
+                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
+                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
+                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
+                    self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
+
+            if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
+                self.build_container_helper(mode="STD")
+
+                if "BG" not in self.container_helper["STD"][file_std_short]:
+                    self.container_helper["STD"][file_std_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["STD"][file_std_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["STD"][file_std_short]["INCL"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
+                self.spikes_isotopes["STD"][file_std_short] = {}
+            elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == False:
+                self.build_container_helper(mode="STD")
+
+                if "BG" not in self.container_helper["STD"][file_std_short]:
+                    self.container_helper["STD"][file_std_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["STD"][file_std_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["STD"][file_std_short]["INCL"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
+                self.spikes_isotopes["STD"][file_std_short] = {}
+            elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == True:
+                for item_01 in ["BG", "MAT"]:
+                    for item_02 in ["Listbox", "Content", "ID", "Indices"]:
+                        if item_02 not in self.container_helper["STD"][file_std_short][item_01]:
+                            if item_02 == "Listbox":
+                                self.container_helper["STD"][file_std_short][item_01][item_02] = None
+                            elif item_02 == "Content":
+                                self.container_helper["STD"][file_std_short][item_01][item_02] = {}
+                            elif item_02 == "ID":
+                                self.container_helper["STD"][file_std_short][item_01][item_02] = 0
+                            elif item_02 == "Indices":
+                                self.container_helper["STD"][file_std_short][item_01][item_02] = []
+
+            categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
+                          "TOOLBARFRAME_RATIO"]
+            self.container_diagrams["STD"][file_std_short] = {}
+            self.container_listboxes["STD"][file_std_short] = {}
+            self.diagrams_setup["STD"][file_std_short] = {}
+            for category in categories:
+                self.container_diagrams["STD"][file_std_short][category] = None
+                self.diagrams_setup["STD"][file_std_short][category] = None
+            categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
+            for category in categories:
+                self.diagrams_setup["STD"][file_std_short][category] = {}
+            categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
+            for category in categories:
+                self.container_listboxes["STD"][file_std_short][category] = None
+
+            cb_i = tk.Checkbutton(
+                master=frm_files, text=file_std_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
+                variable=self.container_var["STD"][file_std]["Checkbox"], onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
+                activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
+                anchor=tk.CENTER, highlightthickness=0, bd=0)
+            text_files.window_create("end", window=cb_i)
+            text_files.insert("end", "\t")
+
+            if self.container_var["STD"][file_std]["SRM"].get() != "Select SRM":
+                var_text = self.container_var["STD"][file_std]["SRM"].get()
+                self.container_files["STD"][file_std_short]["SRM"].set(var_text)
+            else:
+                if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
+                    var_text = self.container_var["General Settings"]["Default SRM"].get()
+                    self.container_var["SRM"][file_std].set(var_text)
+                    self.container_files["STD"][file_std_short]["SRM"].set(var_text)
+
+            opt_srm_i = tk.OptionMenu(
+                frm_files, self.container_var["SRM"][file_std], *np.sort(self.container_lists["SRM Library"]),
+                command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
+                self.fi_change_srm_individual(var_opt, var_indiv, mode))
+            opt_srm_i["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_srm_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+            text_files.window_create("end", window=opt_srm_i)
+            text_files.insert("end", "\t")
+
+            if self.pysills_mode == "MA":
+                btn_i = tk.Button(
+                    master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                    activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                    highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+                    command=lambda var_file=file_std, var_type="STD": self.ma_check_specific_file(var_file, var_type))
+            elif self.pysills_mode == "FI":
+                btn_i = tk.Button(
+                    master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                    activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                    highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+                    command=lambda var_file=file_std, var_type="STD": self.fi_check_specific_file(var_file, var_type))
+            elif self.pysills_mode == "MI":
+                btn_i = tk.Button(
+                    master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                    activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                    highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+                    command=lambda var_file=file_std, var_type="STD": self.mi_check_specific_file(var_file, var_type))
+            text_files.window_create("end", window=btn_i)
+            text_files.insert("end", "\t")
+
+            frm_i = tk.Frame(frm_files, bg=self.sign_red, relief=tk.SOLID, height=15, width=15,
+                             highlightbackground="black", bd=1)
+            text_files.window_create("end", window=frm_i)
+            text_files.insert("end", "\n")
+
+            self.container_var["STD"][file_std]["Frame"] = frm_i
+
+    def place_sample_files_table(self, var_geometry_info):
+        """Creates and places the necessary tkinter widgets for the section: 'Standard Files'
+                Parameters:  var_geometry_info  -   contains information for the widget setup
+                """
+        if self.pysills_mode == "MA":
+            var_parent = self.subwindow_ma_settings
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_parent = self.subwindow_fi_settings
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_parent = self.subwindow_mi_settings
+            var_setting_key = "mi_setting"
+
+        var_row_start = var_geometry_info["Row start"]
+        var_columm_start = var_geometry_info["Column start"]
+        var_row_n = var_geometry_info["N rows"]
+        var_column_n = var_geometry_info["N columns"]
+        var_header_n = var_column_n
+        var_category_n = var_column_n - 6
+
+        # Labels
+        lbl_header = SE(
+            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=1, n_columns=var_header_n,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Sample Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # Buttons
+        btn_confirm = SE(
+            parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_columm_start + var_header_n - 6,
+            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
+
+        # Frames
+        frm_files = SE(
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_files = ttk.Scrollbar(master=frm_files, orient="vertical")
+        text_files = tk.Text(
+            master=frm_files, width=30, height=25, yscrollcommand=vsb_files.set, bg=self.bg_colors["Very Light"])
+        vsb_files.config(command=text_files.yview)
+        vsb_files.pack(side="right", fill="y")
+        text_files.pack(side="left", fill="both", expand=True)
+        #
+        for index, file_smpl in enumerate(self.container_lists["SMPL"]["Long"]):
+            parts = file_smpl.split("/")
+            file_smpl_short = parts[-1]
+
+            df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
+            self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
+            times_smpl_i = DE().get_times(dataframe=df_smpl_i)
+
+            for isotope in df_isotopes:
+                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
+
+            if self.file_loaded is False:
+                if "Na23" in df_isotopes:
+                    possible_is = "Na23"
+                self.container_var["SMPL"][file_smpl] = {}
+                self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
+                self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
+                self.container_var["SMPL"][file_smpl]["IS Data"] = {
+                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
+                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
+                    "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                    "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                    "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+                self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
+                self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
+                self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
+                self.container_var["SMPL"][file_smpl]["ID"].set("A")
+                self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
+                self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
+                self.container_var["SMPL"][file_smpl]["Host Only Tracer"] = {
+                    "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(), "Amount": tk.StringVar()}
+                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Name"].set("Select Isotope")
+                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Value"].set("0")
+                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].set("Select Oxide")
+                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Amount"].set("100")
+                self.container_var["SMPL"][file_smpl]["Second Internal Standard"] = {
+                    "Name": tk.StringVar(), "Value": tk.StringVar()}
+                self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Name"].set("Select Isotope")
+                self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Value"].set("0")
+                #
+            else:
+                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+                #
+                self.container_helper["SMPL"][file_smpl_short]["FIGURE"] = None
+                self.container_helper["SMPL"][file_smpl_short]["CANVAS"] = None
+                self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME"] = None
+                self.container_helper["SMPL"][file_smpl_short]["AXES"] = {}
+                self.container_helper["SMPL"][file_smpl_short]["RESULTS FRAME"] = None
+                self.container_helper["SMPL"][file_smpl_short]["FIGURE RATIO"] = None
+                self.container_helper["SMPL"][file_smpl_short]["CANVAS RATIO"] = None
+                self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME RATIO"] = None
+                self.container_helper["SMPL"][file_smpl_short]["AXES RATIO"] = {}
+                #
+                self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
+                    file_smpl_short] = {}
+                #
+                for isotope in df_isotopes:
+                    self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
+                    self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
+                    self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
+                    self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
+                    #
+                    self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
+                        "RAW": None, "SMOOTHED": None}
+
+            if file_smpl not in self.container_lists["STD"]["Long"] and self.file_loaded == False:
+                if file_smpl not in self.container_lists["SMPL"]["Long"]:
+                    self.container_lists["SMPL"]["Long"].append(file_smpl)
+                    self.container_lists["SMPL"]["Short"].append(file_smpl_short)
+                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+            #
+            if file_smpl_short not in self.container_files["SMPL"]:
+                self.container_files["SMPL"][file_smpl_short] = {}
+                self.container_files["SMPL"][file_smpl_short]["IS"] = tk.StringVar()
+                self.container_files["SMPL"][file_smpl_short]["IS Concentration"] = tk.StringVar()
+                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set("0.0")
+                if self.pysills_mode != "MA":
+                    self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
+                        file_smpl_short] = tk.StringVar()
+                    self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+                        "Set salinity")
+                self.container_measurements["EDITED"][file_smpl_short] = {}
+                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
+                #
+                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
+                #
+                for isotope in df_isotopes:
+                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
+                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
+                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
+                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
+            #
+            if self.file_loaded == True:
+                self.container_measurements["EDITED"][file_smpl_short] = {}
+                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
+                #
+                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
+                #
+                for isotope in df_isotopes:
+                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
+                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
+                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
+                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
+                    #
+                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
+
+            if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
+                self.build_container_helper(mode="SMPL")
+
+                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
+                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["SMPL"][file_smpl_short]["INCL"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
+                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
+            elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
+                self.build_container_helper(mode="SMPL")
+
+                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
+                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+                    self.container_helper["SMPL"][file_smpl_short]["INCL"] = {
+                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
+
+                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
+            elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == True:
+                for item_01 in ["BG", "MAT", "INCL"]:
+                    for item_02 in ["Listbox", "Content", "ID", "Indices"]:
+                        if item_02 not in self.container_helper["SMPL"][file_smpl_short][item_01]:
+                            if item_02 == "Listbox":
+                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = None
+                            elif item_02 == "Content":
+                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = {}
+                            elif item_02 == "ID":
+                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = 0
+                            elif item_02 == "Indices":
+                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = []
+
+            categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
+                          "TOOLBARFRAME_RATIO"]
+            self.container_diagrams["SMPL"][file_smpl_short] = {}
+            self.container_listboxes["SMPL"][file_smpl_short] = {}
+            self.diagrams_setup["SMPL"][file_smpl_short] = {}
+            for category in categories:
+                self.container_diagrams["SMPL"][file_smpl_short][category] = None
+                self.diagrams_setup["SMPL"][file_smpl_short][category] = None
+            categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
+            for category in categories:
+                self.diagrams_setup["SMPL"][file_smpl_short][category] = {}
+            categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
+            for category in categories:
+                self.container_listboxes["SMPL"][file_smpl_short][category] = None
+            #
+            cb_i = tk.Checkbutton(
+                master=frm_files, text=file_smpl_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
+                variable=self.container_var["SMPL"][file_smpl]["Checkbox"], onvalue=1, offvalue=0,
+                selectcolor=self.bg_colors["White"], activebackground=self.bg_colors["Very Light"],
+                activeforeground=self.bg_colors["Very Dark"], anchor=tk.CENTER, highlightthickness=0, bd=0)
+            text_files.window_create("end", window=cb_i)
+            text_files.insert("end", "\t")
+
+            if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
+                var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+            else:
+                var_text = "Select IS"
+            opt_is_i = tk.OptionMenu(
+                frm_files, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *self.container_lists["ISOTOPES"])
+            opt_is_i["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+            opt_is_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+            text_files.window_create("end", window=opt_is_i)
+            text_files.insert("end", "\t")
+            #
+            if self.container_var["SMPL"][file_smpl]["ID"].get() != "A":
+                var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
+            else:
+                var_text = "A"
+            opt_id_i = tk.OptionMenu(
+                frm_files, self.container_var["SMPL"][file_smpl]["ID"], *np.sort(self.list_alphabet))
+            opt_id_i["menu"].config(
+                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+            opt_id_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+            text_files.window_create("end", window=opt_id_i)
+            text_files.insert("end", "\t")
+
+            if self.pysills_mode == "MA":
+                btn_i = tk.Button(
+                    master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
+                    activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                    highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+                    command=lambda var_file=file_smpl, var_type="SMPL": self.ma_check_specific_file(var_file, var_type))
+            elif self.pysills_mode == "FI":
+                btn_i = tk.Button(
+                    master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
+                    activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                    highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+                    command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
+            elif self.pysills_mode == "MI":
+                btn_i = tk.Button(
+                    master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
+                    activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
+                    highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+                    command=lambda var_file=file_smpl, var_type="SMPL": self.mi_check_specific_file(var_file, var_type))
+            text_files.window_create("end", window=btn_i)
+            text_files.insert("end", "\t")
+            #
+            frm_i = tk.Frame(frm_files, bg=self.sign_red, relief=tk.SOLID, height=15, width=15,
+                             highlightbackground="black", bd=1)
+            text_files.window_create("end", window=frm_i)
+            text_files.insert("end", "\n")
+            #
+            self.container_var["SMPL"][file_smpl]["Frame"] = frm_i
 
     def change_filetype_time_signal_diagram_checker(self, var_setting_key):
         self.current_file_id_checker = 0
@@ -13219,10 +13374,6 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
     #
     def fi_settings(self):
-        ## COLORS
-        bg_light = self.bg_colors["Very Light"]
-        bg_medium = self.bg_colors["Light"]
-
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
@@ -13315,25 +13466,6 @@ class PySILLS(tk.Frame):
             #
             if element not in self.container_lists["Elements"]:
                 self.container_lists["Elements"].append(element)
-        #
-        ## LABELS
-        n_col_header = 18
-        n_col_category = 12
-        n_col_files = 24
-        n_col_iso = 18
-        start_row_01 = 0    # Project Information
-        start_row_02 = 3    # Standard Reference Material
-        start_row_03 = 7    # Matrix Settings
-        start_row_04 = 11   # Inclusion Settings
-        start_row_05 = 15   # Quantification Method
-        start_row_06 = 19   # Assemblage Settings
-        start_row_07 = 21   # Dwell Time Settings
-        start_row_08 = 23   # Default Time Window (Background)
-        start_row_09 = 27   # Spike Elimination
-        start_row_10 = 31   # Check-Up
-        start_row_std = 0    # Standard Files Setup
-        start_row_smpl = 18   # Sample Files Setup
-        start_row_iso = start_row_01    # Measured Isotopes
 
         ## Static
         # Build section 'Project Information'
@@ -13366,687 +13498,25 @@ class PySILLS(tk.Frame):
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
-
-        lbl_std = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_std, column_id=n_col_header + 1, n_rows=1,
-            n_columns=n_col_files, fg=self.colors_fi["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Standard Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_smpl = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_smpl, column_id=n_col_header + 1, n_rows=1,
-            n_columns=n_col_files, fg=self.colors_fi["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Sample Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_iso = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_iso, column_id=n_col_header + n_col_files + 2, n_rows=1,
-            n_columns=n_col_iso, fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        ## Dynamic
-        # Standard Files
-        frm_std = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_std + 1, column_id=n_col_header + 1,
-            n_rows=start_row_smpl - 2, n_columns=n_col_files, fg=bg_light,
-            bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_std = ttk.Scrollbar(master=frm_std, orient="vertical")
-        text_std = tk.Text(
-            master=frm_std, width=30, height=25, yscrollcommand=vsb_std.set, bg=self.bg_colors["Very Light"])
-        vsb_std.config(command=text_std.yview)
-        vsb_std.pack(side="right", fill="y")
-        text_std.pack(side="left", fill="both", expand=True)
-        #
-        for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
-            parts = file_std.split("/")
-            file_std_short = parts[-1]
-            df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
-            df_isotopes = DE().get_isotopes(dataframe=df_std_i)
-            self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
-            times_std_i = DE().get_times(dataframe=df_std_i)
-
-            for isotope in df_isotopes:
-                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
-
-            if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
-                self.container_lists["STD"]["Long"].append(file_std)
-                self.container_lists["STD"]["Short"].append(file_std_short)
-                self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-            else:
-                if file_std not in self.container_lists["STD"]["Long"]:
-                    self.container_lists["STD"]["Long"].append(file_std)
-                    self.container_lists["STD"]["Short"].append(file_std_short)
-                if file_std_short not in self.container_var["ma_setting"]["Data Type Plot"]["STD"]:
-                    self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                    self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                    self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-
-            if self.file_loaded is False:
-                self.container_var["STD"][file_std] = {}
-                self.container_var["STD"][file_std]["IS Data"] = {
-                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
-                self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
-                self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
-                self.container_var["STD"][file_std]["Checkbox"].set(1)
-                self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
-                self.container_var["STD"][file_std]["SRM"].set("Select SRM")
-                self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
-                self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
-            else:
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-                #
-                self.spikes_isotopes["STD"][file_std_short] = {}
-                #
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
-                #
-                self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
-                #
-                file_std_short = parts[-1]
-                #
-                self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short] = {}
-                #
-                self.container_helper["STD"][file_std_short]["FIGURE"] = None
-                self.container_helper["STD"][file_std_short]["CANVAS"] = None
-                self.container_helper["STD"][file_std_short]["TOOLBARFRAME"] = None
-                self.container_helper["STD"][file_std_short]["AXES"] = {}
-                self.container_helper["STD"][file_std_short]["RESULTS FRAME"] = None
-                self.container_helper["STD"][file_std_short]["FIGURE RATIO"] = None
-                self.container_helper["STD"][file_std_short]["CANVAS RATIO"] = None
-                self.container_helper["STD"][file_std_short]["TOOLBARFRAME RATIO"] = None
-                self.container_helper["STD"][file_std_short]["AXES RATIO"] = {}
-                #
-                self.container_var["fi_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                self.container_var["fi_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                self.container_var["fi_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                self.container_var["fi_setting"]["Calculation Interval Visibility"]["STD"][
-                    file_std_short] = {}
-                #
-                for isotope in df_isotopes:
-                    self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short][isotope].set(1)
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
-                    #
-                    self.container_var["fi_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                #
-                if file_std_short not in self.container_var["fi_setting"]["Time-Signal Lines"]["STD"]:
-                    self.container_var["fi_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                    self.container_var["fi_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                    self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                    self.container_var["fi_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var["fi_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                    self.container_var["fi_setting"]["Calculation Interval Visibility"]["STD"][
-                        file_std_short] = {}
-                self.container_var["fi_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-                self.container_var["fi_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-                self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-            #
-            if file_std not in self.container_var["SRM"]:
-                self.container_var["SRM"][file_std] = tk.StringVar()
-                self.container_var["SRM"][file_std].set("Select SRM")
-            #
-            if file_std_short not in self.container_files["STD"]:
-                self.container_files["STD"][file_std_short] = {}
-                self.container_files["STD"][file_std_short]["SRM"] = tk.StringVar()
-                self.container_files["STD"][file_std_short]["IS"] = tk.StringVar()
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-                #
-                self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
-                #
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
-            #
-            if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
-                self.build_container_helper(mode="STD")
-
-                if "BG" not in self.container_helper["STD"][file_std_short]:
-                    self.container_helper["STD"][file_std_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["STD"][file_std_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["STD"][file_std_short]["INCL"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["STD"][file_std_short] = {}
-            elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == False:
-                self.build_container_helper(mode="STD")
-
-                if "BG" not in self.container_helper["STD"][file_std_short]:
-                    self.container_helper["STD"][file_std_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["STD"][file_std_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["STD"][file_std_short]["INCL"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["STD"][file_std_short] = {}
-            elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == True:
-                for item_01 in ["BG", "MAT"]:
-                    for item_02 in ["Listbox", "Content", "ID", "Indices"]:
-                        if item_02 not in self.container_helper["STD"][file_std_short][item_01]:
-                            if item_02 == "Listbox":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = None
-                            elif item_02 == "Content":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = {}
-                            elif item_02 == "ID":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = 0
-                            elif item_02 == "Indices":
-                                self.container_helper["STD"][file_std_short][item_01][item_02] = []
-
-            categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
-                          "TOOLBARFRAME_RATIO"]
-            self.container_diagrams["STD"][file_std_short] = {}
-            self.container_listboxes["STD"][file_std_short] = {}
-            self.diagrams_setup["STD"][file_std_short] = {}
-            for category in categories:
-                self.container_diagrams["STD"][file_std_short][category] = None
-                self.diagrams_setup["STD"][file_std_short][category] = None
-            categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
-            for category in categories:
-                self.diagrams_setup["STD"][file_std_short][category] = {}
-            categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
-            for category in categories:
-                self.container_listboxes["STD"][file_std_short][category] = None
-            #
-            cb_i = tk.Checkbutton(
-                master=frm_std, text=file_std_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["STD"][file_std]["Checkbox"], onvalue=1, offvalue=0, selectcolor=bg_light,
-                activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
-                anchor=tk.CENTER, highlightthickness=0, bd=0)
-            text_std.window_create("end", window=cb_i)
-            text_std.insert("end", "\t")
-
-            if self.container_var["STD"][file_std]["SRM"].get() != "Select SRM":
-                var_text = self.container_var["STD"][file_std]["SRM"].get()
-                self.container_files["STD"][file_std_short]["SRM"].set(var_text)
-            else:
-                if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
-                    var_text = self.container_var["General Settings"]["Default SRM"].get()
-                    self.container_var["SRM"][file_std].set(var_text)
-                    self.container_files["STD"][file_std_short]["SRM"].set(var_text)
-            #
-            opt_srm_i = tk.OptionMenu(
-                frm_std, self.container_var["SRM"][file_std], *np.sort(self.container_lists["SRM Library"]),
-                command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
-                self.fi_change_srm_individual(var_opt, var_indiv, mode))
-            opt_srm_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_srm_i.config(
-                bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_std.window_create("end", window=opt_srm_i)
-            text_std.insert("end", "\t")
-
-            btn_i = tk.Button(
-                master=frm_std, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
-                highlightbackground=self.bg_colors["Very Light"],
-                command=lambda var_file=file_std, var_type="STD": self.fi_check_specific_file(var_file, var_type))
-            text_std.window_create("end", window=btn_i)
-            text_std.insert("end", "\t")
-            #
-            frm_i = tk.Frame(frm_std, bg=self.sign_red, relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_std.window_create("end", window=frm_i)
-            text_std.insert("end", "\n")
-            #
-            self.container_var["STD"][file_std]["Frame"] = frm_i
-        #
-        # Sample Files
-        frm_smpl = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_smpl + 1, column_id=n_col_header + 1,
-            n_rows=n_rows - start_row_smpl - 3, n_columns=n_col_files, fg=bg_light,
-            bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
-        text_smpl = tk.Text(
-            master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
-        vsb_smpl.config(command=text_smpl.yview)
-        vsb_smpl.pack(side="right", fill="y")
-        text_smpl.pack(side="left", fill="both", expand=True)
-        #
-        for index, file_smpl in enumerate(self.container_lists["SMPL"]["Long"]):
-            parts = file_smpl.split("/")
-            file_smpl_short = parts[-1]
-
-            df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
-            df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
-            self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
-            times_smpl_i = DE().get_times(dataframe=df_smpl_i)
-
-            for isotope in df_isotopes:
-                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
-
-            if self.file_loaded is False:
-                if "Na23" in df_isotopes:
-                    possible_is = "Na23"
-                self.container_var["SMPL"][file_smpl] = {}
-                self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
-                self.container_var["SMPL"][file_smpl]["IS"].set(possible_is)
-                self.container_var["SMPL"][file_smpl]["IS Data"] = {
-                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(possible_is)
-                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
-                    "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                    "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                    "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
-                self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
-                self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
-                self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
-                self.container_var["SMPL"][file_smpl]["ID"].set("A")
-                self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
-                self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
-                self.container_var["SMPL"][file_smpl]["Host Only Tracer"] = {
-                    "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(), "Amount": tk.StringVar()}
-                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Name"].set("Select Isotope")
-                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Value"].set("0")
-                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].set("Select Oxide")
-                self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Amount"].set("100")
-                self.container_var["SMPL"][file_smpl]["Second Internal Standard"] = {
-                    "Name": tk.StringVar(), "Value": tk.StringVar()}
-                self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Name"].set("Select Isotope")
-                self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Value"].set("0")
-                #
-            else:
-                self.container_var["fi_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-                #
-                self.container_helper["SMPL"][file_smpl_short]["FIGURE"] = None
-                self.container_helper["SMPL"][file_smpl_short]["CANVAS"] = None
-                self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME"] = None
-                self.container_helper["SMPL"][file_smpl_short]["AXES"] = {}
-                self.container_helper["SMPL"][file_smpl_short]["RESULTS FRAME"] = None
-                self.container_helper["SMPL"][file_smpl_short]["FIGURE RATIO"] = None
-                self.container_helper["SMPL"][file_smpl_short]["CANVAS RATIO"] = None
-                self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME RATIO"] = None
-                self.container_helper["SMPL"][file_smpl_short]["AXES RATIO"] = {}
-                #
-                self.container_var["fi_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                self.container_var["fi_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                self.container_var["fi_setting"]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                self.container_var["fi_setting"]["Calculation Interval Visibility"]["SMPL"][
-                    file_smpl_short] = {}
-                #
-                for isotope in df_isotopes:
-                    self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
-                    #
-                    self.container_var["fi_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-
-            if file_smpl not in self.container_lists["STD"]["Long"] and self.file_loaded == False:
-                if file_smpl not in self.container_lists["SMPL"]["Long"]:
-                    self.container_lists["SMPL"]["Long"].append(file_smpl)
-                    self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                self.container_var["fi_setting"]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var["fi_setting"]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-            #
-            if file_smpl_short not in self.container_files["SMPL"]:
-                self.container_files["SMPL"][file_smpl_short] = {}
-                self.container_files["SMPL"][file_smpl_short]["IS"] = tk.StringVar()
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"] = tk.StringVar()
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set("0.0")
-                self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short] = tk.StringVar()
-                self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
-                    "Set salinity")
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
-                #
-                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
-                #
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
-            #
-            if self.file_loaded == True:
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
-                #
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-                #
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
-                    #
-                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
-
-            if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
-                self.build_container_helper(mode="SMPL")
-
-                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
-                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["SMPL"][file_smpl_short]["INCL"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-            elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == False:
-                self.build_container_helper(mode="SMPL")
-
-                if "BG" not in self.container_helper["SMPL"][file_smpl_short]:
-                    self.container_helper["SMPL"][file_smpl_short]["BG"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["SMPL"][file_smpl_short]["MAT"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-                    self.container_helper["SMPL"][file_smpl_short]["INCL"] = {
-                        "Listbox": None, "Content": {}, "ID": 0, "Indices": []}
-
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-            elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == True:
-                for item_01 in ["BG", "MAT", "INCL"]:
-                    for item_02 in ["Listbox", "Content", "ID", "Indices"]:
-                        if item_02 not in self.container_helper["SMPL"][file_smpl_short][item_01]:
-                            if item_02 == "Listbox":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = None
-                            elif item_02 == "Content":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = {}
-                            elif item_02 == "ID":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = 0
-                            elif item_02 == "Indices":
-                                self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = []
-
-            categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
-                          "TOOLBARFRAME_RATIO"]
-            self.container_diagrams["SMPL"][file_smpl_short] = {}
-            self.container_listboxes["SMPL"][file_smpl_short] = {}
-            self.diagrams_setup["SMPL"][file_smpl_short] = {}
-            for category in categories:
-                self.container_diagrams["SMPL"][file_smpl_short][category] = None
-                self.diagrams_setup["SMPL"][file_smpl_short][category] = None
-            categories = ["Time Signal Raw", "Time Signal Smoothed", "Histogram", "Scatter", "Time Ratio"]
-            for category in categories:
-                self.diagrams_setup["SMPL"][file_smpl_short][category] = {}
-            categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
-            for category in categories:
-                self.container_listboxes["SMPL"][file_smpl_short][category] = None
-            #
-            cb_i = tk.Checkbutton(
-                master=frm_smpl, text=file_smpl_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["SMPL"][file_smpl]["Checkbox"], onvalue=1, offvalue=0, selectcolor=bg_light,
-                activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
-                anchor=tk.CENTER, highlightthickness=0, bd=0)
-            text_smpl.window_create("end", window=cb_i)
-            text_smpl.insert("end", "\t")
-
-            if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
-                var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-            else:
-                var_text = "Select IS"
-            opt_is_i = tk.OptionMenu(
-                frm_smpl, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *self.container_lists["ISOTOPES"])
-            opt_is_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_is_i.config(
-                bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_smpl.window_create("end", window=opt_is_i)
-            text_smpl.insert("end", "\t")
-            #
-            if self.container_var["SMPL"][file_smpl]["ID"].get() != "A":
-                var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
-            else:
-                var_text = "A"
-            opt_id_i = tk.OptionMenu(
-                frm_smpl, self.container_var["SMPL"][file_smpl]["ID"], *np.sort(self.list_alphabet))
-            opt_id_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_id_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_smpl.window_create("end", window=opt_id_i)
-            text_smpl.insert("end", "\t")
-            #
-            btn_i = tk.Button(
-                master=frm_smpl, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
-                activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"], highlightthickness=0,
-                highlightbackground=self.bg_colors["Very Light"],
-                command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
-            text_smpl.window_create("end", window=btn_i)
-            text_smpl.insert("end", "\t")
-            #
-            frm_i = tk.Frame(frm_smpl, bg=self.sign_red, relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_smpl.window_create("end", window=frm_i)
-            text_smpl.insert("end", "\n")
-            #
-            self.container_var["SMPL"][file_smpl]["Frame"] = frm_i
-        #
-        self.define_isotope_colors()
+        # Build section 'Standard Files'
+        var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 16, "N columns": 24}
+        self.place_standard_files_table(var_geometry_info=var_standard_files)
+        # Build section 'Sample Files'
+        var_sample_files = {"Row start": 18, "Column start": 19, "N rows": 19, "N columns": 24}
+        self.place_sample_files_table(var_geometry_info=var_sample_files)
         # Build section 'Time-Signal Diagram Checker'
+        self.define_isotope_colors()
         var_time_signal_diagram_check = {"Row start": 26, "Column start": 44, "N rows": 1, "N columns": 18}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
+        # Build section 'Measured Isotopes'
+        var_measured_isotopes = {"Row start": 1, "Column start": 44, "N rows": 16, "N columns": 18}
+        self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
-        # Isotopes
-        if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-            var_text_std = self.container_var["SRM"]["default"][0].get()
-        else:
-            if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
-                var_text_std = self.container_var["General Settings"]["Default SRM"].get()
-            else:
-                var_text_std = "Select SRM"
-        #
-        self.container_var["SRM"]["default"][0].set(var_text_std)
-        #
-        if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-            var_text_iso = self.container_var["SRM"]["default"][1].get()
-        else:
-            if self.container_var["General Settings"]["Default SRM"].get() != "Select SRM":
-                var_text_iso = self.container_var["General Settings"]["Default SRM"].get()
-            else:
-                var_text_iso = "Select SRM"
-        #
-        self.container_var["SRM"]["default"][1].set(var_text_iso)
-        #
-        frm_iso = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_iso + 1, column_id=n_col_header + n_col_files + 2,
-            n_rows=n_rows - 24, n_columns=n_col_iso, fg=bg_light, bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_iso = ttk.Scrollbar(master=frm_iso, orient="vertical")
-        text_iso = tk.Text(
-            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=self.bg_colors["Very Light"])
-        vsb_iso.config(command=text_iso.yview)
-        vsb_iso.pack(side="right", fill="y")
-        text_iso.pack(side="left", fill="both", expand=True)
-        #
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
-            if self.container_var["LASER"].get() != "Select Gas":
-                var_text = self.container_var["LASER"].get()
-            else:
-                var_text = "Select Gas"
-            #
-            if isotope not in self.container_var["SRM"]:
-                self.container_var["SRM"][isotope] = tk.StringVar()
-                self.container_var["SRM"][isotope].set("Select SRM")
-                #
-                self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
-                self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
-                #
-                for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display RAW"]["STD"][file_std_short][isotope].set(1)
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
-                    #
-                    if file_std_short not in self.container_var["fi_setting"]["Time-Signal Lines"]["STD"]:
-                        self.container_var["fi_setting"]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var["fi_setting"]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var["fi_setting"]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var["fi_setting"]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var["fi_setting"]["Calculation Interval Visibility"]["STD"][
-                            file_std_short] = {}
-                    self.container_var["fi_setting"]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                #
-                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var["fi_setting"]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
-                    self.container_var["fi_setting"]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
-                    #
-                    if file_smpl_short not in self.container_var["fi_setting"]["Time-Signal Lines"]["SMPL"] \
-                            or self.file_loaded == True:
-                        self.container_var["fi_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["fi_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var["fi_setting"]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
-                        self.container_var["fi_setting"]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var["fi_setting"]["Calculation Interval Visibility"]["SMPL"][
-                            file_smpl_short] = {}
-                    self.container_var["fi_setting"]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var["fi_setting"]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-            #
-            frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_iso.window_create("end", window=frm_i)
-            text_iso.insert("end", "")
-            lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Very Dark"])
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\t")
-            #
-            if self.container_var["SRM"][isotope].get() != "Select SRM":
-                var_text = self.container_var["SRM"][isotope].get()
-            else:
-                if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-                    var_text = self.container_var["SRM"]["default"][1].get()
-                    self.container_var["SRM"][isotope].set(var_text)
-                else:
-                    var_text = "Select SRM"
-            #
-            opt_srm_i = tk.OptionMenu(
-                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
-                command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
-                self.fi_change_srm_individual(var_opt, var_indiv, mode))
-            opt_srm_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
-            opt_srm_i.config(
-                bg=bg_medium, fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_iso.window_create("end", window=opt_srm_i)
-            text_iso.insert("end", "\t")
-            #
-            key_element = re.search("(\D+)(\d+)", isotope)
-            element = key_element.group(1)
-            self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
-            #
-            if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
-                    and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
-                                                                   element]):
-                self.container_var["charge"][isotope]["textvar"].set("2+ charged")
-                charge_fg = self.accent_color
-            else:
-                self.container_var["charge"][isotope]["textvar"].set("1+ charged")
-                charge_fg = self.bg_colors["Dark Font"]
-            #
-            lbl_i = tk.Label(
-                frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
-                textvariable=self.container_var["charge"][isotope]["textvar"], bg=self.bg_colors["Very Light"],
-                fg=charge_fg)
-            self.container_var["charge"][isotope]["labelvar"] = lbl_i
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\n")
-
-        btn_std = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_smpl - 1, column_id=n_col_header + 1 + n_col_files - 6,
-            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
-            text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        btn_smpl = SE(
-            parent=self.subwindow_fi_settings, row_id=n_rows - 2, column_id=n_col_header + 1 + n_col_files - 6,
-            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
-            text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-
-        list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
-        opt_laser = SE(
-            parent=self.subwindow_fi_settings, row_id=start_row_smpl - 1, column_id=n_col_header + n_col_files + 14,
-            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=bg_medium).create_option_isotope(
-            var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var["LASER"]: self.change_carrier_gas(var_opt))
-        opt_laser["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=bg_medium, activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        opt_laser.config(
-            bg=bg_medium, fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
         ## INITIALIZATION
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="FI")
-        #self.select_spike_elimination(
-        #    var_opt=self.container_var["Spike Elimination Method"].get(), start_row=start_row_09)
+
         if self.file_loaded == False:
             self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
