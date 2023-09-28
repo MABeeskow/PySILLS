@@ -105,7 +105,8 @@ connecting signal intensities, analytical sensitivity and internal standard conc
 
 Concentration Ratio
 ^^^^^^^^^^^^^^^^^^^^
-The intensity ratio is the ratio between the concentrations of isotope :math:`i` and the internal standard :math:`IS`.
+The concentration ratio is the ratio between the concentrations of isotope :math:`i` and the internal standard
+:math:`IS`.
 
 .. math::
     \tilde{C}_i = \frac{C_i}{C_{IS}}
