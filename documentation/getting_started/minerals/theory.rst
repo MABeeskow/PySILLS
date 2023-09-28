@@ -47,33 +47,39 @@ presented equations are different for standard files and sample files.
 
 Normalized Sensitivity
 ^^^^^^^^^^^^^^^^^^^^^^^^
-.. rubric:: Standard Files
+Standard Files
+''''''''''''''''
 .. math::
     S_{i}^{STD} = \frac{I_{i}^{STD}}{C_{i}^{STD}}
 
-.. rubric:: Sample Files
+Sample Files
+''''''''''''''
 .. math::
     S_{i}^{SMPL} = \xi_i^{IS} \cdot \frac{I_{i}^{SMPL}}{C_{i}^{SMPL}}
 
 Analytical Sensitivity
 ^^^^^^^^^^^^^^^^^^^^^^^^
-.. rubric:: Standard Files
+Standard Files
+''''''''''''''''
 .. math::
     \xi_{i}^{IS} = \frac{I_{i}^{STD}}{I_{IS}^{STD}} \cdot \frac{C_{IS}^{STD}}{C_{i}^{STD}}
 
-.. rubric:: Sample Files
+Sample Files
+''''''''''''''
 Since an ICP-MS machine has a sensitivity drift over time, it is necessary to calculate a linear regression through all
 measured standard files, in order to get an analytical sensitivity value at the time of a measured sample file.
 
 Relative Sensitivity Factor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. rubric:: Standard Files
+Standard Files
+''''''''''''''''
 The relative sensitivity factor is one for all isotopes that were measured in a standard reference material.
 
 .. math::
     R_{i}^{STD} = 1
 
-.. rubric:: Sample Files
+Sample Files
+''''''''''''''
 .. math::
     R_{i}^{SMPL} = \xi_{i}^{IS} \cdot \frac{C_{i}^{STD}}{I_{i}^{STD}} \cdot \frac{I_{IS}^{SMPL}}{C_{IS}^{SMPL}}
 
@@ -83,11 +89,13 @@ More blabla
 
 Concentration
 ^^^^^^^^^^^^^^^^^
-.. rubric:: Standard Files
+Standard Files
+''''''''''''''''
 The concentration value of isotope :math:`i` within a measured standard reference material is constant and defined by
 its database. The measured signal intensities have no influence on the concentration values of standard measurements.
 
-.. rubric:: Sample Files
+Sample Files
+''''''''''''''
 With the exception of the concentration value of the internal standard :math:`IS` which has to be measured or estimated
 separately, the concentration of isotope :math:`i` within a sample can be calculated by a quite simple equation
 connecting signal intensities, analytical sensitivity and internal standard concentration.
@@ -106,19 +114,20 @@ Limit of Detection
 ^^^^^^^^^^^^^^^^^^^^
 Standard Files
 ''''''''''''''''
-Longerich et al. (1996):
+.. rubric:: Longerich et al. (1996)
 
 Blabla
 
-Pettke et al. (2012):
+.. rubric:: Pettke et al. (2012)
 
 Blabla
 
-.. rubric:: Sample Files
-Longerich et al. (1996):
+Sample Files
+''''''''''''''
+.. rubric:: Longerich et al. (1996)
 
 Blabla
 
-Pettke et al. (2012):
+.. rubric:: Pettke et al. (2012)
 
 Blabla
