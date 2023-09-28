@@ -16,16 +16,25 @@ for the sample interval which is free from a background-based offset.
 
 Background Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The background intensity :math:`I_{BG}` is defined by the background signal interval which was defined by the user. PySILLS
-calculates with the arithmetic mean of this interval.
+The background intensity :math:`I_{BG,i}` is defined by the background signal interval which was defined by the user.
+PySILLS calculates with the arithmetic mean of this interval.
 
 Background-corrected Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Blabla
+The background-corrected intensity :math:`I_i` is the difference between the signal intensity of the sample interval
+:math:`I_{SMPL,i}` and the background intensity :math:`I_{BG,i}`. Both parameters are the arithmetic mean of those
+intervals.
+
+.. math::
+    I_i = I_{SMPL,i} - I_{BG,i}
 
 Intensity Ratio
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Blabla
+The intensity ratio is the ratio between the background-corrected intensities of isotope :math:`i` and the internal
+standard :math:`IS`.
+
+.. math::
+    \mathfrak{I}_i = \frac{I_i}{I_{IS}}
 
 Sensitivity-related parameters
 --------------------------------
