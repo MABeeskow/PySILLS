@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		18.09.2023
+# Date:		28.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -989,7 +989,16 @@ class PySILLS(tk.Frame):
         # Columns
         for i in range(0, n_columns):
             self.parent.grid_columnconfigure(i, minsize=column_min)
-        #
+
+        ## LANGUAGE SUPPORT
+        self.language_dict = {
+            "Select Mode": {"English": "Select Mode", "German": "Modusauswahl"},
+            "Standard Files": {"English": "Standard Files", "German": "Standardmessungen"},
+            "Sample Files": {"English": "Sample Files", "German": "Probenmessungen"},
+            "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
+            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
+            "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"}}
+
         ################################################################################################################
         #
         ## FRAMES
@@ -1026,6 +1035,7 @@ class PySILLS(tk.Frame):
         self.lb_smpl.bind("<Double-1>", lambda event, var_filetype="SMPL": self.quick_plot_file(var_filetype, event))
         self.select_experiment(var_rb=self.var_rb_mode)
 
+
     def place_main_window_static_elements(self):
         # Initial constants
         start_row = 3
@@ -1042,6 +1052,7 @@ class PySILLS(tk.Frame):
         accent_color = self.accent_color
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
+        self.var_language = self.container_var["General Settings"]["Language"].get()
 
         ## Logo
         try:
@@ -1061,6 +1072,13 @@ class PySILLS(tk.Frame):
             pass
 
         # LABELS
+        var_lbl_01 = self.language_dict["Select Mode"][self.var_language]
+        var_lbl_02 = self.language_dict["Standard Files"][self.var_language]
+        var_lbl_03 = self.language_dict["Sample Files"][self.var_language]
+        var_lbl_04 = self.language_dict["ICP-MS File Setup"][self.var_language]
+        var_lbl_04b = self.language_dict["Select ICP-MS"][self.var_language]
+        var_lbl_04c = self.language_dict["Define ICP-MS"][self.var_language]
+
         lbl_01 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
@@ -1068,27 +1086,27 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column + 11, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Select Mode", relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_01, relief=tk.RAISED, fontsize=font_header)
         lbl_02 = SE(
             parent=self.parent, row_id=start_row + 18, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Standard Files", relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_02, relief=tk.RAISED, fontsize=font_header)
         lbl_03 = SE(
             parent=self.parent, row_id=start_row + 18, column_id=start_column + 11, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Sample Files", relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_03, relief=tk.RAISED, fontsize=font_header)
         lbl_04 = SE(
             parent=self.parent, row_id=start_row + 14, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="ICP-MS File Setup", relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_04, relief=tk.RAISED, fontsize=font_header)
         lbl_04b = SE(
             parent=self.parent, row_id=start_row + 16, column_id=start_column + 8, n_rows=common_n_rows,
             n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Select ICP-MS", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            text=var_lbl_04b, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_04c = SE(
             parent=self.parent, row_id=start_row + 17, column_id=start_column + 8, n_rows=common_n_rows,
             n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Define ICP-MS", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            text=var_lbl_04c, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         now = datetime.datetime.now()
         now = now.strftime("%Y/%m/%d-%H%M")
         lbl_version = SE(
@@ -6712,7 +6730,7 @@ class PySILLS(tk.Frame):
             "turbo", "rainbow", "gist_rainbow", "jet", "nipy_spectral", "gnuplot", "gist_earth", "ocean", "hsv",
             "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
             "cividis", "brg"]
-        list_languages = ["English"]
+        list_languages = ["English", "German", "Spanish", "Italian", "French"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
@@ -6753,7 +6771,11 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Language"],
             var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-        #
+        opt_language["menu"].entryconfig("German", state="disable")
+        opt_language["menu"].entryconfig("Italian", state="disable")
+        opt_language["menu"].entryconfig("Spanish", state="disable")
+        opt_language["menu"].entryconfig("French", state="disable")
+
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
             [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
         #
