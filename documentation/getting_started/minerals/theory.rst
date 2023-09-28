@@ -34,11 +34,14 @@ The intensity ratio is the ratio between the background-corrected intensities of
 standard :math:`IS`.
 
 .. math::
-    \mathfrak{I}_i = \frac{I_i}{I_{IS}}
+    \tilde{I}_i = \frac{I_i}{I_{IS}}
 
 Sensitivity-related parameters
 --------------------------------
-More blabla
+In order to be able to calculate the concentration of isotope :math:`i` within a sample, it is necessary to build a
+connection between the measured signal intensities and the desired concentrations. This link is the sensitivity of an
+ICP-MS instrument. There are three different sensitivities that can be calculated in PySILLS: the normalized sensitivity
+:math:`S_i`, the analytical sensitivity :math:`\xi_i^{IS}` and the relative sensitivity factor :math:`R_i`.
 
 Normalized Sensitivity
 ^^^^^^^^^^^^^^^^^^^^^^^^
