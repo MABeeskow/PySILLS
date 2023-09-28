@@ -6,7 +6,7 @@ Mineral Analysis
 This section gives a short overview about the analysis of minerals based on LA-ICP-MS experiments.
 
 .. toctree::
-    :maxdepth: 3
+    :maxdepth: 4
     :caption: Mineral Analysis
 
     theory

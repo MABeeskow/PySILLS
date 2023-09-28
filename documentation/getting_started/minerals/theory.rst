@@ -47,39 +47,33 @@ presented equations are different for standard files and sample files.
 
 Normalized Sensitivity
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Standard Files
-""""""""""""""""
+.. rubric:: Standard Files
 .. math::
     S_{i}^{STD} = \frac{I_{i}^{STD}}{C_{i}^{STD}}
 
-Sample Files
-""""""""""""""""
+.. rubric:: Sample Files
 .. math::
     S_{i}^{SMPL} = \xi_i^{IS} \cdot \frac{I_{i}^{SMPL}}{C_{i}^{SMPL}}
 
 Analytical Sensitivity
 ^^^^^^^^^^^^^^^^^^^^^^^^
-Standard Files
-""""""""""""""""
+.. rubric:: Standard Files
 .. math::
     \xi_{i}^{IS} = \frac{I_{i}^{STD}}{I_{IS}^{STD}} \cdot \frac{C_{IS}^{STD}}{C_{i}^{STD}}
 
-Sample Files
-""""""""""""""""
+.. rubric:: Sample Files
 Since an ICP-MS machine has a sensitivity drift over time, it is necessary to calculate a linear regression through all
 measured standard files, in order to get an analytical sensitivity value at the time of a measured sample file.
 
 Relative Sensitivity Factor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Standard Files
-""""""""""""""""
+.. rubric:: Standard Files
 The relative sensitivity factor is one for all isotopes that were measured in a standard reference material.
 
 .. math::
     R_{i}^{STD} = 1
 
-Sample Files
-""""""""""""""""
+.. rubric:: Sample Files
 .. math::
     R_{i}^{SMPL} = \xi_{i}^{IS} \cdot \frac{C_{i}^{STD}}{I_{i}^{STD}} \cdot \frac{I_{IS}^{SMPL}}{C_{IS}^{SMPL}}
 
@@ -89,13 +83,11 @@ More blabla
 
 Concentration
 ^^^^^^^^^^^^^^^^^
-Standard Files
-""""""""""""""""
+.. rubric:: Standard Files
 The concentration value of isotope :math:`i` within a measured standard reference material is constant and defined by
 its database. The measured signal intensities have no influence on the concentration values of standard measurements.
 
-Sample Files
-""""""""""""""""
+.. rubric:: Sample Files
 With the exception of the concentration value of the internal standard :math:`IS` which has to be measured or estimated
 separately, the concentration of isotope :math:`i` within a sample can be calculated by a quite simple equation
 connecting signal intensities, analytical sensitivity and internal standard concentration.
@@ -113,7 +105,7 @@ The intensity ratio is the ratio between the concentrations of isotope :math:`i`
 Limit of Detection
 ^^^^^^^^^^^^^^^^^^^^
 Standard Files
-""""""""""""""""
+''''''''''''''''
 Longerich et al. (1996):
 
 Blabla
@@ -122,8 +114,7 @@ Pettke et al. (2012):
 
 Blabla
 
-Sample Files
-""""""""""""""""
+.. rubric:: Sample Files
 Longerich et al. (1996):
 
 Blabla
