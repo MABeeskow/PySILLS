@@ -13888,7 +13888,7 @@ class PySILLS(tk.Frame):
                 xi_opt = {}
                 xi_std_helper = {}
                 list_valid_std = []
-                #
+                var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                     file_std_short = self.container_lists["STD"]["Short"][index]
@@ -13909,8 +13909,11 @@ class PySILLS(tk.Frame):
 
                                 sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
                                     file_std_short]["MAT"][isotope]
+                                sensitivity_is = self.container_analytical_sensitivity["STD"][var_datatype][
+                                    file_std_short]["MAT"][var_is]
+                                result_i_is = sensitivity_i/sensitivity_is
 
-                                xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
+                                xi_std_helper[file_std_short][isotope] = [delta_std_i, result_i_is]
                 #
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     xi_regr = self.calculate_regression(
@@ -14136,7 +14139,7 @@ class PySILLS(tk.Frame):
                 #
             elif var_filetype == "SMPL":
                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
-                #
+
                 if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
                     var_concentration_host_t = float(self.container_var["SMPL"][var_file_long]["Host Only Tracer"][
@@ -14145,17 +14148,17 @@ class PySILLS(tk.Frame):
                     var_t = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
                     var_concentration_host_t = float(
                         self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
-                #
+
                 var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
                 var_intensity_host_t = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_t]
                 var_sensitivity_t = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_t]
-                #
+
                 var_concentration_host_is = (var_intensity_host_is*var_sensitivity_t*var_concentration_host_t)/\
                                             (var_intensity_host_t)
-                #
+
                 for isotope in file_isotopes:
                     if var_focus == "MAT":
                         # Classical Mineral Analysis
@@ -14177,8 +14180,8 @@ class PySILLS(tk.Frame):
                         if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                             ## Matrix-Only Tracer
                             ## Heinrich et al. (2003)
-                            var_concentration_incl_is = float(self.container_var["SMPL"][var_file_long]["IS Data"][
-                                                                  "Concentration"].get())
+                            var_concentration_incl_is = float(
+                                self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
                             #
                             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                             var_srm_is = self.container_var["SRM"][var_is].get()
@@ -14194,9 +14197,8 @@ class PySILLS(tk.Frame):
                             var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
                                 var_file_short]["INCL"][var_is]
                             #
-                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            #
+                            var_sensitivity_i = round(self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope], 6)
                             var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*\
                                            (var_concentration_incl_is/var_sensitivity_i)
                             #
