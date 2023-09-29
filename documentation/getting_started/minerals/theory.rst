@@ -123,7 +123,7 @@ Standard Files
 .. rubric:: Pettke et al. (2012)
 
 .. math::
-    L_{i}^{STD} = \frac{3.29 \cdot \sqrt{\bar{I}_{i}^{BG} \tau_i N_{SMPL} \cdot (1 + N_{SMPL}/N_{BG})} + 2.71}{N_{SMPL} \tau_i} \cdot \frac{C_{i}^{STD}}{I_{i}^{STD}}
+    L_{i}^{STD} = \frac{3.29 \cdot \sqrt{\hat{I}_{i}^{BG} \cdot \tau_i \cdot N_{SMPL} \cdot (1 + N_{SMPL}/N_{BG})} + 2.71}{N_{SMPL} \cdot \tau_i} \cdot \frac{C_{i}^{STD}}{I_{i}^{STD}}
 
 Sample Files
 ''''''''''''''
@@ -135,4 +135,4 @@ Sample Files
 .. rubric:: Pettke et al. (2012)
 
 .. math::
-    L_{i}^{STD} = \frac{3.29 \cdot \sqrt{\bar{I}_{i}^{BG} \tau_i N_{SMPL} \cdot (1 + N_{SMPL}/N_{BG})} + 2.71}{N_{SMPL} \tau_i \xi_{i}^{IS}} \cdot \frac{C_{IS}^{SMPL}}{I_{IS}^{SMPL}}
+    L_{i}^{SMPL} = \frac{3.29 \cdot \sqrt{\hat{I}_{i}^{BG} \cdot \tau_i \cdot N_{SMPL} \cdot (1 + N_{SMPL}/N_{BG})} + 2.71}{N_{SMPL} \cdot \tau_i \cdot \xi_{i}^{IS}} \cdot \frac{C_{IS}^{SMPL}}{I_{IS}^{SMPL}}

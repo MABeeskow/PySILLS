@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		28.09.2023
+# Date:		29.09.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -992,9 +992,11 @@ class PySILLS(tk.Frame):
 
         ## LANGUAGE SUPPORT
         self.language_dict = {
-            "Select Mode": {"English": "Select Mode", "German": "Modusauswahl"},
-            "Standard Files": {"English": "Standard Files", "German": "Standardmessungen"},
-            "Sample Files": {"English": "Sample Files", "German": "Probenmessungen"},
+            "Select Mode": {
+                "English": "Select Mode", "German": "Modusauswahl", "Chinese": "选择模式", "Greek": "Επιλέξτε Λειτουργία",
+                "Russian": "Выбор режима"},
+            "Standard Files": {"English": "Standard Files", "German": "Standardmessungen", "Chinese": "标准文件"},
+            "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
             "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
             "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
             "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"}}
@@ -6730,7 +6732,7 @@ class PySILLS(tk.Frame):
             "turbo", "rainbow", "gist_rainbow", "jet", "nipy_spectral", "gnuplot", "gist_earth", "ocean", "hsv",
             "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
             "cividis", "brg"]
-        list_languages = ["English", "German", "Spanish", "Italian", "French"]
+        list_languages = ["English", "German", "Spanish", "Italian", "French", "Chinese", "Greek", "Russian"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
@@ -6775,6 +6777,9 @@ class PySILLS(tk.Frame):
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
         opt_language["menu"].entryconfig("French", state="disable")
+        opt_language["menu"].entryconfig("Chinese", state="disable")
+        opt_language["menu"].entryconfig("Greek", state="disable")
+        opt_language["menu"].entryconfig("Russian", state="disable")
 
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
             [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
@@ -9589,7 +9594,7 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][file_std_short]["SRM"].set(var_text)
 
             opt_srm_i = tk.OptionMenu(
-                frm_files, self.container_var["SRM"][file_std], *np.sort(self.container_lists["SRM Library"]),
+                frm_files, self.container_var["STD"][file_std]["SRM"], *np.sort(self.container_lists["SRM Library"]),
                 command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.fi_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
@@ -9834,7 +9839,11 @@ class PySILLS(tk.Frame):
 
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
             elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == True:
-                for item_01 in ["BG", "MAT", "INCL"]:
+                if self.pysills_mode in ["FI", "MI"]:
+                    list_focus = ["BG", "MAT", "INCL"]
+                else:
+                    list_focus = ["BG", "MAT"]
+                for item_01 in list_focus:
                     for item_02 in ["Listbox", "Content", "ID", "Indices"]:
                         if item_02 not in self.container_helper["SMPL"][file_smpl_short][item_01]:
                             if item_02 == "Listbox":
@@ -13683,7 +13692,6 @@ class PySILLS(tk.Frame):
                     isotope]
                 var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
                     isotope]
-                #
                 if var_focus == "MAT":
                     var_result = var_intensity_mat_i - var_intensity_bg_i
                     #
@@ -19128,21 +19136,201 @@ class PySILLS(tk.Frame):
             text_incl_is.insert("end", "\n")
 
     def export_data_for_external_calculations(self):
-        for key, variable in self.container_var["fi_setting"]["Inclusion Plugin"].items():
-            if key == "Intensity BG" and variable.get() == 1:
-                pass
-            elif key == "Intensity MAT" and variable.get() == 1:
-                pass
-            elif key == "Intensity MIX" and variable.get() == 1:
-                pass
-            elif key == "Intensity INCL" and variable.get() == 1:
-                pass
-            elif key == "Analytical Sensitivity" and variable.get() == 1:
-                pass
-            elif key == "Concentration SRM" and variable.get() == 1:
-                pass
+        path_pysills = os.path.dirname(os.path.realpath(__file__))
+        filename_export = os.path.join(path_pysills, "PySILLS_exported_results.csv")
+        with open(filename_export, "w") as file_content:
+            file_content.write("EXPORTED RESULTS" + ";\n")
+            file_content.write("\n")
 
-            print(key, variable.get())
+            for key, variable in self.container_var["fi_setting"]["Inclusion Plugin"].items():
+                if key == "Intensity BG" and variable.get() == 1:
+                    file_content.write("Signal Intensity (Background)" + ";\n")
+                    for filetype in ["SMPL", "STD"]:
+                        file_content.write("File type" + ";" + str(filetype) + ";\n")
+                        for datatype in ["RAW", "SMOOTHED"]:
+                            str_header = "Filename" + ";"
+                            file_content.write("Data type" + ";" + str(datatype) + ";\n")
+                            for index, filename_short in enumerate(self.container_lists[filetype]["Short"]):
+                                self.get_intensity(
+                                    var_filetype=filetype, var_datatype=datatype, var_file_short=filename_short,
+                                    var_focus="BG", mode="Specific")
+
+                                str_content = ""
+                                str_content += str(filename_short) + ";"
+                                file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                                for isotope in file_isotopes:
+                                    value_i = self.container_intensity[filetype][datatype][filename_short]["BG"][
+                                        isotope]
+                                    if index == 0:
+                                        str_header += str(isotope) + ";"
+                                    str_content += str(value_i) + ";"
+                                if index == 0:
+                                    str_header += "\n"
+                                str_content += "\n"
+                                if index == 0:
+                                    file_content.write(str(str_header))
+                                    file_content.write(str(str_content))
+                                else:
+                                    file_content.write(str(str_content))
+                        file_content.write("\n")
+
+                elif key == "Intensity MAT" and variable.get() == 1:
+                    file_content.write("Signal Intensity (Matrix)" + ";\n")
+                    for filetype in ["SMPL", "STD"]:
+                        file_content.write("File type" + ";" + str(filetype) + ";\n")
+                        for datatype in ["RAW", "SMOOTHED"]:
+                            str_header = "Filename" + ";"
+                            file_content.write("Data type" + ";" + str(datatype) + ";\n")
+                            for index, filename_short in enumerate(self.container_lists[filetype]["Short"]):
+                                self.get_intensity(
+                                    var_filetype=filetype, var_datatype=datatype, var_file_short=filename_short,
+                                    var_focus="MAT", mode="Specific")
+                                self.fi_get_intensity_corrected(
+                                    var_filetype=filetype, var_datatype=datatype, var_file_short=filename_short,
+                                    var_focus="MAT", mode="Specific")
+
+                                str_content = ""
+                                str_content += str(filename_short) + ";"
+                                file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                                for isotope in file_isotopes:
+                                    value_i = self.container_intensity_corrected[filetype][datatype][filename_short][
+                                        "MAT"][isotope]
+                                    if index == 0:
+                                        str_header += str(isotope) + ";"
+                                    str_content += str(value_i) + ";"
+                                if index == 0:
+                                    str_header += "\n"
+                                str_content += "\n"
+                                if index == 0:
+                                    file_content.write(str(str_header))
+                                    file_content.write(str(str_content))
+                                else:
+                                    file_content.write(str(str_content))
+                        file_content.write("\n")
+
+                elif key == "Intensity MIX" and variable.get() == 1:
+                    file_content.write("Signal Intensity (Mixed)" + ";\n")
+                    file_content.write("File type" + ";" + str("SMPL") + ";\n")
+                    for datatype in ["RAW", "SMOOTHED"]:
+                        str_header = "Filename" + ";"
+                        file_content.write("Data type" + ";" + str(datatype) + ";\n")
+                        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                            self.get_intensity(
+                                var_filetype="SMPL", var_datatype=datatype, var_file_short=filename_short,
+                                var_focus="INCL", mode="Specific")
+                            self.fi_get_intensity_mix(
+                                var_filetype="SMPL", var_datatype=datatype, var_file_short=filename_short)
+
+                            str_content = ""
+                            str_content += str(filename_short) + ";"
+                            file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                            for isotope in file_isotopes:
+                                value_i = self.container_intensity_mix["SMPL"][datatype][filename_short][isotope]
+                                if index == 0:
+                                    str_header += str(isotope) + ";"
+                                str_content += str(value_i) + ";"
+                            if index == 0:
+                                str_header += "\n"
+                            str_content += "\n"
+                            if index == 0:
+                                file_content.write(str(str_header))
+                                file_content.write(str(str_content))
+                            else:
+                                file_content.write(str(str_content))
+                    file_content.write("\n")
+
+                elif key == "Intensity INCL" and variable.get() == 1:
+                    file_content.write("Signal Intensity (Inclusion)" + ";\n")
+                    file_content.write("File type" + ";" + str("SMPL") + ";\n")
+                    for datatype in ["RAW", "SMOOTHED"]:
+                        str_header = "Filename" + ";"
+                        file_content.write("Data type" + ";" + str(datatype) + ";\n")
+                        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                            self.fi_get_intensity_corrected(
+                                var_filetype="SMPL", var_datatype=datatype, var_file_short=filename_short,
+                                var_focus="INCL", mode="Specific")
+
+                            str_content = ""
+                            str_content += str(filename_short) + ";"
+                            file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                            for isotope in file_isotopes:
+                                value_i = self.container_intensity_corrected["SMPL"][datatype][filename_short][
+                                    "INCL"][isotope]
+                                if index == 0:
+                                    str_header += str(isotope) + ";"
+                                str_content += str(value_i) + ";"
+                            if index == 0:
+                                str_header += "\n"
+                            str_content += "\n"
+                            if index == 0:
+                                file_content.write(str(str_header))
+                                file_content.write(str(str_content))
+                            else:
+                                file_content.write(str(str_content))
+                    file_content.write("\n")
+
+                elif key == "Analytical Sensitivity" and variable.get() == 1:
+                    file_content.write("Analytical Sensitivity" + ";\n")
+                    for filetype in ["SMPL", "STD"]:
+                        file_content.write("File type" + ";" + str(filetype) + ";\n")
+                        for datatype in ["RAW", "SMOOTHED"]:
+                            str_header = "Filename" + ";"
+                            file_content.write("Data type" + ";" + str(datatype) + ";\n")
+                            for index, filename_short in enumerate(self.container_lists[filetype]["Short"]):
+                                filename_long = self.container_lists[filetype]["Long"][index]
+                                self.fi_get_analytical_sensitivity(
+                                    var_filetype=filetype, var_datatype=datatype, var_file_short=filename_short,
+                                    var_file_long=filename_long)
+
+                                str_content = ""
+                                str_content += str(filename_short) + ";"
+                                file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                                for isotope in file_isotopes:
+                                    value_i = self.container_analytical_sensitivity[filetype][datatype][filename_short][
+                                        "MAT"][isotope]
+                                    if index == 0:
+                                        str_header += str(isotope) + ";"
+                                    str_content += str(value_i) + ";"
+                                if index == 0:
+                                    str_header += "\n"
+                                str_content += "\n"
+                                if index == 0:
+                                    file_content.write(str(str_header))
+                                    file_content.write(str(str_content))
+                                else:
+                                    file_content.write(str(str_content))
+                        file_content.write("\n")
+
+                elif key == "Concentration SRM" and variable.get() == 1:
+                    file_content.write("Concentration (Standard Reference Material)" + ";\n")
+                    file_content.write("File type" + ";" + str("STD") + ";\n")
+                    for datatype in ["RAW", "SMOOTHED"]:
+                        str_header = "Filename" + ";"
+                        file_content.write("Data type" + ";" + str(datatype) + ";\n")
+                        for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+                            filename_long = self.container_lists[filetype]["Long"][index]
+                            self.fi_get_concentration(
+                                var_filetype="STD", var_datatype=datatype, var_file_short=filename_short,
+                                var_file_long=filename_long)
+
+                            str_content = ""
+                            str_content += str(filename_short) + ";"
+                            file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                            for isotope in file_isotopes:
+                                value_i = self.container_concentration["STD"][datatype][filename_short]["MAT"][isotope]
+                                if index == 0:
+                                    str_header += str(isotope) + ";"
+                                str_content += str(value_i) + ";"
+                            if index == 0:
+                                str_header += "\n"
+                            str_content += "\n"
+                            if index == 0:
+                                file_content.write(str(str_header))
+                                file_content.write(str(str_content))
+                            else:
+                                file_content.write(str(str_content))
+                    file_content.write("\n")
+
 
     def clear_all_calculation_intervals(self, mode):
         if mode == "INCL":
