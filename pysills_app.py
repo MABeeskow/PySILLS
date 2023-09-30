@@ -4886,67 +4886,14 @@ class PySILLS(tk.Frame):
                     report_file.write("\n")
     #
     def save_project(self):
+        save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
         if self.pysills_mode == "MA":
-            save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
-            #
-            ## Save information about the project
-            save_file.write("PROJECT INFORMATION" + "\n")
-            save_file.write("Mineral Analysis" + "\n")
-            #
-            info_author = self.container_var["ma_setting"]["Author"].get()
-            info_source = self.container_var["ma_setting"]["Source ID"].get()
-            info_carrier_gas = self.container_var["LASER"].get()
-            info_icpms = self.var_opt_icp.get()
-            #
-            str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms)
-            str_proj += "\n"
-            #
-            save_file.write(str_proj)
-            save_file.write("\n")
-            #
-            ## Save information about 'Standard Files Setup'
-            save_file.write("STANDARD FILES" + "\n")
-
-            for file_std in self.container_lists["STD"]["Long"]:
-                info_file = file_std
-                if file_std in self.container_var["STD"]:
-                    info_srm = self.container_var["STD"][file_std]["SRM"].get()
-                    info_cb_state = self.container_var["STD"][file_std]["Checkbox"].get()
-                    info_sign_color = self.container_var["STD"][file_std]["Sign Color"].get()
-                else:
-                    info_srm = "Select SRM"
-                    info_cb_state = 1
-                    info_sign_color = self.sign_red
-
-                str_std = str(info_file) + ";" + str(info_srm) + ";" + str(info_cb_state) + ";" + str(info_sign_color)
-
-                str_std += "\n"
-                save_file.write(str_std)
-            save_file.write("\n")
-
-            ## Save information about 'Sample Files Setup'
-            save_file.write("SAMPLE FILES" + "\n")
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                var_file_short = var_file.split("/")[-1]
-                info_file = var_file
-                if var_file_short in self.container_files["SMPL"]:
-                    info_is = self.container_var["SMPL"][var_file]["IS Data"]["IS"].get()
-                    info_assemblage = self.container_var["SMPL"][var_file]["ID"].get()
-                    info_cb_state = self.container_var["SMPL"][var_file]["Checkbox"].get()
-                    info_sign_color = self.container_var["SMPL"][var_file]["Sign Color"].get()
-                else:
-                    info_is = "Select IS"
-                    info_assemblage = "A"
-                    info_cb_state = 1
-                    info_sign_color = self.sign_red
-
-                str_smpl = (str(info_file) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
-                            + ";" + str(info_sign_color))
-
-                str_smpl += "\n"
-                save_file.write(str_smpl)
-            save_file.write("\n")
-
+            # Save information about the project
+            self.save_project_information_in_file(save_file=save_file)
+            # Save information about 'Standard Files Setup'
+            self.save_standard_file_information_in_file(save_file=save_file)
+            # Save information about 'Sample Files Setup'
+            self.save_sample_file_information_in_file(save_file=save_file)
             ## Save information about 'Measured Isotopes'
             save_file.write("ISOTOPES" + "\n")
             #
@@ -5062,56 +5009,18 @@ class PySILLS(tk.Frame):
                     str_spike_isotope += "\n"
                     save_file.write(str_spike_isotope)
 
+            save_file.write("\n")
+
+            ## Save information about the experimental input data
+            self.save_experimental_data_in_file(save_file=save_file)
+
         elif self.pysills_mode == "FI":
-            save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
-            #
-            ## Save information about the project
-            save_file.write("PROJECT INFORMATION" + "\n")
-            save_file.write("Fluid Inclusion Analysis" + "\n")
-            #
-            info_author = self.container_var["fi_setting"]["Author"].get()
-            info_source = self.container_var["fi_setting"]["Source ID"].get()
-            info_carrier_gas = self.container_var["LASER"].get()
-            info_icpms = self.var_opt_icp.get()
-            #
-            str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms)
-            str_proj += "\n"
-            #
-            save_file.write(str_proj)
-            save_file.write("\n")
-            #
-            ## Save information about 'Standard Files Setup'
-            save_file.write("STANDARD FILES" + "\n")
-            #
-            for file_std in self.container_lists["STD"]["Long"]:
-                filename_std_short = file_std.split("/")[-1]
-                #
-                info_file = file_std
-                info_srm = self.container_files["STD"][filename_std_short]["SRM"].get()
-                info_is = self.container_var["STD"][file_std]["IS Data"]["IS"].get()
-                info_cb_state = self.container_var["STD"][file_std]["Checkbox"].get()
-                #
-                str_std = str(info_file) + ";" + str(info_srm) + ";" + str(info_is) + ";" + str(info_cb_state)
-                #
-                str_std += "\n"
-                save_file.write(str_std)
-            save_file.write("\n")
-            #
-            ## Save information about 'Sample Files Setup'
-            save_file.write("SAMPLE FILES" + "\n")
-            #
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                info_file = var_file
-                info_is = self.container_var["SMPL"][var_file]["IS Data"]["IS"].get()
-                info_assemblage = self.container_var["SMPL"][var_file]["ID"].get()
-                info_cb_state = self.container_var["SMPL"][var_file]["Checkbox"].get()
-                #
-                str_smpl = str(info_file) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
-                #
-                str_smpl += "\n"
-                save_file.write(str_smpl)
-            save_file.write("\n")
-            #
+            # Save information about the project
+            self.save_project_information_in_file(save_file=save_file)
+            # Save information about 'Standard Files Setup'
+            self.save_standard_file_information_in_file(save_file=save_file)
+            # Save information about 'Sample Files Setup'
+            self.save_sample_file_information_in_file(save_file=save_file)
             ## Save information about 'Measured Isotopes'
             save_file.write("ISOTOPES" + "\n")
             #
@@ -5298,15 +5207,127 @@ class PySILLS(tk.Frame):
                     str_spike_isotope += "\n"
                     save_file.write(str_spike_isotope)
 
+            save_file.write("\n")
+
+            ## Save information about the experimental input data
+            self.save_experimental_data_in_file(save_file=save_file)
+
         elif self.pysills_mode == "MI":
-            pass
-        #
+            ## Save information about the project
+            self.save_project_information_in_file(save_file=save_file)
+
         ## END
         save_file.write("\n")
         save_file.write("\n")
         save_file.write("END")
         #
         save_file.close()
+
+    def save_project_information_in_file(self, save_file):
+        if self.pysills_mode == "MA":
+            info_mode = "Mineral Analysis"
+            info_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            info_mode = "Fluid Inclusion Analysis"
+            info_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            info_mode = "Melt Inclusion Analysis"
+            info_key = "mi_setting"
+
+        save_file.write("PROJECT INFORMATION" + "\n")
+        save_file.write(str(info_mode) + "\n")
+
+        info_author = self.container_var[info_key]["Author"].get()
+        info_source = self.container_var[info_key]["Source ID"].get()
+        info_carrier_gas = self.container_var["LASER"].get()
+        info_icpms = self.var_opt_icp.get()
+
+        str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms)
+        str_proj += "\n"
+
+        save_file.write(str_proj)
+        save_file.write("\n")
+
+    def save_standard_file_information_in_file(self, save_file):
+        save_file.write("STANDARD FILES" + "\n")
+
+        for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+            filename_long = self.container_lists["STD"]["Long"][index]
+
+            if filename_long in self.container_var["STD"]:
+                info_srm = self.container_var["STD"][filename_long]["SRM"].get()
+                info_cb_state = self.container_var["STD"][filename_long]["Checkbox"].get()
+                info_sign_color = self.container_var["STD"][filename_long]["Sign Color"].get()
+            else:
+                info_srm = "Select SRM"
+                info_cb_state = 1
+                info_sign_color = self.sign_red
+
+            str_std = str(filename_short) + ";" + str(info_srm) + ";" + str(info_cb_state) + ";" + str(info_sign_color)
+
+            str_std += "\n"
+            save_file.write(str_std)
+        save_file.write("\n")
+
+    def save_sample_file_information_in_file(self, save_file):
+        save_file.write("SAMPLE FILES" + "\n")
+
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+
+            if filename_short in self.container_files["SMPL"]:
+                info_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
+                info_assemblage = self.container_var["SMPL"][filename_long]["ID"].get()
+                info_cb_state = self.container_var["SMPL"][filename_long]["Checkbox"].get()
+                info_sign_color = self.container_var["SMPL"][filename_long]["Sign Color"].get()
+            else:
+                info_is = "Select IS"
+                info_assemblage = "A"
+                info_cb_state = 1
+                info_sign_color = self.sign_red
+
+            str_smpl = (str(filename_short) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
+                        + ";" + str(info_sign_color))
+
+            str_smpl += "\n"
+            save_file.write(str_smpl)
+        save_file.write("\n")
+
+    def save_experimental_data_in_file(self, save_file):
+        save_file.write("EXPERIMENTAL DATA" + "\n")
+
+        for filetype in ["STD", "SMPL"]:
+            if filetype == "STD":
+                save_file.write("Standard Files" + "\n")
+            else:
+                save_file.write("Sample Files" + "\n")
+            for index, filename_short in enumerate(self.container_lists[filetype]["Short"]):
+                info_acquisition = self.container_var["acquisition times"][filetype][filename_short].get()
+                filename_long = self.container_lists[filetype]["Long"][index]
+                save_file.write(str(filename_short) + "\n")
+                save_file.write("Acquisition" + ";" + str(info_acquisition) + "\n")
+                file_header = "Time" + ";"
+                file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+                for isotope in file_isotopes:
+                    file_header += str(isotope) + ";"
+                save_file.write(str(file_header) + "\n")
+
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data = DE(filename_long=filename_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data = DE(filename_long=filename_long).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
+
+                dataset_time = list(DE().get_times(dataframe=df_data))
+                for index_line, time_value in enumerate(dataset_time):
+                    file_content_line = str(time_value) + ";"
+                    for isotope in file_isotopes:
+                        file_content_line += str(df_data[isotope][index_line]) + ";"
+                    save_file.write(str(file_content_line) + "\n")
+                save_file.write("\n")
     #
     def open_project(self):
         filename = filedialog.askopenfilename()
@@ -12192,78 +12213,6 @@ class PySILLS(tk.Frame):
     ####################
     ## Data Reduction ##
     ####################
-    # def ma_get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific", check=False):
-    #     if mode == "Specific":
-    #         if var_focus in ["BG", "MAT"]:
-    #             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-    #             for index, isotope in enumerate(file_isotopes):
-    #                 helper_results = []
-    #                 if index == 0:
-    #                     condensed_intervals = IQ(dataframe=None).combine_all_intervals(
-    #                         interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
-    #                 for key, items in condensed_intervals.items():
-    #                     var_indices = items
-    #                     var_key = "Data " + str(var_datatype)
-    #                     var_data = self.container_spikes[var_file_short][isotope][var_key][
-    #                                var_indices[0]:var_indices[1] + 1]
-    #                     helper_results.append(np.mean(var_data))
-    #                 var_result = round(np.mean(helper_results), 3)
-    #                 self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
-    #                     isotope] = var_result
-    #         else:
-    #             for index_focus, var_focus in enumerate(["BG", "MAT"]):
-    #                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-    #                 for index_isotope, isotope in enumerate(file_isotopes):
-    #                     helper_results = []
-    #                     if index_isotope == 0:
-    #                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
-    #                             interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
-    #                     for key, items in condensed_intervals.items():
-    #                         var_indices = items
-    #                         var_key = "Data " + str(var_datatype)
-    #                         var_data = self.container_spikes[var_file_short][isotope][var_key][
-    #                                    var_indices[0]:var_indices[1] + 1]
-    #                         helper_results.append(np.mean(var_data))
-    #                     var_result = round(np.mean(helper_results), 3)
-    #                     self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
-    #                         isotope] = var_result
-    #     else:
-    #         for var_filetype in ["STD", "SMPL"]:
-    #             for var_focus in ["BG", "MAT"]:
-    #                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
-    #                     helper_results = []
-    #                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-    #                         var_file_short = self.container_lists[var_filetype]["Short"][index]
-    #                         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-    #                         if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-    #                             if isotope in file_isotopes:
-    #                                 if var_filetype == "SMPL":
-    #                                     var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-    #                                     var_id_selected = self.container_var["ID"]["Results Files"].get()
-    #                                     if var_id == var_id_selected or self.var_init_ma_datareduction == True:
-    #                                         self.ma_get_intensity(
-    #                                             var_filetype=var_filetype, var_datatype=var_datatype,
-    #                                             var_file_short=var_file_short, var_focus=var_focus)
-    #                                         var_result_i = self.container_intensity[var_filetype][var_datatype][
-    #                                             var_file_short][var_focus][isotope]
-    #                                         helper_results.append(var_result_i)
-    #                                 else:
-    #                                     self.ma_get_intensity(
-    #                                         var_filetype=var_filetype, var_datatype=var_datatype,
-    #                                         var_file_short=var_file_short, var_focus=var_focus)
-    #                                     var_result_i = self.container_intensity[var_filetype][var_datatype][
-    #                                         var_file_short][var_focus][isotope]
-    #                                     helper_results.append(var_result_i)
-    #                     var_result_i = np.mean(helper_results)
-    #                     self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
-    #
-    #     ## CHECK
-    #     if check == True:
-    #         for key_01, item_01 in self.container_intensity.items():
-    #             print("Filetype:", key_01)
-    #             for key_02, item_02 in item_01.items():
-    #                 print("Datatype:", key_02)
-    #                 print(item_02)
 
     def get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific", check=False):
         """ Collect the signal intensities from all defined calculation intervals.
@@ -13594,82 +13543,6 @@ class PySILLS(tk.Frame):
     #########################
     ## Calculation Methods ##
     #########################
-    #
-    # def fi_get_intensity(self, var_filetype="", var_datatype="", var_file_short="", mode="All"):
-    #     """ Extract the intensity data based on the set interval limits.
-    #
-    #     Parameters
-    #     ----------
-    #     var_filetype : str
-    #         Defines the filetype, e.g. "STD" or "SMPL".
-    #     var_datatype : str
-    #         Defines the datatype, e.g. "RAW" or "SMOOTHED".
-    #     var_file_short : str
-    #         Defines the filename as short written version.
-    #     mode : str
-    #         Defines the extraction mode, e.g. "All" says that it has to be done for all files.
-    #
-    #     Returns
-    #     -------
-    #     """
-    #     #
-    #     if mode == "All":
-    #         for var_filetype in ["STD", "SMPL"]:
-    #             for var_datatype in ["RAW", "SMOOTHED"]:
-    #                 for var_focus in ["BG", "MAT", "INCL"]:
-    #                     if var_filetype == "STD" and var_focus == "INCL":
-    #                         pass
-    #                         #
-    #                     else:
-    #                         for isotope in self.container_lists["Measured Isotopes"]["All"]:
-    #                             helper_results = []
-    #                             #
-    #                             for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-    #                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-    #                                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-    #                                 if isotope in file_isotopes:
-    #                                     if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-    #                                         if var_filetype == "SMPL":
-    #                                             var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-    #                                             var_id_selected = self.container_var["ID"]["Default SMPL"].get()
-    #                                             if var_id == var_id_selected:
-    #                                                 self.fi_get_intensity(
-    #                                                     var_filetype=var_filetype, var_datatype=var_datatype,
-    #                                                     var_file_short=var_file_short, mode="Specific")
-    #                                                 var_result_i = self.container_intensity[var_filetype][var_datatype][
-    #                                                     var_file_short][var_focus][isotope]
-    #                                                 helper_results.append(var_result_i)
-    #                                         else:
-    #                                             self.fi_get_intensity(
-    #                                                 var_filetype=var_filetype, var_datatype=var_datatype,
-    #                                                 var_file_short=var_file_short, mode="Specific")
-    #                                             var_result_i = self.container_intensity[var_filetype][var_datatype][
-    #                                                 var_file_short][var_focus][isotope]
-    #                                             helper_results.append(var_result_i)
-    #
-    #                             var_result_i = np.mean(helper_results)
-    #                             self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
-    #         #
-    #     elif mode == "Specific":
-    #         for var_focus in ["BG", "MAT", "INCL"]:
-    #             if var_filetype == "STD" and var_focus in ["INCL"]:
-    #                 pass
-    #             else:
-    #                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-    #                 for isotope in file_isotopes:
-    #                     helper_results = []
-    #                     #
-    #                     for key, items in self.container_helper[var_filetype][var_file_short][var_focus][
-    #                         "Content"].items():
-    #                         var_indices = items["Indices"]
-    #                         var_key = "Data " + str(var_datatype)
-    #                         var_data = self.container_spikes[var_file_short][isotope][var_key][
-    #                                    var_indices[0]:var_indices[1] + 1]
-    #                         helper_results.extend(var_data)
-    #                     #
-    #                     var_result = np.mean(helper_results)
-    #                     self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
-    #                         isotope] = var_result
     #
     def fi_get_intensity_mix(self, var_filetype, var_datatype, var_file_short, mode="Specific"):
         if mode == "Specific":
