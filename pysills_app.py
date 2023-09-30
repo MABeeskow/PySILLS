@@ -311,6 +311,8 @@ class PySILLS(tk.Frame):
 
         self.container_icpms = {"name": None, "skipheader": 1, "skipfooter": 0, "timestamp": 0}
 
+        self.container_flags = {"STD": {"Initialization": False}, "SMPL": {"Initialization": False}}
+
         self.list_std_changed = False
         self.list_smpl_changed = False
         self.list_std_previous = []
@@ -779,6 +781,8 @@ class PySILLS(tk.Frame):
         self.container_lists["ISOTOPES"] = []
         self.container_lists["Measured Isotopes"] = {}
         self.container_lists["Measured Isotopes"]["All"] = []
+        self.container_lists["Measured Elements"] = {}
+        self.container_lists["Measured Elements"]["All"] = []
         self.container_lists["Acquisition Times Delta"] = {}
         self.container_lists["Analytical Sensitivity Regression"] = {}
         self.container_lists["Analytical Sensitivity Regression RAW"] = {}
@@ -4886,341 +4890,36 @@ class PySILLS(tk.Frame):
                     report_file.write("\n")
     #
     def save_project(self):
-        save_file = filedialog.asksaveasfile(mode="w", defaultextension=".txt")
-        if self.pysills_mode == "MA":
-            # Save information about the project
-            self.save_project_information_in_file(save_file=save_file)
-            # Save information about 'Standard Files Setup'
-            self.save_standard_file_information_in_file(save_file=save_file)
-            # Save information about 'Sample Files Setup'
-            self.save_sample_file_information_in_file(save_file=save_file)
-            ## Save information about 'Measured Isotopes'
-            save_file.write("ISOTOPES" + "\n")
-            #
-            for isotope in self.container_lists["ISOTOPES"]:
-                info_srm = self.container_var["SRM"][isotope].get()
-                #
-                str_iso = str(isotope) + ";" + str(info_srm)
-                str_iso += "\n"
-                save_file.write(str_iso )
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Sample Settings'
-            save_file.write("SAMPLE SETTINGS" + "\n")
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                info_file = var_file
-                if var_file in self.container_var["SMPL"]:
-                    info_is = self.container_var["SMPL"][var_file]["IS Data"]["IS"].get()
-                    info_concentration = self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].get()
-                else:
-                    info_is = "Select IS"
-                    info_concentration = "1000000"
+        save_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
+        # Save information about the project
+        self.save_project_information_in_file(save_file=save_file)
+        # Save information about 'Standard Files Setup'
+        self.save_standard_file_information_in_file(save_file=save_file)
+        # Save information about 'Sample Files Setup'
+        self.save_sample_file_information_in_file(save_file=save_file)
+        # Save information about 'Measured Isotopes'
+        self.save_measured_isotopes_in_file(save_file=save_file)
 
-                str_smpl_is = str(info_file) + ";" + str(info_is) + ";" + str(info_concentration)
-                str_smpl_is += "\n"
-                save_file.write(str_smpl_is)
+        if self.pysills_mode in ["FI", "MI"]:
+            # Save information about 'Inclusion Setup'
+            self.save_inclusion_information_in_file(save_file=save_file)
+            # Save information about 'Quantification Setup (Matrix-Only Tracer)'
+            self.save_quantification_method_matrix_only_in_file(save_file=save_file)
+            # Save information about 'Quantification Setup (Second Internal Standard)'
+            self.save_quantification_method_second_internal_in_file(save_file=save_file)
 
-            save_file.write("\n")
-
-            ## Save information about 'Dwell Time Settings'
-            save_file.write("DWELL TIME SETTINGS" + "\n")
-            #
-            for isotope in self.container_lists["ISOTOPES"]:
-                info_dwell = self.container_var["dwell_times"]["Entry"][isotope].get()
-                #
-                str_dwell = str(isotope) + ";" + str(info_dwell)
-                str_dwell += "\n"
-                save_file.write(str_dwell)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Interval Settings'
-            save_file.write("INTERVAL SETTINGS" + "\n")
-            #
-            for var_file in self.container_lists["STD"]["Long"]:
-                var_file_short = var_file.split("/")[-1]
-                str_intervals = str(var_file) + ";" + "STD" + "\n"
-                if var_file_short in self.container_helper["STD"]:
-                    for key, item in self.container_helper["STD"][var_file_short]["BG"]["Content"].items():
-                        info_id = key
-                        info_times = item["Times"]
-                        info_indices = item["Indices"]
-
-                        str_intervals += "BG" + ";" + str(info_id) + ";" + str(info_times) + ";" + \
-                                         str(info_indices) + "\n"
-
-                    for key, item in self.container_helper["STD"][var_file_short]["MAT"]["Content"].items():
-                        info_id = key
-                        info_times = item["Times"]
-                        info_indices = item["Indices"]
-
-                        str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + \
-                                         str(info_indices) + "\n"
-
-                save_file.write(str_intervals)
-
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                var_file_short = var_file.split("/")[-1]
-                str_intervals = str(var_file) + ";" + "SMPL" + "\n"
-                if var_file_short in self.container_helper["SMPL"]:
-                    for key, item in self.container_helper["SMPL"][var_file_short]["BG"]["Content"].items():
-                        info_id = key
-                        info_times = item["Times"]
-                        info_indices = item["Indices"]
-
-                        str_intervals += "BG" + ";" + str(info_id) + ";" + str(info_times) + ";" + \
-                                         str(info_indices) + "\n"
-
-                    for key, item in self.container_helper["SMPL"][var_file_short]["MAT"]["Content"].items():
-                        info_id = key
-                        info_times = item["Times"]
-                        info_indices = item["Indices"]
-
-                        str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + \
-                                         str(info_indices) + "\n"
-
-                save_file.write(str_intervals)
-
-            save_file.write("\n")
-            #
-            ## Save information about 'Spike Elimination'
-            save_file.write("SPIKE ELIMINATION" + "\n")
-
-            info_std_state = self.container_var["Spike Elimination"]["STD"]["State"]
-            info_smpl_state = self.container_var["Spike Elimination"]["SMPL"]["State"]
-            info_method = self.container_var["Spike Elimination Method"].get()
-            info_alpha = self.container_var["ma_setting"]["SE Alpha"].get()
-            info_threshold = self.container_var["ma_setting"]["SE Threshold"].get()
-
-            str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";" \
-                        + str(info_method) + ";" + str(info_alpha) + ";" + str(info_threshold) + "\n"
-
-            save_file.write(str_spike)
-
-            for var_file, dataset_isotopes in self.container_spike_values.items():
-                str_spike_file = var_file + "\n"
-                save_file.write(str_spike_file)
-                for var_isotope, dataset_values in dataset_isotopes.items():
-                    str_spike_isotope = str(var_isotope) + ";"
-                    for var_id, val_id in dataset_values["Save"].items():
-                        str_spike_isotope += str(var_id) + ";" + str(val_id) + ";"
-                    str_spike_isotope = str_spike_isotope[:-1]
-                    str_spike_isotope += "\n"
-                    save_file.write(str_spike_isotope)
-
-            save_file.write("\n")
-
-            ## Save information about the experimental input data
-            self.save_experimental_data_in_file(save_file=save_file)
-
-        elif self.pysills_mode == "FI":
-            # Save information about the project
-            self.save_project_information_in_file(save_file=save_file)
-            # Save information about 'Standard Files Setup'
-            self.save_standard_file_information_in_file(save_file=save_file)
-            # Save information about 'Sample Files Setup'
-            self.save_sample_file_information_in_file(save_file=save_file)
-            ## Save information about 'Measured Isotopes'
-            save_file.write("ISOTOPES" + "\n")
-            #
-            for isotope in self.container_lists["ISOTOPES"]:
-                info_srm = self.container_var["SRM"][isotope].get()
-                #
-                str_iso = str(isotope) + ";" + str(info_srm)
-                str_iso += "\n"
-                save_file.write(str_iso)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Inclusion Setup'
-            save_file.write("INCLUSION SETTINGS" + "\n")
-            #
-            info_method = self.container_var["fi_setting"]["Inclusion Setup Selection"].get()
-            #
-            str_incl = str("Method") + ";" + str(info_method) + "\n"
-            save_file.write(str_incl)
-            #
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                info_file = var_file
-                var_file_short = var_file.split("/")[-1]
-                info_is = self.container_var["SMPL"][var_file]["IS Data"]["IS"].get()
-                info_concentration = self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].get()
-                info_salinity = self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][
-                    var_file_short].get()
-                #
-                str_incl = str(info_file) + ";" + str(info_is) + ";" + str(info_concentration) + ";" \
-                           + str(info_salinity)
-                #
-                str_incl += "\n"
-                save_file.write(str_incl)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Quantification Setup (Matrix-Only Tracer)'
-            save_file.write("QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)" + "\n")
-            #
-            info_method = self.container_var["fi_setting"]["Quantification Method"].get()
-            #
-            str_method = str("Method") + ";" + str(info_method) + "\n"
-            save_file.write(str_method)
-            #
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                info_file = var_file
-                info_amount = self.container_var["SMPL"][var_file]["Host Only Tracer"]["Amount"].get()
-                info_matrix = self.container_var["SMPL"][var_file]["Host Only Tracer"]["Matrix"].get()
-                info_isotope = self.container_var["SMPL"][var_file]["Host Only Tracer"]["Name"].get()
-                info_concentration = self.container_var["SMPL"][var_file]["Host Only Tracer"]["Value"].get()
-                #
-                str_method = str(info_file) + ";" + str(info_amount) + ";" + str(info_matrix) + ";" \
-                             + str(info_isotope) + ";" + str(info_concentration)
-                #
-                str_method += "\n"
-                save_file.write(str_method)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Quantification Setup (Second Internal Standard)'
-            save_file.write("QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)" + "\n")
-            #
-            info_method = self.container_var["fi_setting"]["Quantification Method"].get()
-            #
-            str_method = str("Method") + ";" + str(info_method) + "\n"
-            save_file.write(str_method)
-            #
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                info_file = var_file
-                info_isotope = self.container_var["SMPL"][var_file]["Second Internal Standard"]["Name"].get()
-                info_concentration = self.container_var["SMPL"][var_file]["Second Internal Standard"]["Value"].get()
-                #
-                str_method = str(info_file) + ";" + str(info_isotope) + ";" + str(info_concentration)
-                #
-                str_method += "\n"
-                save_file.write(str_method)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Matrix Setup'
-            save_file.write("MATRIX SETTINGS" + "\n")
-            #
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                info_file = var_file
-                info_isotope = self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Name"].get()
-                info_concentration = self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Concentration"].get()
-                #
-                str_matr = str(info_file) + ";" + str(info_isotope) + ";" + str(info_concentration)
-                #
-                str_matr += "\n"
-                save_file.write(str_matr)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Dwell Time Settings'
-            save_file.write("DWELL TIME SETTINGS" + "\n")
-            #
-            for isotope in self.container_lists["ISOTOPES"]:
-                info_dwell = self.container_var["dwell_times"]["Entry"][isotope].get()
-                #
-                str_dwell = str(isotope) + ";" + str(info_dwell)
-                str_dwell += "\n"
-                save_file.write(str_dwell)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Interval Settings'
-            save_file.write("INTERVAL SETTINGS" + "\n")
-            #
-            for var_file in self.container_lists["STD"]["Long"]:
-                var_file_short = var_file.split("/")[-1]
-                str_intervals = str(var_file) + ";" + "STD" + "\n"
-                #
-                for key, item in self.container_helper["STD"][var_file_short]["BG"]["Content"].items():
-                    info_id = key
-                    info_times = item["Times"]
-                    info_indices = item["Indices"]
-                    #
-                    str_intervals += "BG" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
-                #
-                for key, item in self.container_helper["STD"][var_file_short]["MAT"]["Content"].items():
-                    info_id = key
-                    info_times = item["Times"]
-                    info_indices = item["Indices"]
-                    #
-                    str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
-                #
-                save_file.write(str_intervals)
-            #
-            for var_file in self.container_lists["SMPL"]["Long"]:
-                var_file_short = var_file.split("/")[-1]
-                str_intervals = str(var_file) + ";" + "SMPL" + "\n"
-                #
-                for key, item in self.container_helper["SMPL"][var_file_short]["BG"]["Content"].items():
-                    info_id = key
-                    info_times = item["Times"]
-                    info_indices = item["Indices"]
-                    #
-                    str_intervals += "BG" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
-                #
-                for key, item in self.container_helper["SMPL"][var_file_short]["MAT"]["Content"].items():
-                    info_id = key
-                    info_times = item["Times"]
-                    info_indices = item["Indices"]
-                    #
-                    str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
-                #
-                for key, item in self.container_helper["SMPL"][var_file_short]["INCL"]["Content"].items():
-                    info_id = key
-                    info_times = item["Times"]
-                    info_indices = item["Indices"]
-                    #
-                    str_intervals += "INCL" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(
-                        info_indices) + "\n"
-                #
-                save_file.write(str_intervals)
-            #
-            save_file.write("\n")
-            #
-            ## Save information about 'Spike Elimination'
-            save_file.write("SPIKE ELIMINATION" + "\n")
-
-            info_std_state = self.container_var["Spike Elimination"]["STD"]["State"]
-            info_smpl_state = self.container_var["Spike Elimination"]["SMPL"]["State"]
-            info_inclusion_consideration = self.container_var["fi_setting"]["Spike Elimination Inclusion"].get()
-            info_method = self.container_var["Spike Elimination Method"].get()
-            info_alpha = self.container_var["fi_setting"]["SE Alpha"].get()
-            info_threshold = self.container_var["fi_setting"]["SE Threshold"].get()
-
-            str_spike = str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";" \
-                        + str(info_inclusion_consideration) + ";" + str(info_method) + ";" + str(info_alpha) + ";" \
-                        + str(info_threshold) + "\n"
-
-            save_file.write(str_spike)
-
-            for var_file, dataset_isotopes in self.container_spike_values.items():
-                str_spike_file = var_file + "\n"
-                save_file.write(str_spike_file)
-                for var_isotope, dataset_values in dataset_isotopes.items():
-                    str_spike_isotope = str(var_isotope) + ";"
-                    for var_id, val_id in dataset_values["Save"].items():
-                        str_spike_isotope += str(var_id) + ";" + str(val_id) + ";"
-                    str_spike_isotope = str_spike_isotope[:-1]
-                    str_spike_isotope += "\n"
-                    save_file.write(str_spike_isotope)
-
-            save_file.write("\n")
-
-            ## Save information about the experimental input data
-            self.save_experimental_data_in_file(save_file=save_file)
-
-        elif self.pysills_mode == "MI":
-            ## Save information about the project
-            self.save_project_information_in_file(save_file=save_file)
-
-        ## END
-        save_file.write("\n")
-        save_file.write("\n")
+        # Save information about 'Sample/Matrix Setup'
+        self.save_mineralphase_information_in_file(save_file=save_file)
+        # Save information about 'Dwell Time Settings'
+        self.save_dwell_time_information_in_file(save_file=save_file)
+        # Save information about 'Interval Settings'
+        self.save_interval_information_in_file(save_file=save_file)
+        # Save information about 'Spike Elimination'
+        self.save_spike_elimination_information_in_file(save_file=save_file)
+        # Save information about the experimental input data
+        self.save_experimental_data_in_file(save_file=save_file)
+        # END
         save_file.write("END")
-        #
         save_file.close()
 
     def save_project_information_in_file(self, save_file):
@@ -5258,12 +4957,15 @@ class PySILLS(tk.Frame):
                 info_srm = self.container_var["STD"][filename_long]["SRM"].get()
                 info_cb_state = self.container_var["STD"][filename_long]["Checkbox"].get()
                 info_sign_color = self.container_var["STD"][filename_long]["Sign Color"].get()
+                info_acquisition = self.container_var["acquisition times"]["STD"][filename_short].get()
             else:
                 info_srm = "Select SRM"
                 info_cb_state = 1
                 info_sign_color = self.sign_red
+                info_acquisition = "00:00:00"
 
-            str_std = str(filename_short) + ";" + str(info_srm) + ";" + str(info_cb_state) + ";" + str(info_sign_color)
+            str_std = (str(filename_short) + ";" + str(info_srm) + ";" + str(info_cb_state) + ";" +
+                       str(info_sign_color) + ";" + str(info_acquisition))
 
             str_std += "\n"
             save_file.write(str_std)
@@ -5280,17 +4982,222 @@ class PySILLS(tk.Frame):
                 info_assemblage = self.container_var["SMPL"][filename_long]["ID"].get()
                 info_cb_state = self.container_var["SMPL"][filename_long]["Checkbox"].get()
                 info_sign_color = self.container_var["SMPL"][filename_long]["Sign Color"].get()
+                info_acquisition = self.container_var["acquisition times"]["SMPL"][filename_short].get()
             else:
                 info_is = "Select IS"
                 info_assemblage = "A"
                 info_cb_state = 1
                 info_sign_color = self.sign_red
+                info_acquisition = "00:00:00"
 
             str_smpl = (str(filename_short) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
-                        + ";" + str(info_sign_color))
+                        + ";" + str(info_sign_color) + ";" + str(info_acquisition))
 
             str_smpl += "\n"
             save_file.write(str_smpl)
+        save_file.write("\n")
+
+    def save_measured_isotopes_in_file(self, save_file):
+        save_file.write("ISOTOPES" + "\n")
+
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            info_srm = self.container_var["SRM"][isotope].get()
+
+            str_iso = str(isotope) + ";" + str(info_srm)
+            str_iso += "\n"
+
+            save_file.write(str_iso)
+
+        save_file.write("\n")
+
+    def save_inclusion_information_in_file(self, save_file):
+        save_file.write("INCLUSION SETTINGS" + "\n")
+
+        info_method = self.container_var["fi_setting"]["Inclusion Setup Selection"].get()
+
+        str_incl = str("Method") + ";" + str(info_method) + "\n"
+        save_file.write(str_incl)
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            info_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
+            info_concentration = self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].get()
+            info_salinity = self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][filename_short].get()
+
+            str_incl = (str(filename_short) + ";" + str(info_is) + ";" + str(info_concentration) + ";"
+                        + str(info_salinity))
+
+            str_incl += "\n"
+            save_file.write(str_incl)
+
+        save_file.write("\n")
+
+    def save_quantification_method_matrix_only_in_file(self, save_file):
+        save_file.write("QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)" + "\n")
+
+        info_method = self.container_var["fi_setting"]["Quantification Method"].get()
+
+        str_method = str("Method") + ";" + str(info_method) + "\n"
+        save_file.write(str_method)
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            info_amount = self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Amount"].get()
+            info_matrix = self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Matrix"].get()
+            info_isotope = self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Name"].get()
+            info_concentration = self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Value"].get()
+
+            str_method = (str(filename_short) + ";" + str(info_amount) + ";" + str(info_matrix) + ";"
+                          + str(info_isotope) + ";" + str(info_concentration) + "\n")
+
+            save_file.write(str_method)
+
+        save_file.write("\n")
+
+    def save_quantification_method_second_internal_in_file(self, save_file):
+        save_file.write("QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)" + "\n")
+
+        info_method = self.container_var["fi_setting"]["Quantification Method"].get()
+
+        str_method = str("Method") + ";" + str(info_method) + "\n"
+        save_file.write(str_method)
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            info_isotope = self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Name"].get()
+            info_concentration = self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Value"].get()
+            str_method = str(filename_short) + ";" + str(info_isotope) + ";" + str(info_concentration) + "\n"
+            save_file.write(str_method)
+
+        save_file.write("\n")
+
+    def save_mineralphase_information_in_file(self, save_file):
+        if self.pysills_mode == "MA":
+            info_title = "SAMPLE SETTINGS"
+        elif self.pysills_mode == "FI":
+            info_title = "MATRIX SETTINGS"
+        elif self.pysills_mode == "MI":
+            info_title = "MATRIX SETTINGS"
+
+        save_file.write(str(info_title) + "\n")
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            if filename_long in self.container_var["SMPL"]:
+                if self.pysills_mode == "MA":
+                    info_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
+                    info_concentration = self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].get()
+                else:
+                    info_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                    info_concentration = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"][
+                        "Concentration"].get()
+            else:
+                info_is = "Select IS"
+                info_concentration = "1000000"
+
+            str_smpl_is = str(filename_short) + ";" + str(info_is) + ";" + str(info_concentration) + "\n"
+
+            save_file.write(str_smpl_is)
+
+        save_file.write("\n")
+
+    def save_dwell_time_information_in_file(self, save_file):
+        save_file.write("DWELL TIME SETTINGS" + "\n")
+
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            info_dwell = self.container_var["dwell_times"]["Entry"][isotope].get()
+            str_dwell = str(isotope) + ";" + str(info_dwell) + "\n"
+            save_file.write(str_dwell)
+
+        save_file.write("\n")
+
+    def save_interval_information_in_file(self, save_file):
+        save_file.write("INTERVAL SETTINGS" + "\n")
+
+        for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+            str_intervals = str(filename_short) + ";" + "STD" + "\n"
+
+            for key, item in self.container_helper["STD"][filename_short]["BG"]["Content"].items():
+                info_id = key
+                info_times = item["Times"]
+                info_indices = item["Indices"]
+
+                str_intervals += "BG" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
+
+            for key, item in self.container_helper["STD"][filename_short]["MAT"]["Content"].items():
+                info_id = key
+                info_times = item["Times"]
+                info_indices = item["Indices"]
+
+                str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
+
+            save_file.write(str_intervals)
+
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            str_intervals = str(filename_short) + ";" + "SMPL" + "\n"
+
+            for key, item in self.container_helper["SMPL"][filename_short]["BG"]["Content"].items():
+                info_id = key
+                info_times = item["Times"]
+                info_indices = item["Indices"]
+
+                str_intervals += "BG" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
+
+            for key, item in self.container_helper["SMPL"][filename_short]["MAT"]["Content"].items():
+                info_id = key
+                info_times = item["Times"]
+                info_indices = item["Indices"]
+
+                str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
+
+            if self.pysills_mode in ["FI", "MI"]:
+                for key, item in self.container_helper["SMPL"][filename_short]["INCL"]["Content"].items():
+                    info_id = key
+                    info_times = item["Times"]
+                    info_indices = item["Indices"]
+
+                    str_intervals += "INCL" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(
+                        info_indices) + "\n"
+
+            save_file.write(str_intervals)
+
+        save_file.write("\n")
+
+    def save_spike_elimination_information_in_file(self, save_file):
+        if self.pysills_mode == "MA":
+            mode_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            mode_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            mode_key = "mi_setting"
+
+        save_file.write("SPIKE ELIMINATION" + "\n")
+
+        info_std_state = self.container_var["Spike Elimination"]["STD"]["State"]
+        info_smpl_state = self.container_var["Spike Elimination"]["SMPL"]["State"]
+        info_method = self.container_var["Spike Elimination Method"].get()
+        info_alpha = self.container_var[mode_key]["SE Alpha"].get()
+        info_threshold = self.container_var[mode_key]["SE Threshold"].get()
+
+        if self.pysills_mode == "MA":
+            str_spike = (str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";"
+                         + str(info_method) + ";" + str(info_alpha) + ";" + str(info_threshold) + "\n")
+        else:
+            info_inclusion_consideration = self.container_var[mode_key]["Spike Elimination Inclusion"].get()
+
+            str_spike = (str("STD") + ";" + str(info_std_state) + ";" + str("SMPL") + ";" + str(info_smpl_state) + ";"
+                         + str(info_inclusion_consideration) + ";" + str(info_method) + ";" + str(info_alpha) + ";"
+                         + str(info_threshold) + "\n")
+
+        save_file.write(str_spike)
+
+        for var_file, dataset_isotopes in self.container_spike_values.items():
+            str_spike_file = var_file + "\n"
+            save_file.write(str_spike_file)
+            for var_isotope, dataset_values in dataset_isotopes.items():
+                str_spike_isotope = str(var_isotope) + ";"
+                for var_id, val_id in dataset_values["Save"].items():
+                    str_spike_isotope += str(var_id) + ";" + str(val_id) + ";"
+                str_spike_isotope = str_spike_isotope[:-1]
+                str_spike_isotope += "\n"
+                save_file.write(str_spike_isotope)
+
         save_file.write("\n")
 
     def save_experimental_data_in_file(self, save_file):
@@ -7923,6 +7830,34 @@ class PySILLS(tk.Frame):
             self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
             self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+                if element not in self.container_lists["Measured Elements"]["All"]:
+                    self.container_lists["Measured Elements"]["All"].append(element)
+            for filename_short in self.container_lists["STD"]["Short"]:
+                self.container_lists["Measured Elements"][filename_short] = {}
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"][filename_short]:
+                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    else:
+                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+            for filename_short in self.container_lists["SMPL"]["Short"]:
+                self.container_lists["Measured Elements"][filename_short] = {}
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"][filename_short]:
+                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    else:
+                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+
             self.define_isotope_colors()
 
         ## Window Settings
@@ -9424,6 +9359,10 @@ class PySILLS(tk.Frame):
                 if isotope not in self.container_lists["Measured Isotopes"]["All"]:
                     self.container_lists["Measured Isotopes"]["All"].append(isotope)
 
+            if self.container_flags["STD"]["Initialization"] == False:
+                self.container_flags["STD"][file_std_short] = {
+                    "BG set": False, "MAT set": False, "SMOOTHED data": False}
+
             if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
                 self.container_lists["STD"]["Long"].append(file_std)
                 self.container_lists["STD"]["Short"].append(file_std_short)
@@ -10829,36 +10768,40 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="RAW", sticky="nesw",
-            relief=tk.GROOVE)
+            relief=tk.FLAT)
         rb_02b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
-            relief=tk.GROOVE)
+            relief=tk.FLAT)
         #
         rb_03a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Signal Plot", sticky="nesw",
-            relief=tk.GROOVE, command=lambda var_file=var_file, var_type=var_type, var_lb_state=False:
+            relief=tk.FLAT, command=lambda var_file=var_file, var_type=var_type, var_lb_state=False:
             self.ma_show_time_signal_diagram(var_file, var_type, var_lb_state))
         rb_03b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Ratio Plot", sticky="nesw",
-            relief=tk.GROOVE, command=lambda var_file=var_file, var_type=var_type:
+            relief=tk.FLAT, command=lambda var_file=var_file, var_type=var_type:
             self.ma_show_time_ratio_diagram(var_file, var_type))
         rb_03c = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick Results", sticky="nesw",
-            relief=tk.GROOVE, command=lambda var_file=var_file, var_type=var_type:
+            relief=tk.FLAT, command=lambda var_file=var_file, var_type=var_type:
             self.ma_show_quick_results(var_file, var_type))
-        #
+
+        # if (self.container_flags[var_type][var_file_short]["BG set"] == False or
+        #         self.container_flags[var_type][var_file_short]["MAT set"] == False):
+        #     rb_03c.configure(state="disabled")
+
         rb_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["BG"]).create_radiobutton(
@@ -11214,38 +11157,43 @@ class PySILLS(tk.Frame):
             self.ma_add_interval_to_diagram(var_type, var_file_short, event))
     #
     def ma_show_time_ratio_diagram(self, var_file, var_type):
-        #
         parts = var_file.split("/")
         var_file_short = parts[-1]
-        #
+
         ## Cleaning
         try:
             canvas = self.container_helper[var_type][var_file_short]["CANVAS"]
             toolbarframe = self.container_helper[var_type][var_file_short]["TOOLBARFRAME"]
-            #
+
             if canvas == None:
                 canvas.get_tk_widget().grid_remove()
                 toolbarframe.grid_remove()
         except AttributeError:
             pass
-        #
+
         try:
             resultsframe = self.container_helper[var_type][var_file_short]["RESULTS FRAME"]
-            #
+
             if resultsframe != None:
                 resultsframe.destroy()
         except AttributeError:
             pass
-        #
-        ##
-        var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+
+        if var_type == "STD":
+            var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][var_file_short]:
+                    var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                break
+        else:
+            var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
-        #
+
         self.fig_specific_ratio = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         ax_ratio = self.fig_specific_ratio.add_subplot(label=np.random.uniform())
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Ratio": ax_ratio}
-        #
+
         self.canvas_specific_ratio = FigureCanvasTkAgg(self.fig_specific_ratio, master=self.subwindow_ma_checkfile)
         self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
         self.toolbarFrame_specific_ratio = tk.Frame(master=self.subwindow_ma_checkfile)
@@ -11255,11 +11203,11 @@ class PySILLS(tk.Frame):
         self.toolbar_specific_ratio._message_label.config(
             bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
         self.toolbar_specific_ratio.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
-        #
+
         self.container_helper[var_type][var_file_short]["FIGURE RATIO"] = self.fig_specific_ratio
         self.container_helper[var_type][var_file_short]["CANVAS RATIO"] = self.canvas_specific_ratio
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"] = self.toolbarFrame_specific_ratio
-        #
+
         if self.container_icpms["name"] != None:
             var_skipheader = self.container_icpms["skipheader"]
             var_skipfooter = self.container_icpms["skipfooter"]
@@ -11270,37 +11218,38 @@ class PySILLS(tk.Frame):
                 delimiter=",", skip_header=3, skip_footer=1)
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
-        icp_measurements = np.array([[df_data[isotope]/df_data[var_is] for isotope in self.container_lists["ISOTOPES"]]])
-        y_max = np.amax(icp_measurements)
+        if var_is != "Select IS":
+            icp_measurements = np.array(
+                [[df_data[isotope]/df_data[var_is] for isotope in self.container_lists["ISOTOPES"]]])
+            y_max = np.amax(icp_measurements)
 
-        var_lw = float(self.container_var["General Settings"]["Line width"].get())
-        if var_lw < 0:
-            var_lw = 0.5
-        elif var_lw > 2.5:
-            var_lw = 2.5
+            var_lw = float(self.container_var["General Settings"]["Line width"].get())
+            if var_lw < 0:
+                var_lw = 0.5
+            elif var_lw > 2.5:
+                var_lw = 2.5
 
-        for isotope in self.container_lists["ISOTOPES"]:
-            ln_raw = ax_ratio.plot(self.dataset_time, df_data[isotope]/df_data[var_is], label=isotope,
-                                   color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-        #
-        ax_ratio.grid(True)
-        ax_ratio.set_yscale("log")
-        ax_ratio.set_xlim(left=0, right=x_max)
-        ax_ratio.set_xticks(np.arange(0, x_max, 20))
-        ax_ratio.set_ylim(bottom=10**(-5), top=1.5*y_max)
-        ax_ratio.grid(which="major", linestyle="-", linewidth=1)
-        ax_ratio.minorticks_on()
-        ax_ratio.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
-        ax_ratio.set_axisbelow(True)
-        ax_ratio.set_title(var_file_short, fontsize=9)
-        ax_ratio.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
-        ax_ratio.set_ylabel("Signal Intensity Ratio $I$ (cps/cps)", labelpad=0.5, fontsize=8)
-        ax_ratio.xaxis.set_tick_params(labelsize=8)
-        ax_ratio.yaxis.set_tick_params(labelsize=8)
-        #
-        self.canvas_specific_ratio.draw()
-        #
-    #
+            for isotope in self.container_lists["ISOTOPES"]:
+                ln_raw = ax_ratio.plot(self.dataset_time, df_data[isotope]/df_data[var_is], label=isotope,
+                                       color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+
+            ax_ratio.grid(True)
+            ax_ratio.set_yscale("log")
+            ax_ratio.set_xlim(left=0, right=x_max)
+            ax_ratio.set_xticks(np.arange(0, x_max, 20))
+            ax_ratio.set_ylim(bottom=10**(-5), top=1.5*y_max)
+            ax_ratio.grid(which="major", linestyle="-", linewidth=1)
+            ax_ratio.minorticks_on()
+            ax_ratio.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+            ax_ratio.set_axisbelow(True)
+            ax_ratio.set_title(var_file_short, fontsize=9)
+            ax_ratio.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
+            ax_ratio.set_ylabel("Signal Intensity Ratio $I$ (cps/cps)", labelpad=0.5, fontsize=8)
+            ax_ratio.xaxis.set_tick_params(labelsize=8)
+            ax_ratio.yaxis.set_tick_params(labelsize=8)
+
+            self.canvas_specific_ratio.draw()
+
     def ma_show_quick_results(self, var_file, var_type):
         #
         parts = var_file.split("/")
@@ -11326,24 +11275,25 @@ class PySILLS(tk.Frame):
                 toolbarframe_ratio.grid_remove()
         except AttributeError:
             pass
-        #
-        ##
-        var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
-        #
+
         ## FRAMES
         frm_quick = SE(
             parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=30, n_columns=39,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
-        #
+
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
-        #
+
         ## TREEVIEWS
         list_categories = ["Category"]
         if var_type == "STD":
-            var_is = self.container_lists["Possible IS"][0]
             var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][var_file_short]:
+                    var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                break
             list_considered_isotopes = []
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
@@ -11360,6 +11310,7 @@ class PySILLS(tk.Frame):
             else:
                 stop_calculation = True
         else:
+            var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
             list_considered_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             list_categories.extend(list_considered_isotopes)
             stop_calculation = False
@@ -11381,122 +11332,127 @@ class PySILLS(tk.Frame):
             scb_h.config(command=self.tv_results_quick.xview)
             scb_v.grid(row=0, column=52, rowspan=14, columnspan=1, sticky="ns")
             scb_h.grid(row=14, column=14, rowspan=1, columnspan=38, sticky="ew")
-            #
-            ## INITIALIZATION
-            # Intensity-related parameters
-            if var_type == "STD":
-                self.get_intensity(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
-                    mode="Specific")
-                self.ma_get_intensity_corrected(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                    mode="Specific")
-                var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
-            else:
-                var_srm_file = None
-                for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
-                    file_std_long = self.container_lists["STD"]["Long"][index]
+
+            if var_is != "Select IS":
+                ## INITIALIZATION
+                # Intensity-related parameters
+                if var_type == "STD":
                     self.get_intensity(
-                        var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, var_focus="All",
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
                         mode="Specific")
-                self.ma_get_intensity_corrected(
-                    var_filetype="STD", var_datatype="RAW", var_file_short=None,
-                    var_file_long=None, mode="only STD")
-                #
-                self.get_intensity(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
-                    mode="Specific")
-                self.ma_get_intensity_corrected(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                    mode="Specific")
-                #
-                self.ma_get_intensity_ratio(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                    var_focus="MAT")
-            # Sensitivity-related parameters
-            self.ma_get_analytical_sensitivity(
-                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-            self.ma_get_normalized_sensitivity(
-                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-            if var_type == "SMPL":
-                self.ma_get_rsf(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-            # Concentration-related parameters
-            self.ma_get_concentration(
-                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-            if var_type == "SMPL":
-                self.ma_get_concentration_ratio(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-            self.ma_get_lod(
-                var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-            #
-            entries_intensity_bg_i = ["Intensity BG"]
-            entries_intensity_mat_i = ["Intensity MAT"]
-            entries_intensity_ratio_i = ["Intensity Ratio"]
-            entries_analytical_sensitivity_i = ["Analytical Sensitivity"]
-            entries_normalized_sensitivity_i = ["Normalized Sensitivity"]
-            entries_rsf_i = ["Relative Sensitivity Factor"]
-            entries_concentration_i = ["Concentration"]
-            entries_concentration_ratio_i = ["Concentration Ratio"]
-            entries_lod_i = ["Limit of Detection"]
-            #
-            for isotope in list_considered_isotopes:
-                var_srm_i = self.container_var["SRM"][isotope].get()
-                # Intensity Results
-                intensity_bg_i = self.container_intensity[var_type]["RAW"][var_file_short]["BG"][isotope]
-                intensity_mat_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                if isinstance(intensity_bg_i, np.floating) == False:
-                    print(var_file_short, isotope, "BG:", intensity_bg_i)
-                if isinstance(intensity_mat_i, np.floating) == False:
-                    print(var_file_short, isotope, "MAT:", intensity_mat_i)
-                # Sensitivity Results
-                analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short][
-                    "MAT"][isotope]
-                normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short][
-                    "MAT"][isotope]
-                # Concentration Results
-                concentration_i = self.container_concentration[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                lod_i = self.container_lod[var_type]["RAW"][var_file_short]["MAT"][isotope]
-
-                if var_type == "SMPL":
-                    intensity_ratio_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                    rsf_i = self.container_rsf[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                    concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short]["MAT"][
-                        isotope]
-
-                if var_srm_file == None or var_srm_file == var_srm_i:
-                    entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
-                    entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
-                    entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{3}f}")
-                    entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{3}f}")
-                    entries_concentration_i.append(f"{concentration_i:.{3}f}")
-                    entries_lod_i.append(f"{lod_i:.{3}f}")
+                    self.ma_get_intensity_corrected(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, mode="Specific")
+                    var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
                 else:
-                    entries_intensity_bg_i.append("---")
-                    entries_intensity_mat_i.append("---")
-                    entries_analytical_sensitivity_i.append("---")
-                    entries_normalized_sensitivity_i.append("---")
-                    entries_concentration_i.append("---")
-                    entries_lod_i.append("---")
-
+                    var_srm_file = None
+                    for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
+                        file_std_long = self.container_lists["STD"]["Long"][index]
+                        self.get_intensity(
+                            var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, var_focus="All",
+                            mode="Specific")
+                    self.ma_get_intensity_corrected(
+                        var_filetype="STD", var_datatype="RAW", var_file_short=None,
+                        var_file_long=None, mode="only STD")
+                    #
+                    self.get_intensity(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
+                        mode="Specific")
+                    self.ma_get_intensity_corrected(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, mode="Specific")
+                    #
+                    self.ma_get_intensity_ratio(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, var_focus="MAT")
+                # Sensitivity-related parameters
+                self.ma_get_analytical_sensitivity(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                self.ma_get_normalized_sensitivity(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 if var_type == "SMPL":
-                    entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{3}E}")
-                    entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{3}E}")
-                    entries_rsf_i.append(f"{rsf_i:.{3}f}")
+                    self.ma_get_rsf(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file)
+                # Concentration-related parameters
+                self.ma_get_concentration(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                if var_type == "SMPL":
+                    self.ma_get_concentration_ratio(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file)
+                self.ma_get_lod(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 #
-            self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
-            self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
-            if var_type == "SMPL":
-                self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
-            self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
-            self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
-            if var_type == "SMPL":
-                self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
-            self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
-            if var_type == "SMPL":
-                self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
-            self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
-    #
+                entries_intensity_bg_i = ["Intensity BG"]
+                entries_intensity_mat_i = ["Intensity MAT"]
+                entries_intensity_ratio_i = ["Intensity Ratio"]
+                entries_analytical_sensitivity_i = ["Analytical Sensitivity"]
+                entries_normalized_sensitivity_i = ["Normalized Sensitivity"]
+                entries_rsf_i = ["Relative Sensitivity Factor"]
+                entries_concentration_i = ["Concentration"]
+                entries_concentration_ratio_i = ["Concentration Ratio"]
+                entries_lod_i = ["Limit of Detection"]
+                #
+                for isotope in list_considered_isotopes:
+                    var_srm_i = self.container_var["SRM"][isotope].get()
+                    # Intensity Results
+                    intensity_bg_i = self.container_intensity[var_type]["RAW"][var_file_short]["BG"][isotope]
+                    intensity_mat_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["MAT"][
+                        isotope]
+                    if isinstance(intensity_bg_i, np.floating) == False:
+                        print(var_file_short, isotope, "BG:", intensity_bg_i)
+                    if isinstance(intensity_mat_i, np.floating) == False:
+                        print(var_file_short, isotope, "MAT:", intensity_mat_i)
+                    # Sensitivity Results
+                    analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short][
+                        "MAT"][isotope]
+                    normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short][
+                        "MAT"][isotope]
+                    # Concentration Results
+                    concentration_i = self.container_concentration[var_type]["RAW"][var_file_short]["MAT"][isotope]
+                    lod_i = self.container_lod[var_type]["RAW"][var_file_short]["MAT"][isotope]
+
+                    if var_type == "SMPL":
+                        intensity_ratio_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short]["MAT"][
+                            isotope]
+                        rsf_i = self.container_rsf[var_type]["RAW"][var_file_short]["MAT"][isotope]
+                        concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short][
+                            "MAT"][isotope]
+
+                    if var_srm_file == None or var_srm_file == var_srm_i:
+                        entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
+                        entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
+                        entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{3}f}")
+                        entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{3}f}")
+                        entries_concentration_i.append(f"{concentration_i:.{3}f}")
+                        entries_lod_i.append(f"{lod_i:.{3}f}")
+                    else:
+                        entries_intensity_bg_i.append("---")
+                        entries_intensity_mat_i.append("---")
+                        entries_analytical_sensitivity_i.append("---")
+                        entries_normalized_sensitivity_i.append("---")
+                        entries_concentration_i.append("---")
+                        entries_lod_i.append("---")
+
+                    if var_type == "SMPL":
+                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{3}E}")
+                        entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{3}E}")
+                        entries_rsf_i.append(f"{rsf_i:.{3}f}")
+                    #
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
+
     def ma_show_all_lines(self, var_type, var_file_short):
         if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -12507,10 +12463,12 @@ class PySILLS(tk.Frame):
         if mode == "Specific":
             if var_filetype == "STD":
                 var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
-                if var_is_smpl == None:
-                    var_is = self.container_lists["Possible IS"][0]
-                else:
-                    var_is = var_is_smpl
+                for element, value in sorted(
+                        self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                    if element in self.container_lists["Measured Elements"][var_file_short]:
+                        var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                    break
+
                 key_element_is = re.search("(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
@@ -12591,22 +12549,6 @@ class PySILLS(tk.Frame):
                             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
                     self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
-
-                # for file_smpl in self.container_lists["SMPL"]["Short"]:
-                #     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl]
-                #     delta_i = self.container_lists["Acquisition Times Delta"][file_smpl]
-                #     for isotope in file_isotopes:
-                #         var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
-                #         self.container_lists["Analytical Sensitivity Regression"][isotope] = {
-                #             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
-                #         if var_datatype == "RAW":
-                #             self.container_lists["Analytical Sensitivity Regression RAW"][isotope] = {
-                #             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
-                #         elif var_datatype == "SMOOTHED":
-                #             self.container_lists["Analytical Sensitivity Regression SMOOTHED"][isotope] = {
-                #             "a": xi_opt[isotope][0], "b": xi_opt[isotope][1]}
-                #         self.container_analytical_sensitivity[var_filetype][var_datatype][file_smpl]["MAT"][
-                #             isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
                 for var_focus in ["MAT"]:
