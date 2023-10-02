@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		30.09.2023
+# Date:		02.10.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -5281,12 +5281,12 @@ class PySILLS(tk.Frame):
             n_settings = 0
             if self.pysills_mode == "MA":
                 strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
-                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA", "END"]
             else:
                 strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "INCLUSION SETTINGS",
                            "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
                            "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA", "END"]
 
             index_container = {}
             while n_settings < len(strings):
@@ -5330,6 +5330,7 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][var_file_long] = {
                         "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
                         "Checkbox": tk.IntVar(), "Sign Color": tk.StringVar(), "SRM": tk.StringVar()}
+                    self.container_var["acquisition times"]["STD"][var_file_short] = tk.StringVar()
 
                     self.lb_std.insert(tk.END, str(var_file_short))
                     self.list_std.append(var_file_long)
@@ -5338,7 +5339,8 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][var_file_long]["SRM"].set(splitted_std[1])
                     self.container_var["STD"][var_file_long]["Checkbox"].set(splitted_std[2])
                     self.container_var["STD"][var_file_long]["Sign Color"].set(splitted_std[3])
-                    #
+                    self.container_var["acquisition times"]["STD"][var_file_short].set(splitted_std[4])
+
                     self.ma_current_file_std = self.list_std[0]
                     #
                 ## SAMPLE FILES
@@ -5353,6 +5355,7 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][var_file_long] = {
                         "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
                         "Checkbox": tk.IntVar(), "ID": tk.StringVar(), "Sign Color": tk.StringVar()}
+                    self.container_var["acquisition times"]["SMPL"][var_file_short] = tk.StringVar()
                     #
                     self.lb_smpl.insert(tk.END, str(var_file_short))
                     self.list_smpl.append(var_file_long)
@@ -5365,6 +5368,7 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][var_file_long]["ID"].set(splitted_std[2])
                     self.container_var["SMPL"][var_file_long]["Checkbox"].set(splitted_std[3])
                     self.container_var["SMPL"][var_file_long]["Sign Color"].set(splitted_std[4])
+                    self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_std[5])
                     #
                     self.ma_current_file_smpl = self.list_smpl[0]
                     #
@@ -5452,7 +5456,7 @@ class PySILLS(tk.Frame):
                 ## SPIKE ELIMINATION
                 index = 0
                 for i in range(index_container["SPIKE ELIMINATION"] + 1,
-                               index_container["END"] - 2):
+                               index_container["EXPERIMENTAL DATA"] - 1):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
                     if index == 0:
@@ -5479,6 +5483,60 @@ class PySILLS(tk.Frame):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
                                 self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+                # EXPERIMENTAL DATA
+                helper_indices = {}
+                for index, i in enumerate(range(index_container["EXPERIMENTAL DATA"] + 1, index_container["END"] - 1)):
+                    line_std = str(loaded_lines[i].strip())
+                    splitted_std = line_std.split(";")
+                    if len(splitted_std) == 1:
+                        if splitted_std[0] not in ["Standard Files", "Sample Files", ""]:
+                            if splitted_std[0] not in helper_indices:
+                                helper_indices[splitted_std[0]] = [i + 2]
+                            if index > 1:
+                                helper_indices[last_file].append(i - 2)
+                            last_file = splitted_std[0]
+                if index > 1:
+                    helper_indices[last_file].append(i)
+
+                for key, data in helper_indices.items():
+                    header_names = ["Time"]
+                    header_names.extend(self.container_lists["ISOTOPES"])
+                    dataframe = pd.read_csv(
+                        filename, sep=";", header=0, skiprows=data[0], nrows=data[1] - data[0], usecols=header_names,
+                        engine="python")
+                    dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
+                    if len(dataframe_blank) > 0:
+                        first_blank_index = dataframe_blank.index[0]
+                        dataframe = dataframe[:first_blank_index]
+                    var_columns = dataframe.columns
+                    for column in var_columns:
+                        dataframe[column] = dataframe[column].astype(float)
+                    df_isotopes = DE().get_isotopes(dataframe=dataframe)
+                    times = DE().get_times(dataframe=dataframe)
+                    self.container_lists["Measured Isotopes"][key] = df_isotopes
+
+                    if "Dataframe" not in self.container_measurements:
+                        self.container_measurements["Dataframe"] = {}
+                    if key not in self.container_measurements["Dataframe"]:
+                        self.container_measurements["Dataframe"][key] = dataframe
+
+                    if key not in self.container_measurements["RAW"]:
+                        self.container_measurements["RAW"][key] = {}
+                        self.container_measurements["EDITED"][key] = {}
+                        self.container_measurements["SELECTED"][key] = {}
+                    self.container_measurements["RAW"][key]["Time"] = times.tolist()
+                    self.container_measurements["EDITED"][key]["Time"] = times.tolist()
+                    self.container_measurements["SELECTED"][key]["Time"] = times.tolist()
+
+                    for isotope in df_isotopes:
+                        self.container_measurements["RAW"][key][isotope] = dataframe[isotope].tolist()
+                        self.container_measurements["EDITED"][key][isotope] = {}
+                        if "RAW" not in self.container_measurements["SELECTED"][key]:
+                            self.container_measurements["SELECTED"][key]["RAW"] = {}
+                        if "SMOOTHED" not in self.container_measurements["SELECTED"][key]:
+                            self.container_measurements["SELECTED"][key]["SMOOTHED"] = {}
+                        self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
+                        self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
             elif self.pysills_mode == "FI":
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
@@ -5773,6 +5831,8 @@ class PySILLS(tk.Frame):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
                                 self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+                # EXPERIMENTAL DATA
+                pass
 
             elif self.pysills_mode == "MI":
                 pass
@@ -7766,11 +7826,6 @@ class PySILLS(tk.Frame):
 #
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
-
-        ## COLORS
-        bg_light = self.bg_colors["Very Light"]
-        bg_medium = self.bg_colors["Light"]
-
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
@@ -8639,7 +8694,6 @@ class PySILLS(tk.Frame):
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
-        var_category_n = var_column_n - 6
 
         # Labels
         lbl_09 = SE(
@@ -8657,7 +8711,6 @@ class PySILLS(tk.Frame):
             var_text = self.container_var["Spike Elimination Method"].get()
         else:
             var_text = "Select Method"
-
         opt_09b = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
             n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
@@ -9012,8 +9065,10 @@ class PySILLS(tk.Frame):
         vsb_02.pack(side="right", fill="y")
         text_02.pack(side="left", fill="both", expand=True)
 
-        self.get_acquisition_times(var_filetype="STD")
-        self.get_acquisition_times(var_filetype="SMPL")
+        if len(self.container_var["acquisition times"]["STD"]) == 0:
+            self.get_acquisition_times(var_filetype="STD")
+        if len(self.container_var["acquisition times"]["SMPL"]) == 0:
+            self.get_acquisition_times(var_filetype="SMPL")
 
         lbl_i = tk.Label(
                 frm_02, text="Standard Files", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
@@ -9091,8 +9146,6 @@ class PySILLS(tk.Frame):
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
-        var_category_n = var_column_n - 6
-        var_geometry_plot = [var_row_start, var_columm_start, var_header_n]
 
         # Labels
         lbl_01 = SE(
@@ -9192,14 +9245,17 @@ class PySILLS(tk.Frame):
             var_lw = 2.5
 
         if self.temp_lines_checkup2[var_filetype][var_file_short] == 0:
-            if self.container_icpms["name"] != None:
-                var_skipheader = self.container_icpms["skipheader"]
-                var_skipfooter = self.container_icpms["skipfooter"]
-                df_data = DE(filename_long=var_file_long).get_measurements(
-                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            if self.file_loaded == False:
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data = DE(filename_long=var_file_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data = DE(filename_long=var_file_long).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
             else:
-                df_data = DE(filename_long=var_file_long).get_measurements(
-                    delimiter=",", skip_header=3, skip_footer=1)
+                df_data = self.container_measurements["Dataframe"][var_file_short]
             dataset_time = list(DE().get_times(dataframe=df_data))
             x_max = max(dataset_time)
             icp_measurements = np.array(
@@ -9335,7 +9391,6 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
-
         # Frames
         frm_files = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
@@ -9350,7 +9405,10 @@ class PySILLS(tk.Frame):
         for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
             parts = file_std.split("/")
             file_std_short = parts[-1]
-            df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if file_std_short in self.container_measurements["Dataframe"]:
+                df_std_i = self.container_measurements["Dataframe"][file_std_short]
+            else:
+                df_std_i = DE(filename_long=file_std).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             df_isotopes = DE().get_isotopes(dataframe=df_std_i)
             self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
             times_std_i = DE().get_times(dataframe=df_std_i)
@@ -9538,9 +9596,9 @@ class PySILLS(tk.Frame):
 
             cb_i = tk.Checkbutton(
                 master=frm_files, text=file_std_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["STD"][file_std]["Checkbox"], onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
-                activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
-                anchor=tk.CENTER, highlightthickness=0, bd=0)
+                variable=self.container_var["STD"][file_std]["Checkbox"], onvalue=1, offvalue=0,
+                selectcolor=self.bg_colors["White"], activebackground=self.bg_colors["Very Light"],
+                activeforeground=self.bg_colors["Very Dark"], anchor=tk.CENTER, highlightthickness=0, bd=0)
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
 
@@ -9558,8 +9616,8 @@ class PySILLS(tk.Frame):
                 command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.fi_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
             opt_srm_i.config(
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
@@ -9641,8 +9699,10 @@ class PySILLS(tk.Frame):
         for index, file_smpl in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = file_smpl.split("/")
             file_smpl_short = parts[-1]
-
-            df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+            if file_smpl_short in self.container_measurements["Dataframe"]:
+                df_smpl_i = self.container_measurements["Dataframe"][file_smpl_short]
+            else:
+                df_smpl_i = DE(filename_long=file_smpl).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
             df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
             self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
             times_smpl_i = DE().get_times(dataframe=df_smpl_i)
@@ -9956,7 +10016,6 @@ class PySILLS(tk.Frame):
 
     def define_isotope_colors(self):
         var_n = len(self.container_lists["Measured Isotopes"]["All"])
-        #var_n = len(self.container_lists["ISOTOPES"])
         var_cm = self.container_var["General Settings"]["Colormap"].get()
         cmap = plt.get_cmap(var_cm, var_n)
         colors_mpl = []
@@ -9967,7 +10026,6 @@ class PySILLS(tk.Frame):
 
         self.isotope_colors = {}
         for index, isotope in enumerate(self.container_lists["Measured Isotopes"]["All"]):
-        #for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
             self.container_files["SRM"][isotope] = tk.StringVar()
             self.isotope_colors[isotope] = colors_mpl[index]
 
@@ -10984,15 +11042,18 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["FIGURE"] = self.fig_specific
         self.container_helper[var_type][var_file_short]["CANVAS"] = self.canvas_specific
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME"] = self.toolbarFrame_specific
-        #
-        if self.container_icpms["name"] != None:
-            var_skipheader = self.container_icpms["skipheader"]
-            var_skipfooter = self.container_icpms["skipfooter"]
-            df_data = DE(filename_long=var_file).get_measurements(
-                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = DE(filename_long=var_file).get_measurements(
-                delimiter=",", skip_header=3, skip_footer=1)
+            df_data = self.container_measurements["Dataframe"][var_file_short]
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -11290,6 +11351,7 @@ class PySILLS(tk.Frame):
         list_categories = ["Category"]
         if var_type == "STD":
             var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+            print(self.srm_actual)
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][var_file_short]:
                     var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
