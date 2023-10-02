@@ -1531,14 +1531,18 @@ class PySILLS(tk.Frame):
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG_RATIO"].add_subplot()
 
-                    if self.container_icpms["name"] != None:
-                        var_skipheader = self.container_icpms["skipheader"]
-                        var_skipfooter = self.container_icpms["skipfooter"]
-                        df_data = DE(filename_long=filename_long).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    if self.file_loaded == False:
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            df_data = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        else:
+                            df_data = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=3, skip_footer=1)
                     else:
-                        df_data = DE(filename_long=filename_long).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
+                        df_data = self.container_measurements["Dataframe"][filename_short]
+
                     times = DE().get_times(dataframe=df_data)
                     start_time = times.iloc[0]
                     end_time = times.iloc[-1]
@@ -1622,14 +1626,18 @@ class PySILLS(tk.Frame):
                         self.diagrams_setup[filetype][filename_short]["AX_RATIO"] = \
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG_RATIO"].add_subplot()
-                    if self.container_icpms["name"] != None:
-                        var_skipheader = self.container_icpms["skipheader"]
-                        var_skipfooter = self.container_icpms["skipfooter"]
-                        df_data = DE(filename_long=filename_long).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+
+                    if self.file_loaded == False:
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            df_data = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        else:
+                            df_data = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=3, skip_footer=1)
                     else:
-                        df_data = DE(filename_long=filename_long).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
+                        df_data = self.container_measurements["Dataframe"][filename_short]
 
                     list_names = list(df_data.columns.values)
                     list_names.pop(0)
@@ -3395,7 +3403,7 @@ class PySILLS(tk.Frame):
     def do_spike_elimination_all_grubbs(self, filetype):
         if "Selection" not in self.container_spikes:
             self.container_spikes["Selection"] = {}
-        #
+
         if self.pysills_mode == "MA":
             var_alpha = float(self.container_var["ma_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["ma_setting"]["SE Threshold"].get())
@@ -3403,8 +3411,6 @@ class PySILLS(tk.Frame):
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
-            # elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (alternative)":
-            #     var_method = 2
         elif self.pysills_mode == "FI":
             var_alpha = float(self.container_var["fi_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["fi_setting"]["SE Threshold"].get())
@@ -3412,8 +3418,6 @@ class PySILLS(tk.Frame):
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
-            # elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (alternative)":
-            #     var_method = 2
         elif self.pysills_mode == "MI":
             var_alpha = float(self.container_var["mi_setting"]["SE Alpha"].get())
             var_threshold = int(self.container_var["mi_setting"]["SE Threshold"].get())
@@ -3421,9 +3425,7 @@ class PySILLS(tk.Frame):
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
-            # elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (alternative)":
-            #     var_method = 2
-        #
+
         if filetype == "STD":
             for file_std in self.container_lists["STD"]["Short"]:
                 isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_std]]
@@ -3503,19 +3505,22 @@ class PySILLS(tk.Frame):
                 if file_smpl not in self.container_spikes["Selection"]:
                     self.container_spikes["Selection"][file_smpl] = {}
 
-                if self.container_icpms["name"] != None:
-                    var_skipheader = self.container_icpms["skipheader"]
-                    var_skipfooter = self.container_icpms["skipfooter"]
-                    df_data = DE(filename_long=filename_long).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=filename_long).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=filename_long).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    df_data = DE(filename_long=filename_long).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
+                    df_data = self.container_measurements["Dataframe"][file_smpl]
+
                 list_names = list(df_data.columns.values)
                 list_names.pop(0)
                 df_isotopes = list_names
 
-                #for isotope in self.container_lists["ISOTOPES"]:
                 for isotope in df_isotopes:
                     if bool(self.spikes_isotopes[filetype][file_smpl]) == True:
                         for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_smpl].items():
@@ -5515,6 +5520,19 @@ class PySILLS(tk.Frame):
                     times = DE().get_times(dataframe=dataframe)
                     self.container_lists["Measured Isotopes"][key] = df_isotopes
 
+                    if key not in self.container_lists["Measured Elements"]:
+                        self.container_lists["Measured Elements"][key] = {}
+                    for isotope in df_isotopes:
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element not in self.container_lists["Measured Elements"][key]:
+                            self.container_lists["Measured Elements"][key][element] = [isotope]
+                        else:
+                            if isotope not in self.container_lists["Measured Elements"][key][element]:
+                                self.container_lists["Measured Elements"][key][element].append(isotope)
+                        if element not in self.container_lists["Measured Elements"]["All"]:
+                            self.container_lists["Measured Elements"]["All"].append(element)
+
                     if "Dataframe" not in self.container_measurements:
                         self.container_measurements["Dataframe"] = {}
                     if key not in self.container_measurements["Dataframe"]:
@@ -7396,38 +7414,48 @@ class PySILLS(tk.Frame):
             var_skipfooter = self.container_icpms["skipfooter"]
             var_timestamp = self.container_icpms["timestamp"]
             var_icpms = self.container_icpms["name"]
-            dates, times = Data(filename=var_file).import_as_list(
+
+            if self.file_loaded == False:
+                dates, times = Data(filename=var_file).import_as_list(
                     skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
-            #
+            else:
+                var_time = self.container_var["acquisition times"]["STD"][file_std].get()
+                parts_time = var_time.split(":")
+                times = parts_time
+
+            if len(times) == 2:
+                data_times = times[0]
+            else:
+                data_times = times
+
             if index == 0:
                 if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
                     if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
                         t_start_0 = datetime.timedelta(
-                            hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+                            hours=int(data_times[0]), minutes=int(data_times[1]), seconds=int(data_times[2]))
                     else:
                         t_start_0 = datetime.timedelta(
-                            hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int("00"))
-                    #
+                            hours=int(data_times[0]), minutes=int(data_times[1]), seconds=int("00"))
                 else:
-                    t_start_0 = int(times[0][0]) + int(times[0][1])/60
-            #
+                    t_start_0 = int(data_times[0]) + int(data_times[1])/60
+
             if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
                 if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
                     t_start = datetime.timedelta(
-                        hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+                        hours=int(data_times[0]), minutes=int(data_times[1]), seconds=int(data_times[2]))
                 else:
-                    t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int("00"))
-                #
+                    t_start = datetime.timedelta(
+                        hours=int(data_times[0]), minutes=int(data_times[1]), seconds=int("00"))
             else:
-                t_start = int(times[0][0]) + int(times[0][1])/60
-            #
+                t_start = int(data_times[0]) + int(data_times[1])/60
+
             if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
                 t_delta_0 = (t_start - t_start_0).total_seconds()
             else:
                 t_delta_0 = t_start - t_start_0
-            #
+
             self.container_lists["Acquisition Times Delta"][file_std] = t_delta_0
-            #
+
         for index, var_file in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = var_file.split("/")
             file_smpl = parts[-1]
@@ -7435,27 +7463,37 @@ class PySILLS(tk.Frame):
             var_skipfooter = self.container_icpms["skipfooter"]
             var_timestamp = self.container_icpms["timestamp"]
             var_icpms = self.container_icpms["name"]
-            dates, times = Data(filename=var_file).import_as_list(
+
+            if self.file_loaded == False:
+                dates, times = Data(filename=var_file).import_as_list(
                     skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
-            #
+            else:
+                var_time = self.container_var["acquisition times"]["STD"][file_std].get()
+                parts_time = var_time.split(":")
+                times = parts_time
+
+            if len(times) == 2:
+                data_times = times[0]
+            else:
+                data_times = times
+
             if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
                 if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
                     t_start = datetime.timedelta(
-                        hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+                        hours=int(data_times[0]), minutes=int(data_times[1]), seconds=int(data_times[2]))
                 else:
-                    t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int("00"))
-                #
+                    t_start = datetime.timedelta(
+                        hours=int(data_times[0]), minutes=int(data_times[1]), seconds=int("00"))
             else:
-                t_start = int(times[0][0]) + int(times[0][1])/60
-            #
+                t_start = int(data_times[0]) + int(data_times[1])/60
+
             if self.container_var["General Settings"]["Sensitivity Drift"].get() == 0:
                 t_delta_0 = (t_start - t_start_0).total_seconds()
             else:
                 t_delta_0 = t_start - t_start_0
-            #
+
             self.container_lists["Acquisition Times Delta"][file_smpl] = t_delta_0
-            #
-    #
+
     def check_imported_files(self):
         ## Window Settings
         window_width = 1080
@@ -7879,6 +7917,12 @@ class PySILLS(tk.Frame):
             else:
                 df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
+
+            if "Dataframe" not in self.container_measurements:
+                self.container_measurements["Dataframe"] = {}
+            if file_parts[-1] not in self.container_measurements["Dataframe"]:
+                self.container_measurements["Dataframe"][file_parts[-1]] = df_exmpl
+
             self.times = DE().get_times(dataframe=df_exmpl)
             df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
             self.container_lists["ISOTOPES"] = df_isotopes
@@ -8003,17 +8047,15 @@ class PySILLS(tk.Frame):
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
+
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
-                #
                 self.spike_elimination_all(filetype="STD", algorithm=var_method)
-                #
             if self.container_var["Spike Elimination"]["SMPL"]["State"] == True:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
-                #
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
         else:
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
@@ -11239,7 +11281,6 @@ class PySILLS(tk.Frame):
                 resultsframe.destroy()
         except AttributeError:
             pass
-
         if var_type == "STD":
             var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
@@ -11269,14 +11310,18 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["CANVAS RATIO"] = self.canvas_specific_ratio
         self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"] = self.toolbarFrame_specific_ratio
 
-        if self.container_icpms["name"] != None:
-            var_skipheader = self.container_icpms["skipheader"]
-            var_skipfooter = self.container_icpms["skipfooter"]
-            df_data = DE(filename_long=var_file).get_measurements(
-                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = DE(filename_long=var_file).get_measurements(
-                delimiter=",", skip_header=3, skip_footer=1)
+            df_data = self.container_measurements["Dataframe"][var_file_short]
+
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         if var_is != "Select IS":
@@ -11351,7 +11396,6 @@ class PySILLS(tk.Frame):
         list_categories = ["Category"]
         if var_type == "STD":
             var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
-            print(self.srm_actual)
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][var_file_short]:
                     var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
@@ -19515,7 +19559,6 @@ class PySILLS(tk.Frame):
 
         df_isotopes = self.container_lists["Measured Isotopes"][var_file]
         for var_isotope in df_isotopes:
-        #for var_isotope in self.container_lists["ISOTOPES"]:
             list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
             if len(list_indices) > 0:
                 helper_list.append(var_isotope)
