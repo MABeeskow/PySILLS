@@ -9,6 +9,7 @@ tests/*.png
 tests/*.csv
 outputs/*.csv
 user_settings.txt
+PySILLS_exported_results.csv
 
 __pycache__/
 thesis/

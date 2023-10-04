@@ -998,7 +998,7 @@ class PySILLS(tk.Frame):
         self.language_dict = {
             "Select Mode": {
                 "English": "Select Mode", "German": "Modusauswahl", "Chinese": "选择模式", "Greek": "Επιλέξτε Λειτουργία",
-                "Russian": "Выбор режима"},
+                "Russian": "Выбор режима", "Spanish": "Seleccionar modo", "Italian": "Selezionare la modalità"},
             "Standard Files": {"English": "Standard Files", "German": "Standardmessungen", "Chinese": "标准文件"},
             "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
             "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
