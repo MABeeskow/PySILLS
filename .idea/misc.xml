@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="sdkUUID" value="cf068f70-86d4-4724-a9bc-8d7c9e4361d4" />
+    <option name="sdkName" value="Python 3.7 (PySILLS_Github)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.7 (PySILLS_Github)" project-jdk-type="Python SDK" />
 </project>

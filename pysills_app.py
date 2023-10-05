@@ -319,6 +319,8 @@ class PySILLS(tk.Frame):
         self.list_smpl_previous = []
 
         self.container_spike_values = {}
+
+        self.old_file = False
         #
         self.counter_fast_track_std = 0
         self.counter_fast_track_smpl = 0
@@ -5404,14 +5406,27 @@ class PySILLS(tk.Frame):
             self.select_experiment(var_rb=self.var_rb_mode)
 
             n_settings = 0
-            if self.pysills_mode == "MA":
-                strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
-                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA", "END"]
+            if "EXPERIMENTAL DATA\n" in loaded_lines:
+                if self.pysills_mode == "MA":
+                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
+                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
+                               "END"]
+                else:
+                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                               "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                               "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
+                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
+                               "END"]
             else:
-                strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "INCLUSION SETTINGS",
-                           "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                           "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA", "END"]
+                if self.pysills_mode == "MA":
+                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
+                           "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+                else:
+                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                               "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                               "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
+                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+                self.old_file = True
 
             index_container = {}
             while n_settings < len(strings):
@@ -5440,8 +5455,10 @@ class PySILLS(tk.Frame):
                     self.container_var["ma_setting"]["Author"].set(splitted_std[0])
                     self.container_var["ma_setting"]["Source ID"].set(splitted_std[1])
                     self.container_var["LASER"].set(splitted_std[2])
-                    self.var_opt_icp.set(splitted_std[3])
-                    #
+                    try:
+                        self.var_opt_icp.set(splitted_std[3])
+                    except:
+                        self.var_opt_icp.set("Select ICP-MS")
                 ## STANDARD FILES
                 for i in range(index_container["STANDARD FILES"] + 1,
                                index_container["SAMPLE FILES"] - 1):
@@ -5464,7 +5481,10 @@ class PySILLS(tk.Frame):
                     self.container_var["STD"][var_file_long]["SRM"].set(splitted_std[1])
                     self.container_var["STD"][var_file_long]["Checkbox"].set(splitted_std[2])
                     self.container_var["STD"][var_file_long]["Sign Color"].set(splitted_std[3])
-                    self.container_var["acquisition times"]["STD"][var_file_short].set(splitted_std[4])
+                    try:
+                        self.container_var["acquisition times"]["STD"][var_file_short].set(splitted_std[4])
+                    except:
+                        self.container_var["acquisition times"]["STD"][var_file_short].set("unknown")
 
                     self.ma_current_file_std = self.list_std[0]
                     #
@@ -5493,10 +5513,11 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][var_file_long]["ID"].set(splitted_std[2])
                     self.container_var["SMPL"][var_file_long]["Checkbox"].set(splitted_std[3])
                     self.container_var["SMPL"][var_file_long]["Sign Color"].set(splitted_std[4])
-                    self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_std[5])
-                    #
+                    try:
+                        self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_std[5])
+                    except:
+                        self.container_var["acquisition times"]["SMPL"][var_file_short].set("unknown")
                     self.ma_current_file_smpl = self.list_smpl[0]
-                    #
                 ## ISOTOPES
                 for i in range(index_container["ISOTOPES"] + 1,
                                index_container["SAMPLE SETTINGS"] - 1):
@@ -5580,8 +5601,12 @@ class PySILLS(tk.Frame):
                     #
                 ## SPIKE ELIMINATION
                 index = 0
-                for i in range(index_container["SPIKE ELIMINATION"] + 1,
-                               index_container["EXPERIMENTAL DATA"] - 1):
+                if self.old_file == True:
+                    final_line = index_container["END"] - 1
+                else:
+                    final_line = index_container["EXPERIMENTAL DATA"] - 1
+
+                for i in range(index_container["SPIKE ELIMINATION"] + 1, final_line):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
                     if index == 0:
@@ -5608,73 +5633,75 @@ class PySILLS(tk.Frame):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
                                 self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
-                # EXPERIMENTAL DATA
-                helper_indices = {}
-                for index, i in enumerate(range(index_container["EXPERIMENTAL DATA"] + 1, index_container["END"] - 1)):
-                    line_std = str(loaded_lines[i].strip())
-                    splitted_std = line_std.split(";")
-                    if len(splitted_std) == 1:
-                        if splitted_std[0] not in ["Standard Files", "Sample Files", ""]:
-                            if splitted_std[0] not in helper_indices:
-                                helper_indices[splitted_std[0]] = [i + 2]
-                            if index > 1:
-                                helper_indices[last_file].append(i - 2)
-                            last_file = splitted_std[0]
-                if index > 1:
-                    helper_indices[last_file].append(i)
+                if self.old_file == False:
+                    # EXPERIMENTAL DATA
+                    helper_indices = {}
+                    for index, i in enumerate(range(index_container["EXPERIMENTAL DATA"] + 1,
+                                                    index_container["END"] - 1)):
+                        line_std = str(loaded_lines[i].strip())
+                        splitted_std = line_std.split(";")
+                        if len(splitted_std) == 1:
+                            if splitted_std[0] not in ["Standard Files", "Sample Files", ""]:
+                                if splitted_std[0] not in helper_indices:
+                                    helper_indices[splitted_std[0]] = [i + 2]
+                                if index > 1:
+                                    helper_indices[last_file].append(i - 2)
+                                last_file = splitted_std[0]
+                    if index > 1:
+                        helper_indices[last_file].append(i)
 
-                for key, data in helper_indices.items():
-                    header_names = ["Time"]
-                    header_names.extend(self.container_lists["ISOTOPES"])
-                    dataframe = pd.read_csv(
-                        filename, sep=";", header=0, skiprows=data[0], nrows=data[1] - data[0], usecols=header_names,
-                        engine="python")
-                    dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
-                    if len(dataframe_blank) > 0:
-                        first_blank_index = dataframe_blank.index[0]
-                        dataframe = dataframe[:first_blank_index]
-                    var_columns = dataframe.columns
-                    for column in var_columns:
-                        dataframe[column] = dataframe[column].astype(float)
-                    df_isotopes = DE().get_isotopes(dataframe=dataframe)
-                    times = DE().get_times(dataframe=dataframe)
-                    self.container_lists["Measured Isotopes"][key] = df_isotopes
+                    for key, data in helper_indices.items():
+                        header_names = ["Time"]
+                        header_names.extend(self.container_lists["ISOTOPES"])
+                        dataframe = pd.read_csv(
+                            filename, sep=";", header=0, skiprows=data[0], nrows=data[1] - data[0], usecols=header_names,
+                            engine="python")
+                        dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
+                        if len(dataframe_blank) > 0:
+                            first_blank_index = dataframe_blank.index[0]
+                            dataframe = dataframe[:first_blank_index]
+                        var_columns = dataframe.columns
+                        for column in var_columns:
+                            dataframe[column] = dataframe[column].astype(float)
+                        df_isotopes = DE().get_isotopes(dataframe=dataframe)
+                        times = DE().get_times(dataframe=dataframe)
+                        self.container_lists["Measured Isotopes"][key] = df_isotopes
 
-                    if key not in self.container_lists["Measured Elements"]:
-                        self.container_lists["Measured Elements"][key] = {}
-                    for isotope in df_isotopes:
-                        key_element = re.search("(\D+)(\d+)", isotope)
-                        element = key_element.group(1)
-                        if element not in self.container_lists["Measured Elements"][key]:
-                            self.container_lists["Measured Elements"][key][element] = [isotope]
-                        else:
-                            if isotope not in self.container_lists["Measured Elements"][key][element]:
-                                self.container_lists["Measured Elements"][key][element].append(isotope)
-                        if element not in self.container_lists["Measured Elements"]["All"]:
-                            self.container_lists["Measured Elements"]["All"].append(element)
+                        if key not in self.container_lists["Measured Elements"]:
+                            self.container_lists["Measured Elements"][key] = {}
+                        for isotope in df_isotopes:
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            if element not in self.container_lists["Measured Elements"][key]:
+                                self.container_lists["Measured Elements"][key][element] = [isotope]
+                            else:
+                                if isotope not in self.container_lists["Measured Elements"][key][element]:
+                                    self.container_lists["Measured Elements"][key][element].append(isotope)
+                            if element not in self.container_lists["Measured Elements"]["All"]:
+                                self.container_lists["Measured Elements"]["All"].append(element)
 
-                    if "Dataframe" not in self.container_measurements:
-                        self.container_measurements["Dataframe"] = {}
-                    if key not in self.container_measurements["Dataframe"]:
-                        self.container_measurements["Dataframe"][key] = dataframe
+                        if "Dataframe" not in self.container_measurements:
+                            self.container_measurements["Dataframe"] = {}
+                        if key not in self.container_measurements["Dataframe"]:
+                            self.container_measurements["Dataframe"][key] = dataframe
 
-                    if key not in self.container_measurements["RAW"]:
-                        self.container_measurements["RAW"][key] = {}
-                        self.container_measurements["EDITED"][key] = {}
-                        self.container_measurements["SELECTED"][key] = {}
-                    self.container_measurements["RAW"][key]["Time"] = times.tolist()
-                    self.container_measurements["EDITED"][key]["Time"] = times.tolist()
-                    self.container_measurements["SELECTED"][key]["Time"] = times.tolist()
+                        if key not in self.container_measurements["RAW"]:
+                            self.container_measurements["RAW"][key] = {}
+                            self.container_measurements["EDITED"][key] = {}
+                            self.container_measurements["SELECTED"][key] = {}
+                        self.container_measurements["RAW"][key]["Time"] = times.tolist()
+                        self.container_measurements["EDITED"][key]["Time"] = times.tolist()
+                        self.container_measurements["SELECTED"][key]["Time"] = times.tolist()
 
-                    for isotope in df_isotopes:
-                        self.container_measurements["RAW"][key][isotope] = dataframe[isotope].tolist()
-                        self.container_measurements["EDITED"][key][isotope] = {}
-                        if "RAW" not in self.container_measurements["SELECTED"][key]:
-                            self.container_measurements["SELECTED"][key]["RAW"] = {}
-                        if "SMOOTHED" not in self.container_measurements["SELECTED"][key]:
-                            self.container_measurements["SELECTED"][key]["SMOOTHED"] = {}
-                        self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
-                        self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
+                        for isotope in df_isotopes:
+                            self.container_measurements["RAW"][key][isotope] = dataframe[isotope].tolist()
+                            self.container_measurements["EDITED"][key][isotope] = {}
+                            if "RAW" not in self.container_measurements["SELECTED"][key]:
+                                self.container_measurements["SELECTED"][key]["RAW"] = {}
+                            if "SMOOTHED" not in self.container_measurements["SELECTED"][key]:
+                                self.container_measurements["SELECTED"][key]["SMOOTHED"] = {}
+                            self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
+                            self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
             elif self.pysills_mode == "FI":
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
@@ -5976,18 +6003,18 @@ class PySILLS(tk.Frame):
                 pass
 
             # Initialization
-            #self.define_isotope_colors()
             self.file_loaded = True
             self.demo_mode = False
-            self.select_icp_ms(var_opt=self.var_opt_icp)
-
+            if self.old_file == True and self.var_opt_icp.get() == "Select ICP-MS":
+                self.container_icpms["name"] = None
+            else:
+                self.select_icp_ms(var_opt=self.var_opt_icp)
             if self.pysills_mode == "MA":
                 self.ma_settings()
             elif self.pysills_mode == "FI":
                 self.fi_settings()
             elif self.pysills_mode == "MI":
                 pass
-        #
         except FileNotFoundError:
             pass
 
@@ -9578,7 +9605,21 @@ class PySILLS(tk.Frame):
                     df_std_i = DE(filename_long=file_std).get_measurements(
                         delimiter=",", skip_header=3, skip_footer=1)
             else:
-                df_std_i = self.container_measurements["Dataframe"][file_std_short]
+                if self.old_file == True:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_std_i = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_std_i = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                    if "Dataframe" not in self.container_measurements:
+                        self.container_measurements["Dataframe"] = {}
+                    if file_std_short not in self.container_measurements["Dataframe"]:
+                        self.container_measurements["Dataframe"][file_std_short] = df_std_i
+                else:
+                    df_std_i = self.container_measurements["Dataframe"][file_std_short]
 
             df_isotopes = DE().get_isotopes(dataframe=df_std_i)
             self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
@@ -9883,7 +9924,21 @@ class PySILLS(tk.Frame):
                     df_smpl_i = DE(filename_long=file_smpl).get_measurements(
                         delimiter=",", skip_header=3, skip_footer=1)
             else:
-                df_smpl_i = self.container_measurements["Dataframe"][file_smpl_short]
+                if self.old_file == True:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_smpl_i = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_smpl_i = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                    if "Dataframe" not in self.container_measurements:
+                        self.container_measurements["Dataframe"] = {}
+                    if file_smpl_short not in self.container_measurements["Dataframe"]:
+                        self.container_measurements["Dataframe"][file_smpl_short] = df_smpl_i
+                else:
+                    df_smpl_i = self.container_measurements["Dataframe"][file_smpl_short]
 
             df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
             self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
