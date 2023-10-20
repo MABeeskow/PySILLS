@@ -51,6 +51,12 @@ PySILLS with my workflow in my mind. Now, the goal is to make it also applicable
 
 Let's catch the bugs and smash them! 👊
 
+#### Attention
+It was necessary to apply some changes concerning the saving/loading algorithm of a project. It is possible that an 
+imported project does not contain any information about the acquisition time of the single measurement files. It is 
+necessary to add them manually, to save the project again and to restart it finally again. If the user does not restart 
+the project, it is possible that further bugs occur.
+
 ## 🚀 Installation
 
 It is planned that PySILLS will be able to install via PyPi and conda, since all required dependencies will then be 
@@ -147,11 +153,52 @@ Coming soon ...
 
 ## 💎 Fluid Inclusion Analysis
 
-Coming soon ...
+PySILLS does not only allow the major, minor and trace element analysis of (homogenous) solid phases like minerals and 
+glasses but also from fluid inclusions.
 
 ### Short Step-by-Step Manual
 
-Coming soon ...
+In addition to a more detailed manual, I would like to describe briefly here which steps are necessary for 
+a complete data reduction of a mineral analysis project.
+
+#### Data import
+1. Select the correct analysis mode. In this case, select "Fluid Inclusion Analysis" below "Select Mode".
+2. Import the measurement files by clicking on "Add" below "Standard Files" and "Sample Files".
+
+#### Project setup
+1. Click on "Settings". A new window will be opened.
+
+On the left side of the settings window, you can define some default parameters and features that influence the whole 
+dataset, for example a spike elimination.
+
+2. Select a default standard reference material (SRM) for the standard files and isotopes below the header "Standard 
+Reference Material (SRM)".
+3. Define the matrix by setting a concentration value for the internal standard of the matrix which will be used for 
+example if the "Matrix-only Tracer" quantification method was selected.
+4. Define the settings for the quantification method, for example the "Matrix-only Tracer" algorithm.
+5. Click on "Run" behind "Auto-Detection" below "Default Time Window (Background)" in order to get automatically 
+detected calculation intervals for the background signal. If you are very sure when the laser started and ended, you can 
+also define manually the time limits of the calculation windows.
+6. Click on "Apply to all" for the standard and sample files in order to apply a spike elimination on all files.
+7. Open every standard and sample file and define the calculation intervals for the matrix and inclusion signal.
+8. Define the concentration values of the internal standard that was selected for the sample files (this will be used 
+for the fluid inclusion analysis). There are several options available, for example a mass balance calculation.
+
+Now, all mandatory settings were defined, but it is of course possible to change some parameters if this is 
+necessary.
+
+#### Project results
+After all settings were defined, it is now finally possible to calculate the results of this fluid inclusion analysis 
+project.
+
+1. Click on "Results" below "Fluid Inclusion Analysis" in the main window of PySILLS. A new window will be opened.
+
+The user can now specify which results should be displayed in the table, for example the concentration values for the 
+smoothed (spike eliminated) sample files. Of course, the final step is to create a report file that contains all 
+results.
+
+2. Click on "Export Results" in order to collect and export all data in a created report file. This file contains all 
+possible values that can be displayed in the table. 
 
 ### Screenshots
 
@@ -189,3 +236,8 @@ https://www.scopus.com/record/display.uri?eid=2-s2.0-0030245362&origin=inward&tx
 * Pettke, T., et al., 2012, "Recent developments in element concentration and isotope ratio analysis of individual fluid 
 inclusions by laser ablation single and multiple collector ICP-MS", Ore Geology Reviews, 44, pp. 10-38, [Link](
 https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
+
+---
+
+Version: Pre-Release  
+Date: 20.10.2023
