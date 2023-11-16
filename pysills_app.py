@@ -1090,23 +1090,23 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="PySILLS", relief=tk.RAISED, fontsize=font_header)
+            text="PySILLS", relief=tk.FLAT, fontsize=font_header)
         lbl_01 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column + 11, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=var_lbl_01, relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_01, relief=tk.FLAT, fontsize=font_header)
         lbl_02 = SE(
             parent=self.parent, row_id=start_row + 18, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=var_lbl_02, relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_02, relief=tk.FLAT, fontsize=font_header)
         lbl_03 = SE(
             parent=self.parent, row_id=start_row + 18, column_id=start_column + 11, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=var_lbl_03, relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_03, relief=tk.FLAT, fontsize=font_header)
         lbl_04 = SE(
             parent=self.parent, row_id=start_row + 14, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=var_lbl_04, relief=tk.RAISED, fontsize=font_header)
+            text=var_lbl_04, relief=tk.FLAT, fontsize=font_header)
         lbl_04b = SE(
             parent=self.parent, row_id=start_row + 16, column_id=start_column + 8, n_rows=common_n_rows,
             n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -1355,7 +1355,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Mineral Analysis", relief=tk.RAISED, fontsize="sans 14 bold")
+                text="Mineral Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1392,7 +1392,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Fluid Inclusions", relief=tk.RAISED, fontsize="sans 14 bold")
+                text="Fluid Inclusions", relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1429,7 +1429,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Melt Inclusions", relief=tk.RAISED, fontsize="sans 14 bold")
+                text="Melt Inclusions", relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1464,7 +1464,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Output Analysis", relief=tk.RAISED, fontsize="sans 14 bold")
+                text="Output Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -7357,8 +7357,8 @@ class PySILLS(tk.Frame):
                 parent=subwindow_intervals, row_id=start_row, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=lambda var_file=self.ma_current_file_std, var_type="STD", checkup_mode=True:
-                self.ma_check_specific_file(var_file, var_type, checkup_mode))
+                command=lambda var_filename_long=self.ma_current_file_std, var_filetype="STD", checkup_mode=True:
+                self.ma_check_specific_file(var_filename_long, var_filetype, checkup_mode))
             #
         elif self.pysills_mode == "FI":
             btn_std_03 = SE(
@@ -7392,8 +7392,8 @@ class PySILLS(tk.Frame):
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=lambda var_file=self.ma_current_file_smpl, var_type="SMPL", checkup_mode=True:
-                self.ma_check_specific_file(var_file, var_type, checkup_mode))
+                command=lambda var_filename_long=self.ma_current_file_smpl, var_filetype="SMPL", checkup_mode=True:
+                self.ma_check_specific_file(var_filename_long, var_filetype, checkup_mode))
         elif self.pysills_mode == "FI":
             btn_smpl_03 = SE(
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
@@ -9424,15 +9424,15 @@ class PySILLS(tk.Frame):
         """
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
-            var_setting_key = "ma_setting"
+            var_mode_setting = "ma_setting"
             row_correction = 0
         elif self.pysills_mode == "FI":
             var_parent = self.subwindow_fi_settings
-            var_setting_key = "fi_setting"
+            var_mode_setting = "fi_setting"
             row_correction = 1
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
-            var_setting_key = "mi_setting"
+            var_mode_setting = "mi_setting"
             row_correction = 1
 
         var_row_start = var_geometry_info["Row start"]
@@ -9458,17 +9458,17 @@ class PySILLS(tk.Frame):
         rb_01 = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=5, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[var_setting_key]["Time-Signal Checker"], value_rb=1,
+            var_rb=self.container_var[var_mode_setting]["Time-Signal Checker"], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Standard file", sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_setting_key:
+            relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_mode_setting:
             self.change_filetype_time_signal_diagram_checker(var_setting_key))
         rb_02 = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start + 5,
             n_rows=var_row_n, n_columns=5, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[var_setting_key]["Time-Signal Checker"], value_rb=2,
+            var_rb=self.container_var[var_mode_setting]["Time-Signal Checker"], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Sample file", sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_setting_key:
+            relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_mode_setting:
             self.change_filetype_time_signal_diagram_checker(var_setting_key))
 
         # Buttons
@@ -9477,14 +9477,14 @@ class PySILLS(tk.Frame):
             n_rows=var_row_n, n_columns=4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Before", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_mode="Before", var_setting_key=var_setting_key:
+            command=lambda var_mode="Before", var_setting_key=var_mode_setting:
             self.change_file_time_signal_diagram_checker(var_mode, var_setting_key))
         btn_02 = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start + 14,
             n_rows=var_row_n, n_columns=4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_mode="Next", var_setting_key=var_setting_key:
+            command=lambda var_mode="Next", var_setting_key=var_mode_setting:
             self.change_file_time_signal_diagram_checker(var_mode, var_setting_key))
 
         ## Initialization
@@ -9511,7 +9511,7 @@ class PySILLS(tk.Frame):
                         label=file_short)
                 self.temp_lines_checkup2[filetype][file_short] = 0
 
-        self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
+        self.show_time_signal_diagram_checker(var_setting_key=var_mode_setting)
 
     def show_time_signal_diagram_checker(self, var_setting_key):
         if self.container_var[var_setting_key]["Time-Signal Checker"].get() == 1:
@@ -9946,7 +9946,8 @@ class PySILLS(tk.Frame):
                     master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                     activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
                     highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
-                    command=lambda var_file=file_std, var_type="STD": self.ma_check_specific_file(var_file, var_type))
+                    command=lambda var_filename_long=file_std, var_filetype="STD":
+                    self.ma_check_specific_file(var_filename_long, var_filetype))
             elif self.pysills_mode == "FI":
                 btn_i = tk.Button(
                     master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
@@ -10301,7 +10302,8 @@ class PySILLS(tk.Frame):
                     master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
                     activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
                     highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
-                    command=lambda var_file=file_smpl, var_type="SMPL": self.ma_check_specific_file(var_file, var_type))
+                    command=lambda var_filename_long=file_smpl, var_filetype="SMPL":
+                    self.ma_check_specific_file(var_filename_long, var_filetype))
             elif self.pysills_mode == "FI":
                 btn_i = tk.Button(
                     master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
@@ -11066,31 +11068,35 @@ class PySILLS(tk.Frame):
     #
     ## FILE-SPECIFIC ANALYSIS ##########################################################################################
     #
-    def ma_check_specific_file(self, var_file, var_type="STD", checkup_mode=False):
-        if checkup_mode == True:
-            if var_type == "STD":
-                var_file = self.ma_current_file_std
-            elif var_type == "SMPL":
-                var_file = self.ma_current_file_smpl
-        #
+    def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
+        str_filename_long = var_filename_long
+        str_filetype = var_filetype
+        bool_checkup_mode = checkup_mode
+
+        if bool_checkup_mode == True:
+            if str_filetype == "STD":
+                str_filename_long = self.ma_current_file_std
+            elif str_filetype == "SMPL":
+                str_filename_long = self.ma_current_file_smpl
+
         ## INPUT
-        parts = var_file.split("/")
-        var_file_short = parts[-1]
+        parts = str_filename_long.split("/")
+        var_filename_short = parts[-1]
         self.helper_intervals = {"BG": [], "MAT": []}
-        self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short].set(0)
-        #
+        self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short].set(0)
+
         ## Window Settings
         window_width = 1060
         window_heigth = 750
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_ma_checkfile = tk.Toplevel(self.parent)
-        self.subwindow_ma_checkfile.title("MINERAL ANALYSIS - File Analysis of " + str(var_file_short))
+        self.subwindow_ma_checkfile.title("MINERAL ANALYSIS - File Analysis of " + str(var_filename_short))
         self.subwindow_ma_checkfile.geometry(var_geometry)
         self.subwindow_ma_checkfile.resizable(False, False)
         self.subwindow_ma_checkfile["bg"] = self.bg_colors["Super Dark"]
@@ -11152,132 +11158,133 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Show All", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short: self.ma_show_all_lines(
+            command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_show_all_lines(
                 var_type, var_file_short, ))
         btn_02b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short: self.ma_hide_all_lines(
+            command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
                 var_type, var_file_short))
         btn_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Remove Interval", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short: self.ma_remove_interval(var_type,
-                                                                                                     var_file_short))
+            command=lambda var_type=str_filetype, var_file_short=var_filename_short:
+            self.ma_remove_interval(var_type, var_file_short))
         btn_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
             fg=self.colors_fi["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Confirm and Close", bg_active=self.bg_colors["Dark"],
             fg_active=self.bg_colors["Light Font"],
-            command=lambda var_parent=self.subwindow_ma_checkfile, var_type=var_type, var_file_long=var_file:
+            command=lambda var_parent=self.subwindow_ma_checkfile, var_type=str_filetype,
+                           var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
-        #
+
         ## RADIOBUTTONS
         rb_02a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short], value_rb=0,
+            var_rb=self.container_var["ma_setting"]["Data Type Plot"][str_filetype][var_filename_short], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="RAW", sticky="nesw",
             relief=tk.FLAT)
         rb_02b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short], value_rb=1,
+            var_rb=self.container_var["ma_setting"]["Data Type Plot"][str_filetype][var_filename_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
             relief=tk.FLAT)
         #
         rb_03a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=0,
+            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Signal Plot", sticky="nesw",
-            relief=tk.FLAT, command=lambda var_file=var_file, var_type=var_type, var_lb_state=False:
-            self.ma_show_time_signal_diagram(var_file, var_type, var_lb_state))
+            relief=tk.FLAT, command=lambda var_file=str_filename_long, var_filetype=str_filetype, var_lb_state=False:
+            self.ma_show_time_signal_diagram(var_file, var_filetype, var_lb_state))
         rb_03b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=1,
+            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Ratio Plot", sticky="nesw",
-            relief=tk.FLAT, command=lambda var_file=var_file, var_type=var_type:
+            relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_time_ratio_diagram(var_file, var_type))
         rb_03c = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=2,
+            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick Results", sticky="nesw",
-            relief=tk.FLAT, command=lambda var_file=var_file, var_type=var_type:
+            relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_quick_results(var_file, var_type))
         rb_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["BG"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=0,
+            var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short], value_rb=0,
             color_bg=self.colors_intervals["BG"], fg=self.bg_colors["Light Font"], text="Background Interval",
             sticky="nesw", relief=tk.GROOVE)
         rb_06 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 27, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["MAT"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=1,
+            var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short], value_rb=1,
             color_bg=self.colors_intervals["MAT"], fg=self.bg_colors["Light Font"], text="Sample Interval",
             sticky="nesw",
             relief=tk.GROOVE)
         rb_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
             n_columns=26, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=3,
+            var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short], value_rb=3,
             color_bg=self.bg_colors["Super Dark"], fg=self.bg_colors["Light Font"], text="No Selection",
             sticky="nesw", relief=tk.GROOVE)
-        #
+
         ## CHECKBOXES
-        if "BG" not in self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][
-            var_file_short]:
-            self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][var_file_short] = {
+        if "BG" not in self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][
+            var_filename_short]:
+            self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][var_filename_short] = {
                 "BG": tk.IntVar(), "MAT": tk.IntVar(), "INCL": tk.IntVar()}
-            self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["BG"].set(
+            self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][var_filename_short]["BG"].set(
                 1)
-            self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][var_file_short][
+            self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][var_filename_short][
                 "MAT"].set(1)
         #
         cb_bg = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 25,
             fg=self.colors_fi["Dark Font"], n_rows=1, n_columns=2,
             bg=self.colors_intervals["BG"]).create_simple_checkbox(
-            var_cb=self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][var_file_short][
+            var_cb=self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][var_filename_short][
                 "BG"],
             text="", set_sticky="", own_color=True,
-            command=lambda var_key="BG", var_type=var_type, var_file_short=var_file_short:
+            command=lambda var_key="BG", var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_change_interval_visibility(var_key, var_type, var_file_short))
         cb_mat = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 38,
             fg=self.colors_fi["Dark Font"], n_rows=1, n_columns=2,
             bg=self.colors_intervals["MAT"]).create_simple_checkbox(
-            var_cb=self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][var_file_short][
+            var_cb=self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][var_filename_short][
                 "MAT"],
             text="", set_sticky="", own_color=True,
-            command=lambda var_key="MAT", var_type=var_type, var_file_short=var_file_short:
+            command=lambda var_key="MAT", var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_change_interval_visibility(var_key, var_type, var_file_short))
-        #
+
         ## ENTRIES
         var_entr_start = tk.StringVar()
         var_entr_start.set("Set start value")
         var_entr_end = tk.StringVar()
         var_entr_end.set("Set end value")
         self.helper_time_entries = {"Start": var_entr_start, "End": var_entr_end}
-        #
+
         entr_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_start, text_default=var_entr_start.get(),
-            command=lambda event, var_entr=var_entr_start, var_key="Start", mode=var_file, var_interval=None:
+            command=lambda event, var_entr=var_entr_start, var_key="Start", mode=str_filename_long, var_interval=None:
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
         entr_04b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_end, text_default=var_entr_end.get(),
-            command=lambda event, var_entr=var_entr_end, var_key="End", mode=var_file, var_interval=None:
+            command=lambda event, var_entr=var_entr_end, var_key="End", mode=str_filename_long, var_interval=None:
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
-        #
+
         ## MEASURED ISOTOPES
         frm_iso = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 1, column_id=start_column, n_rows=14,
@@ -11289,8 +11296,8 @@ class PySILLS(tk.Frame):
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
-        #
-        df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
+        df_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
         for index, isotope in enumerate(df_isotopes):
             frm_i = tk.Frame(
                 frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
@@ -11304,61 +11311,64 @@ class PySILLS(tk.Frame):
 
             cb_raw_i = tk.Checkbutton(
                 frm_iso,
-                variable=self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope],
+                variable=self.container_var["ma_setting"]["Display RAW"][str_filetype][var_filename_short][isotope],
                 text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=var_type, var_file_short=var_file_short, var_datatype="RAW",
+                command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="RAW",
                                var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
                                                                                    var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_raw_i)
             text_iso.insert("end", "\t")
 
             cb_smoothed_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][
+                frm_iso, variable=self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][var_filename_short][
                     isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
                 fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=var_type, var_file_short=var_file_short, var_datatype="SMOOTHED",
+                command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="SMOOTHED",
                                var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
                                                                                    var_datatype, var_isotope))
-            if self.container_var["Spike Elimination"][var_type]["State"] == False:
+            if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
                 cb_smoothed_i.configure(state="disabled")
             else:
                 cb_smoothed_i.configure(state="normal")
             text_iso.window_create("end", window=cb_smoothed_i)
             text_iso.insert("end", "\n")
-        #
+
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=6,
             n_columns=13, fg=self.colors_fi["Dark Font"],
             bg=self.colors_intervals["BG LB"]).create_simple_listbox_grid(
             include_scrb_x=False)
-        self.container_helper[var_type][var_file_short]["BG"]["Listbox"] = lb_bg
-        #
+        self.container_helper[str_filetype][var_filename_short]["BG"]["Listbox"] = lb_bg
+
         ## MATRIX INTERVAL
         lb_mat, scrollbar_mat_y = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=6,
             n_columns=13, fg=self.colors_fi["Dark Font"],
             bg=self.colors_intervals["MAT LB"]).create_simple_listbox_grid(include_scrb_x=False)
-        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"] = lb_mat
-        #
+        self.container_helper[str_filetype][var_filename_short]["MAT"]["Listbox"] = lb_mat
+
         ## INITIALIZATION
-        #
-        self.ma_show_time_signal_diagram(var_file=var_file, var_type=var_type)
+
+        self.ma_show_time_signal_diagram(var_file=str_filename_long, var_filetype=str_filetype)
 
     def confirm_specific_file_setup(self, var_parent, var_type, var_file_long):
         self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
         self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
         var_parent.destroy()
 
-    def ma_show_time_signal_diagram(self, var_file, var_type, var_lb_state=True):
-        #
-        parts = var_file.split("/")
-        var_file_short = parts[-1]
-        #
+    def ma_show_time_signal_diagram(self, var_file, var_filetype, var_lb_state=True):
+        str_filename_long = var_file
+        str_filetype = var_filetype
+        bool_lb_state = var_lb_state
+
+        parts = str_filename_long.split("/")
+        str_filename_short = parts[-1]
+
         ## Cleaning
         try:
-            canvas_ratio = self.container_helper[var_type][var_file_short]["CANVAS RATIO"]
-            toolbarframe_ratio = self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"]
+            canvas_ratio = self.container_helper[str_filetype][str_filename_short]["CANVAS RATIO"]
+            toolbarframe_ratio = self.container_helper[str_filetype][str_filename_short]["TOOLBARFRAME RATIO"]
             #
             if canvas_ratio == None:
                 canvas_ratio.get_tk_widget().grid_remove()
@@ -11367,7 +11377,7 @@ class PySILLS(tk.Frame):
             pass
         #
         try:
-            resultsframe = self.container_helper[var_type][var_file_short]["RESULTS FRAME"]
+            resultsframe = self.container_helper[str_filetype][str_filename_short]["RESULTS FRAME"]
             #
             if resultsframe != None:
                 resultsframe.destroy()
@@ -11388,9 +11398,9 @@ class PySILLS(tk.Frame):
         self.toolbar_specific.winfo_children()[-2].config(
             bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
 
-        self.container_helper[var_type][var_file_short]["FIGURE"] = self.fig_specific
-        self.container_helper[var_type][var_file_short]["CANVAS"] = self.canvas_specific
-        self.container_helper[var_type][var_file_short]["TOOLBARFRAME"] = self.toolbarFrame_specific
+        self.container_helper[str_filetype][str_filename_short]["FIGURE"] = self.fig_specific
+        self.container_helper[str_filetype][str_filename_short]["CANVAS"] = self.canvas_specific
+        self.container_helper[str_filetype][str_filename_short]["TOOLBARFRAME"] = self.toolbarFrame_specific
 
         if self.file_loaded == False:
             if self.container_icpms["name"] != None:
@@ -11402,16 +11412,16 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][var_file_short]
+            df_data = self.container_measurements["Dataframe"][str_filename_short]
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
-        df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        df_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
         icp_measurements = np.array([[df_data[isotope] for isotope in df_isotopes]])
         y_max = np.amax(icp_measurements)
 
         ## DIAGRAMS
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
-        self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Signal": ax}
+        self.container_helper[str_filetype][str_filename_short]["AXES"] = {"Time-Signal": ax}
 
         var_lw = float(self.container_var["General Settings"]["Line width"].get())
         if var_lw < 0:
@@ -11422,52 +11432,52 @@ class PySILLS(tk.Frame):
         for isotope in df_isotopes:
             ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
                              linewidth=var_lw, visible=True)
-            self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope]["RAW"] = ln_raw
+            self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope]["RAW"] = ln_raw
             #
-            if isotope in self.container_measurements["EDITED"][var_file_short]:
-                if "Uncut" in self.container_measurements["EDITED"][var_file_short][isotope]:
+            if isotope in self.container_measurements["EDITED"][str_filename_short]:
+                if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
                     ln_smoothed = ax.plot(
-                        self.dataset_time, self.container_measurements["EDITED"][var_file_short][isotope]["Uncut"],
+                        self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope]["Uncut"],
                         label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                    self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                         "SMOOTHED"] = ln_smoothed
-                    self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
+                    self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
                     #
         #
         if self.pysills_mode in ["FI", "MI"]:
-            var_check_bg = self.container_helper[var_type][var_file_short]["BG"]["Content"]
+            var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
         else:
-            var_check_bg = self.container_helper[var_type][var_file_short]["BG"]["Content"]
+            var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
         #
         if len(var_check_bg) > 0:
             if self.pysills_mode in ["MA", "FI", "MI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short]["BG"]["Content"].items():
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short]["BG"]["Content"].items():
                     times_bg = var_content["Times"]
                     #
                     box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
                     var_content["Object"] = box_bg
                     #
-                    if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["BG"]["Listbox"].insert(
+                    if bool_lb_state == True:
+                        self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
                             tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
                     #
             else:
-                times_bg = self.container_helper[var_type][var_file_short]["BG"][1]["Times"]
+                times_bg = self.container_helper[str_filetype][str_filename_short]["BG"][1]["Times"]
                 #
                 box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
-                self.container_helper[var_type][var_file_short]["BG"][1]["Object"] = box_bg
+                self.container_helper[str_filetype][str_filename_short]["BG"][1]["Object"] = box_bg
         #
         if self.pysills_mode == "MA":
             signal_key = "MAT"
-            var_check_sig = self.container_helper[var_type][var_file_short][signal_key]["Content"]
+            var_check_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"]
         else:
             signal_key = "MAT"
-            var_check_sig = self.container_helper[var_type][var_file_short][signal_key]["Content"]
+            var_check_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"]
         #
         if len(var_check_sig) > 0:
             if self.pysills_mode in ["FI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][signal_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
@@ -11475,27 +11485,27 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
                     #
-                    if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"].insert(
+                    if bool_lb_state == True:
+                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
                     #
             elif self.pysills_mode in ["MI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][signal_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
-                    times_sig = self.container_helper[var_type][var_file_short][signal_key]["Content"][1]["Times"]
+                    times_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"][1]["Times"]
                     var_color = self.colors_intervals["MAT"]
                     #
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
                     #
-                    if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"].insert(
+                    if bool_lb_state == True:
+                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
                     #
             else:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][signal_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
@@ -11503,8 +11513,8 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
                     #
-                    if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"].insert(
+                    if bool_lb_state == True:
+                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
         #
@@ -11513,11 +11523,11 @@ class PySILLS(tk.Frame):
             var_check_incl = []
         else:
             inclusion_key = "INCL"
-            var_check_incl = self.container_helper[var_type][var_file_short][inclusion_key]["Content"]
+            var_check_incl = self.container_helper[str_filetype][str_filename_short][inclusion_key]["Content"]
         #
         if len(var_check_incl) > 0:
             if self.pysills_mode in ["FI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][inclusion_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
                     times_incl = var_content["Times"]
                     #
@@ -11525,23 +11535,23 @@ class PySILLS(tk.Frame):
                                           color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
                     #
-                    if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["INCL"]["Listbox"].insert(
+                    if bool_lb_state == True:
+                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
                     #
             elif self.pysills_mode in ["MI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][inclusion_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
-                    times_incl = self.container_helper[var_type][var_file_short][inclusion_key]["Content"][1][
+                    times_incl = self.container_helper[str_filetype][str_filename_short][inclusion_key]["Content"][1][
                         "Times"]
                     #
                     box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35,
                                           color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
                     #
-                    if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["INCL"]["Listbox"].insert(
+                    if bool_lb_state == True:
+                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
         #
@@ -11554,7 +11564,7 @@ class PySILLS(tk.Frame):
         ax.minorticks_on()
         ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         ax.set_axisbelow(True)
-        ax.set_title(var_file_short, fontsize=9)
+        ax.set_title(str_filename_short, fontsize=9)
         ax.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
         ax.set_ylabel("Signal Intensity $I$ (cps)", labelpad=0.5, fontsize=8)
         ax.xaxis.set_tick_params(labelsize=8)
@@ -11563,7 +11573,7 @@ class PySILLS(tk.Frame):
         self.canvas_specific.draw()
         #
         self.canvas_specific.mpl_connect(
-            "button_press_event", lambda event, var_type=var_type, var_file_short=var_file_short:
+            "button_press_event", lambda event, var_type=str_filetype, var_file_short=str_filename_short:
             self.ma_add_interval_to_diagram(var_type, var_file_short, event))
     #
     def ma_show_time_ratio_diagram(self, var_file, var_type):
@@ -13187,7 +13197,7 @@ class PySILLS(tk.Frame):
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
 
-                    if var_sensitivity_i > 0:
+                    if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
                         var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
                         var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
                     else:
@@ -14572,29 +14582,33 @@ class PySILLS(tk.Frame):
 
                             # Factor x
                             var_mo = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                            var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][isotope]
-                            var_intensity_mix_mo = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
-                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
-                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                                "MAT"][isotope]
-                            var_sensitivity_mo = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                                "MAT"][var_mo]
+                            var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+                                isotope]
+                            var_intensity_mix_mo = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+                                var_mo]
+                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+                                var_is]
+                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_sensitivity_mo = self.container_analytical_sensitivity["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_mo]
                             var_a = var_intensity_mix_mo/(var_intensity_mix_is*var_sensitivity_mo)
-                            var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][var_file_short][
-                                "MAT"][var_mo]
-                            var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][var_file_short][
-                                "MAT"][var_is]
-                            #
+                            var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_mo]
+                            var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_is]
+
                             upper_term = var_a*var_concentration_host_mo*var_concentration_incl_is
                             lower_term = var_concentration_host_mo - var_a*\
                                          (var_concentration_host_is - var_concentration_incl_is)
-                            #
+
                             var_concentration_mix_mo = upper_term/lower_term
-                            #
+
                             upper_term = (var_concentration_host_mo - var_concentration_mix_mo)
                             lower_term = var_concentration_host_mo
                             var_x = upper_term/lower_term
-                            var_concentration_mix_is = (var_intensity_mix_is*var_concentration_mix_mo*var_sensitivity_mo)/var_intensity_mix_mo
+                            var_concentration_mix_is = (var_intensity_mix_is*var_concentration_mix_mo*
+                                                        var_sensitivity_mo)/var_intensity_mix_mo
                             var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is)*(
                                     var_concentration_mix_is/var_sensitivity_i)
                         elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
@@ -16782,54 +16796,57 @@ class PySILLS(tk.Frame):
     ## FILE-SPECIFIC ANALYSIS ##########################################################################################
     #
     def fi_check_specific_file(self, var_file, var_type="STD", checkup_mode=False):
+        str_filename_long = var_file
+        str_filetype = var_type
+
         if checkup_mode == True:
-            if var_type == "STD":
-                var_file = self.fi_current_file_std
-            elif var_type == "SMPL":
-                var_file = self.fi_current_file_smpl
-        #
+            if str_filetype == "STD":
+                str_filename_long = self.fi_current_file_std
+            elif str_filetype == "SMPL":
+                str_filename_long = self.fi_current_file_smpl
+
         ## INPUT
-        parts = var_file.split("/")
-        var_file_short = parts[-1]
+        parts = str_filename_long.split("/")
+        str_filename_short = parts[-1]
         self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
-        #
+
         ## Window Settings
         window_width = 1060
         window_heigth = 750
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_fi_checkfile = tk.Toplevel(self.parent)
-        self.subwindow_fi_checkfile.title("FLUID INCLUSION ANALYSIS - File Analysis of " + str(var_file_short))
+        self.subwindow_fi_checkfile.title("FLUID INCLUSION ANALYSIS - File Analysis of " + str(str_filename_short))
         self.subwindow_fi_checkfile.geometry(var_geometry)
         self.subwindow_fi_checkfile.resizable(False, False)
         self.subwindow_fi_checkfile["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_checkfile, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_fi_checkfile, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_fi_checkfile.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_fi_checkfile.grid_columnconfigure(i, minsize=column_min)
-        #
+
         start_row = 0
         start_column = 0
-        #
+
         ## FRAMES
         frm_00 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 8,
             n_columns=n_columns - 11, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
             relief=tk.SOLID)
-        #
+
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column, n_rows=1, n_columns=14,
@@ -16855,150 +16872,150 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=tk.GROOVE, fontsize="sans 10 bold")
-        #
+
         ## BUTTONS
         btn_02a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Show All", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short: self.fi_show_all_lines(
+            command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_show_all_lines(
                 var_type, var_file_short,))
         btn_02b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short: self.fi_hide_all_lines(
+            command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_hide_all_lines(
                 var_type, var_file_short))
         btn_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Remove Interval", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"],
-            command=lambda var_type=var_type, var_file_short=var_file_short:
+            command=lambda var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_remove_interval(var_type, var_file_short))
         btn_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
             fg=self.colors_fi["Dark Font"], bg=self.colors_fi["Medium"]).create_simple_button(
             text="Confirm and Update \nData", bg_active=self.colors_fi["Dark"], fg_active=self.colors_fi["Light Font"],
-            command=lambda var_parent=self.subwindow_fi_checkfile, var_type=var_type, var_file_long=var_file:
+            command=lambda var_parent=self.subwindow_fi_checkfile, var_type=str_filetype, var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
-        #
+
         ## RADIOBUTTONS
         rb_02a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Data Type Plot"][var_type][var_file_short], value_rb=0,
+            var_rb=self.container_var["fi_setting"]["Data Type Plot"][str_filetype][str_filename_short], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="RAW", sticky="nesw",
             relief=tk.GROOVE)
         rb_02b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Data Type Plot"][var_type][var_file_short], value_rb=1,
+            var_rb=self.container_var["fi_setting"]["Data Type Plot"][str_filetype][str_filename_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
             relief=tk.GROOVE)
-        #
+
         rb_03a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=0,
+            var_rb=self.container_var["fi_setting"]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Signal Plot", sticky="nesw",
-            relief=tk.GROOVE, command=lambda var_type=var_type, var_file=var_file, var_lb_state=False:
+            relief=tk.GROOVE, command=lambda var_type=str_filetype, var_file=str_filename_long, var_lb_state=False:
             self.fi_show_time_signal_diagram(var_type, var_file, var_lb_state))
         rb_03b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=1,
+            var_rb=self.container_var["fi_setting"]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Ratio Plot", sticky="nesw",
-            relief=tk.GROOVE, command=lambda var_type=var_type, var_file=var_file:
+            relief=tk.GROOVE, command=lambda var_type=str_filetype, var_file=str_filename_long:
             self.fi_show_time_ratio_diagram(var_type, var_file))
         rb_03c = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Analyse Mode Plot"][var_type][var_file_short], value_rb=2,
+            var_rb=self.container_var["fi_setting"]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick Analysis", sticky="nesw",
-            relief=tk.GROOVE, command=lambda var_type=var_type, var_file=var_file:
+            relief=tk.GROOVE, command=lambda var_type=str_filetype, var_file=str_filename_long:
             self.fi_show_quick_results(var_type, var_file))
-        #
+
         rb_05 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["BG"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=0,
+            var_rb=self.container_var["fi_setting"]["Calculation Interval"][str_filetype][str_filename_short], value_rb=0,
             color_bg=self.colors_intervals["BG"], fg=self.bg_colors["Light Font"], text="Background Interval",
             sticky="nesw", relief=tk.GROOVE)
         rb_06 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 27, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["MAT"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=1,
+            var_rb=self.container_var["fi_setting"]["Calculation Interval"][str_filetype][str_filename_short], value_rb=1,
             color_bg=self.colors_intervals["MAT"], fg=self.bg_colors["Light Font"], text="Matrix Interval", sticky="nesw",
             relief=tk.GROOVE)
         rb_07  = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 40, n_rows=1,
             n_columns=13, fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["INCL"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=2,
+            var_rb=self.container_var["fi_setting"]["Calculation Interval"][str_filetype][str_filename_short], value_rb=2,
             color_bg=self.colors_intervals["INCL"], fg=self.bg_colors["Dark Font"], text="Inclusion Interval",
             sticky="nesw", relief=tk.GROOVE)
         rb_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
             n_columns=39, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
-            var_rb=self.container_var["fi_setting"]["Calculation Interval"][var_type][var_file_short], value_rb=3,
+            var_rb=self.container_var["fi_setting"]["Calculation Interval"][str_filetype][str_filename_short], value_rb=3,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="No Selection",
             sticky="nesw", relief=tk.GROOVE)
-        #
+
         ## CHECKBOXES
-        if "BG" not in self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]:
-            self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short] = {
+        if "BG" not in self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]:
+            self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short] = {
                 "BG": tk.IntVar(), "MAT": tk.IntVar(), "INCL": tk.IntVar()}
-            self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["BG"].set(1)
-            self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["MAT"].set(1)
-            self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["INCL"].set(1)
-        #
+            self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]["BG"].set(1)
+            self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]["MAT"].set(1)
+            self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]["INCL"].set(1)
+
         cb_bg = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 25,
             fg=self.colors_fi["Dark Font"], n_rows=1, n_columns=2, bg=self.colors_intervals["BG"]).create_simple_checkbox(
-            var_cb=self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["BG"],
+            var_cb=self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]["BG"],
             text="", set_sticky="", own_color=True,
-            command=lambda var_key="BG", var_type=var_type, var_file_short=var_file_short:
+            command=lambda var_key="BG", var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_change_interval_visibility(var_key, var_type, var_file_short))
         cb_mat = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 38,
             fg=self.colors_fi["Dark Font"], n_rows=1, n_columns=2, bg=self.colors_intervals["MAT"]).create_simple_checkbox(
-            var_cb=self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["MAT"],
+            var_cb=self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]["MAT"],
             text="", set_sticky="", own_color=True,
-            command=lambda var_key="MAT", var_type=var_type, var_file_short=var_file_short:
+            command=lambda var_key="MAT", var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_change_interval_visibility(var_key, var_type, var_file_short))
         cb_incl = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 51,
             fg=self.colors_fi["Dark Font"], n_rows=1, n_columns=2,
             bg=self.colors_intervals["INCL"]).create_simple_checkbox(
-            var_cb=self.container_var["fi_setting"]["Calculation Interval Visibility"][var_type][var_file_short]["INCL"],
+            var_cb=self.container_var["fi_setting"]["Calculation Interval Visibility"][str_filetype][str_filename_short]["INCL"],
             text="", set_sticky="", own_color=True,
-            command=lambda var_key="INCL", var_type=var_type, var_file_short=var_file_short:
+            command=lambda var_key="INCL", var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_change_interval_visibility(var_key, var_type, var_file_short))
-        #
-        if var_type == "STD":
+
+        if str_filetype == "STD":
             rb_07.configure(state=tk.DISABLED)
             cb_incl.deselect()
             cb_incl.configure(state=tk.DISABLED)
-        #
+
         ## ENTRIES
         var_entr_start = tk.StringVar()
         var_entr_start.set("Set start value")
         var_entr_end = tk.StringVar()
         var_entr_end.set("Set end value")
         self.helper_time_entries = {"Start": var_entr_start, "End": var_entr_end}
-        #
+
         entr_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
             var=var_entr_start, text_default=var_entr_start.get(),
-            command=lambda event, var_entr=var_entr_start, var_key="Start", mode=var_file:
+            command=lambda event, var_entr=var_entr_start, var_key="Start", mode=str_filename_long:
             self.fi_set_bg_interval(var_entr, var_key, mode, event))
         entr_04b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_simple_entry(
             var=var_entr_end, text_default=var_entr_end.get(),
-            command=lambda event, var_entr=var_entr_end, var_key="End", mode=var_file:
+            command=lambda event, var_entr=var_entr_end, var_key="End", mode=str_filename_long:
             self.fi_set_bg_interval(var_entr, var_key, mode, event))
-        #
+
         ## MEASURED ISOTOPES
         frm_iso = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 1, column_id=start_column, n_rows=14, n_columns=14,
@@ -17015,79 +17032,77 @@ class PySILLS(tk.Frame):
                              highlightbackground="black", bd=1)
             text_iso.window_create("end", window=frm_i)
             text_iso.insert("end", "")
-            #
+
             lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_iso.window_create("end", window=lbl_i)
             text_iso.insert("end", "\t")
-            #
+
             cb_raw_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var["fi_setting"]["Display RAW"][var_type][var_file_short][isotope],
+                frm_iso, variable=self.container_var["fi_setting"]["Display RAW"][str_filetype][str_filename_short][isotope],
                 text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=var_type, var_file_short=var_file_short, var_datatype="RAW",
+                command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="RAW",
                                var_isotope=isotope: self.fi_change_line_visibility(var_type, var_file_short,
                                                                                    var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_raw_i)
             text_iso.insert("end", "\t")
-            #
+
             cb_smoothed_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var["fi_setting"]["Display SMOOTHED"][var_type][var_file_short][
+                frm_iso, variable=self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
                     isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
                 fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=var_type, var_file_short=var_file_short, var_datatype="SMOOTHED",
+                command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
                                var_isotope=isotope: self.fi_change_line_visibility(var_type, var_file_short,
                                                                                    var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_smoothed_i)
             text_iso.insert("end", "\n")
-        #
+
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=6,
             n_columns=13, fg=self.colors_fi["Dark Font"], bg=self.colors_intervals["BG LB"]).create_simple_listbox_grid(
             include_scrb_x=False)
-        self.container_helper[var_type][var_file_short]["BG"]["Listbox"] = lb_bg
-        #
+        self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"] = lb_bg
+
         ## MATRIX INTERVAL
         lb_mat, scrollbar_mat_y = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=6,
             n_columns=13, fg=self.colors_fi["Dark Font"],
             bg=self.colors_intervals["MAT LB"]).create_simple_listbox_grid(include_scrb_x=False)
-        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"] = lb_mat
-        #
+        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"] = lb_mat
+
         ## INCLUSION INTERVAL
         lb_incl, scrollbar_incl_y = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 40, n_rows=6,
             n_columns=13, fg=self.colors_fi["Dark Font"],
             bg=self.colors_intervals["INCL LB"]).create_simple_listbox_grid(include_scrb_x=False)
-        self.container_helper[var_type][var_file_short]["INCL"]["Listbox"] = lb_incl
-        #
+        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"] = lb_incl
+
         ## INITIALIZATION
-        #
-        self.fi_show_time_signal_diagram(var_type=var_type, var_file=var_file)
-        #
+        self.fi_show_time_signal_diagram(var_type=str_filetype, var_file=str_filename_long)
+
     def fi_show_time_signal_diagram(self, var_type, var_file, var_lb_state=True):
-        #
-        parts = var_file.split("/")
-        var_file_short = parts[-1]
-        #
+        str_filename_long = var_file
+        str_filetype = var_type
+        parts = str_filename_long.split("/")
+        str_filename_short = parts[-1]
+
         ## Cleaning
         try:
-            canvas_ratio = self.container_helper[var_type][var_file_short]["CANVAS RATIO"]
-            toolbarframe_ratio = self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"]
-            #
+            canvas_ratio = self.container_helper[str_filetype][str_filename_short]["CANVAS RATIO"]
+            toolbarframe_ratio = self.container_helper[str_filetype][str_filename_short]["TOOLBARFRAME RATIO"]
             if canvas_ratio == None:
                 canvas_ratio.get_tk_widget().grid_remove()
                 toolbarframe_ratio.grid_remove()
         except AttributeError:
             pass
-        #
+
         try:
-            resultsframe = self.container_helper[var_type][var_file_short]["RESULTS FRAME"]
-            #
+            resultsframe = self.container_helper[str_filetype][str_filename_short]["RESULTS FRAME"]
             if resultsframe != None:
                 resultsframe.destroy()
         except AttributeError:
             pass
-        #
+
         self.fig_specific = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_specific = FigureCanvasTkAgg(self.fig_specific, master=self.subwindow_fi_checkfile)
         self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
@@ -17098,22 +17113,22 @@ class PySILLS(tk.Frame):
         self.toolbar_specific._message_label.config(
             background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
         self.toolbar_specific.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
-        #
-        self.container_helper[var_type][var_file_short]["FIGURE"] = self.fig_specific
-        self.container_helper[var_type][var_file_short]["CANVAS"] = self.canvas_specific
-        self.container_helper[var_type][var_file_short]["TOOLBARFRAME"] = self.toolbarFrame
+
+        self.container_helper[str_filetype][str_filename_short]["FIGURE"] = self.fig_specific
+        self.container_helper[str_filetype][str_filename_short]["CANVAS"] = self.canvas_specific
+        self.container_helper[str_filetype][str_filename_short]["TOOLBARFRAME"] = self.toolbarFrame
 
         if self.file_loaded == False:
             if self.container_icpms["name"] != None:
                 var_skipheader = self.container_icpms["skipheader"]
                 var_skipfooter = self.container_icpms["skipfooter"]
-                df_data = DE(filename_long=var_file).get_measurements(
+                df_data = DE(filename_long=str_filename_long).get_measurements(
                     delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
             else:
-                df_data = DE(filename_long=var_file).get_measurements(
+                df_data = DE(filename_long=str_filename_long).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][var_file_short]
+            df_data = self.container_measurements["Dataframe"][str_filename_short]
 
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
@@ -17128,124 +17143,120 @@ class PySILLS(tk.Frame):
 
         ## DIAGRAMS
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
-        self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Signal": ax}
-        #
+        self.container_helper[str_filetype][str_filename_short]["AXES"] = {"Time-Signal": ax}
         for isotope in self.container_lists["ISOTOPES"]:
             ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
                              linewidth=var_lw, visible=True)
-            self.container_var["fi_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope]["RAW"] = ln_raw
-            #
-            if "Uncut" in self.container_measurements["EDITED"][var_file_short][isotope]:
+            self.container_var["fi_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                "RAW"] = ln_raw
+
+            if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
                 ln_smoothed = ax.plot(
-                    self.dataset_time, self.container_measurements["EDITED"][var_file_short][isotope]["Uncut"],
+                    self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope]["Uncut"],
                     label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                self.container_var["fi_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                self.container_var["fi_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                     "SMOOTHED"] = ln_smoothed
-                self.container_var["fi_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
-                #
-        #
+                self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
+
         if self.pysills_mode in ["FI", "MI"]:
-            var_check_bg = self.container_helper[var_type][var_file_short]["BG"]["Content"]
+            var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
         else:
-            var_check_bg = self.container_helper[var_type][var_file_short]["BG"]
-        #
+            var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]
+
         if len(var_check_bg) > 0:
             if self.pysills_mode in ["FI", "MI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short]["BG"]["Content"].items():
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short]["BG"][
+                    "Content"].items():
                     times_bg = var_content["Times"]
-                    #
                     box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
                     var_content["Object"] = box_bg
-                    #
+
                     if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["BG"]["Listbox"].insert(
+                        self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
                             tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
-                    #
             else:
-                times_bg = self.container_helper[var_type][var_file_short]["BG"][1]["Times"]
-                #
+                times_bg = self.container_helper[str_filetype][str_filename_short]["BG"][1]["Times"]
                 box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
-                self.container_helper[var_type][var_file_short]["BG"][1]["Object"] = box_bg
-        #
+                self.container_helper[str_filetype][str_filename_short]["BG"][1]["Object"] = box_bg
+
         if self.pysills_mode == "MA":
             signal_key = "SIG"
-            var_check_sig = self.container_helper[var_type][var_file_short][signal_key]
+            var_check_sig = self.container_helper[str_filetype][str_filename_short][signal_key]
         else:
             signal_key = "MAT"
-            var_check_sig = self.container_helper[var_type][var_file_short][signal_key]["Content"]
-        #
+            var_check_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"]
+
         if len(var_check_sig) > 0:
             if self.pysills_mode in ["FI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][signal_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
-                    #
+
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
-                    #
+
                     if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"].insert(
+                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
-                    #
             elif self.pysills_mode in ["MI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][signal_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
-                    times_sig = self.container_helper[var_type][var_file_short][signal_key]["Content"][1]["Times"]
+                    times_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"][1][
+                        "Times"]
                     var_color = self.colors_intervals["MAT"]
-                    #
+
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
-                    #
+
                     if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["MAT"]["Listbox"].insert(
+                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
-                    #
             else:
-                times_sig = times_sig = self.container_helper[var_type][var_file_short][signal_key][1]["Times"]
+                times_sig = times_sig = self.container_helper[str_filetype][str_filename_short][signal_key][1]["Times"]
                 var_color = self.colors_intervals["SIG"]
-                #
+
                 box_sig = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                 var_content["Object"] = box_sig
-        #
+
         if self.pysills_mode == "MA":
             inclusion_key = "INCL"
             var_check_incl = []
         else:
             inclusion_key = "INCL"
-            var_check_incl = self.container_helper[var_type][var_file_short][inclusion_key]["Content"]
-        #
+            var_check_incl = self.container_helper[str_filetype][str_filename_short][inclusion_key]["Content"]
+
         if len(var_check_incl) > 0:
             if self.pysills_mode in ["FI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][inclusion_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
                     times_incl = var_content["Times"]
-                    #
+
                     box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
-                    #
+
                     if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["INCL"]["Listbox"].insert(
+                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
-                    #
+
             elif self.pysills_mode in ["MI"]:
-                for var_id, var_content in self.container_helper[var_type][var_file_short][inclusion_key][
+                for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
-                    times_incl = self.container_helper[var_type][var_file_short][inclusion_key]["Content"][1][
+                    times_incl = self.container_helper[str_filetype][str_filename_short][inclusion_key]["Content"][1][
                         "Times"]
-                    #
+
                     box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
-                    #
+
                     if var_lb_state == True:
-                        self.container_helper[var_type][var_file_short]["INCL"]["Listbox"].insert(
+                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
-        #
+
         ax.grid(True)
         ax.set_yscale("log")
         ax.set_xlim(left=0, right=x_max)
@@ -17255,19 +17266,19 @@ class PySILLS(tk.Frame):
         ax.minorticks_on()
         ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         ax.set_axisbelow(True)
-        ax.set_title(var_file_short, fontsize=9)
+        ax.set_title(str_filename_short, fontsize=9)
         ax.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
         ax.set_ylabel("Signal Intensity $I$ (cps)", labelpad=0.5, fontsize=8)
         ax.xaxis.set_tick_params(labelsize=8)
         ax.yaxis.set_tick_params(labelsize=8)
-        #
+
         self.canvas_specific.draw()
-        #
+
         self.canvas_specific.mpl_connect(
-            "button_press_event", lambda event, var_type=var_type, var_file_short=var_file_short,
-                                         var_file_long=var_file:
+            "button_press_event",
+            lambda event, var_type=str_filetype, var_file_short=str_filename_short, var_file_long=str_filename_long:
             self.fi_add_interval_to_diagram(var_type, var_file_short, var_file_long, event))
-    #
+
     def fi_show_time_ratio_diagram(self, var_type, var_file):
         #
         parts = var_file.split("/")
