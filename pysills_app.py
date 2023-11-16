@@ -12,7 +12,6 @@
 
 ## MODULES
 # external
-from datetime import date
 import os, pathlib, sys, re, datetime, csv, string, math
 import numpy as np
 import pandas as pd
@@ -20,7 +19,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
-import matplotlib.colors as mcolors
 import tkinter as tk
 from tkinter import filedialog, ttk, font
 # internal
@@ -12736,13 +12734,17 @@ class PySILLS(tk.Frame):
                                             helper_results_sigma.append(var_result_sigma_i)
                         var_result_i = np.mean(helper_results)
                         var_result_sigma_i = np.mean(helper_results_sigma)
-                        # self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
-                        # if var_focus == "MAT":
-                        #     self.container_intensity[var_filetype][var_datatype]["1 SIGMA MAT"][
-                        #         isotope] = var_result_sigma_i
-                        # elif var_focus == "INCL":
-                        #     self.container_intensity[var_filetype][var_datatype]["1 SIGMA INCL"][
-                        #         isotope] = var_result_sigma_i
+                        self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
+                        if var_focus == "MAT":
+                            if "1 SIGMA MAT" not in self.container_intensity[var_filetype][var_datatype]:
+                                self.container_intensity[var_filetype][var_datatype]["1 SIGMA MAT"] = {}
+                            self.container_intensity[var_filetype][var_datatype]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
+                        elif var_focus == "INCL":
+                            if "1 SIGMA INCL" not in self.container_intensity[var_filetype][var_datatype]:
+                                self.container_intensity[var_filetype][var_datatype]["1 SIGMA INCL"] = {}
+                            self.container_intensity[var_filetype][var_datatype]["1 SIGMA INCL"][
+                                isotope] = var_result_sigma_i
 
         ## CHECK
         if check == True:
