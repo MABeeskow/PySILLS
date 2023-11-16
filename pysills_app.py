@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		20.10.2023
+# Date:		16.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -1242,6 +1242,7 @@ class PySILLS(tk.Frame):
 
     def select_icp_ms(self, var_opt):
         path = os.getcwd()
+
         if self.file_loaded == False:
             if self.demo_mode == True:
                 try:
@@ -1254,6 +1255,7 @@ class PySILLS(tk.Frame):
         else:
             var_instrument_raw = var_opt.get()
             var_instrument = var_instrument_raw.replace(" ", "_")
+
         file_long = path + str("/lib/icpms/" + var_instrument + ".csv")
         file_content = open(file_long)
 
@@ -2041,11 +2043,12 @@ class PySILLS(tk.Frame):
         elif var_filetype == "SMPL":
             click_id = self.lb_smpl.curselection()
             var_fig = self.quick_plot_figure_smpl
-        #
+
         click_id = click_id[0]
         var_file_long = self.container_lists[var_filetype]["Long"][click_id]
         var_file_short = self.container_lists[var_filetype]["Short"][click_id]
-        #
+        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
         ## Window Settings
         window_width = 1000
         window_heigth = 700
@@ -2089,50 +2092,55 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
 
-        if self.container_icpms["name"] != None:
-            var_skipheader = self.container_icpms["skipheader"]
-            var_skipfooter = self.container_icpms["skipfooter"]
-            df_data = DE(filename_long=var_file_long).get_measurements(
-                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file_long).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = DE(filename_long=var_file_long).get_measurements(
-                delimiter=",", skip_header=3, skip_footer=1)
+            df_data = self.container_measurements["Dataframe"][var_file_short]
 
         list_keys = list(df_data.columns.values)
         del list_keys[0]
         dataset_time = list(df_data.iloc[:, 0])
         x_max = max(dataset_time)
-        #
-        if len(self.container_lists["ISOTOPES"]) == 0:
+
+        if len(file_isotopes) == 0:
             self.container_lists["ISOTOPES"] = list_keys
             self.define_isotope_colors()
 
-        icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
+        icp_measurements = np.array([[df_data[isotope] for isotope in file_isotopes]])
         y_max = np.amax(icp_measurements)
-        #
+
         ## ISOTOPE LIST
         frm_isotopes = SE(
             parent=subwindow_quickplotter, row_id=row_start + 1, column_id=column_start + 40, n_rows=n_rows - 3,
-            n_columns=20, fg=self.green_light, bg=self.bg_colors["Very Light"]).create_frame()
+            n_columns=20, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
         vsb = ttk.Scrollbar(master=frm_isotopes, orient="vertical")
-        text = tk.Text(master=frm_isotopes, width=30, height=15, yscrollcommand=vsb.set, bg=self.bg_colors["Very Light"])
+        text = tk.Text(
+            master=frm_isotopes, width=30, height=15, yscrollcommand=vsb.set, bg=self.bg_colors["Very Light"])
         vsb.config(command=text.yview)
         vsb.pack(side="right", fill="y")
         text.pack(side="left", fill="both", expand=True)
-        #
+
         self.temp_checkbuttons = {}
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+        for index, isotope in enumerate(file_isotopes):
             self.temp_checkbuttons[isotope] = tk.IntVar(value=1)
-            #
-            cb_i = tk.Checkbutton(master=frm_isotopes, text=isotope, fg=self.green_dark, bg=self.bg_colors["Very Light"],
-                                  variable=self.temp_checkbuttons[isotope],
-                                  command=lambda var_isotope=isotope, var_file_short=var_file_short:
-                                  self.show_line(var_isotope, var_file_short))
-            #
+
+            cb_i = tk.Checkbutton(
+                master=frm_isotopes, text=isotope, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"],
+                variable=self.temp_checkbuttons[isotope],
+                command=lambda var_isotope=isotope, var_file_short=var_file_short:
+                self.show_line(var_isotope, var_file_short))
+
             text.window_create("end", window=cb_i)
             text.insert("end", "\n")
             cb_i.select()
-        #
+
         ## DIAGRAMS
         var_fig = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         var_ax = var_fig.add_subplot(label=np.random.uniform())
@@ -2145,11 +2153,11 @@ class PySILLS(tk.Frame):
         elif var_lw > 2.5:
             var_lw = 2.5
 
-        for isotope in self.container_lists["ISOTOPES"]:
+        for isotope in file_isotopes:
             ln = var_ax.plot(dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
                          linewidth=var_lw, visible=True)
             self.temp_lines[isotope] = ln
-        #
+
         if var_file_short in self.container_helper[var_filetype]:
             if len(self.container_helper[var_filetype][var_file_short]["BG"]["Content"]) > 0:
                 times_bg = self.container_helper[var_filetype][var_file_short]["BG"]["Content"][1]["Times"]
@@ -2158,7 +2166,7 @@ class PySILLS(tk.Frame):
             if len(self.container_helper[var_filetype][var_file_short]["MAT"]["Content"]) > 0:
                 times_sig = self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][1]["Times"]
                 box_sig = var_ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=self.colors_intervals["MAT"])
-        #
+
         var_ax.grid(True)
         var_ax.set_yscale("log")
         var_ax.set_xlim(left=0, right=x_max)
@@ -2203,7 +2211,7 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_file_short=var_file_short: self.hide_all_lines(var_file_short))
-    #
+
     def show_line(self, var_isotope, var_file_short):
         if self.temp_checkbuttons[var_isotope].get() == 1:
             self.temp_lines[var_isotope][0].set_visible(True)
@@ -5365,7 +5373,7 @@ class PySILLS(tk.Frame):
     #
     def open_project(self):
         filename = filedialog.askopenfilename()
-        #
+
         try:
             file_loaded = open(str(filename), "r")
             loaded_lines = file_loaded.readlines()
@@ -5708,11 +5716,14 @@ class PySILLS(tk.Frame):
                                index_container["STANDARD FILES"] - 1):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
-                    #
+
                     self.container_var["fi_setting"]["Author"].set(splitted_std[0])
                     self.container_var["fi_setting"]["Source ID"].set(splitted_std[1])
                     self.container_var["LASER"].set(splitted_std[2])
-                    #
+                    try:
+                        self.var_opt_icp.set(splitted_std[3])
+                    except:
+                        self.var_opt_icp.set("Select ICP-MS")
                 ## STANDARD FILES
                 for i in range(index_container["STANDARD FILES"] + 1,
                                index_container["SAMPLE FILES"] - 1):
@@ -6084,17 +6095,18 @@ class PySILLS(tk.Frame):
                                 self.container_measurements["SELECTED"][key]["SMOOTHED"] = {}
                             self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
                             self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
-
             elif self.pysills_mode == "MI":
                 pass
 
             # Initialization
             self.file_loaded = True
             self.demo_mode = False
+
             if self.old_file == True and self.var_opt_icp.get() == "Select ICP-MS":
                 self.container_icpms["name"] = None
             else:
                 self.select_icp_ms(var_opt=self.var_opt_icp)
+
             if self.pysills_mode == "MA":
                 self.ma_settings()
             elif self.pysills_mode == "FI":
@@ -13808,6 +13820,35 @@ class PySILLS(tk.Frame):
             self.container_lists["ISOTOPES"] = df_isotopes
             self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
             self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+                if element not in self.container_lists["Measured Elements"]["All"]:
+                    self.container_lists["Measured Elements"]["All"].append(element)
+            for filename_short in self.container_lists["STD"]["Short"]:
+                self.container_lists["Measured Elements"][filename_short] = {}
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"][filename_short]:
+                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    else:
+                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+            for filename_short in self.container_lists["SMPL"]["Short"]:
+                self.container_lists["Measured Elements"][filename_short] = {}
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"][filename_short]:
+                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    else:
+                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+
             self.define_isotope_colors()
         else:
             self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
