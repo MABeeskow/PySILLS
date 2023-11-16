@@ -2045,43 +2045,43 @@ class PySILLS(tk.Frame):
             var_fig = self.quick_plot_figure_smpl
 
         click_id = click_id[0]
-        var_file_long = self.container_lists[var_filetype]["Long"][click_id]
-        var_file_short = self.container_lists[var_filetype]["Short"][click_id]
-        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        file_long = self.container_lists[var_filetype]["Long"][click_id]
+        file_short = self.container_lists[var_filetype]["Short"][click_id]
+        file_isotopes = self.container_lists["Measured Isotopes"][file_short]
 
         ## Window Settings
         window_width = 1000
         window_heigth = 700
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         subwindow_quickplotter = tk.Toplevel(self.parent)
         subwindow_quickplotter.title("Quick Plotter")
         subwindow_quickplotter.geometry(var_geometry)
         subwindow_quickplotter.resizable(False, False)
         subwindow_quickplotter["bg"] = self.bg_colors["Very Light"]
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_quickplotter, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_quickplotter, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_quickplotter.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             subwindow_quickplotter.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ###########################################################
-        #
+
         row_start = 0
         column_start = 0
-        #
+
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_quickplotter, row_id=row_start, column_id=column_start, n_rows=1, n_columns=40,
@@ -2096,13 +2096,13 @@ class PySILLS(tk.Frame):
             if self.container_icpms["name"] != None:
                 var_skipheader = self.container_icpms["skipheader"]
                 var_skipfooter = self.container_icpms["skipfooter"]
-                df_data = DE(filename_long=var_file_long).get_measurements(
+                df_data = DE(filename_long=file_long).get_measurements(
                     delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
             else:
-                df_data = DE(filename_long=var_file_long).get_measurements(
+                df_data = DE(filename_long=file_long).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][var_file_short]
+            df_data = self.container_measurements["Dataframe"][file_short]
 
         list_keys = list(df_data.columns.values)
         del list_keys[0]
@@ -2134,7 +2134,7 @@ class PySILLS(tk.Frame):
             cb_i = tk.Checkbutton(
                 master=frm_isotopes, text=isotope, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"],
                 variable=self.temp_checkbuttons[isotope],
-                command=lambda var_isotope=isotope, var_file_short=var_file_short:
+                command=lambda var_isotope=isotope, var_file_short=file_short:
                 self.show_line(var_isotope, var_file_short))
 
             text.window_create("end", window=cb_i)
@@ -2154,17 +2154,18 @@ class PySILLS(tk.Frame):
             var_lw = 2.5
 
         for isotope in file_isotopes:
-            ln = var_ax.plot(dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                         linewidth=var_lw, visible=True)
+            ln = var_ax.plot(
+                dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                visible=True)
             self.temp_lines[isotope] = ln
 
-        if var_file_short in self.container_helper[var_filetype]:
-            if len(self.container_helper[var_filetype][var_file_short]["BG"]["Content"]) > 0:
-                times_bg = self.container_helper[var_filetype][var_file_short]["BG"]["Content"][1]["Times"]
-                box_bg = var_ax.axvspan(float(times_bg[0]), float(times_bg[1]), alpha=0.35,
-                                    color=self.colors_intervals["BG"])
-            if len(self.container_helper[var_filetype][var_file_short]["MAT"]["Content"]) > 0:
-                times_sig = self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][1]["Times"]
+        if file_short in self.container_helper[var_filetype]:
+            if len(self.container_helper[var_filetype][file_short]["BG"]["Content"]) > 0:
+                times_bg = self.container_helper[var_filetype][file_short]["BG"]["Content"][1]["Times"]
+                box_bg = var_ax.axvspan(
+                    float(times_bg[0]), float(times_bg[1]), alpha=0.35, color=self.colors_intervals["BG"])
+            if len(self.container_helper[var_filetype][file_short]["MAT"]["Content"]) > 0:
+                times_sig = self.container_helper[var_filetype][file_short]["MAT"]["Content"][1]["Times"]
                 box_sig = var_ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=self.colors_intervals["MAT"])
 
         var_ax.grid(True)
@@ -2176,7 +2177,7 @@ class PySILLS(tk.Frame):
         var_ax.minorticks_on()
         var_ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         var_ax.set_axisbelow(True)
-        var_ax.set_title(var_file_short, fontsize=9)
+        var_ax.set_title(file_short, fontsize=9)
         var_ax.set_xlabel("Time (s)", labelpad=0.5, fontsize=8)
         var_ax.set_ylabel("Signal (cps)", labelpad=0.5, fontsize=8)
         var_ax.xaxis.set_tick_params(labelsize=8)
@@ -2197,7 +2198,7 @@ class PySILLS(tk.Frame):
             background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
         var_toolbar.winfo_children()[-2].config(background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
 
-        self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short] = {
+        self.container_var["Plotting"][self.pysills_mode]["Quickview"][file_short] = {
             "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
 
         ## BUTTONS
@@ -2205,12 +2206,12 @@ class PySILLS(tk.Frame):
             parent=subwindow_quickplotter, row_id=n_rows - 2, column_id=column_start + 40, n_rows=2, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Show All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_file_short=var_file_short: self.show_all_lines(var_file_short))
+            command=lambda var_file_short=file_short: self.show_all_lines(var_file_short))
         btn_02 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2, column_id=column_start + 45, n_rows=2, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_file_short=var_file_short: self.hide_all_lines(var_file_short))
+            command=lambda var_file_short=file_short: self.hide_all_lines(var_file_short))
 
     def show_line(self, var_isotope, var_file_short):
         if self.temp_checkbuttons[var_isotope].get() == 1:
@@ -2876,11 +2877,11 @@ class PySILLS(tk.Frame):
     #
     def select_mineral_is(self, var_min, fluidinclusion=False):
         self.srm_actual[var_min] = {}
-        #
+
         if var_min in self.mineral_chem:
             for key, value in self.mineral_chem[var_min].items():
                 self.srm_actual[var_min][key] = value
-            #
+
             if fluidinclusion == False:
                 if self.file_loaded == False:
                     self.container_var["isotopes"]["default"].set("Select IS")
@@ -2889,13 +2890,14 @@ class PySILLS(tk.Frame):
                 self.container_var["mineralchemistry"].clear()
             self.container_var["mineralchemistry"].extend(list(self.mineral_chem[var_min].keys()))
             self.container_var["mineralchemistry"].sort()
-            #
+
             possible_is = []
             for element in self.container_var["mineralchemistry"]:
                 for isotope in self.container_lists["ISOTOPES"]:
                     key = re.search("(\D+)(\d+)", isotope)
                     if element == key.group(1):
                         possible_is.append(isotope)
+
             if fluidinclusion == True:
                 list_fluidchemistry = ["H", "Na", "Mg", "Ca", "K", "Cl", "F", "Br", "I", "At"]
                 for element in list_fluidchemistry:
@@ -2903,39 +2905,44 @@ class PySILLS(tk.Frame):
                         key = re.search("(\D+)(\d+)", isotope)
                         if element == key.group(1):
                             possible_is.append(isotope)
-            #
+
             if fluidinclusion == False:
                 self.opt_is_std_def["menu"].delete(0, "end")
                 self.opt_is_smpl_def["menu"].delete(0, "end")
-                #
+
                 for index, isotope in enumerate(possible_is):
-                    for file in self.list_std:
+                    for file_long in self.container_lists["STD"]["Long"]:
                         if index == 0:
-                            self.container_optionmenu["STD"][file]["menu"].delete(0, "end")
-                        self.container_optionmenu["STD"][file]["menu"].add_command(
-                            label=isotope, command=lambda element=isotope, file=file: self.change_std_is(element, file))
+                            self.container_optionmenu["STD"][file_long]["menu"].delete(0, "end")
+
+                        self.container_optionmenu["STD"][file_long]["menu"].add_command(
+                            label=isotope, command=lambda element=isotope, file=file_long:
+                            self.change_std_is(element, file))
+
                         if self.file_loaded is False:
-                            self.container_var["STD"][file]["IS"].set("Select IS")
-                    for file in self.list_smpl:
+                            self.container_var["STD"][file_long]["IS"].set("Select IS")
+                    for file_long in self.container_lists["SMPL"]["Long"]:
                         if index == 0:
-                            self.container_optionmenu["SMPL"][file]["menu"].delete(0, "end")
-                        self.container_optionmenu["SMPL"][file]["menu"].add_command(
-                            label=isotope, command=lambda element=isotope, file=file,
-                                                          mineral=self.container_var["mineral"].get():
+                            self.container_optionmenu["SMPL"][file_long]["menu"].delete(0, "end")
+
+                        self.container_optionmenu["SMPL"][file_long]["menu"].add_command(
+                            label=isotope,
+                            command=lambda element=isotope, file=file_long, mineral=self.container_var["mineral"].get():
                             self.change_smpl_is(element, file, mineral))
+
                         if self.file_loaded is False:
-                            self.container_var["SMPL"][file]["IS"].set("Select IS")
-                    #
+                            self.container_var["SMPL"][file_long]["IS"].set("Select IS")
+
                     self.opt_is_std_def["menu"].add_command(
                         label=isotope, command=lambda element=isotope, mineral=var_min:
                         self.change_std_is_default(element, mineral))
                     self.opt_is_smpl_def["menu"].add_command(
                         label=isotope, command=lambda element=isotope, mineral=var_min:
                         self.change_smpl_is_default(element, mineral))
-            #
+
             self.container_lists["Possible IS"].clear()
             self.container_lists["Possible IS"].extend(possible_is)
-            #
+
             self.mineral_chem["Unknown"] = {}
             for element in self.container_var["mineralchemistry"]:
                 for isotope in self.container_lists["ISOTOPES"]:
