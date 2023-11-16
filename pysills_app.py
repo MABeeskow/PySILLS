@@ -18594,57 +18594,171 @@ class PySILLS(tk.Frame):
                             amount_fluid*self.molar_masses_compounds[fluid][element]*total_ppm, 0))
 
     def fi_calculate_chargebalance(self, var_entr, mode, var_file, event):
-        amount_fluid = (100 - float(var_entr.get()))/100
-        amount_nacl_equiv = float(var_entr.get())/100
-        total_ppm = 10**6
+        condition_std, condition_smpl = self.check_file_flags()
 
-        # Calculate fluid data
-        self.calculate_fluid_data()
-        # Calculate chloride data
-        self.calculate_chloride_data()
-        # Prepare NaCl equivalents  calculation
-        self.prepare_nacl_equivalents(
-            amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+        if condition_std == True and condition_smpl == True:
+            amount_fluid = (100 - float(var_entr.get()))/100
+            amount_nacl_equiv = float(var_entr.get())/100
+            total_ppm = 10**6
 
-        if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-            elements_masses = {
-                "H": 1.008, "Li": 6.94, "C": 12.011, "O": 15.999, "Na": 22.99, "Mg": 24.305, "S": 32.06, "Cl": 35.45,
-                "K": 39.098, "Ca": 40.078, "Fe": 55.845}
-        else:
-            elements_masses = {
-                "H": 1.008, "Li": 6.941, "C": 12.010, "O": 16.000, "Na": 22.990, "Mg": 24.300, "S": 32.070, "Cl": 35.45,
-                "K": 39.100, "Ca": 40.080, "Fe": 55.850}
+            # Calculate fluid data
+            self.calculate_fluid_data()
+            # Calculate chloride data
+            self.calculate_chloride_data()
+            # Prepare NaCl equivalents  calculation
+            self.prepare_nacl_equivalents(
+                amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
 
-        if self.init_fi_chargebalance == False:
-            var_filetype = "None"
-            var_file_short = "None"
-            var_file_long = "None"
-            var_focus = "None"
-            if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
-                    self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
-                list_datatype = ["RAW"]
+            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+                elements_masses = {
+                    "H": 1.008, "Li": 6.94, "C": 12.011, "O": 15.999, "Na": 22.99, "Mg": 24.305, "S": 32.06,
+                    "Cl": 35.45, "K": 39.098, "Ca": 40.078, "Fe": 55.845}
             else:
-                list_datatype = ["RAW", "SMOOTHED"]
+                elements_masses = {
+                    "H": 1.008, "Li": 6.941, "C": 12.010, "O": 16.000, "Na": 22.990, "Mg": 24.300, "S": 32.070,
+                    "Cl": 35.45, "K": 39.100, "Ca": 40.080, "Fe": 55.850}
 
-            for var_datatype in list_datatype:
-                # Intensity Analysis
-                self.get_intensity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_focus=var_focus, mode="All")
-                self.fi_get_intensity_corrected(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_focus=var_focus, mode="All")
-                # Sensitivity Results
-                self.fi_get_analytical_sensitivity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
+            if self.init_fi_chargebalance == False:
+                var_filetype = "None"
+                var_file_short = "None"
+                var_file_long = "None"
+                var_focus = "None"
+                if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
+                    list_datatype = ["RAW"]
+                else:
+                    list_datatype = ["RAW", "SMOOTHED"]
 
-            self.init_fi_chargebalance = True
+                for var_datatype in list_datatype:
+                    # Intensity Analysis
+                    self.get_intensity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    self.fi_get_intensity_corrected(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    # Sensitivity Results
+                    self.fi_get_analytical_sensitivity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, mode="All")
 
-        if mode == "demonstration":
-            helper = []
-            for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-                file_smpl = self.container_lists["SMPL"]["Long"][index]
+                self.init_fi_chargebalance = True
+
+            if mode == "demonstration":
+                helper = []
+                for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    file_smpl = self.container_lists["SMPL"]["Long"][index]
+                    var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                    var_nacl_equiv = amount_nacl_equiv*total_ppm
+                    var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                        "Total"])
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                    salt_factor = 1
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt != "NaCl":
+                            molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                            element = self.molar_masses_compounds[salt]["Cation"]
+                            charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
+                            molar_mass_na = elements_masses["Na"]
+
+                            for isotope in file_isotopes:
+                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                isotope_atom = key_isotope.group(1)
+
+                                if element == isotope_atom:
+                                    molar_mass_element = elements_masses[element]
+                                    try:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["MAT"][isotope]
+                                    except:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["MAT"][isotope]
+
+                                    salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
+                                                   (molar_mass_na/molar_mass_element)
+                        else:
+                            salt_factor += 0
+
+                    var_na_true_final = var_na_true_base/salt_factor
+
+                    var_concentration_is = round(var_na_true_final, 4)
+                    helper.append(var_concentration_is)
+
+                try:
+                    for row in self.tv_salt_cb.get_children():
+                        self.tv_salt_cb.delete(row)
+                except:
+                    pass
+
+                self.tv_salt_cb.insert("", tk.END, values=[str("Na"), round(np.mean(helper), 4)])
+
+            elif mode == "default":
+                helper = []
+                for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    file_smpl = self.container_lists["SMPL"]["Long"][index]
+                    var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                    var_nacl_equiv = amount_nacl_equiv*total_ppm
+                    var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                        "Total"])
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                    salt_factor = 1
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt != "NaCl":
+                            molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                            element = self.molar_masses_compounds[salt]["Cation"]
+                            charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
+                            molar_mass_na = elements_masses["Na"]
+                            #
+                            for isotope in file_isotopes:
+                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                isotope_atom = key_isotope.group(1)
+
+                                if element == isotope_atom:
+                                    molar_mass_element = elements_masses[element]
+                                    try:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["MAT"][isotope]
+                                    except:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["MAT"][isotope]
+
+                                    salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)*\
+                                                   (molar_mass_na/molar_mass_element)
+                        else:
+                            salt_factor += 0
+
+                    var_na_true_final = var_na_true_base/salt_factor
+
+                    var_concentration_is = round(var_na_true_final, 4)
+                    helper.append(var_concentration_is)
+
+                    self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+                        var_entr.get())
+                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                    #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+
+                self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set(
+                    round(np.mean(helper), 4))
+            elif mode == "specific":
+                file_smpl = var_file
+                file_smpl_short = file_smpl.split("/")[-1]
                 var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
                 var_nacl_equiv = amount_nacl_equiv*total_ppm
                 var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
@@ -18656,11 +18770,10 @@ class PySILLS(tk.Frame):
                         element = self.molar_masses_compounds[salt]["Cation"]
                         charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
                         molar_mass_na = elements_masses["Na"]
-                        #
                         for isotope in file_isotopes:
                             key_isotope = re.search("(\D+)(\d+)", isotope)
                             isotope_atom = key_isotope.group(1)
-                            #
+
                             if element == isotope_atom:
                                 molar_mass_element = elements_masses[element]
                                 try:
@@ -18677,347 +18790,258 @@ class PySILLS(tk.Frame):
                                         file_smpl_short]["INCL"][var_is_i]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                         file_smpl_short]["MAT"][isotope]
-                                #
-                                salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
-                                               (molar_mass_na/molar_mass_element)
-                        #
-                    else:
-                        salt_factor += 0
-                #
-                var_na_true_final = var_na_true_base/salt_factor
-                #
-                var_concentration_is = round(var_na_true_final, 4)
-                helper.append(var_concentration_is)
-            #
-            try:
-                for row in self.tv_salt_cb.get_children():
-                    self.tv_salt_cb.delete(row)
-            except:
-                pass
-            #
-            self.tv_salt_cb.insert("", tk.END, values=[str("Na"), round(np.mean(helper), 4)])
-            #
-        elif mode == "default":
-            helper = []
-            for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-                file_smpl = self.container_lists["SMPL"]["Long"][index]
-                var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                var_nacl_equiv = amount_nacl_equiv*total_ppm
-                var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
-                file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
-                salt_factor = 1
-                for salt in self.container_lists["Selected Salts"]:
-                    if salt != "NaCl":
-                        molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
-                        element = self.molar_masses_compounds[salt]["Cation"]
-                        charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
-                        molar_mass_na = elements_masses["Na"]
-                        #
-                        for isotope in file_isotopes:
-                            key_isotope = re.search("(\D+)(\d+)", isotope)
-                            isotope_atom = key_isotope.group(1)
-                            #
-                            if element == isotope_atom:
-                                molar_mass_element = elements_masses[element]
-                                try:
-                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][isotope]
-                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][var_is_i]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["MAT"][isotope]
-                                except:
-                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][isotope]
-                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][var_is_i]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                        file_smpl_short]["MAT"][isotope]
-                                #
+
                                 salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)*\
                                                (molar_mass_na/molar_mass_element)
-                        #
                     else:
                         salt_factor += 0
-                #
+
                 var_na_true_final = var_na_true_base/salt_factor
-                #
+
                 var_concentration_is = round(var_na_true_final, 4)
-                helper.append(var_concentration_is)
-                #
-                self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
-                    var_entr.get())
+
                 self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
                 #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
-            #
-            self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set(
-                round(np.mean(helper), 4))
-            #
-        elif mode == "specific":
-            file_smpl = var_file
-            file_smpl_short = file_smpl.split("/")[-1]
-            var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-            var_nacl_equiv = amount_nacl_equiv*total_ppm
-            var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
-            file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
-            salt_factor = 1
-            for salt in self.container_lists["Selected Salts"]:
-                if salt != "NaCl":
-                    molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
-                    element = self.molar_masses_compounds[salt]["Cation"]
-                    charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
-                    molar_mass_na = elements_masses["Na"]
-                    for isotope in file_isotopes:
-                        key_isotope = re.search("(\D+)(\d+)", isotope)
-                        isotope_atom = key_isotope.group(1)
-                        #
-                        if element == isotope_atom:
-                            molar_mass_element = elements_masses[element]
-                            try:
-                                var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                    file_smpl_short]["INCL"][isotope]
-                                var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                    file_smpl_short]["INCL"][var_is_i]
-                                var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                    file_smpl_short]["MAT"][isotope]
-                            except:
-                                var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
-                                    file_smpl_short]["INCL"][isotope]
-                                var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                    file_smpl_short]["INCL"][var_is_i]
-                                var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                    file_smpl_short]["MAT"][isotope]
-                            #
-                            salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)*\
-                                           (molar_mass_na/molar_mass_element)
-                    #
-                else:
-                    salt_factor += 0
-            #
-            var_na_true_final = var_na_true_base/salt_factor
-            #
-            var_concentration_is = round(var_na_true_final, 4)
-            #
-            self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
-            #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
-            self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
-    #
+
+    def check_file_flags(self):
+        helper_flags = {"STD": {"Total": 0, "Currently": 0}, "SMPL": {"Total": 0, "Currently": 0}}
+        for str_filetype in ["STD", "SMPL"]:
+            helper_flags[str_filetype]["Total"] = len(self.container_lists[str_filetype]["Long"])
+            for str_filename_long in self.container_lists[str_filetype]["Long"]:
+                str_color = self.container_var[str_filetype][str_filename_long]["Sign Color"].get()
+                if str_color == "#B0D8A4":
+                    helper_flags[str_filetype]["Currently"] += 1
+
+        condition_std = False
+        condition_smpl = False
+
+        if helper_flags["STD"]["Total"] == helper_flags["STD"]["Currently"]:
+            condition_std = True
+
+        if helper_flags["SMPL"]["Total"] == helper_flags["SMPL"]["Currently"]:
+            condition_smpl = True
+
+        return condition_std, condition_smpl
+
     def fi_calculate_massbalance(self, var_entr, mode, var_file, event):
-        amount_fluid = (100 - float(var_entr.get()))/100
-        amount_nacl_equiv = float(var_entr.get())/100
-        total_ppm = 10**6
+        condition_std, condition_smpl = self.check_file_flags()
 
-        # Calculate fluid data
-        self.calculate_fluid_data()
-        # Calculate chloride data
-        self.calculate_chloride_data()
-        # Prepare NaCl equivalents  calculation
-        self.prepare_nacl_equivalents(
-            amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+        if condition_std == True and condition_smpl == True:
+            amount_fluid = (100 - float(var_entr.get()))/100
+            amount_nacl_equiv = float(var_entr.get())/100
+            total_ppm = 10**6
 
-        if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
-            elements_masses = {
-                "H": 1.008, "Li": 6.94, "C": 12.011, "O": 15.999, "Na": 22.99, "Mg": 24.305, "S": 32.06, "Cl": 35.45,
-                "K": 39.098, "Ca": 40.078, "Fe": 55.845}
-        else:
-            elements_masses = {
-                "H": 1.008, "Li": 6.941, "C": 12.010, "O": 16.000, "Na": 22.990, "Mg": 24.300, "S": 32.070, "Cl": 35.45,
-                "K": 39.100, "Ca": 40.080, "Fe": 55.850}
+            # Calculate fluid data
+            self.calculate_fluid_data()
+            # Calculate chloride data
+            self.calculate_chloride_data()
+            # Prepare NaCl equivalents  calculation
+            self.prepare_nacl_equivalents(
+                amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
 
-        if self.init_fi_massbalance == False:
-            var_filetype = "None"
-            var_file_short = "None"
-            var_file_long = "None"
-            var_focus = "None"
-            if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
-                    self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
-                list_datatype = ["RAW"]
+            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+                elements_masses = {
+                    "H": 1.008, "Li": 6.94, "C": 12.011, "O": 15.999, "Na": 22.99, "Mg": 24.305, "S": 32.06,
+                    "Cl": 35.45, "K": 39.098, "Ca": 40.078, "Fe": 55.845}
             else:
-                list_datatype = ["RAW", "SMOOTHED"]
+                elements_masses = {
+                    "H": 1.008, "Li": 6.941, "C": 12.010, "O": 16.000, "Na": 22.990, "Mg": 24.300, "S": 32.070,
+                    "Cl": 35.45, "K": 39.100, "Ca": 40.080, "Fe": 55.850}
 
-            for var_datatype in list_datatype:
-                # Intensity Analysis
-                self.get_intensity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_focus=var_focus, mode="All")
-                self.fi_get_intensity_corrected(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_focus=var_focus, mode="All")
-                # Sensitivity Results
-                self.fi_get_analytical_sensitivity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
-
-            self.init_fi_massbalance = True
-
-        if mode == "demonstration":
-            helper = []
-            for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-                file_smpl = self.container_lists["SMPL"]["Long"][index]
-                var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
-                var_na_true_base = var_na_equiv
-                var_salt_contribution = 0
-                file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
-                for salt in self.container_lists["Selected Salts"]:
-                    if salt in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
-                        var_weigth = float(
-                            self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                        var_weight_sum = var_weigth*elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"]
-                    #
-                    if salt != "NaCl":
-                        molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
-                        element = self.molar_masses_compounds[salt]["Cation"]
-                        for isotope in file_isotopes:
-                            key_isotope = re.search("(\D+)(\d+)", isotope)
-                            isotope_atom = key_isotope.group(1)
-                            #
-                            if element == isotope_atom:
-                                molar_mass_element = elements_masses[element]
-                                try:
-                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][isotope]
-                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][var_is_i]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["MAT"][isotope]
-                                except:
-                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][isotope]
-                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][var_is_i]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                        file_smpl_short]["MAT"][isotope]
-                                #
-                                var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
-                                                         (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
-                        #
-                    else:
-                        var_na_true_base *= 1
-                #
-                var_salt_contribution_final = var_salt_contribution + 1
-                var_concentration_is = var_na_true_base/var_salt_contribution_final
-                helper.append(var_concentration_is)
-            #
-            try:
-                for row in self.tv_salt.get_children():
-                    self.tv_salt.delete(row)
-            except:
-                pass
-            #
-            self.tv_salt.insert("", tk.END, values=[str("Na"), round(np.mean(helper), 4)])
-            #
-        elif mode == "default":
-            helper = []
-            for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-                file_smpl = self.container_lists["SMPL"]["Long"][index]
-                var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
-                var_na_true_base = var_na_equiv
-                var_salt_contribution = 0
-                file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
-                for salt in self.container_lists["Selected Salts"]:
-                    if salt in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
-                        var_weigth = float(
-                            self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                        var_weight_sum = var_weigth*elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"]
-                    #
-                    if salt != "NaCl":
-                        molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
-                        element = self.molar_masses_compounds[salt]["Cation"]
-                        for isotope in file_isotopes:
-                            key_isotope = re.search("(\D+)(\d+)", isotope)
-                            isotope_atom = key_isotope.group(1)
-                            #
-                            if element == isotope_atom:
-                                molar_mass_element = elements_masses[element]
-                                try:
-                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][isotope]
-                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][var_is_i]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["MAT"][isotope] # SMOOTHED
-                                except:
-                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][isotope]
-                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][var_is_i]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                        file_smpl_short]["MAT"][isotope]
-                                #
-                                var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
-                                                         (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
-                        #
-                    else:
-                        var_na_true_base *= 1
-                #
-                var_salt_contribution_final = var_salt_contribution + 1
-                var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
-                #var_concentration_is = var_na_true_base
-                helper.append(var_concentration_is)
-                #
-                self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
-                    var_entr.get())
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
-                self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
-                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
-            #
-            self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set(round(np.mean(helper), 4))
-            #
-        elif mode == "specific":
-            file_smpl = var_file
-            file_smpl_short = file_smpl.split("/")[-1]
-            var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-            var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
-            var_na_true_base = var_na_equiv
-            var_salt_contribution = 0
-            file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
-            for salt in self.container_lists["Selected Salts"]:
-                if salt in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
-                    var_weigth = float(
-                        self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                    var_weight_sum = var_weigth*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
-                #
-                if salt != "NaCl":
-                    molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
-                    element = self.molar_masses_compounds[salt]["Cation"]
-                    #
-                    for isotope in file_isotopes:
-                        key_isotope = re.search("(\D+)(\d+)", isotope)
-                        isotope_atom = key_isotope.group(1)
-                        #
-                        if element == isotope_atom:
-                            molar_mass_element = elements_masses[element]
-                            try:
-                                var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                    file_smpl_short]["INCL"][isotope]
-                                var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                    file_smpl_short]["INCL"][var_is_i]
-                                var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                    file_smpl_short]["MAT"][isotope]
-                            except:
-                                var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
-                                    file_smpl_short]["INCL"][isotope]
-                                var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                    file_smpl_short]["INCL"][var_is_i]
-                                var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                    file_smpl_short]["MAT"][isotope]
-                            #
-                            var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*\
-                                                     (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
-                    #
+            if self.init_fi_massbalance == False:
+                var_filetype = "None"
+                var_file_short = "None"
+                var_file_long = "None"
+                var_focus = "None"
+                if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
+                    list_datatype = ["RAW"]
                 else:
-                    var_na_true_base *= 1
-            #
-            var_salt_contribution_final = var_salt_contribution + 1
-            #
-            var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
-            #
-            self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
-            self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
-    #
+                    list_datatype = ["RAW", "SMOOTHED"]
+
+                for var_datatype in list_datatype:
+                    # Intensity Analysis
+                    self.get_intensity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    self.fi_get_intensity_corrected(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    # Sensitivity Results
+                    self.fi_get_analytical_sensitivity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, mode="All")
+
+                self.init_fi_massbalance = True
+
+            if mode == "demonstration":
+                helper = []
+                for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    file_smpl = self.container_lists["SMPL"]["Long"][index]
+                    var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                    var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
+                    var_na_true_base = var_na_equiv
+                    var_salt_contribution = 0
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
+                            var_weigth = float(
+                                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
+                            var_weight_sum = var_weigth*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                                "Total"]
+
+                        if salt != "NaCl":
+                            molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                            element = self.molar_masses_compounds[salt]["Cation"]
+                            for isotope in file_isotopes:
+                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                isotope_atom = key_isotope.group(1)
+
+                                if element == isotope_atom:
+                                    molar_mass_element = elements_masses[element]
+                                    try:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["MAT"][isotope]
+                                    except:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["MAT"][isotope]
+
+                                    var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
+                                                             (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
+                        else:
+                            var_na_true_base *= 1
+
+                    var_salt_contribution_final = var_salt_contribution + 1
+                    var_concentration_is = var_na_true_base/var_salt_contribution_final
+                    helper.append(var_concentration_is)
+
+                try:
+                    for row in self.tv_salt.get_children():
+                        self.tv_salt.delete(row)
+                except:
+                    pass
+
+                self.tv_salt.insert("", tk.END, values=[str("Na"), round(np.mean(helper), 4)])
+
+            elif mode == "default":
+                helper = []
+                for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    file_smpl = self.container_lists["SMPL"]["Long"][index]
+                    var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                    var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
+                    var_na_true_base = var_na_equiv
+                    var_salt_contribution = 0
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
+                            var_weigth = float(
+                                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
+                            var_weight_sum = var_weigth*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                                "Total"]
+
+                        if salt != "NaCl":
+                            molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                            element = self.molar_masses_compounds[salt]["Cation"]
+                            for isotope in file_isotopes:
+                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                isotope_atom = key_isotope.group(1)
+
+                                if element == isotope_atom:
+                                    molar_mass_element = elements_masses[element]
+                                    try:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["MAT"][isotope] # SMOOTHED
+                                    except:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_is_i]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["MAT"][isotope]
+
+                                    var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
+                                                             (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
+                        else:
+                            var_na_true_base *= 1
+
+                    var_salt_contribution_final = var_salt_contribution + 1
+                    var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
+                    #var_concentration_is = var_na_true_base
+                    helper.append(var_concentration_is)
+
+                    self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+                        var_entr.get())
+                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+
+                self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set(
+                    round(np.mean(helper), 4))
+            elif mode == "specific":
+                file_smpl = var_file
+                file_smpl_short = file_smpl.split("/")[-1]
+                var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
+                var_na_true_base = var_na_equiv
+                var_salt_contribution = 0
+                file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                for salt in self.container_lists["Selected Salts"]:
+                    if salt in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
+                        var_weigth = float(
+                            self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
+                        var_weight_sum = var_weigth*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
+
+                    if salt != "NaCl":
+                        molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                        element = self.molar_masses_compounds[salt]["Cation"]
+
+                        for isotope in file_isotopes:
+                            key_isotope = re.search("(\D+)(\d+)", isotope)
+                            isotope_atom = key_isotope.group(1)
+
+                            if element == isotope_atom:
+                                molar_mass_element = elements_masses[element]
+                                try:
+                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                        file_smpl_short]["INCL"][isotope]
+                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                        file_smpl_short]["INCL"][var_is_i]
+                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                        file_smpl_short]["MAT"][isotope]
+                                except:
+                                    var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                        file_smpl_short]["INCL"][isotope]
+                                    var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                        file_smpl_short]["INCL"][var_is_i]
+                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                        file_smpl_short]["MAT"][isotope]
+
+                                var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*\
+                                                         (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
+
+                    else:
+                        var_na_true_base *= 1
+
+                var_salt_contribution_final = var_salt_contribution + 1
+
+                var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
+
+                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+
     def fi_set_concentration_is_massbalance(self, event):
         for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
             self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set("unknown")
