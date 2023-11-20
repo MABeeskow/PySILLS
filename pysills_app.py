@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		17.11.2023
+# Date:		20.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -7718,7 +7718,7 @@ class PySILLS(tk.Frame):
                 dates, times = Data(filename=var_file).import_as_list(
                     skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
             else:
-                var_time = self.container_var["acquisition times"]["STD"][file_std].get()
+                var_time = self.container_var["acquisition times"]["SMPL"][file_smpl].get()
                 parts_time = var_time.split(":")
                 times = parts_time
 
@@ -9360,7 +9360,7 @@ class PySILLS(tk.Frame):
         if len(self.container_var["acquisition times"]["STD"]) == 0:
             self.get_acquisition_times(var_filetype="STD")
         if len(self.container_var["acquisition times"]["SMPL"]) == 0:
-            self.get_acquisition_times(var_filetype="SMPL")
+            self.get_acquisition_times(var_filetype="SMPL") #sex
 
         lbl_i = tk.Label(
                 frm_02, text="Standard Files", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
@@ -12946,17 +12946,19 @@ class PySILLS(tk.Frame):
                         var_result_i = np.mean(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
     #
-    def ma_get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long,
-                                           mode="Specific", var_is_smpl=None):
+    def ma_get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific",
+                                      var_is_smpl=None):
         if mode == "Specific":
             if var_filetype == "STD":
                 var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
-                for element, value in sorted(
-                        self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
-                    if element in self.container_lists["Measured Elements"][var_file_short]:
-                        var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
-                    break
-
+                if var_is_smpl == None:
+                    for element, value in sorted(
+                            self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                        if element in self.container_lists["Measured Elements"][var_file_short]:
+                            var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                        break
+                else:
+                    var_is = var_is_smpl
                 key_element_is = re.search("(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
@@ -13025,6 +13027,7 @@ class PySILLS(tk.Frame):
                     xi_opt[isotope].extend(xi_regr)
 
                 delta_i = self.container_lists["Acquisition Times Delta"][var_file_short]
+
                 for isotope in file_isotopes_smpl:
                     var_result_i = xi_opt[isotope][0]*delta_i + xi_opt[isotope][1]
                     self.container_lists["Analytical Sensitivity Regression"][isotope] = {
@@ -14078,8 +14081,8 @@ class PySILLS(tk.Frame):
                     var_intensity_hostincl_t = var_intensity_mix_t - var_intensity_incl_t
                     factor_r = var_intensity_hostincl_t/var_intensity_mat_t
                     #
-                    #var_result = var_intensity_mix_i - var_intensity_mix_t*(var_intensity_host_i/var_intensity_host_t)
-                    var_result = var_intensity_mix_i - factor_r*var_intensity_host_i
+                    var_result = var_intensity_mix_i - var_intensity_mix_t*(var_intensity_host_i/var_intensity_host_t)
+                    #var_result = var_intensity_mix_i - factor_r*var_intensity_host_i
                     # if var_result < 0:
                     #     print(var_file_short, isotope)
                     #     print("I(mix,i):", var_intensity_mix_i, "I(mix,t):", var_intensity_mix_t)
@@ -14502,7 +14505,6 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        #
         if mode == "Specific":
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             if var_filetype == "STD":
@@ -14510,11 +14512,9 @@ class PySILLS(tk.Frame):
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
-                    #
                     var_result_i = self.srm_actual[var_srm_i][element]
                     self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
-                #
             elif var_filetype == "SMPL":
                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
 
@@ -14544,45 +14544,44 @@ class PySILLS(tk.Frame):
                             var_file_short]["MAT"][isotope]
                         var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                             var_file_short]["MAT"][isotope]
-                        #
+
                         if var_intensity_host_is > 0 and var_sensitivity_i > 0:
                             var_result_i = (var_intensity_i/var_intensity_host_is)*\
                                            (var_concentration_host_is/var_sensitivity_i)
                         else:
                             var_result_i = 0.0
-                        #
+
                         self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
-                        #
                     else:
                         if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                             ## Matrix-Only Tracer
                             ## Heinrich et al. (2003)
                             var_concentration_incl_is = float(
                                 self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
-                            #
+
                             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                             var_srm_is = self.container_var["SRM"][var_is].get()
                             key_element = re.search("(\D+)(\d+)", var_is)
                             element = key_element.group(1)
-                            #
+
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             key_element = re.search("(\D+)(\d+)", isotope)
                             element = key_element.group(1)
-                            #
+
                             var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                 var_file_short]["INCL"][isotope]
                             var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
                                 var_file_short]["INCL"][var_is]
-                            #
+
                             var_sensitivity_i = round(self.container_analytical_sensitivity[var_filetype][var_datatype][
                                 var_file_short]["MAT"][isotope], 6)
                             var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*\
                                            (var_concentration_incl_is/var_sensitivity_i)
-                            #
+
                             if var_result_i < 0:
                                 var_result_i = 0.0
-                            #
+
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
                                 isotope] = var_result_i
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
@@ -17460,19 +17459,13 @@ class PySILLS(tk.Frame):
         list_width = [int(item) for item in list_width]
         list_width[0] = 200
 
-        # list_categories = ["Category"]
-        # list_categories.extend(self.container_lists["ISOTOPES"])
-        # list_width = list(85*np.ones(len(list_categories)))
-        # list_width = [int(item) for item in list_width]
-        # list_width[0] = 200
-
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
                 parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=14, n_columns=38,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
-            #
+
             scb_v = ttk.Scrollbar(self.subwindow_fi_checkfile, orient="vertical")
             scb_h = ttk.Scrollbar(self.subwindow_fi_checkfile, orient="horizontal")
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
@@ -17482,21 +17475,6 @@ class PySILLS(tk.Frame):
             scb_h.grid(row=14, column=14, rowspan=1, columnspan=38, sticky="ew")
 
             if var_is != "Select IS":
-
-        # self.tv_results_quick = SE(
-        #     parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=14, n_columns=38,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
-        #     n_categories=len(list_categories), text_n=list_categories,
-        #     width_n=list_width, individual=True)
-        # #
-        # scb_v = ttk.Scrollbar(self.subwindow_fi_checkfile, orient="vertical")
-        # scb_h = ttk.Scrollbar(self.subwindow_fi_checkfile, orient="horizontal")
-        # self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
-        # scb_v.config(command=self.tv_results_quick.yview)
-        # scb_h.config(command=self.tv_results_quick.xview)
-        # scb_v.grid(row=0, column=52, rowspan=14, columnspan=1, sticky="ns")
-        # scb_h.grid(row=14, column=14, rowspan=1, columnspan=38, sticky="ew")
-
                 ## INITIALIZATION
                 if var_type == "STD":
                     # Intensity analysis
@@ -17526,8 +17504,8 @@ class PySILLS(tk.Frame):
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="INCL",
                         mode="Specific")
                     self.fi_get_intensity_ratio(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                        var_focus="INCL")
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, var_focus="INCL")
                     self.fi_get_intensity_mix(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
                     #
@@ -17556,14 +17534,14 @@ class PySILLS(tk.Frame):
                 #
                 if var_type == "SMPL":
                     self.fi_get_concentration(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                        var_focus="INCL")
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, var_focus="INCL")
                     self.fi_get_concentration_ratio(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                        var_focus="INCL")
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, var_focus="INCL")
                     self.fi_get_lod(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                        var_focus="INCL")
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, var_focus="INCL")
                     self.fi_get_mixed_concentration_ratio(
                         var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                     self.fi_get_mixing_ratio(
