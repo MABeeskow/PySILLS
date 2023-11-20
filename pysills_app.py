@@ -14078,11 +14078,10 @@ class PySILLS(tk.Frame):
                     var_intensity_mix_t = var_intensity_incl_t - var_intensity_bg_t
                     var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
                     var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                    var_intensity_hostincl_t = var_intensity_mix_t - var_intensity_incl_t
-                    factor_r = var_intensity_hostincl_t/var_intensity_mat_t
+                    #factor_r = var_intensity_mix_t/var_intensity_mat_t
                     #
                     var_result = var_intensity_mix_i - var_intensity_mix_t*(var_intensity_host_i/var_intensity_host_t)
-                    #var_result = var_intensity_mix_i - factor_r*var_intensity_host_i
+                    #var_result2 = var_intensity_mix_i - factor_r*var_intensity_host_i
                     # if var_result < 0:
                     #     print(var_file_short, isotope)
                     #     print("I(mix,i):", var_intensity_mix_i, "I(mix,t):", var_intensity_mix_t)
