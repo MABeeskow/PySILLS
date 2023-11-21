@@ -17035,8 +17035,9 @@ class PySILLS(tk.Frame):
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
-        #
-        for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
+
+        file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+        for index, isotope in enumerate(file_isotopes):
             frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
                              highlightbackground="black", bd=1)
             text_iso.window_create("end", window=frm_i)
@@ -17047,21 +17048,21 @@ class PySILLS(tk.Frame):
             text_iso.insert("end", "\t")
 
             cb_raw_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var["fi_setting"]["Display RAW"][str_filetype][str_filename_short][isotope],
-                text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="RAW",
-                               var_isotope=isotope: self.fi_change_line_visibility(var_type, var_file_short,
-                                                                                   var_datatype, var_isotope))
+                frm_iso, variable=self.container_var["fi_setting"]["Display RAW"][str_filetype][str_filename_short][
+                    isotope], text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
+                fg=self.bg_colors["Dark Font"], command=lambda var_type=str_filetype, var_file_short=str_filename_short,
+                                                               var_datatype="RAW", var_isotope=isotope:
+                self.fi_change_line_visibility(var_type, var_file_short, var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_raw_i)
             text_iso.insert("end", "\t")
 
             cb_smoothed_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
-                    isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
-                fg=self.bg_colors["Dark Font"],
+                frm_iso, variable=self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][
+                    str_filename_short][isotope], text="SMOOTHED", onvalue=1, offvalue=0,
+                bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
                 command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
-                               var_isotope=isotope: self.fi_change_line_visibility(var_type, var_file_short,
-                                                                                   var_datatype, var_isotope))
+                               var_isotope=isotope: self.fi_change_line_visibility(
+                    var_type, var_file_short, var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_smoothed_i)
             text_iso.insert("end", "\n")
 
@@ -17094,6 +17095,7 @@ class PySILLS(tk.Frame):
         str_filetype = var_type
         parts = str_filename_long.split("/")
         str_filename_short = parts[-1]
+        file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
 
         ## Cleaning
         try:
@@ -17141,7 +17143,7 @@ class PySILLS(tk.Frame):
 
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
-        icp_measurements = np.array([[df_data[isotope] for isotope in self.container_lists["ISOTOPES"]]])
+        icp_measurements = np.array([[df_data[isotope] for isotope in file_isotopes]])
         y_max = np.amax(icp_measurements)
 
         var_lw = float(self.container_var["General Settings"]["Line width"].get())
@@ -17153,9 +17155,9 @@ class PySILLS(tk.Frame):
         ## DIAGRAMS
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
         self.container_helper[str_filetype][str_filename_short]["AXES"] = {"Time-Signal": ax}
-        for isotope in self.container_lists["ISOTOPES"]:
-            ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                             linewidth=var_lw, visible=True)
+        for isotope in file_isotopes:
+            ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope,
+                             color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
             self.container_var["fi_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                 "RAW"] = ln_raw
 
