@@ -14064,28 +14064,53 @@ class PySILLS(tk.Frame):
                         var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
                     else:
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
-                    #
+
+                    var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
+                        isotope]
                     var_intensity_bg_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                         var_t]
                     var_intensity_mat_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
                         var_t]
-                    var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
-                        isotope]
                     var_intensity_incl_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
                         var_t]
-                    #
-                    var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
-                    var_intensity_mix_t = var_intensity_incl_t - var_intensity_bg_t
+
                     var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
+                    var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
                     var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                    #factor_r = var_intensity_mix_t/var_intensity_mat_t
-                    #
-                    var_result = var_intensity_mix_i - var_intensity_mix_t*(var_intensity_host_i/var_intensity_host_t)
-                    #var_result2 = var_intensity_mix_i - factor_r*var_intensity_host_i
-                    # if var_result < 0:
-                    #     print(var_file_short, isotope)
-                    #     print("I(mix,i):", var_intensity_mix_i, "I(mix,t):", var_intensity_mix_t)
-                    #     print("I(host,i):", var_intensity_host_i, "I(host,t):", var_intensity_host_t)
+                    var_intensity_mix_t_old = var_intensity_incl_t - var_intensity_bg_t
+                    var_intensity_mix_t = var_intensity_incl_t
+                    var_intensity_incl_host_i = (var_intensity_incl_t/var_intensity_host_t)*var_intensity_host_i
+                    var_intensity_mix_i_new_heinrich = var_intensity_bg_t + var_intensity_incl_i - var_intensity_bg_i
+                    var_intensity_mix_t_new_heinrich = var_intensity_incl_t
+
+                    factor_r = var_intensity_incl_t/var_intensity_host_t
+                    factor_r_new = (var_intensity_incl_host_i - var_intensity_bg_t)/var_intensity_host_i
+
+                    var_result = round(var_intensity_mix_i -
+                                       var_intensity_mix_t_old*(var_intensity_host_i/var_intensity_host_t), 6)
+                    # var_result = round(var_intensity_mix_i + var_intensity_bg_t -
+                    #                    var_intensity_mix_t*(var_intensity_host_i/var_intensity_host_t), 6)
+                    var_result4 = round(var_intensity_mix_i_new_heinrich -
+                                       var_intensity_mix_t_new_heinrich*(var_intensity_host_i/var_intensity_host_t), 6)
+                    var_result2 = round(var_intensity_mix_i + var_intensity_bg_t - factor_r*var_intensity_host_i, 6)
+                    var_result3 = round(var_intensity_incl_i - var_intensity_bg_i - var_intensity_incl_host_i +
+                                        var_intensity_bg_t, 6)
+                    var_result_5 = round(var_intensity_mix_i - factor_r_new*var_intensity_host_i, 6)
+
+                    if var_result == -0.0:
+                        var_result = abs(var_result)
+                    if var_result3 == -0.0:
+                        var_result3 = abs(var_result3)
+                    # print(isotope)
+                    # print("R:", "SILLS:", factor_r, "PySILLS:", factor_r_new)
+                    # print("Theory:", var_result3)
+                    # print("Heinrich2003:", var_result, var_result4)
+                    # try:
+                    #     print("SILLS:", var_result2, var_result_5)
+                    # except:
+                    #     print("SILLS:", var_result2)
+                    #     print("I(MAT,i):", var_intensity_host_i)
+
                     #
                 elif var_focus == "BG":
                     var_result = var_intensity_bg_i
