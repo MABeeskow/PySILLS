@@ -9360,7 +9360,7 @@ class PySILLS(tk.Frame):
         if len(self.container_var["acquisition times"]["STD"]) == 0:
             self.get_acquisition_times(var_filetype="STD")
         if len(self.container_var["acquisition times"]["SMPL"]) == 0:
-            self.get_acquisition_times(var_filetype="SMPL") #sex
+            self.get_acquisition_times(var_filetype="SMPL")
 
         lbl_i = tk.Label(
                 frm_02, text="Standard Files", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
@@ -19622,8 +19622,8 @@ class PySILLS(tk.Frame):
             text_incl_is.insert("end", "\n")
 
     def export_data_for_external_calculations(self):
-        path_pysills = os.path.dirname(os.path.realpath(__file__))
-        filename_export = os.path.join(path_pysills, "PySILLS_exported_results.csv")
+        filename_export = filedialog.asksaveasfile(mode="w", initialfile = "PySILLS_exported_results", defaultextension=".csv", filetypes=[("csv", "*.csv")])
+        filename_export = filename_export.name
         with open(filename_export, "w") as file_content:
             file_content.write("EXPORTED RESULTS" + ";\n")
             file_content.write("\n")
@@ -19764,7 +19764,7 @@ class PySILLS(tk.Frame):
                             file_content.write("Data type" + ";" + str(datatype) + ";\n")
                             for index, filename_short in enumerate(self.container_lists[filetype]["Short"]):
                                 filename_long = self.container_lists[filetype]["Long"][index]
-                                self.fi_get_analytical_sensitivity(
+                                self.ma_get_analytical_sensitivity(
                                     var_filetype=filetype, var_datatype=datatype, var_file_short=filename_short,
                                     var_file_long=filename_long)
 
