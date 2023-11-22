@@ -39,7 +39,7 @@ The total inclusion signal intensity :math:`I_{SIG3,i}` is composed by the contr
 and the inclusion itself.
 
 .. math::
-    I_{SIG3,i} = I_{BG,i} + I_{MAT,i} + I_{INCL,i}
+    I_{SIG3,i} = I_{BG,i} + I_{MAT,INCL,i} + I_{INCL,i}
 
 Mixed Signal Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -56,17 +56,17 @@ background intensity.
 
 Matrix Contribution to the Total Inclusion Signal Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The matrix contribution :math:`I_{MAT-INCL,i}` to the total inclusion signal intensity :math:`I_{SIG3,i}` is already a
+The matrix contribution :math:`I_{MAT,INCL,i}` to the total inclusion signal intensity :math:`I_{SIG3,i}` is already a
 little bit tricky to determine, since it requires an element which is only present in the matrix but not in the
 inclusion ("matrix-only tracer"). We call this matrix-only tracer element :math:`t`.
 
 .. math::
-    I_{MAT-INCL,t} = I_{SIG3,t} - I_{BG,t} = I_{MIX,t}
+    I_{MAT,INCL,t} = I_{SIG3,t} - I_{BG,t} = I_{MIX,t}
 
 Now, the calculation of this signal contribution is also possible for all other elements.
 
 .. math::
-    I_{MAT-INCL,i} = I_{MAT-INCL,t} \cdot \frac{I_{MAT,i}}{I_{MAT,t}}
+    I_{MAT,INCL,i} = I_{MAT,INCL,t} \cdot \frac{I_{MAT,i}}{I_{MAT,t}}
 
 Background- and Matrix-corrected Inclusion Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -79,7 +79,7 @@ Method 1 - (after Heinrich et al. 2003)
 Method 2 - (after SILLS Equation Sheet)
 ''''''''''''''''
 .. math::
-    I_{INCL,i} = I_{MIX,i} - I_{MAT-INCL,i}
+    I_{INCL,i} = I_{MIX,i} - I_{MAT,INCL,i}
 Method 3 - (after SILLS Equation Sheet)
 ''''''''''''''''
 .. math::
@@ -90,7 +90,7 @@ The factor R can be calculated by the following equation.
 Method 4 - (after the theoretical composition of the total inclusion signal intensity)
 ''''''''''''''''
 .. math::
-    I_{INCL,i} = I_{SIG3,i} - I_{BG,i} - I_{MAT-INCL,i}
+    I_{INCL,i} = I_{SIG3,i} - I_{BG,i} - I_{MAT,INCL,i}
 
 Sensitivity-related parameters
 --------------------------------
