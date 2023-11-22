@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		20.11.2023
+# Date:		21.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -14010,7 +14010,6 @@ class PySILLS(tk.Frame):
     #########################
     ## Calculation Methods ##
     #########################
-    #
     def fi_get_intensity_mix(self, var_filetype, var_datatype, var_file_short, mode="Specific"):
         if mode == "Specific":
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -14019,18 +14018,17 @@ class PySILLS(tk.Frame):
                             isotope]
                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                             isotope]
-                #
+
                 var_result_i = var_intensity_incl_i - var_intensity_bg_i
-                #
+
                 if var_result_i < 0:
                     var_result_i = 0.0
-                #
+
                 self.container_intensity_mix[var_filetype][var_datatype][var_file_short][isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     helper_results = []
-                    #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
@@ -14044,7 +14042,7 @@ class PySILLS(tk.Frame):
 
                     var_result_i = np.mean(helper_results)
                     self.container_intensity_mix[var_filetype][var_datatype][isotope] = var_result_i
-    #
+
     def fi_get_intensity_corrected(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific"):
         if mode == "Specific":
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -14056,10 +14054,9 @@ class PySILLS(tk.Frame):
                 if var_focus == "MAT":
                     var_result = var_intensity_mat_i - var_intensity_bg_i
                 elif var_focus == "INCL":
-                    ## Heinrich et al., (2003)
                     var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
                     var_file_long = self.container_lists[var_filetype]["Long"][var_index]
-                    #
+
                     if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                         var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
                     else:
@@ -14074,53 +14071,38 @@ class PySILLS(tk.Frame):
                     var_intensity_incl_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
                         var_t]
 
-                    var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
+                    var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
                     var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
                     var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                    var_intensity_mix_t_old = var_intensity_incl_t - var_intensity_bg_t
-                    var_intensity_mix_t = var_intensity_incl_t
-                    var_intensity_incl_host_i = (var_intensity_incl_t/var_intensity_host_t)*var_intensity_host_i
-                    var_intensity_mix_i_new_heinrich = var_intensity_bg_t + var_intensity_incl_i - var_intensity_bg_i
-                    var_intensity_mix_t_new_heinrich = var_intensity_incl_t
+                    var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                    var_intensity_mix_t = var_intensity_incl_host_t
+                    var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
 
-                    factor_r = var_intensity_incl_t/var_intensity_host_t
-                    factor_r_new = (var_intensity_incl_host_i - var_intensity_bg_t)/var_intensity_host_i
+                    # Heinrich (2003)
+                    var_result = round(self.calculate_intensity_incl_heinrich(
+                        intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
+                        intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
+                    # # SILLS Equation Sheet
+                    # ## without R
+                    # var_result = round(self.calculate_intensity_incl_sills(
+                    #     intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+                    # ## with R
+                    # var_result = round(self.calculate_intensity_incl_sills(
+                    #     intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
+                    #     intensity_mat_i=var_intensity_host_i, with_r=True), 6)
+                    # # Theory
+                    # var_result = round(self.calculate_intensity_incl_theory(
+                    #     intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
+                    #     intensity_incl_mat_i=var_intensity_incl_host_i), 6)
 
-                    var_result = round(var_intensity_mix_i -
-                                       var_intensity_mix_t_old*(var_intensity_host_i/var_intensity_host_t), 6)
-                    # var_result = round(var_intensity_mix_i + var_intensity_bg_t -
-                    #                    var_intensity_mix_t*(var_intensity_host_i/var_intensity_host_t), 6)
-                    var_result4 = round(var_intensity_mix_i_new_heinrich -
-                                       var_intensity_mix_t_new_heinrich*(var_intensity_host_i/var_intensity_host_t), 6)
-                    var_result2 = round(var_intensity_mix_i + var_intensity_bg_t - factor_r*var_intensity_host_i, 6)
-                    var_result3 = round(var_intensity_incl_i - var_intensity_bg_i - var_intensity_incl_host_i +
-                                        var_intensity_bg_t, 6)
-                    var_result_5 = round(var_intensity_mix_i - factor_r_new*var_intensity_host_i, 6)
-
-                    if var_result == -0.0:
-                        var_result = abs(var_result)
-                    if var_result3 == -0.0:
-                        var_result3 = abs(var_result3)
-                    # print(isotope)
-                    # print("R:", "SILLS:", factor_r, "PySILLS:", factor_r_new)
-                    # print("Theory:", var_result3)
-                    # print("Heinrich2003:", var_result, var_result4)
-                    # try:
-                    #     print("SILLS:", var_result2, var_result_5)
-                    # except:
-                    #     print("SILLS:", var_result2)
-                    #     print("I(MAT,i):", var_intensity_host_i)
-
-                    #
                 elif var_focus == "BG":
                     var_result = var_intensity_bg_i
-                #
+
                 if var_result < 0:
                     var_result = 0.0
 
                 self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][var_focus][
                     isotope] = var_result
-            #
         elif mode == "All":
             for var_filetype in ["STD", "SMPL"]:
                 if var_filetype == "STD":
@@ -14202,6 +14184,22 @@ class PySILLS(tk.Frame):
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
                             isotope] = var_result_i
+
+    def calculate_intensity_incl_heinrich(self, intensity_mix_i, intensity_mix_t, intensity_mat_i, intensity_mat_t):
+        intensity_incl_i = intensity_mix_i - intensity_mix_t*(intensity_mat_i/intensity_mat_t)
+        return intensity_incl_i
+
+    def calculate_intensity_incl_sills(self, intensity_mix_i, intensity_incl_mat_i, intensity_mat_i=None, with_r=False):
+        if with_r == False:
+            intensity_incl_i = intensity_mix_i - intensity_incl_mat_i
+        else:
+            factor_r = intensity_incl_mat_i/intensity_mat_i
+            intensity_incl_i = intensity_mix_i - factor_r*intensity_mat_i
+        return intensity_incl_i
+
+    def calculate_intensity_incl_theory(self, intensity_incl_total_i, intensity_bg_i, intensity_incl_mat_i):
+        intensity_incl_i = intensity_incl_total_i - intensity_bg_i - intensity_incl_mat_i
+        return intensity_incl_i
 
     def fi_get_intensity_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus,
                                     mode="Specific"):
