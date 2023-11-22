@@ -137,7 +137,7 @@ class PySILLS(tk.Frame):
 
         # ['GTK3Agg', 'GTK3Cairo', 'MacOSX', 'nbAgg', 'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo', 'TkAgg', 'TkCairo',
         # 'WebAgg', 'WX', 'WXAgg', 'WXCairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
-
+        print(var_os)
         if var_os == "linux":
             self.defaultFont = font.nametofont("TkDefaultFont")
             default_font = font.nametofont("TkDefaultFont")
@@ -13896,7 +13896,7 @@ class PySILLS(tk.Frame):
                         df_exmpl = DE(filename_long=file_smpl).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    file_parts = file_smpl.split("/")
+                    file_parts = file_smpl .split("/")
                     df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
 
                 self.times = DE().get_times(dataframe=df_exmpl)
