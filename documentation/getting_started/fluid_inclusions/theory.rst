@@ -123,7 +123,7 @@ Analytical Sensitivity
 Standard Files
 ''''''''''''''''
 .. math::
-    \xi_{i}^{IS} = \frac{I_{i}^{STD}}{I_{IS}^{STD}} \cdot \frac{C_{IS}^{STD}}{C_{i}^{STD}}
+    \xi_{i}^{IS} = \frac{S_{i}^{STD}}{S_{IS}^{STD}} = \frac{I_{i}^{STD}}{I_{IS}^{STD}} \cdot \frac{C_{IS}^{STD}}{C_{i}^{STD}}
 
 Sample Files
 ''''''''''''''

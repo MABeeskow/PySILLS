@@ -532,6 +532,8 @@ class PySILLS(tk.Frame):
         self.container_var["fi_setting"]["Time-Signal Checker"].set(1)
         self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
         self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set("0")
+        self.container_var["fi_setting"]["Inclusion Concentration Calculation"] = tk.IntVar()
+        self.container_var["fi_setting"]["Inclusion Concentration Calculation"].set("0")
         #
         for key, item in self.container_var["fi_setting"]["Inclusion Plugin"].items():
             item.set(1)
@@ -14530,28 +14532,73 @@ class PySILLS(tk.Frame):
                     else:
                         if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                             ## Matrix-Only Tracer
-                            ## Heinrich et al. (2003)
-                            var_concentration_incl_is = float(
-                                self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                            if self.container_var["fi_setting"]["Inclusion Concentration Calculation"].get() == 0:
+                                print("Simple Signals (SILLS)")
+                                # Simple Signals (SILLS)
+                                var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
 
-                            var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
-                            var_srm_is = self.container_var["SRM"][var_is].get()
-                            key_element = re.search("(\D+)(\d+)", var_is)
-                            element = key_element.group(1)
+                                var_concentration_incl_is = float(self.container_var["SMPL"][var_file_long]["IS Data"][
+                                                                      "Concentration"].get())
+                                var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope]
+                                var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][var_is]
+                                var_sensitivity_i = round(
+                                    self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                        var_file_short]["MAT"][isotope], 6)
 
-                            var_srm_i = self.container_var["SRM"][isotope].get()
-                            key_element = re.search("(\D+)(\d+)", isotope)
-                            element = key_element.group(1)
+                                ## Inclusion concentration
+                                var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*(
+                                        var_concentration_incl_is/var_sensitivity_i)
+                            else:
+                                print("Using x")
+                                # Using x
+                                var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
 
-                            var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["INCL"][isotope]
-                            var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["INCL"][var_is]
+                                var_intensity_mix_t = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][var_t]
+                                var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][var_is]
+                                var_sensitivity_t = self.container_analytical_sensitivity["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][var_t]
 
-                            var_sensitivity_i = round(self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope], 6)
-                            var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*\
-                                           (var_concentration_incl_is/var_sensitivity_i)
+                                ## Mixed concentration ratio a
+                                var_a = (var_intensity_mix_t/var_intensity_mix_is)/var_sensitivity_t
+
+                                var_concentration_host_t = self.container_concentration["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][var_t]
+                                var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][var_is]
+                                var_concentration_incl_is = float(self.container_var["SMPL"][var_file_long]["IS Data"][
+                                                                      "Concentration"].get())
+
+                                ## Mixing ratio x
+                                upper_term = var_concentration_host_t - var_a*var_concentration_host_is
+                                lower_term = var_concentration_host_t - var_a*(
+                                        var_concentration_host_is - var_concentration_incl_is)
+
+                                var_x = upper_term/lower_term
+
+                                var_concentration_mix_is = ((1 - var_x)*var_concentration_host_is + var_x*
+                                                            var_concentration_incl_is)
+
+                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][isotope]
+                                var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][var_is]
+                                var_intensity_host_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][var_is]
+                                var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+
+
+                                ## Inclusion concentration
+                                var_result_i = (1/(var_x*var_sensitivity_i))*(
+                                        (var_concentration_mix_is/var_intensity_mix_is)*var_intensity_mix_i +
+                                        (var_x - 1)*(var_concentration_host_is/var_intensity_host_is)*
+                                        var_intensity_host_i)
 
                             if var_result_i < 0:
                                 var_result_i = 0.0
@@ -14560,38 +14607,6 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
                                 isotope] = var_result_i
-
-                            # Factor x
-                            var_mo = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                            var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                isotope]
-                            var_intensity_mix_mo = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                var_mo]
-                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                var_is]
-                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_sensitivity_mo = self.container_analytical_sensitivity["SMPL"][var_datatype][
-                                var_file_short]["MAT"][var_mo]
-                            var_a = var_intensity_mix_mo/(var_intensity_mix_is*var_sensitivity_mo)
-                            var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][
-                                var_file_short]["MAT"][var_mo]
-                            var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
-                                var_file_short]["MAT"][var_is]
-
-                            upper_term = var_a*var_concentration_host_mo*var_concentration_incl_is
-                            lower_term = var_concentration_host_mo - var_a*\
-                                         (var_concentration_host_is - var_concentration_incl_is)
-
-                            var_concentration_mix_mo = upper_term/lower_term
-
-                            upper_term = (var_concentration_host_mo - var_concentration_mix_mo)
-                            lower_term = var_concentration_host_mo
-                            var_x = upper_term/lower_term
-                            var_concentration_mix_is = (var_intensity_mix_is*var_concentration_mix_mo*
-                                                        var_sensitivity_mo)/var_intensity_mix_mo
-                            var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is)*(
-                                    var_concentration_mix_is/var_sensitivity_i)
                         elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                             ## Second Internal Standard
                             var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
@@ -16514,6 +16529,11 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column + 26, n_rows=1,
             n_columns=14, fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_01 = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.colors_fi["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Inclusion Concentration Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         ## ENTRIES
         entr_01a = SE(
@@ -16558,6 +16578,18 @@ class PySILLS(tk.Frame):
             var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=3,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
             text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 6, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Concentration Calculation"], value_rb=0,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="without x", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 7, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Concentration Calculation"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="with x", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
         ## OPTION MENUES
         var_text_01b = self.container_var["fi_setting"]["Oxide"].get()
