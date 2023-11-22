@@ -17,12 +17,12 @@ different signal intensities which will be presented in the following subchapter
 
 Background Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The background intensity :math:`I_{BG,i}` is defined by the background signal interval which was defined by the user.
+The background intensity :math:`I_{i}^{BG}` is defined by the background signal interval which was defined by the user.
 PySILLS calculates with the arithmetic mean of this interval. The presented equations are always the same for standard
 files and sample files.
 
 .. math::
-    I_{BG,i} = I_{SIG1,i}
+    I_{i}^{BG} = I_{i}^{SIG1}
 
 Background-corrected Matrix Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -186,12 +186,6 @@ In order to be able to calculate the mixed concentration but also the inclusion 
 equations of SILLS, it is necessary to calculate :math:`x` which cannot determined directly, so that another factor
 called :math:`a` has to be calculated before.
 
-.. math::
-    a = \frac{C_{t}^{MIX}}{C_{IS}^{MIX}} = \frac{I_{t}^{MIX}}{I_{IS}^{MIX}} \cdot \frac{1}{\xi_{t}^{IS}}
-
-.. math::
-    x = \frac{C_{t}^{MAT} -  a \cdot C_{IS}^{MAT}}{C_{t}^{MAT} - a \cdot C_{IS}^{MAT} + a \cdot C_{IS}^{INCL}}
-
 .. rubric:: Inclusion Concentration
 The inclusion concentration can be calculated by at least three different equations that are available in PySILLS.
 
@@ -201,7 +195,10 @@ The inclusion concentration can be calculated by at least three different equati
 
 .. rubric:: Method 2 - Matrix-Only-Tracer and Second Internal Standard (after SILLS Equation Sheet)
 .. math::
-    C_{i}^{INCL} = \frac{1}{x} \cdot \left( \frac{C_{IS}^{MIX}}{I_{IS}^{MIX}} \cdot \frac{I_{i}^{MIX}}{\xi_{i}^{IS}} + (x - 1) \cdot \frac{C_{IS}^{MAT}}{I_{IS}^{MAT}} \cdot \frac{I_{i}^{MAT}}{\xi_{i}^{IS}} \right)
+    C_{i}^{INCL} = \frac{1}{x} \cdot \left( C_{i}^{MIX} + (x - 1) \cdot C_{i}^{MAT} \right)
+
+.. math::
+    C_{i}^{INCL} = \frac{1}{x \cdot \xi_{i}^{IS}} \cdot \left( \frac{C_{IS}^{MIX}}{I_{IS}^{MIX}} \cdot I_{i}^{MIX} + (x - 1) \cdot \frac{C_{IS}^{MAT}}{I_{IS}^{MAT}} \cdot I_{i}^{MAT} \right)
 
 The difference between these two methods is the determination of :math:`x`.
 
