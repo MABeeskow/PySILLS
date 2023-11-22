@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		21.11.2023
+# Date:		22.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -13794,6 +13794,7 @@ class PySILLS(tk.Frame):
         if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
+
             if self.demo_mode == True:
                 self.var_opt_icp.set("Agilent 7900s")
                 fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
@@ -13819,35 +13820,49 @@ class PySILLS(tk.Frame):
                     for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
                                  "Results Sensitivity", "SE STD", "SE SMPL"]:
                         self.container_var["Subwindows"][self.pysills_mode][item] = {}
-                #
+
                 for file_smpl in self.list_smpl:
                     file_parts = file_smpl.split("/")
                     if file_smpl not in self.container_lists["SMPL"]["Long"]:
                         self.container_lists["SMPL"]["Long"].append(file_smpl)
                         self.container_lists["SMPL"]["Short"].append(file_parts[-1])
 
-            self.fi_current_file_std = self.list_std[0]
-            self.fi_current_file_smpl = self.list_smpl[0]
-            #
-            for file_std in self.list_std:
-                file_parts = file_std.split("/")
-                self.lb_std.insert(tk.END, file_parts[-1])
-            for file_smpl in self.list_smpl:
-                file_parts = file_smpl.split("/")
-                self.lb_smpl.insert(tk.END, file_parts[-1])
-            #
-            df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+                self.fi_current_file_std = self.list_std[0]
+                self.fi_current_file_smpl = self.list_smpl[0]
+
+                for file_std in self.list_std:
+                    file_parts = file_std.split("/")
+                    self.lb_std.insert(tk.END, file_parts[-1])
+                for file_smpl in self.list_smpl:
+                    file_parts = file_smpl.split("/")
+                    self.lb_smpl.insert(tk.END, file_parts[-1])
+
+            if self.file_loaded == False:
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
+            else:
+                file_parts = self.list_std[0].split("/")
+                df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
             self.times = DE().get_times(dataframe=df_exmpl)
             df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
             self.container_lists["ISOTOPES"] = df_isotopes
             self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
             self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
+
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
                 key_element = re.search("(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if element not in self.container_lists["Measured Elements"]["All"]:
                     self.container_lists["Measured Elements"]["All"].append(element)
+
             for filename_short in self.container_lists["STD"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
@@ -13859,6 +13874,7 @@ class PySILLS(tk.Frame):
                     else:
                         if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
                             self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+
             for filename_short in self.container_lists["SMPL"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
