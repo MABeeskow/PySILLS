@@ -26,77 +26,77 @@ files and sample files.
 
 Background-corrected Matrix Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The background-corrected matrix intensity :math:`I_{MAT2,i}` is the difference between the signal intensity of the matrix
-interval :math:`I_{SIG2,i}` and the background intensity :math:`I_{BG,i}`. Both parameters are the arithmetic mean of
+The background-corrected matrix intensity :math:`I_{i}^{MAT2}` is the difference between the signal intensity of the matrix
+interval :math:`I_{i}^{SIG2}` and the background intensity :math:`I_{i}^{BG}`. Both parameters are the arithmetic mean of
 those intervals.
 
 .. math::
-    I_{MAT2,i} = I_{SIG2,i} - I_{BG,i}
+    I_{i}^{MAT} = I_{i}^{MAT2} = I_{i}^{SIG2} - I_{i}^{BG}
 
 Composition of the Total Inclusion Signal Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The total inclusion signal intensity :math:`I_{SIG3,i}` is composed by the contributions of the background, the matrix
+The total inclusion signal intensity :math:`I_{i}^{SIG3}` is composed by the contributions of the background, the matrix
 and the inclusion itself.
 
 .. math::
-    I_{SIG3,i} = I_{BG,i} + I_{MAT,INCL,i} + I_{INCL,i}
+    I_{i}^{SIG3} = I_{i}^{BG} + I_{i}^{MAT3} + I_{i}^{INCL}
 
 Mixed Signal Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The mixed signal intensity :math:`I_{MIX,i}` is composed by the contributions of the matrix and the inclusion itself.
+The mixed signal intensity :math:`I_{i}^{MIX}` is composed by the contributions of the matrix and the inclusion itself.
 
 .. math::
-    I_{MIX,i} = I_{MAT3,i} + I_{INCL,i}
+    I_{i}^{MIX} = I_{i}^{MAT3} + I_{i}^{INCL}
 
-Therefore, it can be easily calculated by reducing the total inclusion signal intensity :math:`I_{SIG3,i}` by the
+Therefore, it can be easily calculated by reducing the total inclusion signal intensity :math:`I_{i}^{SIG3}` by the
 background intensity.
 
 .. math::
-    I_{MIX,i} = I_{SIG3,i} - I_{BG,i}
+    I_{i}^{MIX} = I_{i}^{SIG3} - I_{i}^{BG}
 
 Matrix Contribution to the Total Inclusion Signal Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The matrix contribution :math:`I_{MAT3,i}` to the total inclusion signal intensity :math:`I_{SIG3,i}` is already a
+The matrix contribution :math:`I_{i}^{MAT3}` to the total inclusion signal intensity :math:`I_{i}^{SIG3}` is already a
 little bit tricky to determine, since it requires an element which is only present in the matrix but not in the
 inclusion ("matrix-only tracer"). We call this matrix-only tracer element :math:`t`.
 
 .. math::
-    I_{MAT3,t} = I_{SIG3,t} - I_{BG,t} = I_{MIX,t}
+    I_{t}^{MAT3} = I_{t}^{SIG3} - I_{t}^{BG} = I_{t}^{MIX}
 
 Now, the calculation of this signal contribution is also possible for all other elements.
 
 .. math::
-    I_{MAT3,i} = I_{MAT3,t} \cdot \frac{I_{MAT2,i}}{I_{MAT2,t}}
+    I_{i}^{MAT3} = I_{t}^{MAT3} \cdot \frac{I_{i}^{MAT}}{I_{t}^{MAT}}
 
 Background- and Matrix-corrected Inclusion Intensity
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The background- and matrix-corrected inclusion intensity :math:`I_{INCL,i}` can be calculated on at least four different
+The background- and matrix-corrected inclusion intensity :math:`I_{i}^{INCL}` can be calculated on at least four different
 ways that are available in PySILLS.
 
 Method 1 - (after Heinrich et al. 2003)
 ''''''''''''''''
 .. math::
-    I_{INCL,i} = I_{MIX,i} - I_{MIX,t} \cdot \frac{I_{MAT2,i}}{I_{MAT2,t}}
+    I_{i}^{INCL} = I_{i}^{MIX} - I_{t}^{MIX} \cdot \frac{I_{i}^{MAT}}{I_{t}^{MAT}}
 
 Method 2 - (after SILLS Equation Sheet)
 ''''''''''''''''
 .. math::
-    I_{INCL,i} = I_{MIX,i} - I_{MAT3,i}
+    I_{i}^{INCL} = I_{i}^{MIX} - I_{i}^{MAT3}
 
 Method 3 - (after SILLS Equation Sheet)
 ''''''''''''''''
 .. math::
-    I_{INCL,i} = I_{MIX,i} - r \cdot I_{MAT2,i}
+    I_{i}^{INCL} = I_{i}^{MIX} - r \cdot I_{i}^{MAT}
 
 The factor R can be calculated by the following equation.
 
 .. math::
-    r = \frac{I_{MIX,t}}{I_{MAT2,t}}
+    r = \frac{I_{t}^{MIX}}{I_{t}^{MAT}}
 
 Method 4 - (after the theoretical composition of the total inclusion signal intensity)
 ''''''''''''''''
 .. math::
-    I_{INCL,i} = I_{SIG3,i} - I_{BG,i} - I_{MAT3,i}
+    I_{i}^{INCL} = I_{i}^{SIG3} - I_{i}^{BG} - I_{i}^{MAT3}
 
 Sensitivity-related parameters
 --------------------------------
@@ -143,7 +143,7 @@ Sample Files
 ''''''''''''''
 .. rubric:: Matrix Signal
 .. math::
-    R_{i}^{MAT} = R_{i}^{MAT2} = \xi_{i}^{IS} \cdot \frac{C_{i}^{STD}}{I_{i}^{STD}} \cdot \frac{I_{IS}^{MAT2}}{C_{IS}^{MAT2}}
+    R_{i}^{MAT} = R_{i}^{MAT2} = \xi_{i}^{IS} \cdot \frac{C_{i}^{STD}}{I_{i}^{STD}} \cdot \frac{I_{IS}^{MAT}}{C_{IS}^{MAT}}
 
 .. rubric:: Mixed Signal
 .. math::
@@ -193,7 +193,7 @@ The inclusion concentration can be calculated by at least three different equati
 .. math::
     C_{i}^{INCL} = \frac{I_{i}^{INCL}}{I_{IS}^{INCL}} \cdot \frac{C_{IS}^{INCL}}{\xi_{i}^{IS}}
 
-.. rubric:: Method 2 - Matrix-Only-Tracer and Second Internal Standard (after SILLS Equation Sheet)
+.. rubric:: Method 2 & 3 - Matrix-Only-Tracer and Second Internal Standard (after SILLS Equation Sheet)
 .. math::
     C_{i}^{INCL} = \frac{1}{x} \cdot \left( C_{i}^{MIX} + (x - 1) \cdot C_{i}^{MAT} \right)
 
