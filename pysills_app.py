@@ -530,6 +530,8 @@ class PySILLS(tk.Frame):
             "Intensity INCL": tk.IntVar(), "Analytical Sensitivity": tk.IntVar(), "Concentration SRM": tk.IntVar()}
         self.container_var["fi_setting"]["Time-Signal Checker"] = tk.IntVar()
         self.container_var["fi_setting"]["Time-Signal Checker"].set(1)
+        self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
+        self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set("0")
         #
         for key, item in self.container_var["fi_setting"]["Inclusion Plugin"].items():
             item.set(1)
@@ -13861,24 +13863,47 @@ class PySILLS(tk.Frame):
                     file_parts = file_smpl.split("/")
                     self.lb_smpl.insert(tk.END, file_parts[-1])
 
-            if self.file_loaded == False:
-                if self.container_icpms["name"] != None:
-                    var_skipheader = self.container_icpms["skipheader"]
-                    var_skipfooter = self.container_icpms["skipfooter"]
-                    df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            for file_std in self.list_std:
+                file_parts = file_std.split("/")
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_exmpl = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_exmpl = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
-            else:
-                file_parts = self.list_std[0].split("/")
-                df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    file_parts = file_std.split("/")
+                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
 
-            self.times = DE().get_times(dataframe=df_exmpl)
-            df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
-            self.container_lists["ISOTOPES"] = df_isotopes
-            self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
-            self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["ISOTOPES"] = df_isotopes
+                self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+                self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+
+            for file_smpl in self.list_smpl:
+                file_parts = file_smpl.split("/")
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                else:
+                    file_parts = file_smpl.split("/")
+                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["ISOTOPES"] = df_isotopes
+                self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+                self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
 
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -14118,22 +14143,27 @@ class PySILLS(tk.Frame):
                     var_intensity_mix_t = var_intensity_incl_host_t
                     var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
 
-                    # Heinrich (2003)
-                    var_result = round(self.calculate_intensity_incl_heinrich(
-                        intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
-                        intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
-                    # # SILLS Equation Sheet
-                    # ## without R
-                    # var_result = round(self.calculate_intensity_incl_sills(
-                    #     intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i), 6)
-                    # ## with R
-                    # var_result = round(self.calculate_intensity_incl_sills(
-                    #     intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
-                    #     intensity_mat_i=var_intensity_host_i, with_r=True), 6)
-                    # # Theory
-                    # var_result = round(self.calculate_intensity_incl_theory(
-                    #     intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
-                    #     intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+                    if self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get() == 0:
+                        # Heinrich (2003)
+                        var_result = round(self.calculate_intensity_incl_heinrich(
+                            intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
+                            intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
+                    elif self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get() == 1:
+                        # SILLS Equation Sheet
+                        ## without R
+                        var_result = round(self.calculate_intensity_incl_sills(
+                            intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+                    elif self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get() == 2:
+                        # SILLS Equation Sheet
+                        ## with R
+                        var_result = round(self.calculate_intensity_incl_sills(
+                            intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
+                            intensity_mat_i=var_intensity_host_i, with_r=True), 6)
+                    elif self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get() == 3:
+                        # Theory
+                        var_result = round(self.calculate_intensity_incl_theory(
+                            intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
+                            intensity_incl_mat_i=var_intensity_incl_host_i), 6)
 
                 elif var_focus == "BG":
                     var_result = var_intensity_bg_i
@@ -16425,7 +16455,7 @@ class PySILLS(tk.Frame):
     #
     def fi_setup_matrix_only_tracer(self):
         ## Window Settings
-        window_width = 520
+        window_width = 820
         window_heigth = 375
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
@@ -16480,6 +16510,10 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=25, fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_01 = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column + 26, n_rows=1,
+            n_columns=14, fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         ## ENTRIES
         entr_01a = SE(
@@ -16498,7 +16532,33 @@ class PySILLS(tk.Frame):
             text_default=self.container_var["fi_setting"]["Matrix-Only Concentration Default"].get(),
             command=lambda var_entr=self.container_var["fi_setting"]["Matrix-Only Concentration Default"]:
             self.fi_change_default_matrixonly_is_concentration(var_entr))
-        #
+
+        # RADIOBUTTONS
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=0,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Heinrich et al. (2003)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (without R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 3, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=2,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (with R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column + 26,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
         ## OPTION MENUES
         var_text_01b = self.container_var["fi_setting"]["Oxide"].get()
         opt_01b = SE(
@@ -16589,7 +16649,7 @@ class PySILLS(tk.Frame):
     #
     def fi_setup_second_internal_standard(self):
         ## Window Settings
-        window_width = 420
+        window_width = 720
         window_heigth = 375
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
@@ -16638,7 +16698,12 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=20, fg=self.colors_fi["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+        lbl_01 = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=self.colors_fi["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+
         ## OPTION MENUES
         var_text = self.container_var["fi_setting"]["2nd Internal"].get()
         opt_01a = SE(
@@ -16654,7 +16719,33 @@ class PySILLS(tk.Frame):
         opt_01a.config(
             bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
+
+        # RADIOBUTTONS
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 1, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=0,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Heinrich et al. (2003)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 2, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (without R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 3, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=2,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (with R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 4, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
         ## ENTRIES
         entr_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 2, column_id=start_column + 10,
