@@ -302,6 +302,9 @@ class PySILLS(tk.Frame):
         self.container_var["Spike Elimination Check"]["RB Value STD"].set(1)
         self.container_var["Spike Elimination Check"]["RB Value SMPL"] = tk.IntVar()
         self.container_var["Spike Elimination Check"]["RB Value SMPL"].set(1)
+        self.container_var["Geothermometry"] = {}
+        self.container_var["Geothermometry"]["Titanium in Quartz"] = tk.IntVar()
+        self.container_var["Geothermometry"]["Titanium in Quartz"].set(0)
         #
         self.container_var["Spike Elimination"] = {"STD": {"State": False}, "SMPL": {"State": False}}
         #
@@ -1376,11 +1379,10 @@ class PySILLS(tk.Frame):
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.ma_datareduction_files)
-            btn_03.configure(state="disabled")
-            #
+                command=self.ma_extras)
+
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
-        #
+
         elif var_rb.get() == 1:   # Fluid Inclusions
             self.pysills_mode = "FI"
             ## Cleaning
@@ -8111,11 +8113,206 @@ class PySILLS(tk.Frame):
             self.tv_smpl.item(item=selected_item, text=var_file, values=(var_file, new_time))
         #
         self.container_var["acquisition times"][filetype][var_file].set(new_time)
-#
+
+########################################################################################################################
+### EXTRAS #############################################################################################################
+########################################################################################################################
+    def ma_extras(self):
+        """Main window of additional analysis tools for a mineral analysis project."""
+        ## Window Settings
+        window_width = 520
+        window_heigth = 400
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_ma_extras = tk.Toplevel(self.parent)
+        self.subwindow_ma_extras.title("MINERAL ANALYSIS - Extras")
+        self.subwindow_ma_extras.geometry(var_geometry)
+        self.subwindow_ma_extras.resizable(False, False)
+        self.subwindow_ma_extras["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_ma_extras, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_ma_extras, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_ma_extras.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_ma_extras.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_columm_start = 0
+        var_header_n = 12
+        int_category_n = 8
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_columm_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Geothermometry", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_columm_start + var_header_n + 1,
+            n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Geochronology", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        lbl_001 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ti-in-Quartz", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        lbl_002 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_columm_start + var_header_n + 1,
+            n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="U-Pb Dating", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # BUTTONS
+        btn_001 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_columm_start + int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.geothermometry_titanium_in_quartz)
+
+        btn_002 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1,
+            column_id=var_columm_start + var_header_n + 1 + int_category_n, n_rows=1,
+            n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+
+    def geothermometry_titanium_in_quartz(self):
+        """Window for the Titanium-in-Quartz thermometry."""
+        ## Window Settings
+        window_width = 800
+        window_heigth = 400
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_geothermometry_ti_in_qz = tk.Toplevel(self.parent)
+        self.subwindow_geothermometry_ti_in_qz.title("Geothermometry - Titanium-in-Quartz")
+        self.subwindow_geothermometry_ti_in_qz.geometry(var_geometry)
+        self.subwindow_geothermometry_ti_in_qz.resizable(False, False)
+        self.subwindow_geothermometry_ti_in_qz["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_geothermometry_ti_in_qz, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_geothermometry_ti_in_qz, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_geothermometry_ti_in_qz.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_geothermometry_ti_in_qz.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_columm_start = 0
+        var_header_n = 12
+        int_category_n = 12
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start, column_id=var_columm_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Titanium-in-Quartz Thermometry", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        lbl_02 = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 6, column_id=var_columm_start,
+            n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Additional Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        lbl_03 = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start,
+            column_id=var_columm_start + var_header_n + 1, n_rows=1, n_columns=var_header_n + 14,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Results", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # BUTTONS
+        btn_03 = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 5, column_id=var_row_start, n_rows=1,
+            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.run_geothermometer_titanium_in_quartz)
+        btn_03 = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 5, column_id=6, n_rows=1,
+            n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+
+        # RADIOBUTTONS
+        rb_001 = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 1, column_id=var_columm_start,
+            n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["Geothermometry"]["Titanium in Quartz"], value_rb=0,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="TitaniQ - after Wark (2006)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
+        ## TREEVIEW
+        self.tv_results_ti_in_qz = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 1,
+            column_id=var_columm_start + var_header_n + 1, n_rows=14, n_columns=var_header_n + 14,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+            n_categories=5, text_n=["Filename", "Data Type", "C(ppm)", "T(°C)", "T(K)"],
+            width_n=["150", "100", "90", "90", "90"], individual=True)
+
+        for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            entry_results = [str_filename_short, "-", "-"]
+            self.tv_results_ti_in_qz.insert("", tk.END, values=entry_results)
+            file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+            self.list_ti_isotopes = []
+
+            for isotope in file_isotopes:
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+                if element == "Ti":
+                    self.list_ti_isotopes.append(isotope)
+
+            for isotope_ti in self.list_ti_isotopes:
+                entry_results = [isotope_ti, "-", "-"]
+                self.tv_results_ti_in_qz.insert("", tk.END, values=entry_results)
+
+    def run_geothermometer_titanium_in_quartz(self):
+        if self.container_var["Geothermometry"]["Titanium in Quartz"].get() == 0:
+            # TitaniQ
+            self.calculate_temperature_titaniq()
+
+    def calculate_temperature_titaniq(self):
+        if len(self.tv_results_ti_in_qz.get_children()) > 0:
+            for item in self.tv_results_ti_in_qz.get_children():
+                self.tv_results_ti_in_qz.delete(item)
+
+        for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            entry_results = [str_filename_short, "-", "-"]
+            self.tv_results_ti_in_qz.insert("", tk.END, values=entry_results)
+            for datatype in ["RAW", "SMOOTHED"]:
+                for isotope_ti in self.list_ti_isotopes:
+                    val_concentration_ti = round(self.container_concentration["SMPL"][datatype][str_filename_short][
+                                                     "MAT"][isotope_ti], 4)
+                    val_temperature_i_celsius = -3765/(np.log(val_concentration_ti) - 5.69) - 273.15
+                    val_temperature_i_kelvin = val_temperature_i_celsius + 273.15
+                    entry_results = [isotope_ti, datatype, round(val_concentration_ti, 4),
+                                     round(val_temperature_i_celsius, 2), round(val_temperature_i_kelvin, 2)]
+                    self.tv_results_ti_in_qz.insert("", tk.END, values=entry_results)
+
 ########################################################################################################################
 # MINERAL ANALYSIS #####################################################################################################
 ########################################################################################################################
-#
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
         if len(self.container_lists["ISOTOPES"]) == 0:
