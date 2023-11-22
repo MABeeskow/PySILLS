@@ -137,7 +137,7 @@ class PySILLS(tk.Frame):
 
         # ['GTK3Agg', 'GTK3Cairo', 'MacOSX', 'nbAgg', 'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo', 'TkAgg', 'TkCairo',
         # 'WebAgg', 'WX', 'WXAgg', 'WXCairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
-        print(var_os)
+
         if var_os == "linux":
             self.defaultFont = font.nametofont("TkDefaultFont")
             default_font = font.nametofont("TkDefaultFont")
