@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		22.11.2023
+# Date:		23.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -14730,7 +14730,6 @@ class PySILLS(tk.Frame):
                         if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                             ## Matrix-Only Tracer
                             if self.container_var["fi_setting"]["Inclusion Concentration Calculation"].get() == 0:
-                                print("Simple Signals (SILLS)")
                                 # Simple Signals (SILLS)
                                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
 
@@ -14740,15 +14739,13 @@ class PySILLS(tk.Frame):
                                     var_file_short]["INCL"][isotope]
                                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["INCL"][var_is]
-                                var_sensitivity_i = round(
-                                    self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                        var_file_short]["MAT"][isotope], 6)
+                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
 
                                 ## Inclusion concentration
                                 var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*(
                                         var_concentration_incl_is/var_sensitivity_i)
                             else:
-                                print("Using x")
                                 # Using x
                                 var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
 
@@ -14760,7 +14757,9 @@ class PySILLS(tk.Frame):
                                     var_file_short]["MAT"][var_t]
 
                                 ## Mixed concentration ratio a
-                                var_a = (var_intensity_mix_t/var_intensity_mix_is)/var_sensitivity_t
+                                var_a = self.calculate_mixed_concentration_ratio(
+                                    intensity_mix_i=var_intensity_mix_t, intensity_mix_IS=var_intensity_mix_is,
+                                    sensitivity_IS_i=var_sensitivity_t)
 
                                 var_concentration_host_t = self.container_concentration["SMPL"][var_datatype][
                                     var_file_short]["MAT"][var_t]
@@ -14770,11 +14769,10 @@ class PySILLS(tk.Frame):
                                                                       "Concentration"].get())
 
                                 ## Mixing ratio x
-                                upper_term = var_concentration_host_t - var_a*var_concentration_host_is
-                                lower_term = var_concentration_host_t - var_a*(
-                                        var_concentration_host_is - var_concentration_incl_is)
-
-                                var_x = upper_term/lower_term
+                                var_x = self.calculate_mixing_ratio(
+                                    factor_a=var_a, concentration_mat_i=var_concentration_host_t,
+                                    concentration_mat_IS=var_concentration_host_is, concentraton_incl_i=0,
+                                    concentration_incl_IS=var_concentration_incl_is)
 
                                 var_concentration_mix_is = ((1 - var_x)*var_concentration_host_is + var_x*
                                                             var_concentration_incl_is)
@@ -14809,18 +14807,20 @@ class PySILLS(tk.Frame):
                             var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                             var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
                                 "Name"].get()
-                            #
-                            ## Factor a
+
+                            ## Mixed concentration ratio a
                             var_intensity_mix_is1 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
                                 var_is1]
                             var_intensity_mix_is2 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
                                 var_is2]
                             var_sensitivity_is2 = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                 var_file_short]["MAT"][var_is2]
-                            #
-                            var_a = (var_intensity_mix_is2/var_intensity_mix_is1)*(1/var_sensitivity_is2)
-                            #
-                            ## Factor x
+
+                            var_a = self.calculate_mixed_concentration_ratio(
+                                intensity_mix_i=var_intensity_mix_is2, intensity_mix_IS=var_intensity_mix_is1,
+                                sensitivity_IS_i=var_sensitivity_is2)
+
+                            ## Mixing ratio x
                             var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
                                 var_file_short]["MAT"][var_is1]
                             var_concentration_host_is2 = self.container_concentration["SMPL"][var_datatype][
@@ -14829,38 +14829,37 @@ class PySILLS(tk.Frame):
                                 "Concentration"].get())
                             var_concentration_incl_is2 = float(self.container_var["SMPL"][var_file_long][
                                 "Second Internal Standard"]["Value"].get())
-                            #
-                            upper_term = var_concentration_host_is2 - var_a*var_concentration_host_is1
-                            lower_term = var_concentration_host_is2 - var_concentration_incl_is2 - var_a*(
-                                    var_concentration_host_is1 - var_concentration_incl_is1)
-                            #
-                            var_x = upper_term/lower_term
-                            #
+
+                            var_x = self.calculate_mixing_ratio(
+                                factor_a=var_a, concentration_mat_i=var_concentration_host_is2,
+                                concentration_mat_IS=var_concentration_host_is1,
+                                concentraton_incl_i=var_concentration_incl_is2,
+                                concentration_incl_IS=var_concentration_incl_is1)
+
                             ## Mixed Concentration IS1
                             var_concentration_mix_is1 = ((1 - var_x)*var_concentration_host_is1 +
                                                          var_x*var_concentration_incl_is1)
-                            #
+
                             ## Mixed Concentrations
                             var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
                                 isotope]
                             var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                 var_file_short]["MAT"][isotope]
-                            #
+
                             var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is1)*(
                                     var_concentration_mix_is1/var_sensitivity_i)
                             var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
                                 var_file_short]["MAT"][isotope]
                             ## Inclusion Concentrations
                             var_result_i = (var_concentration_mix_i - (1 - var_x)*var_concentration_host_i)/var_x
-                            #
+
                             if var_result_i < 0:
                                 var_result_i = 0.0
-                            #
+
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
                                 isotope] = var_result_i
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Second-Internal"][
                                 isotope] = var_result_i
-            #
         else:
             for var_filetype in ["STD", "SMPL"]:
                 if var_filetype == "STD":
@@ -14889,8 +14888,72 @@ class PySILLS(tk.Frame):
 
                         var_result_i = np.mean(helper_results)
                         self.container_concentration[var_filetype][var_datatype][var_focus][isotope] = var_result_i
-    #
+
+    def calculate_mixed_concentration_ratio(self, intensity_mix_i, intensity_mix_IS, sensitivity_IS_i):
+        """ Calculates the mixed concentration ratio a.
+        1) Matrix-only-Tracer:      a = C_t^MIX/C_IS^MIX    - i = t
+        2) 2nd Internal Standard:   a = C_IS2^MIX/C_IS1^MIX - i = IS2, IS=IS1
+
+        Parameters
+        ----------
+        intensity_mix_i : float
+            The mixed intensity of i
+        intensity_mix_IS : float
+            The mixed intensity of IS
+        sensitivity_IS_i : float
+            The analytical sensitivity of i with respect to IS
+        Returns
+        -------
+        """
+        val_a = intensity_mix_i/(intensity_mix_IS*sensitivity_IS_i)
+        return val_a
+
+    def calculate_mixing_ratio(self, factor_a, concentration_mat_i, concentration_mat_IS, concentraton_incl_i,
+                               concentration_incl_IS):
+        """ Calculates the mixing ratio x.
+        1) Matrix-only-Tracer:      i = t
+        2) 2nd Internal Standard:   i = IS2, IS=IS1
+        Parameters
+        ----------
+        factor_a : float
+            The mixed concentration ratio
+        concentration_mat_i : float
+            The matrix concentration of i
+        concentration_mat_IS : float
+            The matrix concentration of IS
+        concentraton_incl_i : float
+            The inclusion concentration of i
+        concentration_incl_IS : float
+            The inclusion concentration of IS
+        Returns
+        -------
+        val_x : float
+            The mixing ratio
+        """
+        upper_term = concentration_mat_i - factor_a*concentration_mat_IS
+        lower_term = concentration_mat_i - concentraton_incl_i - factor_a*(concentration_mat_IS - concentration_incl_IS)
+        val_x = upper_term/lower_term
+        return val_x
+
     def fi_get_mixed_concentration_ratio(self, var_datatype, var_file_short, var_file_long, mode="Specific"):
+        """ Calculates the mixed concentration ratio a.
+        1) Matrix-only-Tracer:      a = C_t^MIX/C_IS^MIX
+        2) 2nd Internal Standard:   a = C_IS2^MIX/C_IS1^MIX
+
+        Parameters
+        ----------
+        var_datatype : str
+            The data category, e.g. RAW
+        var_file_short : str
+            The file as a short version (without the complete filepath)
+        var_file_long : str
+            The file as the long version (with the complete filepath)
+        mode : str
+            The calculation mode, e.g. "Specific"
+
+        Returns
+        -------
+        """
         if mode == "Specific":
             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -14933,7 +14996,7 @@ class PySILLS(tk.Frame):
 
                     var_result_i = np.mean(helper_results)
                     self.container_mixed_concentration_ratio[var_filetype][var_datatype][isotope] = var_result_i
-    #
+
     def fi_get_mixing_ratio(self, var_datatype, var_file_short, var_file_long, mode="Specific"):
         if mode == "Specific":
             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
@@ -14954,9 +15017,10 @@ class PySILLS(tk.Frame):
                         "MAT"][var_is]
                     var_concentration_incl_is = self.container_concentration["SMPL"][var_datatype][var_file_short][
                         "INCL"][var_is]
-                    #
+
                     upper_term = var_concentration_host_mo - var_a*var_concentration_host_is
-                    lower_term = var_concentration_host_mo - var_a*(var_concentration_host_is - var_concentration_incl_is)
+                    lower_term = var_concentration_host_mo - var_a*(
+                            var_concentration_host_is - var_concentration_incl_is)
                 elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
                     var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
@@ -14967,23 +15031,21 @@ class PySILLS(tk.Frame):
                                                            "Concentration"].get())
                     var_concentration_incl_is2 = float(self.container_var["SMPL"][var_file_long][
                                                            "Second Internal Standard"]["Value"].get())
-                    #
+
                     upper_term = var_concentration_host_is2 - var_a*var_concentration_host_is1
                     lower_term = var_concentration_host_is2 - var_concentration_incl_is2 - var_a*(
                             var_concentration_host_is1 - var_concentration_incl_is1)
-                #
+
                 if lower_term != 0:
                     var_result_i = upper_term/lower_term
                 else:
                     var_result_i = 0
-                #
+
                 self.container_mixing_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
-            #
         else:
             for var_filetype in ["SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
                     helper_results = []
-                    #
                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                         if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
@@ -14998,7 +15060,7 @@ class PySILLS(tk.Frame):
 
                     var_result_i = np.mean(helper_results)
                     self.container_mixing_ratio["SMPL"][var_datatype][isotope] = var_result_i
-    #
+
     def fi_get_concentration_mixed(self, var_datatype, var_file_short, mode="Specific"):
         if mode == "Specific":
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]

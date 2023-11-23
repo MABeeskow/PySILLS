@@ -176,7 +176,7 @@ settings.
 
 .. rubric:: Mixed Concentration
 .. math::
-    C_{i}^{MIX} = (1 - x) \cdot C_{i}^{MAT} + x \cdot C_{i}^{INCL}
+    C_{i}^{MIX} = (1 - x) \cdot C_{i}^{MAT} + x \cdot C_{i}^{INCL} = \frac{I_{i}^{MIX}}{I_{IS}^{MIX}} \cdot \frac{C_{IS}^{MIX}}{\xi_{i}^{IS}}
 .. math::
     C_{t}^{MIX} = (1 - x) \cdot C_{t}^{MAT}
 .. math::
