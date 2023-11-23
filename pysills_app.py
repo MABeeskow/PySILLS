@@ -318,6 +318,8 @@ class PySILLS(tk.Frame):
         self.container_var["ICP-MS Info"]["skipfooter"].set(0)
         self.container_var["ICP-MS Info"]["timestamp"].set(0)
 
+        self.file_system_need_update = True
+
         self.container_flags = {"STD": {"Initialization": False}, "SMPL": {"Initialization": False}}
 
         self.list_std_changed = False
@@ -1427,42 +1429,45 @@ class PySILLS(tk.Frame):
             self.container_lists["Measured Isotopes"][var_file_short_copy] = file_isotopes_original
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short_copy]
 
-            if var_file_long_copy not in self.container_lists[filetype]["Long"]:
-                self.container_lists[filetype]["Long"].append(var_file_long_copy)
-                self.container_lists[filetype]["Short"].append(var_file_short_copy)
-
-            self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy] = tk.IntVar()
-            self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy].set(0)
-            self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy] = tk.IntVar()
-            self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy].set(0)
-            self.container_var[info_key]["Display RAW"][filetype][var_file_short_copy] = {}
-            self.container_var[info_key]["Display SMOOTHED"][filetype][var_file_short_copy] = {}
-
-            if var_file_short_copy not in self.container_var["ma_setting"]["Time-Signal Lines"][filetype]:
-                self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy] = {}
-                self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy] = {}
-                self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy] = {}
-                self.container_var[info_key]["Calculation Interval"][filetype][
-                    var_file_short_copy] = tk.IntVar()
-                self.container_var[info_key]["Calculation Interval"][filetype][var_file_short_copy].set(3)
-                self.container_var[info_key]["Calculation Interval Visibility"][filetype][
-                    var_file_short_copy] = {}
-
-            for isotope in file_isotopes:
-                self.build_checkbutton_isotope_visibility(
-                    var_mode=info_key, var_filetype=filetype, var_filename_short=var_file_short_copy,
-                    var_isotope=isotope)
-
-                self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-                self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-                self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy][
-                    isotope] = {"RAW": None, "SMOOTHED": None}
-
-            self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
-            self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
-            self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
+            self.add_needed_variables_for_later_added_files(
+                filename_long=var_file_long_copy, filename_short=var_file_short_copy, filetype=filetype,
+                file_isotopes=file_isotopes)
+            # if var_file_long_copy not in self.container_lists[filetype]["Long"]:
+            #     self.container_lists[filetype]["Long"].append(var_file_long_copy)
+            #     self.container_lists[filetype]["Short"].append(var_file_short_copy)
+            #
+            # self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy] = tk.IntVar()
+            # self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy].set(0)
+            # self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy] = tk.IntVar()
+            # self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy].set(0)
+            # self.container_var[info_key]["Display RAW"][filetype][var_file_short_copy] = {}
+            # self.container_var[info_key]["Display SMOOTHED"][filetype][var_file_short_copy] = {}
+            #
+            # if var_file_short_copy not in self.container_var["ma_setting"]["Time-Signal Lines"][filetype]:
+            #     self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy] = {}
+            #     self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy] = {}
+            #     self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy] = {}
+            #     self.container_var[info_key]["Calculation Interval"][filetype][
+            #         var_file_short_copy] = tk.IntVar()
+            #     self.container_var[info_key]["Calculation Interval"][filetype][var_file_short_copy].set(3)
+            #     self.container_var[info_key]["Calculation Interval Visibility"][filetype][
+            #         var_file_short_copy] = {}
+            #
+            # for isotope in file_isotopes:
+            #     self.build_checkbutton_isotope_visibility(
+            #         var_mode=info_key, var_filetype=filetype, var_filename_short=var_file_short_copy,
+            #         var_isotope=isotope)
+            #
+            #     self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy][isotope] = {
+            #         "RAW": None, "SMOOTHED": None}
+            #     self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy][isotope] = {
+            #         "RAW": None, "SMOOTHED": None}
+            #     self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy][
+            #         isotope] = {"RAW": None, "SMOOTHED": None}
+            #
+            # self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
+            # self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
+            # self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
 
             var_skipheader = self.container_icpms["skipheader"]
             var_skipfooter = self.container_icpms["skipfooter"]
@@ -1485,6 +1490,51 @@ class PySILLS(tk.Frame):
             elif self.pysills_mode == "FI":
                 self.subwindow_fi_settings.destroy()
                 self.fi_settings()
+
+    def add_needed_variables_for_later_added_files(self, filename_long, filename_short, filetype, file_isotopes):
+        if self.pysills_mode == "MA":
+            info_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            info_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            info_key = "mi_setting"
+
+        if filename_long not in self.container_lists[filetype]["Long"]:
+            self.container_lists[filetype]["Long"].append(filename_long)
+            self.container_lists[filetype]["Short"].append(filename_short)
+
+        self.container_var[info_key]["Data Type Plot"][filetype][filename_short] = tk.IntVar()
+        self.container_var[info_key]["Data Type Plot"][filetype][filename_short].set(0)
+        self.container_var[info_key]["Analyse Mode Plot"][filetype][filename_short] = tk.IntVar()
+        self.container_var[info_key]["Analyse Mode Plot"][filetype][filename_short].set(0)
+        self.container_var[info_key]["Display RAW"][filetype][filename_short] = {}
+        self.container_var[info_key]["Display SMOOTHED"][filetype][filename_short] = {}
+
+        if filename_short not in self.container_var["ma_setting"]["Time-Signal Lines"][filetype]:
+            self.container_var[info_key]["Time-Signal Lines"][filetype][filename_short] = {}
+            self.container_var[info_key]["Time-Ratio Lines"][filetype][filename_short] = {}
+            self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][filename_short] = {}
+            self.container_var[info_key]["Calculation Interval"][filetype][
+                filename_short] = tk.IntVar()
+            self.container_var[info_key]["Calculation Interval"][filetype][filename_short].set(3)
+            self.container_var[info_key]["Calculation Interval Visibility"][filetype][
+                filename_short] = {}
+
+        for isotope in file_isotopes:
+            self.build_checkbutton_isotope_visibility(
+                var_mode=info_key, var_filetype=filetype, var_filename_short=filename_short,
+                var_isotope=isotope)
+
+            self.container_var[info_key]["Time-Signal Lines"][filetype][filename_short][isotope] = {
+                "RAW": None, "SMOOTHED": None}
+            self.container_var[info_key]["Time-Ratio Lines"][filetype][filename_short][isotope] = {
+                "RAW": None, "SMOOTHED": None}
+            self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][filename_short][
+                isotope] = {"RAW": None, "SMOOTHED": None}
+
+        self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
+        self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
+        self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
 
     def select_experiment(self, var_rb):
         start_row = 9
@@ -2300,11 +2350,19 @@ class PySILLS(tk.Frame):
         elif var_lw > 2.5:
             var_lw = 2.5
 
-        for isotope in file_isotopes:
-            ln = var_ax.plot(
-                dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
-                visible=True)
-            self.temp_lines[isotope] = ln
+        try:
+            for isotope in file_isotopes:
+                ln = var_ax.plot(
+                    dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                    visible=True)
+                self.temp_lines[isotope] = ln
+        except:
+            self.define_temporary_colors(filename_short=file_short)
+            for isotope in file_isotopes:
+                ln = var_ax.plot(
+                    dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors_temporary[isotope],
+                    linewidth=var_lw, visible=True)
+                self.temp_lines[isotope] = ln
 
         if file_short in self.container_helper[var_filetype]:
             if len(self.container_helper[var_filetype][file_short]["BG"]["Content"]) > 0:
@@ -6301,7 +6359,6 @@ class PySILLS(tk.Frame):
     ####################
     ## DATA PROCESSING #
     ####################
-    #
     def open_csv(self, datatype):
         if datatype == "STD":
             if "Default_STD_01.csv" in self.list_std:
@@ -6319,29 +6376,49 @@ class PySILLS(tk.Frame):
             filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
                        ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
 
-        # index_header, names_header, var_delimiter = DE(filename_long=filename).find_header()
-        # index_data_end = DE(filename_long=filename).find_dataset_end(
-        #     var_delimiter=var_delimiter, var_index_header=index_header)
-        # var_date_creation = DE(filename_long=filename).get_file_creation_time(var_delimiter=var_delimiter)
-        # var_date_creation = DE(filename_long=filename).get_file_creation_time(var_delimiter=var_delimiter, meta_data=True)
-        # print("Header found in line", index_header)
-        # print(names_header)
-        # print("Delimiter:", var_delimiter)
-        # print("Last data line:", index_data_end)
-
         for i in filename:
             if i not in var_list:
                 var_list.append(i)
                 file_parts = i.split("/")
                 var_listbox.insert(tk.END, file_parts[-1])
-                #
-                if i not in self.container_lists[datatype]["Long"]:
-                    self.container_lists[datatype]["Long"].append(i)
-                    self.container_lists[datatype]["Short"].append(file_parts[-1])
-                #
-                self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
-                self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
-                self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
+                str_filename_long = i
+                str_filename_short = file_parts[-1]
+
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_exmpl = DE(filename_long=str_filename_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_exmpl = DE(filename_long=str_filename_long).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
+
+                if "Dataframe" not in self.container_measurements:
+                    self.container_measurements["Dataframe"] = {}
+                if str_filename_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][str_filename_short] = df_exmpl
+
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["Measured Isotopes"][str_filename_short] = df_isotopes
+                file_isotopes = df_isotopes
+
+                self.add_needed_variables_for_later_added_files(
+                    filename_long=str_filename_long, filename_short=str_filename_short, filetype=datatype,
+                    file_isotopes=file_isotopes)
+
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                var_timestamp = self.container_icpms["timestamp"]
+                var_icpms = self.container_icpms["name"]
+
+                dates, times = Data(filename=str_filename_long).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+
+                if str_filename_short not in self.container_var["acquisition times"][datatype]:
+                    self.container_var["acquisition times"][datatype][str_filename_short] = tk.StringVar()
+                    self.container_var["acquisition times"][datatype][str_filename_short].set(
+                        times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
         self.demo_mode = False
 
@@ -8458,7 +8535,8 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
-        if len(self.container_lists["ISOTOPES"]) == 0:
+        if self.file_system_need_update == True:
+        #if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
             if self.demo_mode == True:
@@ -8657,6 +8735,7 @@ class PySILLS(tk.Frame):
             self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
         self.build_srm_database()
+        self.file_system_need_update = False
 
     def place_project_information(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Project Information'
@@ -10711,6 +10790,20 @@ class PySILLS(tk.Frame):
         self.container_var[var_mode]["Display SMOOTHED"][var_filetype][var_filename_short][var_isotope] = tk.IntVar()
         self.container_var[var_mode]["Display RAW"][var_filetype][var_filename_short][var_isotope].set(1)
         self.container_var[var_mode]["Display SMOOTHED"][var_filetype][var_filename_short][var_isotope].set(0)
+
+    def define_temporary_colors(self, filename_short):
+        var_n = len(self.container_lists["Measured Isotopes"][filename_short])
+        var_cm = self.container_var["General Settings"]["Colormap"].get()
+        cmap = plt.get_cmap(var_cm, var_n)
+        colors_mpl = []
+
+        for i in range(cmap.N):
+            rgba = cmap(i)
+            colors_mpl.append(mpl.colors.rgb2hex(rgba))
+
+        self.isotope_colors_temporary = {}
+        for index, isotope in enumerate(self.container_lists["Measured Isotopes"][filename_short]):
+            self.isotope_colors_temporary[isotope] = colors_mpl[index]
 
     def define_isotope_colors(self):
         var_n = len(self.container_lists["Measured Isotopes"]["All"])
@@ -14159,19 +14252,20 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
     #
     def fi_settings(self):
-        if len(self.container_lists["ISOTOPES"]) == 0:
+        if self.file_system_need_update == True:
             path = os.getcwd()
             parent = os.path.dirname(path)
-
             if self.demo_mode == True:
                 self.var_opt_icp.set("Agilent 7900s")
+                self.select_icp_ms(var_opt=self.var_opt_icp)
                 fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
                 for file in demo_files:
                     if file.startswith("demo_fi"):
                         path_complete = os.path.join(path + str("/demo_files/"), file)
-                        path_raw = pathlib.PureWindowsPath(path_complete)
-                        fi_demo_files["ALL"].append(str(path_raw.as_posix()))
+                        if "_copy" not in  path_complete:
+                            path_raw = pathlib.PureWindowsPath(path_complete)
+                            fi_demo_files["ALL"].append(str(path_raw.as_posix()))
                 fi_demo_files["ALL"].sort()
                 fi_demo_files["STD"].extend(fi_demo_files["ALL"][:2])
                 fi_demo_files["STD"].extend(fi_demo_files["ALL"][-2:])
@@ -14180,29 +14274,27 @@ class PySILLS(tk.Frame):
                 self.list_std = fi_demo_files["STD"]
                 self.list_smpl = fi_demo_files["SMPL"]
 
-                for file_std in self.list_std:
-                    file_parts = file_std.split("/")
-                    if file_std not in self.container_lists["STD"]["Long"]:
-                        self.container_lists["STD"]["Long"].append(file_std)
-                        self.container_lists["STD"]["Short"].append(file_parts[-1])
-                    for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
-                                 "Results Sensitivity", "SE STD", "SE SMPL"]:
-                        self.container_var["Subwindows"][self.pysills_mode][item] = {}
+            self.fi_current_file_std = self.list_std[0]
+            self.fi_current_file_smpl = self.list_smpl[0]
 
-                for file_smpl in self.list_smpl:
-                    file_parts = file_smpl.split("/")
-                    if file_smpl not in self.container_lists["SMPL"]["Long"]:
-                        self.container_lists["SMPL"]["Long"].append(file_smpl)
-                        self.container_lists["SMPL"]["Short"].append(file_parts[-1])
-
-                self.fi_current_file_std = self.list_std[0]
-                self.fi_current_file_smpl = self.list_smpl[0]
-
-                for file_std in self.list_std:
-                    file_parts = file_std.split("/")
+            for file_std in self.list_std:
+                file_parts = file_std.split("/")
+                if file_std not in self.container_lists["STD"]["Long"]:
+                    self.container_lists["STD"]["Long"].append(file_std)
+                    self.container_lists["STD"]["Short"].append(file_parts[-1])
+                if self.demo_mode == True:
                     self.lb_std.insert(tk.END, file_parts[-1])
-                for file_smpl in self.list_smpl:
-                    file_parts = file_smpl.split("/")
+
+                for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
+                             "Results Sensitivity", "SE STD", "SE SMPL"]:
+                    self.container_var["Subwindows"][self.pysills_mode][item] = {}
+
+            for file_smpl in self.list_smpl:
+                file_parts = file_smpl.split("/")
+                if file_smpl not in self.container_lists["SMPL"]["Long"]:
+                    self.container_lists["SMPL"]["Long"].append(file_smpl)
+                    self.container_lists["SMPL"]["Short"].append(file_parts[-1])
+                if self.demo_mode == True:
                     self.lb_smpl.insert(tk.END, file_parts[-1])
 
             for file_std in self.list_std:
@@ -14279,6 +14371,177 @@ class PySILLS(tk.Frame):
                             self.container_lists["Measured Elements"][filename_short][element].append(isotope)
 
             self.define_isotope_colors()
+
+            # if self.container_icpms["name"] != None:
+            #     var_skipheader = self.container_icpms["skipheader"]
+            #     var_skipfooter = self.container_icpms["skipfooter"]
+            #     df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
+            #         delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            # else:
+            #     df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
+            #         delimiter=",", skip_header=3, skip_footer=1)
+            #
+            # if "Dataframe" not in self.container_measurements:
+            #     self.container_measurements["Dataframe"] = {}
+            # if file_parts[-1] not in self.container_measurements["Dataframe"]:
+            #     self.container_measurements["Dataframe"][file_parts[-1]] = df_exmpl
+            #
+            # self.times = DE().get_times(dataframe=df_exmpl)
+            # df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+            # self.container_lists["ISOTOPES"] = df_isotopes
+            # self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+            # self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+            #
+            # for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            #     key_element = re.search("(\D+)(\d+)", isotope)
+            #     element = key_element.group(1)
+            #     if element not in self.container_lists["Measured Elements"]["All"]:
+            #         self.container_lists["Measured Elements"]["All"].append(element)
+            # for filename_short in self.container_lists["STD"]["Short"]:
+            #     self.container_lists["Measured Elements"][filename_short] = {}
+            #     self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+            #     for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+            #         key_element = re.search("(\D+)(\d+)", isotope)
+            #         element = key_element.group(1)
+            #         if element not in self.container_lists["Measured Elements"][filename_short]:
+            #             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+            #         else:
+            #             if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+            #                 self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+            # for filename_short in self.container_lists["SMPL"]["Short"]:
+            #     self.container_lists["Measured Elements"][filename_short] = {}
+            #     self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+            #     for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+            #         key_element = re.search("(\D+)(\d+)", isotope)
+            #         element = key_element.group(1)
+            #         if element not in self.container_lists["Measured Elements"][filename_short]:
+            #             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+            #         else:
+            #             if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+            #                 self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+            #
+            # self.define_isotope_colors()
+
+        # if len(self.container_lists["ISOTOPES"]) == 0:
+        #     path = os.getcwd()
+        #     parent = os.path.dirname(path)
+        #
+        #     if self.demo_mode == True:
+        #         self.var_opt_icp.set("Agilent 7900s")
+        #         fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
+        #         demo_files = os.listdir(path=path + str("/demo_files/"))
+        #         for file in demo_files:
+        #             if file.startswith("demo_fi"):
+        #                 path_complete = os.path.join(path + str("/demo_files/"), file)
+        #                 path_raw = pathlib.PureWindowsPath(path_complete)
+        #                 fi_demo_files["ALL"].append(str(path_raw.as_posix()))
+        #         fi_demo_files["ALL"].sort()
+        #         fi_demo_files["STD"].extend(fi_demo_files["ALL"][:2])
+        #         fi_demo_files["STD"].extend(fi_demo_files["ALL"][-2:])
+        #         fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:-2])
+        #
+        #         self.list_std = fi_demo_files["STD"]
+        #         self.list_smpl = fi_demo_files["SMPL"]
+        #
+        #         for file_std in self.list_std:
+        #             file_parts = file_std.split("/")
+        #             if file_std not in self.container_lists["STD"]["Long"]:
+        #                 self.container_lists["STD"]["Long"].append(file_std)
+        #                 self.container_lists["STD"]["Short"].append(file_parts[-1])
+        #             for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
+        #                          "Results Sensitivity", "SE STD", "SE SMPL"]:
+        #                 self.container_var["Subwindows"][self.pysills_mode][item] = {}
+        #
+        #         for file_smpl in self.list_smpl:
+        #             file_parts = file_smpl.split("/")
+        #             if file_smpl not in self.container_lists["SMPL"]["Long"]:
+        #                 self.container_lists["SMPL"]["Long"].append(file_smpl)
+        #                 self.container_lists["SMPL"]["Short"].append(file_parts[-1])
+        #
+        #         self.fi_current_file_std = self.list_std[0]
+        #         self.fi_current_file_smpl = self.list_smpl[0]
+        #
+        #         for file_std in self.list_std:
+        #             file_parts = file_std.split("/")
+        #             self.lb_std.insert(tk.END, file_parts[-1])
+        #         for file_smpl in self.list_smpl:
+        #             file_parts = file_smpl.split("/")
+        #             self.lb_smpl.insert(tk.END, file_parts[-1])
+        #
+        #     for file_std in self.list_std:
+        #         file_parts = file_std.split("/")
+        #         if self.file_loaded == False:
+        #             if self.container_icpms["name"] != None:
+        #                 var_skipheader = self.container_icpms["skipheader"]
+        #                 var_skipfooter = self.container_icpms["skipfooter"]
+        #                 df_exmpl = DE(filename_long=file_std).get_measurements(
+        #                     delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        #             else:
+        #                 df_exmpl = DE(filename_long=file_std).get_measurements(
+        #                     delimiter=",", skip_header=3, skip_footer=1)
+        #         else:
+        #             file_parts = file_std.split("/")
+        #             df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+        #
+        #         self.times = DE().get_times(dataframe=df_exmpl)
+        #         df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+        #         self.container_lists["ISOTOPES"] = df_isotopes
+        #         self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+        #         self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+        #
+        #     for file_smpl in self.list_smpl:
+        #         file_parts = file_smpl.split("/")
+        #         if self.file_loaded == False:
+        #             if self.container_icpms["name"] != None:
+        #                 var_skipheader = self.container_icpms["skipheader"]
+        #                 var_skipfooter = self.container_icpms["skipfooter"]
+        #                 df_exmpl = DE(filename_long=file_smpl).get_measurements(
+        #                     delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        #             else:
+        #                 df_exmpl = DE(filename_long=file_smpl).get_measurements(
+        #                     delimiter=",", skip_header=3, skip_footer=1)
+        #         else:
+        #             file_parts = file_smpl .split("/")
+        #             df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+        #
+        #         self.times = DE().get_times(dataframe=df_exmpl)
+        #         df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+        #         self.container_lists["ISOTOPES"] = df_isotopes
+        #         self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+        #         self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+        #
+        #
+        #     for isotope in self.container_lists["Measured Isotopes"]["All"]:
+        #         key_element = re.search("(\D+)(\d+)", isotope)
+        #         element = key_element.group(1)
+        #         if element not in self.container_lists["Measured Elements"]["All"]:
+        #             self.container_lists["Measured Elements"]["All"].append(element)
+        #
+        #     for filename_short in self.container_lists["STD"]["Short"]:
+        #         self.container_lists["Measured Elements"][filename_short] = {}
+        #         self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+        #         for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+        #             key_element = re.search("(\D+)(\d+)", isotope)
+        #             element = key_element.group(1)
+        #             if element not in self.container_lists["Measured Elements"][filename_short]:
+        #                 self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+        #             else:
+        #                 if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+        #                     self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+        #
+        #     for filename_short in self.container_lists["SMPL"]["Short"]:
+        #         self.container_lists["Measured Elements"][filename_short] = {}
+        #         self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+        #         for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+        #             key_element = re.search("(\D+)(\d+)", isotope)
+        #             element = key_element.group(1)
+        #             if element not in self.container_lists["Measured Elements"][filename_short]:
+        #                 self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+        #             else:
+        #                 if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+        #                     self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+        #
+        #     self.define_isotope_colors()
         else:
             self.fi_current_file_std = self.container_lists["STD"]["Long"][0]
             self.fi_current_file_smpl = self.container_lists["SMPL"]["Long"][0]
@@ -14385,6 +14648,9 @@ class PySILLS(tk.Frame):
                     var_method = "Grubbs"
                     #
                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+
+        self.build_srm_database()
+        self.file_system_need_update = False
 
     def change_rb_inclusion_setup(self):
         if self.container_var["fi_setting"]["Inclusion Setup Selection"].get() == 1:
@@ -17503,6 +17769,7 @@ class PySILLS(tk.Frame):
         text_iso.pack(side="left", fill="both", expand=True)
 
         file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+
         for index, isotope in enumerate(file_isotopes):
             frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
                              highlightbackground="black", bd=1)
@@ -17513,6 +17780,10 @@ class PySILLS(tk.Frame):
             text_iso.window_create("end", window=lbl_i)
             text_iso.insert("end", "\t")
 
+            if isotope not in self.container_var["fi_setting"]["Display RAW"][str_filetype][str_filename_short]:
+                self.container_var["fi_setting"]["Display RAW"][str_filetype][str_filename_short][
+                    isotope] = tk.IntVar()
+
             cb_raw_i = tk.Checkbutton(
                 frm_iso, variable=self.container_var["fi_setting"]["Display RAW"][str_filetype][str_filename_short][
                     isotope], text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
@@ -17521,6 +17792,10 @@ class PySILLS(tk.Frame):
                 self.fi_change_line_visibility(var_type, var_file_short, var_datatype, var_isotope))
             text_iso.window_create("end", window=cb_raw_i)
             text_iso.insert("end", "\t")
+
+            if isotope not in self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][str_filename_short]:
+                self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
+                    isotope] = tk.IntVar()
 
             cb_smoothed_i = tk.Checkbutton(
                 frm_iso, variable=self.container_var["fi_setting"]["Display SMOOTHED"][str_filetype][
