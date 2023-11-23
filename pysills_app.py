@@ -311,6 +311,12 @@ class PySILLS(tk.Frame):
         self.container_var["Initialization"] = {"STD": False, "SMPL": False, "ISOTOPES": False}
 
         self.container_icpms = {"name": None, "skipheader": 1, "skipfooter": 0, "timestamp": 0}
+        self.container_var["ICP-MS Info"] = {"name": tk.StringVar(), "skipheader": tk.IntVar(),
+                                             "skipfooter": tk.IntVar(), "timestamp": tk.IntVar()}
+        self.container_var["ICP-MS Info"]["name"].set("Unknown ICP-MS")
+        self.container_var["ICP-MS Info"]["skipheader"].set(1)
+        self.container_var["ICP-MS Info"]["skipfooter"].set(0)
+        self.container_var["ICP-MS Info"]["timestamp"].set(0)
 
         self.container_flags = {"STD": {"Initialization": False}, "SMPL": {"Initialization": False}}
 
@@ -651,8 +657,6 @@ class PySILLS(tk.Frame):
         for var_rb in self.container_var["ma_datareduction"]["Radiobutton"]:
             var_rb.set(0)
         self.var_mode_mi = False
-        self.var_rb_timestamp = tk.IntVar()
-        self.var_rb_timestamp.set(0)
         #
         self.container_var["mineralchemistry"] = []
         self.container_var["plotting"] = {}
@@ -1113,13 +1117,13 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
             text=var_lbl_04, relief=tk.FLAT, fontsize=font_header)
         lbl_04b = SE(
-            parent=self.parent, row_id=start_row + 16, column_id=start_column + 8, n_rows=common_n_rows,
-            n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=var_lbl_04b, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            parent=self.parent, row_id=start_row + 16, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text=var_lbl_04b, relief=tk.FLAT, fontsize=font_elements)
         lbl_04c = SE(
-            parent=self.parent, row_id=start_row + 17, column_id=start_column + 8, n_rows=common_n_rows,
-            n_columns=common_n_columns - 5, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=var_lbl_04c, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            parent=self.parent, row_id=start_row + 16, column_id=start_column + common_n_columns + 1, n_rows=common_n_rows,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text=var_lbl_04c, relief=tk.FLAT, fontsize=font_elements)
         now = datetime.datetime.now()
         now = now.strftime("%Y/%m/%d-%H%M")
         lbl_version = SE(
@@ -1153,17 +1157,6 @@ class PySILLS(tk.Frame):
                 rb_mode.configure(state="disabled")
 
             self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
-
-        rb_04a = SE(
-            parent=self.parent, row_id=start_row + 16, column_id=start_column, n_rows=common_n_rows,
-            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.var_rb_timestamp, value_rb=0, color_bg=background_color_elements,
-            fg=font_color_dark, text="Original data", sticky="NESW", relief=tk.FLAT, font=font_elements)
-        rb_04b = SE(
-            parent=self.parent, row_id=start_row + 17, column_id=start_column, n_rows=common_n_rows,
-            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.var_rb_timestamp, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
-            text="Pre-processed data", sticky="NESW", relief=tk.FLAT, font=font_elements)
 
         # BUTTONS
         SE(
@@ -1230,20 +1223,141 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text="Quit", bg_active=accent_color, fg_active=font_color_dark, command=self.parent.quit)
         btn_icp = SE(
-            parent=self.parent, row_id=start_row + 17, column_id=start_column + 13, n_rows=common_n_rows,
-            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Setup", bg_active=accent_color, fg_active=font_color_dark)
-        btn_icp.configure(state="disabled")
+            parent=self.parent, row_id=start_row + 17, column_id=start_column + common_n_columns + 1, n_rows=common_n_rows,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Setup", bg_active=accent_color, fg_active=font_color_dark, command=self.define_icp_ms_import_setup)
 
         # OPTION MENUS
         self.var_opt_icp = tk.StringVar()
         self.var_opt_icp.set("Select ICP-MS")
         opt_icp = SE(
-            parent=self.parent, row_id=start_row + 16, column_id=start_column + 13, n_rows=common_n_rows,
-            n_columns=common_n_columns - 2, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
+            parent=self.parent, row_id=start_row + 17, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
             var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
             var_list=self.container_lists["ICPMS Library"], fg_active=font_color_dark, bg_active=accent_color,
             command=lambda var_opt=self.var_opt_icp: self.select_icp_ms(var_opt))
+
+    def define_icp_ms_import_setup(self):
+        """Window for the ICP-MS file setup."""
+        ## Window Settings
+        window_width = 340
+        window_heigth = 200
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_icpms_setup = tk.Toplevel(self.parent)
+        self.subwindow_icpms_setup.title("ICP-MS File Setup")
+        self.subwindow_icpms_setup.geometry(var_geometry)
+        self.subwindow_icpms_setup.resizable(False, False)
+        self.subwindow_icpms_setup["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_icpms_setup, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_icpms_setup, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_icpms_setup.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_icpms_setup.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_columm_start = 0
+        var_header_n = 16
+        int_category_n = 8
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start, column_id=var_columm_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="ICP-MS File Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Name", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Line of Timestamp", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Skip Header", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_columm_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Skip Footer", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # ENTRIES
+        current_val_name = self.container_var["ICP-MS Info"]["name"].get()
+        current_val_timestamp = self.container_var["ICP-MS Info"]["timestamp"].get()
+        current_val_skipheader = self.container_var["ICP-MS Info"]["skipheader"].get()
+        current_val_skipfooter = self.container_var["ICP-MS Info"]["skipfooter"].get()
+
+        entr_002 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_columm_start + int_category_n,
+            n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["ICP-MS Info"]["name"], text_default=current_val_name)
+        entr_002 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_columm_start + int_category_n,
+            n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["ICP-MS Info"]["timestamp"], text_default=current_val_timestamp)
+        entr_002 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_columm_start + int_category_n,
+            n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["ICP-MS Info"]["skipheader"], text_default=current_val_skipheader)
+        entr_002 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_columm_start + int_category_n,
+            n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["ICP-MS Info"]["skipfooter"], text_default=current_val_skipfooter)
+
+        # BUTTONS
+        btn_02 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
+            column_id=var_columm_start + (var_header_n - int_category_n), n_rows=1,
+            n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
+            bg=self.accent_color).create_simple_button(
+            text="Confirm Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.confirm_icpms_settings)
+        btn_002 = SE(
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
+            column_id=var_columm_start, n_rows=1,
+            n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
+            bg=self.accent_color).create_simple_button(
+            text="Save ICP-MS Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.save_icpms_settings)
+
+    def confirm_icpms_settings(self):
+        self.var_opt_icp.set(self.container_var["ICP-MS Info"]["name"].get())
+        self.container_icpms["timestamp"] = self.container_var["ICP-MS Info"]["timestamp"].get()
+        self.container_icpms["skipheader"] = self.container_var["ICP-MS Info"]["skipheader"].get()
+        self.container_icpms["skipfooter"] = self.container_var["ICP-MS Info"]["skipfooter"].get()
+
+    def save_icpms_settings(self):
+        str_icpms_name = self.container_var["ICP-MS Info"]["name"].get()
+        int_icpms_skipheader = self.container_var["ICP-MS Info"]["skipheader"].get()
+        int_icpms_skipfooter = self.container_var["ICP-MS Info"]["skipfooter"].get()
+        int_icpms_timestamp = self.container_var["ICP-MS Info"]["timestamp"].get()
+
+        filename_export = filedialog.asksaveasfile(
+            mode="w", initialfile=str_icpms_name, defaultextension=".csv", filetypes=[("csv", "*.csv")])
+        filename_export = filename_export.name
+
+        with open(filename_export, "w") as file_content:
+            file_content.write("name" + "," + str(str_icpms_name) + "\n")
+            file_content.write("skipheader" + "," + str(int_icpms_skipheader) + "\n")
+            file_content.write("skipfooter" + "," + str(int_icpms_skipfooter) + "\n")
+            file_content.write("timestamp" + "," + str(int_icpms_timestamp) + "\n")
 
     def select_icp_ms(self, var_opt):
         path = os.getcwd()
@@ -1274,6 +1388,13 @@ class PySILLS(tk.Frame):
                 self.container_icpms[line_parts[0]] = line_parts[-1]
 
     def copy_file(self, filetype):
+        if self.pysills_mode == "MA":
+            info_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            info_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            info_key = "mi_setting"
+
         if filetype == "STD":
             var_lb = self.lb_std
             var_list = self.list_std
@@ -1287,6 +1408,10 @@ class PySILLS(tk.Frame):
         var_file_extension = var_file_long_parts[-1]
         var_file_long_copy = var_file_long_parts[0] + "_copy" + "." + var_file_extension
 
+        file_parts = var_file_long.split("/")
+        file_short_original = file_parts[-1]
+        file_isotopes_original = self.container_lists["Measured Isotopes"][file_short_original]
+
         with open(var_file_long, "r") as file:
             content = file.read()
 
@@ -1298,43 +1423,61 @@ class PySILLS(tk.Frame):
             file_parts_copy = var_file_long_copy.split("/")
             var_file_short_copy = file_parts_copy[-1]
             var_lb.insert(tk.END, var_file_short_copy)
-            #
+
+            self.container_lists["Measured Isotopes"][var_file_short_copy] = file_isotopes_original
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short_copy]
+
             if var_file_long_copy not in self.container_lists[filetype]["Long"]:
                 self.container_lists[filetype]["Long"].append(var_file_long_copy)
                 self.container_lists[filetype]["Short"].append(var_file_short_copy)
 
-            self.container_var["ma_setting"]["Data Type Plot"][filetype][var_file_short_copy] = tk.IntVar()
-            self.container_var["ma_setting"]["Data Type Plot"][filetype][var_file_short_copy].set(0)
-            self.container_var["ma_setting"]["Analyse Mode Plot"][filetype][var_file_short_copy] = tk.IntVar()
-            self.container_var["ma_setting"]["Analyse Mode Plot"][filetype][var_file_short_copy].set(0)
-            self.container_var["ma_setting"]["Display RAW"][filetype][var_file_short_copy] = {}
-            self.container_var["ma_setting"]["Display SMOOTHED"][filetype][var_file_short_copy] = {}
+            self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy] = tk.IntVar()
+            self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy].set(0)
+            self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy] = tk.IntVar()
+            self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy].set(0)
+            self.container_var[info_key]["Display RAW"][filetype][var_file_short_copy] = {}
+            self.container_var[info_key]["Display SMOOTHED"][filetype][var_file_short_copy] = {}
 
             if var_file_short_copy not in self.container_var["ma_setting"]["Time-Signal Lines"][filetype]:
-                self.container_var["ma_setting"]["Time-Signal Lines"][filetype][var_file_short_copy] = {}
-                self.container_var["ma_setting"]["Time-Ratio Lines"][filetype][var_file_short_copy] = {}
-                self.container_var["ma_setting"]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy] = {}
-                self.container_var["ma_setting"]["Calculation Interval"][filetype][
+                self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy] = {}
+                self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy] = {}
+                self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy] = {}
+                self.container_var[info_key]["Calculation Interval"][filetype][
                     var_file_short_copy] = tk.IntVar()
-                self.container_var["ma_setting"]["Calculation Interval"][filetype][var_file_short_copy].set(3)
-                self.container_var["ma_setting"]["Calculation Interval Visibility"][filetype][
+                self.container_var[info_key]["Calculation Interval"][filetype][var_file_short_copy].set(3)
+                self.container_var[info_key]["Calculation Interval Visibility"][filetype][
                     var_file_short_copy] = {}
 
-            for isotope in self.container_lists["ISOTOPES"]:
+            for isotope in file_isotopes:
                 self.build_checkbutton_isotope_visibility(
-                    var_mode="ma_setting", var_filetype=filetype, var_filename_short=var_file_short_copy,
+                    var_mode=info_key, var_filetype=filetype, var_filename_short=var_file_short_copy,
                     var_isotope=isotope)
 
-                self.container_var["ma_setting"]["Time-Signal Lines"][filetype][var_file_short_copy][isotope] = {
+                self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy][isotope] = {
                     "RAW": None, "SMOOTHED": None}
-                self.container_var["ma_setting"]["Time-Ratio Lines"][filetype][var_file_short_copy][isotope] = {
+                self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy][isotope] = {
                     "RAW": None, "SMOOTHED": None}
-                self.container_var["ma_setting"]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy][
+                self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy][
                     isotope] = {"RAW": None, "SMOOTHED": None}
 
             self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
             self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
             self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
+
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+
+            dates, times = Data(filename=var_file_long_copy).import_as_list(
+                skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+
+            t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+
+            if var_file_short_copy not in self.container_var["acquisition times"][filetype]:
+                self.container_var["acquisition times"][filetype][var_file_short_copy] = tk.StringVar()
+                self.container_var["acquisition times"][filetype][var_file_short_copy].set(
+                    times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
             if self.pysills_mode == "MA":
                 self.subwindow_ma_settings.destroy()
@@ -14787,7 +14930,6 @@ class PySILLS(tk.Frame):
                                     var_file_short]["MAT"][var_is]
                                 var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
                                     var_file_short]["MAT"][isotope]
-
 
                                 ## Inclusion concentration
                                 var_result_i = (1/(var_x*var_sensitivity_i))*(
