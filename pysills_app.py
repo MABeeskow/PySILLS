@@ -1155,7 +1155,7 @@ class PySILLS(tk.Frame):
                 var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
                 text=mode, sticky="NESW", relief=tk.FLAT, font=font_elements, command=lambda var_rb=self.var_rb_mode:
                 self.select_experiment(var_rb))
-            if mode in ["Melt Inclusions", "Output Analysis"]:
+            if mode in ["Output Analysis"]:
                 rb_mode.configure(state="disabled")
 
             self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
@@ -1432,42 +1432,6 @@ class PySILLS(tk.Frame):
             self.add_needed_variables_for_later_added_files(
                 filename_long=var_file_long_copy, filename_short=var_file_short_copy, filetype=filetype,
                 file_isotopes=file_isotopes)
-            # if var_file_long_copy not in self.container_lists[filetype]["Long"]:
-            #     self.container_lists[filetype]["Long"].append(var_file_long_copy)
-            #     self.container_lists[filetype]["Short"].append(var_file_short_copy)
-            #
-            # self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy] = tk.IntVar()
-            # self.container_var[info_key]["Data Type Plot"][filetype][var_file_short_copy].set(0)
-            # self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy] = tk.IntVar()
-            # self.container_var[info_key]["Analyse Mode Plot"][filetype][var_file_short_copy].set(0)
-            # self.container_var[info_key]["Display RAW"][filetype][var_file_short_copy] = {}
-            # self.container_var[info_key]["Display SMOOTHED"][filetype][var_file_short_copy] = {}
-            #
-            # if var_file_short_copy not in self.container_var["ma_setting"]["Time-Signal Lines"][filetype]:
-            #     self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy] = {}
-            #     self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy] = {}
-            #     self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy] = {}
-            #     self.container_var[info_key]["Calculation Interval"][filetype][
-            #         var_file_short_copy] = tk.IntVar()
-            #     self.container_var[info_key]["Calculation Interval"][filetype][var_file_short_copy].set(3)
-            #     self.container_var[info_key]["Calculation Interval Visibility"][filetype][
-            #         var_file_short_copy] = {}
-            #
-            # for isotope in file_isotopes:
-            #     self.build_checkbutton_isotope_visibility(
-            #         var_mode=info_key, var_filetype=filetype, var_filename_short=var_file_short_copy,
-            #         var_isotope=isotope)
-            #
-            #     self.container_var[info_key]["Time-Signal Lines"][filetype][var_file_short_copy][isotope] = {
-            #         "RAW": None, "SMOOTHED": None}
-            #     self.container_var[info_key]["Time-Ratio Lines"][filetype][var_file_short_copy][isotope] = {
-            #         "RAW": None, "SMOOTHED": None}
-            #     self.container_var[info_key]["Checkboxes Isotope Diagram"][filetype][var_file_short_copy][
-            #         isotope] = {"RAW": None, "SMOOTHED": None}
-            #
-            # self.container_var["Plotting"][self.pysills_mode]["Quickview"] = {"Canvas": None, "Toolbar": None}
-            # self.container_var["Plotting"][self.pysills_mode]["Time-Signal"] = {"Canvas": None, "Toolbar": None}
-            # self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
 
             var_skipheader = self.container_icpms["skipheader"]
             var_skipfooter = self.container_icpms["skipfooter"]
@@ -1490,6 +1454,9 @@ class PySILLS(tk.Frame):
             elif self.pysills_mode == "FI":
                 self.subwindow_fi_settings.destroy()
                 self.fi_settings()
+            elif self.pysills_mode == "MI":
+                self.subwindow_mi_settings.destroy()
+                self.mi_settings()
 
     def add_needed_variables_for_later_added_files(self, filename_long, filename_short, filetype, file_isotopes):
         if self.pysills_mode == "MA":
@@ -1607,8 +1574,7 @@ class PySILLS(tk.Frame):
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.ma_datareduction_files)
+                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
@@ -1634,16 +1600,17 @@ class PySILLS(tk.Frame):
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.mi_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.fi_datareduction_files)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.ma_datareduction_files)
+                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
@@ -6324,7 +6291,7 @@ class PySILLS(tk.Frame):
             elif self.pysills_mode == "FI":
                 self.fi_settings()
             elif self.pysills_mode == "MI":
-                pass
+                self.mi_settings()
         except FileNotFoundError:
             pass
 
@@ -14250,7 +14217,6 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
 # FLUID INCLUSION ANALYSIS #############################################################################################
 ########################################################################################################################
-    #
     def fi_settings(self):
         if self.file_system_need_update == True:
             path = os.getcwd()
@@ -14638,6 +14604,240 @@ class PySILLS(tk.Frame):
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
             self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            #
+        else:
+            self.fi_select_srm_initialization()
+        #
+        for filetype in ["STD", "SMPL"]:
+            if self.container_var["Spike Elimination"][filetype]["State"] == True:
+                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
+                    var_method = "Grubbs"
+                    #
+                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+
+        self.build_srm_database()
+        self.file_system_need_update = False
+
+########################################################################################################################
+### MELT INCLUSIONS ####################################################################################################
+########################################################################################################################
+
+    def mi_settings(self):
+        if self.file_system_need_update == True:
+            path = os.getcwd()
+            parent = os.path.dirname(path)
+            if self.demo_mode == True:
+                self.var_opt_icp.set("Agilent 7900s")
+                self.select_icp_ms(var_opt=self.var_opt_icp)
+                mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
+                demo_files = os.listdir(path=path + str("/demo_files/"))
+                for file in demo_files:
+                    if file.startswith("demo_mi"):
+                        path_complete = os.path.join(path + str("/demo_files/"), file)
+                        if "_copy" not in  path_complete:
+                            path_raw = pathlib.PureWindowsPath(path_complete)
+                            mi_demo_files["ALL"].append(str(path_raw.as_posix()))
+                mi_demo_files["ALL"].sort()
+                mi_demo_files["STD"].extend(mi_demo_files["ALL"][:2])
+                mi_demo_files["STD"].extend(mi_demo_files["ALL"][-2:])
+                mi_demo_files["SMPL"].extend(mi_demo_files["ALL"][2:-2])
+
+                self.list_std = mi_demo_files["STD"]
+                self.list_smpl = mi_demo_files["SMPL"]
+
+            self.mi_current_file_std = self.list_std[0]
+            self.mi_current_file_smpl = self.list_smpl[0]
+
+            for file_std in self.list_std:
+                file_parts = file_std.split("/")
+                if file_std not in self.container_lists["STD"]["Long"]:
+                    self.container_lists["STD"]["Long"].append(file_std)
+                    self.container_lists["STD"]["Short"].append(file_parts[-1])
+                if self.demo_mode == True:
+                    self.lb_std.insert(tk.END, file_parts[-1])
+
+                for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
+                             "Results Sensitivity", "SE STD", "SE SMPL"]:
+                    self.container_var["Subwindows"][self.pysills_mode][item] = {}
+
+            for file_smpl in self.list_smpl:
+                file_parts = file_smpl.split("/")
+                if file_smpl not in self.container_lists["SMPL"]["Long"]:
+                    self.container_lists["SMPL"]["Long"].append(file_smpl)
+                    self.container_lists["SMPL"]["Short"].append(file_parts[-1])
+                if self.demo_mode == True:
+                    self.lb_smpl.insert(tk.END, file_parts[-1])
+
+            for file_std in self.list_std:
+                file_parts = file_std.split("/")
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_exmpl = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_exmpl = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                else:
+                    file_parts = file_std.split("/")
+                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["ISOTOPES"] = df_isotopes
+                self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+                self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+
+            for file_smpl in self.list_smpl:
+                file_parts = file_smpl.split("/")
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                else:
+                    file_parts = file_smpl .split("/")
+                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["ISOTOPES"] = df_isotopes
+                self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+                self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+
+
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+                if element not in self.container_lists["Measured Elements"]["All"]:
+                    self.container_lists["Measured Elements"]["All"].append(element)
+
+            for filename_short in self.container_lists["STD"]["Short"]:
+                self.container_lists["Measured Elements"][filename_short] = {}
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"][filename_short]:
+                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    else:
+                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+
+            for filename_short in self.container_lists["SMPL"]["Short"]:
+                self.container_lists["Measured Elements"][filename_short] = {}
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                for isotope in self.container_lists["Measured Isotopes"][filename_short]:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"][filename_short]:
+                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    else:
+                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+
+            self.define_isotope_colors()
+        else:
+            self.mi_current_file_std = self.container_lists["STD"]["Long"][0]
+            self.mi_current_file_smpl = self.container_lists["SMPL"]["Long"][0]
+            self.define_isotope_colors()
+
+        ## Window Settings
+        window_width = 1260
+        window_heigth = 1000
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        #
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+        #
+        self.subwindow_mi_settings = tk.Toplevel(self.parent)
+        self.subwindow_mi_settings.title("MELT INCLUSION ANALYSIS - Setup")
+        self.subwindow_mi_settings.geometry(var_geometry)
+        self.subwindow_mi_settings.resizable(False, False)
+        self.subwindow_mi_settings["bg"] = self.bg_colors["Super Dark"]
+        #
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_mi_settings, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_mi_settings, y, weight=1)
+        #
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_mi_settings.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_mi_settings.grid_columnconfigure(i, minsize=column_min)
+        #
+        ## INITIALIZATION
+        for isotope in self.container_lists["ISOTOPES"]:
+            key_element = re.search("(\D+)(\d+)", isotope)
+            element = key_element.group(1)
+            #
+            if element not in self.container_lists["Elements"]:
+                self.container_lists["Elements"].append(element)
+
+        ## Static
+        # Build section 'Project Information'
+        var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_project_information(var_geometry_info=var_project_information)
+        # Build section 'Standard Reference Material'
+        var_standard_reference_material = {"Row start": 3, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_standard_reference_material(var_geometry_info=var_standard_reference_material)
+        # Build section 'Matrix Settings'
+        var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_sample_settings(var_geometry_info=var_sample_settings)
+        # Build section 'Quantification Method'
+        var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_quantification_method(var_geometry_info=var_quantification_method)
+        # Build section 'Assemblage Setup'
+        var_assemblage_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
+        # Build section 'Dwell Time Setup'
+        var_dwell_time_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
+        # Build section 'Calculation Window (Background) Setup'
+        var_calculation_window_bg_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
+        # Build section 'Spike Elimination Setup'
+        var_spike_elimination_setup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
+        # Build section 'Check-Up'
+        var_checkup = {"Row start": 33, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_checkup_feature(var_geometry_info=var_checkup)
+        # Build section 'Acquisition Times'
+        var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
+        self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
+        # Build section 'Standard Files'
+        var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 16, "N columns": 24}
+        self.place_standard_files_table(var_geometry_info=var_standard_files)
+        # Build section 'Sample Files'
+        var_sample_files = {"Row start": 18, "Column start": 19, "N rows": 19, "N columns": 24}
+        self.place_sample_files_table(var_geometry_info=var_sample_files)
+        # Build section 'Time-Signal Diagram Checker'
+        self.define_isotope_colors()
+        var_time_signal_diagram_check = {"Row start": 26, "Column start": 44, "N rows": 1, "N columns": 18}
+        self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
+        # Build section 'Measured Isotopes'
+        var_measured_isotopes = {"Row start": 1, "Column start": 44, "N rows": 16, "N columns": 18}
+        self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
+
+        ## INITIALIZATION
+        self.select_spike_elimination(
+            var_opt=self.container_var["Spike Elimination Method"].get(),
+            start_row=var_spike_elimination_setup["Row start"], mode="FI")
+
+        if self.file_loaded == False:
+            self.mi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.mi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+            self.mi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+            self.mi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
             #
         else:
             self.fi_select_srm_initialization()
