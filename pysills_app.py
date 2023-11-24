@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		23.11.2023
+# Date:		24.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -469,126 +469,128 @@ class PySILLS(tk.Frame):
         self.var_init_ma_dataexploration = False
         #
         ## FLUID/MELT INCLUSION ANALYSIS
-        self.container_var["fi_setting"]["Time BG Start"] = tk.StringVar()
-        self.container_var["fi_setting"]["Time BG Start"].set("Set start time")
-        self.container_var["fi_setting"]["Time BG End"] = tk.StringVar()
-        self.container_var["fi_setting"]["Time BG End"].set("Set end time")
-        self.container_var["fi_setting"]["Time MAT Start"] = tk.StringVar()
-        self.container_var["fi_setting"]["Time MAT Start"].set("Set start time")
-        self.container_var["fi_setting"]["Time MAT End"] = tk.StringVar()
-        self.container_var["fi_setting"]["Time MAT End"].set("Set end time")
-        self.container_var["fi_setting"]["Time INCL Start"] = tk.StringVar()
-        self.container_var["fi_setting"]["Time INCL Start"].set("Set start time")
-        self.container_var["fi_setting"]["Time INCL End"] = tk.StringVar()
-        self.container_var["fi_setting"]["Time INCL End"].set("Set end time")
-        self.container_var["fi_setting"]["Author"] = tk.StringVar()
-        self.container_var["fi_setting"]["Source ID"] = tk.StringVar()
-        self.container_var["fi_setting"]["Source ID"].set("RUR01")
-        self.container_var["fi_setting"]["Method"] = tk.StringVar()
-        self.container_var["fi_setting"]["Method"].set("Select Method")
-        self.container_var["fi_setting"]["Host Setup Selection"] = tk.IntVar()
-        self.container_var["fi_setting"]["Host Setup Selection"].set(1)
-        self.container_var["fi_setting"]["Inclusion Setup Selection"] = tk.IntVar()
-        self.container_var["fi_setting"]["Inclusion Setup Selection"].set(1)
-        self.container_var["fi_setting"]["Quantification Method"] = tk.IntVar()
-        self.container_var["fi_setting"]["Quantification Method"].set(1)
-        self.container_var["fi_setting"]["IS MAT Default"] = tk.StringVar()
-        self.container_var["fi_setting"]["IS MAT Default"].set("Select IS")
-        self.container_var["fi_setting"]["IS MAT Default Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["IS MAT Default Concentration"].set("1000000")
-        self.container_var["fi_setting"]["IS INCL Default"] = tk.StringVar()
-        self.container_var["fi_setting"]["IS INCL Default"].set("Select IS")
-        self.container_var["fi_setting"]["IS INCL Default Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["IS INCL Default Concentration"].set("1000000")
-        self.container_var["fi_setting"]["Oxide"] = tk.StringVar()
-        self.container_var["fi_setting"]["Oxide"].set("Select Oxide")
-        self.container_var["fi_setting"]["Oxide Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["Oxide Concentration"].set("100")
-        self.container_var["fi_setting"]["Element"] = tk.StringVar()
-        self.container_var["fi_setting"]["Element"].set("Select Element")
-        self.container_var["fi_setting"]["Element Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["Element Concentration"].set("1000000")
-        self.container_var["fi_setting"]["Sulfide"] = tk.StringVar()
-        self.container_var["fi_setting"]["Sulfide"].set("Select Sulfide")
-        self.container_var["fi_setting"]["Sulfide Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["Sulfide Concentration"].set("1000000")
-        self.container_var["fi_setting"]["Halide"] = tk.StringVar()
-        self.container_var["fi_setting"]["Halide"].set("Select Halide")
-        self.container_var["fi_setting"]["Halide Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["Halide Concentration"].set("100")
-        self.container_var["fi_setting"]["Mineral Concentration"] = tk.StringVar()
-        self.container_var["fi_setting"]["Mineral Concentration"].set("100")
-        self.container_var["fi_setting"]["Host Only"] = tk.StringVar()
-        self.container_var["fi_setting"]["Host Only"].set("Select Isotope")
-        self.container_var["fi_setting"]["2nd Internal"] = tk.StringVar()
-        self.container_var["fi_setting"]["2nd Internal"].set("Select Isotope")
-        self.container_var["fi_setting"]["2nd Internal Concentration Default"] = tk.StringVar()
-        self.container_var["fi_setting"]["2nd Internal Concentration Default"].set("0")
-        self.container_var["fi_setting"]["Matrix-Only Concentration Default"] = tk.StringVar()
-        self.container_var["fi_setting"]["Matrix-Only Concentration Default"].set("0")
-        self.container_var["fi_setting"]["Matrix Amount Default"] = tk.StringVar()
-        self.container_var["fi_setting"]["Matrix Amount Default"].set("100")
-        self.container_var["fi_setting"]["IS Selection"] = tk.IntVar()
-        self.container_var["fi_setting"]["IS Selection"].set(1)
-        self.container_var["fi_setting"]["Spike Elimination Inclusion"] = tk.IntVar()
-        self.container_var["fi_setting"]["Spike Elimination Inclusion"].set(2)
-        self.container_var["fi_setting"]["SE Alpha"] = tk.StringVar()
-        self.container_var["fi_setting"]["SE Alpha"].set("0.05")
-        self.container_var["fi_setting"]["SE Threshold"] = tk.StringVar()
-        self.container_var["fi_setting"]["SE Threshold"].set("1000")
-        self.container_var["fi_setting"]["Inclusion Plugin"] = {
-            "Intensity BG": tk.IntVar(), "Intensity MAT": tk.IntVar(), "Intensity MIX": tk.IntVar(),
-            "Intensity INCL": tk.IntVar(), "Analytical Sensitivity": tk.IntVar(), "Concentration SRM": tk.IntVar()}
-        self.container_var["fi_setting"]["Time-Signal Checker"] = tk.IntVar()
-        self.container_var["fi_setting"]["Time-Signal Checker"].set(1)
-        self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
-        self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set("0")
-        self.container_var["fi_setting"]["Inclusion Concentration Calculation"] = tk.IntVar()
-        self.container_var["fi_setting"]["Inclusion Concentration Calculation"].set("0")
-        #
-        for key, item in self.container_var["fi_setting"]["Inclusion Plugin"].items():
-            item.set(1)
-        #
-        self.molar_masses_compounds = {}
-        self.container_var["fi_setting"]["Salt Correction"] = {
-            "Chlorides": {}, "Carbonates": {}, "Sulfates": {}, "Salinity": tk.StringVar(),
-            "Default Salinity": tk.StringVar(), "Default Concentration": tk.StringVar(), "Default IS": tk.StringVar(),
-            "Salinity SMPL": {}}
-        self.container_var["fi_setting"]["Salt Correction"]["Salinity"].set("0.0")
-        self.container_var["fi_setting"]["Salt Correction"]["Default Salinity"].set("Set Salinity (in %)")
-        self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set("0.0")
-        self.container_var["fi_setting"]["Salt Correction"]["Default IS"].set("Select IS")
-        salt_chlorides = ["NaCl", "KCl", "CaCl2", "MgCl2", "LiCl", "FeCl2"]
-        salt_carbonates = ["Na2CO3", "K2CO3", "NaHCO3"]
-        salt_sulfates = ["Na2SO4"]
-        for salt in salt_chlorides:
-            self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt] = {
-                "State": tk.IntVar(), "Weight": tk.StringVar()}
-            if salt == "NaCl":
-                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["State"].set(1)
-                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
-            else:
-                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["State"].set(0)
-                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
-        for salt in salt_carbonates:
-            self.container_var["fi_setting"]["Salt Correction"]["Carbonates"][salt] = {
-                "State": tk.IntVar(), "Weight": tk.StringVar()}
-            self.container_var["fi_setting"]["Salt Correction"]["Carbonates"][salt]["State"].set(0)
-            self.container_var["fi_setting"]["Salt Correction"]["Carbonates"][salt]["Weight"].set("1.0")
-        for salt in salt_sulfates:
-            self.container_var["fi_setting"]["Salt Correction"]["Sulfates"][salt] = {
-                "State": tk.IntVar(), "Weight": tk.StringVar()}
-            self.container_var["fi_setting"]["Salt Correction"]["Sulfates"][salt]["State"].set(0)
-            self.container_var["fi_setting"]["Salt Correction"]["Sulfates"][salt]["Weight"].set("1.0")
-        self.container_var["fi_setting"]["Data Type Plot"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Analyse Mode Plot"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Display RAW"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Display SMOOTHED"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Time-Signal Lines"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Time-Ratio Lines"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Checkboxes Isotope Diagram"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Calculation Interval"] = {"STD": {}, "SMPL": {}}
-        self.container_var["fi_setting"]["Calculation Interval Visibility"] = {"STD": {}, "SMPL": {}}
+        keys = ["fi_setting", "mi_setting"]
+        for key_setting in keys:
+            self.container_var[key_setting]["Time BG Start"] = tk.StringVar()
+            self.container_var[key_setting]["Time BG Start"].set("Set start time")
+            self.container_var[key_setting]["Time BG End"] = tk.StringVar()
+            self.container_var[key_setting]["Time BG End"].set("Set end time")
+            self.container_var[key_setting]["Time MAT Start"] = tk.StringVar()
+            self.container_var[key_setting]["Time MAT Start"].set("Set start time")
+            self.container_var[key_setting]["Time MAT End"] = tk.StringVar()
+            self.container_var[key_setting]["Time MAT End"].set("Set end time")
+            self.container_var[key_setting]["Time INCL Start"] = tk.StringVar()
+            self.container_var[key_setting]["Time INCL Start"].set("Set start time")
+            self.container_var[key_setting]["Time INCL End"] = tk.StringVar()
+            self.container_var[key_setting]["Time INCL End"].set("Set end time")
+            self.container_var[key_setting]["Author"] = tk.StringVar()
+            self.container_var[key_setting]["Source ID"] = tk.StringVar()
+            self.container_var[key_setting]["Source ID"].set("RUR01")
+            self.container_var[key_setting]["Method"] = tk.StringVar()
+            self.container_var[key_setting]["Method"].set("Select Method")
+            self.container_var[key_setting]["Host Setup Selection"] = tk.IntVar()
+            self.container_var[key_setting]["Host Setup Selection"].set(1)
+            self.container_var[key_setting]["Inclusion Setup Selection"] = tk.IntVar()
+            self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
+            self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
+            self.container_var[key_setting]["Quantification Method"].set(1)
+            self.container_var[key_setting]["IS MAT Default"] = tk.StringVar()
+            self.container_var[key_setting]["IS MAT Default"].set("Select IS")
+            self.container_var[key_setting]["IS MAT Default Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["IS MAT Default Concentration"].set("1000000")
+            self.container_var[key_setting]["IS INCL Default"] = tk.StringVar()
+            self.container_var[key_setting]["IS INCL Default"].set("Select IS")
+            self.container_var[key_setting]["IS INCL Default Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["IS INCL Default Concentration"].set("1000000")
+            self.container_var[key_setting]["Oxide"] = tk.StringVar()
+            self.container_var[key_setting]["Oxide"].set("Select Oxide")
+            self.container_var[key_setting]["Oxide Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["Oxide Concentration"].set("100")
+            self.container_var[key_setting]["Element"] = tk.StringVar()
+            self.container_var[key_setting]["Element"].set("Select Element")
+            self.container_var[key_setting]["Element Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["Element Concentration"].set("1000000")
+            self.container_var[key_setting]["Sulfide"] = tk.StringVar()
+            self.container_var[key_setting]["Sulfide"].set("Select Sulfide")
+            self.container_var[key_setting]["Sulfide Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["Sulfide Concentration"].set("1000000")
+            self.container_var[key_setting]["Halide"] = tk.StringVar()
+            self.container_var[key_setting]["Halide"].set("Select Halide")
+            self.container_var[key_setting]["Halide Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["Halide Concentration"].set("100")
+            self.container_var[key_setting]["Mineral Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["Mineral Concentration"].set("100")
+            self.container_var[key_setting]["Host Only"] = tk.StringVar()
+            self.container_var[key_setting]["Host Only"].set("Select Isotope")
+            self.container_var[key_setting]["2nd Internal"] = tk.StringVar()
+            self.container_var[key_setting]["2nd Internal"].set("Select Isotope")
+            self.container_var[key_setting]["2nd Internal Concentration Default"] = tk.StringVar()
+            self.container_var[key_setting]["2nd Internal Concentration Default"].set("0")
+            self.container_var[key_setting]["Matrix-Only Concentration Default"] = tk.StringVar()
+            self.container_var[key_setting]["Matrix-Only Concentration Default"].set("0")
+            self.container_var[key_setting]["Matrix Amount Default"] = tk.StringVar()
+            self.container_var[key_setting]["Matrix Amount Default"].set("100")
+            self.container_var[key_setting]["IS Selection"] = tk.IntVar()
+            self.container_var[key_setting]["IS Selection"].set(1)
+            self.container_var[key_setting]["Spike Elimination Inclusion"] = tk.IntVar()
+            self.container_var[key_setting]["Spike Elimination Inclusion"].set(2)
+            self.container_var[key_setting]["SE Alpha"] = tk.StringVar()
+            self.container_var[key_setting]["SE Alpha"].set("0.05")
+            self.container_var[key_setting]["SE Threshold"] = tk.StringVar()
+            self.container_var[key_setting]["SE Threshold"].set("1000")
+            self.container_var[key_setting]["Inclusion Plugin"] = {
+                "Intensity BG": tk.IntVar(), "Intensity MAT": tk.IntVar(), "Intensity MIX": tk.IntVar(),
+                "Intensity INCL": tk.IntVar(), "Analytical Sensitivity": tk.IntVar(), "Concentration SRM": tk.IntVar()}
+            self.container_var[key_setting]["Time-Signal Checker"] = tk.IntVar()
+            self.container_var[key_setting]["Time-Signal Checker"].set(1)
+            self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+            self.container_var[key_setting]["Inclusion Intensity Calculation"].set("0")
+            self.container_var[key_setting]["Inclusion Concentration Calculation"] = tk.IntVar()
+            self.container_var[key_setting]["Inclusion Concentration Calculation"].set("0")
+            #
+            for key, item in self.container_var[key_setting]["Inclusion Plugin"].items():
+                item.set(1)
+            #
+            self.molar_masses_compounds = {}
+            self.container_var[key_setting]["Salt Correction"] = {
+                "Chlorides": {}, "Carbonates": {}, "Sulfates": {}, "Salinity": tk.StringVar(),
+                "Default Salinity": tk.StringVar(), "Default Concentration": tk.StringVar(), "Default IS": tk.StringVar(),
+                "Salinity SMPL": {}}
+            self.container_var[key_setting]["Salt Correction"]["Salinity"].set("0.0")
+            self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set("Set Salinity (in %)")
+            self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set("0.0")
+            self.container_var[key_setting]["Salt Correction"]["Default IS"].set("Select IS")
+            salt_chlorides = ["NaCl", "KCl", "CaCl2", "MgCl2", "LiCl", "FeCl2"]
+            salt_carbonates = ["Na2CO3", "K2CO3", "NaHCO3"]
+            salt_sulfates = ["Na2SO4"]
+            for salt in salt_chlorides:
+                self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt] = {
+                    "State": tk.IntVar(), "Weight": tk.StringVar()}
+                if salt == "NaCl":
+                    self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"].set(1)
+                    self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
+                else:
+                    self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"].set(0)
+                    self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
+            for salt in salt_carbonates:
+                self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt] = {
+                    "State": tk.IntVar(), "Weight": tk.StringVar()}
+                self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt]["State"].set(0)
+                self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt]["Weight"].set("1.0")
+            for salt in salt_sulfates:
+                self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt] = {
+                    "State": tk.IntVar(), "Weight": tk.StringVar()}
+                self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt]["State"].set(0)
+                self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt]["Weight"].set("1.0")
+            self.container_var[key_setting]["Data Type Plot"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Analyse Mode Plot"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Display RAW"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Display SMOOTHED"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Time-Signal Lines"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Time-Ratio Lines"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Checkboxes Isotope Diagram"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Calculation Interval"] = {"STD": {}, "SMPL": {}}
+            self.container_var[key_setting]["Calculation Interval Visibility"] = {"STD": {}, "SMPL": {}}
         #
         self.container_var["fi_datareduction_isotopes"]["File Type"] = tk.IntVar()          # e.g. Sample files
         self.container_var["fi_datareduction_isotopes"]["File Type"].set(1)
@@ -1146,7 +1148,7 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
 
         # RADIOBUTTONS
-        list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
+        list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions (not ready)", "Output Analysis (not ready)"]
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
             rb_mode = SE(
@@ -1155,7 +1157,7 @@ class PySILLS(tk.Frame):
                 var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
                 text=mode, sticky="NESW", relief=tk.FLAT, font=font_elements, command=lambda var_rb=self.var_rb_mode:
                 self.select_experiment(var_rb))
-            if mode in ["Output Analysis"]:
+            if mode in ["Output Analysis (not ready)"]:
                 rb_mode.configure(state="disabled")
 
             self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
@@ -14834,13 +14836,13 @@ class PySILLS(tk.Frame):
             start_row=var_spike_elimination_setup["Row start"], mode="FI")
 
         if self.file_loaded == False:
-            self.mi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-            self.mi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-            self.mi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-            self.mi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+            self.select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+            self.select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
             #
         else:
-            self.fi_select_srm_initialization()
+            self.select_srm_initialization()
         #
         for filetype in ["STD", "SMPL"]:
             if self.container_var["Spike Elimination"][filetype]["State"] == True:
@@ -17244,13 +17246,23 @@ class PySILLS(tk.Frame):
     def fi_select_srm_initialization(self):
         for isotope in self.container_lists["ISOTOPES"]:
             var_srm_i = self.container_var["SRM"][isotope].get()
-            #
+
             if var_srm_i not in self.srm_actual:
                 self.srm_actual[var_srm_i] = {}
                 ESRM().place_srm_values(srm_name=var_srm_i, srm_dict=self.srm_actual)
-            #
+
             self.fill_srm_values(var_srm=var_srm_i)
-    #
+
+    def select_srm_initialization(self):
+        for isotope in self.container_lists["ISOTOPES"]:
+            var_srm_i = self.container_var["SRM"][isotope].get()
+
+            if var_srm_i not in self.srm_actual:
+                self.srm_actual[var_srm_i] = {}
+                ESRM().place_srm_values(srm_name=var_srm_i, srm_dict=self.srm_actual)
+
+            self.fill_srm_values(var_srm=var_srm_i)
+
     def fi_select_srm_default(self, var_opt, mode="STD"):
         if mode == "STD":
             for file_std in self.list_std:
@@ -17268,7 +17280,24 @@ class PySILLS(tk.Frame):
             ESRM().place_srm_values(srm_name=var_opt, srm_dict=self.srm_actual)
         #
         self.fill_srm_values(var_srm=var_opt)
-    #
+
+    def select_srm_default(self, var_opt, mode="STD"):
+        if mode == "STD":
+            for file_std in self.list_std:
+                parts = file_std.split("/")
+                self.container_var["STD"][file_std]["SRM"].set(var_opt)
+                self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
+        elif mode == "ISOTOPES":
+            for isotope in self.container_lists["ISOTOPES"]:
+                self.container_var["SRM"][isotope].set(var_opt)
+                self.container_files["SRM"][isotope].set(var_opt)
+
+        if var_opt not in self.srm_actual:
+            self.srm_actual[var_opt] = {}
+            ESRM().place_srm_values(srm_name=var_opt, srm_dict=self.srm_actual)
+
+        self.fill_srm_values(var_srm=var_opt)
+
     def fi_change_srm_individual(self, var_opt, var_indiv, mode="STD"):
         if mode == "STD":
             parts = var_indiv.split("/")
@@ -17312,14 +17341,25 @@ class PySILLS(tk.Frame):
             var_is = var_opt
             for file_std in self.list_std:
                 self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
-    #
+
+    def select_is_default(self, var_opt, mode="STD"):
+        if mode == "STD":
+            var_is = var_opt
+            for file_std in self.list_std:
+                self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_is)
+
     def fi_select_id_default(self, var_opt):
         var_id = var_opt
         for file_smpl in self.list_smpl:
             self.container_var["SMPL"][file_smpl]["ID"].set(var_id)
-    #
+
+    def select_id_default(self, var_opt):
+        var_id = var_opt
+        for file_smpl in self.list_smpl:
+            self.container_var["SMPL"][file_smpl]["ID"].set(var_id)
+
     ## GENERAL CALCULATIONS ############################################################################################
-    #
+
     def calculate_regression(self, data, isotope, file_data):
         x_data = []
         y_data = []
