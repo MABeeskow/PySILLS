@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		24.11.2023
+# Date:		27.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -320,6 +320,18 @@ class PySILLS(tk.Frame):
 
         self.file_system_need_update = True
 
+        self.bool_incl_is_massbalance = False
+        self.bool_incl_is_chargebalance = False
+        self.bool_incl_is_pypitzer = False
+        self.bool_incl_is_custom = False
+        self.bool_incl_is_external = False
+        self.str_incl_is_custom_external = "Unknown"
+
+        self.bool_matrixonlytracer = False
+        self.bool_secondinternalstandard = False
+        self.bool_halter2002 = False
+        self.bool_borisova2021 = False
+
         self.container_flags = {"STD": {"Initialization": False}, "SMPL": {"Initialization": False}}
 
         self.list_std_changed = False
@@ -492,8 +504,12 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Host Setup Selection"].set(1)
             self.container_var[key_setting]["Inclusion Setup Selection"] = tk.IntVar()
             self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
+            self.container_var[key_setting]["Inclusion Setup Option"] = tk.StringVar()
+            self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
             self.container_var[key_setting]["Quantification Method"].set(1)
+            self.container_var[key_setting]["Quantification Method Option"] = tk.StringVar()
+            self.container_var[key_setting]["Quantification Method Option"].set("Matrix-only Tracer")
             self.container_var[key_setting]["IS MAT Default"] = tk.StringVar()
             self.container_var[key_setting]["IS MAT Default"].set("Select IS")
             self.container_var[key_setting]["IS MAT Default Concentration"] = tk.StringVar()
@@ -8977,6 +8993,13 @@ class PySILLS(tk.Frame):
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_04b.configure(state="disabled")
         else:
+            if self.pysills_mode == "FI":
+                key_setting = "fi_setting"
+                int_row_start_quantification = 2
+            elif self.pysills_mode == "MI":
+                key_setting = "mi_setting"
+                int_row_start_quantification = 2
+
             # Labels
             lbl_04 = SE(
                 parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
@@ -8984,145 +9007,254 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Inclusion Settings", relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_05 = SE(
-                parent=var_parent, row_id=var_row_start + 4, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n, fg=self.colors_fi["Light Font"],
+                parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_columm_start,
+                n_rows=var_row_n, n_columns=var_header_n, fg=self.colors_fi["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Quantification Method", relief=tk.FLAT, fontsize="sans 10 bold")
 
-            # Buttons
-            self.btn_setup_massbalance = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.fi_mass_balance)
-            self.btn_setup_chargebalance = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.fi_charge_balance)
-            self.btn_setup_plugin = SE(
-                parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.fi_inclusion_setup_plugin)
-            self.btn_setup_quantification_matrixonly = SE(
-                parent=var_parent, row_id=var_row_start + 5, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.fi_setup_matrix_only_tracer)
-            self.btn_setup_quantification_secondinternal = SE(
-                parent=var_parent, row_id=var_row_start + 6, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.fi_setup_second_internal_standard)
-            self.btn_setup_quantification_plugin = SE(
-                parent=var_parent, row_id=var_row_start + 7, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-            self.btn_setup_quantification_plugin.configure(state="disabled")
+            # Option Menu
+            str_default_inclusion_setup = self.container_var[key_setting]["Inclusion Setup Option"].get()
+            list_opt_incl_is_quantification = [
+                "Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2023)", "Custom Data", "External Calculation"]
 
-            # Radiobuttons
-            if self.pysills_mode == "FI":
-                rb_04a = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                    bg=self.bg_colors["Light"]).create_radiobutton(
-                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=1,
-                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Mass Balance",
-                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_inclusion_setup)
-                rb_04b = SE(
-                    parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
-                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                    bg=self.bg_colors["Light"]).create_radiobutton(
-                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=2,
-                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Charge Balance",
-                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_inclusion_setup)
-                rb_04c = SE(
-                    parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                    bg=self.bg_colors["Light"]).create_radiobutton(
-                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=3,
-                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
-                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_inclusion_setup)
-            elif self.pysills_mode == "MI":
-                rb_04a = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                    bg=self.bg_colors["Light"]).create_radiobutton(
-                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=1,
-                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data",
-                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=None)
-                rb_04b = SE(
-                    parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
-                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                    bg=self.bg_colors["Light"]).create_radiobutton(
-                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=2,
-                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Halter et al. (2004)",
-                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=None)
-                rb_04b.configure(state="disabled")
-                rb_04c = SE(
-                    parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-                    n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                    bg=self.bg_colors["Light"]).create_radiobutton(
-                    var_rb=self.container_var[var_setting_key]["Inclusion Setup Selection"], value_rb=3,
-                    color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Borisova et al. (2021)",
-                    sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=None)
-                rb_04c.configure(state="disabled")
+            opt_02a = SE(
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_srm(
+                var_srm=self.container_var[key_setting]["Inclusion Setup Option"], text_set=str_default_inclusion_setup,
+                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color, sort_list=False,
+                option_list=list_opt_incl_is_quantification,
+                command=lambda var_opt=self.container_var[key_setting]["Inclusion Setup Option"],
+                               dict_geometry_info=var_geometry_info:
+                self.select_opt_inclusion_is_quantification(var_opt, dict_geometry_info))
+            opt_02a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_02a.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
-            if self.container_var[var_setting_key]["Inclusion Setup Selection"].get() == 1:
-                self.btn_setup_massbalance.configure(state="normal")
-                self.btn_setup_chargebalance.configure(state="disabled")
-                self.btn_setup_plugin.configure(state="disabled")
-            elif self.container_var[var_setting_key]["Inclusion Setup Selection"].get() == 2:
-                self.btn_setup_massbalance.configure(state="disabled")
-                self.btn_setup_chargebalance.configure(state="normal")
-                self.btn_setup_plugin.configure(state="disabled")
-            elif self.container_var[var_setting_key]["Inclusion Setup Selection"].get() == 3:
-                self.btn_setup_massbalance.configure(state="disabled")
-                self.btn_setup_chargebalance.configure(state="disabled")
-                self.btn_setup_plugin.configure(state="normal")
+            opt_02a['menu'].entryconfig("PyPitzer (Liu et al. 2023)", state="disable")
 
-            rb_05a = SE(
-                parent=var_parent, row_id=var_row_start + 5, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=1,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Matrix-only Tracer",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_quantification_setup)
-            rb_05b = SE(
-                parent=var_parent, row_id=var_row_start + 6, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=2,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="2nd Internal Standard",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_quantification_setup)
-            rb_05c = SE(
-                parent=var_parent, row_id=var_row_start + 7, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=3,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold", command=self.change_rb_quantification_setup)
-            rb_05c.configure(state="disabled")
+            str_default_quantification_setup = self.container_var[key_setting]["Quantification Method Option"].get()
+            list_opt_incl_quantification = [
+                "Matrix-only Tracer (SILLS)", "Second Internal Standard (SILLS)",
+                "Geometric Approach (Halter et al. 2002)", "Geometric Approach (Borisova et al. 2021)"]
 
-            if self.container_var[var_setting_key]["Quantification Method"].get() == 1:
-                self.btn_setup_quantification_matrixonly.configure(state="normal")
-                self.btn_setup_quantification_secondinternal.configure(state="disabled")
-                self.btn_setup_quantification_plugin.configure(state="disabled")
-            elif self.container_var[var_setting_key]["Quantification Method"].get() == 2:
-                self.btn_setup_quantification_matrixonly.configure(state="disabled")
-                self.btn_setup_quantification_secondinternal.configure(state="normal")
-                self.btn_setup_quantification_plugin.configure(state="disabled")
-            elif self.container_var[var_setting_key]["Quantification Method"].get() == 3:
-                self.btn_setup_quantification_matrixonly.configure(state="disabled")
-                self.btn_setup_quantification_secondinternal.configure(state="disabled")
-                self.btn_setup_quantification_plugin.configure(state="normal")
+            opt_03a = SE(
+                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_srm(
+                var_srm=self.container_var[key_setting]["Quantification Method Option"],
+                text_set=str_default_quantification_setup, fg_active=self.bg_colors["Dark Font"],
+                bg_active=self.accent_color, option_list=list_opt_incl_quantification, sort_list=False,
+                command=lambda var_opt=self.container_var[key_setting]["Quantification Method Option"],
+                               dict_geometry_info=var_geometry_info:
+                self.select_opt_inclusion_quantification(var_opt, dict_geometry_info))
+            opt_03a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_03a.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+
+            opt_03a['menu'].entryconfig("Geometric Approach (Halter et al. 2002)", state="disable")
+            opt_03a['menu'].entryconfig("Geometric Approach (Borisova et al. 2021)", state="disable")
+
+    def select_opt_inclusion_is_quantification(self, var_opt, dict_geometry_info):
+        var_row_start = dict_geometry_info["Row start"]
+        var_row_n = dict_geometry_info["N rows"]
+        var_column_n = dict_geometry_info["N columns"]
+        var_category_n = var_column_n - 6
+
+        if self.pysills_mode == "FI":
+            var_parent = self.subwindow_fi_settings
+        elif self.pysills_mode == "MI":
+            var_parent = self.subwindow_mi_settings
+
+        self.bool_incl_is_massbalance = False
+        self.bool_incl_is_chargebalance = False
+        self.bool_incl_is_pypitzer = False
+        self.bool_incl_is_custom = False
+        self.bool_incl_is_external = False
+
+        if var_opt == "Mass Balance":
+            if self.bool_incl_is_massbalance == False:
+                self.btn_setup_massbalance = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_mass_balance)
+                self.bool_incl_is_massbalance = True
+            else:
+                self.btn_setup_massbalance.grid()
+                if self.bool_incl_is_chargebalance == True:
+                    self.btn_setup_chargebalance.grid_remove()
+                if self.bool_incl_is_pypitzer == True:
+                    self.btn_setup_pypitzer.grid_remove()
+                if self.bool_incl_is_custom == True:
+                    self.btn_setup_customdata.grid_remove()
+                if self.bool_incl_is_external == True:
+                    self.btn_setup_external.grid_remove()
+        elif var_opt == "Charge Balance":
+            if self.bool_incl_is_chargebalance == False:
+                self.btn_setup_chargebalance = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_charge_balance)
+                self.bool_incl_is_chargebalance = True
+            else:
+                self.btn_setup_chargebalance.grid()
+                if self.bool_incl_is_massbalance == True:
+                    self.btn_setup_massbalance.grid_remove()
+                if self.bool_incl_is_pypitzer == True:
+                    self.btn_setup_pypitzer.grid_remove()
+                if self.bool_incl_is_custom == True:
+                    self.btn_setup_customdata.grid_remove()
+                if self.bool_incl_is_external == True:
+                    self.btn_setup_external.grid_remove()
+        elif var_opt == "PyPitzer (Liu et al. 2023)":
+            if self.bool_incl_is_pypitzer == False:
+                self.btn_setup_pypitzer = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_pyitzer)
+                self.bool_incl_is_pypitzer = True
+            else:
+                self.btn_setup_pypitzer.grid()
+                if self.bool_incl_is_massbalance == True:
+                    self.btn_setup_massbalance.grid_remove()
+                if self.bool_incl_is_chargebalance == True:
+                    self.btn_setup_chargebalance.grid_remove()
+                if self.bool_incl_is_custom == True:
+                    self.btn_setup_customdata.grid_remove()
+                if self.bool_incl_is_external == True:
+                    self.btn_setup_external.grid_remove()
+        elif var_opt == "Custom Data":
+            if self.bool_incl_is_custom == False:
+                self.btn_setup_customdata = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_inclusion_setup_plugin)
+                self.bool_incl_is_custom = True
+                self.str_incl_is_custom_external = "Custom"
+            else:
+                self.btn_setup_customdata.grid()
+                if self.bool_incl_is_massbalance == True:
+                    self.btn_setup_massbalance.grid_remove()
+                if self.bool_incl_is_chargebalance == True:
+                    self.btn_setup_chargebalance.grid_remove()
+                if self.bool_incl_is_pypitzer == True:
+                    self.btn_setup_pypitzer.grid_remove()
+                if self.bool_incl_is_external == True:
+                    self.btn_setup_external.grid_remove()
+        elif var_opt == "External Calculation":
+            if self.bool_incl_is_external == False:
+                self.btn_setup_external = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_inclusion_setup_plugin)
+                self.bool_incl_is_external = True
+                self.str_incl_is_custom_external = "External"
+            else:
+                self.btn_setup_external.grid()
+                if self.bool_incl_is_massbalance == True:
+                    self.btn_setup_massbalance.grid_remove()
+                if self.bool_incl_is_chargebalance == True:
+                    self.btn_setup_chargebalance.grid_remove()
+                if self.bool_incl_is_pypitzer == True:
+                    self.btn_setup_pypitzer.grid_remove()
+                if self.bool_incl_is_custom == True:
+                    self.btn_setup_customdata.grid_remove()
+
+    def select_opt_inclusion_quantification(self, var_opt, dict_geometry_info):
+        var_row_start = dict_geometry_info["Row start"]
+        var_row_n = dict_geometry_info["N rows"]
+        var_column_n = dict_geometry_info["N columns"]
+        var_category_n = var_column_n - 6
+
+        if self.pysills_mode == "FI":
+            var_parent = self.subwindow_fi_settings
+        elif self.pysills_mode == "MI":
+            var_parent = self.subwindow_mi_settings
+
+        if var_opt == "Matrix-only Tracer (SILLS)":
+            if self.bool_matrixonlytracer == False:
+                self.btn_setup_matrixonlytracer = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_setup_matrix_only_tracer)
+                self.bool_matrixonlytracer = True
+            else:
+                self.btn_setup_matrixonlytracer.grid()
+                if self.bool_secondinternalstandard == True:
+                    self.btn_setup_secondis.grid_remove()
+                if self.bool_halter2002 == True:
+                    self.btn_setup_halter2002.grid_remove()
+                if self.bool_borisova2021 == True:
+                    self.btn_setup_borisova2021.grid_remove()
+        elif var_opt == "Second Internal Standard (SILLS)":
+            if self.bool_secondinternalstandard == False:
+                self.btn_setup_secondis = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_setup_second_internal_standard)
+                self.bool_secondinternalstandard = True
+            else:
+                self.btn_setup_secondis.grid()
+                if self.bool_matrixonlytracer == True:
+                    self.btn_setup_matrixonlytracer.grid_remove()
+                if self.bool_halter2002 == True:
+                    self.btn_setup_halter2002.grid_remove()
+                if self.bool_borisova2021 == True:
+                    self.btn_setup_borisova2021.grid_remove()
+        elif var_opt == "Geometric Approach (Halter et al. 2002)":
+            if self.bool_halter2002 == False:
+                self.btn_setup_halter2002 = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_setup_halter2002)
+                self.bool_halter2002 = True
+            else:
+                self.btn_setup_halter2002.grid()
+                if self.bool_matrixonlytracer == True:
+                    self.btn_setup_matrixonlytracer.grid_remove()
+                if self.bool_secondinternalstandard == True:
+                    self.btn_setup_secondis.grid_remove()
+                if self.bool_borisova2021 == True:
+                    self.btn_setup_borisova2021.grid_remove()
+        elif var_opt == "Geometric Approach (Borisova et al. 2021)":
+            if self.bool_borisova2021 == False:
+                self.btn_setup_borisova2021 = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=self.fi_setup_borisova2021)
+                self.bool_borisova2021 = True
+            else:
+                self.btn_setup_borisova2021.grid()
+                if self.bool_matrixonlytracer == True:
+                    self.btn_setup_matrixonlytracer.grid_remove()
+                if self.bool_secondinternalstandard == True:
+                    self.btn_setup_secondis.grid_remove()
+                if self.bool_halter2002 == True:
+                    self.btn_setup_halter2002.grid_remove()
 
     def place_assemblage_setup(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Assemblage Setup'
@@ -14565,19 +14697,19 @@ class PySILLS(tk.Frame):
         var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_quantification_method(var_geometry_info=var_quantification_method)
         # Build section 'Assemblage Setup'
-        var_assemblage_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 14, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
         # Build section 'Dwell Time Setup'
-        var_dwell_time_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
         # Build section 'Calculation Window (Background) Setup'
-        var_calculation_window_bg_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 33, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 29, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
@@ -14619,6 +14751,10 @@ class PySILLS(tk.Frame):
 
         self.build_srm_database()
         self.file_system_need_update = False
+
+        self.select_opt_inclusion_is_quantification(var_opt="Mass Balance", dict_geometry_info=var_quantification_method)
+        self.select_opt_inclusion_quantification(
+            var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
 ########################################################################################################################
 ### MELT INCLUSIONS ####################################################################################################
@@ -14799,19 +14935,19 @@ class PySILLS(tk.Frame):
         var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_quantification_method(var_geometry_info=var_quantification_method)
         # Build section 'Assemblage Setup'
-        var_assemblage_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 14, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
         # Build section 'Dwell Time Setup'
-        var_dwell_time_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
         # Build section 'Calculation Window (Background) Setup'
-        var_calculation_window_bg_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 33, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 29, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
@@ -14854,6 +14990,10 @@ class PySILLS(tk.Frame):
         self.build_srm_database()
         self.file_system_need_update = False
 
+        self.select_opt_inclusion_is_quantification(var_opt="Mass Balance", dict_geometry_info=var_quantification_method)
+        self.select_opt_inclusion_quantification(
+            var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
+
     def change_rb_inclusion_setup(self):
         if self.container_var["fi_setting"]["Inclusion Setup Selection"].get() == 1:
             self.btn_setup_massbalance.configure(state="normal")
@@ -14869,19 +15009,41 @@ class PySILLS(tk.Frame):
             self.btn_setup_plugin.configure(state="normal")
     #
     def change_rb_quantification_setup(self):
-        if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+        if self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+
+        if self.container_var[var_setting_key]["Quantification Method"].get() == 1:
             self.btn_setup_quantification_matrixonly.configure(state="normal")
             self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            self.btn_setup_quantification_plugin.configure(state="disabled")
-        elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+            if self.pysills_mode == "FI":
+                self.btn_setup_quantification_plugin.configure(state="disabled")
+            elif self.pysills_mode == "MI":
+                self.btn_setup_quantification_halter.configure(state="disabled")
+                self.btn_setup_quantification_borisova.configure(state="disabled")
+        elif self.container_var[var_setting_key]["Quantification Method"].get() == 2:
             self.btn_setup_quantification_matrixonly.configure(state="disabled")
             self.btn_setup_quantification_secondinternal.configure(state="normal")
-            self.btn_setup_quantification_plugin.configure(state="disabled")
-        elif self.container_var["fi_setting"]["Quantification Method"].get() == 3:
+            if self.pysills_mode == "FI":
+                self.btn_setup_quantification_plugin.configure(state="disabled")
+            elif self.pysills_mode == "MI":
+                self.btn_setup_quantification_halter.configure(state="disabled")
+                self.btn_setup_quantification_borisova.configure(state="disabled")
+        elif self.container_var[var_setting_key]["Quantification Method"].get() == 3:
             self.btn_setup_quantification_matrixonly.configure(state="disabled")
             self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            self.btn_setup_quantification_plugin.configure(state="normal")
-    #
+            if self.pysills_mode == "FI":
+                self.btn_setup_quantification_plugin.configure(state="normal")
+            elif self.pysills_mode == "MI":
+                self.btn_setup_quantification_halter.configure(state="normal")
+                self.btn_setup_quantification_borisova.configure(state="disabled")
+        elif self.container_var[var_setting_key]["Quantification Method"].get() == 4:
+            self.btn_setup_quantification_matrixonly.configure(state="disabled")
+            self.btn_setup_quantification_secondinternal.configure(state="disabled")
+            self.btn_setup_quantification_halter.configure(state="disabled")
+            self.btn_setup_quantification_borisova.configure(state="normal")
+
     #########################
     ## Calculation Methods ##
     #########################
@@ -20447,76 +20609,96 @@ class PySILLS(tk.Frame):
         #
         start_row = 0
         start_column = 0
-        #
-        ## FRAMES
-        #
+
         ## LABELS
-        lbl_01 = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="LA-ICP-MS Data Export", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_02 = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 11, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        ## CHECKBOXES
-        var_cb_01a = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity BG"]
-        var_cb_01b = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity MAT"]
-        var_cb_01c = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity MIX"]
-        var_cb_01d = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity INCL"]
-        var_cb_01e = self.container_var["fi_setting"]["Inclusion Plugin"]["Analytical Sensitivity"]
-        var_cb_01f = self.container_var["fi_setting"]["Inclusion Plugin"]["Concentration SRM"]
-        #
-        cb_01a = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column,
-            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
-            var_cb=var_cb_01a, text="Intensity (Background)", set_sticky="nesw", own_color=True)
-        cb_01b = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column,
-            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
-            var_cb=var_cb_01b, text="Intensity (Matrix)", set_sticky="nesw", own_color=True)
-        cb_01c = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 3, column_id=start_column,
-            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
-            var_cb=var_cb_01c, text="Intensity (Mix)", set_sticky="nesw", own_color=True)
-        cb_01d = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 4, column_id=start_column,
-            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
-            var_cb=var_cb_01d, text="Intensity (Inclusion)", set_sticky="nesw", own_color=True)
-        cb_01e = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 5, column_id=start_column,
-            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
-            var_cb=var_cb_01e, text="Analytical Sensitivity", set_sticky="nesw", own_color=True)
-        cb_01f = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 6, column_id=start_column,
-            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
-            var_cb=var_cb_01f, text="Concentration (SRM)", set_sticky="nesw", own_color=True)
-        #
-        cb_01a.configure(font="sans 10")
-        cb_01b.configure(font="sans 10")
-        cb_01c.configure(font="sans 10")
-        cb_01d.configure(font="sans 10")
-        cb_01e.configure(font="sans 10")
-        cb_01f.configure(font="sans 10")
-        #
-        ## BUTTONS
-        btn_01h = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 7, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Export Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
-            command=self.export_data_for_external_calculations)
-        btn_02a = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Import Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
-            command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
-        #
-        ## TREEVIEWS
-        frm_incl_is = SE(
-            parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column + 11, n_rows=8,
-            n_columns=21, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_incl_is = ttk.Scrollbar(master=frm_incl_is, orient="vertical")
+        if self.str_incl_is_custom_external == "External":
+            lbl_01 = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="LA-ICP-MS Data Export", relief=tk.FLAT, fontsize="sans 10 bold")
+            lbl_02 = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 11, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
+        else:
+            lbl_02 = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        if self.str_incl_is_custom_external == "External":
+            ## CHECKBOXES
+            var_cb_01a = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity BG"]
+            var_cb_01b = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity MAT"]
+            var_cb_01c = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity MIX"]
+            var_cb_01d = self.container_var["fi_setting"]["Inclusion Plugin"]["Intensity INCL"]
+            var_cb_01e = self.container_var["fi_setting"]["Inclusion Plugin"]["Analytical Sensitivity"]
+            var_cb_01f = self.container_var["fi_setting"]["Inclusion Plugin"]["Concentration SRM"]
+
+            cb_01a = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column,
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=var_cb_01a, text="Intensity (Background)", set_sticky="nesw", own_color=True)
+            cb_01b = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column,
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=var_cb_01b, text="Intensity (Matrix)", set_sticky="nesw", own_color=True)
+            cb_01c = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 3, column_id=start_column,
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=var_cb_01c, text="Intensity (Mix)", set_sticky="nesw", own_color=True)
+            cb_01d = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 4, column_id=start_column,
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=var_cb_01d, text="Intensity (Inclusion)", set_sticky="nesw", own_color=True)
+            cb_01e = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 5, column_id=start_column,
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=var_cb_01e, text="Analytical Sensitivity", set_sticky="nesw", own_color=True)
+            cb_01f = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 6, column_id=start_column,
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=10, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=var_cb_01f, text="Concentration (SRM)", set_sticky="nesw", own_color=True)
+
+            cb_01a.configure(font="sans 10")
+            cb_01b.configure(font="sans 10")
+            cb_01c.configure(font="sans 10")
+            cb_01d.configure(font="sans 10")
+            cb_01e.configure(font="sans 10")
+            cb_01f.configure(font="sans 10")
+
+            ## BUTTONS
+            btn_01h = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 7, column_id=start_column, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Export Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
+                command=self.export_data_for_external_calculations)
+            btn_02a = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column + 11, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Import Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
+                command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
+        else:
+            ## BUTTONS
+            btn_02a = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Import Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
+                command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
+
+        if self.str_incl_is_custom_external == "External":
+            ## TREEVIEWS
+            frm_incl_is = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column + 11, n_rows=8,
+                n_columns=21, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+            vsb_incl_is = ttk.Scrollbar(master=frm_incl_is, orient="vertical")
+        else:
+            ## TREEVIEWS
+            frm_incl_is = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column, n_rows=8,
+                n_columns=21, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+            vsb_incl_is = ttk.Scrollbar(master=frm_incl_is, orient="vertical")
+
         text_incl_is = tk.Text(
             master=frm_incl_is, width=30, height=25, yscrollcommand=vsb_incl_is.set, bg=self.bg_colors["Very Light"])
         vsb_incl_is.config(command=text_incl_is.yview)

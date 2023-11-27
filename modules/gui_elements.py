@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 09.08.2023
+# 27.11.2023
 # ----------------------
 #
 ## MODULES
@@ -439,7 +439,8 @@ class SimpleElements:
                     sticky="nesw")
         return cb
     #
-    def create_option_srm(self, var_srm, text_set, command=None, option_list=None, fg_active="black", bg_active="white"):
+    def create_option_srm(self, var_srm, text_set, command=None, option_list=None, fg_active="black", bg_active="white",
+                          sort_list=True):
         #
         var_srm.set(text_set)
         if option_list == None:
@@ -453,8 +454,9 @@ class SimpleElements:
                 ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0]
         else:
             option_list_srm = option_list
-        #
-        option_list_srm.sort()
+
+        if sort_list == True:
+            option_list_srm.sort()
         #
         if command == None:
             opt_menu_srm = tk.OptionMenu(self.parent, var_srm, *option_list_srm)
