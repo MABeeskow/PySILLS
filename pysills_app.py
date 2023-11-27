@@ -318,6 +318,23 @@ class PySILLS(tk.Frame):
         self.container_var["ICP-MS Info"]["skipfooter"].set(0)
         self.container_var["ICP-MS Info"]["timestamp"].set(0)
 
+        self.container_var["Halter2002"] = {
+            "Dimension a": tk.StringVar(), "Dimension b": tk.StringVar(), "Rho(Host)": tk.StringVar(),
+            "Rho(Incl)": tk.StringVar(), "Laser Radius": tk.StringVar()}
+        self.container_var["Halter2002"]["Dimension a"].set("50.0")
+        self.container_var["Halter2002"]["Dimension b"].set("50.0")
+        self.container_var["Halter2002"]["Rho(Host)"].set("2700.0")
+        self.container_var["Halter2002"]["Rho(Incl)"].set("1200.0")
+        self.container_var["Halter2002"]["Laser Radius"].set("75.0")
+
+        self.container_var["Borisova2021"] = {
+            "Radius Inclusion": tk.StringVar(), "Radius Host": tk.StringVar(), "Rho(Host)": tk.StringVar(),
+            "Rho(Incl)": tk.StringVar()}
+        self.container_var["Borisova2021"]["Radius Inclusion"].set("50.0")
+        self.container_var["Borisova2021"]["Radius Host"].set("75.0")
+        self.container_var["Borisova2021"]["Rho(Host)"].set("2700.0")
+        self.container_var["Borisova2021"]["Rho(Incl)"].set("1200.0")
+
         self.file_system_need_update = True
 
         self.bool_incl_is_massbalance = False
@@ -9058,9 +9075,6 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
-            opt_03a['menu'].entryconfig("Geometric Approach (Halter et al. 2002)", state="disable")
-            opt_03a['menu'].entryconfig("Geometric Approach (Borisova et al. 2021)", state="disable")
-
     def select_opt_inclusion_is_quantification(self, var_opt, dict_geometry_info):
         var_row_start = dict_geometry_info["Row start"]
         var_row_n = dict_geometry_info["N rows"]
@@ -9228,7 +9242,7 @@ class PySILLS(tk.Frame):
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                    command=self.fi_setup_halter2002)
+                    command=self.define_setup_halter2002)
                 self.bool_halter2002 = True
             else:
                 self.btn_setup_halter2002.grid()
@@ -9245,7 +9259,7 @@ class PySILLS(tk.Frame):
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                    command=self.fi_setup_borisova2021)
+                    command=self.define_setup_borisova2021)
                 self.bool_borisova2021 = True
             else:
                 self.btn_setup_borisova2021.grid()
@@ -10607,6 +10621,7 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
                     self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
                     if self.pysills_mode != "MA":
+                        # Matrix-only Tracer
                         self.container_var["SMPL"][file_smpl]["Host Only Tracer"] = {
                             "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
                             "Amount": tk.StringVar()}
@@ -10614,10 +10629,28 @@ class PySILLS(tk.Frame):
                         self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Value"].set("0")
                         self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].set("Select Oxide")
                         self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Amount"].set("100")
+                        # Second Internal Standard
                         self.container_var["SMPL"][file_smpl]["Second Internal Standard"] = {
                             "Name": tk.StringVar(), "Value": tk.StringVar()}
                         self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Name"].set("Select Isotope")
                         self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Value"].set("0")
+                        # Geometric Approach (Halter et al. 2002)
+                        self.container_var["SMPL"][file_smpl]["Halter2002"] = {
+                            "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                            "rho(host)": tk.StringVar(), "R": tk.StringVar()}
+                        self.container_var["SMPL"][file_smpl]["Halter2002"]["a"].set("50.0")
+                        self.container_var["SMPL"][file_smpl]["Halter2002"]["b"].set("50.0")
+                        self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(incl)"].set("2700.0")
+                        self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(host)"].set("1200.0")
+                        self.container_var["SMPL"][file_smpl]["Halter2002"]["R"].set("75.0")
+                        # Geometric Approach (Borisova et al. 2021)
+                        self.container_var["SMPL"][file_smpl]["Borisova2021"] = {
+                            "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                            "rho(host)": tk.StringVar()}
+                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(incl)"].set("50.0")
+                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(host)"].set("75.0")
+                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(incl)"].set("2700.0")
+                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(host)"].set("1200.0")
             else:
                 self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                 self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
@@ -17536,7 +17569,351 @@ class PySILLS(tk.Frame):
         results = [m, c]
         #
         return results
-    #
+
+    def define_setup_halter2002(self):
+        ## Window Settings
+        window_width = 680
+        window_heigth = 600
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_quantification_setup_halter2002 = tk.Toplevel(self.parent)
+        self.subwindow_quantification_setup_halter2002.title(
+            "Quantification Setup - Geometric Approach (Halter et al. 2002)")
+        self.subwindow_quantification_setup_halter2002.geometry(var_geometry)
+        self.subwindow_quantification_setup_halter2002.resizable(False, False)
+        self.subwindow_quantification_setup_halter2002["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_quantification_setup_halter2002, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_quantification_setup_halter2002, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_quantification_setup_halter2002.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_quantification_setup_halter2002.grid_columnconfigure(i, minsize=column_min)
+
+        start_row = 0
+        start_column = 0
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column, n_rows=1,
+            n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Default Settings", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_002 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column,
+            n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Inclusion Dimensions (\u03bcm)", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_002a = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Length of semi-axis a", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_002b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Length of semi-axis b", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_003 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 4, column_id=start_column,
+            n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Sample Densities (g/cm3)", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_003a = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 5, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Host Density", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_003b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 6, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Inclusion Density", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_004 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 7, column_id=start_column,
+            n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Laser Setup (\u03bcm)", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_004a = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 8, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ablation Radius / Pit Size", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_005 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 10, column_id=start_column,
+            n_rows=1, n_columns=33, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_006 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        ## BUTTONS
+        btn_001 = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 9, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"])
+
+        # RADIOBUTTONS
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=0,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Heinrich et al. (2003)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (without R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=2,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (with R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 4, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
+        ## ENTRIES
+        entr_002a = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Halter2002"]["Dimension a"],
+            text_default=self.container_var["Halter2002"]["Dimension a"].get())
+        entr_002b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Halter2002"]["Dimension b"],
+            text_default=self.container_var["Halter2002"]["Dimension b"].get())
+        entr_003a = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 5, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Halter2002"]["Rho(Host)"],
+            text_default=self.container_var["Halter2002"]["Rho(Host)"].get())
+        entr_003b = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 6, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Halter2002"]["Rho(Incl)"],
+            text_default=self.container_var["Halter2002"]["Rho(Incl)"].get())
+        entr_004a = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 8, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Halter2002"]["Laser Radius"],
+            text_default=self.container_var["Halter2002"]["Laser Radius"].get())
+
+        ## TREEVIEWS
+        frm_smpl = SE(
+            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 11, column_id=start_column,
+            n_rows=12, n_columns=33, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_frame()
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
+        text_smpl = tk.Text(
+            master=frm_smpl, width=25, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
+        vsb_smpl.config(command=text_smpl.yview)
+        vsb_smpl.pack(side="right", fill="y")
+        text_smpl.pack(side="left", fill="both", expand=True)
+
+        lbl_file = tk.Label(frm_smpl, text="Filename", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_file)
+        text_smpl.insert("end", "\t")
+        lbl_a = tk.Label(frm_smpl, text="Semi-Axis a", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_a)
+        text_smpl.insert("end", "\t")
+        lbl_b = tk.Label(frm_smpl, text="Semi-Axis b", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_b)
+        text_smpl.insert("end", "\t")
+        lbl_rhohost = tk.Label(
+            frm_smpl, text="Host Density", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_rhohost)
+        text_smpl.insert("end", "\t")
+        lbl_rhoincl = tk.Label(
+            frm_smpl, text="Inclusion Density", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_rhoincl)
+        text_smpl.insert("end", "\t")
+        lbl_ablationradius = tk.Label(
+            frm_smpl, text="Ablation Radius", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_ablationradius)
+        text_smpl.insert("end", "\n")
+
+        for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
+            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
+            lbl_i = tk.Label(frm_smpl, text=file_smpl, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            text_smpl.window_create("end", window=lbl_i)
+            text_smpl.insert("end", "\t")
+
+            entr_1_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["a"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_1_i)
+            text_smpl.insert("end", "\t")
+
+            entr_2_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["b"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_2_i)
+            text_smpl.insert("end", "\t")
+
+            entr_3_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(host)"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_3_i)
+            text_smpl.insert("end", "\t")
+
+            entr_4_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(incl)"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_4_i)
+            text_smpl.insert("end", "\t")
+
+            entr_5_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["R"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_5_i)
+            text_smpl.insert("end", "\n")
+
+    def define_setup_borisova2021(self):
+        ## Window Settings
+        window_width = 680
+        window_heigth = 600
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_quantification_setup_borisova2021 = tk.Toplevel(self.parent)
+        self.subwindow_quantification_setup_borisova2021.title(
+            "Quantification Setup - Geometric Approach (Borisova et al. 2021)")
+        self.subwindow_quantification_setup_borisova2021.geometry(var_geometry)
+        self.subwindow_quantification_setup_borisova2021.resizable(False, False)
+        self.subwindow_quantification_setup_borisova2021["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_quantification_setup_borisova2021, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_quantification_setup_borisova2021, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_quantification_setup_borisova2021.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_quantification_setup_borisova2021.grid_columnconfigure(i, minsize=column_min)
+
+        start_row = 0
+        start_column = 0
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column, n_rows=1,
+            n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Default Settings", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_002 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column,
+            n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Sample Dimensions (\u03bcm)", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_002a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Inclusion Radius", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_002b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ablation Radius / Pit Size", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_003 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 4, column_id=start_column,
+            n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Sample Densities (g/cm3)", relief=tk.FLAT,
+            fontsize="sans 10 bold")
+        lbl_003a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 5, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Host Density", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_003b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 6, column_id=start_column,
+            n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Inclusion Density", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_005 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 10, column_id=start_column,
+            n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_006 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        ## BUTTONS
+        btn_001 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"])
+
+        # RADIOBUTTONS
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=0,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Heinrich et al. (2003)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (without R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=2,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (with R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 4, column_id=start_column + 19,
+            n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
+        ## ENTRIES
+        entr_002a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Borisova2021"]["Radius Inclusion"],
+            text_default=self.container_var["Borisova2021"]["Radius Inclusion"].get())
+        entr_002b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Borisova2021"]["Radius Host"],
+            text_default=self.container_var["Borisova2021"]["Radius Host"].get())
+        entr_003a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 5, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Borisova2021"]["Rho(Host)"],
+            text_default=self.container_var["Borisova2021"]["Rho(Host)"].get())
+        entr_003b = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 6, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Borisova2021"]["Rho(Incl)"],
+            text_default=self.container_var["Borisova2021"]["Rho(Incl)"].get())
+
     def fi_setup_matrix_only_tracer(self):
         ## Window Settings
         window_width = 820
