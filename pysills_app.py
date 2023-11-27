@@ -17787,7 +17787,7 @@ class PySILLS(tk.Frame):
     def define_setup_borisova2021(self):
         ## Window Settings
         window_width = 680
-        window_heigth = 600
+        window_heigth = 550
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
@@ -17850,7 +17850,7 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Inclusion Density", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_005 = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 10, column_id=start_column,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column,
             n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
@@ -17862,7 +17862,7 @@ class PySILLS(tk.Frame):
 
         ## BUTTONS
         btn_001 = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column + 10,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 7, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"])
 
@@ -17913,6 +17913,68 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["Borisova2021"]["Rho(Incl)"],
             text_default=self.container_var["Borisova2021"]["Rho(Incl)"].get())
+
+        ## TREEVIEWS
+        frm_smpl = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 9, column_id=start_column,
+            n_rows=12, n_columns=33, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_frame()
+        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
+        text_smpl = tk.Text(
+            master=frm_smpl, width=25, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
+        vsb_smpl.config(command=text_smpl.yview)
+        vsb_smpl.pack(side="right", fill="y")
+        text_smpl.pack(side="left", fill="both", expand=True)
+
+        lbl_file = tk.Label(frm_smpl, text="Filename", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_file)
+        text_smpl.insert("end", "\t")
+        lbl_a = tk.Label(
+            frm_smpl, text="Inclusion Radius ", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_a)
+        text_smpl.insert("end", "\t")
+        lbl_b = tk.Label(
+            frm_smpl, text="Ablation Radius", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_b)
+        text_smpl.insert("end", "\t")
+        lbl_rhohost = tk.Label(
+            frm_smpl, text="Host Density", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_rhohost)
+        text_smpl.insert("end", "\t")
+        lbl_rhoincl = tk.Label(
+            frm_smpl, text="Inclusion Density", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_smpl.window_create("end", window=lbl_rhoincl)
+        text_smpl.insert("end", "\n")
+
+        for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
+            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
+            lbl_i = tk.Label(frm_smpl, text=file_smpl, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            text_smpl.window_create("end", window=lbl_i)
+            text_smpl.insert("end", "\t")
+
+            entr_2_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["R(incl)"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_2_i)
+            text_smpl.insert("end", "\t")
+
+            entr_3_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["R(host)"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_3_i)
+            text_smpl.insert("end", "\t")
+
+            entr_4_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["rho(host)"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_4_i)
+            text_smpl.insert("end", "\t")
+
+            entr_5_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["rho(incl)"],
+                width=15)
+            text_smpl.window_create("insert", window=entr_5_i)
+            text_smpl.insert("end", "\n")
 
     def fi_setup_matrix_only_tracer(self):
         ## Window Settings
