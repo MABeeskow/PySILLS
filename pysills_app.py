@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.11.2023
+# Date:		28.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -526,7 +526,7 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
             self.container_var[key_setting]["Quantification Method"].set(1)
             self.container_var[key_setting]["Quantification Method Option"] = tk.StringVar()
-            self.container_var[key_setting]["Quantification Method Option"].set("Matrix-only Tracer")
+            self.container_var[key_setting]["Quantification Method Option"].set("Matrix-only Tracer (SILLS)")
             self.container_var[key_setting]["IS MAT Default"] = tk.StringVar()
             self.container_var[key_setting]["IS MAT Default"].set("Select IS")
             self.container_var[key_setting]["IS MAT Default Concentration"] = tk.StringVar()
@@ -15127,9 +15127,11 @@ class PySILLS(tk.Frame):
                     var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
                     var_file_long = self.container_lists[var_filetype]["Long"][var_index]
 
-                    if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+                    if self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                    else:
+                    elif self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
 
                     var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
@@ -15497,11 +15499,15 @@ class PySILLS(tk.Frame):
             elif var_filetype == "SMPL":
                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
 
-                if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+                if self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
                     var_concentration_host_t = float(self.container_var["SMPL"][var_file_long]["Host Only Tracer"][
                                                          "Value"].get())
-                elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                     var_t = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
                     var_concentration_host_t = float(
                         self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
@@ -15533,7 +15539,9 @@ class PySILLS(tk.Frame):
                         self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
                     else:
-                        if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+                        if self.container_var["fi_setting"][
+                            "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                        #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                             ## Matrix-Only Tracer
                             if self.container_var["fi_setting"]["Inclusion Concentration Calculation"].get() == 0:
                                 # Simple Signals (SILLS)
@@ -15607,7 +15615,9 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
                                 isotope] = var_result_i
-                        elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+                        elif self.container_var["fi_setting"][
+                            "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                        #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                             ## Second Internal Standard
                             var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                             var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
@@ -15665,6 +15675,76 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Second-Internal"][
                                 isotope] = var_result_i
+                        elif self.container_var["fi_setting"][
+                            "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                            # Mixing ratio x
+                            var_x = self.calculate_mixing_ratio_geometric_approach(filename_long=var_file_long)
+
+                            helper_concentration_std_i = []
+                            helper_intensity_std_i = []
+                            for str_filename_std_short in self.container_lists["STD"]["Short"]:
+                                helper_val_concentration_i = self.container_concentration["STD"][var_datatype][
+                                    str_filename_std_short]["MAT"][isotope]
+                                helper_val_intensity_i = self.container_intensity_corrected["STD"][var_datatype][
+                                        str_filename_std_short]["MAT"][isotope]
+                                helper_concentration_std_i.append(helper_val_concentration_i)
+                                helper_intensity_std_i.append(helper_val_intensity_i)
+
+                            var_concentration_std_i = np.mean(helper_concentration_std_i)
+                            var_intensity_std_i = np.mean(helper_intensity_std_i)
+                            var_intensity_host_i = self.container_intensity_corrected["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                            var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+                                isotope]
+
+                            var_rsf_host_i = 1
+                            var_rsf_mix_i = 1
+
+                            # Inclusion Concentration
+                            var_result_i = (var_concentration_std_i/var_intensity_std_i)*(
+                                    (var_intensity_host_i/var_rsf_host_i)*(1 - 1/var_x) +
+                                    var_intensity_mix_i/(var_x*var_rsf_mix_i))
+
+                            if var_result_i < 0:
+                                var_result_i = 0.0
+
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["Halter2002"][
+                                isotope] = var_result_i
+                        elif self.container_var["fi_setting"][
+                            "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                            var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_rho_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+                                                       "rho(host)"].get())
+                            var_rho_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+                                                       "rho(incl)"].get())
+                            var_radius_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+                                                          "R(host)"].get())
+                            var_radius_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+                                                          "R(incl)"].get())
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+                                isotope]
+                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+                                var_is]
+                            var_factor_s_i = var_sensitivity_i
+                            var_factor_k_i = var_intensity_mix_i/var_intensity_mix_is
+
+                            # Inclusion Concentration
+                            var_result_i = (var_concentration_host_i*(var_rho_host_i/var_rho_incl_i)*
+                                            ((1.5*var_radius_host_i**2)/(var_rho_incl_i**2) - 1)*var_factor_s_i*
+                                            var_factor_k_i)
+
+                            if var_result_i < 0:
+                                var_result_i = 0.0
+
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["Borisova2021"][
+                                isotope] = var_result_i
         else:
             for var_filetype in ["STD", "SMPL"]:
                 if var_filetype == "STD":
@@ -15712,6 +15792,32 @@ class PySILLS(tk.Frame):
         """
         val_a = intensity_mix_i/(intensity_mix_IS*sensitivity_IS_i)
         return val_a
+
+    def calculate_mixing_ratio_geometric_approach(self, filename_long):
+        """ Calculates the mixing ratio x.
+        Parameters
+        ----------
+        filename_long : string
+            The long version of the filename (whole path)
+        Returns
+        -------
+        val_x : float
+            The mixing ratio
+        """
+        str_filename_long = filename_long
+
+        val_a = float(self.container_var["SMPL"][str_filename_long]["Halter2002"]["a"].get())
+        val_b = float(self.container_var["SMPL"][str_filename_long]["Halter2002"]["b"].get())
+        val_rho_incl = float(self.container_var["SMPL"][str_filename_long]["Halter2002"]["rho(incl)"].get())
+        val_rho_host = float(self.container_var["SMPL"][str_filename_long]["Halter2002"]["rho(host)"].get())
+        val_radius = float(self.container_var["SMPL"][str_filename_long]["Halter2002"]["R"].get())
+
+        upper_term = (4/3)*np.pi*val_a*val_b*val_rho_incl
+        lower_term = ((2*np.pi*val_radius**2 - (4/3)*np.pi*val_a*val_b)*val_rho_host + (4/3)*np.pi*val_a*val_b*
+                      val_rho_incl)
+        val_x = upper_term/lower_term
+
+        return val_x
 
     def calculate_mixing_ratio(self, factor_a, concentration_mat_i, concentration_mat_IS, concentraton_incl_i,
                                concentration_incl_IS):
@@ -15763,18 +15869,26 @@ class PySILLS(tk.Frame):
             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
 
-            if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+            if self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+            #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                 var_mo = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-            elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+            elif self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+            #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                 var_mo = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
 
             for isotope in file_isotopes:
-                if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+                if self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "MAT"][var_mo]
-                elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
@@ -15807,14 +15921,20 @@ class PySILLS(tk.Frame):
             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
 
-            if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+            if self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+            #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                 var_mo = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-            elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+            elif self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+            #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                 var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                 var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
 
             for isotope in file_isotopes:
-                if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+                if self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
                     var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][var_file_short][
                         "MAT"][var_mo]
@@ -15826,7 +15946,9 @@ class PySILLS(tk.Frame):
                     upper_term = var_concentration_host_mo - var_a*var_concentration_host_is
                     lower_term = var_concentration_host_mo - var_a*(
                             var_concentration_host_is - var_concentration_incl_is)
-                elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
                     var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
                         var_file_short]["MAT"][var_is1]
@@ -18900,9 +19022,13 @@ class PySILLS(tk.Frame):
         if var_type == "STD":
             var_key_isotope = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
         else:
-            if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
+            if self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+            #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                 var_key_isotope = self.container_var["SMPL"][var_file]["Host Only Tracer"]["Name"].get()
-            else:
+            elif self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+            #else:
                 var_key_isotope = self.container_var["SMPL"][var_file]["Second Internal Standard"]["Name"].get()
         #
         var_id = self.container_lists[var_type]["Long"].index(var_file)
@@ -22007,10 +22133,10 @@ class PySILLS(tk.Frame):
         else:
             self.container_concentration[var_filetype]["RAW"][var_file_short] = {
                 "MAT": {}, "INCL": {}, "MIX": {}, "Matrix-Only": {}, "Second-Internal": {}, "1 SIGMA MAT": {},
-                "1 SIGMA INCL": {}}
+                "1 SIGMA INCL": {}, "Halter2002": {}, "Borisova2021": {}}
             self.container_concentration[var_filetype]["SMOOTHED"][var_file_short] = {
                 "MAT": {}, "INCL": {}, "MIX": {}, "Matrix-Only": {}, "Second-Internal": {}, "1 SIGMA MAT": {},
-                "1 SIGMA INCL": {}}
+                "1 SIGMA INCL": {}, "Halter2002": {}, "Borisova2021": {}}
             #
             if var_filetype == "SMPL":
                 self.container_mixed_concentration[var_filetype]["RAW"][var_file_short] = {}
@@ -22102,7 +22228,14 @@ class PySILLS(tk.Frame):
                 self.container_concentration[var_filetype]["RAW"][var_file_short]["Matrix-Only"][isotope] = None
                 self.container_concentration[var_filetype]["SMOOTHED"][var_file_short]["Matrix-Only"][isotope] = None
                 self.container_concentration[var_filetype]["RAW"][var_file_short]["Second-Internal"][isotope] = None
-                self.container_concentration[var_filetype]["SMOOTHED"][var_file_short]["Second-Internal"][isotope] = None
+                self.container_concentration[var_filetype]["SMOOTHED"][var_file_short]["Second-Internal"][
+                    isotope] = None
+                self.container_concentration[var_filetype]["RAW"][var_file_short]["Halter2002"][isotope] = None
+                self.container_concentration[var_filetype]["SMOOTHED"][var_file_short]["Halter2002"][
+                    isotope] = None
+                self.container_concentration[var_filetype]["RAW"][var_file_short]["Borisova2021"][isotope] = None
+                self.container_concentration[var_filetype]["SMOOTHED"][var_file_short]["Borisova2021"][
+                    isotope] = None
             ## Concentration Ratio
             self.container_concentration_ratio[var_filetype]["RAW"][var_file_short]["MAT"][isotope] = None
             self.container_concentration_ratio[var_filetype]["SMOOTHED"][var_file_short]["MAT"][isotope] = None
