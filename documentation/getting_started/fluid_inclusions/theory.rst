@@ -202,6 +202,17 @@ The inclusion concentration can be calculated by at least three different equati
 
 The difference between these two methods is the determination of :math:`x`.
 
+.. rubric:: Method 4 - Geometric Approach (after Borisova et al. 2021)
+.. math::
+    C_{i}^{INCL} = C_{IS}^{MAT} \cdot \frac{\varrho_{MAT}}{\varrho_{INCL}} \cdot \left( \frac{3}{2} \frac{r_{MAT}^{2}}{r_{INCL}^{2}} - 1 \right) \cdot \frac{K_{i}^{IS}}{\xi_{i}^{IS}}
+
+:math:`r_{MAT}` and :math:`r_{INCL}` are the radius of the ablated host mineral and of the inclusion.
+:math:`\varrho_{MAT}` and :math:`\varrho_{INCL}` are the densitities of the host mineral and the fluid inclusion.
+The factor :math:`K_{i}^{IS}` can be calculated by the following equation.
+
+.. math::
+    K_{i}^{IS} = \frac{\varrho_{INCL}}{\varrho_{MAT}} \cdot \frac{I_{i}^{INCL}}{I_{IS}^{INCL}} \cdot \frac{C_{IS}^{INCL}}{C_{IS}^{MAT}} \cdot \left( \frac{3}{2} \frac{r_{MAT}^{2}}{r_{INCL}^{2}} - 1 \right)^{-1}
+
 Mixed Concentration Ratio a and Mixing Ratio x
 ''''''''''''''
 The mixed concentration ratio :math:`a` is necessary for the determination of the mixing ratio :math:`x`.

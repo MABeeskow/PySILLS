@@ -320,20 +320,22 @@ class PySILLS(tk.Frame):
 
         self.container_var["Halter2002"] = {
             "Dimension a": tk.StringVar(), "Dimension b": tk.StringVar(), "Rho(Host)": tk.StringVar(),
-            "Rho(Incl)": tk.StringVar(), "Laser Radius": tk.StringVar()}
+            "Rho(Incl)": tk.StringVar(), "Laser Radius": tk.StringVar(), "Name": tk.StringVar()}
         self.container_var["Halter2002"]["Dimension a"].set("50.0")
         self.container_var["Halter2002"]["Dimension b"].set("50.0")
         self.container_var["Halter2002"]["Rho(Host)"].set("2700.0")
         self.container_var["Halter2002"]["Rho(Incl)"].set("1200.0")
         self.container_var["Halter2002"]["Laser Radius"].set("75.0")
+        self.container_var["Halter2002"]["Name"].set("Select isotope")
 
         self.container_var["Borisova2021"] = {
             "Radius Inclusion": tk.StringVar(), "Radius Host": tk.StringVar(), "Rho(Host)": tk.StringVar(),
-            "Rho(Incl)": tk.StringVar()}
+            "Rho(Incl)": tk.StringVar(), "Name": tk.StringVar()}
         self.container_var["Borisova2021"]["Radius Inclusion"].set("50.0")
         self.container_var["Borisova2021"]["Radius Host"].set("75.0")
         self.container_var["Borisova2021"]["Rho(Host)"].set("2700.0")
         self.container_var["Borisova2021"]["Rho(Incl)"].set("1200.0")
+        self.container_var["Borisova2021"]["Name"].set("Select isotope")
 
         self.file_system_need_update = True
 
@@ -5756,11 +5758,22 @@ class PySILLS(tk.Frame):
                                index_container["DWELL TIME SETTINGS"] - 1):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
-                    #
-                    var_file_long = splitted_std[0]
-                    self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].set(splitted_std[1])
-                    self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].set(splitted_std[2])
-                    #
+
+                    info_file = splitted_std[0]
+                    info_isotope = splitted_std[1]
+                    info_concentration = splitted_std[2]
+
+                    self.container_var["SMPL"][info_file]["IS Data"]["IS"].set(info_isotope)
+                    self.container_var["SMPL"][info_file]["IS Data"]["Concentration"].set(info_concentration)
+
+                    self.container_var["SMPL"][info_file]["Matrix Setup"] = {
+                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                    self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
+                    self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(
+                        info_concentration)
+
                 ## DWELL TIME SETTINGS
                 for i in range(index_container["DWELL TIME SETTINGS"] + 1,
                                index_container["INTERVAL SETTINGS"] - 1):
@@ -8538,9 +8551,9 @@ class PySILLS(tk.Frame):
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
         if self.file_system_need_update == True:
-        #if len(self.container_lists["ISOTOPES"]) == 0:
             path = os.getcwd()
             parent = os.path.dirname(path)
+
             if self.demo_mode == True:
                 self.var_opt_icp.set("Agilent 7900s")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
@@ -8556,13 +8569,13 @@ class PySILLS(tk.Frame):
                 ma_demo_files["STD"].extend(ma_demo_files["ALL"][:3])
                 ma_demo_files["STD"].extend(ma_demo_files["ALL"][-3:])
                 ma_demo_files["SMPL"].extend(ma_demo_files["ALL"][3:-4])
-                #
+
                 self.list_std = ma_demo_files["STD"]
                 self.list_smpl = ma_demo_files["SMPL"]
-            #
+
             self.ma_current_file_std = self.list_std[0]
             self.ma_current_file_smpl = self.list_smpl[0]
-            #
+
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
                 if file_std not in self.container_lists["STD"]["Long"]:
@@ -8570,11 +8583,11 @@ class PySILLS(tk.Frame):
                     self.container_lists["STD"]["Short"].append(file_parts[-1])
                 if self.demo_mode == True:
                     self.lb_std.insert(tk.END, file_parts[-1])
-                #
+
                 for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
                              "Results Sensitivity", "SE STD", "SE SMPL"]:
                     self.container_var["Subwindows"][self.pysills_mode][item] = {}
-            #
+
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
@@ -8583,17 +8596,51 @@ class PySILLS(tk.Frame):
                 if self.demo_mode == True:
                     self.lb_smpl.insert(tk.END, file_parts[-1])
 
-            if self.container_icpms["name"] != None:
-                var_skipheader = self.container_icpms["skipheader"]
-                var_skipfooter = self.container_icpms["skipfooter"]
-                df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
-                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-            else:
-                df_exmpl = DE(filename_long=self.list_std[0]).get_measurements(
-                    delimiter=",", skip_header=3, skip_footer=1)
+            for file_std in self.list_std:
+                file_parts = file_std.split("/")
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_exmpl = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_exmpl = DE(filename_long=file_std).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                else:
+                    file_parts = file_std.split("/")
+                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["ISOTOPES"] = df_isotopes
+                self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+                self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
+
+            for file_smpl in self.list_smpl:
+                file_parts = file_smpl.split("/")
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                else:
+                    file_parts = file_smpl .split("/")
+                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                self.times = DE().get_times(dataframe=df_exmpl)
+                df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
+                self.container_lists["ISOTOPES"] = df_isotopes
+                self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
+                self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
             if "Dataframe" not in self.container_measurements:
                 self.container_measurements["Dataframe"] = {}
+
             if file_parts[-1] not in self.container_measurements["Dataframe"]:
                 self.container_measurements["Dataframe"][file_parts[-1]] = df_exmpl
 
@@ -8608,6 +8655,7 @@ class PySILLS(tk.Frame):
                 element = key_element.group(1)
                 if element not in self.container_lists["Measured Elements"]["All"]:
                     self.container_lists["Measured Elements"]["All"].append(element)
+
             for filename_short in self.container_lists["STD"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
@@ -8619,6 +8667,7 @@ class PySILLS(tk.Frame):
                     else:
                         if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
                             self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+
             for filename_short in self.container_lists["SMPL"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
@@ -10676,7 +10725,28 @@ class PySILLS(tk.Frame):
                 self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
                 self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
                     file_smpl_short] = {}
-                #
+
+                if "Halter2002" not in self.container_var["SMPL"][file_smpl]:
+                    # Geometric Approach (Halter et al. 2002)
+                    self.container_var["SMPL"][file_smpl]["Halter2002"] = {
+                        "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                        "rho(host)": tk.StringVar(), "R": tk.StringVar()}
+                    self.container_var["SMPL"][file_smpl]["Halter2002"]["a"].set("50.0")
+                    self.container_var["SMPL"][file_smpl]["Halter2002"]["b"].set("50.0")
+                    self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(incl)"].set("2700.0")
+                    self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(host)"].set("1200.0")
+                    self.container_var["SMPL"][file_smpl]["Halter2002"]["R"].set("75.0")
+
+                if "Borisova2021" not in self.container_var["SMPL"][file_smpl]:
+                    # Geometric Approach (Borisova et al. 2021)
+                    self.container_var["SMPL"][file_smpl]["Borisova2021"] = {
+                        "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                        "rho(host)": tk.StringVar()}
+                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(incl)"].set("50.0")
+                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(host)"].set("75.0")
+                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(incl)"].set("2700.0")
+                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(host)"].set("1200.0")
+
                 for isotope in df_isotopes:
                     self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
                     self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][
@@ -11013,33 +11083,33 @@ class PySILLS(tk.Frame):
         window_width = 800
         window_heigth = 450
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         subwindow_ma_matrix_concentration = tk.Toplevel(self.parent)
         subwindow_ma_matrix_concentration.title(var_window_header)
         subwindow_ma_matrix_concentration.geometry(var_geometry)
         subwindow_ma_matrix_concentration.resizable(False, False)
         subwindow_ma_matrix_concentration["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_ma_matrix_concentration, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_ma_matrix_concentration, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_ma_matrix_concentration.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             subwindow_ma_matrix_concentration.grid_columnconfigure(i, minsize=column_min)
-        #
+
         start_row = 0
         start_column = 0
-        #
+
         ## LABELS
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1:
             var_text_02 = "Oxide Settings (default)"
@@ -11053,7 +11123,7 @@ class PySILLS(tk.Frame):
         elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 4:
             var_text_02 = "Custom data"
             var_key = "custom"
-        #
+
         lbl_01 = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=19,
@@ -11063,11 +11133,13 @@ class PySILLS(tk.Frame):
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
             n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=var_text_02, relief=tk.FLAT, fontsize="sans 10 bold")
+
         if self.container_var[var_setting_key]["Host Setup Selection"].get() not in [3, 4]:
             lbl_03 = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 3, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 4:
             lbl_03 = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
@@ -11084,6 +11156,7 @@ class PySILLS(tk.Frame):
                     var_isotope_concentration = self.srm_actual[var_srm_i][element]
                     if var_isotope_concentration > 0:
                         list_possible_elements.append(isotope)
+
         ## OPTION MENUS
         if var_key == "oxides":
             list_elements = []
@@ -11102,13 +11175,13 @@ class PySILLS(tk.Frame):
             var_list_is = self.container_lists["Oxides"]
             var_opt_default = self.container_var[var_setting_key]["Oxide"]
             var_entr_default = self.container_var[var_setting_key]["Oxide Concentration"]
-            #
+
             if self.container_var[var_setting_key]["Oxide"].get() != "Select Oxide" \
                     and self.container_var[var_setting_key]["Oxide"].get() not in self.container_lists["Elements"]:
                 var_opt_default_text = self.container_var[var_setting_key]["Oxide"].get()
             else:
                 var_opt_default_text = "Select Oxide"
-            #
+
             if self.container_var[var_setting_key]["Oxide Concentration"].get() != "100.0":
                 var_entr_default_text = self.container_var[var_setting_key]["Oxide Concentration"].get()
             else:
@@ -11128,13 +11201,13 @@ class PySILLS(tk.Frame):
             var_list_is = self.container_lists["Elements"]
             var_opt_default = self.container_var[var_setting_key]["Element"]
             var_entr_default = self.container_var[var_setting_key]["Element Concentration"]
-            #
+
             if self.container_var[var_setting_key]["Element"].get() != "Select Element" \
                     and self.container_var[var_setting_key]["Element"].get() not in self.container_lists["Oxides"]:
                 var_opt_default_text = self.container_var[var_setting_key]["Element"].get()
             else:
                 var_opt_default_text = "Select Element"
-            #
+
             if self.container_var[var_setting_key]["Element Concentration"].get() != "1000000":
                 var_entr_default_text = self.container_var[var_setting_key]["Element Concentration"].get()
             else:
@@ -11179,19 +11252,19 @@ class PySILLS(tk.Frame):
                 var=var_entr_is_default, text_default=var_entr_is_default_text,
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
-        #
+
         if var_key != "experiments" and var_key != "custom":
             var_opt_is_default = self.container_var["IS"]["Default SMPL"]
             var_opt_is_list = list_possible_elements
             var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
-            #
+
             if var_opt_is_default.get() != "Select IS":
                 var_opt_is_default_text = var_opt_is_default.get()
             else:
                 var_opt_is_default_text = "Select IS"
-            #
+
             var_entr_is_default_text = self.container_var["IS"]["Default SMPL Concentration"].get()
-            #
+
             opt_02a = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
@@ -11207,7 +11280,7 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                 activeforeground=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, highlightthickness=0)
-            #
+
             self.opt_02b = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 4, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
@@ -11223,7 +11296,7 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                 activeforeground=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, highlightthickness=0)
-            #
+
             ## ENTRIES
             entr_02a = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
@@ -11237,7 +11310,7 @@ class PySILLS(tk.Frame):
                 var=var_entr_is_default, text_default=var_entr_is_default_text,
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
-        #
+
         ## SAMPLE FILES
         frm_smpl = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column, n_rows=16,
@@ -11248,16 +11321,16 @@ class PySILLS(tk.Frame):
         vsb_smpl.config(command=text_smpl.yview)
         vsb_smpl.pack(side="right", fill="y")
         text_smpl.pack(side="left", fill="both", expand=True)
-        #
+
         for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
             file_smpl = self.container_lists["SMPL"]["Long"][index]
             lbl_i = tk.Label(frm_smpl, text=file_smpl_short, bg=self.bg_colors["Very Light"],
                              fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("end", window=lbl_i)
             text_smpl.insert("end", "\t")
-            #
+
             if var_key == "oxides":     # Oxide Selection
-                var_list_is = list_possible_elements #self.container_lists["ISOTOPES"]
+                var_list_is = list_possible_elements
                 var_list_comp = self.container_lists["Oxides"]
                 var_opt_comp_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"]
                 var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"]
@@ -11267,7 +11340,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_opt_is_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"]
                     var_entr_is_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"]
-                #
+
                 if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].get() != "Select Oxide":
                     var_opt_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].get()
                 else:
@@ -11276,18 +11349,18 @@ class PySILLS(tk.Frame):
                         var_opt_i_default = var_opt_default.get()
                     else:
                         var_opt_i_default = "Select Oxide"
-                #
+
                 if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].get() != "100.0":
                     var_entr_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"][
                         "Concentration"].get()
                 else:
                     var_entr_i_default = "100.0"
-                #
+
                 if self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get() != "1000000":
                     var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
                 else:
                     var_entr_is_default = "1000000"
-                #
+
             elif var_key == "elements":  # Element Selection
                 var_list_is = list_possible_elements #self.container_lists["ISOTOPES"]
                 var_list_comp = self.container_lists["Elements"]
@@ -11299,7 +11372,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_opt_is_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"]
                     var_entr_is_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"]
-                #
+
                 if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].get() != "Select Element":
                     var_opt_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
                         "Name"].get()
@@ -11309,13 +11382,13 @@ class PySILLS(tk.Frame):
                         var_opt_i_default = var_opt_default.get()
                     else:
                         var_opt_i_default = "Select Element"
-                #
+
                 if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].get() != "100.0":
                     var_entr_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
                         "Concentration"].get()
                 else:
                     var_entr_i_default = "100.0"
-                #
+
                 if self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get() != "1000000":
                     var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
                 else:
@@ -11344,7 +11417,11 @@ class PySILLS(tk.Frame):
             var_entr_is_i.set(var_entr_is_default)
             if var_key != "experiments" and var_key != "custom":
                 var_entr_i.set(var_entr_i_default)
-                var_opt_comp_i.set(var_opt_i_default)
+                if len(var_opt_i_default) > 0:
+                    var_opt_comp_i.set(var_opt_i_default)
+                else:
+                    var_opt_comp_i.set(var_opt_default_text)
+
                 opt_comp_i = tk.OptionMenu(
                     frm_smpl, var_opt_comp_i, *var_list_comp,
                     command=lambda var_opt=var_opt_comp_i, var_file=file_smpl, state_default=False:
@@ -11357,6 +11434,11 @@ class PySILLS(tk.Frame):
                                 highlightthickness=0)
                 text_smpl.window_create("end", window=opt_comp_i)
                 text_smpl.insert("end", " \t")
+
+                if len(var_entr_i.get()) > 0:
+                    var_entr_i.set(var_entr_i.get())
+                else:
+                    var_entr_i.set(var_entr_default_text)
 
                 entr_i = tk.Entry(
                     frm_smpl, textvariable=var_entr_i, width=15, fg=self.bg_colors["Dark Font"],
@@ -11371,15 +11453,15 @@ class PySILLS(tk.Frame):
                 frm_smpl, var_opt_is_i, *var_list_is,
                 command=lambda var_opt=var_opt_is_i, var_file=file_smpl, state_default=False:
                 self.ma_change_matrix_compound(var_opt, var_file, state_default))
-            opt_is_i["menu"].config(fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                                    activeforeground=self.colors_fi["Dark Font"],
-                                    activebackground=self.accent_color)
-            opt_is_i.config(bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                            activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color,
-                            highlightthickness=0)
+            opt_is_i["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color)
+            opt_is_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
             text_smpl.window_create("end", window=opt_is_i)
             text_smpl.insert("end", " \t")
-            #
+
             entr_is_i = tk.Entry(
                 frm_smpl, textvariable=var_entr_is_i, width=15, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["White"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"])
@@ -15133,6 +15215,12 @@ class PySILLS(tk.Frame):
                     elif self.container_var["fi_setting"][
                         "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
+                    elif self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                        var_t = self.container_var["SMPL"][var_file_long]["Halter2002"]["Name"].get()
+                    elif self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                        var_t = self.container_var["Borisova2021"]["Name"].get()
 
                     var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
                         isotope]
@@ -15501,14 +15589,17 @@ class PySILLS(tk.Frame):
 
                 if self.container_var["fi_setting"][
                     "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
                     var_concentration_host_t = float(self.container_var["SMPL"][var_file_long]["Host Only Tracer"][
                                                          "Value"].get())
                 elif self.container_var["fi_setting"][
                     "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                     var_t = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+                    var_concentration_host_t = float(
+                        self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                    var_t = self.container_var["Borisova2021"]["Name"].get()
                     var_concentration_host_t = float(
                         self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
 
@@ -15539,10 +15630,9 @@ class PySILLS(tk.Frame):
                         self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
                     else:
+                        # Matrix-only Tracer Method
                         if self.container_var["fi_setting"][
                             "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                        #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
-                            ## Matrix-Only Tracer
                             if self.container_var["fi_setting"]["Inclusion Concentration Calculation"].get() == 0:
                                 # Simple Signals (SILLS)
                                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
@@ -15615,10 +15705,9 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
                                 isotope] = var_result_i
+                        # Second Internal Standard
                         elif self.container_var["fi_setting"][
                             "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                        #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
-                            ## Second Internal Standard
                             var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                             var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
                                 "Name"].get()
@@ -15714,8 +15803,8 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
                         elif self.container_var["fi_setting"][
                             "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
-                            var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
-                                var_file_short]["MAT"][isotope]
+                            var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_is]
                             var_rho_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
                                                        "rho(host)"].get())
                             var_rho_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
@@ -15724,19 +15813,27 @@ class PySILLS(tk.Frame):
                                                           "R(host)"].get())
                             var_radius_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
                                                           "R(incl)"].get())
-                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_normalized_sensitivity_i = self.container_normalized_sensitivity["SMPL"][var_datatype][
                                 var_file_short]["MAT"][isotope]
-                            var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                isotope]
-                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                var_is]
-                            var_factor_s_i = var_sensitivity_i
-                            var_factor_k_i = var_intensity_mix_i/var_intensity_mix_is
+                            var_normalized_sensitivity_is = self.container_normalized_sensitivity["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_incl_i = self.container_intensity_corrected["SMPL"][var_datatype][
+                                var_file_short]["INCL"][isotope]
+                            var_intensity_incl_is = self.container_intensity_corrected["SMPL"][var_datatype][
+                                var_file_short]["INCL"][var_is]
+                            var_concentration_incl_is = float(
+                                self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+
+                            var_factor_s_i = var_normalized_sensitivity_is/var_normalized_sensitivity_i
+                            var_factor_k_i = ((var_rho_incl_i/var_rho_host_i)*
+                                              (var_intensity_incl_i/var_intensity_incl_is)*
+                                              (var_concentration_incl_is/var_concentration_host_is)*
+                                              (var_radius_incl_i**2)/(1.5*var_radius_host_i**2 - var_radius_incl_i**2))
 
                             # Inclusion Concentration
-                            var_result_i = (var_concentration_host_i*(var_rho_host_i/var_rho_incl_i)*
-                                            ((1.5*var_radius_host_i**2)/(var_rho_incl_i**2) - 1)*var_factor_s_i*
-                                            var_factor_k_i)
+                            var_result_i = (var_concentration_host_is*(var_rho_host_i/var_rho_incl_i)*var_factor_s_i*
+                                            var_factor_k_i*(1.5*var_radius_host_i**2 - var_radius_incl_i**2)/(
+                                                    var_radius_incl_i**2))
 
                             if var_result_i < 0:
                                 var_result_i = 0.0
@@ -15871,24 +15968,35 @@ class PySILLS(tk.Frame):
 
             if self.container_var["fi_setting"][
                 "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-            #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                 var_mo = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
             elif self.container_var["fi_setting"][
                 "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-            #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                 var_mo = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
+            elif self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                var_mo = self.container_var["Borisova2021"]["Name"].get()
 
             for isotope in file_isotopes:
                 if self.container_var["fi_setting"][
                     "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "MAT"][var_mo]
                 elif self.container_var["fi_setting"][
                     "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
+                    var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
+                    var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
+                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
+                        "MAT"][var_mo]
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                    var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
+                    var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
+                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
+                        "MAT"][var_mo]
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
@@ -15923,18 +16031,18 @@ class PySILLS(tk.Frame):
 
             if self.container_var["fi_setting"][
                 "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-            #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                 var_mo = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
             elif self.container_var["fi_setting"][
                 "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-            #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                 var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                 var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
+            elif self.container_var["fi_setting"][
+                "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                var_mo = self.container_var["Borisova2021"]["Name"].get()
 
             for isotope in file_isotopes:
                 if self.container_var["fi_setting"][
                     "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                #if self.container_var["fi_setting"]["Quantification Method"].get() == 1:
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
                     var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][var_file_short][
                         "MAT"][var_mo]
@@ -15948,7 +16056,6 @@ class PySILLS(tk.Frame):
                             var_concentration_host_is - var_concentration_incl_is)
                 elif self.container_var["fi_setting"][
                     "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                #elif self.container_var["fi_setting"]["Quantification Method"].get() == 2:
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
                     var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
                         var_file_short]["MAT"][var_is1]
@@ -15962,6 +16069,19 @@ class PySILLS(tk.Frame):
                     upper_term = var_concentration_host_is2 - var_a*var_concentration_host_is1
                     lower_term = var_concentration_host_is2 - var_concentration_incl_is2 - var_a*(
                             var_concentration_host_is1 - var_concentration_incl_is1)
+                elif self.container_var["fi_setting"][
+                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                    var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
+                    var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][var_file_short][
+                        "MAT"][var_mo]
+                    var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][var_file_short][
+                        "MAT"][var_is]
+                    var_concentration_incl_is = self.container_concentration["SMPL"][var_datatype][var_file_short][
+                        "INCL"][var_is]
+
+                    upper_term = var_concentration_host_mo - var_a*var_concentration_host_is
+                    lower_term = var_concentration_host_mo - var_a*(
+                            var_concentration_host_is - var_concentration_incl_is)
 
                 if lower_term != 0:
                     var_result_i = upper_term/lower_term
@@ -17981,6 +18101,25 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_006a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 19,
+            n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Matrix-only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # OPTION MENUS
+        list_isotopes_all = self.container_lists["Measured Isotopes"]["All"]
+        opt_03a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 27,
+            n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Borisova2021"]["Name"], option_list=list_isotopes_all,
+            text_set=self.container_var["Borisova2021"]["Name"].get(), fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color)
+        opt_03a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_03a.config(
+            bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+            activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
         ## BUTTONS
         btn_001 = SE(
@@ -17990,25 +18129,25 @@ class PySILLS(tk.Frame):
 
         # RADIOBUTTONS
         rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 19,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Heinrich et al. (2003)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column + 19,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (without R)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column + 19,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 4, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS (with R)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 4, column_id=start_column + 19,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 5, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["fi_setting"]["Inclusion Intensity Calculation"], value_rb=3,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
