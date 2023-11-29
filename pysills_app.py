@@ -15460,7 +15460,7 @@ class PySILLS(tk.Frame):
                 var_concentration_host_is = (var_intensity_host_is*var_sensitivity_t*var_concentration_host_t)/\
                                             (var_intensity_host_t)
 
-                for isotope in file_isotopes:
+                for index, isotope in enumerate(file_isotopes):
                     if var_focus == "MAT":
                         # Classical Mineral Analysis
                         var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
@@ -15613,10 +15613,10 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
                         elif self.container_var["fi_setting"][
                             "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                            var_t = self.container_var["Halter2002"]["Name"].get()
                             # Mixing ratio x
-                            var_x, var_concentration_mix_is = self.estimate_x_halter2002(
-                                datatype=var_datatype, filename_long=var_file_long, filename_short=var_file_short)
+                            if index == 0:
+                                var_x, var_concentration_mix_is = self.estimate_x_halter2002(
+                                    datatype=var_datatype, filename_long=var_file_long, filename_short=var_file_short)
                             var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
                                 var_file_short]["MAT"][isotope]
                             var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
@@ -15684,18 +15684,19 @@ class PySILLS(tk.Frame):
                     focus_set = ["MAT"]
                 else:
                     focus_set = ["MAT", "INCL"]
-                #
+
                 for var_focus in focus_set:
                     if var_focus not in self.container_concentration[var_filetype][var_datatype]:
                         self.container_concentration[var_filetype][var_datatype][var_focus] = {}
-                        #
+
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
-                        #
+
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
                                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
                                 if isotope in file_isotopes:
                                     self.fi_get_concentration(
                                         var_filetype=var_filetype, var_datatype=var_datatype,
@@ -17903,6 +17904,7 @@ class PySILLS(tk.Frame):
     def estimate_x_halter2002(self, datatype, filename_long, filename_short):
         # Initial conditions
         x_star = self.calculate_mixing_ratio_geometric_approach(filename_long=filename_long)
+        #x_star = 0.5
         x_low = 0.0
         x_high = 1.0
         x_min = 0.0001
@@ -17917,14 +17919,13 @@ class PySILLS(tk.Frame):
 
         # Calculate C(MIX,IS)*
         var_concentration_incl_is = float(self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].get())
-        var_concentration_host_is = self.container_concentration["SMPL"][datatype][filename_short]["MAT"][var_is]
 
-        var_concentration_mix_is_star_min = self.helper_calculate_concentration_mix_is_star(
-            x_now=x_min, concentration_host_is=var_concentration_host_is,
-            concentration_incl_is=var_concentration_incl_is)
-        var_concentration_mix_is_star_max = self.helper_calculate_concentration_mix_is_star(
-            x_now=x_max, concentration_host_is=var_concentration_host_is,
-            concentration_incl_is=var_concentration_incl_is)
+        var_concentration_mix_is_star_min = self.helper_calculate_concentration_mix_is_star_alternative(
+            x_now=x_min, concentration_host_t=var_concentration_host_t, intensity_mix_t=var_intensity_mix_t,
+            intensity_mix_is=var_intensity_mix_is, sensitivity_t=var_sensitivity_t)
+        var_concentration_mix_is_star_max = self.helper_calculate_concentration_mix_is_star_alternative(
+            x_now=x_max, concentration_host_t=var_concentration_host_t, intensity_mix_t=var_intensity_mix_t,
+            intensity_mix_is=var_intensity_mix_is, sensitivity_t=var_sensitivity_t)
         # Calculate C(INCL,i)*
         var_concentration_host_is = self.container_concentration["SMPL"][datatype][filename_short]["MAT"][var_is]
 
@@ -17939,12 +17940,8 @@ class PySILLS(tk.Frame):
             var_slope = 1
         else:
             var_slope = -1
-
         # Test run
         # Calculate C(MIX,IS)*
-        # var_concentration_mix_is_star = self.helper_calculate_concentration_mix_is_star(
-        #     x_now=x_star, concentration_host_is=var_concentration_host_is,
-        #     concentration_incl_is=var_concentration_incl_is)
         var_concentration_mix_is_star = self.helper_calculate_concentration_mix_is_star_alternative(
             x_now=x_star, concentration_host_t=var_concentration_host_t, intensity_mix_t=var_intensity_mix_t,
             intensity_mix_is=var_intensity_mix_is, sensitivity_t=var_sensitivity_t)
@@ -17958,20 +17955,15 @@ class PySILLS(tk.Frame):
         index = 0
         magicnumber = 0.0001
         if magicnumber_star > magicnumber:
-            while magicnumber_star > magicnumber:
+            while magicnumber_star > magicnumber and index < 100:
                 # Calculate C(MIX,IS)*
-                # var_concentration_mix_is_star = self.helper_calculate_concentration_mix_is_star(
-                #     x_now=x_star, concentration_host_is=var_concentration_host_is,
-                #     concentration_incl_is=var_concentration_incl_is)
                 var_concentration_mix_is_star = self.helper_calculate_concentration_mix_is_star_alternative(
                     x_now=x_star, concentration_host_t=var_concentration_host_t, intensity_mix_t=var_intensity_mix_t,
                     intensity_mix_is=var_intensity_mix_is, sensitivity_t=var_sensitivity_t)
-
                 # Calculate C(INCL,IS)*
                 var_concentration_incl_is_star = self.helper_calculate_concentration_incl_i_star(
                     x_now=x_star, concentration_host_i=var_concentration_host_is,
                     concentration_mix_i=var_concentration_mix_is_star)
-
                 # Update x_star
                 if var_slope == 1:
                     if var_concentration_incl_is_star < var_concentration_incl_is:
