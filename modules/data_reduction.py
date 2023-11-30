@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		13.09.2023
+# Date:		30.11.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -215,7 +215,10 @@ class IntensityQuantification:
 
         return condensed_intervals
 
-    def get_intensity(self, interval_bg, interval_min, interval_incl=None):
+    def get_intensity(self, interval_bg=None, interval_min=None, interval_incl=None):
+        print(self.dataframe)
+        print(self.dataframe.keys())
+        print(interval_bg, interval_min, interval_incl)
         if self.mode == "specific":
             # Background
 
