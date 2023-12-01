@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		30.11.2023
+# Date:		01.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -139,10 +139,12 @@ class DataExtraction:
         return df_times
 
 class IntensityQuantification:
-    def __init__(self, dataframe, internal_standard=None, mode="specific"):
+    def __init__(self, dataframe, internal_standard=None, mode="specific", project_type="MA", results_container=None):
         self.dataframe = dataframe
         self.internal_standard = internal_standard
         self.mode = mode
+        self.project_type = project_type
+        self.results_container = results_container
 
     def prepare_calculation_intervals(self, interval_bg=None, interval_mat=None, interval_incl=None):
         if interval_bg != None:
@@ -215,24 +217,154 @@ class IntensityQuantification:
 
         return condensed_intervals
 
-    def get_intensity(self, interval_bg=None, interval_min=None, interval_incl=None):
-        print(self.dataframe)
-        print(self.dataframe.keys())
-        print(interval_bg, interval_min, interval_incl)
-        if self.mode == "specific":
-            # Background
-
-            # Mineral/Matrix Signal
-
-            # Inclusion Signal
-            pass
+    def get_intensity(self, interval_bg=None, interval_min=None, interval_incl=None, data_key="Data RAW",
+                      average_type="arithmetic mean", stack_intervals=False):
+        """ Collect the signal intensities from all defined calculation intervals.
+        -------
+        Parameters
+        interval_bg : dict
+            Dictionary that contains the defined intervals for the background signal.
+        interval_min : dict
+            Dictionary that contains the defined intervals for the mineral/matrix signal.
+        interval_incl : dict
+            Dictionary that contains the defined intervals for the inclusion signal.
+        data_key : str
+            It specifies if the raw or smoothed data have to be considered.
+        average_type : str
+            It specifies if the arithmetic mean or the median has to be used.
+        stack_intervals : boolean
+            It defines if the interval dataset has to be stacked or averaged.
+        -------
+        Returns
+        helper_results : dict
+            Dictionary that contains the results.
+        -------
+        """
+        if self.project_type == "MA":
+            list_focus = ["BG", "MAT"]
         else:
-            # Background
+            list_focus = ["BG", "MAT", "INCL"]
 
-            # Mineral/Matrix Signal
+        helper_results = {}
 
-            # Inclusion Signal
-            pass
+        for isotope in self.dataframe.keys():
+            if self.project_type == "MA":
+                helper_results[isotope] = {
+                    "uncorrected": {"BG": 0, "MAT": 0, "1 SIGMA BG": 0, "1 SIGMA MAT": 0},
+                    "corrected": {"BG": 0, "MAT": 0, "1 SIGMA BG": 0, "1 SIGMA MAT": 0}}
+            else:
+                helper_results[isotope] = {
+                    "uncorrected": {"BG": 0, "MAT": 0, "INCL": 0, "1 SIGMA BG": 0, "1 SIGMA MAT": 0, "1 SIGMA INCL": 0},
+                    "corrected": {"BG": 0, "MAT": 0, "INCL": 0, "MIX": 0, "1 SIGMA BG": 0, "1 SIGMA MAT": 0,
+                                  "1 SIGMA INCL": 0, "1 SIGMA MIX": 0}}
+
+            for focus in list_focus:
+                if focus == "BG":
+                    # Background
+                    helper_bg = []
+                    helper_bg_sigma = []
+                    for index, interval in interval_bg.items():
+                        start_index = interval[0]
+                        end_index = interval[1] + 1
+                        dataset = self.dataframe[isotope][data_key][start_index:end_index]
+
+                        if stack_intervals == False:
+                            if average_type == "arithmetic mean":
+                                helper_bg.append(np.mean(dataset))
+                            else:
+                                helper_bg.append(np.median(dataset))
+                            helper_bg_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
+                        else:
+                            helper_bg.extend(dataset)
+
+                    if stack_intervals == True:
+                        helper_bg_sigma.append(np.std(helper_bg, ddof=1)/np.sqrt(len(helper_bg)))
+
+                    if average_type == "arithmetic mean":
+                        result_bg = np.mean(helper_bg)
+                        result_bg_1sigma = np.mean(helper_bg_sigma)
+                    else:
+                        result_bg = np.median(helper_bg)
+                        result_bg_1sigma = np.median(helper_bg_sigma)
+
+                    helper_results[isotope]["uncorrected"]["BG"] = result_bg
+                    helper_results[isotope]["uncorrected"]["1 SIGMA BG"] = result_bg_1sigma
+                    helper_results[isotope]["corrected"]["BG"] = result_bg - result_bg
+                    helper_results[isotope]["corrected"]["1 SIGMA BG"] = result_bg_1sigma - result_bg_1sigma
+                    self.results_container["BG"][isotope] = result_bg
+                elif focus == "MAT":
+                    # Mineral/Matrix Signal
+                    helper_mat = []
+                    helper_mat_sigma = []
+                    for index, interval in interval_min.items():
+                        start_index = interval[0]
+                        end_index = interval[1] + 1
+                        dataset = self.dataframe[isotope][data_key][start_index:end_index]
+
+                        if stack_intervals == False:
+                            if average_type == "arithmetic mean":
+                                helper_mat.append(np.mean(dataset))
+                            else:
+                                helper_mat.append(np.median(dataset))
+                            helper_mat_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
+                        else:
+                            helper_mat.extend(dataset)
+
+                    if stack_intervals == True:
+                        helper_mat_sigma.append(np.std(helper_mat, ddof=1)/np.sqrt(len(helper_mat)))
+
+                    if average_type == "arithmetic mean":
+                        result_mat = np.mean(helper_mat)
+                        result_mat_1sigma = np.mean(helper_mat_sigma)
+                    else:
+                        result_mat = np.median(helper_mat)
+                        result_mat_1sigma = np.median(helper_mat_sigma)
+
+                    helper_results[isotope]["uncorrected"]["MAT"] = result_mat
+                    helper_results[isotope]["uncorrected"]["1 SIGMA MAT"] = result_mat_1sigma
+                    helper_results[isotope]["corrected"]["MAT"] = result_mat - result_bg
+                    helper_results[isotope]["corrected"]["1 SIGMA MAT"] = result_mat_1sigma - result_bg_1sigma
+                    self.results_container["MAT"][isotope] = result_mat
+                    self.results_container["1 SIGMA MAT"][isotope] = result_mat_1sigma
+                elif focus == "INCL":
+                    # Inclusion Signal
+                    helper_incl = []
+                    helper_incl_sigma = []
+                    for index, interval in interval_incl.items():
+                        start_index = interval[0]
+                        end_index = interval[1] + 1
+                        dataset = self.dataframe[isotope][data_key][start_index:end_index]
+
+                        if stack_intervals == False:
+                            if average_type == "arithmetic mean":
+                                helper_incl.append(np.mean(dataset))
+                            else:
+                                helper_incl.append(np.median(dataset))
+                            helper_incl_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
+                        else:
+                            helper_incl.extend(dataset)
+
+                    if stack_intervals == True:
+                        helper_incl_sigma.append(np.std(helper_incl, ddof=1)/np.sqrt(len(helper_incl)))
+
+                    if average_type == "arithmetic mean":
+                        result_incl = np.mean(helper_incl)
+                        result_incl_1sigma = np.mean(helper_incl_sigma)
+                    else:
+                        result_incl = np.median(helper_incl)
+                        result_incl_1sigma = np.median(helper_incl_sigma)
+
+                    helper_results[isotope]["uncorrected"]["INCL"] = result_incl
+                    helper_results[isotope]["uncorrected"]["1 SIGMA INCL"] = result_incl_1sigma
+                    helper_results[isotope]["corrected"]["MIX"] = result_incl - result_bg
+                    helper_results[isotope]["corrected"]["1 SIGMA MIX"] = result_incl_1sigma - result_bg_1sigma
+                    self.results_container["INCL"][isotope] = result_incl
+                    self.results_container["1 SIGMA INCL"][isotope] = result_incl_1sigma
+
+            # for key, item in helper_results[isotope].items():
+            #     print(key, item)
+
+        return self.results_container
 
     def get_intensity_ratio(self, isotope):
         if self.mode == "specific":

@@ -285,6 +285,8 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["LOD Selection"].set(0)
         self.container_var["General Settings"]["Desired Average"] = tk.IntVar()
         self.container_var["General Settings"]["Desired Average"].set(1)
+        self.container_var["General Settings"]["Interval Processing"] = tk.IntVar()
+        self.container_var["General Settings"]["Interval Processing"].set(1)
         self.container_var["General Settings"]["BG Offset Start"] = tk.IntVar()
         self.container_var["General Settings"]["BG Offset Start"].set(15)
         self.container_var["General Settings"]["BG Offset End"] = tk.IntVar()
@@ -7369,6 +7371,19 @@ class PySILLS(tk.Frame):
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Median",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
+        rb_07 = SE(
+            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 38, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["General Settings"]["Interval Processing"], value_rb=1,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Average of every interval",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_07 = SE(
+            parent=subwindow_generalsettings, row_id=4, column_id=start_column + 38, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["General Settings"]["Interval Processing"], value_rb=2,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Stack all intervals into one",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         #
         self.gui_elements["general_settings"]["Radiobutton"]["General"].extend(
             [rb_05a, rb_05b, rb_06a, rb_06b])
@@ -13428,6 +13443,32 @@ class PySILLS(tk.Frame):
 
         if mode == "Specific":
             if var_focus in list_focus:
+                # condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
+                # condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
+                # str_datakey = "Data " + str(var_datatype)
+                #
+                # if self.pysills_mode in ["FI", "MI"]:
+                #     condensed_intervals_incl = self.container_var[var_filetype][var_file_short]["Intervals"]["INCL"]
+                # else:
+                #     condensed_intervals_incl = None
+                #
+                # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                #     str_averagetype = "arithmetic mean"
+                # else:
+                #     str_averagetype = "median"
+                #
+                # if self.container_var["General Settings"]["Interval Processing"].get() == 1:
+                #     bool_intervalstack = False
+                # else:
+                #     bool_intervalstack = True
+                #
+                # IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
+                #    results_container=self.container_intensity[var_filetype][var_datatype][
+                #        var_file_short]).get_intensity(
+                #     interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
+                #     interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
+                #     stack_intervals=bool_intervalstack)
+
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                 condensed_intervals = self.container_var[var_filetype][var_file_short]["Intervals"][var_focus]
 
@@ -13465,9 +13506,34 @@ class PySILLS(tk.Frame):
                         self.container_intensity[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
                             isotope] = var_result_sigma
             else:
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                 for index_focus, var_focus in enumerate(list_focus):
-                    file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                     self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+
+                    # condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
+                    # condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
+                    # str_datakey = "Data " + str(var_datatype)
+                    #
+                    # if self.pysills_mode in ["FI", "MI"]:
+                    #     condensed_intervals_incl = self.container_var[var_filetype][var_file_short]["Intervals"]["INCL"]
+                    # else:
+                    #     condensed_intervals_incl = None
+                    #
+                    # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    #     str_averagetype = "arithmetic mean"
+                    # else:
+                    #     str_averagetype = "median"
+                    #
+                    # if self.container_var["General Settings"]["Interval Processing"].get() == 1:
+                    #     bool_intervalstack = False
+                    # else:
+                    #     bool_intervalstack = True
+                    #
+                    # IQ(
+                    #     dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode).get_intensity(
+                    #     interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
+                    #     interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
+                    #     stack_intervals=bool_intervalstack)
 
                     for index_isotope, isotope in enumerate(file_isotopes):
                         helper_results = []
@@ -13525,7 +13591,6 @@ class PySILLS(tk.Frame):
                             self.container_intensity[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
                                 isotope] = var_result_sigma
         else:
-            # Alternative
             time_start = datetime.datetime.now()
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in list_focus:
@@ -19224,6 +19289,7 @@ class PySILLS(tk.Frame):
         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"] = lb_incl
 
         ## INITIALIZATION
+        self.container_var["fi_setting"]["Analyse Mode Plot"][str_filetype][str_filename_short].set(0)
         self.fi_show_time_signal_diagram(var_type=str_filetype, var_file=str_filename_long)
 
     def fi_show_time_signal_diagram(self, var_type, var_file, var_lb_state=True):
@@ -19743,30 +19809,26 @@ class PySILLS(tk.Frame):
                         x_i = self.container_mixing_ratio[var_type]["RAW"][var_file_short][isotope]
 
                     # Filling results container
-                    entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
-                    entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
+                    entries_intensity_bg_i.append(f"{intensity_bg_i:.{4}f}")
+                    entries_intensity_mat_i.append(f"{intensity_mat_i:.{4}f}")
                     if var_type == "SMPL":
-                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{2}E}")
-                        entries_intensity_incl_i.append(f"{intensity_incl_i:.{1}f}")
-                        entries_intensity_mix_i.append(f"{intensity_mix_i:.{1}f}")
-                        entries_intensity_ratio_incl_i.append(f"{intensity_ratio_incl_i:.{2}E}")
-                    entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{3}f}")
-                    entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{3}f}")
+                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
+                        entries_intensity_incl_i.append(f"{intensity_incl_i:.{4}f}")
+                        entries_intensity_mix_i.append(f"{intensity_mix_i:.{4}f}")
+                        entries_intensity_ratio_incl_i.append(f"{intensity_ratio_incl_i:.{4}E}")
+                    entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{4}f}")
+                    entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
                     if var_type == "SMPL":
-                        entries_rsf_i.append(f"{rsf_i:.{2}E}")
-                    entries_concentration_i.append(f"{concentration_i:.{1}f}")
+                        entries_rsf_i.append(f"{rsf_i:.{4}E}")
+                    entries_concentration_i.append(f"{concentration_i:.{4}f}")
                     if var_type == "SMPL":
-                        entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{2}E}")
-                        entries_lod_i.append(f"{lod_i:.{3}f}")
-                        # entries_intensity_incl_i.append(f"{intensity_incl_i:.{1}f}")
-                        # entries_intensity_mix_i.append(f"{intensity_mix_i:.{1}f}")
-                        # entries_intensity_ratio_incl_i.append(f"{intensity_ratio_incl_i:.{2}E}")
-                        #
-                        entries_concentration_incl_i.append(f"{concentration_incl_i:.{1}f}")
-                        entries_concentration_mix_i.append(f"{concentration_mix_i:.{1}f}")
-                        entries_a_i.append(f"{a_i:.{3}f}")
-                        entries_x_i.append(f"{x_i:.{2}E}")
-                        entries_lod_incl_i.append(f"{lod_incl_i:.{3}f}")
+                        entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
+                        entries_lod_i.append(f"{lod_i:.{4}f}")
+                        entries_concentration_incl_i.append(f"{concentration_incl_i:.{4}f}")
+                        entries_concentration_mix_i.append(f"{concentration_mix_i:.{4}f}")
+                        entries_a_i.append(f"{a_i:.{4}f}")
+                        entries_x_i.append(f"{x_i:.{4}E}")
+                        entries_lod_incl_i.append(f"{lod_incl_i:.{4}f}")
 
                 # Intensity Results
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
