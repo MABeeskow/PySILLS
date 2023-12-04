@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		30.11.2023
+# Date:		04.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -13436,219 +13436,105 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        if self.pysills_mode == "MA":
-            list_focus = ["BG", "MAT"]
-        else:
-            list_focus = ["BG", "MAT", "INCL"]
-
         if mode == "Specific":
-            if var_focus in list_focus:
-                # condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
-                # condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
-                # str_datakey = "Data " + str(var_datatype)
-                #
-                # if self.pysills_mode in ["FI", "MI"]:
-                #     condensed_intervals_incl = self.container_var[var_filetype][var_file_short]["Intervals"]["INCL"]
-                # else:
-                #     condensed_intervals_incl = None
-                #
-                # if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                #     str_averagetype = "arithmetic mean"
-                # else:
-                #     str_averagetype = "median"
-                #
-                # if self.container_var["General Settings"]["Interval Processing"].get() == 1:
-                #     bool_intervalstack = False
-                # else:
-                #     bool_intervalstack = True
-                #
-                # IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
-                #    results_container=self.container_intensity[var_filetype][var_datatype][
-                #        var_file_short]).get_intensity(
-                #     interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
-                #     interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
-                #     stack_intervals=bool_intervalstack)
+            self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+            condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
+            condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
+            str_datakey = "Data " + str(var_datatype)
 
-                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-                condensed_intervals = self.container_var[var_filetype][var_file_short]["Intervals"][var_focus]
-
-                for index, isotope in enumerate(file_isotopes):
-                    helper_results = []
-                    helper_results_sigma = []
-
-                    for key, items in condensed_intervals.items():
-                        var_indices = items
-                        var_key = "Data " + str(var_datatype)
-                        var_data = self.container_spikes[var_file_short][isotope][var_key][
-                                   var_indices[0]:var_indices[1] + 1]
-
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            helper_results.append(np.mean(var_data))
-                        else:
-                            helper_results.append(np.median(var_data))
-
-                        helper_results_sigma.append(np.std(var_data, ddof=1))
-
-                    if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                        var_result = np.mean(helper_results)
-                        var_result_sigma = np.mean(helper_results_sigma)
-                    else:
-                        var_result = np.median(helper_results)
-                        var_result_sigma = np.median(helper_results_sigma)
-
-                    self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
-                        isotope] = var_result
-
-                    if var_focus == "MAT":
-                        self.container_intensity[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                            isotope] = var_result_sigma
-                    elif var_focus == "INCL":
-                        self.container_intensity[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
-                            isotope] = var_result_sigma
+            if self.pysills_mode in ["FI", "MI"]:
+                condensed_intervals_incl = self.container_var[var_filetype][var_file_short]["Intervals"]["INCL"]
             else:
-                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-                for index_focus, var_focus in enumerate(list_focus):
-                    self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+                condensed_intervals_incl = None
 
-                    # condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
-                    # condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
-                    # str_datakey = "Data " + str(var_datatype)
-                    #
-                    # if self.pysills_mode in ["FI", "MI"]:
-                    #     condensed_intervals_incl = self.container_var[var_filetype][var_file_short]["Intervals"]["INCL"]
-                    # else:
-                    #     condensed_intervals_incl = None
-                    #
-                    # if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                    #     str_averagetype = "arithmetic mean"
-                    # else:
-                    #     str_averagetype = "median"
-                    #
-                    # if self.container_var["General Settings"]["Interval Processing"].get() == 1:
-                    #     bool_intervalstack = False
-                    # else:
-                    #     bool_intervalstack = True
-                    #
-                    # IQ(
-                    #     dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode).get_intensity(
-                    #     interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
-                    #     interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
-                    #     stack_intervals=bool_intervalstack)
+            if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                str_averagetype = "arithmetic mean"
+            else:
+                str_averagetype = "median"
 
-                    for index_isotope, isotope in enumerate(file_isotopes):
-                        helper_results = []
-                        helper_results_bg = []
-                        helper_results_sigma = []
-                        n_focus = 0
+            if self.container_var["General Settings"]["Interval Processing"].get() == 1:
+                bool_intervalstack = False
+            else:
+                bool_intervalstack = True
 
-                        if index_isotope == 0:
-                            condensed_intervals = self.container_var[var_filetype][var_file_short]["Intervals"][
-                                var_focus]
+            IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
+               results_container=self.container_intensity[var_filetype][var_datatype][
+                   var_file_short]).get_intensity(
+                interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
+                interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
+                stack_intervals=bool_intervalstack)
+        else:
+            # Alternative
+            time_start = datetime.datetime.now()
+
+            for var_filetype in ["STD", "SMPL"]:
+                for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
+                    if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                        var_file_short = self.container_lists[var_filetype]["Short"][index]
+                        var_focus = None
+                        if var_filetype == "SMPL":
+                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                            var_id_selected = self.container_var["ID"]["Results Files"].get()
+                            if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                                condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"][
+                                    "BG"]
+                                condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"][
+                                    "MAT"]
+                                str_datakey = "Data " + str(var_datatype)
+
+                                if self.pysills_mode in ["FI", "MI"]:
+                                    condensed_intervals_incl = self.container_var[var_filetype][var_file_short][
+                                        "Intervals"]["INCL"]
+                                else:
+                                    condensed_intervals_incl = None
+
+                                if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                    str_averagetype = "arithmetic mean"
+                                else:
+                                    str_averagetype = "median"
+
+                                if self.container_var["General Settings"]["Interval Processing"].get() == 1:
+                                    bool_intervalstack = False
+                                else:
+                                    bool_intervalstack = True
+
+                                IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
+                                   results_container=self.container_intensity[var_filetype][var_datatype][
+                                       var_file_short]).get_intensity(
+                                    interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
+                                    interval_incl=condensed_intervals_incl, data_key=str_datakey,
+                                    average_type=str_averagetype,
+                                    stack_intervals=bool_intervalstack)
+                        else:
                             condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"][
                                 "BG"]
+                            condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"][
+                                "MAT"]
+                            str_datakey = "Data " + str(var_datatype)
 
-                        for key_bg, items_bg in condensed_intervals_bg.items():
-                            var_indices_bg = items_bg
-                            var_key_bg = "Data " + str(var_datatype)
-                            var_data_bg = self.container_spikes[var_file_short][isotope][var_key_bg][
-                                          var_indices_bg[0]:var_indices_bg[1] + 1]
-                            helper_results_bg.append(np.std(var_data_bg, ddof=1)/np.sqrt(len(var_data_bg)))
-
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result_bg = np.mean(helper_results_bg)
-                        else:
-                            var_result_bg = np.median(helper_results_bg)
-
-                        for key, items in condensed_intervals.items():
-                            var_indices = items
-                            var_key = "Data " + str(var_datatype)
-                            var_data = self.container_spikes[var_file_short][isotope][var_key][
-                                       var_indices[0]:var_indices[1] + 1]
+                            if self.pysills_mode in ["FI", "MI"]:
+                                condensed_intervals_incl = self.container_var[var_filetype][var_file_short][
+                                    "Intervals"]["INCL"]
+                            else:
+                                condensed_intervals_incl = None
 
                             if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                                helper_results.append(np.mean(var_data))
+                                str_averagetype = "arithmetic mean"
                             else:
-                                helper_results.append(np.median(var_data))
+                                str_averagetype = "median"
 
-                            n_focus += len(var_data)
-                            helper_results_sigma.append(np.std(var_data, ddof=1)/np.sqrt(len(var_data)))
-
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result = np.mean(helper_results)
-                            var_result_focus = np.mean(helper_results_sigma)
-                        else:
-                            var_result = np.median(helper_results)
-                            var_result_focus = np.median(helper_results_sigma)
-
-                        var_result_sigma = var_result_bg + var_result_focus
-                        self.container_intensity[var_filetype][var_datatype][var_file_short][var_focus][
-                            isotope] = var_result
-
-                        if var_focus == "MAT":
-                            self.container_intensity[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                                isotope] = var_result_sigma
-                        elif var_focus == "INCL":
-                            self.container_intensity[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
-                                isotope] = var_result_sigma
-        else:
-            time_start = datetime.datetime.now()
-            for var_filetype in ["STD", "SMPL"]:
-                for var_focus in list_focus:
-                    for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                        if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                            var_file_short = self.container_lists[var_filetype]["Short"][index]
-
-                            if var_filetype == "SMPL":
-                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                                var_id_selected = self.container_var["ID"]["Results Files"].get()
-                                if var_id == var_id_selected or self.var_init_ma_datareduction == True:
-                                    self.get_intensity(
-                                        var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_focus=var_focus)
+                            if self.container_var["General Settings"]["Interval Processing"].get() == 1:
+                                bool_intervalstack = False
                             else:
-                                self.get_intensity(
-                                    var_filetype=var_filetype, var_datatype=var_datatype,
-                                    var_file_short=var_file_short, var_focus=var_focus)
+                                bool_intervalstack = True
 
-                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                        helper_results = []
-                        helper_results_sigma = []
-
-                        for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                                var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-
-                                if isotope in file_isotopes:
-                                    var_result_i = self.container_intensity[var_filetype][var_datatype][
-                                        var_file_short][var_focus][isotope]
-                                    helper_results.append(var_result_i)
-
-                                    if var_focus != "BG":
-                                        var_sigma_key = "1 SIGMA " + str(var_focus)
-                                        var_result_sigma_i = self.container_intensity[var_filetype][
-                                            var_datatype][var_file_short][var_sigma_key][isotope]
-                                        helper_results_sigma.append(var_result_sigma_i)
-
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result_i = np.mean(helper_results)
-                            var_result_sigma_i = np.mean(helper_results_sigma)
-                        else:
-                            var_result_i = np.median(helper_results)
-                            var_result_sigma_i = np.median(helper_results_sigma)
-
-                        self.container_intensity[var_filetype][var_datatype][isotope] = var_result_i
-
-                        if var_focus == "MAT":
-                            if "1 SIGMA MAT" not in self.container_intensity[var_filetype][var_datatype]:
-                                self.container_intensity[var_filetype][var_datatype]["1 SIGMA MAT"] = {}
-                            self.container_intensity[var_filetype][var_datatype]["1 SIGMA MAT"][
-                                isotope] = var_result_sigma_i
-                        elif var_focus == "INCL":
-                            if "1 SIGMA INCL" not in self.container_intensity[var_filetype][var_datatype]:
-                                self.container_intensity[var_filetype][var_datatype]["1 SIGMA INCL"] = {}
-                            self.container_intensity[var_filetype][var_datatype]["1 SIGMA INCL"][
-                                isotope] = var_result_sigma_i
+                            IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
+                               results_container=self.container_intensity[var_filetype][var_datatype][
+                                   var_file_short]).get_intensity(
+                                interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
+                                interval_incl=condensed_intervals_incl, data_key=str_datakey,
+                                average_type=str_averagetype,
+                                stack_intervals=bool_intervalstack)
 
             time_end = datetime.datetime.now()
             time_delta = (time_end - time_start)*1000
