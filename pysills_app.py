@@ -12563,31 +12563,28 @@ class PySILLS(tk.Frame):
                 ## INITIALIZATION
                 # Intensity-related parameters
                 if var_type == "STD":
+                    self.get_condensed_intervals_of_file(filetype=var_type, filename_short=var_file_short)
                     self.get_intensity(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
-                        mode="Specific")
-                    self.ma_get_intensity_corrected(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
-                        var_file_long=var_file, mode="Specific")
-                    var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
                 else:
                     var_srm_file = None
                     for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
-                        file_std_long = self.container_lists["STD"]["Long"][index]
+                        self.get_condensed_intervals_of_file(filetype="STD", filename_short=file_std_short)
                         self.get_intensity(
-                            var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, var_focus="All",
-                            mode="Specific")
-                    self.ma_get_intensity_corrected(
-                        var_filetype="STD", var_datatype="RAW", var_file_short=None,
-                        var_file_long=None, mode="only STD")
-                    #
+                            var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, mode="Specific")
+
+                    if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                        str_averagetype = "arithmetic mean"
+                    else:
+                        str_averagetype = "median"
+
+                    IQ(dataframe=None, project_type=self.pysills_mode,
+                       results_container=self.container_intensity_corrected["STD"]["RAW"]).get_averaged_intensities(
+                        data_container=self.container_intensity_corrected["STD"]["RAW"], average_type=str_averagetype)
+
                     self.get_intensity(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
-                        mode="Specific")
-                    self.ma_get_intensity_corrected(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
-                        var_file_long=var_file, mode="Specific")
-                    #
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
+
                     self.ma_get_intensity_ratio(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="MAT")
@@ -13008,14 +13005,34 @@ class PySILLS(tk.Frame):
             var_file_long = "None"
             var_focus = "None"
             self.var_init_ma_datareduction = True
+
+            list_is = {"STD": [], "SMPL": []}
+            for str_filename_long in self.container_lists["SMPL"]["Long"]:
+                str_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
+                if str_is not in list_is["SMPL"]:
+                    list_is["SMPL"].append(str_is)
+
             for var_datatype in ["RAW", "SMOOTHED"]:
                 # Intensity Analysis
                 self.get_intensity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_focus=var_focus, mode="All")
-                self.ma_get_intensity_corrected(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
+
+                if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    str_averagetype = "arithmetic mean"
+                else:
+                    str_averagetype = "median"
+
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_corrected["STD"][var_datatype]).get_averaged_intensities(
+                    data_container=self.container_intensity_corrected["STD"][var_datatype],
+                    average_type=str_averagetype)
+
+                # IQ(dataframe=None, project_type=self.pysills_mode,
+                #    results_container=self.container_intensity_ratio["SMPL"][var_datatype]).get_intensity_ratio(
+                #     data_container=self.container_intensity_corrected["SMPL"][var_datatype],
+                #     isotope_is=list_is)
+
                 self.ma_get_intensity_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
@@ -13416,7 +13433,7 @@ class PySILLS(tk.Frame):
     ## Data Reduction ##
     ####################
 
-    def get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific", check=False):
+    def get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus=None, mode="Specific", check=False):
         """ Collect the signal intensities from all defined calculation intervals.
         -------
         Parameters
@@ -13436,7 +13453,7 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        if mode == "Specific":
+        if mode == "Specific" and var_focus == None:
             self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
             condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
             condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
@@ -13463,15 +13480,77 @@ class PySILLS(tk.Frame):
                 interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
                 interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
                 stack_intervals=bool_intervalstack)
+
+            if self.pysills_mode == "FI":
+                mode_id = self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get()
+                if var_filetype == "SMPL":
+                    var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                    var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                    if self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                        var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                    elif self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                        var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
+                    elif self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                        var_t = self.container_var["Halter2002"]["Name"].get()
+                    elif self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                        var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                    IQ(dataframe=None, project_type=self.pysills_mode,
+                       results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                           var_file_short]).get_intensity_corrected(
+                        data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                        mode=mode_id, isotope_t=var_t)
+            elif self.pysills_mode == "MI":
+                mode_id = self.container_var["mi_setting"]["Inclusion Intensity Calculation"].get()
+
+                if var_filetype == "SMPL":
+                    var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                    var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                    if self.container_var["fi_setting"][
+                        "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                        var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                    elif self.container_var["mi_setting"][
+                        "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                        var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
+                    elif self.container_var["mi_setting"][
+                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                        var_t = self.container_var["Halter2002"]["Name"].get()
+                    elif self.container_var["mi_setting"][
+                        "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                        var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                    IQ(dataframe=None, project_type=self.pysills_mode,
+                       results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                           var_file_short]).get_intensity_corrected(
+                        data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                        mode=mode_id, isotope_t=var_t)
+            else:
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                       var_file_short]).get_intensity_corrected(
+                    data_container=self.container_intensity[var_filetype][var_datatype][var_file_short])
         else:
             # Alternative
             time_start = datetime.datetime.now()
 
-            for var_filetype in ["STD", "SMPL"]:
+            if var_focus == "STD":
+                list_filetypes = ["STD"]
+            elif var_focus == "SMPL":
+                list_filetypes = ["SMPL"]
+            else:
+                list_filetypes = ["STD", "SMPL"]
+
+            for var_filetype in list_filetypes:
                 for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                     if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                         var_file_short = self.container_lists[var_filetype]["Short"][index]
-                        var_focus = None
+
                         if var_filetype == "SMPL":
                             var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
                             var_id_selected = self.container_var["ID"]["Results Files"].get()
@@ -13535,6 +13614,63 @@ class PySILLS(tk.Frame):
                                 interval_incl=condensed_intervals_incl, data_key=str_datakey,
                                 average_type=str_averagetype,
                                 stack_intervals=bool_intervalstack)
+
+                        if self.pysills_mode == "FI":
+                            mode_id = self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get()
+                            if var_filetype == "SMPL":
+                                var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                                var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                                if self.container_var["fi_setting"][
+                                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                                    var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                                elif self.container_var["fi_setting"][
+                                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                                    var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
+                                        "Name"].get()
+                                elif self.container_var["fi_setting"][
+                                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                                    var_t = self.container_var["Halter2002"]["Name"].get()
+                                elif self.container_var["fi_setting"][
+                                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                                    var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                                IQ(dataframe=None, project_type=self.pysills_mode,
+                                   results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                       var_file_short]).get_intensity_corrected(
+                                    data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                                    mode=mode_id, isotope_t=var_t)
+                        elif self.pysills_mode == "MI":
+                            mode_id = self.container_var["mi_setting"]["Inclusion Intensity Calculation"].get()
+
+                            if var_filetype == "SMPL":
+                                var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                                var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                                if self.container_var["fi_setting"][
+                                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                                    var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                                elif self.container_var["mi_setting"][
+                                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                                    var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
+                                        "Name"].get()
+                                elif self.container_var["mi_setting"][
+                                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                                    var_t = self.container_var["Halter2002"]["Name"].get()
+                                elif self.container_var["mi_setting"][
+                                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                                    var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                                IQ(dataframe=None, project_type=self.pysills_mode,
+                                   results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                       var_file_short]).get_intensity_corrected(
+                                    data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                                    mode=mode_id, isotope_t=var_t)
+                        else:
+                            IQ(dataframe=None, project_type=self.pysills_mode,
+                               results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                   var_file_short]).get_intensity_corrected(
+                                data_container=self.container_intensity[var_filetype][var_datatype][var_file_short])
 
             time_end = datetime.datetime.now()
             time_delta = (time_end - time_start)*1000
@@ -19572,8 +19708,7 @@ class PySILLS(tk.Frame):
                 if var_type == "STD":
                     # Intensity analysis
                     self.get_intensity(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
-                        mode="Specific")
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
                     self.fi_get_intensity_corrected(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="MAT",
                         mode="Specific")
@@ -19581,15 +19716,13 @@ class PySILLS(tk.Frame):
                     # Intensity analysis
                     for file_std_short in self.container_lists["STD"]["Short"]:
                         self.get_intensity(
-                            var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, var_focus="All",
-                            mode="Specific")
+                            var_filetype="STD", var_datatype="RAW", var_file_short=file_std_short, mode="Specific")
 
                     self.fi_get_intensity_corrected(
                         var_filetype="STD", var_datatype="RAW", var_file_short=None, var_focus="MAT", mode="only STD")
 
                     self.get_intensity(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="All",
-                        mode="Specific")
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
                     self.fi_get_intensity_corrected(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_focus="MAT",
                         mode="Specific")

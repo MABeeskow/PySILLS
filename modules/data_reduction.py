@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		01.12.2023
+# Date:		04.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -219,7 +219,7 @@ class IntensityQuantification:
 
     def get_intensity(self, interval_bg=None, interval_min=None, interval_incl=None, data_key="Data RAW",
                       average_type="arithmetic mean", stack_intervals=False):
-        """ Collect the signal intensities from all defined calculation intervals.
+        """ Collects the signal intensities from all defined calculation intervals.
         -------
         Parameters
         interval_bg : dict
@@ -366,21 +366,168 @@ class IntensityQuantification:
 
         return self.results_container
 
-    def get_intensity_ratio(self, isotope):
-        if self.mode == "specific":
-            # Background
-
-            # Mineral/Matrix Signal
-
-            # Inclusion Signal
-            pass
+    def get_intensity_corrected(self, data_container, mode=None, isotope_t=None):
+        """ Calculates the background- and partially also matrix-corrected signal intensities.
+        -------
+        Parameters
+        data_container : dict
+            Dictionary that contains the previously extracted signal intensities.
+        mode : int
+            It defines which quantification method has to be used.
+        isotope_t : str
+            It defines the special isotope that is needed for the quantification.
+        -------
+        Returns
+        helper_results : dict
+            Dictionary that contains the results.
+        -------
+        """
+        if self.project_type == "MA":
+            list_focus = ["MAT"]
         else:
-            # Background
+            list_focus = ["MAT", "INCL"]
 
-            # Mineral/Matrix Signal
+        for isotope in data_container["BG"].keys():
+            intensity_bg_i = data_container["BG"][isotope]
+            for focus in list_focus:
+                if focus == "MAT":
+                    intensity_sig2_i = data_container[focus][isotope]
+                    value_mat_i = intensity_sig2_i - intensity_bg_i
 
-            # Inclusion Signal
-            pass
+                    if value_mat_i > 0:
+                        result_mat_i = value_mat_i
+                    else:
+                        result_mat_i = 0
+
+                    self.results_container["BG"][isotope] = 0.0
+                    self.results_container[focus][isotope] = result_mat_i
+                elif focus == "INCL":
+                    intensity_sig2_i = data_container["MAT"][isotope]
+                    intensity_sig3_i = data_container[focus][isotope]
+                    intensity_mix_i = intensity_sig3_i - intensity_bg_i
+                    intensity_mat_i = intensity_sig2_i - intensity_bg_i
+
+                    intensity_bg_t = data_container["BG"][isotope_t]
+                    intensity_sig2_t = data_container["MAT"][isotope_t]
+                    intensity_sig3_t = data_container[focus][isotope_t]
+                    intensity_mat_t = intensity_sig2_t - intensity_bg_t
+
+                    if intensity_mix_i > 0:
+                        intensity_mix_i = intensity_mix_i
+                    else:
+                        intensity_mix_i = 0
+
+                    if intensity_mat_i > 0:
+                        intensity_mat_i = intensity_mat_i
+                    else:
+                        intensity_mat_i = 0
+
+                    if intensity_mat_t > 0:
+                        intensity_mat_t = intensity_mat_t
+                    else:
+                        intensity_mat_t = 0
+
+                    if mode == 0:   # Heinrich et al. (2003)
+                        intensity_mix_t = intensity_sig3_t - intensity_bg_t
+                        value_incl_i = intensity_mix_i - intensity_mix_t*(intensity_mat_i/intensity_mat_t)
+                    elif mode == 1: # "SILLS (without R)"
+                        intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
+                        intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                        value_incl_i = intensity_mix_i - intensity_incl_mat_i
+                    elif mode == 2: # "SILLS (with R)"
+                        intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
+                        intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                        factor_r = intensity_incl_mat_i/intensity_mat_i
+                        value_incl_i = intensity_mix_i - factor_r*intensity_mat_i
+                    elif mode == 3: # "Theory"
+                        intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
+                        intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                        value_incl_i = intensity_sig3_i - intensity_bg_i - intensity_incl_mat_i
+
+                    if value_incl_i > 0:
+                        result_incl_i = value_incl_i
+                    else:
+                        result_incl_i = 0
+
+                    self.results_container[focus][isotope] = result_incl_i
+
+                    if "MIX" not in self.results_container:
+                        self.results_container["MIX"] = {}
+
+                    if isotope not in self.results_container["MIX"]:
+                        self.results_container["MIX"][isotope] = intensity_mix_i
+
+                    if "MAT-INCL" not in self.results_container:
+                        self.results_container["MAT-INCL"] = {}
+
+                    if isotope not in self.results_container["MAT-INCL"]:
+                        try:
+                            self.results_container["MAT-INCL"][isotope] = intensity_incl_mat_i
+                        except:
+                            intensity_incl_mat_i = intensity_sig3_i - result_incl_i - intensity_bg_i
+                            self.results_container["MAT-INCL"][isotope] = intensity_incl_mat_i
+
+        return self.results_container
+
+    def get_averaged_intensities(self, data_container, average_type="arithmetic mean"):
+        """ Calculates the intensity average (arithmetic mean or median) for all isotopes.
+        -------
+        Parameters
+        data_container : dict
+            Dictionary that contains the previously extracted signal intensities.
+        average_type : str
+            It defines which average has to be used for the quantification.
+        -------
+        Returns
+        helper_results : dict
+            Dictionary that contains the results.
+        -------
+        """
+        helper_results = {}
+        for filename, item in data_container.items():
+            if type(item) == dict:
+                for isotope in item["MAT"].keys():
+                    if isotope not in helper_results:
+                        helper_results[isotope] = []
+
+                    intensity_mat_i = item["MAT"][isotope]
+                    helper_results[isotope].append(intensity_mat_i)
+
+        for isotope, item in helper_results.items():
+            if average_type == "arithmetic mean":
+                result_i = np.mean(item)
+            elif average_type == "median":
+                result_i = np.median(item)
+
+            self.results_container[isotope] = result_i
+
+        return self.results_container
+
+    def get_intensity_ratio(self, data_container, isotope_is):
+        for filename_short, item in data_container.items():
+            if type(item) == dict:
+                for focus, data_isotopes in item.items():
+                    for is_isotope in isotope_is["SMPL"]:
+                        intensity_is = data_isotopes[is_isotope]
+                        if is_isotope not in self.results_container:
+                            self.results_container[is_isotope] = {}
+
+                        if type(self.results_container[is_isotope]) != dict:
+                            self.results_container[is_isotope] = {}
+
+                        for isotope, intensity in data_isotopes.items():
+                            if focus != "BG":
+                                if intensity_is != None:
+                                    result_i = intensity/intensity_is
+                                else:
+                                    result_i = None
+                            else:
+                                result_i = 0.0
+
+                        self.results_container[is_isotope][isotope] = result_i
+
+        return self.results_container
+
 
 class SensitivityQuantification:
     def __init__(self, internal_standard, mode="specific"):
