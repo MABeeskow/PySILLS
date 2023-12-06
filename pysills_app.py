@@ -17710,7 +17710,7 @@ class PySILLS(tk.Frame):
     def fi_datareduction_files(self):   # FI - DATAREDUCTION FILES #####################################################
         ## Window Settings
         window_width = 1260
-        window_heigth = 775
+        window_heigth = 725
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
@@ -17763,17 +17763,7 @@ class PySILLS(tk.Frame):
             n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_06 = SE(
-        #     parent=self.subwindow_fi_datareduction_files, row_id=start_row + 21, column_id=start_column,
-        #     n_rows=1,
-        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-        #     text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_07 = SE(
-        #     parent=self.subwindow_fi_datareduction_files, row_id=start_row + 25, column_id=start_column,
-        #     n_rows=1,
-        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-        #     text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+
         ## RADIOBUTTONS
         self.rb_01a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 1, column_id=start_column, n_rows=1,
@@ -17906,27 +17896,13 @@ class PySILLS(tk.Frame):
         opt_03a.config(
             bg=self.bg_colors["Dark"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
+
         ## BUTTONS
         btn_06a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_export_calculation_report)
-
-        btn_07a = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 29, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Concentration Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_show_diagrams_concentration)
-        btn_07a.configure(state="disabled")
-
-        btn_07b = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 27, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Intensity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_show_diagrams_intensity)
-        btn_07b.configure(state="disabled")
 
         self.var_rb_01 = tk.IntVar()
         self.var_rb_01.set(1)
@@ -17936,9 +17912,9 @@ class PySILLS(tk.Frame):
         self.var_rb_03.set(0)
 
         btn_07c = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 28, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 27, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text="Sensitivity Drift", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.show_diagrams_sensitivity)
         btn_07c = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
@@ -17959,7 +17935,7 @@ class PySILLS(tk.Frame):
         list_width[0] = 125
 
         self.tv_results_files = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=0, column_id=11, n_rows=30, n_columns=51,
+            parent=self.subwindow_fi_datareduction_files, row_id=0, column_id=11, n_rows=28, n_columns=51,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(list_categories), text_n=list_categories,
             width_n=list_width, individual=True)
@@ -17969,8 +17945,8 @@ class PySILLS(tk.Frame):
         self.tv_results_files.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
         scb_v.config(command=self.tv_results_files.yview)
         scb_h.config(command=self.tv_results_files.xview)
-        scb_v.grid(row=0, column=62, rowspan=30, columnspan=1, sticky="ns")
-        scb_h.grid(row=30, column=11, rowspan=1, columnspan=51, sticky="ew")
+        scb_v.grid(row=0, column=62, rowspan=28, columnspan=1, sticky="ns")
+        scb_h.grid(row=28, column=11, rowspan=1, columnspan=51, sticky="ew")
 
         ## INITIALIZATION
         self.fi_datareduction_tables(init=True)
