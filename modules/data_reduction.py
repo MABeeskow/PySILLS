@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		04.12.2023
+# Date:		06.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -366,7 +366,8 @@ class IntensityQuantification:
 
         return self.results_container
 
-    def get_intensity_corrected(self, data_container, mode=None, isotope_t=None):
+    def get_intensity_corrected(self, data_container, data_container_ratio=None, isotope_is=None, mode=None,
+                                isotope_t=None):
         """ Calculates the background- and partially also matrix-corrected signal intensities.
         -------
         Parameters
@@ -503,31 +504,62 @@ class IntensityQuantification:
 
         return self.results_container
 
-    def get_intensity_ratio(self, data_container, isotope_is):
-        for filename_short, item in data_container.items():
-            if type(item) == dict:
-                for focus, data_isotopes in item.items():
-                    for is_isotope in isotope_is["SMPL"]:
-                        intensity_is = data_isotopes[is_isotope]
-                        if is_isotope not in self.results_container:
-                            self.results_container[is_isotope] = {}
+    def get_intensity_ratio(self, data_container, dict_is, filename_short=None, datatype=None):
+        """ Calculates the intensity ratio for all isotopes.
+        -------
+        Parameters
+        data_container : dict
+            Dictionary that contains the previously extracted signal intensities.
+        dict_is : dict
+            Dictionary that contains information about the internal standard of every file.
+        filename_short : str
+            Short version of the file of interest (only needed for 'Quick Results' mode).
+        datatype : str
+            It specifies the data type (only needed for the final 'Results' mode).
+        -------
+        Returns
+        -------
+        """
+        if self.project_type == "MA":
+            list_focus = ["MAT"]
+        else:
+            list_focus = ["MAT", "INCL"]
 
-                        if type(self.results_container[is_isotope]) != dict:
-                            self.results_container[is_isotope] = {}
+        if filename_short != None:
+            if filename_short in dict_is["STD"]:
+                isotope_is = dict_is["STD"][filename_short]
+                for focus in ["MAT"]:
+                    value_is = data_container[filename_short][focus][isotope_is]
+                    for isotope, value in data_container[filename_short][focus].items():
+                        result_i = value/value_is
+                        self.results_container[filename_short][focus][isotope] = result_i
+            elif filename_short in dict_is["SMPL"]:
+                isotope_is = dict_is["SMPL"][filename_short]
+                for focus in list_focus:
+                    value_is = data_container[filename_short][focus][isotope_is]
+                    for isotope, value in data_container[filename_short][focus].items():
+                        result_i = value/value_is
+                        self.results_container[filename_short][focus][isotope] = result_i
+            else:
+                print("File", filename_short, "was not found!")
+        else:
+            for filetype in ["STD", "SMPL"]:
+                for filename_short, isotope_is in dict_is[filetype].items():
+                    if filetype == "STD":
+                        list_focus = ["MAT"]
+                    else:
+                        if self.project_type == "MA":
+                            list_focus = ["MAT"]
+                        else:
+                            list_focus = ["MAT", "INCL"]
 
-                        for isotope, intensity in data_isotopes.items():
-                            if focus != "BG":
-                                if intensity_is != None:
-                                    result_i = intensity/intensity_is
-                                else:
-                                    result_i = None
-                            else:
-                                result_i = 0.0
-
-                        self.results_container[is_isotope][isotope] = result_i
+                    for focus in list_focus:
+                        value_is = data_container[filetype][datatype][filename_short][focus][isotope_is]
+                        for isotope, value in data_container[filetype][datatype][filename_short][focus].items():
+                            result_i = value/value_is
+                            self.results_container[filetype][datatype][filename_short][focus][isotope] = result_i
 
         return self.results_container
-
 
 class SensitivityQuantification:
     def __init__(self, internal_standard, mode="specific"):

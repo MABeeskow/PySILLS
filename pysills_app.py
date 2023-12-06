@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		04.12.2023
+# Date:		06.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -12577,7 +12577,6 @@ class PySILLS(tk.Frame):
                         str_averagetype = "arithmetic mean"
                     else:
                         str_averagetype = "median"
-
                     IQ(dataframe=None, project_type=self.pysills_mode,
                        results_container=self.container_intensity_corrected["STD"]["RAW"]).get_averaged_intensities(
                         data_container=self.container_intensity_corrected["STD"]["RAW"], average_type=str_averagetype)
@@ -12591,6 +12590,12 @@ class PySILLS(tk.Frame):
                 # Sensitivity-related parameters
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                results_is = self.determine_possible_is(filetype="ALL")
+
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_ratio[var_type]["RAW"]).get_intensity_ratio(
+                    data_container=self.container_intensity_corrected[var_type]["RAW"], dict_is=results_is,
+                    filename_short=var_file_short)
                 self.ma_get_normalized_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 if var_type == "SMPL":
@@ -12606,7 +12611,7 @@ class PySILLS(tk.Frame):
                         var_file_long=var_file)
                 self.ma_get_lod(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-                #
+
                 entries_intensity_bg_i = ["Intensity BG"]
                 entries_intensity_mat_i = ["Intensity SMPL"]
                 entries_intensity_mat_sigma_i = ["Intensity 1 SIGMA SMPL"]
@@ -12618,7 +12623,7 @@ class PySILLS(tk.Frame):
                 entries_concentration_sigma_i = ["Concentration 1 SIGMA SMPL"]
                 entries_concentration_ratio_i = ["Concentration Ratio"]
                 entries_lod_i = ["Limit of Detection"]
-                #
+
                 for isotope in list_considered_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     # Intensity Results
@@ -12650,15 +12655,22 @@ class PySILLS(tk.Frame):
                         rsf_i = self.container_rsf[var_type]["RAW"][var_file_short]["MAT"][isotope]
                         concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short][
                             "MAT"][isotope]
+                    else:
+                        intensity_ratio_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short]["MAT"][
+                            isotope]
 
                     if var_srm_file == None or var_srm_file == var_srm_i:
-                        entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
-                        entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
-                        entries_intensity_mat_sigma_i.append(f"{intensity_mat_sigma_i:.{1}f}")
+                        entries_intensity_bg_i.append(f"{intensity_bg_i:.{4}f}")
+                        entries_intensity_mat_i.append(f"{intensity_mat_i:.{4}f}")
+                        entries_intensity_mat_sigma_i.append(f"{intensity_mat_sigma_i:.{4}f}")
                         entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{4}f}")
                         entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
-                        entries_concentration_i.append(f"{concentration_i:.{4}f}")
-                        entries_concentration_sigma_i.append(f"{concentration_sigma_i:.{4}f}")
+                        if var_type == "SMPL":
+                            entries_concentration_i.append(f"{concentration_i:.{4}f}")
+                            entries_concentration_sigma_i.append(f"{concentration_sigma_i:.{4}f}")
+                        else:
+                            entries_concentration_i.append(f"{concentration_i:.{1}f}")
+                            entries_concentration_sigma_i.append(f"{concentration_sigma_i:.{1}f}")
                         entries_lod_i.append(f"{lod_i:.{4}f}")
                     else:
                         entries_intensity_bg_i.append("---")
@@ -12674,11 +12686,15 @@ class PySILLS(tk.Frame):
                         entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
                         entries_rsf_i.append(f"{rsf_i:.{4}f}")
+                    else:
+                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
 
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_sigma_i)
                 if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
+                else:
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
@@ -13028,11 +13044,6 @@ class PySILLS(tk.Frame):
                     data_container=self.container_intensity_corrected["STD"][var_datatype],
                     average_type=str_averagetype)
 
-                # IQ(dataframe=None, project_type=self.pysills_mode,
-                #    results_container=self.container_intensity_ratio["SMPL"][var_datatype]).get_intensity_ratio(
-                #     data_container=self.container_intensity_corrected["SMPL"][var_datatype],
-                #     isotope_is=list_is)
-
                 self.ma_get_intensity_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
@@ -13040,6 +13051,10 @@ class PySILLS(tk.Frame):
                 self.get_analytical_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
+                results_is = self.determine_possible_is(filetype="ALL")
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_ratio).get_intensity_ratio(
+                    data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
                 self.ma_get_normalized_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
@@ -13376,7 +13391,40 @@ class PySILLS(tk.Frame):
             #
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
-    #
+
+    def determine_possible_is(self, filetype="SMPL"):
+        """ Collect the file-specific information about the internal standard (IS).
+        -------
+        Parameters
+        filetype : str
+            The file category, e.g. STD
+        -------
+        Returns
+        helper_is : dict
+            A dictionary that contains the file-specific information about the internal standard.
+        -------
+        """
+        helper_is = {"STD": {}, "SMPL": {}}
+
+        if filetype == "STD":
+            for index, filename_long in enumerate(self.container_lists[filetype]["Long"]):
+                filename_short = self.container_lists[filetype]["Short"][index]
+                isotope_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+                helper_is[filetype][filename_short] = isotope_is
+        elif filetype == "SMPL":
+            for index, filename_long in enumerate(self.container_lists[filetype]["Long"]):
+                filename_short = self.container_lists[filetype]["Short"][index]
+                isotope_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+                helper_is[filetype][filename_short] = isotope_is
+        elif filetype == "ALL":
+            for filetype_key in ["STD", "SMPL"]:
+                for index, filename_long in enumerate(self.container_lists[filetype_key]["Long"]):
+                    filename_short = self.container_lists[filetype_key]["Short"][index]
+                    isotope_is = self.container_var[filetype_key][filename_long]["IS Data"]["IS"].get()
+                    helper_is[filetype_key][filename_short] = isotope_is
+
+        return helper_is
+
     def ma_determine_ndigits(self, var_value):
         trunc_value = math.trunc(var_value)
         #
@@ -13972,6 +14020,7 @@ class PySILLS(tk.Frame):
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].set(var_is)
                 for isotope in file_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     if var_srm_i == var_srm_file:
@@ -14506,7 +14555,7 @@ class PySILLS(tk.Frame):
     def ma_datareduction_files(self):  # MA - DATAREDUCTION FILES ######################################################
         ## Window Settings
         window_width = 1260
-        window_heigth = 700 # 675
+        window_heigth = 625
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
@@ -14559,16 +14608,16 @@ class PySILLS(tk.Frame):
             n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06 = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 19, column_id=start_column,
-            n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_07 = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 22, column_id=start_column,
-            n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Further Information", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_06 = SE(
+        #     parent=self.subwindow_ma_datareduction_files, row_id=start_row + 19, column_id=start_column,
+        #     n_rows=1,
+        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+        #     text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_07 = SE(
+        #     parent=self.subwindow_ma_datareduction_files, row_id=start_row + 22, column_id=start_column,
+        #     n_rows=1,
+        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+        #     text="Further Information", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
         rb_01a = SE(
@@ -14681,68 +14730,54 @@ class PySILLS(tk.Frame):
         ## BUTTONS
         btn_06a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 20, column_id=start_column, n_rows=2,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Export Results", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.calculation_report_setup)
-        #
-        btn_07a = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Concentration Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_show_diagrams_concentration)
-        btn_07a.configure(state="disabled")
-        #
-        btn_07b = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 25, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Intensity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_show_diagrams_intensity)
-        btn_07b.configure(state="disabled")
-        #
+
         self.var_rb_01 = tk.IntVar()
         self.var_rb_01.set(1)
         self.var_rb_02 = tk.IntVar()
         self.var_rb_02.set(0)
         self.var_rb_03 = tk.IntVar()
         self.var_rb_03.set(0)
-        #
+
         btn_07c = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.show_diagrams_sensitivity)
-        btn_07d = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Sensitivity Drift", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.show_diagrams_sensitivity)
+        btn_07d = SE(
+            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 22, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Detailed Data Analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        #
+
         ## FRAMES
         frm_a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row, column_id=start_column + 11,
             n_rows=n_rows, n_columns=n_columns - 11, fg=self.bg_colors["Very Light"],
             bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
-        #
+
         ## TREEVIEWS
         list_categories = ["Files"]
-        list_categories.extend(self.container_lists["ISOTOPES"])
+        list_categories.extend(self.container_lists["Measured Isotopes"]["All"])
         list_width = list(75*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
         list_width[0] = 125
-        #
+
         self.tv_results_files = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=0, column_id=12, n_rows=18, n_columns=50,
+            parent=self.subwindow_ma_datareduction_files, row_id=0, column_id=11, n_rows=24, n_columns=51,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(list_categories), text_n=list_categories,
             width_n=list_width, individual=True)
-        #
+
         scb_v = ttk.Scrollbar(self.subwindow_ma_datareduction_files, orient="vertical")
         scb_h = ttk.Scrollbar(self.subwindow_ma_datareduction_files, orient="horizontal")
         self.tv_results_files.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
         scb_v.config(command=self.tv_results_files.yview)
         scb_h.config(command=self.tv_results_files.xview)
-        scb_v.grid(row=0, column=62, rowspan=18, columnspan=1, sticky="ns")
-        scb_h.grid(row=18, column=12, rowspan=1, columnspan=50, sticky="ew")
-        #
+        scb_v.grid(row=0, column=62, rowspan=24, columnspan=1, sticky="ns")
+        scb_h.grid(row=24, column=11, rowspan=1, columnspan=51, sticky="ew")
+
         ## INITIALIZATION
         self.ma_datareduction_tables(init=True)
     #
@@ -16634,6 +16669,10 @@ class PySILLS(tk.Frame):
                 self.get_analytical_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
+                results_is = self.determine_possible_is(filetype="ALL")
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_ratio).get_intensity_ratio(
+                    data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
                 self.fi_get_normalized_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
@@ -17671,7 +17710,7 @@ class PySILLS(tk.Frame):
     def fi_datareduction_files(self):   # FI - DATAREDUCTION FILES #####################################################
         ## Window Settings
         window_width = 1260
-        window_heigth = 750
+        window_heigth = 775
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
@@ -17724,16 +17763,16 @@ class PySILLS(tk.Frame):
             n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06 = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 21, column_id=start_column,
-            n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_07 = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 25, column_id=start_column,
-            n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_06 = SE(
+        #     parent=self.subwindow_fi_datareduction_files, row_id=start_row + 21, column_id=start_column,
+        #     n_rows=1,
+        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+        #     text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_07 = SE(
+        #     parent=self.subwindow_fi_datareduction_files, row_id=start_row + 25, column_id=start_column,
+        #     n_rows=1,
+        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+        #     text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
         #
         ## RADIOBUTTONS
         self.rb_01a = SE(
@@ -17870,38 +17909,42 @@ class PySILLS(tk.Frame):
         #
         ## BUTTONS
         btn_06a = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=2,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Dark"]).create_simple_button(
-            text="Export Results", bg_active=self.red_dark, fg_active=self.bg_colors["Dark Font"],
+            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_export_calculation_report)
-        #
+
         btn_07a = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 29, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
             text="Concentration Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_concentration)
         btn_07a.configure(state="disabled")
-        #
+
         btn_07b = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 27, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
             text="Intensity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.fi_show_diagrams_intensity)
         btn_07b.configure(state="disabled")
-        #
+
         self.var_rb_01 = tk.IntVar()
         self.var_rb_01.set(1)
         self.var_rb_02 = tk.IntVar()
         self.var_rb_02.set(0)
         self.var_rb_03 = tk.IntVar()
         self.var_rb_03.set(0)
-        #
+
         btn_07c = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 28, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
             text="Sensitivity Diagrams", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.show_diagrams_sensitivity)
-        #
+        btn_07c = SE(
+            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            text="Detailed Analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+
         ## FRAMES
         frm_a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row, column_id=start_column + 11,
@@ -17910,25 +17953,25 @@ class PySILLS(tk.Frame):
         #
         ## TREEVIEW
         list_categories = ["Files"]
-        list_categories.extend(self.container_lists["ISOTOPES"])
+        list_categories.extend(self.container_lists["Measured Isotopes"]["All"])
         list_width = list(75*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
         list_width[0] = 125
-        #
+
         self.tv_results_files = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=0, column_id=11, n_rows=16, n_columns=51,
+            parent=self.subwindow_fi_datareduction_files, row_id=0, column_id=11, n_rows=30, n_columns=51,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(list_categories), text_n=list_categories,
             width_n=list_width, individual=True)
-        #
+
         scb_v = ttk.Scrollbar(self.subwindow_fi_datareduction_files, orient="vertical")
         scb_h = ttk.Scrollbar(self.subwindow_fi_datareduction_files, orient="horizontal")
         self.tv_results_files.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
         scb_v.config(command=self.tv_results_files.yview)
         scb_h.config(command=self.tv_results_files.xview)
-        scb_v.grid(row=0, column=62, rowspan=16, columnspan=1, sticky="ns")
-        scb_h.grid(row=16, column=11, rowspan=1, columnspan=51, sticky="ew")
-        #
+        scb_v.grid(row=0, column=62, rowspan=30, columnspan=1, sticky="ns")
+        scb_h.grid(row=30, column=11, rowspan=1, columnspan=51, sticky="ew")
+
         ## INITIALIZATION
         self.fi_datareduction_tables(init=True)
 
@@ -19741,6 +19784,12 @@ class PySILLS(tk.Frame):
                 # Sensitivity analysis
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                results_is = self.determine_possible_is(filetype="ALL")
+
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_ratio[var_type]["RAW"]).get_intensity_ratio(
+                    data_container=self.container_intensity_corrected[var_type]["RAW"], dict_is=results_is,
+                    filename_short=var_file_short)
                 self.fi_get_normalized_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 self.fi_get_rsf(
