@@ -12,7 +12,7 @@
 
 ## MODULES
 # external
-import os, pathlib, sys, re, datetime, csv, string, math
+import os, pathlib, sys, re, datetime, csv, string, math, webbrowser
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -252,6 +252,20 @@ class PySILLS(tk.Frame):
         self.container_var["IS STD Default"].set("0.0")
         self.container_var["IS SMPL Default"] = tk.StringVar()
         self.container_var["IS SMPL Default"].set("0.0")
+
+        # Detailed Data Analysis
+        self.container_var["Detailed Data Analysis"] = {
+            "Filename STD": tk.StringVar(), "Filename SMPL": tk.StringVar(), "Datatype": tk.IntVar(),
+            "Focus": tk.IntVar(), "Intensity Results": tk.StringVar(), "Sensitivity Results": tk.StringVar(),
+            "Concentration Results": tk.StringVar()}
+        self.container_var["Detailed Data Analysis"]["Filename STD"].set("Select Standard File")
+        self.container_var["Detailed Data Analysis"]["Filename SMPL"].set("Select Sample File")
+        self.container_var["Detailed Data Analysis"]["Datatype"].set(0)
+        self.container_var["Detailed Data Analysis"]["Focus"].set(0)
+        self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
+        self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
+        self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+
         self.container_var["General Settings"] = {}                                 # General Settings
         self.container_var["General Settings"]["Language"] = tk.StringVar()
         self.container_var["General Settings"]["Language"].set("English")
@@ -1256,11 +1270,10 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text="General Settings", bg_active=accent_color, fg_active=font_color_dark,
             command=self.subwindow_general_settings)
-        btn_docu = SE(
+        btn_about = SE(
             parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="About", bg_active=accent_color, fg_active=font_color_dark)
-        btn_docu.configure(state="disabled")
+            text="About", bg_active=accent_color, fg_active=font_color_dark, command=self.about_pysills)
         SE(
             parent=self.parent, row_id=start_row + 12, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -12186,7 +12199,7 @@ class PySILLS(tk.Frame):
                 resultsframe.destroy()
         except AttributeError:
             pass
-        #
+
         self.fig_specific = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_specific = FigureCanvasTkAgg(self.fig_specific, master=self.subwindow_ma_checkfile)
         self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
@@ -12401,6 +12414,7 @@ class PySILLS(tk.Frame):
                 resultsframe.destroy()
         except AttributeError:
             pass
+
         if var_type == "STD":
             var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
@@ -12546,7 +12560,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=14, n_columns=38,
+                parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=38,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -12556,8 +12570,8 @@ class PySILLS(tk.Frame):
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
-            scb_v.grid(row=0, column=52, rowspan=14, columnspan=1, sticky="ns")
-            scb_h.grid(row=14, column=14, rowspan=1, columnspan=38, sticky="ew")
+            scb_v.grid(row=0, column=52, rowspan=18, columnspan=1, sticky="ns")
+            scb_h.grid(row=18, column=14, rowspan=1, columnspan=38, sticky="ew")
 
             if var_is != "Select IS":
                 ## INITIALIZATION
@@ -12615,7 +12629,7 @@ class PySILLS(tk.Frame):
                 entries_intensity_bg_i = ["Intensity BG"]
                 entries_intensity_mat_i = ["Intensity SMPL"]
                 entries_intensity_mat_sigma_i = ["Intensity 1 SIGMA SMPL"]
-                entries_intensity_ratio_i = ["Intensity Ratio"]
+                entries_intensity_ratio_i = ["Intensity SMPL Ratio"]
                 entries_analytical_sensitivity_i = ["Analytical Sensitivity"]
                 entries_normalized_sensitivity_i = ["Normalized Sensitivity"]
                 entries_rsf_i = ["Relative Sensitivity Factor"]
@@ -12623,8 +12637,10 @@ class PySILLS(tk.Frame):
                 entries_concentration_sigma_i = ["Concentration 1 SIGMA SMPL"]
                 entries_concentration_ratio_i = ["Concentration Ratio"]
                 entries_lod_i = ["Limit of Detection"]
+                entries_empty = [""]
 
                 for isotope in list_considered_isotopes:
+                    entries_empty.append("")
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     # Intensity Results
                     intensity_bg_i = self.container_intensity[var_type]["RAW"][var_file_short]["BG"][isotope]
@@ -12663,6 +12679,7 @@ class PySILLS(tk.Frame):
                         entries_intensity_bg_i.append(f"{intensity_bg_i:.{4}f}")
                         entries_intensity_mat_i.append(f"{intensity_mat_i:.{4}f}")
                         entries_intensity_mat_sigma_i.append(f"{intensity_mat_sigma_i:.{4}f}")
+                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
                         entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{4}f}")
                         entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
                         if var_type == "SMPL":
@@ -12683,27 +12700,27 @@ class PySILLS(tk.Frame):
                         entries_lod_i.append("---")
 
                     if var_type == "SMPL":
-                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
                         entries_rsf_i.append(f"{rsf_i:.{4}f}")
-                    else:
-                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
 
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_sigma_i)
-                if var_type == "SMPL":
-                    self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
-                else:
-                    self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_empty)
                 self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
+
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_empty)
                 self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_i)
+
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
+
                 self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
 
     def ma_show_all_lines(self, var_type, var_file_short):
@@ -14608,16 +14625,6 @@ class PySILLS(tk.Frame):
             n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_06 = SE(
-        #     parent=self.subwindow_ma_datareduction_files, row_id=start_row + 19, column_id=start_column,
-        #     n_rows=1,
-        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-        #     text="Export Results", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_07 = SE(
-        #     parent=self.subwindow_ma_datareduction_files, row_id=start_row + 22, column_id=start_column,
-        #     n_rows=1,
-        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-        #     text="Further Information", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
         rb_01a = SE(
@@ -14749,7 +14756,8 @@ class PySILLS(tk.Frame):
         btn_07d = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 22, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Detailed Data Analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Detailed Data Analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.detailed_data_analysis)
 
         ## FRAMES
         frm_a = SE(
@@ -14780,7 +14788,386 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         self.ma_datareduction_tables(init=True)
-    #
+
+    def detailed_data_analysis(self):
+        if self.pysills_mode == "MA":
+            str_title_window = "MINERAL ANALYSIS - Detailed Data Analysis"
+        elif self.pysills_mode == "FI":
+            str_title_window = "FLUID INCLUSION ANALYSIS - Detailed Data Analysis"
+        elif self.pysills_mode == "MI":
+            str_title_window = "MELT INCLUSION ANALYSIS - Detailed Data Analysis"
+
+        ## Window Settings
+        window_width = 900
+        window_heigth = 600
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_detailed_data_analysis = tk.Toplevel(self.parent)
+        self.subwindow_detailed_data_analysis.title(str_title_window)
+        self.subwindow_detailed_data_analysis.geometry(var_geometry)
+        self.subwindow_detailed_data_analysis.resizable(False, False)
+        self.subwindow_detailed_data_analysis["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_detailed_data_analysis, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_detailed_data_analysis, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_detailed_data_analysis.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_detailed_data_analysis.grid_columnconfigure(i, minsize=column_min)
+
+        ################################################################################################################
+
+        start_row = 0
+        start_column = 0
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Filename", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02 = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 3, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Experimental Data", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03 = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 6, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Experimental Focus", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_04 = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 11, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Intensity Results", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_05 = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 13, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Sensitivity Results", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_06 = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 15, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Composition Results", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # RADIOBUTTONS
+        rb_02a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 4, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=self.container_var["Detailed Data Analysis"]["Datatype"], value_rb=0,
+            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Original Data", sticky="nesw",
+            relief=tk.FLAT)
+        rb_02b = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 5, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=self.container_var["Detailed Data Analysis"]["Datatype"], value_rb=1,
+            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Smoothed Data", sticky="nesw",
+            relief=tk.FLAT)
+
+        rb_03a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 7, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=0,
+            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Background", sticky="nesw",
+            relief=tk.FLAT)
+        rb_03b = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 8, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=1,
+            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Mineral / Matrix", sticky="nesw",
+            relief=tk.FLAT)
+        rb_03c = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 9, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=2,
+            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Inclusion", sticky="nesw",
+            relief=tk.FLAT)
+        rb_03d = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 10, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
+            var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=3,
+            color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Mixed Signal", sticky="nesw",
+            relief=tk.FLAT)
+
+        # OPTION MENUS
+        list_files_std = self.container_lists["STD"]["Short"]
+        str_default_std = self.container_var["Detailed Data Analysis"]["Filename STD"].get()
+        opt_01a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 1, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Detailed Data Analysis"]["Filename STD"], option_list=list_files_std,
+            text_set=str_default_std, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_01a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_01a.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        list_files_smpl = self.container_lists["SMPL"]["Short"]
+        str_default_smpl = self.container_var["Detailed Data Analysis"]["Filename STD"].get()
+        opt_01b = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 2, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Detailed Data Analysis"]["Filename SMPL"], option_list=list_files_smpl,
+            text_set=str_default_smpl, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_01b["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_01b.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        list_intensity_parameter = ["Measured Intensity", "Intensity", "Intensity Ratio", "Intensity Noise",
+                                    "\u03C3 Intensity"]
+        str_default_intensity = self.container_var["Detailed Data Analysis"]["Intensity Results"].get()
+        opt_04a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 12, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Detailed Data Analysis"]["Intensity Results"],
+            option_list=list_intensity_parameter, text_set=str_default_intensity, fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color)
+        opt_04a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_04a.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        list_sensitivity_parameter = ["Analytical Sensitivity", "Normalized Sensitivity", "Relative Sensitivity Factor"]
+        str_default_sensitivity = self.container_var["Detailed Data Analysis"]["Sensitivity Results"].get()
+        opt_05a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 14, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Detailed Data Analysis"]["Sensitivity Results"],
+            option_list=list_sensitivity_parameter, text_set=str_default_sensitivity,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_05a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_05a.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        list_concentration_parameter = ["Concentration", "Concentration Ratio", "Concentration Noise",
+                                        "Limit of Detection", "\u03C3 Concentration"]
+        str_default_concentration = self.container_var["Detailed Data Analysis"]["Concentration Results"].get()
+        opt_05a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row + 16, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Detailed Data Analysis"]["Concentration Results"],
+            option_list=list_concentration_parameter, text_set=str_default_concentration,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_05a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_05a.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        # INITIALIZATION
+        if self.pysills_mode == "MA":
+            rb_03c.configure(state="disabled")
+            rb_03d.configure(state="disabled")
+
+    def about_pysills(self):
+        ## Window Settings
+        window_width = 620
+        window_heigth = 625
+        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_heigth/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_about_pysills = tk.Toplevel(self.parent)
+        self.subwindow_about_pysills.title("PySILLS - About")
+        self.subwindow_about_pysills.geometry(var_geometry)
+        self.subwindow_about_pysills.resizable(False, False)
+        self.subwindow_about_pysills["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_about_pysills, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_about_pysills, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_about_pysills.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_about_pysills.grid_columnconfigure(i, minsize=column_min)
+
+        ################################################################################################################
+
+        start_row = 0
+        start_column = 0
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Development", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_01a = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 10, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Maximilian A. Beeskow", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_01b = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 10, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Thomas Wagner", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_01c = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 10, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Tobias Fusswinkel", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001a = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 20, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001b = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 20, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001b = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 20, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        lbl_02 = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Additional Information", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02a = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column + 11, n_rows=1,
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS on GitHub", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_02b = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 6, column_id=start_column + 11, n_rows=1,
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS on ReadTheDocs", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_02c = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 7, column_id=start_column + 11, n_rows=1,
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS on YouTube", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_02d = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 11, n_rows=1,
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS on Blogger", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+
+        lbl_02a.bind("<Button-1>", self.callback_github)
+        lbl_02b.bind("<Button-1>", self.callback_readthedocs)
+        lbl_02c.bind("<Button-1>", self.callback_youtube)
+        lbl_02d.bind("<Button-1>", self.callback_readthedocs)
+
+        lbl_03 = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Citation", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03a = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="If you use PySILLS for your work, please cite the following", relief=tk.FLAT,
+            fontsize="sans 10 bold", anchor=tk.W)
+        lbl_03b = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 11, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="journal article:", relief=tk.FLAT,
+            fontsize="sans 10 bold", anchor=tk.W)
+        lbl_03cb = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 12, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Placeholder Journal Article", relief=tk.FLAT,
+            fontsize="sans 10 bold", anchor=tk.W)
+
+        lbl_04 = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column, n_rows=1,
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="References", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_04a = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="SILLS Equation Summary", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04b = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 15, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Guillong et al. (2008)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04c = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 16, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Heinrich et al. (2003)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04d = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 17, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Longerich et al. (1996)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04e = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 18, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Pettke et al. (2012)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04f = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 19, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Halter et al. (2002)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04g = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 20, column_id=start_column + 11, n_rows=1,
+            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Borisova et al. (2021)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+
+        lbl_04a.bind("<Button-1>", self.callback_sills)
+        lbl_04b.bind("<Button-1>", self.callback_guillong2008)
+        lbl_04c.bind("<Button-1>", self.callback_heinrich2003)
+        lbl_04d.bind("<Button-1>", self.callback_longerich1996)
+        lbl_04e.bind("<Button-1>", self.callback_pettke2012)
+        lbl_04f.bind("<Button-1>", self.callback_halter2002)
+        lbl_04g.bind("<Button-1>", self.callback_borisova2021)
+
+    def callback_github(self, event):
+        webbrowser.open_new(r"https://github.com/MABeeskow/PySILLS")
+
+    def callback_readthedocs(self, event):
+        webbrowser.open_new(r"https://pysills.readthedocs.io/en/latest/")
+
+    def callback_youtube(self, event):
+        webbrowser.open_new(r"https://www.youtube.com/@PySILLS")
+
+    def callback_blogger(self, event):
+        webbrowser.open_new(r"https://pysills.blogspot.com/")
+
+    def callback_sills(self, event):
+        webbrowser.open_new(r"https://mineralsystems.ethz.ch/software/sills.html")
+
+    def callback_guillong2008(self, event):
+        webbrowser.open_new(r"https://www.semanticscholar.org/paper/SILLS%3A-A-MATLAB-based-program-for-the-reduction-"
+                            r"of-Guillong-Meier/1949b62d2282894b842ec5e94f7f6c759dd89865")
+
+    def callback_heinrich2003(self, event):
+        webbrowser.open_new(r"https://www.sciencedirect.com/science/article/pii/S001670370300084X")
+
+    def callback_longerich1996(self, event):
+        webbrowser.open_new(r"https://pubs.rsc.org/en/content/articlelanding/1996/ja/ja9961100899")
+
+    def callback_pettke2012(self, event):
+        webbrowser.open_new(r"https://www.sciencedirect.com/science/article/pii/S016913681100134X")
+
+    def callback_halter2002(self, event):
+        webbrowser.open_new(r"https://www.sciencedirect.com/science/article/pii/S0009254101003722")
+
+    def callback_borisova2021(self, event):
+        webbrowser.open_new(r"https://ejm.copernicus.org/articles/33/305/2021/")
+
     def change_id_results(self, var_opt, mode="MA"):
         if mode == "MA":
             self.ma_datareduction_tables()
@@ -17919,7 +18306,8 @@ class PySILLS(tk.Frame):
         btn_07c = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
-            text="Detailed Analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Detailed Data Analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.detailed_data_analysis)
 
         ## FRAMES
         frm_a = SE(
@@ -19709,7 +20097,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=14, n_columns=38,
+                parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=38,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -19719,8 +20107,8 @@ class PySILLS(tk.Frame):
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
-            scb_v.grid(row=0, column=52, rowspan=14, columnspan=1, sticky="ns")
-            scb_h.grid(row=14, column=14, rowspan=1, columnspan=38, sticky="ew")
+            scb_v.grid(row=0, column=52, rowspan=18, columnspan=1, sticky="ns")
+            scb_h.grid(row=18, column=14, rowspan=1, columnspan=38, sticky="ew")
 
             if var_is != "Select IS":
                 ## INITIALIZATION
@@ -19808,7 +20196,8 @@ class PySILLS(tk.Frame):
                 entries_concentration_i = ["Concentration MAT"]
                 entries_concentration_ratio_i = ["Concentration Ratio MAT"]
                 entries_lod_i = ["Limit of Detection MAT"]
-                #
+                entries_empty = [""]
+
                 if var_type == "SMPL":
                     entries_intensity_incl_i = ["Intensity INCL"]
                     entries_intensity_ratio_incl_i = ["Intensity Ratio INCL"]
@@ -19817,8 +20206,9 @@ class PySILLS(tk.Frame):
                     entries_a_i = ["Mixed Concentration Ratio"]
                     entries_x_i = ["Mixing Ratio"]
                     entries_lod_incl_i = ["Limit of Detection INCL"]
-                #
+
                 for isotope in list_considered_isotopes:
+                    entries_empty.append("")
                     # Intensity Results
                     intensity_bg_i = self.container_intensity[var_type]["RAW"][var_file_short]["BG"][isotope]
                     intensity_mat_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["MAT"][
@@ -19855,16 +20245,21 @@ class PySILLS(tk.Frame):
                     # Filling results container
                     entries_intensity_bg_i.append(f"{intensity_bg_i:.{4}f}")
                     entries_intensity_mat_i.append(f"{intensity_mat_i:.{4}f}")
+
                     if var_type == "SMPL":
                         entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
                         entries_intensity_incl_i.append(f"{intensity_incl_i:.{4}f}")
                         entries_intensity_mix_i.append(f"{intensity_mix_i:.{4}f}")
                         entries_intensity_ratio_incl_i.append(f"{intensity_ratio_incl_i:.{4}E}")
+
                     entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{4}f}")
                     entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
+
                     if var_type == "SMPL":
                         entries_rsf_i.append(f"{rsf_i:.{4}E}")
+
                     entries_concentration_i.append(f"{concentration_i:.{4}f}")
+
                     if var_type == "SMPL":
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
                         entries_lod_i.append(f"{lod_i:.{4}f}")
@@ -19877,18 +20272,27 @@ class PySILLS(tk.Frame):
                 # Intensity Results
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
+
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_mix_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_empty)
+
                 # Sensitivity Results
                 self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
+
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_empty)
+
                 # Concentration Results
                 self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
+
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_i)

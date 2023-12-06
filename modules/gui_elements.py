@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 27.11.2023
+# 06.12.2023
 # ----------------------
 #
 ## MODULES
@@ -27,7 +27,7 @@ class SimpleElements:
         self.bg = bg
     #
     def create_simple_label(self, text, fontsize=None, relief=tk.GROOVE, textvariable=False, anchor="center",
-                            sticky="nesw"):
+                            sticky="nesw", link=False):
         if fontsize != None:
             if textvariable == False:
                 lbl = tk.Label(self.parent, text=text, relief=relief, bg=self.bg, fg=self.fg, font=(fontsize),
@@ -40,6 +40,10 @@ class SimpleElements:
                 lbl = tk.Label(self.parent, text=text, relief=relief, bg=self.bg, fg=self.fg, font=fontsize)
             else:
                 lbl = tk.Label(self.parent, textvariable=text, relief=relief, bg=self.bg, fg=self.fg, font=fontsize)
+
+        if link == True:
+            lbl.configure(cursor="hand2")
+
         lbl.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns, sticky=sticky)
         #
         return lbl
