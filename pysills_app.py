@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		06.12.2023
+# Date:		07.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -9139,7 +9139,7 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
                 text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.ma_matrix_concentration_setup)
+                command=self.mineral_matrix_quantification)
 
         # Radiobuttons
         if self.pysills_mode != "MA":
@@ -9184,11 +9184,231 @@ class PySILLS(tk.Frame):
                 var_iso=self.container_var["Quantification Mineral"]["Method"], option_list=list_methods,
                 text_set=str_default_method, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
             opt_03a["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
             opt_03a.config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-                activebackground=self.accent_color, highlightthickness=0)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
+
+    def mineral_matrix_quantification(self):
+        # Window Settings
+        window_width = 360
+        window_height = 175
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        if self.pysills_mode == "MA":
+            str_title_window = "Sample Quantification"
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            str_title_window = "Matrix Quantification"
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            str_title_window = "Matrix Quantification"
+            var_setting_key = "mi_setting"
+
+        self.subwindow_mineral_matrix_quantification = tk.Toplevel(self.parent)
+        self.subwindow_mineral_matrix_quantification.title(str_title_window)
+        self.subwindow_mineral_matrix_quantification.geometry(var_geometry)
+        self.subwindow_mineral_matrix_quantification.resizable(False, False)
+        self.subwindow_mineral_matrix_quantification["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_mineral_matrix_quantification, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_mineral_matrix_quantification, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_mineral_matrix_quantification.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_mineral_matrix_quantification.grid_columnconfigure(i, minsize=column_min)
+
+        str_method = self.container_var["Quantification Mineral"]["Method"].get()
+
+        var_row_start = 0
+        var_columm_start = 0
+        var_row_n = 1
+        var_header_n = 8
+
+        if str_method == "Internal Standard":
+            # LABELS
+            lbl_01 = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_columm_start,
+                n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Internal Standard Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            # RADIOBUTTONS
+            rb_01a = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
+                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Oxide Calculation",
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            rb_01b = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 2,
+                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Element Calculation",
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            rb_01c = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 4,
+                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Experimental Data",
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            rb_01d = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 5,
+                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data",
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            rb_01e = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 3,
+                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=5,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Mineral Calculation",
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            rb_01e.configure(state="disabled")
+            # BUTTONS
+            btn_02a = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
+                column_id=var_header_n +1, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_simple_button(
+                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.ma_matrix_concentration_setup)
+        elif str_method == "100 wt.% Oxides":
+            # LABELS
+            lbl_01 = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_columm_start,
+                n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Oxide Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            # BUTTONS
+            btn_01a = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
+                column_id=var_columm_start, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_simple_button(
+                text="Composition Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.oxides_setup_composition)
+            btn_01b = SE(
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
+                column_id=var_header_n + 1, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_simple_button(
+                text="File-specific Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.oxides_setup_files)
+
+    def oxides_setup_composition(self):
+        # Window Settings
+        window_width = 900
+        window_height = 450
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        if self.pysills_mode == "MA":
+            str_title_window = "Sample Quantification"
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            str_title_window = "Matrix Quantification"
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            str_title_window = "Matrix Quantification"
+            var_setting_key = "mi_setting"
+
+        self.subwindow_oxides_composition = tk.Toplevel(self.parent)
+        self.subwindow_oxides_composition.title(str_title_window)
+        self.subwindow_oxides_composition.geometry(var_geometry)
+        self.subwindow_oxides_composition.resizable(False, False)
+        self.subwindow_oxides_composition["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_oxides_composition, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_oxides_composition, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_oxides_composition.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_oxides_composition.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_columm_start = 0
+        var_row_n = 1
+        var_header_n = 8
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_oxides_composition, row_id=var_row_start, column_id=var_columm_start,
+            n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Select all present oxides", relief=tk.FLAT, fontsize="sans 10 bold")
+
+    def oxides_setup_files(self):
+        # Window Settings
+        window_width = 900
+        window_height = 450
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        if self.pysills_mode == "MA":
+            str_title_window = "Sample Quantification"
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            str_title_window = "Matrix Quantification"
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            str_title_window = "Matrix Quantification"
+            var_setting_key = "mi_setting"
+
+        self.subwindow_oxides_files = tk.Toplevel(self.parent)
+        self.subwindow_oxides_files.title(str_title_window)
+        self.subwindow_oxides_files.geometry(var_geometry)
+        self.subwindow_oxides_files.resizable(False, False)
+        self.subwindow_oxides_files["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_oxides_files, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_oxides_files, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_oxides_files.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_oxides_files.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_columm_start = 0
+        var_row_n = 1
+        var_header_n = 8
+
+        # LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=var_columm_start,
+            n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="File-specific Settings", relief=tk.FLAT, fontsize="sans 10 bold")
 
     def place_quantification_method(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Quantification Method'
