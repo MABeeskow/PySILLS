@@ -253,6 +253,10 @@ class PySILLS(tk.Frame):
         self.container_var["IS SMPL Default"] = tk.StringVar()
         self.container_var["IS SMPL Default"].set("0.0")
 
+        # Quantification Method
+        self.container_var["Quantification Mineral"] = {"Method": tk.StringVar()}
+        self.container_var["Quantification Mineral"]["Method"].set("Select Method")
+
         # Detailed Data Analysis
         self.container_var["Detailed Data Analysis"] = {
             "Filename STD": tk.StringVar(), "Filename SMPL": tk.StringVar(), "Datatype": tk.IntVar(),
@@ -8881,25 +8885,25 @@ class PySILLS(tk.Frame):
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_sample_settings(var_geometry_info=var_sample_settings)
         # Build section 'Quantification Method'
-        var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_quantification_method = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_quantification_method(var_geometry_info=var_quantification_method)
         # Build section 'Assemblage Setup'
-        var_assemblage_setup = {"Row start": 13, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 11, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
         # Build section 'Dwell Time Setup'
-        var_dwell_time_setup = {"Row start": 15, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 13, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
         # Build section 'Calculation Window (Background) Setup'
-        var_calculation_window_bg_setup = {"Row start": 17, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 15, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
         # Build section 'Calculation Window (Sample) Setup'
-        var_calculation_window_smpl_setup = {"Row start": 21, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_smpl_setup = {"Row start": 19, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_smpl_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 25, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 23, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 29, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 17, "Column start": 42, "N rows": 1, "N columns": 18}
@@ -9113,49 +9117,78 @@ class PySILLS(tk.Frame):
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=var_header, relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_03a = SE(
-            parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text=var_lbl_setup, relief=tk.FLAT, fontsize="sans 10 bold")
+
+        if self.pysills_mode != "MA":
+            lbl_03a = SE(
+                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_simple_label(
+                text=var_lbl_setup, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
-        btn_03a = SE(
-            parent=var_parent, row_id=var_row_start + 3, column_id=var_header_n - 9, n_rows=var_row_n,
-            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.ma_matrix_concentration_setup)
+        if self.pysills_mode != "MA":
+            btn_03a = SE(
+                parent=var_parent, row_id=var_row_start + 3, column_id=var_header_n - 9, n_rows=var_row_n,
+                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_simple_button(
+                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.ma_matrix_concentration_setup)
+        else:
+            btn_03a = SE(
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
+                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_simple_button(
+                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.ma_matrix_concentration_setup)
 
         # Radiobuttons
-        rb_03a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-            n_columns=var_header_n - 9,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Oxide Calculation", sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold")
-        rb_03b = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
-            n_columns=var_header_n - 9,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Element Calculation",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_03c = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=var_row_n,
-            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Experimental Data", sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold")
-        rb_03c = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
-            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data", sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold")
+        if self.pysills_mode != "MA":
+            rb_03a = SE(
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_header_n - 9,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Oxide Calculation", sticky="nesw",
+                relief=tk.FLAT, font="sans 10 bold")
+            rb_03b = SE(
+                parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_header_n - 9,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Element Calculation",
+                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            rb_03c = SE(
+                parent=var_parent, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=var_row_n,
+                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Experimental Data", sticky="nesw",
+                relief=tk.FLAT, font="sans 10 bold")
+            rb_03c = SE(
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
+                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_radiobutton(
+                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data", sticky="nesw",
+                relief=tk.FLAT, font="sans 10 bold")
+
+        # Option Menu
+        if self.pysills_mode == "MA":
+            str_default_method = self.container_var["Quantification Mineral"]["Method"].get()
+            list_methods = ["Internal Standard", "100 wt.% Oxides"]
+
+            opt_03a = SE(
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=self.container_var["Quantification Mineral"]["Method"], option_list=list_methods,
+                text_set=str_default_method, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+            opt_03a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_03a.config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
 
     def place_quantification_method(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Quantification Method'
