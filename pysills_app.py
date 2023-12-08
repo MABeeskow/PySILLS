@@ -259,17 +259,15 @@ class PySILLS(tk.Frame):
 
         # 100 wt.% Oxides
         self.container_var["Oxides Quantification"] = {"Major": {}, "Minor": {}, "Ratios": {}, "Total Amounts": {}}
-        list_major_oxides = ["SiO2", "TiO2", "Ti2O3", "Al2O3", "FeO", "Fe2O3", "MnO", "Mn2O3", "MgO", "CaO", "Na2O",
-                             "K2O", "P2O5", "P2O3", "SO2", "SO3"]
-        list_industrial_metal_oxides = ["CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "SnO", "WO3", "MoO2",
+        list_major_oxides = ["SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "MnO2", "MgO", "CaO", "Na2O",
+                             "K2O", "P2O5", "SO3"]
+        list_industrial_metal_oxides = ["CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO2",
                                         "MoO3"]
-        list_precious_metals = ["AgO", "PdO", "PtO", "Au2O3", "OsO2", "Os2O3", "RuO", "Ru2O3", "IrO", "Ir2O3", "Rh2O",
-                                "Rh2O3"]
-        list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Sm2O3", "Gd2O3", "Dy2O3",
-                                 "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Lu2O3", "Tm2O3"]
+        list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
+        list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3",
+                                 "Dy2O3", "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
         list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO", "GeO2"]
-        list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "S-Ratio", "Cr-Ratio", "Ge-Ratio", "Mo-Ratio", "Os-Ratio", "Ru-Ratio",
-                            "Ir-Ratio", "Rh-Ratio"]
+        list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "Pb-Ratio", "Pr-Ratio", "Tb-Ratio"]
         for oxide in list_major_oxides:
             self.container_var["Oxides Quantification"]["Major"][oxide] = tk.IntVar()
             self.container_var["Oxides Quantification"]["Major"][oxide].set(0)
@@ -911,6 +909,23 @@ class PySILLS(tk.Frame):
         self.container_lists["Halides"] = [
             "NaCl", "KCl", "KI", "LiCl", "CuCl2", "AgCl", "CaCl2", "ClF", "CH3Br", "CHI3", "HCl", "HBr"]
         self.container_lists["Elements"] = []
+        self.container_lists["Selected Oxides"] = {"All": [], "Conversion Factor": {"SiO2", 2.1392}}
+
+        self.conversion_factors = {
+            "Ag2O": 1.0741, "Al2O3": 1.8895, "As2O3": 1.3203, "Au2O": 1.0406, "B2O3": 3.2202, "BaO": 1.1165,
+            "BeO": 2.7758, "CO2": 3.6644, "CaO": 1.3992, "CdO": 1.1423, "Ce2O3": 1.1713, "CeO2": 1.2284, "CoO": 1.2715,
+            "Cr2O3": 1.4615, "Cs2O": 1.0602, "CuO": 1.2518, "Dy2O3": 1.1477, "Er2O3": 1.1435, "Eu2O3": 1.1579,
+            "FeO": 1.2865, "Fe2O3": 1.4297, "Ga2O3": 1.3442, "Gd2O3": 1.1526, "GeO2": 1.4408, "HfO2": 1.1793,
+            "HgO": 1.0798, "Ho2O3": 1.1455, "In2O3": 1.2091, "IrO": 1.0832, "K2O": 1.2046, "La2O3": 1.1728,
+            "Li2O": 2.1527, "Lu2O3": 1.1371, "MgO": 1.6582, "MnO": 1.2912, "MnO2": 1.5825, "MoO3": 1.5003,
+            "N2O5": 3.8551, "Na2O": 1.3480, "Nb2O5": 1.4305, "Nd2O3": 1.1664, "NiO": 1.2725, "OsO": 1.0841,
+            "P2O5": 2.2916, "PbO": 1.0772, "PbO2": 1.1544, "PdO": 1.1504, "Pr2O3": 1.1703, "Pr6O11": 1.2082,
+            "PtO": 1.0820, "Rb2O": 1.0936, "ReO": 1.0859, "RhO": 1.5555, "RuO": 1.1583, "SO3": 2.4972, "Sb2O5": 1.3284,
+            "Sc2O3": 1.5338, "SeO3": 1.6079, "SiO2": 2.1392, "Sm2O3": 1.1596, "SnO2": 1.2696, "SrO": 1.1826,
+            "Ta2O5": 1.2211, "Tb2O3": 1.1510, "Tb4O7": 1.1762, "TeO3": 1.3762, "ThO2": 1.1379, "TiO2": 1.6681,
+            "Tl2O3": 1.1174, "Tm2O3": 1.1421, "UO2": 1.1344, "UO3": 1.2017, "U3O8": 1.1792, "V2O5": 1.7852,
+            "WO3": 1.2610, "Y2O3": 1.2699, "Yb2O3": 1.1387, "ZnO": 1.2448, "ZrO2": 1.3508}
+
         self.container_results = {}
         self.container_results["STD"] = {}
         self.container_results["STD"]["RAW"] = {}
@@ -5365,15 +5380,20 @@ class PySILLS(tk.Frame):
                 info_cb_state = self.container_var["SMPL"][filename_long]["Checkbox"].get()
                 info_sign_color = self.container_var["SMPL"][filename_long]["Sign Color"].get()
                 info_acquisition = self.container_var["acquisition times"]["SMPL"][filename_short].get()
+                info_oxide = self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"].get()
+                info_totalamount = self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].get()
             else:
                 info_is = "Select IS"
                 info_assemblage = "A"
                 info_cb_state = 1
                 info_sign_color = self.sign_red
                 info_acquisition = "00:00:00"
+                info_oxide = "Select Oxide"
+                info_totalamount = "100.0"
 
             str_smpl = (str(filename_short) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
-                        + ";" + str(info_sign_color) + ";" + str(info_acquisition))
+                        + ";" + str(info_sign_color) + ";" + str(info_acquisition) + ";" + str(info_oxide)  + ";"
+                        + str(info_totalamount))
 
             str_smpl += "\n"
             save_file.write(str_smpl)
@@ -5391,6 +5411,15 @@ class PySILLS(tk.Frame):
             save_file.write(str_iso)
 
         save_file.write("\n")
+
+        if len(self.container_lists["Selected Oxides"]["All"]) > 0:
+            for oxide in self.container_lists["Selected Oxides"]["All"]:
+                str_oxide = str(oxide)
+                str_oxide += "\n"
+
+                save_file.write(str_oxide)
+
+            save_file.write("\n")
 
     def save_inclusion_information_in_file(self, save_file):
         save_file.write("INCLUSION SETTINGS" + "\n")
@@ -5778,7 +5807,19 @@ class PySILLS(tk.Frame):
                         "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
                         "Checkbox": tk.IntVar(), "ID": tk.StringVar(), "Sign Color": tk.StringVar()}
                     self.container_var["acquisition times"]["SMPL"][var_file_short] = tk.StringVar()
-                    #
+
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"] = {
+                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].set("0.0")
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Element"]["Name"].set("Select Element")
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+
                     self.lb_smpl.insert(tk.END, str(var_file_short))
                     self.list_smpl.append(var_file_long)
                     self.container_lists["SMPL"]["Long"].append(var_file_long)
@@ -5790,21 +5831,42 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][var_file_long]["ID"].set(splitted_std[2])
                     self.container_var["SMPL"][var_file_long]["Checkbox"].set(splitted_std[3])
                     self.container_var["SMPL"][var_file_long]["Sign Color"].set(splitted_std[4])
+
                     try:
                         self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_std[5])
                     except:
                         self.container_var["acquisition times"]["SMPL"][var_file_short].set("unknown")
+
+                    self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].set(splitted_std[1])
+
+                    try:
+                        self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].set(splitted_std[6])
+                    except:
+                        self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+
+                    if var_file_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
+                        self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short] = tk.StringVar()
+
+                    try:
+                        self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short].set(
+                            splitted_std[7])
+                    except:
+                        self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short].set("100.0")
+
                     self.ma_current_file_smpl = self.list_smpl[0]
                 ## ISOTOPES
                 for i in range(index_container["ISOTOPES"] + 1,
                                index_container["SAMPLE SETTINGS"] - 1):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
-                    #
-                    isotope = splitted_std[0]
-                    self.container_var["SRM"][isotope] = tk.StringVar()
-                    self.container_lists["ISOTOPES"].append(isotope)
-                    self.container_var["SRM"][isotope].set(splitted_std[1])
+                    if len(splitted_std) > 1:
+                        isotope = splitted_std[0]
+                        self.container_var["SRM"][isotope] = tk.StringVar()
+                        self.container_lists["ISOTOPES"].append(isotope)
+                        self.container_var["SRM"][isotope].set(splitted_std[1])
+                    else:
+                        oxide = splitted_std[0]
+                        self.container_lists["Selected Oxides"]["All"].append(oxide)
                     #
                 ## SAMPLE/MATRIX SETTINGS
                 for i in range(index_container["SAMPLE SETTINGS"] + 1,
@@ -5819,10 +5881,6 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][info_file]["IS Data"]["IS"].set(info_isotope)
                     self.container_var["SMPL"][info_file]["IS Data"]["Concentration"].set(info_concentration)
 
-                    self.container_var["SMPL"][info_file]["Matrix Setup"] = {
-                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(
                         info_concentration)
@@ -9150,77 +9208,30 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=var_header, relief=tk.FLAT, fontsize="sans 10 bold")
 
-        if self.pysills_mode != "MA":
-            lbl_03a = SE(
-                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_label(
-                text=var_lbl_setup, relief=tk.FLAT, fontsize="sans 10 bold")
-
         # Buttons
-        if self.pysills_mode != "MA":
-            btn_03a = SE(
-                parent=var_parent, row_id=var_row_start + 3, column_id=var_header_n - 9, n_rows=var_row_n,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.ma_matrix_concentration_setup)
-        else:
-            btn_03a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.mineral_matrix_quantification)
-
-        # Radiobuttons
-        if self.pysills_mode != "MA":
-            rb_03a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n - 9,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Oxide Calculation", sticky="nesw",
-                relief=tk.FLAT, font="sans 10 bold")
-            rb_03b = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n - 9,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Element Calculation",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_03c = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=var_row_n,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Experimental Data", sticky="nesw",
-                relief=tk.FLAT, font="sans 10 bold")
-            rb_03c = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data", sticky="nesw",
-                relief=tk.FLAT, font="sans 10 bold")
+        btn_03a = SE(
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.mineral_matrix_quantification)
 
         # Option Menu
-        if self.pysills_mode == "MA":
-            str_default_method = self.container_var["Quantification Mineral"]["Method"].get()
-            list_methods = ["Internal Standard", "100 wt.% Oxides"]
+        str_default_method = self.container_var["Quantification Mineral"]["Method"].get()
+        list_methods = ["Internal Standard", "100 wt.% Oxides"]
 
-            opt_03a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_option_isotope(
-                var_iso=self.container_var["Quantification Mineral"]["Method"], option_list=list_methods,
-                text_set=str_default_method, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-            opt_03a["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_03a.config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
+        opt_03a = SE(
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["Quantification Mineral"]["Method"], option_list=list_methods,
+            text_set=str_default_method, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_03a["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+        opt_03a.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
 
     def mineral_matrix_quantification(self):
         # Window Settings
@@ -9343,7 +9354,7 @@ class PySILLS(tk.Frame):
     def oxides_setup_composition(self):
         # Window Settings
         window_width = 1220
-        window_height = 475
+        window_height = 525
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
@@ -9386,23 +9397,23 @@ class PySILLS(tk.Frame):
 
         # FRAMES
         frm_01 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=17,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=19,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
         frm_02 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_header_n + 2, n_rows=17,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_header_n + 2, n_rows=19,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
         frm_03 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=2*var_header_n + 3, n_rows=17,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=2*var_header_n + 3, n_rows=19,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
         frm_04 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=3*var_header_n + 4, n_rows=17,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=3*var_header_n + 4, n_rows=19,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
         frm_04 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=4*var_header_n + 5, n_rows=17,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=4*var_header_n + 5, n_rows=19,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
 
@@ -9451,107 +9462,90 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_oxides_composition, row_id=var_row_start + 3, column_id=5*var_header_n + 6,
             n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="MnO/(MnO + Mn2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="MnO/(MnO + MnO2)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06c = SE(
             parent=self.subwindow_oxides_composition, row_id=var_row_start + 4, column_id=5*var_header_n + 6,
             n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="SO2/(SO2 + SO3)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="PbO2/(PbO + PbO2)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06c = SE(
             parent=self.subwindow_oxides_composition, row_id=var_row_start + 5, column_id=5*var_header_n + 6,
             n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="CrO/(CrO + Cr2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Pr6O11/(Pr2O3 + Pr6O11)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06c = SE(
             parent=self.subwindow_oxides_composition, row_id=var_row_start + 6, column_id=5*var_header_n + 6,
             n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="GeO/(GeO + GeO2)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 7, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="MoO2/(MoO2 + MoO3)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 8, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="OsO2/(OsO2 + Os2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 9, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="RuO/(RuO + Ru2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 10, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="IrO/(IrO + Ir2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 11, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="Rh2O/(Rh2O + Rh2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Tb4O7/(Tb2O3 + Tb4O7)", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # CHECKBOXES
         ## Major Oxides
-        list_major_oxides = ["SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "Ti2O3", "P2O5",
-                             "P2O3", "MnO", "Mn2O3", "SO2", "SO3"]
+        list_major_oxides = ["SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO",
+                             "MnO2", "SO3"]
         for index, oxide in enumerate(list_major_oxides):
             cb_002a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
                 column_id=var_columm_start, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Major"][oxide], text=oxide, set_sticky="nesw",
-                own_color=True)
+                own_color=True, command=lambda var_oxide=oxide, var_key="Major": self.select_oxide(var_oxide, var_key))
+            if oxide in self.container_lists["Selected Oxides"]["All"]:
+                cb_002a.select()
 
         ## Industrial Metals
-        list_industrial_metals= ["CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "SnO", "WO3", "MoO2", "MoO3"]
+        list_industrial_metals= ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO3"]
         for index, oxide in enumerate(list_industrial_metals):
             cb_003a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
                 column_id=var_header_n + 2, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
-                own_color=True)
+                own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            if oxide in self.container_lists["Selected Oxides"]["All"]:
+                cb_003a.select()
 
         ## Precious Metals
-        list_precious_metals = ["AgO", "PdO", "PtO", "Au2O3", "OsO2", "Os2O3", "RuO", "Ru2O3", "IrO", "Ir2O3", "Rh2O",
-                                "Rh2O3"]
+        list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
         for index, oxide in enumerate(list_precious_metals):
             cb_004a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
                 column_id=2*var_header_n + 3, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
-                own_color=True)
+                own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            if oxide in self.container_lists["Selected Oxides"]["All"]:
+                cb_004a.select()
 
         ## Rare Earth Metals
-        list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Sm2O3", "Gd2O3", "Dy2O3",
-                                 "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Lu2O3", "Tm2O3"]
+        list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3",
+                                 "Dy2O3", "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
         for index, oxide in enumerate(list_rareearth_metals):
             cb_005a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
                 column_id=3*var_header_n + 4, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
-                own_color=True)
+                own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            if oxide in self.container_lists["Selected Oxides"]["All"]:
+                cb_005a.select()
 
         ## Other Elements
-        list_other_elements= ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO", "GeO2"]
+        list_other_elements= ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2"]
         for index, oxide in enumerate(list_other_elements):
             cb_005a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
                 column_id=4*var_header_n + 5, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
-                own_color=True)
+                own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            if oxide in self.container_lists["Selected Oxides"]["All"]:
+                cb_005a.select()
 
         # ENTRIES
-        list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "S-Ratio", "Cr-Ratio", "Ge-Ratio", "Mo-Ratio", "Os-Ratio",
-                            "Ru-Ratio", "Ir-Ratio", "Rh-Ratio"]
+        list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "Pb-Ratio", "Pr-Ratio", "Tb-Ratio"]
         for index, ratio in enumerate(list_oxideratios):
-            if ratio in ["Mn-Ratio", "Os-Ratio"]:
+            if ratio in ["Mn-Ratio"]:
                 self.container_var["Oxides Quantification"]["Ratios"][ratio].set("1.0")
 
             entr_002 = SE(
@@ -9561,9 +9555,19 @@ class PySILLS(tk.Frame):
                 var=self.container_var["Oxides Quantification"]["Ratios"][ratio],
                 text_default=self.container_var["Oxides Quantification"]["Ratios"][ratio].get())
 
+    def select_oxide(self, var_oxide, var_key):
+        state_cb = self.container_var["Oxides Quantification"][var_key][var_oxide].get()
+        if state_cb == 1:
+            if var_oxide not in self.container_lists["Selected Oxides"]["All"]:
+                self.container_lists["Selected Oxides"]["All"].append(var_oxide)
+
+        if state_cb  == 0:
+            if var_oxide in self.container_lists["Selected Oxides"]["All"]:
+                self.container_lists["Selected Oxides"]["All"].remove(var_oxide)
+
     def oxides_setup_files(self):
         # Window Settings
-        window_width = 620
+        window_width = 760
         window_height = 425
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -9612,17 +9616,17 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="File-specific Settings", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=2*var_header_n + 2,
+            parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Default total amount of oxides", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 2, column_id=2*var_header_n + 2,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 2, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Import data from file", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 4, column_id=2*var_header_n + 2,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 4, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Select Reference Element", relief=tk.FLAT, fontsize="sans 10 bold")
@@ -9631,28 +9635,29 @@ class PySILLS(tk.Frame):
         var_entr_default = tk.StringVar()
         var_entr_default.set("100.0")
         entr_02a = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=2*var_header_n + 2,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_default, text_default=var_entr_default.get())
 
         # BUTTONS
         btn_03a = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 3, column_id=2*var_header_n + 2,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 3, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         # OPTION MENUS
         opt_04a = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=2*var_header_n + 2,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.container_var["IS"]["Default SMPL"],
-            option_list=self.container_lists["Measured Isotopes"]["All"],
-            text_set=self.container_var["IS"]["Default SMPL"].get(), fg_active=self.bg_colors["Dark Font"],
-            bg_active=self.accent_color, command=lambda var_opt=self.container_var["IS"]["Default SMPL"]:
-        self.select_reference_element(var_opt))
+            var_iso=self.container_var[var_setting_key]["Oxide"],
+            option_list=self.container_lists["Selected Oxides"]["All"],
+            text_set=self.container_var[var_setting_key]["Oxide"].get(), fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var[var_setting_key]["Oxide"], var_file=None, state_default=True:
+            self.ma_change_matrix_compound(var_opt, var_file, state_default))
         opt_04a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
@@ -9660,10 +9665,28 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color, highlightthickness=0)
 
+
+        self.opt_02b = SE(
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 6, column_id=3*var_header_n + 1,
+            n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["IS"]["Default SMPL"],
+            option_list=self.container_lists["Measured Isotopes"]["All"],
+            text_set=self.container_var["IS"]["Default SMPL"].get(), fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color, command=lambda var_opt=self.container_var["IS"]["Default SMPL"]:
+        self.select_reference_element(var_opt))
+        self.opt_02b["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        self.opt_02b.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+
         ## TREEVIEWS
         frm_tv = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=15,
-            n_columns=2*var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+            n_columns=3*var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
         vsb_tv = ttk.Scrollbar(master=frm_tv, orient="vertical")
         text_tv = tk.Text(
             master=frm_tv, width=30, height=25, yscrollcommand=vsb_tv.set, bg=self.bg_colors["Very Light"])
@@ -9676,16 +9699,59 @@ class PySILLS(tk.Frame):
         text_tv.window_create("end", window=lbl_i)
         text_tv.insert("end", "\t")
         lbl_i = tk.Label(
+            frm_tv, text="Reference Oxide", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_tv.window_create("end", window=lbl_i)
+        text_tv.insert("end", "\t")
+        lbl_i = tk.Label(
+            frm_tv, text="Reference Isotope", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        text_tv.window_create("end", window=lbl_i)
+        text_tv.insert("end", "\t")
+        lbl_i = tk.Label(
             frm_tv, text="Total amount of oxides (wt.%)", bg=self.bg_colors["Very Light"],
             fg=self.bg_colors["Dark Font"])
         text_tv.window_create("end", window=lbl_i)
         text_tv.insert("end", "\n")
 
-        for filename_short in self.container_lists["SMPL"]["Short"]:
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
             lbl_i = tk.Label(
                 frm_tv, text=filename_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_tv.window_create("end", window=lbl_i)
             text_tv.insert("end", "\t")
+
+            opt_oxide_i = tk.OptionMenu(
+                frm_tv, self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"],
+                *self.container_lists["Selected Oxides"]["All"],
+                command=lambda var_opt=self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"],
+                               var_file=filename_long, state_default=False:
+                self.ma_change_matrix_compound(var_opt, var_file, state_default))
+            opt_oxide_i["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+            opt_oxide_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
+            text_tv.window_create("end", window=opt_oxide_i)
+            text_tv.insert("end", " \t")
+
+            if self.pysills_mode == "MA":
+                var_opt_is_i = self.container_var["SMPL"][filename_long]["IS Data"]["IS"]
+            else:
+                var_opt_is_i = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"]
+
+            opt_ref_i = tk.OptionMenu(
+                frm_tv, var_opt_is_i, *self.container_lists["Measured Isotopes"]["All"],
+                command=lambda var_opt=var_opt_is_i, var_file=filename_long, state_default=False:
+                self.ma_change_matrix_compound(var_opt, var_file, state_default))
+            opt_ref_i["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+            opt_ref_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
+            text_tv.window_create("end", window=opt_ref_i)
+            text_tv.insert("end", " \t")
 
             if filename_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
                 self.container_var["Oxides Quantification"]["Total Amounts"][filename_short] = tk.StringVar()
@@ -9699,10 +9765,8 @@ class PySILLS(tk.Frame):
             text_tv.insert("end", "\n")
 
     def select_reference_element(self, var_opt):
-        print("Selected element:", var_opt)
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
-            print(filename_short)
             self.container_var["SMPL"][filename_long]["IS Data"]["IS"].set(var_opt)
 
     def place_quantification_method(self, var_geometry_info):
@@ -14805,6 +14869,13 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+
         if mode == "Specific":
             if var_filetype == "STD":
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -14822,30 +14893,74 @@ class PySILLS(tk.Frame):
                         isotope] = var_result_i
             elif var_filetype == "SMPL":
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-                for isotope in file_isotopes:
-                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                    var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
-                                                     "Concentration"].get())
-                    var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                        "MAT"][isotope]
-                    var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                        "MAT"][var_is]
-                    var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                        "1 SIGMA MAT"][isotope]
-                    var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                        var_file_short]["MAT"][isotope]
+                if self.container_var["Quantification Mineral"]["Method"].get() == "Internal Standard":
+                    for isotope in file_isotopes:
+                        var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                        var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
+                                                         "Concentration"].get())
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
+                            "MAT"][isotope]
+                        var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
+                            "MAT"][var_is]
+                        var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                            "1 SIGMA MAT"][isotope]
+                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
 
-                    if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
-                        var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
-                        var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
-                    else:
-                        var_result_i = 0.0
-                        var_result_sigma_i = 0.0
+                        if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
+                            var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
+                            var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
+                        else:
+                            var_result_i = 0.0
+                            var_result_sigma_i = 0.0
 
-                    self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                        isotope] = var_result_i
-                    self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                        isotope] = var_result_sigma_i
+                        self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                            isotope] = var_result_sigma_i
+                else:
+                    var_ref = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                    var_ref_oxide = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].get()
+                    conversion_factor_ref = self.conversion_factors[var_ref_oxide]
+                    conversion_factor_to_ppm = 10**6
+                    amount_total_oxides = float(
+                        self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short].get())/100
+                    lower_term = 1
+                    for isotope in file_isotopes:
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+                        var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][var_ref]
+                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+
+                        if var_sensitivity_i > 0 and var_intensity_ref > 0 and isotope != var_ref:
+                            lower_term += (var_intensity_i/var_intensity_ref)/var_sensitivity_i
+
+                    var_amount_ref = 1/lower_term
+                    var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
+                                             conversion_factor_to_ppm)
+                    for isotope in file_isotopes:
+                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+                        var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
+                            var_file_short]["MAT"][var_ref]
+                        var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                            "1 SIGMA MAT"][isotope]
+                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+
+                        if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
+                            var_result_i = (var_intensity_i/var_intensity_ref)*(var_concentration_ref/var_sensitivity_i)
+                            var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
+                        else:
+                            var_result_i = 0.0
+                            var_result_sigma_i = 0.0
+
+                        self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                            isotope] = var_result_sigma_i
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -15976,22 +16091,22 @@ class PySILLS(tk.Frame):
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_sample_settings(var_geometry_info=var_sample_settings)
         # Build section 'Quantification Method'
-        var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_quantification_method = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_quantification_method(var_geometry_info=var_quantification_method)
         # Build section 'Assemblage Setup'
-        var_assemblage_setup = {"Row start": 14, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 12, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
         # Build section 'Dwell Time Setup'
-        var_dwell_time_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 14, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
         # Build section 'Calculation Window (Background) Setup'
-        var_calculation_window_bg_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 29, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 27, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
@@ -16214,22 +16329,22 @@ class PySILLS(tk.Frame):
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_sample_settings(var_geometry_info=var_sample_settings)
         # Build section 'Quantification Method'
-        var_quantification_method = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_quantification_method = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_quantification_method(var_geometry_info=var_quantification_method)
         # Build section 'Assemblage Setup'
-        var_assemblage_setup = {"Row start": 14, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 12, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
         # Build section 'Dwell Time Setup'
-        var_dwell_time_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 14, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
         # Build section 'Calculation Window (Background) Setup'
-        var_calculation_window_bg_setup = {"Row start": 18, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 22, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 29, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 27, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
