@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		08.12.2023
+# Date:		11.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -5866,7 +5866,9 @@ class PySILLS(tk.Frame):
                         self.container_var["SRM"][isotope].set(splitted_std[1])
                     else:
                         oxide = splitted_std[0]
-                        self.container_lists["Selected Oxides"]["All"].append(oxide)
+
+                        if len(oxide) > 0:
+                            self.container_lists["Selected Oxides"]["All"].append(oxide)
                     #
                 ## SAMPLE/MATRIX SETTINGS
                 for i in range(index_container["SAMPLE SETTINGS"] + 1,
@@ -9557,6 +9559,7 @@ class PySILLS(tk.Frame):
 
     def select_oxide(self, var_oxide, var_key):
         state_cb = self.container_var["Oxides Quantification"][var_key][var_oxide].get()
+
         if state_cb == 1:
             if var_oxide not in self.container_lists["Selected Oxides"]["All"]:
                 self.container_lists["Selected Oxides"]["All"].append(var_oxide)
@@ -9648,14 +9651,14 @@ class PySILLS(tk.Frame):
             text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         # OPTION MENUS
+        list_opt04a = sorted(self.container_lists["Selected Oxides"]["All"])
         opt_04a = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var[var_setting_key]["Oxide"],
-            option_list=self.container_lists["Selected Oxides"]["All"],
-            text_set=self.container_var[var_setting_key]["Oxide"].get(), fg_active=self.bg_colors["Dark Font"],
-            bg_active=self.accent_color,
+            option_list=list_opt04a, text_set=self.container_var[var_setting_key]["Oxide"].get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var[var_setting_key]["Oxide"], var_file=None, state_default=True:
             self.ma_change_matrix_compound(var_opt, var_file, state_default))
         opt_04a["menu"].config(
@@ -9720,9 +9723,10 @@ class PySILLS(tk.Frame):
             text_tv.window_create("end", window=lbl_i)
             text_tv.insert("end", "\t")
 
+            list_opt_oxide_i = sorted(self.container_lists["Selected Oxides"]["All"])
             opt_oxide_i = tk.OptionMenu(
                 frm_tv, self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"],
-                *self.container_lists["Selected Oxides"]["All"],
+                *list_opt_oxide_i,
                 command=lambda var_opt=self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"],
                                var_file=filename_long, state_default=False:
                 self.ma_change_matrix_compound(var_opt, var_file, state_default))
@@ -14940,6 +14944,7 @@ class PySILLS(tk.Frame):
                     var_amount_ref = 1/lower_term
                     var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
                                              conversion_factor_to_ppm)
+
                     for isotope in file_isotopes:
                         var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
                             var_file_short]["MAT"][isotope]
