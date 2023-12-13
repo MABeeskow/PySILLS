@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.12.2023
+# Date:		13.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -110,7 +110,7 @@ class PySILLS(tk.Frame):
         self.chemistry_data = {
             "O": 15.999, "Na": 22.990, "Mg": 24.305, "Al": 26.982, "Si": 28.085, "P": 30.974, "K": 39.098, "Ca": 40.078,
             "Ti": 47.867, "Cr": 51.996, "Mn": 54.938, "Fe": 55.845, "Ga": 69.723, "Ge": 72.630, "Zr": 91.224,
-            "Ba": 137.33}
+            "Ba": 137.33, "B": 10.81}
         self.chemistry_data_sills = {
             "O": 16.000, "Na": 22.990, "Mg": 24.300, "Al": 26.980, "Si": 28.090, "P": 30.970, "K": 39.100, "Ca": 40.080,
             "Ti": 47.870, "Cr": 52.000, "Mn": 54.940, "Fe": 55.850, "Ga": 69.720, "Ge": 72.610, "Zr": 91.220,
@@ -259,14 +259,15 @@ class PySILLS(tk.Frame):
 
         # 100 wt.% Oxides
         self.container_var["Oxides Quantification"] = {"Major": {}, "Minor": {}, "Ratios": {}, "Total Amounts": {}}
-        list_major_oxides = ["SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "MnO2", "MgO", "CaO", "Na2O",
-                             "K2O", "P2O5", "SO3"]
-        list_industrial_metal_oxides = ["CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO2",
-                                        "MoO3"]
+        list_major_oxides = [
+            "SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "MnO2", "MgO", "CaO", "Na2O", "K2O", "P2O5", "SO3"]
+        list_industrial_metal_oxides = [
+            "CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO2", "MoO3"]
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
-        list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3",
-                                 "Dy2O3", "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
-        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO", "GeO2"]
+        list_rareearth_metals = [
+            "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
+            "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
+        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3"]
         list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "Pb-Ratio", "Pr-Ratio", "Tb-Ratio"]
         for oxide in list_major_oxides:
             self.container_var["Oxides Quantification"]["Major"][oxide] = tk.IntVar()
@@ -295,7 +296,7 @@ class PySILLS(tk.Frame):
         self.container_var["Detailed Data Analysis"]["Filename STD"].set("Select Standard File")
         self.container_var["Detailed Data Analysis"]["Filename SMPL"].set("Select Sample File")
         self.container_var["Detailed Data Analysis"]["Datatype"].set(0)
-        self.container_var["Detailed Data Analysis"]["Focus"].set(0)
+        self.container_var["Detailed Data Analysis"]["Focus"].set(1)
         self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
         self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
         self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
@@ -641,8 +642,8 @@ class PySILLS(tk.Frame):
             self.molar_masses_compounds = {}
             self.container_var[key_setting]["Salt Correction"] = {
                 "Chlorides": {}, "Carbonates": {}, "Sulfates": {}, "Salinity": tk.StringVar(),
-                "Default Salinity": tk.StringVar(), "Default Concentration": tk.StringVar(), "Default IS": tk.StringVar(),
-                "Salinity SMPL": {}}
+                "Default Salinity": tk.StringVar(), "Default Concentration": tk.StringVar(),
+                "Default IS": tk.StringVar(), "Salinity SMPL": {}}
             self.container_var[key_setting]["Salt Correction"]["Salinity"].set("0.0")
             self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set("Set Salinity (in %)")
             self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set("0.0")
@@ -926,6 +927,10 @@ class PySILLS(tk.Frame):
             "Tl2O3": 1.1174, "Tm2O3": 1.1421, "UO2": 1.1344, "UO3": 1.2017, "U3O8": 1.1792, "V2O5": 1.7852,
             "WO3": 1.2610, "Y2O3": 1.2699, "Yb2O3": 1.1387, "ZnO": 1.2448, "ZrO2": 1.3508}
 
+        self.maximum_amounts = {
+            "Al": 529261, "B": 310556, "Be": 360327, "Fe": 777309, "Ga": 743938, "Ge": 694174,
+            "Li": 464540, "Mn": 774462, "Na": 741864, "Si": 467437, "Sn": 881233, "Ti": 599349}
+
         self.container_results = {}
         self.container_results["STD"] = {}
         self.container_results["STD"]["RAW"] = {}
@@ -1122,7 +1127,24 @@ class PySILLS(tk.Frame):
             "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
             "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
             "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
-            "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"}}
+            "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
+            "Add": {"English": "Add", "German": "Hinzufügen"},
+            "Copy": {"English": "Copy", "German": "Kopieren"},
+            "Delete": {"English": "Delete", "German": "Löschen"},
+            "New Project": {"English": "New Project", "German": "Neues Projekt"},
+            "Load Project": {"English": "Open Project", "German": "Projekt laden"},
+            "Save Project": {"English": "Save Project", "German": "Projekt speichern"},
+            "General Settings": {"English": "Main Settings", "German": "Haupteinstellungen"},
+            "About": {"English": "About PySILLS", "German": "Über PySILLS"},
+            "Quit": {"English": "Quit", "German": "Beenden"},
+            "Setup": {"English": "Setup", "German": "Einstellungen"},
+            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
+            "Mineral Analysis": {"English": "Mineral Analysis", "German": "Minerale"},
+            "Settings": {"English": "Settings", "German": "Einstellungen"},
+            "Results": {"English": "Results", "German": "Ergebnisse"},
+            "Extras": {"English": "Extras", "German": "Extras"},
+            "Fluid Inclusions": {"English": "Fluid Inclusions", "German": "Flüssigkeitseinschlüsse"},
+            "Melt Inclusions": {"English": "Melt Inclusions", "German": "Schmelzeinschlüsse"}}
 
         ################################################################################################################
         #
@@ -1252,7 +1274,13 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
 
         # RADIOBUTTONS
-        list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions (not ready)", "Output Analysis (not ready)"]
+        if self.var_language == "English":
+            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions (not ready)",
+                         "Output Analysis (not ready)"]
+        elif self.var_language == "German":
+            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse",
+                         "Output Analysis (not ready)"]
+
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
             rb_mode = SE(
@@ -1267,76 +1295,89 @@ class PySILLS(tk.Frame):
             self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
 
         # BUTTONS
+        var_btn_01 = self.language_dict["Add"][self.var_language]
+        var_btn_02 = self.language_dict["Copy"][self.var_language]
+        var_btn_03 = self.language_dict["Delete"][self.var_language]
+        var_btn_04 = self.language_dict["New Project"][self.var_language]
+        var_btn_05 = self.language_dict["Load Project"][self.var_language]
+        var_btn_06 = self.language_dict["Save Project"][self.var_language]
+        var_btn_07 = self.language_dict["General Settings"][self.var_language]
+        var_btn_08 = self.language_dict["About"][self.var_language]
+        var_btn_09 = self.language_dict["Quit"][self.var_language]
+        var_btn_10 = self.language_dict["Setup"][self.var_language]
+
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=start_column, n_rows=common_n_rows + 1,
-            n_columns=n_columns_button, fg=font_color_dark,
+            parent=self.parent, row_id=start_row + 20, column_id=start_column, n_rows=common_n_rows,
+            n_columns=2*n_columns_button, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Add", bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="STD":
+            text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="STD":
             self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=3, n_rows=common_n_rows + 1,
-            n_columns=n_columns_button, fg=font_color_dark,
+            parent=self.parent, row_id=start_row + 21, column_id=start_column, n_rows=common_n_rows,
+            n_columns=2*n_columns_button, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Copy", bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="STD":
+            text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="STD":
             self.copy_file(filetype))
         SE(
             parent=self.parent, row_id=start_row + 20, column_id=6, n_rows=common_n_rows + 1,
             n_columns=n_columns_button + 1, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Delete", bg_active=accent_color, fg_active=font_color_dark,
+            text=var_btn_03, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_std, var_list=self.list_std: self.delete_csv(var_lb, var_list))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows + 1,
-            n_columns=n_columns_button, fg=font_color_dark,
+            parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows,
+            n_columns=2*n_columns_button, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Add", bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="SMPL":
+            text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="SMPL":
             self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=14, n_rows=common_n_rows + 1,
-            n_columns=n_columns_button, fg=font_color_dark,
+            parent=self.parent, row_id=start_row + 21, column_id=11, n_rows=common_n_rows,
+            n_columns=2*n_columns_button, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Copy", bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="SMPL":
+            text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="SMPL":
             self.copy_file(filetype))
         SE(
             parent=self.parent, row_id=start_row + 20, column_id=17, n_rows=common_n_rows + 1,
             n_columns=n_columns_button + 1, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Delete", bg_active=accent_color, fg_active=font_color_dark,
+            text=var_btn_03, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_smpl, var_list=self.list_smpl: self.delete_csv(var_lb, var_list))
-        #
+
         SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="New Project", bg_active=accent_color, fg_active=font_color_dark, command=self.restart_pysills)
+            text=var_btn_04, bg_active=accent_color, fg_active=font_color_dark, command=self.restart_pysills)
         SE(
             parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Load Project", bg_active=accent_color, fg_active=font_color_dark, command=self.open_project)
+            text=var_btn_05, bg_active=accent_color, fg_active=font_color_dark, command=self.open_project)
         SE(
             parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Save Project", bg_active=accent_color, fg_active=font_color_dark, command=self.save_project)
+            text=var_btn_06, bg_active=accent_color, fg_active=font_color_dark, command=self.save_project)
         SE(
             parent=self.parent, row_id=start_row + 8, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="General Settings", bg_active=accent_color, fg_active=font_color_dark,
+            text=var_btn_07, bg_active=accent_color, fg_active=font_color_dark,
             command=self.subwindow_general_settings)
         btn_about = SE(
             parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="About", bg_active=accent_color, fg_active=font_color_dark, command=self.about_pysills)
+            text=var_btn_08, bg_active=accent_color, fg_active=font_color_dark, command=self.about_pysills)
         SE(
             parent=self.parent, row_id=start_row + 12, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Quit", bg_active=accent_color, fg_active=font_color_dark, command=self.parent.quit)
+            text=var_btn_09, bg_active=accent_color, fg_active=font_color_dark, command=self.parent.quit)
         btn_icp = SE(
-            parent=self.parent, row_id=start_row + 17, column_id=start_column + common_n_columns + 1, n_rows=common_n_rows,
-            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Setup", bg_active=accent_color, fg_active=font_color_dark, command=self.define_icp_ms_import_setup)
+            parent=self.parent, row_id=start_row + 17, column_id=start_column + common_n_columns + 1,
+            n_rows=common_n_rows, n_columns=common_n_columns, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text=var_btn_10, bg_active=accent_color, fg_active=font_color_dark, command=self.define_icp_ms_import_setup)
 
         # OPTION MENUS
         self.var_opt_icp = tk.StringVar()
-        self.var_opt_icp.set("Select ICP-MS")
+        str_opt_icpms = self.language_dict["Select ICP-MS"][self.var_language]
+        self.var_opt_icp.set(str_opt_icpms)
         opt_icp = SE(
             parent=self.parent, row_id=start_row + 17, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
@@ -1611,7 +1652,11 @@ class PySILLS(tk.Frame):
     def select_experiment(self, var_rb):
         start_row = 9
         start_column = 11
-        #
+
+        str_btn_01 = self.language_dict["Settings"][self.var_language]
+        str_btn_02 = self.language_dict["Results"][self.var_language]
+        str_btn_03 = self.language_dict["Extras"][self.var_language]
+
         if var_rb.get() == 0:   # Mineral Analysis
             self.pysills_mode = "MA"
             ## Cleaning
@@ -1622,10 +1667,11 @@ class PySILLS(tk.Frame):
                     self.gui_elements["main"][gui_category]["Specific"].clear()
             #
             ## Labels
+            str_lbl_01 = self.language_dict["Mineral Analysis"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Mineral Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1633,17 +1679,17 @@ class PySILLS(tk.Frame):
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_extras)
 
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
@@ -1658,10 +1704,11 @@ class PySILLS(tk.Frame):
                     self.gui_elements["main"][gui_category]["Specific"].clear()
             #
             ## Labels
+            str_lbl_01 = self.language_dict["Fluid Inclusions"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Fluid Inclusions", relief=tk.FLAT, fontsize="sans 14 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1669,17 +1716,17 @@ class PySILLS(tk.Frame):
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_datareduction_files)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
@@ -1694,10 +1741,11 @@ class PySILLS(tk.Frame):
                     self.gui_elements["main"][gui_category]["Specific"].clear()
             #
             ## Labels
+            str_lbl_01 = self.language_dict["Melt Inclusions"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Melt Inclusions", relief=tk.FLAT, fontsize="sans 14 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -1705,17 +1753,17 @@ class PySILLS(tk.Frame):
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.mi_settings)
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_datareduction_files)
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
@@ -1741,15 +1789,15 @@ class PySILLS(tk.Frame):
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_02 = SE(
                 parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Extras", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03.configure(state="disabled")
             #
@@ -7418,7 +7466,7 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Language"],
             var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-        opt_language["menu"].entryconfig("German", state="disable")
+        #opt_language["menu"].entryconfig("German", state="disable")
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
         opt_language["menu"].entryconfig("French", state="disable")
@@ -9481,10 +9529,20 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Tb4O7/(Tb2O3 + Tb4O7)", relief=tk.FLAT, fontsize="sans 10 bold")
 
+        # BUTTONS
+        btn_01a = SE(
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 18, column_id=5*var_header_n + 6, n_rows=2,
+            n_columns=2*var_header_n - 2, fg=self.bg_colors["Dark Font"],
+            bg=self.accent_color).create_simple_button(
+            text="Guess the composition", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.guess_composition)
+
         # CHECKBOXES
+        self.container_checkboxes = {}
         ## Major Oxides
-        list_major_oxides = ["SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO",
-                             "MnO2", "SO3"]
+        list_major_oxides = [
+            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "MnO2", "SO3"]
+        list_major_oxides = sorted(list_major_oxides)
         for index, oxide in enumerate(list_major_oxides):
             cb_002a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
@@ -9492,11 +9550,14 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Major"][oxide], text=oxide, set_sticky="nesw",
                 own_color=True, command=lambda var_oxide=oxide, var_key="Major": self.select_oxide(var_oxide, var_key))
+            self.container_checkboxes[oxide] = cb_002a
+
             if oxide in self.container_lists["Selected Oxides"]["All"]:
                 cb_002a.select()
 
         ## Industrial Metals
         list_industrial_metals= ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO3"]
+        list_industrial_metals = sorted(list_industrial_metals)
         for index, oxide in enumerate(list_industrial_metals):
             cb_003a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
@@ -9504,11 +9565,14 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
                 own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            self.container_checkboxes[oxide] = cb_003a
+
             if oxide in self.container_lists["Selected Oxides"]["All"]:
                 cb_003a.select()
 
         ## Precious Metals
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
+        list_precious_metals = sorted(list_precious_metals)
         for index, oxide in enumerate(list_precious_metals):
             cb_004a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
@@ -9516,12 +9580,15 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
                 own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            self.container_checkboxes[oxide] = cb_004a
+
             if oxide in self.container_lists["Selected Oxides"]["All"]:
                 cb_004a.select()
 
         ## Rare Earth Metals
         list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3",
                                  "Dy2O3", "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
+        list_rareearth_metals = sorted(list_rareearth_metals)
         for index, oxide in enumerate(list_rareearth_metals):
             cb_005a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
@@ -9529,11 +9596,14 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
                 own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            self.container_checkboxes[oxide] = cb_005a
+
             if oxide in self.container_lists["Selected Oxides"]["All"]:
                 cb_005a.select()
 
         ## Other Elements
-        list_other_elements= ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2"]
+        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3"]
+        list_other_elements = sorted(list_other_elements)
         for index, oxide in enumerate(list_other_elements):
             cb_005a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
@@ -9541,6 +9611,8 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Minor"][oxide], text=oxide, set_sticky="nesw",
                 own_color=True, command=lambda var_oxide=oxide, var_key="Minor": self.select_oxide(var_oxide, var_key))
+            self.container_checkboxes[oxide] = cb_005a
+
             if oxide in self.container_lists["Selected Oxides"]["All"]:
                 cb_005a.select()
 
@@ -9556,6 +9628,29 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var["Oxides Quantification"]["Ratios"][ratio],
                 text_default=self.container_var["Oxides Quantification"]["Ratios"][ratio].get())
+
+    def guess_composition(self):
+        list_major_oxides = [
+            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "MnO2", "SO3"]
+        list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO3"]
+        list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
+        list_rareearth_metals = [
+            "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
+            "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
+        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3"]
+        all_lists = [
+            list_major_oxides, list_industrial_metals, list_precious_metals, list_rareearth_metals, list_other_elements]
+
+        for list_oxides in all_lists:
+            for oxide in list_oxides:
+                key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+                element_oxide = key.group(1)
+                if element_oxide in self.container_lists["Measured Elements"]["All"]:
+                    if oxide not in ["FeO", "MnO2", "PbO2", "Pr6O11", "Tb4O7"]:
+                        self.container_checkboxes[oxide].select()
+
+                        if oxide not in self.container_lists["Selected Oxides"]["All"]:
+                            self.container_lists["Selected Oxides"]["All"].append(oxide)
 
     def select_oxide(self, var_oxide, var_key):
         state_cb = self.container_var["Oxides Quantification"][var_key][var_oxide].get()
@@ -10028,7 +10123,16 @@ class PySILLS(tk.Frame):
                     command=self.fi_setup_matrix_only_tracer)
                 self.bool_matrixonlytracer = True
             else:
-                self.btn_setup_matrixonlytracer.grid()
+                try:
+                    self.btn_setup_matrixonlytracer.grid()
+                except:
+                    self.btn_setup_matrixonlytracer = SE(
+                        parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                        n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                        bg=self.bg_colors["Light"]).create_simple_button(
+                        text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                        command=self.fi_setup_matrix_only_tracer)
+                    self.bool_matrixonlytracer = True
                 if self.bool_secondinternalstandard == True:
                     self.btn_setup_secondis.grid_remove()
                 if self.bool_halter2002 == True:
@@ -11312,7 +11416,7 @@ class PySILLS(tk.Frame):
                     master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                     activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
                     highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
-                    command=lambda var_file=file_std, var_type="STD": self.mi_check_specific_file(var_file, var_type))
+                    command=lambda var_file=file_std, var_type="STD": self.fi_check_specific_file(var_file, var_type))
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
 
@@ -11712,7 +11816,7 @@ class PySILLS(tk.Frame):
                     master=frm_files, text="Setup", bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
                     activebackground=self.accent_color, activeforeground=self.bg_colors["Dark Font"],
                     highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
-                    command=lambda var_file=file_smpl, var_type="SMPL": self.mi_check_specific_file(var_file, var_type))
+                    command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
 
@@ -11795,6 +11899,8 @@ class PySILLS(tk.Frame):
         for index, isotope in enumerate(self.container_lists["Measured Isotopes"]["All"]):
             self.container_files["SRM"][isotope] = tk.StringVar()
             self.isotope_colors[isotope] = colors_mpl[index]
+
+
 
     def build_container_helper(self, mode):
         """Creates and defines some important helper variables.
@@ -14924,6 +15030,8 @@ class PySILLS(tk.Frame):
                             isotope] = var_result_sigma_i
                 else:
                     var_ref = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                    key_element = re.search("(\D+)(\d+)", var_ref)
+                    ref_element = key_element.group(1)
                     var_ref_oxide = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].get()
                     conversion_factor_ref = self.conversion_factors[var_ref_oxide]
                     conversion_factor_to_ppm = 10**6
@@ -14944,28 +15052,90 @@ class PySILLS(tk.Frame):
                     var_amount_ref = 1/lower_term
                     var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
                                              conversion_factor_to_ppm)
+                    max_amount_ref = self.maximum_amounts[ref_element]
 
-                    for isotope in file_isotopes:
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
-                        var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][var_ref]
-                        var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                            "1 SIGMA MAT"][isotope]
-                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
+                    if var_concentration_ref <= max_amount_ref:
+                        correction_factor_i = 1
+                        for isotope in file_isotopes:
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_ref]
+                            var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+                                var_file_short]["1 SIGMA MAT"][isotope]
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
 
-                        if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
-                            var_result_i = (var_intensity_i/var_intensity_ref)*(var_concentration_ref/var_sensitivity_i)
-                            var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
-                        else:
-                            var_result_i = 0.0
-                            var_result_sigma_i = 0.0
+                            if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
+                                var_result_i = ((var_intensity_i/var_intensity_ref)*
+                                                (var_concentration_ref/var_sensitivity_i))
+                                var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
+                            else:
+                                var_result_i = 0.0
+                                var_result_sigma_i = 0.0
 
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                            isotope] = var_result_sigma_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
+
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            max_amount_i = self.maximum_amounts[element]
+
+                            if var_result_i > max_amount_i:
+                                correction_factor_i = max_amount_i/var_result_i
+                                break
+
+                        if correction_factor_i != 1:
+                            for isotope in file_isotopes:
+                                var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][var_ref]
+                                var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["1 SIGMA MAT"][isotope]
+                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+
+                                if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
+                                    var_result_i = correction_factor_i*(var_intensity_i/var_intensity_ref)*(
+                                            var_concentration_ref/var_sensitivity_i)
+                                    var_result_sigma_i = (correction_factor_i*(var_intensity_sigma_i/var_intensity_i)*
+                                                          var_result_i)
+                                else:
+                                    var_result_i = 0.0
+                                    var_result_sigma_i = 0.0
+
+                                self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                    isotope] = var_result_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                    isotope] = var_result_sigma_i
+                    else:
+                        correction_factor = max_amount_ref/var_concentration_ref
+                        var_concentration_ref = correction_factor*var_concentration_ref
+                        for isotope in file_isotopes:
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_ref]
+                            var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+                                var_file_short]["1 SIGMA MAT"][isotope]
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+
+                            if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
+                                var_result_i = (var_intensity_i/var_intensity_ref)*(
+                                            var_concentration_ref/var_sensitivity_i)
+                                var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
+                            else:
+                                var_result_i = 0.0
+                                var_result_sigma_i = 0.0
+
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -15376,32 +15546,33 @@ class PySILLS(tk.Frame):
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=7,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Relative Sensitivity Factor",
             sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
-        #
+
         ## OPTION MENUS
         if self.container_var["ID"]["Default SMPL"].get() != "Select ID":
             var_text = self.container_var["ID"]["Default SMPL"].get()
         else:
             var_text = "Select ID"
-        #
+
         list_id_found = []
         for var_file_long in self.container_lists["SMPL"]["Long"]:
             var_id_i = self.container_var["SMPL"][var_file_long]["ID"].get()
             if var_id_i not in list_id_found:
                 list_id_found.append(var_id_i)
-        #
-        opt_03a = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=start_row + 7, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.container_var["ID"]["Results Files"], option_list=list_id_found,
-            text_set=var_text, fg_active=self.bg_colors["Dark Font"], bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["ID"]["Results Files"]: self.change_id_results(var_opt))
-        opt_03a["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        opt_03a.config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, highlightthickness=0)
-        #
+
+        if len(list_id_found) > 0:
+            opt_03a = SE(
+                parent=self.subwindow_ma_datareduction_files, row_id=start_row + 7, column_id=start_column, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=self.container_var["ID"]["Results Files"], option_list=list_id_found,
+                text_set=var_text, fg_active=self.bg_colors["Dark Font"], bg_active=self.red_dark,
+                command=lambda var_opt=self.container_var["ID"]["Results Files"]: self.change_id_results(var_opt))
+            opt_03a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_03a.config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
+
         ## BUTTONS
         btn_06a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 20, column_id=start_column, n_rows=2,
@@ -15440,22 +15611,41 @@ class PySILLS(tk.Frame):
         list_width = [int(item) for item in list_width]
         list_width[0] = 125
 
-        self.tv_results_files = SE(
-            parent=self.subwindow_ma_datareduction_files, row_id=0, column_id=11, n_rows=24, n_columns=51,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
-            n_categories=len(list_categories), text_n=list_categories,
-            width_n=list_width, individual=True)
+        if len(list_categories) > 1:
+            self.tv_results_files = SE(
+                parent=self.subwindow_ma_datareduction_files, row_id=0, column_id=11, n_rows=24, n_columns=51,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+                n_categories=len(list_categories), text_n=list_categories,
+                width_n=list_width, individual=True)
 
-        scb_v = ttk.Scrollbar(self.subwindow_ma_datareduction_files, orient="vertical")
-        scb_h = ttk.Scrollbar(self.subwindow_ma_datareduction_files, orient="horizontal")
-        self.tv_results_files.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
-        scb_v.config(command=self.tv_results_files.yview)
-        scb_h.config(command=self.tv_results_files.xview)
-        scb_v.grid(row=0, column=62, rowspan=24, columnspan=1, sticky="ns")
-        scb_h.grid(row=24, column=11, rowspan=1, columnspan=51, sticky="ew")
+            scb_v = ttk.Scrollbar(self.subwindow_ma_datareduction_files, orient="vertical")
+            scb_h = ttk.Scrollbar(self.subwindow_ma_datareduction_files, orient="horizontal")
+            self.tv_results_files.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
+            scb_v.config(command=self.tv_results_files.yview)
+            scb_h.config(command=self.tv_results_files.xview)
+            scb_v.grid(row=0, column=62, rowspan=24, columnspan=1, sticky="ns")
+            scb_h.grid(row=24, column=11, rowspan=1, columnspan=51, sticky="ew")
 
-        ## INITIALIZATION
-        self.ma_datareduction_tables(init=True)
+            ## INITIALIZATION
+            self.ma_datareduction_tables(init=True)
+        else:
+            rb_01a.configure(state="disabled")
+            rb_01b.configure(state="disabled")
+            rb_02a.configure(state="disabled")
+            rb_02b.configure(state="disabled")
+            rb_04a.configure(state="disabled")
+            rb_05a.configure(state="disabled")
+            self.rb_conc_ratio.configure(state="disabled")
+            self.rb_lod.configure(state="disabled")
+            rb_05d.configure(state="disabled")
+            self.rb_int_ratio.configure(state="disabled")
+            rb_05f.configure(state="disabled")
+            rb_05g.configure(state="disabled")
+            self.rb_rsf.configure(state="disabled")
+
+            btn_06a.configure(state="disabled")
+            btn_07c.configure(state="disabled")
+            btn_07d.configure(state="disabled")
 
     def detailed_data_analysis(self):
         if self.pysills_mode == "MA":
@@ -15565,12 +15755,15 @@ class PySILLS(tk.Frame):
 
         # OPTION MENUS
         list_files_std = self.container_lists["STD"]["Short"]
-        str_default_std = self.container_var["Detailed Data Analysis"]["Filename STD"].get()
+        str_default_std = "Select Standard File"
+
         opt_01a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["Detailed Data Analysis"]["Filename STD"], option_list=list_files_std,
-            text_set=str_default_std, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+            text_set=str_default_std, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["Detailed Data Analysis"]["Filename STD"]:
+            self.detailed_analysis_select_file(var_opt))
         opt_01a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
@@ -15579,12 +15772,14 @@ class PySILLS(tk.Frame):
             activebackground=self.accent_color, highlightthickness=0)
 
         list_files_smpl = self.container_lists["SMPL"]["Short"]
-        str_default_smpl = self.container_var["Detailed Data Analysis"]["Filename STD"].get()
+        str_default_smpl = "Select Sample File"
         opt_01b = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["Detailed Data Analysis"]["Filename SMPL"], option_list=list_files_smpl,
-            text_set=str_default_smpl, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+            text_set=str_default_smpl, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["Detailed Data Analysis"]["Filename SMPL"]:
+            self.detailed_analysis_select_file(var_opt))
         opt_01b["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
@@ -15594,13 +15789,15 @@ class PySILLS(tk.Frame):
 
         list_intensity_parameter = ["Measured Intensity", "Intensity", "Intensity Ratio", "Intensity Noise",
                                     "\u03C3 Intensity"]
-        str_default_intensity = self.container_var["Detailed Data Analysis"]["Intensity Results"].get()
+        str_default_intensity = "Select Parameter"
         opt_04a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["Detailed Data Analysis"]["Intensity Results"],
             option_list=list_intensity_parameter, text_set=str_default_intensity, fg_active=self.bg_colors["Dark Font"],
-            bg_active=self.accent_color)
+            bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["Detailed Data Analysis"]["Intensity Results"]:
+            self.detailed_analysis_select_focus(var_opt))
         opt_04a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
@@ -15609,13 +15806,15 @@ class PySILLS(tk.Frame):
             activebackground=self.accent_color, highlightthickness=0)
 
         list_sensitivity_parameter = ["Analytical Sensitivity", "Normalized Sensitivity", "Relative Sensitivity Factor"]
-        str_default_sensitivity = self.container_var["Detailed Data Analysis"]["Sensitivity Results"].get()
+        str_default_sensitivity = "Select Parameter"
         opt_05a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 14, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["Detailed Data Analysis"]["Sensitivity Results"],
             option_list=list_sensitivity_parameter, text_set=str_default_sensitivity,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["Detailed Data Analysis"]["Sensitivity Results"]:
+            self.detailed_analysis_select_focus(var_opt))
         opt_05a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
@@ -15625,13 +15824,15 @@ class PySILLS(tk.Frame):
 
         list_concentration_parameter = ["Concentration", "Concentration Ratio", "Concentration Noise",
                                         "Limit of Detection", "\u03C3 Concentration"]
-        str_default_concentration = self.container_var["Detailed Data Analysis"]["Concentration Results"].get()
+        str_default_concentration = "Select Parameter"
         opt_05a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 16, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["Detailed Data Analysis"]["Concentration Results"],
             option_list=list_concentration_parameter, text_set=str_default_concentration,
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+            command=lambda var_opt=self.container_var["Detailed Data Analysis"]["Concentration Results"]:
+            self.detailed_analysis_select_focus(var_opt))
         opt_05a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color)
@@ -15639,15 +15840,72 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color, highlightthickness=0)
 
+        # FRAMES
+        frm_a = SE(
+            parent=self.subwindow_detailed_data_analysis, row_id=start_row, column_id=start_column + 11,
+            n_rows=n_rows, n_columns=n_columns - 11, fg=self.bg_colors["Very Light"],
+            bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
+
+        # TREEVIEW
+        list_categories = ["Isotope", "Value"]
+        #list_categories.extend(self.container_lists["Measured Isotopes"]["All"])
+        list_width = list(130*np.ones(len(list_categories)))
+        list_width = [int(item) for item in list_width]
+        list_width[0] = 90
+
+        if len(list_categories) > 1:
+            self.tv_results_detailed = SE(
+                parent=self.subwindow_detailed_data_analysis, row_id=start_row, column_id=start_column + 11,
+                n_rows=n_rows - 1, n_columns=11, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["White"]).create_treeview(
+                n_categories=len(list_categories), text_n=list_categories,
+                width_n=list_width, individual=True)
+
+            scb_v = ttk.Scrollbar(self.subwindow_detailed_data_analysis, orient="vertical")
+            scb_h = ttk.Scrollbar(self.subwindow_detailed_data_analysis, orient="horizontal")
+            self.tv_results_detailed.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
+            scb_v.config(command=self.tv_results_detailed.yview)
+            scb_h.config(command=self.tv_results_detailed.xview)
+            scb_v.grid(row=0, column=22, rowspan=n_rows - 1, columnspan=1, sticky="ns")
+            scb_h.grid(row=n_rows - 1, column=11, rowspan=1, columnspan=11, sticky="ew")
+
         # INITIALIZATION
         if self.pysills_mode == "MA":
             rb_03c.configure(state="disabled")
             rb_03d.configure(state="disabled")
 
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                entries_i = [isotope, 0.000]
+                self.tv_results_detailed.insert("", tk.END, values=entries_i)
+
+    def detailed_analysis_select_file(self, var_opt):
+        self.container_var["Detailed Data Analysis"]["Datatype"].set(0)
+        self.container_var["Detailed Data Analysis"]["Focus"].set(1)
+        self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
+        self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
+        self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+
+        if var_opt in self.container_lists["STD"]["Short"]:
+            self.container_var["Detailed Data Analysis"]["Filename SMPL"].set("Select Sample File")
+        elif var_opt in self.container_lists["SMPL"]["Short"]:
+            self.container_var["Detailed Data Analysis"]["Filename STD"].set("Select Standard File")
+
+    def detailed_analysis_select_focus(self, var_opt):
+        if var_opt in ["Measured Intensity", "Intensity", "Intensity Ratio", "Intensity Noise", "\u03C3 Intensity"]:
+            self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
+            self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+        elif var_opt in ["Analytical Sensitivity", "Normalized Sensitivity", "Relative Sensitivity Factor"]:
+            self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
+            self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+        elif var_opt in ["Concentration", "Concentration Ratio", "Concentration Noise", "Limit of Detection",
+                         "\u03C3 Concentration"]:
+            self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
+            self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
+
     def about_pysills(self):
         ## Window Settings
         window_width = 620
-        window_heigth = 625
+        window_heigth = 550
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
@@ -19756,7 +20014,7 @@ class PySILLS(tk.Frame):
         entr_01a = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column + 13,
             n_rows=1, n_columns=12, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Very Light"]).create_simple_entry(
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["fi_setting"]["Matrix Amount Default"],
             text_default=self.container_var["fi_setting"]["Matrix Amount Default"].get(),
             command=lambda var_entr=self.container_var["fi_setting"]["Matrix Amount Default"]:
@@ -19764,7 +20022,7 @@ class PySILLS(tk.Frame):
         entr_01d = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column + 13,
             n_rows=1, n_columns=12, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Very Light"]).create_simple_entry(
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["fi_setting"]["Matrix-Only Concentration Default"],
             text_default=self.container_var["fi_setting"]["Matrix-Only Concentration Default"].get(),
             command=lambda var_entr=self.container_var["fi_setting"]["Matrix-Only Concentration Default"]:
