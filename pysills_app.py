@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		13.12.2023
+# Date:		14.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -15720,38 +15720,44 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Datatype"], value_rb=0,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Original Data", sticky="nesw",
-            relief=tk.FLAT)
+            relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Datatype"]:
+            self.detailed_analysis_change_datatype(var_rb))
         rb_02b = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Datatype"], value_rb=1,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Smoothed Data", sticky="nesw",
-            relief=tk.FLAT)
+            relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Datatype"]:
+            self.detailed_analysis_change_datatype(var_rb))
 
         rb_03a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 7, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=0,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Background", sticky="nesw",
-            relief=tk.FLAT)
+            relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
+            self.detailed_analysis_change_focus(var_rb))
         rb_03b = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 8, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=1,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Mineral / Matrix", sticky="nesw",
-            relief=tk.FLAT)
+            relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
+            self.detailed_analysis_change_focus(var_rb))
         rb_03c = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=2,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Inclusion", sticky="nesw",
-            relief=tk.FLAT)
+            relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
+            self.detailed_analysis_change_focus(var_rb))
         rb_03d = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 10, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=3,
             color_bg=self.bg_colors["Dark"], fg=self.bg_colors["Light Font"], text="Mixed Signal", sticky="nesw",
-            relief=tk.FLAT)
+            relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
+            self.detailed_analysis_change_focus(var_rb))
 
         # OPTION MENUS
         list_files_std = self.container_lists["STD"]["Short"]
@@ -15848,7 +15854,6 @@ class PySILLS(tk.Frame):
 
         # TREEVIEW
         list_categories = ["Isotope", "Value"]
-        #list_categories.extend(self.container_lists["Measured Isotopes"]["All"])
         list_width = list(130*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
         list_width[0] = 90
@@ -15870,37 +15875,179 @@ class PySILLS(tk.Frame):
             scb_h.grid(row=n_rows - 1, column=11, rowspan=1, columnspan=11, sticky="ew")
 
         # INITIALIZATION
+        self.last_category_parameter = "No"
         if self.pysills_mode == "MA":
             rb_03c.configure(state="disabled")
             rb_03d.configure(state="disabled")
 
-            for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                entries_i = [isotope, 0.000]
-                self.tv_results_detailed.insert("", tk.END, values=entries_i)
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            entries_i = [isotope, 0.000]
+            self.tv_results_detailed.insert("", tk.END, values=entries_i)
 
     def detailed_analysis_select_file(self, var_opt):
         self.container_var["Detailed Data Analysis"]["Datatype"].set(0)
         self.container_var["Detailed Data Analysis"]["Focus"].set(1)
-        self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
-        self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
-        self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
 
         if var_opt in self.container_lists["STD"]["Short"]:
             self.container_var["Detailed Data Analysis"]["Filename SMPL"].set("Select Sample File")
         elif var_opt in self.container_lists["SMPL"]["Short"]:
             self.container_var["Detailed Data Analysis"]["Filename STD"].set("Select Standard File")
 
-    def detailed_analysis_select_focus(self, var_opt):
+        str_last_category = self.last_category_parameter + " Results"
+        if str_last_category in ["Intensity Results", "Sensitivity Results", "Concentration Results"]:
+            self.detailed_analysis_select_focus(var_opt=self.container_var["Detailed Data Analysis"][str_last_category])
+        else:
+            self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
+            self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
+            self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+
+    def detailed_analysis_change_datatype(self, var_rb):
+        if var_rb.get() == 0:
+            str_datatype = "RAW"
+        else:
+            str_datatype = "SMOOTHED"
+
+        str_last_category = self.last_category_parameter + " Results"
+        self.detailed_analysis_select_focus(
+            var_opt=self.container_var["Detailed Data Analysis"][str_last_category], var_datatype=str_datatype)
+
+    def detailed_analysis_change_focus(self, var_rb):
+        if var_rb.get() == 0:
+            str_focus = "BG"
+        elif var_rb.get() == 1:
+            str_focus = "MAT"
+        elif var_rb.get() == 2:
+            str_focus = "INCL"
+        else:
+            str_focus = "MIX"
+
+        str_last_category = self.last_category_parameter + " Results"
+        self.detailed_analysis_select_focus(
+            var_opt=self.container_var["Detailed Data Analysis"][str_last_category], var_focus=str_focus)
+
+    def detailed_analysis_select_focus(self, var_opt, var_datatype=None, var_focus=None):
+        # Cleaning
+        if len(self.tv_results_detailed.get_children()) > 0:
+            for item in self.tv_results_detailed.get_children():
+                self.tv_results_detailed.delete(item)
+
+        # Initialization
+        str_filename_std_short = self.container_var["Detailed Data Analysis"]["Filename STD"].get()
+        str_filename_smpl_short = self.container_var["Detailed Data Analysis"]["Filename SMPL"].get()
+
+        if str_filename_std_short != "Select Standard File":
+            str_filename_short = str_filename_std_short
+            str_filetype = "STD"
+        else:
+            str_filename_short = str_filename_smpl_short
+            str_filetype = "SMPL"
+
+        file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+
+        if var_datatype == None:
+            if self.container_var["Detailed Data Analysis"]["Datatype"].get() == 0:
+                str_datatype = "RAW"
+            else:
+                str_datatype = "SMOOTHED"
+        else:
+            str_datatype = var_datatype
+
+        if var_focus == None:
+            if self.container_var["Detailed Data Analysis"]["Focus"].get() == 0:
+                str_focus = "BG"
+            elif self.container_var["Detailed Data Analysis"]["Focus"].get() == 1:
+                str_focus = "MAT"
+            elif self.container_var["Detailed Data Analysis"]["Focus"].get() == 2:
+                str_focus = "INCL"
+            else:
+                str_focus = "MIX"
+        else:
+            str_focus = var_focus
+
+        if type(var_opt) != str:
+            var_opt = var_opt.get()
+
+        # Algorithm
         if var_opt in ["Measured Intensity", "Intensity", "Intensity Ratio", "Intensity Noise", "\u03C3 Intensity"]:
             self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
             self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+            self.last_category_parameter = "Intensity"
+
+            if var_opt == "Measured Intensity":
+                for isotope in file_isotopes:
+                    value_i = self.container_intensity[str_filetype][str_datatype][str_filename_short][str_focus][
+                        isotope]
+                    entries_i = [isotope, round(value_i, 4)]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Intensity":
+                for isotope in file_isotopes:
+                    value_i = self.container_intensity_corrected[str_filetype][str_datatype][str_filename_short][
+                        str_focus][isotope]
+                    entries_i = [isotope, round(value_i, 4)]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Intensity Ratio":
+                for isotope in file_isotopes:
+                    value_i = self.container_intensity_ratio[str_filetype][str_datatype][str_filename_short][
+                        str_focus][isotope]
+                    entries_i = [isotope, f"{value_i:.{4}E}"]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Intensity Noise":
+                pass
+            elif var_opt == "\u03C3 Intensity":
+                pass
         elif var_opt in ["Analytical Sensitivity", "Normalized Sensitivity", "Relative Sensitivity Factor"]:
             self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
             self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
+            self.last_category_parameter = "Sensitivity"
+
+            if var_opt == "Analytical Sensitivity":
+                for isotope in file_isotopes:
+                    value_i = self.container_analytical_sensitivity[str_filetype][str_datatype][str_filename_short][
+                        str_focus][isotope]
+                    entries_i = [isotope, round(value_i, 4)]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Normalized Sensitivity":
+                for isotope in file_isotopes:
+                    value_i = self.container_normalized_sensitivity[str_filetype][str_datatype][str_filename_short][
+                        str_focus][isotope]
+                    entries_i = [isotope, round(value_i, 4)]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Relative Sensitivity Factor":
+                for isotope in file_isotopes:
+                    value_i = self.container_rsf[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
+                    entries_i = [isotope, f"{value_i:.{4}E}"]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
         elif var_opt in ["Concentration", "Concentration Ratio", "Concentration Noise", "Limit of Detection",
                          "\u03C3 Concentration"]:
             self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
             self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
+            self.last_category_parameter = "Concentration"
+
+            if var_opt == "Concentration":
+                for isotope in file_isotopes:
+                    value_i = self.container_concentration[str_filetype][str_datatype][str_filename_short][
+                        str_focus][isotope]
+                    lod_i = self.container_lod[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
+                    if value_i >= lod_i:
+                        entries_i = [isotope, round(value_i, 4)]
+                    else:
+                        entries_i = [isotope, str(round(value_i, 4)) + " < LoD"]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Concentration Ratio":
+                for isotope in file_isotopes:
+                    value_i = self.container_concentration_ratio[str_filetype][str_datatype][str_filename_short][
+                        str_focus][isotope]
+                    entries_i = [isotope, f"{value_i:.{4}E}"]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "Concentration Noise":
+                pass
+            elif var_opt == "Limit of Detection":
+                for isotope in file_isotopes:
+                    value_i = self.container_lod[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
+                    entries_i = [isotope, round(value_i, 4)]
+                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
+            elif var_opt == "\u03C3 Concentration":
+                pass
 
     def about_pysills(self):
         ## Window Settings
