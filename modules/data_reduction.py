@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		06.12.2023
+# Date:		14.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -398,7 +398,7 @@ class IntensityQuantification:
                     if value_mat_i > 0:
                         result_mat_i = value_mat_i
                     else:
-                        result_mat_i = 0
+                        result_mat_i = 0.0
 
                     self.results_container["BG"][isotope] = 0.0
                     self.results_container[focus][isotope] = result_mat_i
@@ -416,17 +416,17 @@ class IntensityQuantification:
                     if intensity_mix_i > 0:
                         intensity_mix_i = intensity_mix_i
                     else:
-                        intensity_mix_i = 0
+                        intensity_mix_i = 0.0
 
                     if intensity_mat_i > 0:
                         intensity_mat_i = intensity_mat_i
                     else:
-                        intensity_mat_i = 0
+                        intensity_mat_i = 0.0
 
                     if intensity_mat_t > 0:
                         intensity_mat_t = intensity_mat_t
                     else:
-                        intensity_mat_t = 0
+                        intensity_mat_t = 0.0
 
                     if mode == 0:   # Heinrich et al. (2003)
                         intensity_mix_t = intensity_sig3_t - intensity_bg_t
@@ -448,7 +448,7 @@ class IntensityQuantification:
                     if value_incl_i > 0:
                         result_incl_i = value_incl_i
                     else:
-                        result_incl_i = 0
+                        result_incl_i = 0.0
 
                     self.results_container[focus][isotope] = result_incl_i
 

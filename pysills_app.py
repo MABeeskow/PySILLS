@@ -110,7 +110,16 @@ class PySILLS(tk.Frame):
         self.chemistry_data = {
             "O": 15.999, "Na": 22.990, "Mg": 24.305, "Al": 26.982, "Si": 28.085, "P": 30.974, "K": 39.098, "Ca": 40.078,
             "Ti": 47.867, "Cr": 51.996, "Mn": 54.938, "Fe": 55.845, "Ga": 69.723, "Ge": 72.630, "Zr": 91.224,
-            "Ba": 137.33, "B": 10.81}
+            "Ba": 137.33, "B": 10.81, "Ag": 107.87, "As": 74.922, "Li": 6.94, "Rb": 85.468, "Cs": 132.91, "Sr": 87.62,
+            "Sc": 44.956, "Y": 88.906, "Hf": 178.49, "V": 50.942, "Nb": 92.906, "Ta": 180.95, "Mo": 95.962, "W": 183.84,
+            "Tc": 98.906, "Re": 186.21, "Ru": 101.07, "Os": 190.23, "Co": 58.933, "Rh": 102.91, "Ir": 192.22,
+            "Ni": 58.693, "Pd": 106.42, "Pt": 195.08, "Cu": 63.546, "Au": 196.97, "Zn": 65.38, "Cd": 112.41,
+            "Hg": 200.59, "In": 114.82, "Tl": 204.38, "C": 12.011, "Sn": 118.71, "Pb": 207.2, "N": 14.007, "Sb": 121.76,
+            "Bi": 208.98, "S": 32.06, "Se": 78.96, "Te": 127.60, "Po": 209.98, "Cl": 35.45, "Br": 79.904, "I": 126.90,
+            "At": 210.99, "La": 138.91, "Ce": 140.12, "Pr": 140.91, "Nd": 144.24, "Pm": 146.92, "Sm": 150.36,
+            "Eu": 151.96, "Gd": 157.25, "Tb": 158.93, "Dy": 162.50, "Ho": 164.93, "Er": 167.26, "Tm": 168.93,
+            "Yb": 173.05, "Lu": 174.97, "Ac": 227.03, "Th": 232.04, "Pa": 231.04, "U": 238.05, "Be": 9.0122,
+            "F": 18.998, "H": 1.008}
         self.chemistry_data_sills = {
             "O": 16.000, "Na": 22.990, "Mg": 24.300, "Al": 26.980, "Si": 28.090, "P": 30.970, "K": 39.100, "Ca": 40.080,
             "Ti": 47.870, "Cr": 52.000, "Mn": 54.940, "Fe": 55.850, "Ga": 69.720, "Ge": 72.610, "Zr": 91.220,
@@ -267,7 +276,8 @@ class PySILLS(tk.Frame):
         list_rareearth_metals = [
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
             "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
-        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3"]
+        list_other_elements = [
+            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O"]
         list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "Pb-Ratio", "Pr-Ratio", "Tb-Ratio"]
         for oxide in list_major_oxides:
             self.container_var["Oxides Quantification"]["Major"][oxide] = tk.IntVar()
@@ -925,11 +935,78 @@ class PySILLS(tk.Frame):
             "Sc2O3": 1.5338, "SeO3": 1.6079, "SiO2": 2.1392, "Sm2O3": 1.1596, "SnO2": 1.2696, "SrO": 1.1826,
             "Ta2O5": 1.2211, "Tb2O3": 1.1510, "Tb4O7": 1.1762, "TeO3": 1.3762, "ThO2": 1.1379, "TiO2": 1.6681,
             "Tl2O3": 1.1174, "Tm2O3": 1.1421, "UO2": 1.1344, "UO3": 1.2017, "U3O8": 1.1792, "V2O5": 1.7852,
-            "WO3": 1.2610, "Y2O3": 1.2699, "Yb2O3": 1.1387, "ZnO": 1.2448, "ZrO2": 1.3508}
+            "WO3": 1.2610, "Y2O3": 1.2699, "Yb2O3": 1.1387, "ZnO": 1.2448, "ZrO2": 1.3508, "Cl2O": 1.2257,
+            "Br2O": 1.1001, "I2O": 1.0630, "At2O": 1.0379}
 
-        self.maximum_amounts = {
-            "Al": 529261, "B": 310556, "Be": 360327, "Fe": 777309, "Ga": 743938, "Ge": 694174,
-            "Li": 464540, "Mn": 774462, "Na": 741864, "Si": 467437, "Sn": 881233, "Ti": 599349}
+        self.maximum_amounts = {}
+
+        for oxide in self.conversion_factors.keys():
+            key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+            element_cation = key.group(1)
+
+            if key.group(2) != "":
+                index_cation = int(key.group(2))
+            else:
+                index_cation = 1
+
+            if key.group(4) != "":
+                index_anion = int(key.group(4))
+            else:
+                index_anion = 1
+
+            molar_mass_cation = self.chemistry_data[element_cation]
+            molar_mass_anion = 15.999
+            molar_mass_oxide = index_cation*molar_mass_cation + index_anion*molar_mass_anion
+            amount_cation_ppm = round((index_cation*molar_mass_cation)/molar_mass_oxide*10**6, 4)
+
+            if element_cation in self.maximum_amounts:
+                if amount_cation_ppm > self.maximum_amounts[element_cation]:
+                    self.maximum_amounts[element_cation] = amount_cation_ppm
+            else:
+                self.maximum_amounts[element_cation] = amount_cation_ppm
+
+        self.mineral_chemistry = {}
+        list_minerals = ["Quartz", "Chloro-Apatite", "Fluor-Apatite", "Hydroxy-Apatite"]
+        for mineral in list_minerals:
+            self.mineral_chemistry[mineral] = {}
+            if mineral == "Quartz": # SiO2
+                mass_si = self.chemistry_data["Si"]
+                mass_o = self.chemistry_data["O"]
+                mass_total = 1*mass_si + 2*mass_o
+                w_si = 1*mass_si/mass_total
+                self.mineral_chemistry[mineral]["Si"] = round(w_si, 10)
+            elif mineral == "Chloro-Apatite": # Ca5 (PO4)3 Cl
+                mass_ca = self.chemistry_data["Ca"]
+                mass_p = self.chemistry_data["P"]
+                mass_cl = self.chemistry_data["Cl"]
+                mass_o = self.chemistry_data["O"]
+                mass_total = 5*mass_ca + 3*(1*mass_p + 4*mass_o) + 1*mass_cl
+                w_ca = 5*mass_ca/mass_total
+                w_p = 3*mass_p/mass_total
+                w_cl = 1*mass_cl/mass_total
+                self.mineral_chemistry[mineral]["Ca"] = round(w_ca, 10)
+                self.mineral_chemistry[mineral]["P"] = round(w_p, 10)
+                self.mineral_chemistry[mineral]["Cl"] = round(w_cl, 10)
+            elif mineral == "Fluor-Apatite": # Ca5 (PO4)3 F
+                mass_ca = self.chemistry_data["Ca"]
+                mass_p = self.chemistry_data["P"]
+                mass_f = self.chemistry_data["F"]
+                mass_o = self.chemistry_data["O"]
+                mass_total = 5*mass_ca + 3*(1*mass_p + 4*mass_o) + 1*mass_f
+                w_ca = 5*mass_ca/mass_total
+                w_p = 3*mass_p/mass_total
+                self.mineral_chemistry[mineral]["Ca"] = round(w_ca, 10)
+                self.mineral_chemistry[mineral]["P"] = round(w_p, 10)
+            elif mineral == "Hydroxy-Apatite": # Ca5 (PO4)3 (OH)
+                mass_ca = self.chemistry_data["Ca"]
+                mass_p = self.chemistry_data["P"]
+                mass_h = self.chemistry_data["H"]
+                mass_o = self.chemistry_data["O"]
+                mass_total = 5*mass_ca + 3*(1*mass_p + 4*mass_o) + 1*(mass_h + mass_o)
+                w_ca = 5*mass_ca/mass_total
+                w_p = 3*mass_p/mass_total
+                self.mineral_chemistry[mineral]["Ca"] = round(w_ca, 10)
+                self.mineral_chemistry[mineral]["P"] = round(w_p, 10)
 
         self.container_results = {}
         self.container_results["STD"] = {}
@@ -5840,6 +5917,23 @@ class PySILLS(tk.Frame):
                     except:
                         self.container_var["acquisition times"]["STD"][var_file_short].set("unknown")
 
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            var_timestamp = self.container_icpms["timestamp"]
+                            var_icpms = self.container_icpms["name"]
+
+                            dates, times = Data(filename=var_file_long).import_as_list(
+                                skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                                icpms=var_icpms)
+                        else:
+                            dates, times = Data(filename=var_file_long).import_as_list(
+                                skip_header=3, skip_footer=1, timestamp=2,
+                                icpms="Agilent 7900s")
+
+                        self.container_var["acquisition times"]["STD"][var_file_short].set(
+                            times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+
                     self.ma_current_file_std = self.list_std[0]
                     #
                 ## SAMPLE FILES
@@ -5884,6 +5978,23 @@ class PySILLS(tk.Frame):
                         self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_std[5])
                     except:
                         self.container_var["acquisition times"]["SMPL"][var_file_short].set("unknown")
+
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            var_timestamp = self.container_icpms["timestamp"]
+                            var_icpms = self.container_icpms["name"]
+
+                            dates, times = Data(filename=var_file_long).import_as_list(
+                                skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                                icpms=var_icpms)
+                        else:
+                            dates, times = Data(filename=var_file_long).import_as_list(
+                                skip_header=3, skip_footer=1, timestamp=2,
+                                icpms="Agilent 7900s")
+
+                        self.container_var["acquisition times"]["SMPL"][var_file_short].set(
+                            times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
                     self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].set(splitted_std[1])
 
@@ -8169,6 +8280,10 @@ class PySILLS(tk.Frame):
                 parts_time = var_time.split(":")
                 times = parts_time
 
+            if times[0] == "unknown" and self.file_loaded == True:
+                dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+
             if len(times) == 2:
                 data_times = times[0]
             else:
@@ -8217,6 +8332,10 @@ class PySILLS(tk.Frame):
                 var_time = self.container_var["acquisition times"]["SMPL"][file_smpl].get()
                 parts_time = var_time.split(":")
                 times = parts_time
+
+            if times[0] == "unknown" and self.file_loaded == True:
+                dates, times = Data(filename=var_file).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
 
             if len(times) == 2:
                 data_times = times[0]
@@ -8904,8 +9023,18 @@ class PySILLS(tk.Frame):
                         df_exmpl = DE(filename_long=file_std).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    file_parts = file_std.split("/")
-                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    if "Dataframe" in self.container_measurements:
+                        file_parts = file_std.split("/")
+                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    else:
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            df_exmpl = DE(filename_long=file_std).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        else:
+                            df_exmpl = DE(filename_long=file_std).get_measurements(
+                                delimiter=",", skip_header=3, skip_footer=1)
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -8925,8 +9054,18 @@ class PySILLS(tk.Frame):
                         df_exmpl = DE(filename_long=file_smpl).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    file_parts = file_smpl .split("/")
-                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    if "Dataframe" in self.container_measurements:
+                        file_parts = file_smpl.split("/")
+                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    else:
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        else:
+                            df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                                delimiter=",", skip_header=3, skip_footer=1)
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -9602,7 +9741,8 @@ class PySILLS(tk.Frame):
                 cb_005a.select()
 
         ## Other Elements
-        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3"]
+        list_other_elements = [
+            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O"]
         list_other_elements = sorted(list_other_elements)
         for index, oxide in enumerate(list_other_elements):
             cb_005a = SE(
@@ -9637,7 +9777,8 @@ class PySILLS(tk.Frame):
         list_rareearth_metals = [
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
             "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
-        list_other_elements = ["Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3"]
+        list_other_elements = [
+            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O"]
         all_lists = [
             list_major_oxides, list_industrial_metals, list_precious_metals, list_rareearth_metals, list_other_elements]
 
@@ -9737,6 +9878,8 @@ class PySILLS(tk.Frame):
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_default, text_default=var_entr_default.get())
+        entr_02a.bind(
+            "<Return>", lambda event, var_entr=var_entr_default: self.change_total_oxides_amount(var_entr, event))
 
         # BUTTONS
         btn_03a = SE(
@@ -9862,6 +10005,10 @@ class PySILLS(tk.Frame):
                 highlightbackground=self.bg_colors["Very Light"])
             text_tv.window_create("insert", window=entr_i)
             text_tv.insert("end", "\n")
+
+    def change_total_oxides_amount(self, var_entr, event):
+        for filename_short in self.container_lists["SMPL"]["Short"]:
+            self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].set(var_entr.get())
 
     def select_reference_element(self, var_opt):
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
@@ -12360,9 +12507,10 @@ class PySILLS(tk.Frame):
 
         # Finishing
         for var_file_smpl in self.container_var["SMPL"].keys():
-            var_is = self.container_var["SMPL"][var_file_smpl]["IS Data"]["IS"].get()
-            if var_is not in self.container_lists["Possible IS"]:
-                self.container_lists["Possible IS"].append(var_is)
+            if "IS Data" in self.container_var["SMPL"][var_file_smpl]:
+                var_is = self.container_var["SMPL"][var_file_smpl]["IS Data"]["IS"].get()
+                if var_is not in self.container_lists["Possible IS"]:
+                    self.container_lists["Possible IS"].append(var_is)
 
     def import_is_data(self, parent, mode="MA"):
         filename = filedialog.askopenfilenames(
@@ -12556,10 +12704,11 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             self.container_lists["Possible IS"].clear()
             for var_file, var_content in self.container_var["SMPL"].items():
-                var_is = var_content["IS Data"]["IS"].get()
-                if var_is not in self.container_lists["Possible IS"]:
-                    self.container_lists["Possible IS"].append(var_is)
-    #
+                if var_file in self.container_lists["SMPL"]["Long"]:
+                    var_is = var_content["IS Data"]["IS"].get()
+                    if var_is not in self.container_lists["Possible IS"]:
+                        self.container_lists["Possible IS"].append(var_is)
+
     def ma_change_is_concentration(self, var_entr, var_file, state_default, event):
         if state_default == True:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
@@ -13370,12 +13519,16 @@ class PySILLS(tk.Frame):
                         isotope]
                     intensity_mat_sigma_i = self.container_intensity[var_type]["RAW"][var_file_short][
                         "1 SIGMA MAT"][isotope]
+
                     if isinstance(intensity_bg_i, np.floating) == False:
                         print(var_file_short, isotope, "BG:", intensity_bg_i)
+
                     if isinstance(intensity_mat_i, np.floating) == False:
                         print(var_file_short, isotope, "MAT:", intensity_mat_i)
+
                     if isinstance(intensity_mat_sigma_i, np.floating) == False:
                         print(var_file_short, isotope, "MAT:", intensity_mat_sigma_i)
+
                     # Sensitivity Results
                     analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short][
                         "MAT"][isotope]
@@ -15004,30 +15157,70 @@ class PySILLS(tk.Frame):
             elif var_filetype == "SMPL":
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                 if self.container_var["Quantification Mineral"]["Method"].get() == "Internal Standard":
+                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                    key_element = re.search("(\D+)(\d+)", var_is)
+                    is_element = key_element.group(1)
+                    max_amount_is = self.maximum_amounts[is_element]
+                    var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
+                                                     "Concentration"].get())
+
                     for isotope in file_isotopes:
-                        var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                        var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
-                                                         "Concentration"].get())
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                            "MAT"][isotope]
-                        var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                            "MAT"][var_is]
-                        var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                            "1 SIGMA MAT"][isotope]
-                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
+                        if var_concentration_is <= max_amount_is:
+                            correction_factor_i = 1
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+                                var_file_short]["1 SIGMA MAT"][isotope]
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
 
-                        if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
-                            var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_sensitivity_i)
-                            var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
-                        else:
-                            var_result_i = 0.0
-                            var_result_sigma_i = 0.0
+                            if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
+                                var_result_i = ((var_intensity_i/var_intensity_is)*
+                                                (var_concentration_is/var_sensitivity_i))
+                                var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
+                            else:
+                                var_result_i = 0.0
+                                var_result_sigma_i = 0.0
 
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                            isotope] = var_result_sigma_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
+
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            max_amount_i = self.maximum_amounts[element]
+
+                            if var_result_i > max_amount_i:
+                                correction_factor_i = max_amount_i/var_result_i
+                                break
+
+                    if correction_factor_i != 1:
+                        for isotope in file_isotopes:
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+                                var_file_short]["1 SIGMA MAT"][isotope]
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+
+                            if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
+                                var_result_i = (correction_factor_i*(var_intensity_i/var_intensity_is)*
+                                                (var_concentration_is/var_sensitivity_i))
+                                var_result_sigma_i = (correction_factor_i*(var_intensity_sigma_i/var_intensity_i)*
+                                                      var_result_i)
+                            else:
+                                var_result_i = 0.0
+                                var_result_sigma_i = 0.0
+
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
                 else:
                     var_ref = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                     key_element = re.search("(\D+)(\d+)", var_ref)
@@ -15049,8 +15242,8 @@ class PySILLS(tk.Frame):
                         if var_sensitivity_i > 0 and var_intensity_ref > 0 and isotope != var_ref:
                             lower_term += (var_intensity_i/var_intensity_ref)/var_sensitivity_i
 
-                    var_amount_ref = 1/lower_term
-                    var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
+                    var_amount_ref = 1/(amount_total_oxides*lower_term)
+                    var_concentration_ref = (1*(var_amount_ref/conversion_factor_ref)*
                                              conversion_factor_to_ppm)
                     max_amount_ref = self.maximum_amounts[ref_element]
 
