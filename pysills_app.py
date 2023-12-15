@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		14.12.2023
+# Date:		15.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -12543,15 +12543,16 @@ class PySILLS(tk.Frame):
                             self.container_var["STD"][file_std]["IS Data"]["IS"].set(df_expdata["isotope"][index])
 
     def ma_change_matrix_compound(self, var_opt, var_file=None, state_default=False):
-        if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
+        str_method = self.container_var["Quantification Mineral"]["Method"].get()
+        if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1 or str_method != "Internal Standard":
             var_key = "Oxide"
         else:
             var_key = "Element"
-        #
+
         if state_default == True:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].set(var_opt)
-            #
+
             self.container_var["IS"]["Default SMPL Concentration"].set(1000000)
             if var_key == "Oxide":
                 key = re.search("(\D+)(\d*)(\D+)(\d*)", var_opt)
@@ -12559,13 +12560,13 @@ class PySILLS(tk.Frame):
             else:
                 var_opt_element = var_opt
             possible_is = []
-            #
+
             for isotope in self.container_lists["ISOTOPES"]:
                 key_02 = re.search("(\D+)(\d+)", isotope)
                 element = key_02.group(1)
                 if element == var_opt_element:
                     possible_is.append(isotope)
-            #
+
             self.container_var["IS"]["Default SMPL"].set("Select IS")
             for index, isotope in enumerate(possible_is):
                 if index == 0:
@@ -14913,8 +14914,10 @@ class PySILLS(tk.Frame):
                     "MAT"][var_is]
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                 self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].set(var_is)
+
                 for isotope in file_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
+
                     if var_srm_i == var_srm_file:
                         if element_is in self.srm_actual[var_srm_i]:
                             var_concentration_is = self.srm_actual[var_srm_i][element_is]
@@ -15242,9 +15245,10 @@ class PySILLS(tk.Frame):
                         if var_sensitivity_i > 0 and var_intensity_ref > 0 and isotope != var_ref:
                             lower_term += (var_intensity_i/var_intensity_ref)/var_sensitivity_i
 
-                    var_amount_ref = 1/(amount_total_oxides*lower_term)
-                    var_concentration_ref = (1*(var_amount_ref/conversion_factor_ref)*
+                    var_amount_ref = 1/lower_term
+                    var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
                                              conversion_factor_to_ppm)
+                    var_concentration_ref = var_amount_ref*conversion_factor_to_ppm
                     max_amount_ref = self.maximum_amounts[ref_element]
 
                     if var_concentration_ref <= max_amount_ref:
