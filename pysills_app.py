@@ -1221,7 +1221,21 @@ class PySILLS(tk.Frame):
             "Results": {"English": "Results", "German": "Ergebnisse"},
             "Extras": {"English": "Extras", "German": "Extras"},
             "Fluid Inclusions": {"English": "Fluid Inclusions", "German": "Flüssigkeitseinschlüsse"},
-            "Melt Inclusions": {"English": "Melt Inclusions", "German": "Schmelzeinschlüsse"}}
+            "Melt Inclusions": {"English": "Melt Inclusions", "German": "Schmelzeinschlüsse"},
+            "Development": {"English": "Development", "German": "Entwicklung"},
+            "Additional Information": {"English": "Additional Information", "German": "Weitere Informationen"},
+            "Citation": {"English": "Citing PySILLS", "German": "PySILLS zitieren"},
+            "References": {"English": "References", "German": "Quellen"},
+            "Project Information": {"English": "Project Information", "German": "Projektinformationen"},
+            "Calculation Accuracy": {"English": "Calculation Accuracy", "German": "Numerische Genauigkeit"},
+            "Sensitivity Drift": {"English": "Sensitivity Drift", "German": "Sensitivitätsverschiebung"},
+            "Limit of Detection": {"English": "Limit of Detection", "German": "Nachweisgrenze"},
+            "Offset Automatic Interval Detection": {"English": "Offset Automatic Interval Detection", "German": "Versatz der automatischen Intervalerkennung"},
+            "Colormap": {"English": "Colormap", "German": "Farbpalette"},
+            "Report File": {"English": "Report File", "German": "Ausgabedatei"},
+            "Plotting Setup": {"English": "Plotting Setup", "German": "Diagrammeinstellungen"},
+            "Language Selection": {"English": "Language Selection", "German": "Sprachauswahl"},
+            "Data Processing": {"English": "Data Processing", "German": "Datenverarbeitung"}}
 
         ################################################################################################################
         #
@@ -1782,6 +1796,8 @@ class PySILLS(tk.Frame):
             #
             ## Labels
             str_lbl_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+            if self.var_language == "German":
+                str_lbl_01 = "Flüssigkeits-\neinschlüsse"
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -7383,23 +7399,23 @@ class PySILLS(tk.Frame):
         window_width = 980
         window_heigth = 375
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         subwindow_generalsettings = tk.Toplevel(self.parent)
         subwindow_generalsettings.title("General Settings")
         subwindow_generalsettings.geometry(var_geometry)
         subwindow_generalsettings.resizable(False, False)
         subwindow_generalsettings["bg"] = self.bg_colors["Super Dark"]
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_generalsettings, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_generalsettings, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_generalsettings.grid_rowconfigure(i, minsize=row_min)
@@ -7410,12 +7426,23 @@ class PySILLS(tk.Frame):
         ###########################################################
         start_row = 0
         start_column = 0
-        #
+
         ## Labels
+        str_lbl_01 = self.language_dict["Project Information"][self.var_language]
+        str_lbl_02 = self.language_dict["Calculation Accuracy"][self.var_language]
+        str_lbl_03 = self.language_dict["Sensitivity Drift"][self.var_language]
+        str_lbl_04 = self.language_dict["Limit of Detection"][self.var_language]
+        str_lbl_05 = self.language_dict["Offset Automatic Interval Detection"][self.var_language]
+        str_lbl_06 = self.language_dict["Colormap"][self.var_language]
+        str_lbl_07 = self.language_dict["Report File"][self.var_language]
+        str_lbl_08 = self.language_dict["Plotting Setup"][self.var_language]
+        str_lbl_09 = self.language_dict["Language Selection"][self.var_language]
+        str_lbl_10 = self.language_dict["Data Processing"][self.var_language]
+
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=start_column, n_rows=2, n_columns=9,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Project Information", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_generalsettings, row_id=4, column_id=start_column, n_rows=2, n_columns=9,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
@@ -7423,43 +7450,43 @@ class PySILLS(tk.Frame):
         lbl_04 = SE(
             parent=subwindow_generalsettings, row_id=8, column_id=start_column, n_rows=2, n_columns=9,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Calculation Accuracy", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=start_column + 10, n_rows=2, n_columns=16,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Sensitivity Drift", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06 = SE(
             parent=subwindow_generalsettings, row_id=5, column_id=start_column + 10, n_rows=2, n_columns=16,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Limit of Detection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07 = SE(
             parent=subwindow_generalsettings, row_id=10, column_id=start_column + 10, n_rows=2, n_columns=16,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Offset Automatic Interval Detection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=start_column + 27, n_rows=2, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Colormap", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09 = SE(
             parent=subwindow_generalsettings, row_id=5, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Report File", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_10 = SE(
             parent=subwindow_generalsettings, row_id=9, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Plotting Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=12, column_id=start_column + 27, n_rows=1, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Language Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=start_column + 38, n_rows=1, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Data Processing", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+            text=str_lbl_10, relief=tk.FLAT, fontsize="sans 10 bold")
+
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
-        #
+
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=9,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
@@ -16293,10 +16320,15 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         # LABELS
+        str_lbl_01 = self.language_dict["Development"][self.var_language]
+        str_lbl_02 = self.language_dict["Additional Information"][self.var_language]
+        str_lbl_03 = self.language_dict["Citation"][self.var_language]
+        str_lbl_04 = self.language_dict["References"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Development", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 10, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -16325,7 +16357,7 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Additional Information", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -16351,7 +16383,7 @@ class PySILLS(tk.Frame):
         lbl_03 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-            text="Citation", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column + 11, n_rows=1,
             n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -16371,7 +16403,7 @@ class PySILLS(tk.Frame):
         lbl_04 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-            text="References", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column + 11, n_rows=1,
             n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
