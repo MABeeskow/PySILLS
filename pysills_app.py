@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		15.12.2023
+# Date:		18.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -6699,13 +6699,25 @@ class PySILLS(tk.Frame):
                     filename_long=str_filename_long, filename_short=str_filename_short, filetype=datatype,
                     file_isotopes=file_isotopes)
 
-                var_skipheader = self.container_icpms["skipheader"]
-                var_skipfooter = self.container_icpms["skipfooter"]
-                var_timestamp = self.container_icpms["timestamp"]
-                var_icpms = self.container_icpms["name"]
+                if (self.container_icpms["name"] != None and
+                        self.container_icpms["name"] not in ["PerkinElmer Syngistix"]):
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    var_timestamp = self.container_icpms["timestamp"]
+                    var_icpms = self.container_icpms["name"]
 
-                dates, times = Data(filename=str_filename_long).import_as_list(
-                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+                    dates, times = Data(filename=str_filename_long).import_as_list(
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                        icpms=var_icpms)
+                elif self.container_icpms["name"] == "PerkinElmer Syngistix":
+                    create_time = os.path.getctime(str_filename_long)
+                    create_date = datetime.datetime.fromtimestamp(create_time)
+                    times = [[str(create_date.hour), str(create_date.minute), str(create_date.second)]]
+                    dates = [str(create_date.year), str(create_date.month), str(create_date.day)]
+                else:
+                    dates, times = Data(filename=str_filename_long).import_as_list(
+                        skip_header=3, skip_footer=1, timestamp=2,
+                        icpms="Agilent 7900s")
 
                 if str_filename_short not in self.container_var["acquisition times"][datatype]:
                     self.container_var["acquisition times"][datatype][str_filename_short] = tk.StringVar()
