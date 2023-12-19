@@ -55,7 +55,7 @@ Standard Files
 Sample Files
 ''''''''''''''
 .. math::
-    S_{i}^{SMPL} = \xi_i^{IS} \cdot \frac{I_{i}^{SMPL}}{C_{i}^{SMPL}}
+    S_{i}^{SMPL} = \xi_i^{IS} \cdot \frac{I_{IS}^{SMPL}}{C_{IS}^{SMPL}}
 
 Analytical Sensitivity
 ^^^^^^^^^^^^^^^^^^^^^^^^

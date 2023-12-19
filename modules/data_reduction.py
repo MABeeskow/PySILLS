@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		14.12.2023
+# Date:		19.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -562,23 +562,88 @@ class IntensityQuantification:
         return self.results_container
 
 class SensitivityQuantification:
-    def __init__(self, internal_standard, mode="specific"):
-        self.internal_standard = internal_standard
+    def __init__(self, dataframe_01, dataframe_02, mode="specific", project_type="MA", results_container=None):
+        self.dataframe_01 = dataframe_01
+        self.dataframe_02 = dataframe_02
         self.mode = mode
+        self.project_type = project_type
+        self.results_container = results_container
+
+    def get_normalized_sensitivity(self, filename_short=None, filetype=None, datatype=None, data_sensitivity=None,
+                                   dict_is=None):
+        """ Calculates the normalized sensitivity for all isotopes.
+        -------
+        Parameters
+        filename_short : str
+            Short version of the file of interest (only needed for 'Quick Results' mode).
+        filetype : str
+            File type (e.g. STD) (only needed for 'Quick Results' mode).
+        datatype : str
+            Data type (e.g. RAW) (only needed for 'Final Results' mode).
+        data_sensitivity : dict
+            It contains the analytical sensitivity data.
+        dict_is : dict
+            It contains information about the internal standard.
+        -------
+        Returns
+        -------
+        """
+        if filename_short != None:
+            if filetype == "STD":
+                for isotope, intensity_i in self.dataframe_01["MAT"].items():
+                    concentration_i = self.dataframe_02["MAT"][isotope]
+
+                    if intensity_i != None and concentration_i > 0:
+                        result_i = intensity_i/concentration_i
+                    else:
+                        result_i = 0.0
+
+                    self.results_container[filename_short]["MAT"][isotope] = result_i
+            else:
+                str_is = dict_is[filetype][filename_short]
+                intensity_is = self.dataframe_01["MAT"][str_is]
+                concentration_is = self.dataframe_02["MAT"][str_is]
+                for isotope, intensity_i in self.dataframe_01["MAT"].items():
+                    sensitivity_i = data_sensitivity["MAT"][isotope]
+
+                    if concentration_is > 0:
+                        result_i = (sensitivity_i*intensity_is)/concentration_is
+                    else:
+                        result_i = 0.0
+
+                    self.results_container[filename_short]["MAT"][isotope] = result_i
+        else:
+            for filetype in ["STD", "SMPL"]:
+                if filetype == "STD":
+                    for filename_short, dataset_01 in self.dataframe_01[filetype][datatype].items():
+                        if type(dataset_01) == dict:
+                            for isotope, intensity_i in dataset_01["MAT"].items():
+                                concentration_i = self.dataframe_02[filetype][datatype][filename_short]["MAT"][isotope]
+
+                                if intensity_i != None and concentration_i > 0:
+                                    result_i = intensity_i/concentration_i
+                                else:
+                                    result_i = 0.0
+
+                                self.results_container[filetype][datatype][filename_short]["MAT"][isotope] = result_i
+                else:
+                    for filename_short, dataset_01 in self.dataframe_01[filetype][datatype].items():
+                        str_is = dict_is[filetype][filename_short]
+                        intensity_is = self.dataframe_01[filetype][datatype][filename_short]["MAT"][str_is]
+                        concentration_is = self.dataframe_02[filetype][datatype][filename_short]["MAT"][str_is]
+                        for isotope, intensity_i in dataset_01["MAT"].items():
+                            sensitivity_i = data_sensitivity[filetype][datatype][filename_short]["MAT"][isotope]
+
+                            if concentration_is > 0:
+                                result_i = (sensitivity_i*intensity_is)/concentration_is
+                            else:
+                                result_i = 0.0
+
+                            self.results_container[filetype][datatype][filename_short]["MAT"][isotope] = result_i
+
+        return self.results_container
 
     def get_analytical_sensitivity(self):
-        if self.mode == "specific":
-            # Mineral/Matrix Signal
-
-            # Inclusion Signal
-            pass
-        else:
-            # Mineral/Matrix Signal
-
-            # Inclusion Signal
-            pass
-
-    def get_normalized_sensitivity(self):
         if self.mode == "specific":
             # Mineral/Matrix Signal
 
@@ -654,5 +719,29 @@ class CompositionQuantification:
 
             # Melt Inclusion Analysis
             pass
+
+class LinearRegression:
+    def __init__(self, x_values, y_values):
+        self.x_values = x_values
+        self.y_values = y_values
+
+    def calculate_linar_regression(self):
+            mean_x = np.mean(self.x_values)
+            mean_y = np.mean(self.y_values)
+            helper_xy = 0
+            helper_x2 = 0
+            n = len(self.x_values)
+
+            for index, x_value in enumerate(self.x_values):
+                y_value = self.y_values[index]
+                helper_xy += x_value*y_value
+                helper_x2 += x_value**2
+
+            upper_term = helper_xy - n*mean_x*mean_y
+            lower_term = helper_x2 - n*mean_x**2
+            b = upper_term/lower_term
+            a = mean_y - b*mean_x
+
+            return a, b
 
 ## TESTING -------------------------------------------------------------------------------------------------------------

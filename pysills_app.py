@@ -13586,6 +13586,8 @@ class PySILLS(tk.Frame):
                     self.get_condensed_intervals_of_file(filetype=var_type, filename_short=var_file_short)
                     self.get_intensity(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
+                    self.ma_get_concentration(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 else:
                     var_srm_file = None
                     for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
@@ -13611,13 +13613,12 @@ class PySILLS(tk.Frame):
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 results_is = self.determine_possible_is(filetype="ALL")
-
+                # Intensity Ratio
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_ratio[var_type]["RAW"]).get_intensity_ratio(
                     data_container=self.container_intensity_corrected[var_type]["RAW"], dict_is=results_is,
                     filename_short=var_file_short)
-                self.ma_get_normalized_sensitivity(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+
                 if var_type == "SMPL":
                     self.ma_get_rsf(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
@@ -13625,10 +13626,19 @@ class PySILLS(tk.Frame):
                 # Concentration-related parameters
                 self.ma_get_concentration(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                # Normalized Sensitivity
+                SQ(dataframe_01=self.container_intensity_corrected[var_type]["RAW"][var_file_short],
+                   dataframe_02=self.container_concentration[var_type]["RAW"][var_file_short],
+                   results_container=self.container_normalized_sensitivity[var_type]["RAW"]).get_normalized_sensitivity(
+                    filename_short=var_file_short, filetype=var_type,
+                    data_sensitivity=self.container_analytical_sensitivity[var_type]["RAW"][var_file_short],
+                    dict_is=results_is)
+
                 if var_type == "SMPL":
                     self.ma_get_concentration_ratio(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file)
+
                 self.ma_get_lod(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
 
@@ -14083,9 +14093,6 @@ class PySILLS(tk.Frame):
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_ratio).get_intensity_ratio(
                     data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
-                self.ma_get_normalized_sensitivity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
                 self.ma_get_rsf(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
@@ -14093,6 +14100,9 @@ class PySILLS(tk.Frame):
                 self.ma_get_concentration(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
+                SQ(dataframe_01=self.container_intensity_corrected, dataframe_02=self.container_concentration,
+                       results_container=self.container_normalized_sensitivity).get_normalized_sensitivity(
+                    datatype=var_datatype, data_sensitivity=self.container_analytical_sensitivity, dict_is=results_is)
                 self.ma_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
@@ -21591,14 +21601,21 @@ class PySILLS(tk.Frame):
                    results_container=self.container_intensity_ratio[var_type]["RAW"]).get_intensity_ratio(
                     data_container=self.container_intensity_corrected[var_type]["RAW"], dict_is=results_is,
                     filename_short=var_file_short)
-                self.fi_get_normalized_sensitivity(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                # self.fi_get_normalized_sensitivity(
+                #     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 self.fi_get_rsf(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
                 # Concentration analysis
                 self.fi_get_concentration(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
+                # Normalized Sensitivity
+                SQ(dataframe_01=self.container_intensity_corrected[var_type]["RAW"][var_file_short],
+                   dataframe_02=self.container_concentration[var_type]["RAW"][var_file_short],
+                   results_container=self.container_normalized_sensitivity[var_type]["RAW"]).get_normalized_sensitivity(
+                    filename_short=var_file_short, filetype=var_type,
+                    data_sensitivity=self.container_analytical_sensitivity[var_type]["RAW"][var_file_short],
+                    dict_is=results_is)
                 self.fi_get_concentration_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
