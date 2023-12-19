@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		19.12.2023
+# Date:		20.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -16930,7 +16930,7 @@ class PySILLS(tk.Frame):
             path = os.getcwd()
             parent = os.path.dirname(path)
             if self.demo_mode == True:
-                self.var_opt_icp.set("Agilent 7900s")
+                self.var_opt_icp.set("PerkinElmer Syngistix")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
                 mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
@@ -16986,6 +16986,42 @@ class PySILLS(tk.Frame):
                     file_parts = file_std.split("/")
                     df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
 
+                if (self.container_icpms["name"] != None and
+                        self.container_icpms["name"] not in ["PerkinElmer Syngistix"]):
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    var_timestamp = self.container_icpms["timestamp"]
+                    var_icpms = self.container_icpms["name"]
+
+                    dates, times = Data(filename=file_std).import_as_list(
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                        icpms=var_icpms)
+                elif self.container_icpms["name"] == "PerkinElmer Syngistix":
+                    var_os = sys.platform
+                    if var_os not in ["linux", "darwin"]:
+                        create_time = os.path.getctime(file_std)
+                    else:
+                        create_time = os.path.getmtime(file_std)
+
+                    create_date = datetime.datetime.fromtimestamp(create_time)
+                    hour = create_date.strftime("%H")
+                    minute = create_date.strftime("%M")
+                    second = create_date.strftime("%S")
+                    year = create_date.strftime("%Y")
+                    month = create_date.strftime("%m")
+                    day = create_date.strftime("%d")
+                    times = [[str(hour), str(minute), str(second)]]
+                    dates = [str(year), str(month), str(day)]
+                else:
+                    dates, times = Data(filename=file_std).import_as_list(
+                        skip_header=3, skip_footer=1, timestamp=2,
+                        icpms="Agilent 7900s")
+
+                if file_parts[-1] not in self.container_var["acquisition times"]["STD"]:
+                    self.container_var["acquisition times"]["STD"][file_parts[-1]] = tk.StringVar()
+                self.container_var["acquisition times"]["STD"][file_parts[-1]].set(
+                    times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
                 self.container_lists["ISOTOPES"] = df_isotopes
@@ -17006,6 +17042,42 @@ class PySILLS(tk.Frame):
                 else:
                     file_parts = file_smpl .split("/")
                     df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                if (self.container_icpms["name"] != None and
+                        self.container_icpms["name"] not in ["PerkinElmer Syngistix"]):
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    var_timestamp = self.container_icpms["timestamp"]
+                    var_icpms = self.container_icpms["name"]
+
+                    dates, times = Data(filename=file_smpl).import_as_list(
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                        icpms=var_icpms)
+                elif self.container_icpms["name"] == "PerkinElmer Syngistix":
+                    var_os = sys.platform
+                    if var_os not in ["linux", "darwin"]:
+                        create_time = os.path.getctime(file_smpl)
+                    else:
+                        create_time = os.path.getmtime(file_smpl)
+
+                    create_date = datetime.datetime.fromtimestamp(create_time)
+                    hour = create_date.strftime("%H")
+                    minute = create_date.strftime("%M")
+                    second = create_date.strftime("%S")
+                    year = create_date.strftime("%Y")
+                    month = create_date.strftime("%m")
+                    day = create_date.strftime("%d")
+                    times = [[str(hour), str(minute), str(second)]]
+                    dates = [str(year), str(month), str(day)]
+                else:
+                    dates, times = Data(filename=file_smpl).import_as_list(
+                        skip_header=3, skip_footer=1, timestamp=2,
+                        icpms="Agilent 7900s")
+
+                if file_parts[-1] not in self.container_var["acquisition times"]["SMPL"]:
+                    self.container_var["acquisition times"]["SMPL"][file_parts[-1]] = tk.StringVar()
+                self.container_var["acquisition times"]["SMPL"][file_parts[-1]].set(
+                    times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
