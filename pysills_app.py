@@ -13570,7 +13570,7 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
-            #
+
             scb_v = ttk.Scrollbar(self.subwindow_ma_checkfile, orient="vertical")
             scb_h = ttk.Scrollbar(self.subwindow_ma_checkfile, orient="horizontal")
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
@@ -15083,6 +15083,8 @@ class PySILLS(tk.Frame):
                 var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 file_isotopes_smpl = self.container_lists["Measured Isotopes"][var_file_short]
 
+                list_delta_std_i = []
+                list_xi_std_i = {}
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
                     file_isotopes = self.container_lists["Measured Isotopes"][file_std_short]
@@ -15093,6 +15095,7 @@ class PySILLS(tk.Frame):
                             var_file_long=file_std, var_is_smpl=var_is_smpl)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
+                        list_delta_std_i.append(delta_std_i)
                         for isotope in file_isotopes:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             if var_srm_i == var_srm_file:
@@ -15102,15 +15105,23 @@ class PySILLS(tk.Frame):
                                     list_valid_std.append(file_std_short)
                                 if isotope not in xi_opt:
                                     xi_opt[isotope] = []
+                                if isotope not in list_xi_std_i:
+                                    list_xi_std_i[isotope] = []
 
                                 sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
                                     file_std_short]["MAT"][isotope]
+                                list_xi_std_i[isotope].append(sensitivity_i)
 
                                 xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
 
                 for isotope in file_isotopes_smpl:
-                    xi_regr = self.calculate_regression(
-                        data=xi_std_helper, isotope=isotope, file_data=list_valid_std)
+                    a_i, b_i = self.calculate_linar_regression(
+                        x_values=list_delta_std_i, y_values=list_xi_std_i[isotope])
+                    a_i = round(a_i, 12)
+                    b_i = round(b_i, 12)
+                    xi_regr = [b_i, a_i]
+                    # xi_regr = self.calculate_regression(
+                    #     data=xi_std_helper, isotope=isotope, file_data=list_valid_std)
                     xi_opt[isotope].extend(xi_regr)
 
                 delta_i = self.container_lists["Acquisition Times Delta"][var_file_short]
@@ -23683,6 +23694,26 @@ class PySILLS(tk.Frame):
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
             text_incl_is.window_create("insert", window=entr_is_i)
             text_incl_is.insert("end", "\n")
+
+    def calculate_linar_regression(self, x_values, y_values):
+        mean_x = np.mean(x_values)
+        mean_y = np.mean(y_values)
+        helper_xy = 0
+        helper_x2 = 0
+        n = len(x_values)
+
+        for index, x_value in enumerate(x_values):
+            y_value = y_values[index]
+            helper_xy += x_value*y_value
+            helper_x2 += x_value**2
+
+        upper_term = helper_xy - n*mean_x*mean_y
+        lower_term = helper_x2 - n*mean_x**2
+        b = upper_term/lower_term
+        a = mean_y - b*mean_x
+
+        return a, b
+
 
     def export_data_for_external_calculations(self):
         filename_export = filedialog.asksaveasfile(
