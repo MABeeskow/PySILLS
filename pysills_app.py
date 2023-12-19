@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		18.12.2023
+# Date:		19.12.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -1230,12 +1230,33 @@ class PySILLS(tk.Frame):
             "Calculation Accuracy": {"English": "Calculation Accuracy", "German": "Numerische Genauigkeit"},
             "Sensitivity Drift": {"English": "Sensitivity Drift", "German": "Sensitivitätsverschiebung"},
             "Limit of Detection": {"English": "Limit of Detection", "German": "Nachweisgrenze"},
-            "Offset Automatic Interval Detection": {"English": "Offset Automatic Interval Detection", "German": "Versatz der automatischen Intervalerkennung"},
+            "Offset Automatic Interval Detection": {
+                "English": "Offset Automatic Interval Detection",
+                "German": "Versatz der automatischen Intervalerkennung"},
             "Colormap": {"English": "Colormap", "German": "Farbpalette"},
             "Report File": {"English": "Report File", "German": "Ausgabedatei"},
             "Plotting Setup": {"English": "Plotting Setup", "German": "Diagrammeinstellungen"},
             "Language Selection": {"English": "Language Selection", "German": "Sprachauswahl"},
-            "Data Processing": {"English": "Data Processing", "German": "Datenverarbeitung"}}
+            "Data Processing": {"English": "Data Processing", "German": "Datenverarbeitung"},
+            "MINERAL ANALYSIS - Setup": {
+                "English": "MINERAL ANALYSIS - Setup", "German": "MINERALANALYSE - Einstellungen"},
+            "Author": {"English": "Author", "German": "Autor"},
+            "Source ID": {"English": "Source ID", "German": "Proben ID"},
+            "Standard Reference Material (SRM)": {
+                "English": "Standard Reference Material (SRM)", "German": "Standard/Referenzmaterial (SRM)"},
+            "Isotopes": {"English": "Isotopes", "German": "Isotope"},
+            "Sample Settings": {"English": "Sample Settings", "German": "Probeneinstellungen"},
+            "Matrix Settings": {"English": "Matrix Settings", "German": "Matrixeinstellungen"},
+            "Internal Standard Setup": {
+                "English": "Internal Standard Setup", "German": "Einstellungen interner Standard"},
+            "Oxide Calculation": {"English": "Oxide Calculation", "German": "Oxidberechnung"},
+            "Element Calculation": {"English": "Element Calculation", "German": "Elementberechnung"},
+            "Experimental Data": {"English": "Experimental Data", "German": "Experimentelle Daten"},
+            "Custom Data": {"English": "Custom Data", "German": "Manuelle Dateneingabe"},
+            "Oxide Setup": {"English": "Oxide Setup", "German": "Oxideinstellungen"},
+            "Composition Setup": {"English": "Composition Setup", "German": "Zusammensetzung\n definieren"},
+            "Mineral Calculation": {"English": "Mineral Calculation", "German": "Mineralberechnung"},
+            "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
 
         ################################################################################################################
         #
@@ -9165,7 +9186,8 @@ class PySILLS(tk.Frame):
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
+        str_title_window = self.language_dict["MINERAL ANALYSIS - Setup"][self.var_language]
         self.subwindow_ma_settings = tk.Toplevel(self.parent)
         self.subwindow_ma_settings.title("MINERAL ANALYSIS - Setup")
         self.subwindow_ma_settings.geometry(var_geometry)
@@ -9284,19 +9306,23 @@ class PySILLS(tk.Frame):
         var_category_n = var_column_n - 6
 
         # Labels
+        str_lbl_01 = self.language_dict["Project Information"][self.var_language]
+        str_lbl_02 = self.language_dict["Author"][self.var_language]
+        str_lbl_03 = self.language_dict["Source ID"][self.var_language]
+
         lbl_01 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.colors_fi["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Project Information", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Author", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Source ID", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Entries
         self.container_var[var_setting_key]["Author"].set(
@@ -9335,21 +9361,25 @@ class PySILLS(tk.Frame):
         var_category_n = var_column_n - 6
 
         # Labels
+        str_lbl_01 = self.language_dict["Standard Reference Material (SRM)"][self.var_language]
+        str_lbl_02 = self.language_dict["Standard Files"][self.var_language]
+        str_lbl_03 = self.language_dict["Isotopes"][self.var_language]
+
         lbl_02 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.colors_fi["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Standard Reference Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n - 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Standard Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02b = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n - 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Option Menus
         if self.container_var["SRM"]["default"][0].get() != "Select SRM":
@@ -9409,18 +9439,18 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-            var_header = "Sample Settings"
-            var_lbl_setup = "Internal Standard Setup"
+            str_lbl_01 = self.language_dict["Sample Settings"][self.var_language]
+            str_btn_01 = self.language_dict["Setup"][self.var_language]
         elif self.pysills_mode == "FI":
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
-            var_header = "Matrix Settings"
-            var_lbl_setup = "Matrix Setup"
+            str_lbl_01 = self.language_dict["Matrix Settings"][self.var_language]
+            str_btn_01 = self.language_dict["Setup"][self.var_language]
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
             var_setting_key = "mi_setting"
-            var_header = "Matrix Settings"
-            var_lbl_setup = "Matrix Setup"
+            str_lbl_01 = self.language_dict["Matrix Settings"][self.var_language]
+            str_btn_01 = self.language_dict["Setup"][self.var_language]
 
         var_row_start = var_geometry_info["Row start"]
         var_columm_start = var_geometry_info["Column start"]
@@ -9434,14 +9464,14 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text=var_header, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
         btn_03a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_header_n - 9, n_rows=var_row_n,
             n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.mineral_matrix_quantification)
 
         # Option Menu
@@ -9463,7 +9493,7 @@ class PySILLS(tk.Frame):
 
     def mineral_matrix_quantification(self):
         # Window Settings
-        window_width = 360
+        window_width = 480
         window_height = 175
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -9505,50 +9535,58 @@ class PySILLS(tk.Frame):
         var_row_start = 0
         var_columm_start = 0
         var_row_n = 1
-        var_header_n = 8
+        var_header_n = 11
 
         if str_method == "Internal Standard":
             # LABELS
+            str_lbl_01 = self.language_dict["Internal Standard Setup"][self.var_language]
+            str_lbl_02 = self.language_dict["Oxide Calculation"][self.var_language]
+            str_lbl_03 = self.language_dict["Element Calculation"][self.var_language]
+            str_lbl_04 = self.language_dict["Experimental Data"][self.var_language]
+            str_lbl_05 = self.language_dict["Custom Data"][self.var_language]
+            str_lbl_06 = self.language_dict["Mineral Calculation"][self.var_language]
+            str_btn_01 = self.language_dict["Setup"][self.var_language]
+
             lbl_01 = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_columm_start,
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Internal Standard Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
             # RADIOBUTTONS
             rb_01a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
                 column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Oxide Calculation",
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_02,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01b = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 2,
                 column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Element Calculation",
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_03,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01c = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 4,
                 column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Experimental Data",
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_04,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01d = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 5,
                 column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Custom Data",
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_05,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01e = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 3,
                 column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=5,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Mineral Calculation",
+                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_06,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01e.configure(state="disabled")
             # BUTTONS
@@ -9556,27 +9594,31 @@ class PySILLS(tk.Frame):
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
                 column_id=var_header_n +1, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_matrix_concentration_setup)
         elif str_method == "100 wt.% Oxides":
             # LABELS
+            str_lbl_01 = self.language_dict["Oxide Setup"][self.var_language]
+            str_btn_01 = self.language_dict["Composition Setup"][self.var_language]
+            str_btn_02 = self.language_dict["File-specific Setup"][self.var_language]
+
             lbl_01 = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_columm_start,
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Oxide Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
             # BUTTONS
             btn_01a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
                 column_id=var_columm_start, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
-                text="Composition Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.oxides_setup_composition)
             btn_01b = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
                 column_id=var_header_n + 1, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
-                text="File-specific Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.oxides_setup_files)
 
     def oxides_setup_composition(self):
