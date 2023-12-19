@@ -588,6 +588,12 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
             self.container_var[key_setting]["Inclusion Setup Option"] = tk.StringVar()
             self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
+
+            if key_setting == "mi_setting":
+                self.container_var[key_setting]["Inclusion Setup Option"].set("100 wt.% Oxides")
+            else:
+                self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
+
             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
             self.container_var[key_setting]["Quantification Method"].set(1)
             self.container_var[key_setting]["Quantification Method Option"] = tk.StringVar()
@@ -6854,11 +6860,11 @@ class PySILLS(tk.Frame):
     def detect_signal_interval(self, mode="BG"):
         data_interval_detection = {}
         data_calc = {}
-        #
+
         list_files = []
         list_files.extend(self.container_lists["STD"]["Long"])
         list_files.extend(self.container_lists["SMPL"]["Long"])
-        #
+
         for file_long in list_files:
             if self.container_icpms["name"] != None:
                 var_skipheader = self.container_icpms["skipheader"]
@@ -6870,15 +6876,36 @@ class PySILLS(tk.Frame):
                     delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
             file_short = file_long.split("/")[-1]
-            #
+
             condition = False
             index_isotope = 0
-            isotope_is = self.container_var["IS"]["Default STD"].get()
-            #
+            if file_long in self.container_lists["STD"]["Long"]:
+                var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+                index = self.container_lists["STD"]["Long"].index(file_long)
+                file_short = self.container_lists["STD"]["Short"][index]
+
+                for element, value in sorted(
+                        self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                    if element in self.container_lists["Measured Elements"][file_short]:
+                        isotope_is = self.container_lists["Measured Elements"][file_short][element][0]
+                    break
+            else:
+                isotope_is = self.container_var["SMPL"][file_long]["IS Data"]["IS"].get() #self.container_var["IS"]["Default STD"].get()
+
             if isotope_is == "Select IS":
                 file_dummy = file_long
-                df_data_dummy = DE(filename_long=file_dummy).get_measurements(
-                    delimiter=",", skip_header=3, skip_footer=1)
+
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data_dummy = DE(filename_long=file_dummy).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data_dummy = DE(filename_long=file_dummy).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
+
+                #df_data_dummy = DE(filename_long=file_dummy).get_measurements(
+                #    delimiter=",", skip_header=3, skip_footer=1)
 
                 max_values = {"Last": 0}
                 for isotope in list(df_data_dummy.keys())[1:]:
@@ -6893,12 +6920,12 @@ class PySILLS(tk.Frame):
                             max_values.clear()
                             max_values[isotope] = np.median(dataset_isotope)
                             max_values["Last"] = np.median(dataset_isotope)
-                #
+
                 del max_values["Last"]
                 isotope_is = list(max_values.keys())[0]
             else:
                 max_values = {"Last": 0}
-                #
+
                 for isotope in list(df_data.keys())[1:]:
                     dataset_isotope = list(df_data[isotope])
                     if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -6911,17 +6938,18 @@ class PySILLS(tk.Frame):
                             max_values.clear()
                             max_values[isotope] = np.median(dataset_isotope)
                             max_values["Last"] = np.median(dataset_isotope)
-                #
+
                 del max_values["Last"]
                 isotope_is = list(max_values.keys())[0]
-            #
+
+            n_loops = 0
             while condition == False:
                 n = 0
                 if file_short not in data_interval_detection:
                     data_interval_detection[file_short] = {"BG": {"Start": None, "End": None, "Index": None},
                                                            "MAT": {"Start": None, "End": None, "Index": None}}
                     data_calc[file_short] = {"Time": [], "Cumulative Average": [], "Change": [], "Ratio": []}
-                #
+
                 dataset_isotope = list(df_data[isotope_is])
                 condition_2 = False
                 index_2 = 10
@@ -6935,10 +6963,10 @@ class PySILLS(tk.Frame):
                         condition_2 = True
                     else:
                         index_2 += 1
-                #
+
                 for index, value_time in enumerate(dataset_time):
                     data_calc[file_short]["Time"].append(value_time)
-                    #
+
                     if index > 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
                             value_cumulavg = np.mean(dataset_isotope[:index+1])
@@ -6969,45 +6997,50 @@ class PySILLS(tk.Frame):
                         data_calc[file_short]["Change"].append(value_change)
                         value_ratio = value_cumulavg/mean_first10
                         data_calc[file_short]["Ratio"].append(value_ratio)
-                    #
+
                     if value_ratio > 20 and data_interval_detection[file_short]["BG"]["End"] == None:
                         offset_bg_start = self.container_var["General Settings"]["BG Offset Start"].get()
                         offset_bg_end = self.container_var["General Settings"]["BG Offset End"].get()
                         offset_mat_start = self.container_var["General Settings"]["MAT Offset Start"].get()
-                        #
+
                         data_interval_detection[file_short]["BG"]["Start"] = dataset_time[offset_bg_start]
-                        #
+
                         index_time = dataset_time.index(value_time)
                         data_interval_detection[file_short]["BG"]["End"] = dataset_time[index_time - offset_bg_end]
                         data_interval_detection[file_short]["MAT"]["Start"] = dataset_time[index_time + offset_mat_start]
-                        #
+
                         index_start = dataset_time.index(dataset_time[offset_bg_start])
                         index_end = dataset_time.index(dataset_time[index_time - offset_bg_end])
                         data_interval_detection[file_short]["BG"]["Index"] = [index_start, index_end]
-                        #
+
                         index_start_mat = dataset_time.index(dataset_time[index_time + offset_mat_start])
-                    #
+
                     if value_change < 0 and index > 0.5*len(dataset_time) \
                             and data_interval_detection[file_short]["MAT"]["End"] == None:
                         offset_mat_end = self.container_var["General Settings"]["MAT Offset End"].get()
-                        #
+
                         index_time = dataset_time.index(value_time)
                         data_interval_detection[file_short]["MAT"]["End"] = dataset_time[index_time - offset_mat_end]
-                        #
+
                         index_end = dataset_time.index(dataset_time[index_time - offset_mat_end])
                         data_interval_detection[file_short]["MAT"]["Index"] = [index_start_mat, index_end]
-                #
+
                 for key1, value1 in data_interval_detection[file_short].items():
                     if key1 == mode:
                         for key2, value2 in value1.items():
                             if value2 != None:
                                 n += 1
-                #
+
                 if n == 3:
                     condition = True
                 else:
                     index_isotope += 1
-        #
+
+                n_loops += 1
+
+                if n_loops == 1000:
+                    break
+
         if mode == "BG":
             if self.pysills_mode == "MA":
                 self.container_var["ma_setting"]["Time BG Start"].set("auto-detection used")
@@ -7017,51 +7050,58 @@ class PySILLS(tk.Frame):
                     self.container_var["fi_setting"]["Time BG Start"].set("auto-detection used")
                     self.container_var["fi_setting"]["Time BG End"].set("auto-detection used")
                 else:
-                    self.container_var["mi_setting"]["Time BG Start"].set("auto-detection used")
-                    self.container_var["mi_setting"]["Time BG End"].set("auto-detection used")
-            #
+                    if n_loops == 1000:
+                        self.container_var["mi_setting"]["Time BG Start"].set("auto-detection not successfull")
+                        self.container_var["mi_setting"]["Time BG End"].set("auto-detection not successfull")
+                    else:
+                        self.container_var["mi_setting"]["Time BG Start"].set("auto-detection used")
+                        self.container_var["mi_setting"]["Time BG End"].set("auto-detection used")
+
             self.autodetection_bg = True
         elif mode == "MAT":
             self.container_var["ma_setting"]["Time MAT Start"].set("auto-detection used")
             self.container_var["ma_setting"]["Time MAT End"].set("auto-detection used")
             self.autodetection_sig = True
-        #
-        for filename, dataset in data_interval_detection.items():
-            if filename in self.container_lists["STD"]["Short"]:
-                filetype = "STD"
+
+        if n_loops < 1000:
+            for filename, dataset in data_interval_detection.items():
+                if filename in self.container_lists["STD"]["Short"]:
+                    filetype = "STD"
+
+                    if self.pysills_mode == "MA":
+                        self.temp_lines_checkup2[filetype][filename] = 0
+                elif filename in self.container_lists["SMPL"]["Short"]:
+                    filetype = "SMPL"
+
+                    if self.pysills_mode == "MA":
+                        self.temp_lines_checkup2[filetype][filename] = 0
+
+                var_index = self.container_lists[filetype]["Short"].index(filename)
+                filename_long = self.container_lists[filetype]["Long"][var_index]
+
+                t_start = dataset[mode]["Start"]
+                t_end = dataset[mode]["End"]
+                index_start = dataset[mode]["Index"][0]
+                index_end = dataset[mode]["Index"][1]
+
+                self.container_helper[filetype][filename][mode]["Content"][1] = {
+                    "Times": [t_start, t_end], "Indices": [index_start, index_end], "Object": None}
+                self.container_helper[filetype][filename][mode]["ID"] += 1
+                self.container_helper[filetype][filename][mode]["Indices"].append(1)
+
+                self.container_var[filetype][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                self.container_var[filetype][filename_long]["Sign Color"].set(self.sign_yellow)
+
                 if self.pysills_mode == "MA":
                     self.temp_lines_checkup2[filetype][filename] = 0
-            elif filename in self.container_lists["SMPL"]["Short"]:
-                filetype = "SMPL"
-                if self.pysills_mode == "MA":
+                    self.show_time_signal_diagram_checker(var_setting_key="ma_setting")
+                elif self.pysills_mode == "FI":
                     self.temp_lines_checkup2[filetype][filename] = 0
+                    self.show_time_signal_diagram_checker(var_setting_key="fi_setting")
+                elif self.pysills_mode == "MI":
+                    self.temp_lines_checkup2[filetype][filename] = 0
+                    self.show_time_signal_diagram_checker(var_setting_key="mi_setting")
 
-            var_index = self.container_lists[filetype]["Short"].index(filename)
-            filename_long = self.container_lists[filetype]["Long"][var_index]
-
-            t_start = dataset[mode]["Start"]
-            t_end = dataset[mode]["End"]
-            index_start = dataset[mode]["Index"][0]
-            index_end = dataset[mode]["Index"][1]
-
-            self.container_helper[filetype][filename][mode]["Content"][1] = {
-                "Times": [t_start, t_end], "Indices": [index_start, index_end], "Object": None}
-            self.container_helper[filetype][filename][mode]["ID"] += 1
-            self.container_helper[filetype][filename][mode]["Indices"].append(1)
-
-            self.container_var[filetype][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
-            self.container_var[filetype][filename_long]["Sign Color"].set(self.sign_yellow)
-
-            if self.pysills_mode == "MA":
-                self.temp_lines_checkup2[filetype][filename] = 0
-                self.show_time_signal_diagram_checker(var_setting_key="ma_setting")
-            elif self.pysills_mode == "FI":
-                self.temp_lines_checkup2[filetype][filename] = 0
-                self.show_time_signal_diagram_checker(var_setting_key="fi_setting")
-            elif self.pysills_mode == "MI":
-                self.temp_lines_checkup2[filetype][filename] = 0
-                self.show_time_signal_diagram_checker(var_setting_key="mi_setting")
-    #
     def internal_standard_concentration_setup(self):
         try:
             self.srm_isotopes
@@ -10173,8 +10213,11 @@ class PySILLS(tk.Frame):
 
             # Option Menu
             str_default_inclusion_setup = self.container_var[key_setting]["Inclusion Setup Option"].get()
-            list_opt_incl_is_quantification = [
-                "Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2023)", "Custom Data", "External Calculation"]
+            if self.pysills_mode == "FI":
+                list_opt_incl_is_quantification = ["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2023)",
+                                                   "Custom Data", "External Calculation"]
+            elif self.pysills_mode == "MI":
+                list_opt_incl_is_quantification = ["100 wt.% Oxides", "Custom Data", "External Calculation"]
 
             opt_02a = SE(
                 parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
@@ -10193,7 +10236,8 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
-            opt_02a['menu'].entryconfig("PyPitzer (Liu et al. 2023)", state="disable")
+            if self.pysills_mode == "FI":
+                opt_02a['menu'].entryconfig("PyPitzer (Liu et al. 2023)", state="disable")
 
             str_default_quantification_setup = self.container_var[key_setting]["Quantification Method Option"].get()
             list_opt_incl_quantification = [
