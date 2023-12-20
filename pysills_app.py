@@ -16735,9 +16735,9 @@ class PySILLS(tk.Frame):
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             fi_demo_files["ALL"].append(str(path_raw.as_posix()))
                 fi_demo_files["ALL"].sort()
-                fi_demo_files["STD"].extend(fi_demo_files["ALL"][:2])
-                fi_demo_files["STD"].extend(fi_demo_files["ALL"][-2:])
-                fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][2:-2])
+                fi_demo_files["STD"].extend(fi_demo_files["ALL"][:4])
+                fi_demo_files["STD"].extend(fi_demo_files["ALL"][-4:])
+                fi_demo_files["SMPL"].extend(fi_demo_files["ALL"][4:-4])
 
                 self.list_std = fi_demo_files["STD"]
                 self.list_smpl = fi_demo_files["SMPL"]
