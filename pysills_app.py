@@ -15355,6 +15355,38 @@ class PySILLS(tk.Frame):
                             if var_result_i > max_amount_i:
                                 correction_factor_i = max_amount_i/var_result_i
                                 break
+                        else:
+                            var_concentration_is = max_amount_is
+                            correction_factor_i = 1
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+                                var_file_short]["1 SIGMA MAT"][isotope]
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+
+                            if var_sensitivity_i > 0 and var_intensity_is > 0 and var_intensity_i > 0:
+                                var_result_i = ((var_intensity_i/var_intensity_is)*
+                                                (var_concentration_is/var_sensitivity_i))
+                                var_result_sigma_i = (var_intensity_sigma_i/var_intensity_i)*var_result_i
+                            else:
+                                var_result_i = 0.0
+                                var_result_sigma_i = 0.0
+
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
+
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            max_amount_i = self.maximum_amounts[element]
+
+                            if var_result_i > max_amount_i:
+                                correction_factor_i = max_amount_i/var_result_i
+                                break
 
                     if correction_factor_i != 1:
                         for isotope in file_isotopes:
@@ -17570,15 +17602,12 @@ class PySILLS(tk.Frame):
                     sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
                         "MAT"][isotope]
                     var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                    var_srm_is = self.container_var["SRM"][var_is].get()
-                    #
-                    key_element = re.search("(\D+)(\d+)", var_is)
-                    element = key_element.group(1)
-                    concentration_is = self.srm_actual[var_srm_is][element]
-                    #
+                    concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                        var_is]
+
                     intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         "MAT"][var_is]
-                    #
+
                     var_result_i = sensitivity_i*(intensity_is/concentration_is)
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
@@ -18563,9 +18592,9 @@ class PySILLS(tk.Frame):
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_ratio).get_intensity_ratio(
                     data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
-                self.fi_get_normalized_sensitivity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
+                # self.fi_get_normalized_sensitivity(
+                #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                #     var_file_long=var_file_long, mode="All")
                 self.fi_get_rsf(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
@@ -18573,6 +18602,9 @@ class PySILLS(tk.Frame):
                 self.fi_get_concentration(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                self.fi_get_normalized_sensitivity(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
                 self.fi_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
@@ -21612,7 +21644,10 @@ class PySILLS(tk.Frame):
 
         n_intervals_bg = len(self.container_helper[var_type][var_file_short]["BG"]["Content"])
         n_intervals_mat = len(self.container_helper[var_type][var_file_short]["MAT"]["Content"])
-        n_intervals_incl = len(self.container_helper[var_type][var_file_short]["INCL"]["Content"])
+        if var_type == "STD":
+            n_intervals_incl = 1
+        else:
+            n_intervals_incl = len(self.container_helper[var_type][var_file_short]["INCL"]["Content"])
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
