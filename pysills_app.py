@@ -592,6 +592,8 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
             self.container_var[key_setting]["Inclusion Setup Option"] = tk.StringVar()
             self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
+            self.container_var[key_setting]["Last solid"] = tk.StringVar()
+            self.container_var[key_setting]["Last solid"].set("Select last solid")
 
             if key_setting == "mi_setting":
                 self.container_var[key_setting]["Inclusion Setup Option"].set("100 wt.% Oxides")
@@ -6850,7 +6852,7 @@ class PySILLS(tk.Frame):
             entr_i = tk.Entry(
                 frm_dwell, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope],
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
-                highlightbackground=self.bg_colors["Very Light"])
+                highlightbackground=self.bg_colors["Very Light"], width=12)
             text_dwell.window_create("insert", window=entr_i)
             text_dwell.insert("end", "\n")
 
@@ -7223,7 +7225,7 @@ class PySILLS(tk.Frame):
                 entr_i = tk.Entry(
                     frm_iso, textvariable=self.container_var["SMPL"][file]["IS Data"]["Concentration"],
                     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
-                    highlightbackground=self.bg_colors["Very Light"])
+                    highlightbackground=self.bg_colors["Very Light"], width=15)
                 text_iso.window_create("insert", window=entr_i)
                 text_iso.insert("end", "\n")
 
@@ -11113,7 +11115,7 @@ class PySILLS(tk.Frame):
 
             entr_i = tk.Entry(
                 frm_02, textvariable=self.container_var["acquisition times"]["STD"][var_file_short],
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0, width=12)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
@@ -11129,7 +11131,7 @@ class PySILLS(tk.Frame):
 
             entr_i = tk.Entry(
                 frm_02, textvariable=self.container_var["acquisition times"]["SMPL"][var_file_short],
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0)
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0, width=12)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
@@ -11862,7 +11864,7 @@ class PySILLS(tk.Frame):
                         self.container_var["SMPL"][file_smpl]["Melting temperature"] = tk.StringVar()
                         self.container_var["SMPL"][file_smpl]["Melting temperature"].set("25.0")
                         self.container_var["SMPL"][file_smpl]["Last compound"] = tk.StringVar()
-                        self.container_var["SMPL"][file_smpl]["Last compound"].set("Select last compound")
+                        self.container_var["SMPL"][file_smpl]["Last compound"].set("Select last solid")
             else:
                 self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                 self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
@@ -20291,31 +20293,31 @@ class PySILLS(tk.Frame):
 
             entr_1_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["a"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_1_i)
             text_smpl.insert("end", "\t")
 
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["b"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_2_i)
             text_smpl.insert("end", "\t")
 
             entr_3_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(host)"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_3_i)
             text_smpl.insert("end", "\t")
 
             entr_4_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(incl)"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_4_i)
             text_smpl.insert("end", "\t")
 
             entr_5_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["R"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_5_i)
             text_smpl.insert("end", "\n")
 
@@ -20610,25 +20612,25 @@ class PySILLS(tk.Frame):
 
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["R(incl)"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_2_i)
             text_smpl.insert("end", "\t")
 
             entr_3_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["R(host)"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_3_i)
             text_smpl.insert("end", "\t")
 
             entr_4_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["rho(host)"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_4_i)
             text_smpl.insert("end", "\t")
 
             entr_5_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["rho(incl)"],
-                width=15)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_5_i)
             text_smpl.insert("end", "\n")
 
@@ -20672,19 +20674,19 @@ class PySILLS(tk.Frame):
         lbl_01a = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=13, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Matrix Amount", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Matrix Amount", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=13, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Matrix", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Matrix", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01c = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=13, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Matrix-Only Tracer", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Matrix-Only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01d = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=13, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Concentration (ppm)", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Concentration (ppm)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=25, fg=self.colors_fi["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -20807,7 +20809,7 @@ class PySILLS(tk.Frame):
             #
             entr_1_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"],
-                width=5)
+                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             entr_1_i.bind(
                 "<Return>", lambda event, var_file=file_smpl_long: self.change_specific_matrix_amount(var_file, event))
             text_smpl.window_create("insert", window=entr_1_i)
@@ -20839,7 +20841,7 @@ class PySILLS(tk.Frame):
             #
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Value"],
-                width=15)
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_2_i)
             text_smpl.insert("end", "\n")
     #
@@ -20884,11 +20886,11 @@ class PySILLS(tk.Frame):
         lbl_01a = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 1, column_id=start_column,
             n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Second Internal Standard", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Second Internal Standard", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 2, column_id=start_column,
             n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Concentration (ppm)", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Concentration (ppm)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 3, column_id=start_column,
             n_rows=1, n_columns=20, fg=self.colors_fi["Light Font"],
@@ -20982,7 +20984,8 @@ class PySILLS(tk.Frame):
             text_smpl.insert("end", "\t")
             #
             entr_i = tk.Entry(
-                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Second Internal Standard"]["Value"])
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Second Internal Standard"]["Value"],
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_i)
             text_smpl.insert("end", "\n")
     #
@@ -23409,11 +23412,11 @@ class PySILLS(tk.Frame):
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 16, n_rows=1,
             n_columns=24, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Melting temperature of the last solid", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Melting temperature of the last solid (in °C)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 16, n_rows=1,
-            n_columns=24, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-            text="(in °C)", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
+            text="Last solid (default)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 41, n_rows=1,
             n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
@@ -23425,7 +23428,7 @@ class PySILLS(tk.Frame):
 
         ## BUTTONS
         btn_00c = SE(
-            parent=subwindow_fi_inclusion_pypitzer, row_id=n_rows - 2, column_id=start_column + 34, n_rows=1,
+            parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 34, n_rows=1,
             n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_00d = SE(
@@ -23435,6 +23438,35 @@ class PySILLS(tk.Frame):
             command=self.run_pypitzer)
 
         ## OPTION MENUS
+        var_list_last_compound = [
+            "Ice H2O", "Halite NaCl","Hydrohalite NaCl*2H2O", "Sylvite KCl", "Antarcticite CaCl2*6H2O",
+            "Bischofite MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O", "Carnallite KCl*MgCl2*6H2O",
+            "Tachyhydrite CaMg2Cl6*12H2O", "Mirabilite Na2SO4*10H2O", "Thenardite Na2SO4", "Hexahydrite MgSO4*6H2O",
+            "Epsomite MgSO4*7H2O", "Arcanite K2SO4", "Picromerite K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O",
+            "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O", "FeSO4*H2O", "FeSO4*7H2O"]
+
+        var_list_last_compound_simple = [
+            "H2O", "NaCl", "NaCl*2H2O", "KCl", "CaCl2*6H2O", "MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O",
+            "KCl*MgCl2*6H2O", "CaMg2Cl6*12H2O", "Na2SO4*10H2O", "Na2SO4", "MgSO4*6H2O", "MgSO4*7H2O", "K2SO4",
+            "K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O", "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O",
+            "FeSO4*H2O", "FeSO4*7H2O"]
+
+        opt_last_solid_default = SE(
+            parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 25, n_rows=1,
+            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["fi_setting"]["Last solid"], option_list=var_list_last_compound,
+            text_set=self.container_var["fi_setting"]["Last solid"].get(), fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color, command=lambda opt=self.container_var["fi_setting"]["Last solid"]:
+            self.change_last_solid_default(opt))
+        opt_last_solid_default["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_last_solid_default.config(
+            bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
         opt_is_default = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 51, n_rows=1,
             n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
@@ -23522,7 +23554,7 @@ class PySILLS(tk.Frame):
 
         frm_temperatures = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 2, column_id=start_column + 16,
-            n_rows=n_rows - 4, n_columns=24, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
+            n_rows=n_rows - 3, n_columns=24, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
         vsb_temperatures = ttk.Scrollbar(master=frm_temperatures, orient="vertical")
         text_temperatures = tk.Text(
             master=frm_temperatures, width=30, height=25, yscrollcommand=vsb_temperatures.set,
@@ -23530,19 +23562,6 @@ class PySILLS(tk.Frame):
         vsb_temperatures.config(command=text_temperatures.yview)
         vsb_temperatures.pack(side="right", fill="y")
         text_temperatures.pack(side="left", fill="both", expand=True)
-
-        var_list_last_compound = [
-            "Ice H2O", "Halite NaCl","Hydrohalite NaCl*2H2O", "Sylvite KCl", "Antarcticite CaCl2*6H2O",
-            "Bischofite MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O", "Carnallite KCl*MgCl2*6H2O",
-            "Tachyhydrite CaMg2Cl6*12H2O", "Mirabilite Na2SO4*10H2O", "Thenardite Na2SO4", "Hexahydrite MgSO4*6H2O",
-            "Epsomite MgSO4*7H2O", "Arcanite K2SO4", "Picromerite K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O",
-            "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O", "FeSO4*H2O", "FeSO4*7H2O"]
-
-        var_list_last_compound_simple = [
-            "H2O", "NaCl", "NaCl*2H2O", "KCl", "CaCl2*6H2O", "MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O",
-            "KCl*MgCl2*6H2O", "CaMg2Cl6*12H2O", "Na2SO4*10H2O", "Na2SO4", "MgSO4*6H2O", "MgSO4*7H2O", "K2SO4",
-            "K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O", "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O",
-            "FeSO4*H2O", "FeSO4*7H2O"]
 
         for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
             file_smpl_long = self.container_lists["SMPL"]["Long"][index]
@@ -23554,7 +23573,8 @@ class PySILLS(tk.Frame):
             text_temperatures.insert("end", "\t")
 
             entr_i = tk.Entry(
-                frm_temperatures, textvariable=self.container_var["SMPL"][file_smpl_long]["Melting temperature"])
+                frm_temperatures, textvariable=self.container_var["SMPL"][file_smpl_long]["Melting temperature"],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0, width=8)
             text_temperatures.window_create("insert", window=entr_i)
             text_temperatures.insert("end", "\t")
 
@@ -23602,10 +23622,14 @@ class PySILLS(tk.Frame):
             text_is.insert("end", " \t")
 
             entr_i = tk.Entry(
-                frm_is, textvariable=self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"])
+                frm_is, textvariable=self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0, width=8)
             text_is.window_create("insert", window=entr_i)
             text_is.insert("end", "\n")
 
+    def change_last_solid_default(self, opt):
+        for index, file_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
+            self.container_var["SMPL"][file_smpl_long]["Last compound"].set(opt)
     def select_cation(self, cation):
         if self.temp_checkbuttons_pypitzer[cation].get() == 1:
             if cation not in self.container_lists["Selected Cations"]:
@@ -23837,15 +23861,18 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=opt_is_i)
             text_smpl.insert("end", " \t")
             #
-            entr_i = tk.Entry(frm_smpl, textvariable=self.container_var["fi_setting"]["Salt Correction"][
-                "Salinity SMPL"][file_smpl_short])
+            entr_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][
+                    file_smpl_short], width=8, highlightthickness=0, bg=self.bg_colors["White"],
+                fg=self.bg_colors["Dark Font"])
             entr_i.bind("<Return>", lambda event, var_entr=self.container_var["fi_setting"]["Salt Correction"][
                 "Salinity SMPL"][file_smpl_short], mode="specific", var_file=file_smpl:
             self.fi_calculate_chargebalance(var_entr, mode, var_file, event))
             text_smpl.window_create("insert", window=entr_i)
             text_smpl.insert("end", "\t")
-            entr_i = tk.Entry(frm_smpl,
-                              textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"])
+            entr_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"], width=8,
+                highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_i)
             text_smpl.insert("end", "\n")
         #
@@ -24027,16 +24054,19 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=opt_is_i)
             text_smpl.insert("end", " \t")
             #
-            entr_i = tk.Entry(frm_smpl, textvariable=self.container_var["fi_setting"]["Salt Correction"][
-                "Salinity SMPL"][file_smpl_short])
+            entr_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][
+                    file_smpl_short], width=8, highlightthickness=0, bg=self.bg_colors["White"],
+                fg=self.bg_colors["Dark Font"])
             entr_i.bind("<Return>", lambda event, var_entr=self.container_var["fi_setting"]["Salt Correction"][
                 "Salinity SMPL"][file_smpl_short], mode="specific", var_file=file_smpl:
             self.fi_calculate_massbalance(var_entr, mode, var_file, event))
             text_smpl.window_create("insert", window=entr_i)
             text_smpl.insert("end", "\t")
             # before: self.container_files["SMPL"][file_smpl_short]["IS Concentration"]
-            entr_i = tk.Entry(frm_smpl,
-                              textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"])
+            entr_i = tk.Entry(
+                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"], width=8,
+                highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_i)
             text_smpl.insert("end", "\n")
         #
@@ -24195,7 +24225,9 @@ class PySILLS(tk.Frame):
             text_incl_is.window_create("end", window=opt_is_i)
             text_incl_is.insert("end", " \t")
             #
-            entr_is_i = tk.Entry(frm_incl_is, textvariable=var_entr_is_i, width=30)
+            entr_is_i = tk.Entry(
+                frm_incl_is, textvariable=var_entr_is_i, width=10, highlightthickness=0, bg=self.bg_colors["White"],
+                fg=self.bg_colors["Dark Font"])
             entr_is_i.bind(
                 "<Return>", lambda event, var_entr=var_entr_is_i, var_file=file_smpl, state_default=False:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
