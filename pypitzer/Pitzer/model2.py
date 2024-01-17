@@ -736,7 +736,7 @@ class FluidPitzer:
         target_species = self.solids[y]
 
         def solubility_equilibrium_single(x):
-            print(x)
+            # print("x:", x)
             lna_pitzer = self.get_water_activity(x)
             if target_species == 'H2O(S)':
                 # lnk_ice = clegg_and_brimblecombe(self.get_t(x))
@@ -802,6 +802,6 @@ class FluidPitzer:
 
         # end of timer
         elapsed_time = time.time() - start_time
-        print('times used:', elapsed_time)
+        # print("times used:", elapsed_time)
 
         return res

@@ -6313,32 +6313,46 @@ class PySILLS(tk.Frame):
                 ## SAMPLE FILES
                 for i in range(index_container["SAMPLE FILES"] + 1,
                                index_container["ISOTOPES"] - 1):
-                    line_std = str(loaded_lines[i].strip())
-                    splitted_std = line_std.split(";")
+                    line_smpl = str(loaded_lines[i].strip())
+                    splitted_data_smpl = line_smpl.split(";")
 
-                    var_file_long = splitted_std[0]
-                    var_file_short = splitted_std[0].split("/")[-1]
+                    var_file_long = splitted_data_smpl[0]
+                    var_file_short = splitted_data_smpl[0].split("/")[-1]
 
                     self.container_var["SMPL"][var_file_long] = {
                         "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
                         "Checkbox": tk.IntVar(), "ID": tk.StringVar(), "Sign Color": tk.StringVar()}
                     self.container_var["acquisition times"]["SMPL"][var_file_short] = tk.StringVar()
+                    self.container_var["SMPL"][var_file_long]["Last compound"] = tk.StringVar()
+                    self.container_var["SMPL"][var_file_long]["Last compound"].set("Select last solid")
+                    self.container_var["SMPL"][var_file_long]["Melting temperature"] = tk.StringVar()
+                    self.container_var["SMPL"][var_file_long]["Melting temperature"].set("25.0")
 
                     self.lb_smpl.insert(tk.END, str(var_file_short))
                     self.list_smpl.append(var_file_long)
                     self.container_lists["SMPL"]["Long"].append(var_file_long)
                     self.container_lists["SMPL"]["Short"].append(var_file_short)
                     self.container_var["SMPL"][var_file_long]["Checkbox"].get()
-                    self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].set(splitted_std[1])
-                    self.container_var["SMPL"][var_file_long]["ID"].set(splitted_std[2])
-                    self.container_var["SMPL"][var_file_long]["Checkbox"].set(splitted_std[3])
+                    self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].set(splitted_data_smpl[1])
+                    self.container_var["SMPL"][var_file_long]["ID"].set(splitted_data_smpl[2])
+                    self.container_var["SMPL"][var_file_long]["Checkbox"].set(splitted_data_smpl[3])
 
                     try:
-                        self.container_var["SMPL"][var_file_long]["Sign Color"].set(splitted_std[4])
+                        self.container_var["SMPL"][var_file_long]["Sign Color"].set(splitted_data_smpl[4])
                     except:
                         self.container_var["SMPL"][var_file_long]["Sign Color"].set(self.sign_red)
 
-                    self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_std[5])
+                    self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_data_smpl[5])
+
+                    try:
+                        self.container_var["SMPL"][var_file_long]["Last compound"].set(splitted_data_smpl[8])
+                    except:
+                        self.container_var["SMPL"][var_file_long]["Last compound"].set("Select last solid")
+
+                    try:
+                        self.container_var["SMPL"][var_file_long]["Melting temperature"].set(splitted_data_smpl[9])
+                    except:
+                        self.container_var["SMPL"][var_file_long]["Melting temperature"].set("25.0")
 
                     self.fi_current_file_smpl = self.list_smpl[0]
                     #
@@ -23639,6 +23653,7 @@ class PySILLS(tk.Frame):
                 self.container_lists["Selected Cations"].remove(cation)
 
     def run_pypitzer(self):
+        self.dict_species_pypitzer = {}
         var_list_last_compound = [
             "Ice H2O", "Halite NaCl", "Hydrohalite NaCl*2H2O", "Sylvite KCl", "Antarcticite CaCl2*6H2O",
             "Bischofite MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O", "Carnallite KCl*MgCl2*6H2O",
@@ -23651,16 +23666,34 @@ class PySILLS(tk.Frame):
             "K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O", "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O",
             "FeSO4*H2O", "FeSO4*7H2O"]
 
-        # Selected species (cations)
-        list_species = []
-        list_species.extend(self.container_lists["Selected Cations"])
-        list_species.extend(self.container_lists["Selected Anions"])
-        print("Cations:", self.container_lists["Selected Cations"])
-        # Selected species (anions)
-        print("Anions:", self.container_lists["Selected Anions"])
+        self.dict_species_helper = {}
+        for cation in self.container_lists["Selected Cations"]:
+            if cation in ["Li", "Na", "K", "Rb", "Cs", "Fr"]:
+                self.dict_species_helper[cation] = cation+"+"
+            else:
+                self.dict_species_helper[cation] = cation
+
+        for anion in self.container_lists["Selected Anions"]:
+            if anion in ["F", "Cl", "Br", "I", "At"]:
+                self.dict_species_helper[anion] = anion+"-"
+            elif anion == "S":
+                self.dict_species_helper[anion] = anion+"O4-2"
+            else:
+                self.dict_species_helper[anion] = anion
+
         # Selected species (all)
-        self.build_species_dictionary()
-        print("Selected species:", self.dict_species_pypitzer)
+        for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            self.dict_species_pypitzer[file_smpl_short] = {}
+            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
+            self.get_intensity(
+                var_filetype="SMPL", var_datatype="RAW", var_file_short=file_smpl_short, mode="Specific")
+            self.fi_get_intensity_corrected(
+                var_filetype="SMPL", var_datatype="RAW", var_file_short=file_smpl_short, var_focus="INCL",
+                mode="Specific")
+            self.fi_get_intensity_ratio(
+                var_filetype="SMPL", var_datatype="RAW", var_file_short=file_smpl_short, var_file_long=file_smpl_long,
+                var_focus="INCL")
+            self.build_species_dictionary(filename_short=file_smpl_short)
 
         self.dict_inital_guess_pypitzer = {}
         for index, file_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
@@ -23673,14 +23706,29 @@ class PySILLS(tk.Frame):
             # Melting temperature of last solid
             str_melting_temperature_i = self.container_var["SMPL"][file_smpl_long]["Melting temperature"].get()
 
-            print(file_smpl_short, str_last_solid_i, str_melting_temperature_i, self.dict_inital_guess_pypitzer[file_smpl_short])
+            fluid_inclusion = FluidPitzer(
+                x0=self.dict_inital_guess_pypitzer[file_smpl_short],
+                species=self.dict_species_pypitzer[file_smpl_short],
+                solids=[str_last_solid_i],
+                t=float(str_melting_temperature_i))
 
-    def build_species_dictionary(self):
-        self.dict_species_pypitzer = {}
-        for cation in self.container_lists["Selected Cations"]:
-            self.dict_species_pypitzer[cation] = None
-        for anion in self.container_lists["Selected Anions"]:
-            self.dict_species_pypitzer[anion] = None
+            results_pypitzer = fluid_inclusion.optimize()
+            print("Results (PyPitzer):", results_pypitzer)
+
+        print("PyPitzer finished!")
+    def build_species_dictionary(self, filename_short):
+        dict_chemistry = self.container_lists["Measured Elements"][filename_short]
+        helper_ratios = {}
+
+        for element, ion in self.dict_species_helper.items():
+            helper_ratios[element] = {}
+            list_isotopes = dict_chemistry[element]
+
+            for isotope in list_isotopes:
+                value_i = self.container_intensity_ratio["SMPL"]["RAW"][filename_short]["INCL"][isotope]
+                helper_ratios[element][isotope] = value_i
+
+            self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
 
     def fi_charge_balance(self):
         if "IS" not in self.container_optionmenu["SMPL"]:

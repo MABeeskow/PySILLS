@@ -665,7 +665,6 @@ def get_chemical_potential(species, t):
         )
     return std_chemical_potential
 
-
 def get_hydrate_data(solid):
     data = {}
     if solid in solids.keys():

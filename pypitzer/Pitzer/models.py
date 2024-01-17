@@ -719,7 +719,7 @@ class FluidPitzer:
         return total_g
 
     def solubility_equilibrium(self, x):
-        print(x)
+        #print(x)
         target_species = self.solids[0]
         lna_pitzer = self.get_water_activity(x)
         if target_species == 'H2O(S)':
@@ -776,6 +776,6 @@ class FluidPitzer:
 
         # end of timer
         elapsed_time = time.time() - start_time
-        print('times used:', elapsed_time)
+        #print('times used:', elapsed_time)
 
         return res
