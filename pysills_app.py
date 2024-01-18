@@ -23825,9 +23825,11 @@ class PySILLS(tk.Frame):
                     bg=self.bg_colors["Very Light"], variable=self.temp_checkbuttons_pypitzer[var_anion])
                 text_anions.window_create("end", window=cb_i)
                 text_anions.insert("end", "\n")
-                #if var_anion != "Cl":
-                #    self.container_lists["Selected Anions"].append(var_anion)
-                self.container_lists["Selected Anions"].append(var_anion)
+                if var_anion != "Cl":
+                    self.container_lists["Selected Anions"].append(var_anion)
+                #self.container_lists["Selected Anions"].append(var_anion)
+                if var_anion == "Cl":
+                    cb_i.configure(state="disabled")
 
         frm_isotopes = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 8,
@@ -23967,6 +23969,8 @@ class PySILLS(tk.Frame):
         for cation in self.container_lists["Selected Cations"]:
             if cation in ["Li", "Na", "K", "Rb", "Cs", "Fr"]:
                 self.dict_species_helper[cation] = cation+"+"
+            elif cation in ["Be", "Mg", "Ca", "Sr", "Ba", "Ra", "Fe"]:
+                self.dict_species_helper[cation] = cation + "+2"
             else:
                 self.dict_species_helper[cation] = cation
 
@@ -23974,7 +23978,9 @@ class PySILLS(tk.Frame):
             if anion in ["F", "Br", "I", "At"]:
                 self.dict_species_helper[anion] = anion+"-"
             elif anion == "S":
+                #self.dict_species_helper[anion] = anion + "-2"
                 self.dict_species_helper[anion] = anion+"O4-2"
+                #self.dict_species_helper[anion] = anion
             else:
                 self.dict_species_helper[anion] = anion
 
@@ -24007,9 +24013,18 @@ class PySILLS(tk.Frame):
             key_element_is = re.search("(\D+)(\d+)", str_is)
             element_is = key_element_is.group(1)
             val_molar_mass_is = self.chemistry_data[element_is]
+            val_molar_mass_cl = self.chemistry_data["Cl"]
             val_concentration_incl_is = round(results_pypitzer.x[0]*val_molar_mass_is*1000, 4)
+            val_concentration_incl_cl = round(results_pypitzer.x[1]*val_molar_mass_cl*1000, 4)
 
             self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(val_concentration_incl_is)
+
+            print(file_smpl_short)
+            print("Species input:", self.dict_species_pypitzer[file_smpl_short])
+            print("b(INLC,IS):", results_pypitzer.x[0], "mol/(kgH2O)", ":", "b(INCL,Cl):", results_pypitzer.x[1],
+                  "mol/(kgH2O)", ":", "Ratio:", results_pypitzer.x[1]/results_pypitzer.x[0])
+            print("C(INLC,IS):", val_concentration_incl_is, "ppm", ":", "C(INCL,Cl):", val_concentration_incl_cl,
+                  "ppm", ":", "Ratio:", val_concentration_incl_cl/val_concentration_incl_is)
 
     def perform_complete_quantification(self, mode="normal"):
         if mode == "PyPitzer":
@@ -24085,18 +24100,27 @@ class PySILLS(tk.Frame):
             for isotope in list_isotopes:
                 key_element_i = re.search("(\D+)(\d+)", isotope)
                 element_i = key_element_i.group(1)
+                val_molar_mass_i = self.chemistry_data[element_i]
+                if element_i in self.temp_checkbuttons_pypitzer:
+                    if self.temp_checkbuttons_pypitzer[element_i].get() == 1:
+                        # if element != "S":
+                        #     val_molar_mass_i = self.chemistry_data[element_i]
+                        # else:
+                        #     val_molar_mass_i = self.chemistry_data[element_i] + 4*self.chemistry_data["O"]
 
-                if element != "S":
-                    val_molar_mass_i = self.chemistry_data[element_i]
-                else:
-                    val_molar_mass_i = self.chemistry_data[element_i] + 4*self.chemistry_data["O"]
+                        val_concentration_ratio_i = self.container_concentration_ratio["SMPL"]["RAW"][filename_short][
+                            "INCL"][
+                            isotope]
 
-                value_i = (val_molar_mass_is/val_molar_mass_i)*self.container_concentration_ratio["SMPL"]["RAW"][
-                    filename_short]["INCL"][isotope]
+                        value_i = (val_molar_mass_is/val_molar_mass_i)*val_concentration_ratio_i
 
-                helper_ratios[element][isotope] = value_i
-
-            self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
+                        helper_ratios[element][isotope] = value_i
+                    else:
+                        del helper_ratios[element_i]
+            print(helper_ratios)
+            if element in self.temp_checkbuttons_pypitzer:
+                if self.temp_checkbuttons_pypitzer[element_i].get() == 1:
+                    self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
 
     def fi_charge_balance(self):
         if "IS" not in self.container_optionmenu["SMPL"]:
