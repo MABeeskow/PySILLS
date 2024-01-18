@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		17.01.2023
+# Date:		18.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -17763,7 +17763,7 @@ class PySILLS(tk.Frame):
                         self.container_rsf[var_filetype][var_datatype][isotope] = var_result_i
     #
     def fi_get_concentration(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT",
-                             mode="Specific"):
+                             mode="Specific", pypitzer=False):
         """ Calculates the concentration, C, based on the following two equations:
         1) Standard Files:  C_i = SRM_dataset(element)
         2) Sample Files:    C_i = (intensity_smpl_i/intensity_smpl_is)*(concentration_smpl_is/sensitivity_i)
@@ -17850,8 +17850,12 @@ class PySILLS(tk.Frame):
                                 # Simple Signals (SILLS)
                                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
 
-                                var_concentration_incl_is = float(self.container_var["SMPL"][var_file_long]["IS Data"][
-                                                                      "Concentration"].get())
+                                if pypitzer == False:
+                                    var_concentration_incl_is = float(
+                                        self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                                else:
+                                    var_concentration_incl_is = 1.0
+
                                 var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["INCL"][isotope]
                                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
@@ -17882,8 +17886,12 @@ class PySILLS(tk.Frame):
                                     var_file_short]["MAT"][var_t]
                                 var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
                                     var_file_short]["MAT"][var_is]
-                                var_concentration_incl_is = float(self.container_var["SMPL"][var_file_long]["IS Data"][
-                                                                      "Concentration"].get())
+
+                                if pypitzer == False:
+                                    var_concentration_incl_is = float(
+                                        self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                                else:
+                                    var_concentration_incl_is = 1.0
 
                                 ## Mixing ratio x
                                 var_x = self.calculate_mixing_ratio(
@@ -17942,8 +17950,13 @@ class PySILLS(tk.Frame):
                                 var_file_short]["MAT"][var_is1]
                             var_concentration_host_is2 = self.container_concentration["SMPL"][var_datatype][
                                 var_file_short]["MAT"][var_is2]
-                            var_concentration_incl_is1 = float(self.container_var["SMPL"][var_file_long]["IS Data"][
-                                "Concentration"].get())
+
+                            if pypitzer == False:
+                                var_concentration_incl_is1 = float(
+                                    self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                            else:
+                                var_concentration_incl_is1 = 1.0
+
                             var_concentration_incl_is2 = float(self.container_var["SMPL"][var_file_long][
                                 "Second Internal Standard"]["Value"].get())
 
@@ -18023,8 +18036,12 @@ class PySILLS(tk.Frame):
                                 var_file_short]["INCL"][isotope]
                             var_intensity_incl_is = self.container_intensity_corrected["SMPL"][var_datatype][
                                 var_file_short]["INCL"][var_is]
-                            var_concentration_incl_is = float(
-                                self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+
+                            if pypitzer == False:
+                                var_concentration_incl_is = float(
+                                    self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                            else:
+                                var_concentration_incl_is = 1.0
 
                             var_factor_s_i = var_normalized_sensitivity_is/var_normalized_sensitivity_i
                             var_factor_k_i = ((var_rho_incl_i/var_rho_host_i)*
@@ -18066,7 +18083,8 @@ class PySILLS(tk.Frame):
                                 if isotope in file_isotopes:
                                     self.fi_get_concentration(
                                         var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_file_long=var_file_long, var_focus=var_focus)
+                                        var_file_short=var_file_short, var_file_long=var_file_long, var_focus=var_focus,
+                                        pypitzer=pypitzer)
                                     var_result_i = self.container_concentration[var_filetype][var_datatype][
                                         var_file_short][var_focus][isotope]
                                     helper_results.append(var_result_i)
@@ -23653,6 +23671,8 @@ class PySILLS(tk.Frame):
                 self.container_lists["Selected Cations"].remove(cation)
 
     def run_pypitzer(self):
+        self.perform_complete_quantification(mode="PyPitzer")
+
         self.dict_species_pypitzer = {}
         var_list_last_compound = [
             "Ice H2O", "Halite NaCl", "Hydrohalite NaCl*2H2O", "Sylvite KCl", "Antarcticite CaCl2*6H2O",
@@ -23684,15 +23704,6 @@ class PySILLS(tk.Frame):
         # Selected species (all)
         for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
             self.dict_species_pypitzer[file_smpl_short] = {}
-            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
-            self.get_intensity(
-                var_filetype="SMPL", var_datatype="RAW", var_file_short=file_smpl_short, mode="Specific")
-            self.fi_get_intensity_corrected(
-                var_filetype="SMPL", var_datatype="RAW", var_file_short=file_smpl_short, var_focus="INCL",
-                mode="Specific")
-            self.fi_get_intensity_ratio(
-                var_filetype="SMPL", var_datatype="RAW", var_file_short=file_smpl_short, var_file_long=file_smpl_long,
-                var_focus="INCL")
             self.build_species_dictionary(filename_short=file_smpl_short)
 
         self.dict_inital_guess_pypitzer = {}
@@ -23716,6 +23727,65 @@ class PySILLS(tk.Frame):
             print("Results (PyPitzer):", results_pypitzer)
 
         print("PyPitzer finished!")
+
+    def perform_complete_quantification(self, mode="normal"):
+        if mode == "PyPitzer":
+            bool_pypitzer = True
+        else:
+            bool_pypitzer = False
+
+        # Perform quantification
+        for var_filetype in ["STD", "SMPL"]:
+            for var_file_short in self.container_lists[var_filetype]["Short"]:
+                self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+
+        var_filetype = "None"
+        var_file_short = "None"
+        var_file_long = "None"
+        var_focus = "None"
+
+        for var_datatype in ["RAW", "SMOOTHED"]:
+            # Intensity Results
+            self.get_intensity(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_focus=var_focus, mode="All")
+            self.fi_get_intensity_corrected(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_focus=var_focus, mode="All")
+            self.fi_get_intensity_mix(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
+
+            # Sensitivity Results
+            self.get_analytical_sensitivity(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, mode="All")
+            results_is = self.determine_possible_is(filetype="ALL")
+            IQ(dataframe=None, project_type=self.pysills_mode,
+               results_container=self.container_intensity_ratio).get_intensity_ratio(
+                data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
+            self.fi_get_rsf(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, var_focus=var_focus, mode="All")
+
+            # Concentration Results
+            self.fi_get_concentration(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, var_focus=var_focus, mode="All", pypitzer=bool_pypitzer)
+            self.fi_get_normalized_sensitivity(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, mode="All")
+            self.fi_get_concentration_ratio(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, var_focus=var_focus, mode="All")
+            self.fi_get_lod(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, var_focus=var_focus, mode="All")
+            self.fi_get_mixed_concentration_ratio(
+                var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
+            self.fi_get_mixing_ratio(
+                var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
+            self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
+
     def build_species_dictionary(self, filename_short):
         dict_chemistry = self.container_lists["Measured Elements"][filename_short]
         helper_ratios = {}
@@ -23725,7 +23795,7 @@ class PySILLS(tk.Frame):
             list_isotopes = dict_chemistry[element]
 
             for isotope in list_isotopes:
-                value_i = self.container_intensity_ratio["SMPL"]["RAW"][filename_short]["INCL"][isotope]
+                value_i = self.container_concentration_ratio["SMPL"]["RAW"][filename_short]["INCL"][isotope]
                 helper_ratios[element][isotope] = value_i
 
             self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
