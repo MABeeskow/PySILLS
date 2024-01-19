@@ -23433,237 +23433,6 @@ class PySILLS(tk.Frame):
         start_row = 0
         start_column = 0
 
-        # ## LABELS
-        # lbl_00a = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column, n_rows=1, n_columns=15,
-        #     fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-        #     text="Composition: H2O + ...", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_01 = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column, n_rows=1,
-        #     n_columns=7, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-        #     text="Cations", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_02 = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 8, n_rows=1,
-        #     n_columns=7, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-        #     text="Anions", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_00b = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 16, n_rows=1,
-        #     n_columns=24, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-        #     text="Melting temperature of the last solid (in °C)", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_00b = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 16, n_rows=1,
-        #     n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-        #     text="Last solid (default)", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_00b = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 41, n_rows=1,
-        #     n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-        #     text="Internal standard concentration", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_00b = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 41, n_rows=1,
-        #     n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-        #     text="Internal standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        # ## BUTTONS
-        # btn_00c = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 34, n_rows=1,
-        #     n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-        #     text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        # btn_00d = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=n_rows - 2, column_id=start_column + 51, n_rows=1,
-        #     n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-        #     text="Run calculation", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-        #     command=self.run_pypitzer)
-        #
-        # ## OPTION MENUS
-        # var_list_last_compound = [
-        #     "Ice H2O", "Halite NaCl", "Hydrohalite NaCl*2H2O", "Sylvite KCl", "Antarcticite CaCl2*6H2O",
-        #     "Bischofite MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O", "Carnallite KCl*MgCl2*6H2O",
-        #     "Tachyhydrite CaMg2Cl6*12H2O", "Mirabilite Na2SO4*10H2O", "Thenardite Na2SO4", "Hexahydrite MgSO4*6H2O",
-        #     "Epsomite MgSO4*7H2O", "Arcanite K2SO4", "Picromerite K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O",
-        #     "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O", "FeSO4*H2O", "FeSO4*7H2O"]
-        #
-        # var_list_last_compound_simple = [
-        #     "H2O", "NaCl", "NaCl*2H2O", "KCl", "CaCl2*6H2O", "MgCl2*6H2O", "MgCl2*8H2O", "MgCl2*12H2O",
-        #     "KCl*MgCl2*6H2O", "CaMg2Cl6*12H2O", "Na2SO4*10H2O", "Na2SO4", "MgSO4*6H2O", "MgSO4*7H2O", "K2SO4",
-        #     "K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O", "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O",
-        #     "FeSO4*H2O", "FeSO4*7H2O"]
-        #
-        # opt_last_solid_default = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 25, n_rows=1,
-        #     n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-        #     var_iso=self.container_var["fi_setting"]["Last solid"], option_list=var_list_last_compound,
-        #     text_set=self.container_var["fi_setting"]["Last solid"].get(), fg_active=self.bg_colors["Dark Font"],
-        #     bg_active=self.accent_color, command=lambda opt=self.container_var["fi_setting"]["Last solid"]:
-        #     self.change_last_solid_default(opt))
-        # opt_last_solid_default["menu"].config(
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-        #     activeforeground=self.bg_colors["Dark Font"],
-        #     activebackground=self.accent_color)
-        # opt_last_solid_default.config(
-        #     bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
-        #     activeforeground=self.bg_colors["Dark Font"],
-        #     activebackground=self.accent_color, highlightthickness=0)
-        #
-        # opt_is_default = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 51, n_rows=1,
-        #     n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-        #     var_iso=self.container_var["fi_setting"]["Salt Correction"]["Default IS"],
-        #     option_list=self.container_lists["Measured Isotopes"]["All"],
-        #     text_set=self.container_var["fi_setting"]["Salt Correction"]["Default IS"].get(),
-        #     fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-        #     command=lambda var_opt=self.container_var["fi_setting"]["Salt Correction"]["Default IS"],
-        #                    var_key="SMPL":
-        #     self.fi_change_is_default(var_opt, var_key))
-        # opt_is_default["menu"].config(
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-        #     activeforeground=self.bg_colors["Dark Font"],
-        #     activebackground=self.accent_color)
-        # opt_is_default.config(
-        #     bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
-        #     activeforeground=self.bg_colors["Dark Font"],
-        #     activebackground=self.accent_color, highlightthickness=0)
-        #
-        # ## TREEVIEWS
-        # frm_cations = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 2, column_id=start_column, n_rows=n_rows - 3,
-        #     n_columns=7, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
-        # vsb_cations = ttk.Scrollbar(master=frm_cations, orient="vertical")
-        # text_cations = tk.Text(
-        #     master=frm_cations, width=30, height=25, yscrollcommand=vsb_cations.set,
-        #     bg=self.bg_colors["Very Light"])
-        # vsb_cations.config(command=text_cations.yview)
-        # vsb_cations.pack(side="right", fill="y")
-        # text_cations.pack(side="left", fill="both", expand=True)
-        #
-        # self.temp_checkbuttons_pypitzer = {}
-        # list_anions = []
-        # for var_cation in self.container_lists["Measured Elements"]["All"]:
-        #     if var_cation not in ["Cl", "S", "Br", "I"]:
-        #         if var_cation == "Na":
-        #             self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=1)
-        #             self.container_lists["Selected Cations"].append(var_cation)
-        #         else:
-        #             self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=0)
-        #
-        #         cb_i = tk.Checkbutton(
-        #             master=frm_cations, text=var_cation, fg=self.bg_colors["Dark Font"],
-        #             bg=self.bg_colors["Very Light"], variable=self.temp_checkbuttons_pypitzer[var_cation],
-        #             command=lambda cation=var_cation: self.select_cation(cation))
-        #
-        #         if var_cation not in ["Na", "K", "Mg", "Ca", "Fe", "Cs", "Sr"]:
-        #             cb_i.configure(state="disabled")
-        #
-        #         text_cations.window_create("end", window=cb_i)
-        #         text_cations.insert("end", "\n")
-        #     else:
-        #         list_anions.append(var_cation)
-        #
-        # frm_anions = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 2, column_id=start_column + 8,
-        #     n_rows=n_rows - 3, n_columns=7, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
-        # vsb_anions = ttk.Scrollbar(master=frm_anions, orient="vertical")
-        # text_anions = tk.Text(
-        #     master=frm_anions, width=30, height=25, yscrollcommand=vsb_anions.set,
-        #     bg=self.bg_colors["Very Light"])
-        # vsb_anions.config(command=text_anions.yview)
-        # vsb_anions.pack(side="right", fill="y")
-        # text_anions.pack(side="left", fill="both", expand=True)
-        #
-        # for var_anion in list_anions:
-        #     self.temp_checkbuttons_pypitzer[var_anion] = tk.IntVar(value=1)
-        #
-        #     if var_anion == "S":
-        #         var_anion_ext = "S (SO4-2)"
-        #     else:
-        #         var_anion_ext = var_anion
-        #
-        #     cb_i = tk.Checkbutton(
-        #         master=frm_anions, text=var_anion_ext, fg=self.bg_colors["Dark Font"],
-        #         bg=self.bg_colors["Very Light"], variable=self.temp_checkbuttons_pypitzer[var_anion])
-        #
-        #     if var_anion not in ["Cl", "S"]:
-        #         cb_i.configure(state="disabled")
-        #     else:
-        #         self.container_lists["Selected Anions"].append(var_anion)
-        #
-        #     text_anions.window_create("end", window=cb_i)
-        #     text_anions.insert("end", "\n")
-        #
-        # frm_temperatures = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 2, column_id=start_column + 16,
-        #     n_rows=n_rows - 3, n_columns=24, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
-        # vsb_temperatures = ttk.Scrollbar(master=frm_temperatures, orient="vertical")
-        # text_temperatures = tk.Text(
-        #     master=frm_temperatures, width=30, height=25, yscrollcommand=vsb_temperatures.set,
-        #     bg=self.bg_colors["Very Light"])
-        # vsb_temperatures.config(command=text_temperatures.yview)
-        # vsb_temperatures.pack(side="right", fill="y")
-        # text_temperatures.pack(side="left", fill="both", expand=True)
-        #
-        # for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
-        #     file_smpl_long = self.container_lists["SMPL"]["Long"][index]
-        #     var_opt_i = self.container_var["SMPL"][file_smpl_long]["Last compound"]
-        #
-        #     lbl_i = tk.Label(
-        #         frm_temperatures, text=file_smpl, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-        #     text_temperatures.window_create("end", window=lbl_i)
-        #     text_temperatures.insert("end", "\t")
-        #
-        #     entr_i = tk.Entry(
-        #         frm_temperatures, textvariable=self.container_var["SMPL"][file_smpl_long]["Melting temperature"],
-        #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0, width=8)
-        #     text_temperatures.window_create("insert", window=entr_i)
-        #     text_temperatures.insert("end", "\t")
-        #
-        #     opt_last_compound_i = tk.OptionMenu(
-        #         frm_temperatures, var_opt_i, *var_list_last_compound)
-        #     opt_last_compound_i["menu"].config(
-        #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-        #         activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color)
-        #     opt_last_compound_i.config(
-        #         bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-        #         activeforeground=self.colors_fi["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
-        #     text_temperatures.window_create("end", window=opt_last_compound_i)
-        #     text_temperatures.insert("end", " \n")
-        #
-        # frm_is = SE(
-        #     parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 2, column_id=start_column + 41,
-        #     n_rows=n_rows - 4, n_columns=18, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_frame()
-        # vsb_is = ttk.Scrollbar(master=frm_is, orient="vertical")
-        # text_is = tk.Text(
-        #     master=frm_is, width=30, height=25, yscrollcommand=vsb_is.set,
-        #     bg=self.bg_colors["Very Light"])
-        # vsb_is.config(command=text_is.yview)
-        # vsb_is.pack(side="right", fill="y")
-        # text_is.pack(side="left", fill="both", expand=True)
-        #
-        # for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
-        #     file_smpl_long = self.container_lists["SMPL"]["Long"][index]
-        #     var_opt_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"]
-        #     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl]
-        #
-        #     lbl_i = tk.Label(
-        #         frm_is, text=file_smpl, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-        #     text_is.window_create("end", window=lbl_i)
-        #     text_is.insert("end", "\t")
-        #
-        #     opt_is = tk.OptionMenu(
-        #         frm_is, var_opt_is, *file_isotopes)
-        #     opt_is["menu"].config(
-        #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-        #         activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-        #     opt_is.config(
-        #         bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-        #         activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
-        #     text_is.window_create("end", window=opt_is)
-        #     text_is.insert("end", " \t")
-        #
-        #     entr_i = tk.Entry(
-        #         frm_is, textvariable=self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"],
-        #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0, width=8)
-        #     text_is.window_create("insert", window=entr_i)
-        #     text_is.insert("end", "\n")
-
         ## LABELS
         lbl_00a = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column, n_rows=1, n_columns=7,
@@ -23831,9 +23600,10 @@ class PySILLS(tk.Frame):
                     bg=self.bg_colors["Very Light"], variable=self.temp_checkbuttons_pypitzer[var_anion])
                 text_anions.window_create("end", window=cb_i)
                 text_anions.insert("end", "\n")
+
                 if var_anion != "Cl":
                     self.container_lists["Selected Anions"].append(var_anion)
-                #self.container_lists["Selected Anions"].append(var_anion)
+
                 if var_anion == "Cl":
                     cb_i.configure(state="disabled")
 
@@ -23984,9 +23754,7 @@ class PySILLS(tk.Frame):
             if anion in ["F", "Br", "I", "At"]:
                 self.dict_species_helper[anion] = anion+"-"
             elif anion == "S":
-                #self.dict_species_helper[anion] = anion + "-2"
                 self.dict_species_helper[anion] = anion+"O4-2"
-                #self.dict_species_helper[anion] = anion
             else:
                 self.dict_species_helper[anion] = anion
 
@@ -24031,6 +23799,7 @@ class PySILLS(tk.Frame):
                   "mol/(kgH2O)", ":", "Ratio:", results_pypitzer.x[1]/results_pypitzer.x[0])
             print("C(INLC,IS):", val_concentration_incl_is, "ppm", ":", "C(INCL,Cl):", val_concentration_incl_cl,
                   "ppm", ":", "Ratio:", val_concentration_incl_cl/val_concentration_incl_is)
+        print("PyPitzer calculation successfully terminated!")
 
     def perform_complete_quantification(self, mode="normal"):
         if mode == "PyPitzer":
@@ -24106,27 +23875,22 @@ class PySILLS(tk.Frame):
             for isotope in list_isotopes:
                 key_element_i = re.search("(\D+)(\d+)", isotope)
                 element_i = key_element_i.group(1)
-                val_molar_mass_i = self.chemistry_data[element_i]
+
                 if element_i in self.temp_checkbuttons_pypitzer:
                     if self.temp_checkbuttons_pypitzer[element_i].get() == 1:
-                        # if element != "S":
-                        #     val_molar_mass_i = self.chemistry_data[element_i]
-                        # else:
-                        #     val_molar_mass_i = self.chemistry_data[element_i] + 4*self.chemistry_data["O"]
-
+                        val_molar_mass_i = self.chemistry_data[element_i]
                         val_concentration_ratio_i = self.container_concentration_ratio["SMPL"]["RAW"][filename_short][
-                            "INCL"][
-                            isotope]
-
+                            "INCL"][isotope]
                         value_i = (val_molar_mass_is/val_molar_mass_i)*val_concentration_ratio_i
 
                         helper_ratios[element][isotope] = value_i
                     else:
                         del helper_ratios[element_i]
-            print(helper_ratios)
+
             if element in self.temp_checkbuttons_pypitzer:
                 if self.temp_checkbuttons_pypitzer[element_i].get() == 1:
-                    self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
+                    if element == element_i:
+                        self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
 
     def fi_charge_balance(self):
         if "IS" not in self.container_optionmenu["SMPL"]:
