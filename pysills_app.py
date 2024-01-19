@@ -885,6 +885,8 @@ class PySILLS(tk.Frame):
         #
         self.container_lists["Selected Cations"] = []
         self.container_lists["Selected Anions"] = []
+        self.container_lists["Possible Cations"] = []
+        self.container_lists["Possible Anions"] = []
         self.container_lists["Salt Chemistry"] = {}
         self.container_lists["Selected Salts"] = []
         self.container_lists["SRM Data"] = {}
@@ -926,6 +928,10 @@ class PySILLS(tk.Frame):
         self.container_lists["Plugins SE"] = {} # SE = Spike Elimination
         self.container_lists["Plugins SE"]["Names"] = []
         self.container_lists["Plugins SE"]["Files"] = []
+
+        self.helper_checkbuttons = {"Isotopes": {}, "On": [], "Off": []}
+        self.temp_checkbuttons_pypitzer = {}
+
         self.container_lists["Oxides"] = [
             "SiO2", "TiO2", "Al2O3", "Fe2O3", "Fe3O4", "FeO", "MgO", "MnO", "CaO", "BaO", "Na2O", "K2O", "P2O5",
             "Cr2O3", "ZrO2"]
@@ -23559,18 +23565,23 @@ class PySILLS(tk.Frame):
         vsb_cations.pack(side="right", fill="y")
         text_cations.pack(side="left", fill="both", expand=True)
 
-        self.temp_checkbuttons_pypitzer = {}
-        self.helper_checkbuttons = {"Isotopes": {}}
+        #self.temp_checkbuttons_pypitzer = {}
+        #self.helper_checkbuttons = {"Isotopes": {}, "On": [], "Off": []}
         list_anions = []
         for var_cation in self.container_lists["Measured Elements"]["All"]:
             if var_cation not in ["Cl", "S", "Br", "I"]:
                 if var_cation == "Na":
-                    self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=1)
-                    self.container_lists["Selected Cations"].append(var_cation)
+                    if var_cation not in self.temp_checkbuttons_pypitzer:
+                        self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=1)
+                        self.container_lists["Selected Cations"].append(var_cation)
+                        self.container_lists["Possible Cations"].append(var_cation)
                 else:
-                    self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=0)
+                    if var_cation not in self.temp_checkbuttons_pypitzer:
+                        self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=0)
 
                 if var_cation in ["Na", "K", "Mg", "Ca", "Fe", "Cs", "Sr"]:
+                    if var_cation not in self.container_lists["Possible Cations"]:
+                        self.container_lists["Possible Cations"].append(var_cation)
                     cb_i = tk.Checkbutton(
                         master=frm_cations, text=var_cation, fg=self.bg_colors["Dark Font"],
                         bg=self.bg_colors["Very Light"], variable=self.temp_checkbuttons_pypitzer[var_cation],
@@ -23592,7 +23603,8 @@ class PySILLS(tk.Frame):
         text_anions.pack(side="left", fill="both", expand=True)
 
         for var_anion in list_anions:
-            self.temp_checkbuttons_pypitzer[var_anion] = tk.IntVar(value=1)
+            if var_anion not in self.temp_checkbuttons_pypitzer:
+                self.temp_checkbuttons_pypitzer[var_anion] = tk.IntVar(value=1)
 
             if var_anion == "S":
                 var_anion_ext = "S (SO4-2)"
@@ -23608,6 +23620,7 @@ class PySILLS(tk.Frame):
 
                 if var_anion != "Cl":
                     self.container_lists["Selected Anions"].append(var_anion)
+                    self.container_lists["Possible Anions"].append(var_anion)
 
                 if var_anion == "Cl":
                     cb_i.configure(state="disabled")
@@ -23626,17 +23639,22 @@ class PySILLS(tk.Frame):
         for var_isotope in self.container_lists["Measured Isotopes"]["All"]:
             key_element_i = re.search("(\D+)(\d+)", var_isotope)
             element_i = key_element_i.group(1)
+            if element_i in self.container_lists["Possible Cations"] or element_i in self.container_lists[
+                "Possible Anions"]:
+                if element_i != "Cl":
+                    if element_i in ["Na", "S"]:
+                        if element_i not in self.helper_checkbuttons["Isotopes"]:
+                            self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=1)
+                    else:
+                        if element_i not in self.helper_checkbuttons["Isotopes"]:
+                            self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=0)
 
-            if element_i == "Na":
-                self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=1)
-            else:
-                self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=0)
-
-            cb_i = tk.Checkbutton(
-                master=frm_isotopes, text=var_isotope, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Very Light"], variable=self.helper_checkbuttons["Isotopes"][var_isotope])
-            text_isotopes.window_create("end", window=cb_i)
-            text_isotopes.insert("end", "\n")
+                    cb_i = tk.Checkbutton(
+                        master=frm_isotopes, text=var_isotope, fg=self.bg_colors["Dark Font"],
+                        bg=self.bg_colors["Very Light"], variable=self.helper_checkbuttons["Isotopes"][var_isotope],
+                        command=lambda isotope=var_isotope: self.select_isotope(isotope))
+                    text_isotopes.window_create("end", window=cb_i)
+                    text_isotopes.insert("end", "\n")
 
         frm_temperatures = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 4, column_id=start_column + 16,
@@ -23722,6 +23740,18 @@ class PySILLS(tk.Frame):
         for index, file_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
             self.container_var["SMPL"][file_smpl_long]["Last compound"].set(opt)
 
+    def select_isotope(self, isotope):
+        if self.helper_checkbuttons["Isotopes"][isotope].get() == 1:
+            if isotope not in self.helper_checkbuttons["On"]:
+                self.helper_checkbuttons["On"].append(isotope)
+            if isotope in self.helper_checkbuttons["Off"]:
+                self.helper_checkbuttons["Off"].remove(isotope)
+        else:
+            if isotope not in self.helper_checkbuttons["Off"]:
+                self.helper_checkbuttons["Off"].append(isotope)
+            if isotope in self.helper_checkbuttons["On"]:
+                self.helper_checkbuttons["On"].remove(isotope)
+
     def select_cation(self, cation):
         if self.temp_checkbuttons_pypitzer[cation].get() == 1:
             if cation not in self.container_lists["Selected Cations"]:
@@ -23764,81 +23794,84 @@ class PySILLS(tk.Frame):
                 self.dict_species_helper[anion] = anion
 
         # Selected species (all)
-        for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
-            self.dict_species_pypitzer[file_smpl_short] = {}
-            self.build_species_dictionary(filename_short=file_smpl_short, filename_long=file_smpl_long)
+        for var_datatype in ["RAW", "SMOOTHED"]:
+            self.dict_species_pypitzer[var_datatype] = {}
+            for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                file_smpl_long = self.container_lists["SMPL"]["Long"][index]
+                self.dict_species_pypitzer[var_datatype][file_smpl_short] = {}
+                self.build_species_dictionary(
+                    filename_short=file_smpl_short, filename_long=file_smpl_long, datatype=var_datatype)
 
-        self.dict_inital_guess_pypitzer = {}
-        helper_molalities_na = {}
-        for index, file_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
-            file_smpl_short = self.container_lists["SMPL"]["Short"][index]
-            self.dict_inital_guess_pypitzer[file_smpl_short] = (1, 1)
-            # Last solid
-            str_last_solid_i = self.container_var["SMPL"][file_smpl_long]["Last compound"].get()
-            index_last_solid_i = var_list_last_compound.index(str_last_solid_i)
-            str_last_solid_i = var_list_last_compound_simple[index_last_solid_i]
-            # Melting temperature of last solid
-            str_melting_temperature_i = self.container_var["SMPL"][file_smpl_long]["Melting temperature"].get()
+            self.dict_inital_guess_pypitzer = {}
+            helper_molalities_na = {}
+            for index, file_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
+                file_smpl_short = self.container_lists["SMPL"]["Short"][index]
+                self.dict_inital_guess_pypitzer[file_smpl_short] = (1, 1)
+                # Last solid
+                str_last_solid_i = self.container_var["SMPL"][file_smpl_long]["Last compound"].get()
+                index_last_solid_i = var_list_last_compound.index(str_last_solid_i)
+                str_last_solid_i = var_list_last_compound_simple[index_last_solid_i]
+                # Melting temperature of last solid
+                str_melting_temperature_i = self.container_var["SMPL"][file_smpl_long]["Melting temperature"].get()
 
-            fluid_inclusion = FluidPitzer(
-                x0=self.dict_inital_guess_pypitzer[file_smpl_short],
-                species=self.dict_species_pypitzer[file_smpl_short],
-                solids=[str_last_solid_i],
-                t=float(str_melting_temperature_i))
+                fluid_inclusion = FluidPitzer(
+                    x0=self.dict_inital_guess_pypitzer[file_smpl_short],
+                    species=self.dict_species_pypitzer[var_datatype][file_smpl_short],
+                    solids=[str_last_solid_i],
+                    t=float(str_melting_temperature_i))
 
-            results_pypitzer = fluid_inclusion.optimize()
+                results_pypitzer = fluid_inclusion.optimize()
 
-            b_na = results_pypitzer.x[0]
-            b_cl = results_pypitzer.x[1]
-            str_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"].get()
-            key_element_is = re.search("(\D+)(\d+)", str_is)
-            element_is = key_element_is.group(1)
-            val_molar_mass_is = self.chemistry_data[element_is]
-            val_molar_mass_cl = self.chemistry_data["Cl"]
-            val_concentration_incl_is = round(b_na*val_molar_mass_is*1000, 4)
-            val_concentration_incl_cl = round(b_cl*val_molar_mass_cl*1000, 4)
-            helper_molalities_na[file_smpl_short] = {"Na": b_na, "Cl": b_cl}
+                b_na = results_pypitzer.x[0]
+                b_cl = results_pypitzer.x[1]
+                str_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"].get()
+                key_element_is = re.search("(\D+)(\d+)", str_is)
+                element_is = key_element_is.group(1)
+                val_molar_mass_is = self.chemistry_data[element_is]
+                val_molar_mass_cl = self.chemistry_data["Cl"]
+                val_concentration_incl_is = round(b_na*val_molar_mass_is*1000, 4)
+                val_concentration_incl_cl = round(b_cl*val_molar_mass_cl*1000, 4)
+                helper_molalities_na[file_smpl_short] = {"Na": b_na, "Cl": b_cl}
 
-            self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(val_concentration_incl_is)
+                self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(val_concentration_incl_is)
 
-        #     print(file_smpl_short)
-        #     print("Species input:", self.dict_species_pypitzer[file_smpl_short])
-        #     print("b(INCL,IS):", b_na, "mol/(kgH2O)", ":", "b(INCL,Cl):", b_cl,
-        #           "mol/(kgH2O)", ":", "Ratio:", b_cl/b_na)
-        #     print("C(INCL,IS):", val_concentration_incl_is, "ppm", ":", "C(INCL,Cl):", val_concentration_incl_cl,
-        #           "ppm", ":", "Ratio:", val_concentration_incl_cl/val_concentration_incl_is)
-        # print("")
-        # print("PyPitzer calculation successfully terminated!\n")
-        self.pypitzer_performed = True
+            #     print(file_smpl_short)
+            #     print("Species input:", self.dict_species_pypitzer[var_datatype][file_smpl_short])
+            #     print("b(INCL,IS):", b_na, "mol/(kgH2O)", ":", "b(INCL,Cl):", b_cl,
+            #           "mol/(kgH2O)", ":", "Ratio:", b_cl/b_na)
+            #     print("C(INCL,IS):", val_concentration_incl_is, "ppm", ":", "C(INCL,Cl):", val_concentration_incl_cl,
+            #           "ppm", ":", "Ratio:", val_concentration_incl_cl/val_concentration_incl_is)
+            # print("")
+            # print("PyPitzer calculation successfully terminated!\n")
+            self.pypitzer_performed = True
 
-        for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
-            file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+            for file_smpl_short in self.container_lists["SMPL"]["Short"]:
+                file_smpl_long = self.container_lists["SMPL"]["Long"][index]
+                file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
 
-            str_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"].get()
-            key_element_is = re.search("(\D+)(\d+)", str_is)
-            element_is = key_element_is.group(1)
-            val_molar_mass_is = self.chemistry_data[element_is]
-            b_is = helper_molalities_na[file_smpl_short]
+                str_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"].get()
+                key_element_is = re.search("(\D+)(\d+)", str_is)
+                element_is = key_element_is.group(1)
+                val_molar_mass_is = self.chemistry_data[element_is]
 
-            for isotope in file_isotopes:
-                key_element_i = re.search("(\D+)(\d+)", isotope)
-                element_i = key_element_i.group(1)
-                val_molar_mass_i = self.chemistry_data[element_i]
-                val_concentration_ratio_i = self.container_concentration_ratio["SMPL"]["RAW"][file_smpl_short]["INCL"][
-                    isotope]
-                ratio_mod_i = (val_molar_mass_is/val_molar_mass_i)*val_concentration_ratio_i
+                for isotope in file_isotopes:
+                    key_element_i = re.search("(\D+)(\d+)", isotope)
+                    element_i = key_element_i.group(1)
+                    val_molar_mass_i = self.chemistry_data[element_i]
+                    val_concentration_ratio_i = self.container_concentration_ratio["SMPL"][var_datatype][
+                        file_smpl_short]["INCL"][isotope]
+                    ratio_mod_i = (val_molar_mass_is/val_molar_mass_i)*val_concentration_ratio_i
 
-                if element_i == "Na":
-                    b_i = helper_molalities_na[file_smpl_short][element_i]
-                elif element_i == "Cl":
-                    b_i = helper_molalities_na[file_smpl_short][element_i]
-                else:
-                    b_i = helper_molalities_na[file_smpl_short]["Na"]*ratio_mod_i
+                    if element_i == "Na":
+                        b_i = helper_molalities_na[file_smpl_short][element_i]
+                    elif element_i == "Cl":
+                        b_i = helper_molalities_na[file_smpl_short][element_i]
+                    else:
+                        b_i = helper_molalities_na[file_smpl_short]["Na"]*ratio_mod_i
 
-                val_concentration_incl_i = round(b_i*val_molar_mass_i*1000, 4)
-                self.container_concentration["SMPL"]["RAW"][file_smpl_short]["INCL"][isotope] = val_concentration_incl_i
+                    val_concentration_incl_i = round(b_i*val_molar_mass_i*1000, 4)
+                    self.container_concentration["SMPL"][var_datatype][file_smpl_short]["INCL"][
+                        isotope] = val_concentration_incl_i
 
     def perform_complete_quantification(self, mode="normal"):
         if mode == "PyPitzer":
@@ -23898,7 +23931,7 @@ class PySILLS(tk.Frame):
                 var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
             self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
 
-    def build_species_dictionary(self, filename_short, filename_long):
+    def build_species_dictionary(self, filename_short, filename_long, datatype):
         dict_chemistry = self.container_lists["Measured Elements"][filename_short]
         helper_ratios = {}
 
@@ -23918,8 +23951,8 @@ class PySILLS(tk.Frame):
                 if element_i in self.temp_checkbuttons_pypitzer:
                     if self.temp_checkbuttons_pypitzer[element_i].get() == 1:
                         val_molar_mass_i = self.chemistry_data[element_i]
-                        val_concentration_ratio_i = self.container_concentration_ratio["SMPL"]["RAW"][filename_short][
-                            "INCL"][isotope]
+                        val_concentration_ratio_i = self.container_concentration_ratio["SMPL"][datatype][
+                            filename_short]["INCL"][isotope]
                         value_i = (val_molar_mass_is/val_molar_mass_i)*val_concentration_ratio_i
 
                         helper_ratios[element][isotope] = value_i
@@ -23929,7 +23962,12 @@ class PySILLS(tk.Frame):
             if element in self.temp_checkbuttons_pypitzer:
                 if self.temp_checkbuttons_pypitzer[element_i].get() == 1:
                     if element == element_i:
-                        self.dict_species_pypitzer[filename_short][ion] = np.mean(list(helper_ratios[element].values()))
+                        helper_values = []
+                        for isotope, value in helper_ratios[element].items():
+                            if self.helper_checkbuttons["Isotopes"][isotope].get() == 1:
+                                helper_values.append(value)
+
+                        self.dict_species_pypitzer[datatype][filename_short][ion] = np.mean(helper_values)
 
     def fi_charge_balance(self):
         if "IS" not in self.container_optionmenu["SMPL"]:
