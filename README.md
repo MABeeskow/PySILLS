@@ -209,8 +209,8 @@ Coming soon ...
 PyPitzer allows thermodynamic modeling of fluid inclusion systems based on the Pitzer model. The quantification of those
 systems requires microthermometric data as well as element/Na ratios from LA-ICP-MS experiments. PyPitzer is able to 
 calculate precise concentrations of fluid inclusion compositions for also complex multi-element systems.
-The calculated results of PyPitzer can be imported in PySILLS. It is planned to integrate PyPitzer in PySILLS in the 
-future.
+It is possible to use an already fully implemented version of PyPitzer in PySILLS or to use it externally which means 
+that the user can export the necessary LA-ICP-MS data and import then the calculated Na concentrations.
 
 [PyPitzer](https://github.com/pypitzer/pypitzer)
 
@@ -230,6 +230,9 @@ laser-ablation inductively-coupled-plasma mass-spectrometry", Geochimica et Cosm
 * Guillong, M., et al., 2008, "SILLS: A MATLAB-based program for the reduction of Laser ablation ICP-MS data of 
 homogenous materials and inclusions", Mineralogical Association of Canada Short Course, 40, pp. 323-333, [Link](
 https://ethz.ch/content/dam/ethz/special-interest/erdw/geopetro/mineralsystems-dam/documents/MAC_SC_40_Sills_description.pdf)
+* Liu, Y., et al., 2024, "An integrated approach for quantifiying fluid inclusion data combining microthermometry, 
+LA-ICP-MS, and thermodynamic modeling", Chemical Geology, 644, pp. 1-18, [Link](
+https://www.sciencedirect.com/science/article/pii/S0009254123005648?via%3Dihub)
 * Longerich, H.P., et al., 1996, "Laser Ablation Inductively Coupled Plasma Mass Spectrometric Transient Signal Data 
 Acquisition and Analyte Concentration Calculation", Journal of Analytical Atomic Spectrometry, 11, pp. 899-904, [Link](
 https://www.scopus.com/record/display.uri?eid=2-s2.0-0030245362&origin=inward&txGid=a8ec37914d0f3f4ed5d97cd7db187e41)
@@ -240,4 +243,4 @@ https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
 ---
 
 Version: Pre-Release  
-Date: 20.10.2023
+Last updated: 19.01.2024

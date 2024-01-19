@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		18.01.2023
+# Date:		19.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -10236,7 +10236,7 @@ class PySILLS(tk.Frame):
             # Option Menu
             str_default_inclusion_setup = self.container_var[key_setting]["Inclusion Setup Option"].get()
             if self.pysills_mode == "FI":
-                list_opt_incl_is_quantification = ["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2023)",
+                list_opt_incl_is_quantification = ["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2024)",
                                                    "Custom Data", "External Calculation"]
             elif self.pysills_mode == "MI":
                 list_opt_incl_is_quantification = ["100 wt.% Oxides", "Custom Data", "External Calculation"]
@@ -10257,9 +10257,6 @@ class PySILLS(tk.Frame):
             opt_02a.config(
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-
-            #if self.pysills_mode == "FI":
-            #    opt_02a['menu'].entryconfig("PyPitzer (Liu et al. 2023)", state="disable")
 
             str_default_quantification_setup = self.container_var[key_setting]["Quantification Method Option"].get()
             list_opt_incl_quantification = [
@@ -10338,7 +10335,7 @@ class PySILLS(tk.Frame):
                     self.btn_setup_customdata.grid_remove()
                 if self.bool_incl_is_external == True:
                     self.btn_setup_external.grid_remove()
-        elif var_opt == "PyPitzer (Liu et al. 2023)":
+        elif var_opt == "PyPitzer (Liu et al. 2024)":
             if self.bool_incl_is_pypitzer == False:
                 self.btn_setup_pypitzer = SE(
                     parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
@@ -16598,38 +16595,43 @@ class PySILLS(tk.Frame):
             text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="SILLS Equation Summary", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 15, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Guillong et al. (2008)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04c = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 16, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Heinrich et al. (2003)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04d = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 17, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Longerich et al. (1996)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04e = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 18, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Pettke et al. (2012)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04f = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 19, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Halter et al. (2002)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04g = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 20, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Borisova et al. (2021)", relief=tk.FLAT,
+            fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_04h = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column + 21, n_rows=1,
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Liu et al. (2024)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
 
         lbl_04a.bind("<Button-1>", self.callback_sills)
@@ -16639,6 +16641,7 @@ class PySILLS(tk.Frame):
         lbl_04e.bind("<Button-1>", self.callback_pettke2012)
         lbl_04f.bind("<Button-1>", self.callback_halter2002)
         lbl_04g.bind("<Button-1>", self.callback_borisova2021)
+        lbl_04h.bind("<Button-1>", self.callback_liu2024)
 
     def callback_github(self, event):
         webbrowser.open_new(r"https://github.com/MABeeskow/PySILLS")
@@ -16673,6 +16676,9 @@ class PySILLS(tk.Frame):
 
     def callback_borisova2021(self, event):
         webbrowser.open_new(r"https://ejm.copernicus.org/articles/33/305/2021/")
+
+    def callback_liu2024(self, event):
+        webbrowser.open_new(r"https://www.sciencedirect.com/science/article/pii/S0009254123005648?via%3Dihub")
 
     def change_id_results(self, var_opt, mode="MA"):
         if mode == "MA":
@@ -23967,9 +23973,9 @@ class PySILLS(tk.Frame):
 
         self.dict_species_helper = {}
         for cation in self.container_lists["Selected Cations"]:
-            if cation in ["Li", "Na", "K", "Rb", "Cs", "Fr"]:
+            if cation in ["Li", "Na", "K", "Rb", "Cs"]:
                 self.dict_species_helper[cation] = cation+"+"
-            elif cation in ["Be", "Mg", "Ca", "Sr", "Ba", "Ra", "Fe"]:
+            elif cation in ["Mg", "Ca", "Sr", "Fe"]:
                 self.dict_species_helper[cation] = cation + "+2"
             else:
                 self.dict_species_helper[cation] = cation
