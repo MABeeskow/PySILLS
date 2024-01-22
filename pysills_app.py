@@ -429,6 +429,7 @@ class PySILLS(tk.Frame):
         self.container_spike_values = {}
 
         self.old_file = False
+        self.without_pypitzer = False
         #
         self.counter_fast_track_std = 0
         self.counter_fast_track_smpl = 0
@@ -5948,11 +5949,19 @@ class PySILLS(tk.Frame):
                                "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
                                "END"]
                 else:
-                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                               "INCLUSION SETTINGS", "PYPITZER SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                               "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
-                               "END"]
+                    if "PYPITZER SETTINGS" in loaded_lines:
+                        strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                   "INCLUSION SETTINGS", "PYPITZER SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                                   "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
+                                   "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
+                                   "END"]
+                    else:
+                        strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                   "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                                   "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
+                                   "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
+                                   "END"]
+                        self.without_pypitzer = True
             else:
                 if self.pysills_mode == "MA":
                     strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
@@ -6421,7 +6430,12 @@ class PySILLS(tk.Frame):
 
                 ## INCLUSION SETTINGS
                 index = 0
-                for i in range(index_container["INCLUSION SETTINGS"] + 1, index_container["PYPITZER SETTINGS"] - 1):
+                if self.without_pypitzer == False:
+                    keyword = "PYPITZER SETTINGS"
+                else:
+                    keyword = "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"
+
+                for i in range(index_container["INCLUSION SETTINGS"] + 1, index_container[keyword] - 1):
                     line_data = str(loaded_lines[i].strip())
                     splitted_data = line_data.split(";")
 
@@ -6446,29 +6460,30 @@ class PySILLS(tk.Frame):
                     index += 1
 
                 # PYPITZER SETTINGS
-                for i in range(index_container["PYPITZER SETTINGS"] + 1,
-                               index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
-                    line_data = str(loaded_lines[i].strip())
-                    splitted_data = line_data.split(";")
+                if self.without_pypitzer == False:
+                    for i in range(index_container["PYPITZER SETTINGS"] + 1,
+                                   index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
+                        line_data = str(loaded_lines[i].strip())
+                        splitted_data = line_data.split(";")
 
-                    if splitted_data[0] == "Cations": #sex
-                        self.container_lists["Selected Cations"].extend(splitted_data[1:])
-                    elif splitted_data[0] == "Anions":
-                        self.container_lists["Selected Anions"].extend(splitted_data[1:])
-                    elif splitted_data[0] == "Isotopes":
-                        for isotope in splitted_data[1:]:
-                            self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
-                            self.helper_checkbuttons["Isotopes"][isotope].set(1)
-                    elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
-                        for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
-                            var_last_compound = splitted_data[1]
-                            var_melting_temperature = splitted_data[2]
+                        if splitted_data[0] == "Cations":
+                            self.container_lists["Selected Cations"].extend(splitted_data[1:])
+                        elif splitted_data[0] == "Anions":
+                            self.container_lists["Selected Anions"].extend(splitted_data[1:])
+                        elif splitted_data[0] == "Isotopes":
+                            for isotope in splitted_data[1:]:
+                                self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
+                                self.helper_checkbuttons["Isotopes"][isotope].set(1)
+                        elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
+                            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                                var_last_compound = splitted_data[1]
+                                var_melting_temperature = splitted_data[2]
 
-                            self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
-                            self.container_var["SMPL"][filename_smpl_long]["Melting temperature"] = tk.StringVar()
-                            self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(var_last_compound)
-                            self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
-                                var_melting_temperature)
+                                self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
+                                self.container_var["SMPL"][filename_smpl_long]["Melting temperature"] = tk.StringVar()
+                                self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(var_last_compound)
+                                self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
+                                    var_melting_temperature)
 
                 ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
                 index = 0
@@ -11526,167 +11541,146 @@ class PySILLS(tk.Frame):
             parts = file_std.split("/")
             file_std_short = parts[-1]
 
-            if self.file_loaded == False:
-                if self.container_icpms["name"] != None:
-                    var_skipheader = self.container_icpms["skipheader"]
-                    var_skipfooter = self.container_icpms["skipfooter"]
-                    df_std_i = DE(filename_long=file_std).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                else:
-                    df_std_i = DE(filename_long=file_std).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
-            else:
-                if self.old_file == True:
-                    if self.container_icpms["name"] != None:
-                        var_skipheader = self.container_icpms["skipheader"]
-                        var_skipfooter = self.container_icpms["skipfooter"]
-                        df_std_i = DE(filename_long=file_std).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                    else:
-                        df_std_i = DE(filename_long=file_std).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
-                    if "Dataframe" not in self.container_measurements:
-                        self.container_measurements["Dataframe"] = {}
-                    if file_std_short not in self.container_measurements["Dataframe"]:
-                        self.container_measurements["Dataframe"][file_std_short] = df_std_i
-                else:
-                    df_std_i = self.container_measurements["Dataframe"][file_std_short]
-
-            df_isotopes = DE().get_isotopes(dataframe=df_std_i)
-            self.container_lists["Measured Isotopes"][file_std_short] = df_isotopes
-            times_std_i = DE().get_times(dataframe=df_std_i)
+            # Assigns isotopic signal intensity and time data for every standard/srm file
+            df_isotopes, times_std_i = self.assign_time_and_isotopic_data(filetype="STD", filename_long=file_std)
+            # Creates all necessary variables that are related to the standard files
+            self.build_all_needed_variables(filetype="STD", filename_long=file_std, filename_short=file_std_short)
 
             for isotope in df_isotopes:
                 if isotope not in self.container_lists["Measured Isotopes"]["All"]:
                     self.container_lists["Measured Isotopes"]["All"].append(isotope)
 
+            if file_std_short not in self.container_measurements["EDITED"]:
+                self.container_measurements["EDITED"][file_std_short] = {}
+                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+
             if self.container_flags["STD"]["Initialization"] == False:
                 self.container_flags["STD"][file_std_short] = {
                     "BG set": False, "MAT set": False, "SMOOTHED data": False}
 
-            if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
-                self.container_lists["STD"]["Long"].append(file_std)
-                self.container_lists["STD"]["Short"].append(file_std_short)
-                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
-            else:
-                if file_std not in self.container_lists["STD"]["Long"]:
-                    self.container_lists["STD"]["Long"].append(file_std)
-                    self.container_lists["STD"]["Short"].append(file_std_short)
-                if file_std_short not in self.container_var[var_setting_key]["Data Type Plot"]["STD"]:
-                    self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
-                if file_std_short not in self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"]:
-                    self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                if file_std_short not in self.container_var[var_setting_key]["Display RAW"]["STD"]:
-                    self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
-                if file_std_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["STD"]:
-                    self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
+            # if file_std not in self.container_lists["STD"]["Long"] and self.demo_mode == True:
+            #     self.container_lists["STD"]["Long"].append(file_std)
+            #     self.container_lists["STD"]["Short"].append(file_std_short)
+            #     self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+            #     self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+            #     self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
+            # else:
+            #     if file_std not in self.container_lists["STD"]["Long"]:
+            #         self.container_lists["STD"]["Long"].append(file_std)
+            #         self.container_lists["STD"]["Short"].append(file_std_short)
+            #     if file_std_short not in self.container_var[var_setting_key]["Data Type Plot"]["STD"]:
+            #         self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+            #     if file_std_short not in self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"]:
+            #         self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+            #     if file_std_short not in self.container_var[var_setting_key]["Display RAW"]["STD"]:
+            #         self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+            #     if file_std_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["STD"]:
+            #         self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
 
-            if self.file_loaded is False:
-                self.container_var["STD"][file_std] = {}
-                self.container_var["STD"][file_std]["IS Data"] = {
-                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
-                self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
-                self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
-                self.container_var["STD"][file_std]["Checkbox"].set(1)
-                self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
-                self.container_var["STD"][file_std]["SRM"].set("Select SRM")
-                self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
-                self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
-            else:
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-
-                self.spikes_isotopes["STD"][file_std_short] = {}
-
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
-
-                self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
-
-                file_std_short = parts[-1]
-
-                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
-                self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
-                self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
-
-                self.container_helper["STD"][file_std_short]["FIGURE"] = None
-                self.container_helper["STD"][file_std_short]["CANVAS"] = None
-                self.container_helper["STD"][file_std_short]["TOOLBARFRAME"] = None
-                self.container_helper["STD"][file_std_short]["AXES"] = {}
-                self.container_helper["STD"][file_std_short]["RESULTS FRAME"] = None
-                self.container_helper["STD"][file_std_short]["FIGURE RATIO"] = None
-                self.container_helper["STD"][file_std_short]["CANVAS RATIO"] = None
-                self.container_helper["STD"][file_std_short]["TOOLBARFRAME RATIO"] = None
-                self.container_helper["STD"][file_std_short]["AXES RATIO"] = {}
-
-                self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
-                self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
-                    file_std_short] = {}
-
-                for isotope in df_isotopes:
-                    self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
-                    self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short][isotope].set(1)
-                    self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
-                    #
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-
-                if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                    self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                    self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
-                    self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
-                        file_std_short] = {}
-                self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-                self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
-                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
-                    "RAW": None, "SMOOTHED": None}
+            # if self.file_loaded is False:
+            #     self.container_var["STD"][file_std] = {}
+            #     self.container_var["STD"][file_std]["IS Data"] = {
+            #         "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+            #     self.container_var["STD"][file_std]["IS Data"]["IS"].set("Select IS")
+            #     self.container_var["STD"][file_std]["IS Data"]["Concentration"].set("0.0")
+            #     self.container_var["STD"][file_std]["Checkbox"] = tk.IntVar()
+            #     self.container_var["STD"][file_std]["Checkbox"].set(1)
+            #     self.container_var["STD"][file_std]["SRM"] = tk.StringVar()
+            #     self.container_var["STD"][file_std]["SRM"].set("Select SRM")
+            #     self.container_var["STD"][file_std]["Sign Color"] = tk.StringVar()
+            #     self.container_var["STD"][file_std]["Sign Color"].set(self.sign_red)
+            # else:
+            #     #self.container_measurements["EDITED"][file_std_short] = {}
+            #     #self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+            #
+            #     self.spikes_isotopes["STD"][file_std_short] = {}
+            #
+            #     for isotope in df_isotopes:
+            #         self.container_measurements["EDITED"][file_std_short][isotope] = {}
+            #         self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
+            #         self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
+            #         self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
+            #
+            #     self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode=self.pysills_mode)
+            #
+            #     file_std_short = parts[-1]
+            #
+            #     self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+            #     self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+            #     self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
+            #
+            #     self.container_helper["STD"][file_std_short]["FIGURE"] = None
+            #     self.container_helper["STD"][file_std_short]["CANVAS"] = None
+            #     self.container_helper["STD"][file_std_short]["TOOLBARFRAME"] = None
+            #     self.container_helper["STD"][file_std_short]["AXES"] = {}
+            #     self.container_helper["STD"][file_std_short]["RESULTS FRAME"] = None
+            #     self.container_helper["STD"][file_std_short]["FIGURE RATIO"] = None
+            #     self.container_helper["STD"][file_std_short]["CANVAS RATIO"] = None
+            #     self.container_helper["STD"][file_std_short]["TOOLBARFRAME RATIO"] = None
+            #     self.container_helper["STD"][file_std_short]["AXES RATIO"] = {}
+            #
+            #     self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+            #     self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+            #     self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+            #     self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+            #     self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
+            #         file_std_short] = {}
+            #
+            #     for isotope in df_isotopes:
+            #         self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short][isotope] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short][isotope] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short][isotope].set(1)
+            #         self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short][isotope].set(0)
+            #         #
+            #         self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+            #             "RAW": None, "SMOOTHED": None}
+            #         self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+            #             "RAW": None, "SMOOTHED": None}
+            #         self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+            #             "RAW": None, "SMOOTHED": None}
+            #
+            #     if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
+            #         self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+            #         self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+            #         self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+            #         self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+            #         self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
+            #             file_std_short] = {}
+            #     self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+            #         "RAW": None, "SMOOTHED": None}
+            #     self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+            #         "RAW": None, "SMOOTHED": None}
+            #     self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
+            #         "RAW": None, "SMOOTHED": None}
 
             if file_std not in self.container_var["SRM"]:
                 self.container_var["SRM"][file_std] = tk.StringVar()
                 self.container_var["SRM"][file_std].set("Select SRM")
 
-            if file_std_short not in self.container_files["STD"]:
-                self.container_files["STD"][file_std_short] = {}
-                self.container_files["STD"][file_std_short]["SRM"] = tk.StringVar()
-                self.container_files["STD"][file_std_short]["IS"] = tk.StringVar()
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
-
-                self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode="FI")
-
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_std_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
+            # if file_std_short not in self.container_files["STD"]:
+            #     self.container_files["STD"][file_std_short] = {}
+            #     self.container_files["STD"][file_std_short]["SRM"] = tk.StringVar()
+            #     self.container_files["STD"][file_std_short]["IS"] = tk.StringVar()
+            #     self.container_measurements["EDITED"][file_std_short] = {}
+            #     self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+            #
+            #     self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode=self.pysills_mode)
+            #
+            #     for isotope in df_isotopes:
+            #         self.container_measurements["EDITED"][file_std_short][isotope] = {}
+            #         self.container_measurements["EDITED"][file_std_short][isotope]["BG"] = []
+            #         self.container_measurements["EDITED"][file_std_short][isotope]["MAT"] = []
+            #         self.container_measurements["EDITED"][file_std_short][isotope]["INCL"] = []
 
             if len(self.container_lists["STD"]["Long"]) < len(self.list_std) and self.file_loaded == False:
                 self.build_container_helper(mode="STD")
@@ -11724,6 +11718,8 @@ class PySILLS(tk.Frame):
                                 self.container_helper["STD"][file_std_short][item_01][item_02] = 0
                             elif item_02 == "Indices":
                                 self.container_helper["STD"][file_std_short][item_01][item_02] = []
+
+            self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode=self.pysills_mode)
 
             categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
                           "TOOLBARFRAME_RATIO"]
@@ -11806,7 +11802,43 @@ class PySILLS(tk.Frame):
 
             self.container_var["STD"][file_std]["Frame"] = frm_i
 
-    def build_all_needed_variables(self, filetype):
+    def assign_time_and_isotopic_data(self, filetype, filename_long):
+        parts = filename_long.split("/")
+        filename_short = parts[-1]
+
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_i = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_i = DE(filename_long=filename_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+        else:
+            if self.old_file == True:
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_i = DE(filename_long=filename_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_i = DE(filename_long=filename_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
+
+                if "Dataframe" not in self.container_measurements:
+                    self.container_measurements["Dataframe"] = {}
+
+                if filename_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][filename_short] = df_i
+            else:
+                df_i = self.container_measurements["Dataframe"][filename_short]
+
+        df_isotopes_i = DE().get_isotopes(dataframe=df_i)
+        self.container_lists["Measured Isotopes"][filename_short] = df_isotopes_i
+        df_times_i = DE().get_times(dataframe=df_i)
+
+        return df_isotopes_i, df_times_i
+
+    def build_all_needed_variables(self, filetype, filename_long, filename_short):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
         elif self.pysills_mode == "FI":
@@ -11814,18 +11846,177 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
 
-        if self.demo_mode == True:
-            pass
-        else:
-            if self.file_loaded == True:
-                pass
-            else:
-                pass
+        # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
+        if filename_long not in self.container_lists[filetype]["Long"]:
+            self.container_lists[filetype]["Long"].append(filename_long)
+        if filename_short not in self.container_lists[filetype]["Short"]:
+            self.container_lists[filetype]["Short"].append(filename_short)
+
+        if filename_short not in self.container_var[var_setting_key]["Data Type Plot"][filetype]:
+            self.container_var[var_setting_key]["Data Type Plot"][filetype][filename_short] = tk.IntVar()
+            self.container_var[var_setting_key]["Data Type Plot"][filetype][filename_short].set(0)
+        if filename_short not in self.container_var[var_setting_key]["Analyse Mode Plot"][filetype]:
+            self.container_var[var_setting_key]["Analyse Mode Plot"][filetype][filename_short] = tk.IntVar()
+            self.container_var[var_setting_key]["Analyse Mode Plot"][filetype][filename_short].set(0)
+        if filename_short not in self.container_var[var_setting_key]["Display RAW"][filetype]:
+            self.container_var[var_setting_key]["Display RAW"][filetype][filename_short] = {}
+        if filename_short not in self.container_var[var_setting_key]["Display SMOOTHED"][filetype]:
+            self.container_var[var_setting_key]["Display SMOOTHED"][filetype][filename_short] = {}
+
+        if filename_long not in self.container_var[filetype]:
+            self.container_var[filetype][filename_long] = {}
+            if self.file_loaded == False:
+                self.container_var[filetype][filename_long]["IS Data"] = {
+                    "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+                self.container_var[filetype][filename_long]["IS Data"]["IS"].set("Select IS")
+                self.container_var[filetype][filename_long]["IS Data"]["Concentration"].set("0.0")
+                self.container_var[filetype][filename_long]["Checkbox"] = tk.IntVar()
+                self.container_var[filetype][filename_long]["Checkbox"].set(1)
+                self.container_var[filetype][filename_long]["SRM"] = tk.StringVar()
+                self.container_var[filetype][filename_long]["SRM"].set("Select SRM")
+                self.container_var[filetype][filename_long]["Sign Color"] = tk.StringVar()
+                self.container_var[filetype][filename_long]["Sign Color"].set(self.sign_red)
+                self.container_var[filetype][filename_long]["ID"] = tk.StringVar()
+                self.container_var[filetype][filename_long]["ID"].set("A")
+
+            if filetype == "STD":
+                if filename_long not in self.container_var["SRM"]:
+                    self.container_var["SRM"][filename_long] = tk.StringVar()
+                    self.container_var["SRM"][filename_long].set("Select SRM")
+
+                if filename_short not in self.container_files[filetype]:
+                    self.container_files["STD"][filename_short] = {}
+                    self.container_files["STD"][filename_short]["SRM"] = tk.StringVar()
+                    self.container_files["STD"][filename_short]["IS"] = tk.StringVar()
+
+            if filetype == "SMPL":
+                self.container_var[filetype][filename_long]["ID"] = tk.StringVar()
+                self.container_var[filetype][filename_long]["ID"].set("A")
+
+                self.container_var[filetype][filename_long]["Matrix Setup"] = {
+                    "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                    "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                    "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+                self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
+                self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+                self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+                self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Name"].set("Select Element")
+                self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+
+                if filename_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
+                    self.container_var["Oxides Quantification"]["Total Amounts"][filename_short] = tk.StringVar()
+                    self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].set("100.0")
+
+                if self.pysills_mode != "MA":
+                    # Matrix-only Tracer
+                    if "Host Only Tracer" not in self.container_var["SMPL"][filename_long]:
+                        self.container_var["SMPL"][filename_long]["Host Only Tracer"] = {
+                            "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
+                            "Amount": tk.StringVar()}
+                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Name"].set("Select Isotope")
+                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Value"].set("0")
+                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Matrix"].set("Select Oxide")
+                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Amount"].set("100")
+                    # Second Internal Standard
+                    if "Second Internal Standard" not in self.container_var["SMPL"][filename_long]:
+                        self.container_var["SMPL"][filename_long]["Second Internal Standard"] = {
+                            "Name": tk.StringVar(), "Value": tk.StringVar()}
+                        self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Name"].set(
+                            "Select Isotope")
+                        self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Value"].set("0")
+                    # Geometric Approach (Halter et al. 2002)
+                    if "Halter2002" not in self.container_var["SMPL"][filename_long]:
+                        self.container_var["SMPL"][filename_long]["Halter2002"] = {
+                            "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                            "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
+                        self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set("50.0")
+                        self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set("50.0")
+                        self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set("2700.0")
+                        self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set("1200.0")
+                        self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set("75.0")
+                        self.container_var["SMPL"][filename_long]["Halter2002"]["Name"].set("Select isotope")
+                    # Geometric Approach (Borisova et al. 2021)
+                    if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
+                        self.container_var["SMPL"][filename_long]["Borisova2021"] = {
+                            "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                            "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
+                        self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set("50.0")
+                        self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set("75.0")
+                        self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set("2700.0")
+                        self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set("1200.0")
+                        self.container_var["SMPL"][filename_long]["Borisova2021"]["Name"].set("Select isotope")
+                    # Melting temperatures
+                    if "Melting temperature" not in self.container_var["SMPL"][filename_long]:
+                        self.container_var["SMPL"][filename_long]["Melting temperature"] = tk.StringVar()
+                        self.container_var["SMPL"][filename_long]["Melting temperature"].set("25.0")
+                    # Last compound
+                    if "Last compound" not in self.container_var["SMPL"][filename_long]:
+                        self.container_var["SMPL"][filename_long]["Last compound"] = tk.StringVar()
+                        self.container_var["SMPL"][filename_long]["Last compound"].set("Select last solid")
+                    # Salinity
+                    if filename_short not in self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"]:
+                        self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
+                            filename_short] = tk.StringVar()
+                        self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
+                            filename_short].set("Set salinity")
+
+        if filename_short not in self.spikes_isotopes[filetype]:
+            self.spikes_isotopes[filetype][filename_short] = {}
+
+        if filename_short not in self.container_var[var_setting_key]["Time-Signal Lines"][filetype]:
+            self.container_var[var_setting_key]["Time-Signal Lines"][filetype][filename_short] = {}
+        if filename_short not in self.container_var[var_setting_key]["Time-Ratio Lines"][filetype]:
+            self.container_var[var_setting_key]["Time-Ratio Lines"][filetype][filename_short] = {}
+        if filename_short not in self.container_var[var_setting_key]["Checkboxes Isotope Diagram"][filetype]:
+            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"][filetype][filename_short] = {}
+        if filename_short not in self.container_var[var_setting_key]["Calculation Interval"][filetype]:
+            self.container_var[var_setting_key]["Calculation Interval"][filetype][filename_short] = tk.IntVar()
+            self.container_var[var_setting_key]["Calculation Interval"][filetype][filename_short].set(3)
+        if filename_short not in self.container_var[var_setting_key]["Calculation Interval Visibility"][filetype]:
+            self.container_var[var_setting_key]["Calculation Interval Visibility"][filetype][filename_short] = {}
+
+        if filename_short not in self.container_helper[filetype]:
+            self.container_helper[filetype][filename_short] = {}
+
+        for category in ["FIGURE", "CANVAS", "TOOLBARFRAME", "RESULTS FRAME", "FIGURE RATIO", "CANVAS RATIO",
+                         "TOOLBARFRAME RATIO"]:
+            if category not in self.container_helper[filetype][filename_short]:
+                self.container_helper[filetype][filename_short][category] = None
+        for category in ["AXES", "AXES RATIO"]:
+            if category not in self.container_helper[filetype][filename_short]:
+                self.container_helper[filetype][filename_short][category] = {}
+
+        if filename_short not in self.container_measurements["EDITED"]:
+            self.container_measurements["EDITED"][filename_short] = {}
+
+        # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+        for isotope in file_isotopes:
+            if isotope not in self.container_measurements["EDITED"][filename_short]:
+                self.container_measurements["EDITED"][filename_short][isotope] = {"BG": [], "MAT": [], "INCL": []}
+            if isotope not in self.container_var[var_setting_key]["Display RAW"][filetype][filename_short]:
+                self.container_var[var_setting_key]["Display RAW"][filetype][filename_short][isotope] = tk.IntVar()
+                self.container_var[var_setting_key]["Display RAW"][filetype][filename_short][isotope].set(1)
+            if isotope not in self.container_var[var_setting_key]["Display SMOOTHED"][filetype][filename_short]:
+                self.container_var[var_setting_key]["Display SMOOTHED"][filetype][filename_short][isotope] = tk.IntVar()
+                self.container_var[var_setting_key]["Display SMOOTHED"][filetype][filename_short][isotope].set(0)
+            if isotope not in self.container_var[var_setting_key]["Time-Signal Lines"][filetype][filename_short]:
+                self.container_var[var_setting_key]["Time-Signal Lines"][filetype][filename_short][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+            if isotope not in self.container_var[var_setting_key]["Time-Signal Lines"][filetype][filename_short]:
+                self.container_var[var_setting_key]["Time-Ratio Lines"][filetype][filename_short][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
+            if isotope not in self.container_var[var_setting_key]["Time-Signal Lines"][filetype][filename_short]:
+                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"][filetype][filename_short][isotope] = {
+                    "RAW": None, "SMOOTHED": None}
 
     def place_sample_files_table(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Standard Files'
-                Parameters:  var_geometry_info  -   contains information for the widget setup
-                """
+        Parameters:  var_geometry_info  -   contains information for the widget setup
+        """
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
@@ -11870,244 +12061,227 @@ class PySILLS(tk.Frame):
             parts = file_smpl.split("/")
             file_smpl_short = parts[-1]
 
-            if file_smpl_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
-                self.container_var["Oxides Quantification"]["Total Amounts"][file_smpl_short] = tk.StringVar()
-                self.container_var["Oxides Quantification"]["Total Amounts"][file_smpl_short].set("100.0")
+            # Assigns isotopic signal intensity and time data for every sample file
+            df_isotopes, times_smpl_i = self.assign_time_and_isotopic_data(filetype="SMPL", filename_long=file_smpl)
+            # Creates all necessary variables that are related to the sample files
+            self.build_all_needed_variables(filetype="SMPL", filename_long=file_smpl, filename_short=file_smpl_short)
 
-            if self.file_loaded == False:
-                if self.container_icpms["name"] != None:
-                    var_skipheader = self.container_icpms["skipheader"]
-                    var_skipfooter = self.container_icpms["skipfooter"]
-                    df_smpl_i = DE(filename_long=file_smpl).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                else:
-                    df_smpl_i = DE(filename_long=file_smpl).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
-            else:
-                if self.old_file == True:
-                    if self.container_icpms["name"] != None:
-                        var_skipheader = self.container_icpms["skipheader"]
-                        var_skipfooter = self.container_icpms["skipfooter"]
-                        df_smpl_i = DE(filename_long=file_smpl).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                    else:
-                        df_smpl_i = DE(filename_long=file_smpl).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
-                    if "Dataframe" not in self.container_measurements:
-                        self.container_measurements["Dataframe"] = {}
-                    if file_smpl_short not in self.container_measurements["Dataframe"]:
-                        self.container_measurements["Dataframe"][file_smpl_short] = df_smpl_i
-                else:
-                    df_smpl_i = self.container_measurements["Dataframe"][file_smpl_short]
-
-            df_isotopes = DE().get_isotopes(dataframe=df_smpl_i)
-            self.container_lists["Measured Isotopes"][file_smpl_short] = df_isotopes
-            times_smpl_i = DE().get_times(dataframe=df_smpl_i)
+            # if file_smpl_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
+            #     self.container_var["Oxides Quantification"]["Total Amounts"][file_smpl_short] = tk.StringVar()
+            #     self.container_var["Oxides Quantification"]["Total Amounts"][file_smpl_short].set("100.0")
 
             for isotope in df_isotopes:
                 if isotope not in self.container_lists["Measured Isotopes"]["All"]:
                     self.container_lists["Measured Isotopes"]["All"].append(isotope)
 
-            if self.file_loaded is False:
-                if file_smpl not in self.container_var["SMPL"]:
-                    self.container_var["SMPL"][file_smpl] = {}
-                    self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["IS"].set("Select IS")
-                    self.container_var["SMPL"][file_smpl]["IS Data"] = {
-                        "IS": tk.StringVar(), "Concentration": tk.StringVar()}
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
-                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
-                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
-                    self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
-                    self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
-                    self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["ID"].set("A")
-                    self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
-                    self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
-                    if self.pysills_mode != "MA":
-                        # Matrix-only Tracer
-                        self.container_var["SMPL"][file_smpl]["Host Only Tracer"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
-                            "Amount": tk.StringVar()}
-                        self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Name"].set("Select Isotope")
-                        self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Value"].set("0")
-                        self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].set("Select Oxide")
-                        self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Amount"].set("100")
-                        # Second Internal Standard
-                        self.container_var["SMPL"][file_smpl]["Second Internal Standard"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar()}
-                        self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Name"].set("Select Isotope")
-                        self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Value"].set("0")
-                        # Geometric Approach (Halter et al. 2002)
-                        self.container_var["SMPL"][file_smpl]["Halter2002"] = {
-                            "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
-                            "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
-                        self.container_var["SMPL"][file_smpl]["Halter2002"]["a"].set("50.0")
-                        self.container_var["SMPL"][file_smpl]["Halter2002"]["b"].set("50.0")
-                        self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(incl)"].set("2700.0")
-                        self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(host)"].set("1200.0")
-                        self.container_var["SMPL"][file_smpl]["Halter2002"]["R"].set("75.0")
-                        self.container_var["SMPL"][file_smpl]["Halter2002"]["Name"].set("Select isotope")
-                        # Geometric Approach (Borisova et al. 2021)
-                        self.container_var["SMPL"][file_smpl]["Borisova2021"] = {
-                            "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
-                            "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
-                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(incl)"].set("50.0")
-                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(host)"].set("75.0")
-                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(incl)"].set("2700.0")
-                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(host)"].set("1200.0")
-                        self.container_var["SMPL"][file_smpl]["Borisova2021"]["Name"].set("Select isotope")
-                        # Melting temperatures
-                        self.container_var["SMPL"][file_smpl]["Melting temperature"] = tk.StringVar()
-                        self.container_var["SMPL"][file_smpl]["Melting temperature"].set("25.0")
-                        self.container_var["SMPL"][file_smpl]["Last compound"] = tk.StringVar()
-                        self.container_var["SMPL"][file_smpl]["Last compound"].set("Select last solid")
-            else:
-                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-                #
-                self.container_helper["SMPL"][file_smpl_short]["FIGURE"] = None
-                self.container_helper["SMPL"][file_smpl_short]["CANVAS"] = None
-                self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME"] = None
-                self.container_helper["SMPL"][file_smpl_short]["AXES"] = {}
-                self.container_helper["SMPL"][file_smpl_short]["RESULTS FRAME"] = None
-                self.container_helper["SMPL"][file_smpl_short]["FIGURE RATIO"] = None
-                self.container_helper["SMPL"][file_smpl_short]["CANVAS RATIO"] = None
-                self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME RATIO"] = None
-                self.container_helper["SMPL"][file_smpl_short]["AXES RATIO"] = {}
-                #
-                self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
-                    file_smpl_short] = {}
-
-                if "Halter2002" not in self.container_var["SMPL"][file_smpl]:
-                    # Geometric Approach (Halter et al. 2002)
-                    self.container_var["SMPL"][file_smpl]["Halter2002"] = {
-                        "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
-                        "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
-                    self.container_var["SMPL"][file_smpl]["Halter2002"]["a"].set("50.0")
-                    self.container_var["SMPL"][file_smpl]["Halter2002"]["b"].set("50.0")
-                    self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(incl)"].set("2700.0")
-                    self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(host)"].set("1200.0")
-                    self.container_var["SMPL"][file_smpl]["Halter2002"]["R"].set("75.0")
-                    self.container_var["SMPL"][file_smpl]["Halter2002"]["Name"].set("Select isotope")
-
-                if "Borisova2021" not in self.container_var["SMPL"][file_smpl]:
-                    # Geometric Approach (Borisova et al. 2021)
-                    self.container_var["SMPL"][file_smpl]["Borisova2021"] = {
-                        "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
-                        "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
-                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(incl)"].set("50.0")
-                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(host)"].set("75.0")
-                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(incl)"].set("2700.0")
-                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(host)"].set("1200.0")
-                    self.container_var["SMPL"][file_smpl]["Borisova2021"]["Name"].set("Select isotope")
-
-                for isotope in df_isotopes:
-                    self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
-                    self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][
-                        isotope] = tk.IntVar()
-                    self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
-                    self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
-                    #
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
-                        isotope] = {"RAW": None, "SMOOTHED": None}
-
-            if file_smpl not in self.container_lists["SMPL"]["Long"] and self.demo_mode == True:
-                self.container_lists["SMPL"]["Long"].append(file_smpl)
-                self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-            else:
-                if file_smpl not in self.container_lists["SMPL"]["Long"]:
-                    self.container_lists["SMPL"]["Long"].append(file_smpl)
-                    self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                if file_smpl_short not in self.container_var[var_setting_key]["Data Type Plot"]["SMPL"]:
-                    self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                    self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                if file_smpl_short not in self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"]:
-                    self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                    self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                if file_smpl_short not in self.container_var[var_setting_key]["Display RAW"]["SMPL"]:
-                    self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                if file_smpl_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"]:
-                    self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-
-            if file_smpl_short not in self.container_var[var_setting_key]["Display RAW"]["STD"]:
-                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
-            if file_smpl_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["STD"]:
-                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-
-            if file_smpl not in self.container_lists["SMPL"]["Long"] and self.file_loaded == False:
-                if file_smpl not in self.container_lists["SMPL"]["Long"]:
-                    self.container_lists["SMPL"]["Long"].append(file_smpl)
-                    self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
-                self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
-                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
-                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
-            #
-            if file_smpl_short not in self.container_files["SMPL"]:
-                self.container_files["SMPL"][file_smpl_short] = {}
-                self.container_files["SMPL"][file_smpl_short]["IS"] = tk.StringVar()
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"] = tk.StringVar()
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set("0.0")
-                if self.pysills_mode != "MA":
-                    self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
-                        file_smpl_short] = tk.StringVar()
-                    self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
-                        "Set salinity")
+            if file_smpl_short not in self.container_measurements["EDITED"]:
                 self.container_measurements["EDITED"][file_smpl_short] = {}
                 self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
-                #
-                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
-                #
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
+
+            if self.container_flags["SMPL"]["Initialization"] == False:
+                self.container_flags["SMPL"][file_smpl_short] = {
+                    "BG set": False, "MAT set": False, "SMOOTHED data": False}
+
+            # if self.file_loaded is False:
+            #     if file_smpl not in self.container_var["SMPL"]:
+            #         self.container_var["SMPL"][file_smpl] = {}
+            #         self.container_var["SMPL"][file_smpl]["IS"] = tk.StringVar()
+            #         self.container_var["SMPL"][file_smpl]["IS"].set("Select IS")
+            #         self.container_var["SMPL"][file_smpl]["IS Data"] = {
+            #             "IS": tk.StringVar(), "Concentration": tk.StringVar()}
+            #         self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set("Select IS")
+            #         self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set("0.0")
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"] = {
+            #             "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+            #             "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+            #             "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Name"].set("Select Element")
+            #         self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+            #         self.container_var["SMPL"][file_smpl]["Checkbox"] = tk.IntVar()
+            #         self.container_var["SMPL"][file_smpl]["Checkbox"].set(1)
+            #         self.container_var["SMPL"][file_smpl]["ID"] = tk.StringVar()
+            #         self.container_var["SMPL"][file_smpl]["ID"].set("A")
+            #         self.container_var["SMPL"][file_smpl]["Sign Color"] = tk.StringVar()
+            #         self.container_var["SMPL"][file_smpl]["Sign Color"].set(self.sign_red)
+            #         # if self.pysills_mode != "MA":
+            #         #     # Matrix-only Tracer
+            #         #     self.container_var["SMPL"][file_smpl]["Host Only Tracer"] = {
+            #         #         "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
+            #         #         "Amount": tk.StringVar()}
+            #         #     self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Name"].set("Select Isotope")
+            #         #     self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Value"].set("0")
+            #         #     self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].set("Select Oxide")
+            #         #     self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Amount"].set("100")
+            #         #     # Second Internal Standard
+            #         #     self.container_var["SMPL"][file_smpl]["Second Internal Standard"] = {
+            #         #         "Name": tk.StringVar(), "Value": tk.StringVar()}
+            #         #     self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Name"].set("Select Isotope")
+            #         #     self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Value"].set("0")
+            #         #     # Geometric Approach (Halter et al. 2002)
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"] = {
+            #         #         "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
+            #         #         "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"]["a"].set("50.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"]["b"].set("50.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(incl)"].set("2700.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(host)"].set("1200.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"]["R"].set("75.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Halter2002"]["Name"].set("Select isotope")
+            #         #     # Geometric Approach (Borisova et al. 2021)
+            #         #     self.container_var["SMPL"][file_smpl]["Borisova2021"] = {
+            #         #         "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
+            #         #         "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
+            #         #     self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(incl)"].set("50.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(host)"].set("75.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(incl)"].set("2700.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(host)"].set("1200.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Borisova2021"]["Name"].set("Select isotope")
+            #         #     # Melting temperatures
+            #         #     self.container_var["SMPL"][file_smpl]["Melting temperature"] = tk.StringVar()
+            #         #     self.container_var["SMPL"][file_smpl]["Melting temperature"].set("25.0")
+            #         #     self.container_var["SMPL"][file_smpl]["Last compound"] = tk.StringVar()
+            #         #     self.container_var["SMPL"][file_smpl]["Last compound"].set("Select last solid")
+            # else:
+            #     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+            #     self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+            #     self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+            #     #
+            #     self.container_helper["SMPL"][file_smpl_short]["FIGURE"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["CANVAS"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["AXES"] = {}
+            #     self.container_helper["SMPL"][file_smpl_short]["RESULTS FRAME"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["FIGURE RATIO"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["CANVAS RATIO"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["TOOLBARFRAME RATIO"] = None
+            #     self.container_helper["SMPL"][file_smpl_short]["AXES RATIO"] = {}
+            #     #
+            #     self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+            #     self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+            #     self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+            #     self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+            #     self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
+            #         file_smpl_short] = {}
             #
-            if self.file_loaded == True:
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
-                #
-                self.spikes_isotopes["SMPL"][file_smpl_short] = {}
-                #
-                for isotope in df_isotopes:
-                    self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
-                    self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
-                    #
-                self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode="FI")
+            #     if "Halter2002" not in self.container_var["SMPL"][file_smpl]:
+            #         # Geometric Approach (Halter et al. 2002)
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"] = {
+            #             "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
+            #             "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"]["a"].set("50.0")
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"]["b"].set("50.0")
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(incl)"].set("2700.0")
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"]["rho(host)"].set("1200.0")
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"]["R"].set("75.0")
+            #         self.container_var["SMPL"][file_smpl]["Halter2002"]["Name"].set("Select isotope")
+            #
+            #     if "Borisova2021" not in self.container_var["SMPL"][file_smpl]:
+            #         # Geometric Approach (Borisova et al. 2021)
+            #         self.container_var["SMPL"][file_smpl]["Borisova2021"] = {
+            #             "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
+            #             "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
+            #         self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(incl)"].set("50.0")
+            #         self.container_var["SMPL"][file_smpl]["Borisova2021"]["R(host)"].set("75.0")
+            #         self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(incl)"].set("2700.0")
+            #         self.container_var["SMPL"][file_smpl]["Borisova2021"]["rho(host)"].set("1200.0")
+            #         self.container_var["SMPL"][file_smpl]["Borisova2021"]["Name"].set("Select isotope")
+            #
+            #     for isotope in df_isotopes:
+            #         self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][
+            #             isotope] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short][isotope].set(1)
+            #         self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short][isotope].set(0)
+            #         #
+            #         self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+            #             "RAW": None, "SMOOTHED": None}
+            #         self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+            #             "RAW": None, "SMOOTHED": None}
+            #         self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
+            #             isotope] = {"RAW": None, "SMOOTHED": None}
+
+            # if file_smpl not in self.container_lists["SMPL"]["Long"] and self.demo_mode == True:
+            #     self.container_lists["SMPL"]["Long"].append(file_smpl)
+            #     self.container_lists["SMPL"]["Short"].append(file_smpl_short)
+            #     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+            #     self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+            #     self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+            # else:
+            #     if file_smpl not in self.container_lists["SMPL"]["Long"]:
+            #         self.container_lists["SMPL"]["Long"].append(file_smpl)
+            #         self.container_lists["SMPL"]["Short"].append(file_smpl_short)
+            #     if file_smpl_short not in self.container_var[var_setting_key]["Data Type Plot"]["SMPL"]:
+            #         self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+            #     if file_smpl_short not in self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"]:
+            #         self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #         self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+            #     if file_smpl_short not in self.container_var[var_setting_key]["Display RAW"]["SMPL"]:
+            #         self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+            #     if file_smpl_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"]:
+            #         self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+
+            # if file_smpl_short not in self.container_var[var_setting_key]["Display RAW"]["SMPL"]:
+            #     self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+            # if file_smpl_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"]:
+            #     self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+
+            # if file_smpl not in self.container_lists["SMPL"]["Long"] and self.file_loaded == False:
+            #     if file_smpl not in self.container_lists["SMPL"]["Long"]:
+            #         self.container_lists["SMPL"]["Long"].append(file_smpl)
+            #         self.container_lists["SMPL"]["Short"].append(file_smpl_short)
+            #     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
+            #     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+            #     self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+            #     self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+            #
+            # if file_smpl_short not in self.container_files["SMPL"]:
+            #     self.container_files["SMPL"][file_smpl_short] = {}
+            #     self.container_files["SMPL"][file_smpl_short]["IS"] = tk.StringVar()
+            #     self.container_files["SMPL"][file_smpl_short]["IS Concentration"] = tk.StringVar()
+            #     self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set("0.0")
+            #     if self.pysills_mode != "MA":
+            #         self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
+            #             file_smpl_short] = tk.StringVar()
+            #         self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+            #             "Set salinity")
+            #     self.container_measurements["EDITED"][file_smpl_short] = {}
+            #     self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
+            #     #
+            #     self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode=self.pysills_mode)
+            #     #
+            #     for isotope in df_isotopes:
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
+            #
+            # if self.file_loaded == True:
+            #     self.container_measurements["EDITED"][file_smpl_short] = {}
+            #     self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
+            #     #
+            #     self.spikes_isotopes["SMPL"][file_smpl_short] = {}
+            #     #
+            #     for isotope in df_isotopes:
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope] = {}
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope]["BG"] = []
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope]["MAT"] = []
+            #         self.container_measurements["EDITED"][file_smpl_short][isotope]["INCL"] = []
+            #         #
+            #     self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode=self.pysills_mode)
 
             if len(self.container_lists["SMPL"]["Long"]) < len(self.list_smpl) and self.file_loaded == False:
                 self.build_container_helper(mode="SMPL")
@@ -12149,6 +12323,8 @@ class PySILLS(tk.Frame):
                                 self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = 0
                             elif item_02 == "Indices":
                                 self.container_helper["SMPL"][file_smpl_short][item_01][item_02] = []
+
+            self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode=self.pysills_mode)
 
             categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
                           "TOOLBARFRAME_RATIO"]
