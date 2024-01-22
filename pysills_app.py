@@ -11577,12 +11577,15 @@ class PySILLS(tk.Frame):
                 if file_std not in self.container_lists["STD"]["Long"]:
                     self.container_lists["STD"]["Long"].append(file_std)
                     self.container_lists["STD"]["Short"].append(file_std_short)
-                if file_std_short not in self.container_var["ma_setting"]["Data Type Plot"]["STD"]:
+                if file_std_short not in self.container_var[var_setting_key]["Data Type Plot"]["STD"]:
                     self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short] = tk.IntVar()
                     self.container_var[var_setting_key]["Data Type Plot"]["STD"][file_std_short].set(0)
+                if file_std_short not in self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"]:
                     self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short] = tk.IntVar()
                     self.container_var[var_setting_key]["Analyse Mode Plot"]["STD"][file_std_short].set(0)
+                if file_std_short not in self.container_var[var_setting_key]["Display RAW"]["STD"]:
                     self.container_var[var_setting_key]["Display RAW"]["STD"][file_std_short] = {}
+                if file_std_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["STD"]:
                     self.container_var[var_setting_key]["Display SMOOTHED"]["STD"][file_std_short] = {}
 
             if self.file_loaded is False:
@@ -11803,6 +11806,22 @@ class PySILLS(tk.Frame):
 
             self.container_var["STD"][file_std]["Frame"] = frm_i
 
+    def build_all_needed_variables(self, filetype):
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+
+        if self.demo_mode == True:
+            pass
+        else:
+            if self.file_loaded == True:
+                pass
+            else:
+                pass
+
     def place_sample_files_table(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Standard Files'
                 Parameters:  var_geometry_info  -   contains information for the widget setup
@@ -12015,7 +12034,6 @@ class PySILLS(tk.Frame):
                     self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
                         isotope] = {"RAW": None, "SMOOTHED": None}
 
-
             if file_smpl not in self.container_lists["SMPL"]["Long"] and self.demo_mode == True:
                 self.container_lists["SMPL"]["Long"].append(file_smpl)
                 self.container_lists["SMPL"]["Short"].append(file_smpl_short)
@@ -12029,13 +12047,21 @@ class PySILLS(tk.Frame):
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
                     self.container_lists["SMPL"]["Long"].append(file_smpl)
                     self.container_lists["SMPL"]["Short"].append(file_smpl_short)
-                if file_smpl_short not in self.container_var["ma_setting"]["Data Type Plot"]["SMPL"]:
+                if file_smpl_short not in self.container_var[var_setting_key]["Data Type Plot"]["SMPL"]:
                     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                     self.container_var[var_setting_key]["Data Type Plot"]["SMPL"][file_smpl_short].set(0)
+                if file_smpl_short not in self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"]:
                     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short] = tk.IntVar()
                     self.container_var[var_setting_key]["Analyse Mode Plot"]["SMPL"][file_smpl_short].set(0)
+                if file_smpl_short not in self.container_var[var_setting_key]["Display RAW"]["SMPL"]:
                     self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+                if file_smpl_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"]:
                     self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
+
+            if file_smpl_short not in self.container_var[var_setting_key]["Display RAW"]["STD"]:
+                self.container_var[var_setting_key]["Display RAW"]["SMPL"][file_smpl_short] = {}
+            if file_smpl_short not in self.container_var[var_setting_key]["Display SMOOTHED"]["STD"]:
+                self.container_var[var_setting_key]["Display SMOOTHED"]["SMPL"][file_smpl_short] = {}
 
             if file_smpl not in self.container_lists["SMPL"]["Long"] and self.file_loaded == False:
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
@@ -21695,7 +21721,11 @@ class PySILLS(tk.Frame):
             pass
 
         if var_type == "STD":
-            var_key_isotope = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+            var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][var_file_short]:
+                    var_key_isotope = self.container_lists["Measured Elements"][var_file_short][element][0]
+                break
         else:
             if self.container_var["fi_setting"][
                 "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
