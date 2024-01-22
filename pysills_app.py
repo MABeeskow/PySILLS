@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		19.01.2023
+# Date:		22.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -5485,6 +5485,8 @@ class PySILLS(tk.Frame):
         if self.pysills_mode in ["FI", "MI"]:
             # Save information about 'Inclusion Setup'
             self.save_inclusion_information_in_file(save_file=save_file)
+            # Save information about 'PyPitzer'
+            self.save_pypitzer_settings_in_file(save_file=save_file)
             # Save information about 'Quantification Setup (Matrix-Only Tracer)'
             self.save_quantification_method_matrix_only_in_file(save_file=save_file)
             # Save information about 'Quantification Setup (Second Internal Standard)'
@@ -5630,6 +5632,49 @@ class PySILLS(tk.Frame):
 
             str_incl += "\n"
             save_file.write(str_incl)
+
+        save_file.write("\n")
+
+    def save_pypitzer_settings_in_file(self, save_file):
+        save_file.write("PYPITZER SETTINGS" + "\n")
+
+        str_cations = "Cations" + ";"
+        str_anions = "Anions" + ";"
+        str_isotopes = "Isotopes" + ";"
+
+        for index, cation in enumerate(self.container_lists["Selected Cations"]):
+            if index < len(self.container_lists["Selected Cations"]) - 1:
+                str_cations += cation + ";"
+            else:
+                str_cations += cation + "\n"
+
+        for index, anion in enumerate(self.container_lists["Selected Anions"]):
+            if index < len(self.container_lists["Selected Anions"]) - 1:
+                str_anions += anion + ";"
+            else:
+                str_anions += anion + "\n"
+
+        for index, isotope in enumerate(list(self.helper_checkbuttons["Isotopes"].keys())):
+            if self.helper_checkbuttons["Isotopes"][isotope].get() == 1:
+                if index < len(list(self.helper_checkbuttons["Isotopes"].keys())) - 1:
+                    str_isotopes += isotope + ";"
+                else:
+                    str_isotopes += isotope + "\n"
+
+        str_isotopes = str_isotopes[:-1]
+        str_isotopes += "\n"
+
+        save_file.write(str_cations)
+        save_file.write(str_anions)
+        save_file.write(str_isotopes)
+
+        for index, filename_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
+            filename_smpl_short = self.container_lists["SMPL"]["Short"][index]
+            var_last_compound = self.container_var["SMPL"][filename_smpl_long]["Last compound"].get()
+            var_melting_temperature = self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].get()
+            str_file = filename_smpl_short + ";" + var_last_compound + ";" + var_melting_temperature + "\n"
+
+            save_file.write(str_file)
 
         save_file.write("\n")
 
@@ -5904,7 +5949,7 @@ class PySILLS(tk.Frame):
                                "END"]
                 else:
                     strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                               "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                               "INCLUSION SETTINGS", "PYPITZER SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
                                "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
                                "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
                                "END"]
@@ -5914,7 +5959,7 @@ class PySILLS(tk.Frame):
                            "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
                 else:
                     strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                               "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                               "INCLUSION SETTINGS", "PYPITZER SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
                                "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
                                "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
                 self.old_file = True
@@ -6373,34 +6418,58 @@ class PySILLS(tk.Frame):
                     self.container_var["SRM"][isotope] = tk.StringVar()
                     self.container_lists["ISOTOPES"].append(isotope)
                     self.container_var["SRM"][isotope].set(splitted_std[1])
-                    #
+
                 ## INCLUSION SETTINGS
                 index = 0
-                for i in range(index_container["INCLUSION SETTINGS"] + 1,
-                               index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
+                for i in range(index_container["INCLUSION SETTINGS"] + 1, index_container["PYPITZER SETTINGS"] - 1):
                     line_data = str(loaded_lines[i].strip())
                     splitted_data = line_data.split(";")
-                    #
+
                     if index == 0:
                         self.container_var["fi_setting"]["Inclusion Setup Selection"] = tk.IntVar()
                         self.container_var["fi_setting"]["Inclusion Setup Selection"].set(splitted_data[1])
-                        #
+
                     else:
                         info_file = splitted_data[0]
                         info_file_short = info_file.split("/")[-1]
                         info_is = splitted_data[1]
                         info_concentration = splitted_data[2]
                         info_salinity = splitted_data[3]
-                        #
+
                         self.container_var["SMPL"][info_file]["IS Data"]["IS"].set(info_is)
                         self.container_var["SMPL"][info_file]["IS Data"]["Concentration"].set(info_concentration)
                         self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][
                             info_file_short] = tk.StringVar()
                         self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][info_file_short].set(
                             info_salinity)
-                    #
+
                     index += 1
-                #
+
+                # PYPITZER SETTINGS
+                for i in range(index_container["PYPITZER SETTINGS"] + 1,
+                               index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
+                    line_data = str(loaded_lines[i].strip())
+                    splitted_data = line_data.split(";")
+
+                    if splitted_data[0] == "Cations": #sex
+                        self.container_lists["Selected Cations"].extend(splitted_data[1:])
+                    elif splitted_data[0] == "Anions":
+                        self.container_lists["Selected Anions"].extend(splitted_data[1:])
+                    elif splitted_data[0] == "Isotopes":
+                        for isotope in splitted_data[1:]:
+                            self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
+                            self.helper_checkbuttons["Isotopes"][isotope].set(1)
+                    elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
+                        for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                            var_last_compound = splitted_data[1]
+                            var_melting_temperature = splitted_data[2]
+
+                            self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
+                            self.container_var["SMPL"][filename_smpl_long]["Melting temperature"] = tk.StringVar()
+                            self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(var_last_compound)
+                            self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
+                                var_melting_temperature)
+
                 ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
                 index = 0
                 for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
