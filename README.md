@@ -69,12 +69,14 @@ following packages:
 * scipy
 * pandas
 * matplotlib
+* sympy
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) &nbsp;
 ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) &nbsp;
 ![SciPy](https://img.shields.io/badge/SciPy-%230C55A5.svg?style=for-the-badge&logo=scipy&logoColor=%white) &nbsp;
 ![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white) &nbsp;
 ![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)
+![Sympy](https://img.shields.io/badge/SymPy-3B5526.svg?style=for-the-badge&logo=SymPy&logoColor=white) &nbsp;
 
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white) &nbsp;
 ![macOS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=macos&logoColor=F0F0F0) &nbsp;
@@ -182,7 +184,8 @@ also define manually the time limits of the calculation windows.
 6. Click on "Apply to all" for the standard and sample files in order to apply a spike elimination on all files.
 7. Open every standard and sample file and define the calculation intervals for the matrix and inclusion signal.
 8. Define the concentration values of the internal standard that was selected for the sample files (this will be used 
-for the fluid inclusion analysis). There are several options available, for example a mass balance calculation.
+for the fluid inclusion analysis). There are several options available, for example a mass balance calculation or a 
+calculation based on PyPitzer.
 
 Now, all mandatory settings were defined, but it is of course possible to change some parameters if this is 
 necessary.
@@ -243,4 +246,4 @@ https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
 ---
 
 Version: Pre-Release  
-Last updated: 19.01.2024
+Last updated: 23.01.2024
