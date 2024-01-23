@@ -20514,7 +20514,8 @@ class PySILLS(tk.Frame):
         btn_001 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 9, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-            text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"])
+            text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
+            command=self.change_values_halter2002_all)
 
         # RADIOBUTTONS
         rb_01b = SE(
@@ -20547,27 +20548,37 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["Halter2002"]["Dimension a"],
-            text_default=self.container_var["Halter2002"]["Dimension a"].get())
+            text_default=self.container_var["Halter2002"]["Dimension a"].get(),
+            command=lambda event, entr=self.container_var["Halter2002"]["Dimension a"], mode="a":
+            self.change_values_halter2002(entr, mode, event))
         entr_002b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["Halter2002"]["Dimension b"],
-            text_default=self.container_var["Halter2002"]["Dimension b"].get())
+            text_default=self.container_var["Halter2002"]["Dimension b"].get(),
+            command=lambda event, entr=self.container_var["Halter2002"]["Dimension b"], mode="b":
+            self.change_values_halter2002(entr, mode, event))
         entr_003a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 5, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["Halter2002"]["Rho(Host)"],
-            text_default=self.container_var["Halter2002"]["Rho(Host)"].get())
+            text_default=self.container_var["Halter2002"]["Rho(Host)"].get(),
+            command=lambda event, entr=self.container_var["Halter2002"]["Rho(Host)"], mode="rho(host)":
+            self.change_values_halter2002(entr, mode, event))
         entr_003b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 6, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["Halter2002"]["Rho(Incl)"],
-            text_default=self.container_var["Halter2002"]["Rho(Incl)"].get())
+            text_default=self.container_var["Halter2002"]["Rho(Incl)"].get(),
+            command=lambda event, entr=self.container_var["Halter2002"]["Rho(Incl)"], mode="rho(incl)":
+            self.change_values_halter2002(entr, mode, event))
         entr_004a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 8, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["Halter2002"]["Laser Radius"],
-            text_default=self.container_var["Halter2002"]["Laser Radius"].get())
+            text_default=self.container_var["Halter2002"]["Laser Radius"].get(),
+            command=lambda event, entr=self.container_var["Halter2002"]["Laser Radius"], mode="R":
+            self.change_values_halter2002(entr, mode, event))
 
         ## TREEVIEWS
         frm_smpl = SE(
@@ -20638,6 +20649,37 @@ class PySILLS(tk.Frame):
                 width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_smpl.window_create("insert", window=entr_5_i)
             text_smpl.insert("end", "\n")
+
+    def change_values_halter2002(self, entr, mode, event):
+        val_default = entr.get()
+        if mode == "a":
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["a"].set(val_default)
+        elif mode == "b":
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["b"].set(val_default)
+        elif mode == "rho(host)":
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["rho(host)"].set(val_default)
+        elif mode == "rho(incl)":
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["rho(incl)"].set(val_default)
+        elif mode == "R":
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["R"].set(val_default)
+
+    def change_values_halter2002_all(self):
+        val_default_a = self.container_var["Halter2002"]["Dimension a"].get()
+        val_default_b = self.container_var["Halter2002"]["Dimension b"].get()
+        val_default_rho_host = self.container_var["Halter2002"]["Rho(Host)"].get()
+        val_default_rho_incl = self.container_var["Halter2002"]["Rho(Incl)"].get()
+        val_default_r = self.container_var["Halter2002"]["Laser Radius"].get()
+        for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+            self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["a"].set(val_default_a)
+            self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["b"].set(val_default_b)
+            self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["rho(host)"].set(val_default_rho_host)
+            self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["rho(incl)"].set(val_default_rho_incl)
+            self.container_var["SMPL"][filename_smpl_long]["Halter2002"]["R"].set(val_default_r)
 
     def estimate_x_halter2002(self, datatype, filename_long, filename_short):
         # Initial conditions
