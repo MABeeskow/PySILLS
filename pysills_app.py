@@ -5489,6 +5489,10 @@ class PySILLS(tk.Frame):
             self.save_quantification_method_matrix_only_in_file(save_file=save_file)
             # Save information about 'Quantification Setup (Second Internal Standard)'
             self.save_quantification_method_second_internal_in_file(save_file=save_file)
+            # Save information about 'Geometric Approach (Halter2002)'
+            self.save_quantification_method_halter2002(save_file=save_file)
+            #Save information about 'Geometric Approach (Borisova2021)'
+            self.save_quantification_method_borisova2021(save_file=save_file)
 
         # Save information about 'Sample/Matrix Setup'
         self.save_mineralphase_information_in_file(save_file=save_file)
@@ -5723,6 +5727,43 @@ class PySILLS(tk.Frame):
             save_file.write(str_method)
 
         save_file.write("\n")
+        
+    def save_quantification_method_halter2002(self, save_file):
+        save_file.write("QUANTIFICATION SETTINGS (HALTER2002)" + "\n")
+        info_method = self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get()
+        str_method = str("Method") + ";" + str(info_method) + "\n"
+        save_file.write(str_method)
+
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            val_a_i = self.container_var["SMPL"][filename_long]["Halter2002"]["a"].get()
+            val_b_i = self.container_var["SMPL"][filename_long]["Halter2002"]["b"].get()
+            val_rho_host_i = self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].get()
+            val_rho_incl_i = self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].get()
+            val_r_i = self.container_var["SMPL"][filename_long]["Halter2002"]["R"].get()
+            str_i = (str(filename_short) + ";" + str(val_a_i) + ";" + str(val_b_i) + ";" + str(val_rho_host_i) +
+                     ";" + str(val_rho_incl_i) + ";" + str(val_r_i) + "\n")
+            save_file.write(str_i)
+
+        save_file.write("\n")
+    
+    def save_quantification_method_borisova2021(self, save_file):
+        save_file.write("QUANTIFICATION SETTINGS (BORISOVA2021)" + "\n")
+        info_method = self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get()
+        str_method = str("Method") + ";" + str(info_method) + "\n"
+        save_file.write(str_method)
+
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            val_r_host_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].get()
+            val_r_incl_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].get()
+            val_rho_host_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].get()
+            val_rho_incl_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].get()
+            str_i = (str(filename_short) + ";" + str(val_r_host_i) + ";" + str(val_r_incl_i) + ";" +
+                     str(val_rho_host_i) + ";" + str(val_rho_incl_i) + "\n")
+            save_file.write(str_i)
+
+        save_file.write("\n")
 
     def save_mineralphase_information_in_file(self, save_file):
         if self.pysills_mode == "MA":
@@ -5946,12 +5987,15 @@ class PySILLS(tk.Frame):
                                "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
                                "END"]
                 else:
-                    if "PYPITZER SETTINGS" in loaded_lines:
+                    if ("PYPITZER SETTINGS" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)" in loaded_lines
+                            and "QUANTIFICATION SETTINGS (BORISOVA2021)" in loaded_lines):
                         strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                                   "INCLUSION SETTINGS", "PYPITZER SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                                   "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                                   "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
-                                   "END"]
+                                   "INCLUSION SETTINGS", "PYPITZER SETTINGS",
+                                   "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                                   "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)",
+                                   "QUANTIFICATION SETTINGS (HALTER2002)", "QUANTIFICATION SETTINGS (BORISOVA2021)",
+                                   "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
+                                   "EXPERIMENTAL DATA", "END"]
                     else:
                         strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
                                    "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
@@ -5965,9 +6009,12 @@ class PySILLS(tk.Frame):
                            "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
                 else:
                     strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                               "INCLUSION SETTINGS", "PYPITZER SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                               "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
+                               "INCLUSION SETTINGS", "PYPITZER SETTINGS",
+                               "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                               "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)",
+                               "QUANTIFICATION SETTINGS (HALTER2002)", "QUANTIFICATION SETTINGS (BORISOVA2021)",
+                               "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
+                               "END"]
                 self.old_file = True
 
             index_container = {}
@@ -6512,8 +6559,13 @@ class PySILLS(tk.Frame):
                 #
                 ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
                 index = 0
+                if self.without_pypitzer == False:
+                    keyword = "QUANTIFICATION SETTINGS (HALTER2002)"
+                else:
+                    keyword = "MATRIX SETTINGS"
+
                 for i in range(index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] + 1,
-                               index_container["MATRIX SETTINGS"] - 1):
+                               index_container[keyword] - 1):
                     line_data = str(loaded_lines[i].strip())
                     splitted_data = line_data.split(";")
                     #
@@ -6533,7 +6585,21 @@ class PySILLS(tk.Frame):
                             info_concentration)
                     #
                     index += 1
-                #
+
+                ## QUANTIFICATION SETTINGS (HALTER2002)
+                if self.without_pypitzer == False:
+                    for i in range(index_container["QUANTIFICATION SETTINGS (HALTER2002)"] + 1,
+                                   index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
+                        line_data = str(loaded_lines[i].strip())
+                        splitted_data = line_data.split(";")
+
+                ## QUANTIFICATION SETTINGS (BORISOVA2021)
+                if self.without_pypitzer == False:
+                    for i in range(index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] + 1,
+                                   index_container["MATRIX SETTINGS"] - 1):
+                        line_data = str(loaded_lines[i].strip())
+                        splitted_data = line_data.split(";")
+
                 ## MATRIX SETTINGS
                 for i in range(index_container["MATRIX SETTINGS"] + 1,
                                index_container["DWELL TIME SETTINGS"] - 1):
