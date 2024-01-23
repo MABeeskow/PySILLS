@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		22.01.2023
+# Date:		23.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -11891,76 +11891,79 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][filename_short]["IS"] = tk.StringVar()
 
             if filetype == "SMPL":
-                self.container_var[filetype][filename_long]["ID"] = tk.StringVar()
-                self.container_var[filetype][filename_long]["ID"].set("A")
-
-                self.container_var[filetype][filename_long]["Matrix Setup"] = {
-                    "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                    "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                    "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].set("Select IS")
-                self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
-                self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
-                self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
-                self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Name"].set("Select Element")
-                self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
+                if self.file_loaded == False:
+                    self.container_var[filetype][filename_long]["ID"] = tk.StringVar()
+                    self.container_var[filetype][filename_long]["ID"].set("A")
+                    self.container_var[filetype][filename_long]["Matrix Setup"] = {
+                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                    self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+                    self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
+                    self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Name"].set("Select Oxide")
+                    self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+                    self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Name"].set("Select Element")
+                    self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
 
                 if filename_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
-                    self.container_var["Oxides Quantification"]["Total Amounts"][filename_short] = tk.StringVar()
-                    self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].set("100.0")
+                    if self.file_loaded == False:
+                        self.container_var["Oxides Quantification"]["Total Amounts"][filename_short] = tk.StringVar()
+                        self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].set("100.0")
 
                 if self.pysills_mode != "MA":
-                    # Matrix-only Tracer
-                    if "Host Only Tracer" not in self.container_var["SMPL"][filename_long]:
-                        self.container_var["SMPL"][filename_long]["Host Only Tracer"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
-                            "Amount": tk.StringVar()}
-                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Name"].set("Select Isotope")
-                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Value"].set("0")
-                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Matrix"].set("Select Oxide")
-                        self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Amount"].set("100")
-                    # Second Internal Standard
-                    if "Second Internal Standard" not in self.container_var["SMPL"][filename_long]:
-                        self.container_var["SMPL"][filename_long]["Second Internal Standard"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar()}
-                        self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Name"].set(
-                            "Select Isotope")
-                        self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Value"].set("0")
-                    # Geometric Approach (Halter et al. 2002)
-                    if "Halter2002" not in self.container_var["SMPL"][filename_long]:
-                        self.container_var["SMPL"][filename_long]["Halter2002"] = {
-                            "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
-                            "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
-                        self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set("50.0")
-                        self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set("50.0")
-                        self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set("2700.0")
-                        self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set("1200.0")
-                        self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set("75.0")
-                        self.container_var["SMPL"][filename_long]["Halter2002"]["Name"].set("Select isotope")
-                    # Geometric Approach (Borisova et al. 2021)
-                    if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
-                        self.container_var["SMPL"][filename_long]["Borisova2021"] = {
-                            "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
-                            "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
-                        self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set("50.0")
-                        self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set("75.0")
-                        self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set("2700.0")
-                        self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set("1200.0")
-                        self.container_var["SMPL"][filename_long]["Borisova2021"]["Name"].set("Select isotope")
-                    # Melting temperatures
-                    if "Melting temperature" not in self.container_var["SMPL"][filename_long]:
-                        self.container_var["SMPL"][filename_long]["Melting temperature"] = tk.StringVar()
-                        self.container_var["SMPL"][filename_long]["Melting temperature"].set("25.0")
-                    # Last compound
-                    if "Last compound" not in self.container_var["SMPL"][filename_long]:
-                        self.container_var["SMPL"][filename_long]["Last compound"] = tk.StringVar()
-                        self.container_var["SMPL"][filename_long]["Last compound"].set("Select last solid")
-                    # Salinity
-                    if filename_short not in self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"]:
-                        self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
-                            filename_short] = tk.StringVar()
-                        self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
-                            filename_short].set("Set salinity")
+                    if self.file_loaded == False:
+                        # Matrix-only Tracer
+                        if "Host Only Tracer" not in self.container_var["SMPL"][filename_long]:
+                            self.container_var["SMPL"][filename_long]["Host Only Tracer"] = {
+                                "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
+                                "Amount": tk.StringVar()}
+                            self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Name"].set("Select Isotope")
+                            self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Value"].set("0")
+                            self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Matrix"].set("Select Oxide")
+                            self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Amount"].set("100")
+                        # Second Internal Standard
+                        if "Second Internal Standard" not in self.container_var["SMPL"][filename_long]:
+                            self.container_var["SMPL"][filename_long]["Second Internal Standard"] = {
+                                "Name": tk.StringVar(), "Value": tk.StringVar()}
+                            self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Name"].set(
+                                "Select Isotope")
+                            self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Value"].set("0")
+                        # Geometric Approach (Halter et al. 2002)
+                        if "Halter2002" not in self.container_var["SMPL"][filename_long]:
+                            self.container_var["SMPL"][filename_long]["Halter2002"] = {
+                                "a": tk.StringVar(), "b": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                                "rho(host)": tk.StringVar(), "R": tk.StringVar(), "Name": tk.StringVar()}
+                            self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set("50.0")
+                            self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set("50.0")
+                            self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set("2700.0")
+                            self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set("1200.0")
+                            self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set("75.0")
+                            self.container_var["SMPL"][filename_long]["Halter2002"]["Name"].set("Select isotope")
+                        # Geometric Approach (Borisova et al. 2021)
+                        if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
+                            self.container_var["SMPL"][filename_long]["Borisova2021"] = {
+                                "R(incl)": tk.StringVar(), "R(host)": tk.StringVar(), "rho(incl)": tk.StringVar(),
+                                "rho(host)": tk.StringVar(), "Name": tk.StringVar()}
+                            self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set("50.0")
+                            self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set("75.0")
+                            self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set("2700.0")
+                            self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set("1200.0")
+                            self.container_var["SMPL"][filename_long]["Borisova2021"]["Name"].set("Select isotope")
+                        # Melting temperatures
+                        if "Melting temperature" not in self.container_var["SMPL"][filename_long]:
+                            self.container_var["SMPL"][filename_long]["Melting temperature"] = tk.StringVar()
+                            self.container_var["SMPL"][filename_long]["Melting temperature"].set("25.0")
+                        # Last compound
+                        if "Last compound" not in self.container_var["SMPL"][filename_long]:
+                            self.container_var["SMPL"][filename_long]["Last compound"] = tk.StringVar()
+                            self.container_var["SMPL"][filename_long]["Last compound"].set("Select last solid")
+                        # Salinity
+                        if filename_short not in self.container_var[var_setting_key]["Salt Correction"][
+                            "Salinity SMPL"]:
+                            self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
+                                filename_short] = tk.StringVar()
+                            self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
+                                filename_short].set("Set salinity")
 
         if filename_short not in self.spikes_isotopes[filetype]:
             self.spikes_isotopes[filetype][filename_short] = {}
@@ -23367,9 +23370,10 @@ class PySILLS(tk.Frame):
 
                     self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
                         var_entr.get())
-                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
-                    #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
+
                     self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                    if file_smpl_short in self.container_files["SMPL"]:
+                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set(
@@ -23421,9 +23425,9 @@ class PySILLS(tk.Frame):
 
                 var_concentration_is = round(var_na_true_final, 4)
 
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
-                #self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                if file_smpl_short in self.container_files["SMPL"]:
+                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
 
     def check_file_flags(self):
         helper_flags = {"STD": {"Total": 0, "Currently": 0}, "SMPL": {"Total": 0, "Currently": 0}}
@@ -23608,9 +23612,10 @@ class PySILLS(tk.Frame):
 
                     self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
                         var_entr.get())
-                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
                     self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
                     self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                    if file_smpl_short in self.container_files["SMPL"]:
+                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].set(
@@ -23667,20 +23672,29 @@ class PySILLS(tk.Frame):
 
                 var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
 
-                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                if file_smpl_short in self.container_files["SMPL"]:
+                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
 
     def fi_set_concentration_is_massbalance(self, event):
         for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
             self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set("unknown")
-            self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(
+            self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(
                 self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].get())
+            if file_smpl_short in self.container_files["SMPL"]:
+                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(
+                    self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].get())
     #
     def fi_set_concentration_is_chargebalance(self, event):
         for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            file_smpl_long = self.container_lists["SMPL"]["Long"][index]
             self.container_var["fi_setting"]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set("unknown")
-            self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(
+            self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(
                 self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].get())
+            if file_smpl_short in self.container_files["SMPL"]:
+                self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(
+                    self.container_var["fi_setting"]["Salt Correction"]["Default Concentration"].get())
 
     def fi_pypitzer(self):
         ## Window Settings
