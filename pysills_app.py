@@ -7109,7 +7109,8 @@ class PySILLS(tk.Frame):
 
         list_files = []
         list_files.extend(self.container_lists["STD"]["Long"])
-        list_files.extend(self.container_lists["SMPL"]["Long"])
+        if self.pysills_mode == "MA" or mode == "BG":
+            list_files.extend(self.container_lists["SMPL"]["Long"])
 
         for file_long in list_files:
             if self.container_icpms["name"] != None:
@@ -7136,7 +7137,7 @@ class PySILLS(tk.Frame):
                         isotope_is = self.container_lists["Measured Elements"][file_short][element][0]
                     break
             else:
-                isotope_is = self.container_var["SMPL"][file_long]["IS Data"]["IS"].get() #self.container_var["IS"]["Default STD"].get()
+                isotope_is = self.container_var["SMPL"][file_long]["IS Data"]["IS"].get()
 
             if isotope_is == "Select IS":
                 file_dummy = file_long
@@ -7149,9 +7150,6 @@ class PySILLS(tk.Frame):
                 else:
                     df_data_dummy = DE(filename_long=file_dummy).get_measurements(
                         delimiter=",", skip_header=3, skip_footer=1)
-
-                #df_data_dummy = DE(filename_long=file_dummy).get_measurements(
-                #    delimiter=",", skip_header=3, skip_footer=1)
 
                 max_values = {"Last": 0}
                 for isotope in list(df_data_dummy.keys())[1:]:
@@ -7305,8 +7303,16 @@ class PySILLS(tk.Frame):
 
             self.autodetection_bg = True
         elif mode == "MAT":
-            self.container_var["ma_setting"]["Time MAT Start"].set("auto-detection used")
-            self.container_var["ma_setting"]["Time MAT End"].set("auto-detection used")
+            if self.pysills_mode == "MA":
+                self.container_var["ma_setting"]["Time MAT Start"].set("auto-detection used")
+                self.container_var["ma_setting"]["Time MAT End"].set("auto-detection used")
+            elif self.pysills_mode == "FI":
+                self.container_var["fi_setting"]["Time MAT Start"].set("auto-detection used")
+                self.container_var["fi_setting"]["Time MAT End"].set("auto-detection used")
+            elif self.pysills_mode == "MI":
+                self.container_var["mi_setting"]["Time MAT Start"].set("auto-detection used")
+                self.container_var["mi_setting"]["Time MAT End"].set("auto-detection used")
+
             self.autodetection_sig = True
 
         if n_loops < 1000:
@@ -9512,26 +9518,23 @@ class PySILLS(tk.Frame):
         # Build section 'Matrix Settings'
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_sample_settings(var_geometry_info=var_sample_settings)
-        # Build section 'Quantification Method'
-        var_quantification_method = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
-        self.place_quantification_method(var_geometry_info=var_quantification_method)
         # Build section 'Assemblage Setup'
-        var_assemblage_setup = {"Row start": 11, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_assemblage_setup = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
         # Build section 'Dwell Time Setup'
-        var_dwell_time_setup = {"Row start": 13, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_dwell_time_setup = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
         # Build section 'Calculation Window (Background) Setup'
-        var_calculation_window_bg_setup = {"Row start": 15, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_bg_setup = {"Row start": 12, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
         # Build section 'Calculation Window (Sample) Setup'
-        var_calculation_window_smpl_setup = {"Row start": 19, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_calculation_window_smpl_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_smpl_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 23, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 29, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 17, "Column start": 42, "N rows": 1, "N columns": 18}
@@ -10406,37 +10409,7 @@ class PySILLS(tk.Frame):
         var_category_n = var_column_n - 6
 
         if self.pysills_mode == "MA":
-            # Labels
-            lbl_04 = SE(
-                parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Quantification Method", relief=tk.FLAT, fontsize="sans 10 bold")
-
-            # Buttons
-            btn_04b = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
-                n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-            btn_04b.configure(state='disabled')
-
-            # Radiobuttons
-            rb_04a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n + 6, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=1,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Sensitivity-based (SILLS)",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_04b = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Quantification Method"], value_rb=3,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Plugin-based Methods",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_04b.configure(state="disabled")
+            pass
         else:
             if self.pysills_mode == "FI":
                 key_setting = "fi_setting"
@@ -10447,13 +10420,13 @@ class PySILLS(tk.Frame):
 
             # Labels
             lbl_04 = SE(
-                parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
-                n_columns=var_header_n, fg=self.colors_fi["Light Font"],
+                parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_columm_start,
+                n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Inclusion Settings", relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_05 = SE(
-                parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_columm_start,
-                n_rows=var_row_n, n_columns=var_header_n, fg=self.colors_fi["Light Font"],
+                parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Quantification Method", relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -10466,7 +10439,7 @@ class PySILLS(tk.Frame):
                 list_opt_incl_is_quantification = ["100 wt.% Oxides", "Custom Data", "External Calculation"]
 
             opt_02a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
                 n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_srm(
                 var_srm=self.container_var[key_setting]["Inclusion Setup Option"], text_set=str_default_inclusion_setup,
                 fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color, sort_list=False,
@@ -10488,7 +10461,7 @@ class PySILLS(tk.Frame):
                 "Geometric Approach (Halter et al. 2002)", "Geometric Approach (Borisova et al. 2021)"]
 
             opt_03a = SE(
-                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
                 n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_srm(
                 var_srm=self.container_var[key_setting]["Quantification Method Option"],
                 text_set=str_default_quantification_setup, fg_active=self.bg_colors["Dark Font"],
@@ -10524,7 +10497,7 @@ class PySILLS(tk.Frame):
         if var_opt == "Mass Balance":
             if self.bool_incl_is_massbalance == False:
                 self.btn_setup_massbalance = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10543,7 +10516,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "Charge Balance":
             if self.bool_incl_is_chargebalance == False:
                 self.btn_setup_chargebalance = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10562,7 +10535,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "PyPitzer (Liu et al. 2024)":
             if self.bool_incl_is_pypitzer == False:
                 self.btn_setup_pypitzer = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10581,7 +10554,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "Custom Data":
             if self.bool_incl_is_custom == False:
                 self.btn_setup_customdata = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10601,7 +10574,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "External Calculation":
             if self.bool_incl_is_external == False:
                 self.btn_setup_external = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10633,7 +10606,7 @@ class PySILLS(tk.Frame):
         if var_opt == "Matrix-only Tracer (SILLS)":
             if self.bool_matrixonlytracer == False:
                 self.btn_setup_matrixonlytracer = SE(
-                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10644,7 +10617,7 @@ class PySILLS(tk.Frame):
                     self.btn_setup_matrixonlytracer.grid()
                 except:
                     self.btn_setup_matrixonlytracer = SE(
-                        parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                        parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
                         n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                         bg=self.bg_colors["Light"]).create_simple_button(
                         text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10659,7 +10632,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "Second Internal Standard (SILLS)":
             if self.bool_secondinternalstandard == False:
                 self.btn_setup_secondis = SE(
-                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10676,7 +10649,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "Geometric Approach (Halter et al. 2002)":
             if self.bool_halter2002 == False:
                 self.btn_setup_halter2002 = SE(
-                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10693,7 +10666,7 @@ class PySILLS(tk.Frame):
         elif var_opt == "Geometric Approach (Borisova et al. 2021)":
             if self.bool_borisova2021 == False:
                 self.btn_setup_borisova2021 = SE(
-                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -10878,6 +10851,18 @@ class PySILLS(tk.Frame):
         """Creates and places the necessary tkinter widgets for the section: 'Calculation Window (Sample) Setup'
         Parameters:  var_geometry_info  -   contains information for the widget setup
         """
+        if self.pysills_mode == "MA":
+            var_parent = self.subwindow_ma_settings
+            var_setting_key = "ma_setting"
+            str_header = "Default Time Window (Sample)"
+        elif self.pysills_mode == "FI":
+            var_parent = self.subwindow_fi_settings
+            var_setting_key = "fi_setting"
+            str_header = "Default Time Window (Matrix)"
+        elif self.pysills_mode == "MI":
+            var_parent = self.subwindow_mi_settings
+            var_setting_key = "mi_setting"
+            str_header = "Default Time Window (Matrix)"
 
         var_row_start = var_geometry_info["Row start"]
         var_columm_start = var_geometry_info["Column start"]
@@ -10888,58 +10873,58 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_08 = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Default Time Window (Sample)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_header, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08a = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Start", relief=var_relief, fontsize="sans 10 bold")
         lbl_08b = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=var_relief, fontsize="sans 10 bold")
         lbl_08c = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
 
         # Buttons
         btn_08c = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n - 6, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n - 6, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="MAT": self.detect_signal_interval(mode))
         btn_08cd = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="MAT": self.clear_all_calculation_intervals(mode))
 
         # Entries
-        var_entr_08a_default = self.container_var["ma_setting"]["Time MAT Start"].get()
-        var_entr_08b_default = self.container_var["ma_setting"]["Time MAT End"].get()
+        var_entr_08a_default = self.container_var[var_setting_key]["Time MAT Start"].get()
+        var_entr_08b_default = self.container_var[var_setting_key]["Time MAT End"].get()
 
         entr_08a = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
-            var=self.container_var["ma_setting"]["Time MAT Start"], text_default=var_entr_08a_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT Start"], var_key="Start",
+            var=self.container_var[var_setting_key]["Time MAT Start"], text_default=var_entr_08a_default,
+            command=lambda event, var_entr=self.container_var[var_setting_key]["Time MAT Start"], var_key="Start",
                            mode="default", var_interval="MAT":
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
         entr_08b = SE(
-            parent=self.subwindow_ma_settings, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
-            var=self.container_var["ma_setting"]["Time MAT End"], text_default=var_entr_08b_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time MAT End"], var_key="End",
+            var=self.container_var[var_setting_key]["Time MAT End"], text_default=var_entr_08b_default,
+            command=lambda event, var_entr=self.container_var[var_setting_key]["Time MAT End"], var_key="End",
                            mode="default", var_interval="MAT":
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
 
@@ -14316,8 +14301,14 @@ class PySILLS(tk.Frame):
         if mode == "default":
             time = var_entr.get()
             time = time.replace(",", ".")
-            #
-            for var_type in ["STD", "SMPL"]:
+            if self.pysills_mode in ["FI", "MI"]:
+                if var_interval == "MAT":
+                    list_filetypes = ["STD"]
+                else:
+                    list_filetypes = ["STD", "SMPL"]
+            else:
+                list_filetypes = ["STD", "SMPL"]
+            for var_type in list_filetypes:
                 for var_file in self.container_lists[var_type]["Long"]:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -14336,7 +14327,6 @@ class PySILLS(tk.Frame):
                         self.container_helper[var_type][var_file_short][var_interval]["ID"] += 1
                         self.container_helper[var_type][var_file_short][var_interval]["Indices"].append(1)
 
-                    print(time)
                     x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
                     if var_key == "Start":
                         var_entr.set("Start value set!")
@@ -14379,16 +14369,16 @@ class PySILLS(tk.Frame):
                     delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
             var_file_short = var_file.split("/")[-1]
-            #
+
             if self.container_var["ma_setting"]["Calculation Interval"]["STD"][var_file_short].get() == 0:
                 var_category = "BG"
             elif self.container_var["ma_setting"]["Calculation Interval"]["STD"][var_file_short].get() == 1:
                 var_category = "MAT"
-            #
+
             time = var_entr.get()
             time = time.replace(",", ".")
             x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
-            #
+
             current_id = self.container_helper["STD"][var_file_short][var_category]["ID"]
             if var_key == "Start":
                 var_id = current_id + 1
@@ -17372,11 +17362,14 @@ class PySILLS(tk.Frame):
         # Build section 'Calculation Window (Background) Setup'
         var_calculation_window_bg_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
+        # Build section 'Calculation Window (Matrix) Setup'
+        var_calculation_window_mat_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_mat_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 24, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 27, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
