@@ -653,9 +653,9 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Time-Signal Checker"] = tk.IntVar()
             self.container_var[key_setting]["Time-Signal Checker"].set(1)
             self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-            self.container_var[key_setting]["Inclusion Intensity Calculation"].set("0")
+            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
             self.container_var[key_setting]["Inclusion Concentration Calculation"] = tk.IntVar()
-            self.container_var[key_setting]["Inclusion Concentration Calculation"].set("0")
+            self.container_var[key_setting]["Inclusion Concentration Calculation"].set(0)
             #
             for key, item in self.container_var[key_setting]["Inclusion Plugin"].items():
                 item.set(1)
@@ -5137,15 +5137,26 @@ class PySILLS(tk.Frame):
                         report_concentration_incl[var_key][isotope] = round(value_mean, n_digits)
                         #
                         # Concentration Matrix
+                        if var_filetype == "STD":
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
                         value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
                         value_mean = self.container_concentration[var_filetype][var_datatype]["MAT"][isotope]
                         #
                         n_digits = 5
-                        #
-                        report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-                        report_concentration_mat[var_key][isotope] = round(value_mean, n_digits)
+
+                        if var_filetype == "SMPL":
+                            report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+                            report_concentration_mat[var_key][isotope] = round(value_mean, n_digits)
+                        else:
+                            if var_srm_i == var_srm_file:
+                                report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_i, n_digits)
+                            else:
+                                report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = "undefined"
+                            report_concentration_mat[var_key][isotope] = round(value_mean, n_digits)
                         #
                         # Concentration Mixed
                         if var_filetype == "SMPL":
@@ -5267,14 +5278,35 @@ class PySILLS(tk.Frame):
                         # Analytical Sensitivity
                         value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
-                        value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
-                        #
+
+                        if var_filetype == "STD" and index == 0:
+                            helper_std = {}
+                            helper_std[isotope] = []
+                            var_srm_i = self.container_var["SRM"][isotope].get()
+                            for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+                                filename_long = self.container_lists["STD"]["Long"][index]
+                                var_srm_file = self.container_var["STD"][filename_long]["SRM"].get()
+                                if var_srm_file == var_srm_i:
+                                    value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                        filename_short]["MAT"][isotope]
+                                    helper_std[isotope].append(value_i)
+                            value_mean = np.nanmean(helper_std[isotope])
+
+                        if var_filetype == "SMPL":
+                            value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
+
                         n_digits = 5
-                        #
-                        report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-                        report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
+                        if value_i != None:
+                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+                        else:
+                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "undefined"
+                        if value_mean != None:
+                            report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_digits)
+                        else:
+                            report_analytical_sensitivity[var_key][isotope] = "undefined"
+
                         # Normalized Sensitivity
                         value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
@@ -6569,9 +6601,13 @@ class PySILLS(tk.Frame):
                     if index == 0:
                         self.container_var["fi_setting"]["Quantification Method"] = tk.IntVar()
                         self.container_var["fi_setting"]["Quantification Method"].set(splitted_data[1])
-                        try:
-                            self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(splitted_data[2])
-                        except:
+
+                        if "Inclusion Intensity Calculation" not in self.container_var["fi_setting"]:
+                            self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
+                        if len(splitted_data) == 3:
+                            self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(
+                                int(splitted_data[2]))
+                        else:
                             self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(0)
                     else:
                         info_file = splitted_data[0]
@@ -6605,9 +6641,13 @@ class PySILLS(tk.Frame):
                     if index == 0:
                         self.container_var["fi_setting"]["Quantification Method"] = tk.IntVar()
                         self.container_var["fi_setting"]["Quantification Method"].set(splitted_data[1])
-                        try:
-                            self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(splitted_data[2])
-                        except:
+
+                        if "Inclusion Intensity Calculation" not in self.container_var["fi_setting"]:
+                            self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
+                        if len(splitted_data) == 3:
+                            self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(
+                                int(splitted_data[2]))
+                        else:
                             self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(0)
                     else:
                         info_file = splitted_data[0]
@@ -6631,7 +6671,9 @@ class PySILLS(tk.Frame):
                         splitted_data = line_data.split(";")
 
                         if index == 0:
-                            val_method = splitted_data[1]
+                            val_method = int(splitted_data[1])
+                            if "Inclusion Intensity Calculation" not in self.container_var["fi_setting"]:
+                                self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
                             self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(val_method)
                         else:
                             filename_short = splitted_data[0]
@@ -6642,13 +6684,17 @@ class PySILLS(tk.Frame):
                             val_rho_host_i = splitted_data[3]
                             val_rho_incl_i = splitted_data[4]
                             val_r_i = splitted_data[5]
+                            if "Halter2002" not in self.container_var["SMPL"][filename_long]:
+                                self.container_var["SMPL"][filename_long]["Halter2002"] = {
+                                    "a": tk.StringVar(), "b": tk.StringVar(), "rho(host)": tk.StringVar(),
+                                    "rho(incl)": tk.StringVar(), "R": tk.StringVar()}
                             self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set(val_a_i)
                             self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set(val_b_i)
                             self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set(val_rho_host_i)
                             self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set(val_rho_incl_i)
                             self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set(val_r_i)
 
-                            index += 1
+                        index += 1
 
                 ## QUANTIFICATION SETTINGS (BORISOVA2021)
                 index = 0
@@ -6659,7 +6705,9 @@ class PySILLS(tk.Frame):
                         splitted_data = line_data.split(";")
 
                         if index == 0:
-                            val_method = splitted_data[1]
+                            val_method = int(splitted_data[1])
+                            if "Inclusion Intensity Calculation" not in self.container_var["fi_setting"]:
+                                self.container_var["fi_setting"]["Inclusion Intensity Calculation"] = tk.IntVar()
                             self.container_var["fi_setting"]["Inclusion Intensity Calculation"].set(val_method)
                         else:
                             filename_short = splitted_data[0]
@@ -6669,12 +6717,16 @@ class PySILLS(tk.Frame):
                             val_r_incl_i = splitted_data[2]
                             val_rho_host_i = splitted_data[3]
                             val_rho_incl_i = splitted_data[4]
+                            if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
+                                self.container_var["SMPL"][filename_long]["Borisova2021"] = {
+                                    "R(host)": tk.StringVar(), "R(incl)": tk.StringVar(), "rho(host)": tk.StringVar(),
+                                    "rho(incl)": tk.StringVar()}
                             self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set(val_r_host_i)
                             self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set(val_r_incl_i)
                             self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set(val_rho_host_i)
                             self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set(val_rho_incl_i)
 
-                            index += 1
+                        index += 1
 
                 ## MATRIX SETTINGS
                 for i in range(index_container["MATRIX SETTINGS"] + 1,
@@ -6746,6 +6798,7 @@ class PySILLS(tk.Frame):
                             #
                             key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
                             key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
+
                             helper_times = [float(key_times.group(1)), float(key_times.group(3))]
                             helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
                             helper_times.sort()
@@ -15529,6 +15582,7 @@ class PySILLS(tk.Frame):
                             var_result_i = 0.0
                         self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                             isotope] = var_result_i
+
                         if var_is_smpl != None:
                             var_result_is = 1.0
                             self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
