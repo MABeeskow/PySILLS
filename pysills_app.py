@@ -5686,7 +5686,7 @@ class PySILLS(tk.Frame):
         info_method = self.container_var["fi_setting"]["Quantification Method"].get()
         info_method_incl = self.container_var["fi_setting"]["Inclusion Intensity Calculation"].get()
 
-        str_method = str("Method") + ";" + str(info_method) + ";" + str(info_method_incl) +  "\n"
+        str_method = str("Method") + ";" + str(info_method) + ";" + str(info_method_incl) + "\n"
         save_file.write(str_method)
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
