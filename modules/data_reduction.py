@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		19.12.2023
+# Date:		25.01.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -262,11 +262,13 @@ class IntensityQuantification:
                 if focus == "BG":
                     # Background
                     helper_bg = []
+                    helper_bg_2 = []
                     helper_bg_sigma = []
                     for index, interval in interval_bg.items():
                         start_index = interval[0]
                         end_index = interval[1] + 1
                         dataset = self.dataframe[isotope][data_key][start_index:end_index]
+                        helper_bg_2.extend(dataset)
 
                         if stack_intervals == False:
                             if average_type == "arithmetic mean":
@@ -281,11 +283,15 @@ class IntensityQuantification:
                         helper_bg_sigma.append(np.std(helper_bg, ddof=1)/np.sqrt(len(helper_bg)))
 
                     if average_type == "arithmetic mean":
-                        result_bg = np.mean(helper_bg)
-                        result_bg_1sigma = np.mean(helper_bg_sigma)
+                        #result_bg = np.mean(helper_bg)
+                        result_bg = np.mean(helper_bg_2)
+                        #result_bg_1sigma = np.mean(helper_bg_sigma)
+                        result_bg_1sigma = np.mean(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
                     else:
-                        result_bg = np.median(helper_bg)
-                        result_bg_1sigma = np.median(helper_bg_sigma)
+                        #result_bg = np.median(helper_bg)
+                        result_bg = np.median(helper_bg_2)
+                        #result_bg_1sigma = np.median(helper_bg_sigma)
+                        result_bg_1sigma = np.median(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
 
                     helper_results[isotope]["uncorrected"]["BG"] = result_bg
                     helper_results[isotope]["uncorrected"]["1 SIGMA BG"] = result_bg_1sigma
@@ -296,16 +302,19 @@ class IntensityQuantification:
                     # Mineral/Matrix Signal
                     helper_mat = []
                     helper_mat_sigma = []
+                    helper_mat_2 = []
                     for index, interval in interval_min.items():
                         start_index = interval[0]
                         end_index = interval[1] + 1
                         dataset = self.dataframe[isotope][data_key][start_index:end_index]
+                        helper_mat_2.extend(dataset)
 
                         if stack_intervals == False:
                             if average_type == "arithmetic mean":
                                 helper_mat.append(np.mean(dataset))
                             else:
                                 helper_mat.append(np.median(dataset))
+                            helper_mat_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
                             helper_mat_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
                         else:
                             helper_mat.extend(dataset)
@@ -314,11 +323,15 @@ class IntensityQuantification:
                         helper_mat_sigma.append(np.std(helper_mat, ddof=1)/np.sqrt(len(helper_mat)))
 
                     if average_type == "arithmetic mean":
-                        result_mat = np.mean(helper_mat)
-                        result_mat_1sigma = np.mean(helper_mat_sigma)
+                        #result_mat = np.mean(helper_mat)
+                        result_mat = np.mean(helper_mat_2)
+                        #result_mat_1sigma = np.mean(helper_mat_sigma)
+                        result_mat_1sigma = np.mean(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
                     else:
-                        result_mat = np.median(helper_mat)
-                        result_mat_1sigma = np.median(helper_mat_sigma)
+                        #result_mat = np.median(helper_mat)
+                        result_mat = np.median(helper_mat_2)
+                        #result_mat_1sigma = np.median(helper_mat_sigma)
+                        result_mat_1sigma = np.median(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
 
                     helper_results[isotope]["uncorrected"]["MAT"] = result_mat
                     helper_results[isotope]["uncorrected"]["1 SIGMA MAT"] = result_mat_1sigma
@@ -329,11 +342,13 @@ class IntensityQuantification:
                 elif focus == "INCL":
                     # Inclusion Signal
                     helper_incl = []
+                    helper_incl_2 = []
                     helper_incl_sigma = []
                     for index, interval in interval_incl.items():
                         start_index = interval[0]
                         end_index = interval[1] + 1
                         dataset = self.dataframe[isotope][data_key][start_index:end_index]
+                        helper_incl_2.extend(dataset)
 
                         if stack_intervals == False:
                             if average_type == "arithmetic mean":
@@ -348,11 +363,15 @@ class IntensityQuantification:
                         helper_incl_sigma.append(np.std(helper_incl, ddof=1)/np.sqrt(len(helper_incl)))
 
                     if average_type == "arithmetic mean":
-                        result_incl = np.mean(helper_incl)
-                        result_incl_1sigma = np.mean(helper_incl_sigma)
+                        # result_incl = np.mean(helper_incl)
+                        # result_incl_1sigma = np.mean(helper_incl_sigma)
+                        result_incl = np.mean(helper_incl_2)
+                        result_incl_1sigma = np.mean(np.std(helper_incl_2, ddof=1)/np.sqrt(len(helper_incl_2)))
                     else:
-                        result_incl = np.median(helper_incl)
-                        result_incl_1sigma = np.median(helper_incl_sigma)
+                        # result_incl = np.median(helper_incl)
+                        # result_incl_1sigma = np.median(helper_incl_sigma)
+                        result_incl = np.median(helper_incl_2)
+                        result_incl_1sigma = np.median(np.std(helper_incl_2, ddof=1)/np.sqrt(len(helper_incl_2)))
 
                     helper_results[isotope]["uncorrected"]["INCL"] = result_incl
                     helper_results[isotope]["uncorrected"]["1 SIGMA INCL"] = result_incl_1sigma
