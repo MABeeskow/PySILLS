@@ -5581,7 +5581,7 @@ class PySILLS(tk.Frame):
                 info_totalamount = "100.0"
 
             str_smpl = (str(filename_short) + ";" + str(info_is) + ";" + str(info_assemblage) + ";" + str(info_cb_state)
-                        + ";" + str(info_sign_color) + ";" + str(info_acquisition) + ";" + str(info_oxide)  + ";"
+                        + ";" + str(info_sign_color) + ";" + str(info_acquisition) + ";" + str(info_oxide) + ";"
                         + str(info_totalamount))
 
             str_smpl += "\n"
@@ -6458,6 +6458,9 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][var_file_long]["IS Data"]["SMOOTHED"]["IS"].set("Select IS")
                     self.container_var["SMPL"][var_file_long]["IS Data"]["SMOOTHED"]["Concentration"].set("0.0")
 
+                    self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short] = tk.StringVar()
+                    #self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"]
+
                     self.lb_smpl.insert(tk.END, str(var_file_short))
                     self.list_smpl.append(var_file_long)
                     self.container_lists["SMPL"]["Long"].append(var_file_long)
@@ -6473,6 +6476,9 @@ class PySILLS(tk.Frame):
                         self.container_var["SMPL"][var_file_long]["Sign Color"].set(self.sign_red)
 
                     self.container_var["acquisition times"]["SMPL"][var_file_short].set(splitted_data_smpl[5])
+
+                    self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short].set(
+                        splitted_data_smpl[7])
 
                     try:
                         self.container_var["SMPL"][var_file_long]["Last compound"].set(splitted_data_smpl[8])
