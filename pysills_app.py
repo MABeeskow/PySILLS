@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		23.01.2023
+# Date:		24.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -23754,8 +23754,12 @@ class PySILLS(tk.Frame):
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                             file_smpl_short]["MAT"][isotope]
-                                    var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*(
-                                            1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
+                                    try:
+                                        var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*(
+                                                1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
+                                    except:
+                                        print("Error Mass Balance:", var_weight_sum, var_intensity_i, var_intensity_na,
+                                              var_sensitivity_i, molar_mass_salt, molar_mass_element)
                         else:
                             var_na_true_base *= 1
 
