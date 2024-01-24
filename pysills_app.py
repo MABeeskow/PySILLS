@@ -17404,23 +17404,33 @@ class PySILLS(tk.Frame):
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
             self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-            #
         else:
             self.fi_select_srm_initialization()
-        #
+
         for filetype in ["STD", "SMPL"]:
             if self.container_var["Spike Elimination"][filetype]["State"] == True:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
-                    #
                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
 
-        self.build_srm_database()
         self.file_system_need_update = False
 
         self.select_opt_inclusion_is_quantification(var_opt="Mass Balance", dict_geometry_info=var_quantification_method)
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
+
+        if self.demo_mode == True:
+            for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
+                if index in [2, 3, 6, 7]:
+                    self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
+
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["IS Data"]["IS"].set("Na23")
+
+            self.container_var["SRM"]["Cl35"].set("Scapolite 17")
+            self.container_var["SRM"]["Br81"].set("Scapolite 17")
+
+        self.build_srm_database()
 
 ########################################################################################################################
 ### MELT INCLUSIONS ####################################################################################################
