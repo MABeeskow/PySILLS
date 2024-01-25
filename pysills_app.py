@@ -9622,6 +9622,12 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
 
+        for filetype in ["STD", "SMPL"]:
+            if self.container_var["Spike Elimination"][filetype]["State"] == True:
+                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
+                    var_method = "Grubbs"
+                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+
         if self.file_loaded == True:
             if self.container_var["Spike Elimination"]["STD"]["State"] == True:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
