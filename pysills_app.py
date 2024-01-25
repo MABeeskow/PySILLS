@@ -24178,19 +24178,21 @@ class PySILLS(tk.Frame):
         vsb_cations.pack(side="right", fill="y")
         text_cations.pack(side="left", fill="both", expand=True)
 
-        #self.temp_checkbuttons_pypitzer = {}
-        #self.helper_checkbuttons = {"Isotopes": {}, "On": [], "Off": []}
         list_anions = []
         for var_cation in self.container_lists["Measured Elements"]["All"]:
             if var_cation not in ["Cl", "S", "Br", "I"]:
                 if var_cation == "Na":
                     if var_cation not in self.temp_checkbuttons_pypitzer:
                         self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=1)
-                        self.container_lists["Selected Cations"].append(var_cation)
-                        self.container_lists["Possible Cations"].append(var_cation)
+                        if var_cation not in self.container_lists["Selected Cations"]:
+                            self.container_lists["Selected Cations"].append(var_cation)
+                        if var_cation not in self.container_lists["Possible Cations"]:
+                            self.container_lists["Possible Cations"].append(var_cation)
                 else:
                     if var_cation not in self.temp_checkbuttons_pypitzer:
                         self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=0)
+                        if var_cation in self.container_lists["Selected Cations"]:
+                            self.temp_checkbuttons_pypitzer[var_cation] = tk.IntVar(value=1)
 
                 if var_cation in ["Na", "K", "Mg", "Ca", "Fe", "Cs", "Sr"]:
                     if var_cation not in self.container_lists["Possible Cations"]:
@@ -24216,8 +24218,12 @@ class PySILLS(tk.Frame):
         text_anions.pack(side="left", fill="both", expand=True)
 
         for var_anion in list_anions:
-            if var_anion not in self.temp_checkbuttons_pypitzer:
+            if var_anion == "Cl":
                 self.temp_checkbuttons_pypitzer[var_anion] = tk.IntVar(value=1)
+            if var_anion not in self.temp_checkbuttons_pypitzer:
+                self.temp_checkbuttons_pypitzer[var_anion] = tk.IntVar(value=0)
+                if var_anion in self.container_lists["Selected Anions"]:
+                    self.temp_checkbuttons_pypitzer[var_anion] = tk.IntVar(value=1)
 
             if var_anion == "S":
                 var_anion_ext = "S (SO4-2)"
@@ -24232,8 +24238,10 @@ class PySILLS(tk.Frame):
                 text_anions.insert("end", "\n")
 
                 if var_anion != "Cl":
-                    self.container_lists["Selected Anions"].append(var_anion)
-                    self.container_lists["Possible Anions"].append(var_anion)
+                    if var_anion not in self.container_lists["Selected Anions"]:
+                        self.container_lists["Selected Anions"].append(var_anion)
+                    if var_anion not in self.container_lists["Possible Anions"]:
+                        self.container_lists["Possible Anions"].append(var_anion)
 
                 if var_anion == "Cl":
                     cb_i.configure(state="disabled")
@@ -24257,10 +24265,16 @@ class PySILLS(tk.Frame):
                 if element_i != "Cl":
                     if element_i in ["Na", "S"]:
                         if element_i not in self.helper_checkbuttons["Isotopes"]:
-                            self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=1)
+                            self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=0)
+                            if (element_i in self.container_lists["Selected Cations"] or
+                                    element_i in self.container_lists["Selected Anions"]):
+                                self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=1)
                     else:
                         if element_i not in self.helper_checkbuttons["Isotopes"]:
                             self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=0)
+                            if (element_i in self.container_lists["Selected Cations"] or
+                                    element_i in self.container_lists["Selected Anions"]):
+                                self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=1)
 
                     cb_i = tk.Checkbutton(
                         master=frm_isotopes, text=var_isotope, fg=self.bg_colors["Dark Font"],
@@ -24390,6 +24404,8 @@ class PySILLS(tk.Frame):
             "FeSO4-H2O", "FeSO4-7H2O"]
 
         self.dict_species_helper = {}
+        print(self.container_lists["Selected Cations"])
+        print(self.container_lists["Selected Anions"])
         for cation in self.container_lists["Selected Cations"]:
             if cation in ["Li", "Na", "K", "Rb", "Cs"]:
                 self.dict_species_helper[cation] = cation+"+"
@@ -24561,7 +24577,11 @@ class PySILLS(tk.Frame):
 
         for element, ion in self.dict_species_helper.items():
             helper_ratios[element] = {}
-            list_isotopes = dict_chemistry[element]
+            if element in dict_chemistry:
+                list_isotopes = dict_chemistry[element]
+            else:
+                continue
+
 
             for isotope in list_isotopes:
                 key_element_i = re.search("(\D+)(\d+)", isotope)
