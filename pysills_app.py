@@ -403,6 +403,8 @@ class PySILLS(tk.Frame):
 
         self.file_system_need_update = True
         self.pypitzer_performed = False
+        self.initialization_run_std = True
+        self.initialization_run_smpl = True
 
         self.bool_incl_is_massbalance = False
         self.bool_incl_is_chargebalance = False
@@ -9534,7 +9536,7 @@ class PySILLS(tk.Frame):
         window_width = 1220
         window_heigth = 950
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
@@ -9542,23 +9544,23 @@ class PySILLS(tk.Frame):
 
         str_title_window = self.language_dict["MINERAL ANALYSIS - Setup"][self.var_language]
         self.subwindow_ma_settings = tk.Toplevel(self.parent)
-        self.subwindow_ma_settings.title("MINERAL ANALYSIS - Setup")
+        self.subwindow_ma_settings.title(str_title_window)
         self.subwindow_ma_settings.geometry(var_geometry)
         self.subwindow_ma_settings.resizable(False, False)
         self.subwindow_ma_settings["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_ma_settings, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_ma_settings, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_ma_settings.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_ma_settings.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ## INITIALIZATION
         for isotope in self.container_lists["ISOTOPES"]:
             key_element = re.search("(\D+)(\d+)", isotope)
@@ -11718,18 +11720,34 @@ class PySILLS(tk.Frame):
             parts = file_std.split("/")
             file_std_short = parts[-1]
 
-            # Assigns isotopic signal intensity and time data for every standard/srm file
-            df_isotopes, times_std_i = self.assign_time_and_isotopic_data(filetype="STD", filename_long=file_std)
-            # Creates all necessary variables that are related to the standard files
-            self.build_all_needed_variables(filetype="STD", filename_long=file_std, filename_short=file_std_short)
+            if self.initialization_run_std == True:
+                # Assigns isotopic signal intensity and time data for every standard/srm file
+                df_isotopes, times_std_i = self.assign_time_and_isotopic_data(filetype="STD", filename_long=file_std)
 
-            for isotope in df_isotopes:
-                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
+                for isotope in df_isotopes:
+                    if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                        self.container_lists["Measured Isotopes"]["All"].append(isotope)
 
-            if file_std_short not in self.container_measurements["EDITED"]:
-                self.container_measurements["EDITED"][file_std_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+                if file_std_short not in self.container_measurements["EDITED"]:
+                    self.container_measurements["EDITED"][file_std_short] = {}
+                    self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
+                # Creates all necessary variables that are related to the standard files
+                self.build_all_needed_variables(filetype="STD", filename_long=file_std, filename_short=file_std_short)
+
+                if file_std not in self.container_var["SRM"]:
+                    self.container_var["SRM"][file_std] = tk.StringVar()
+                    self.container_var["SRM"][file_std].set("Select SRM")
+
+            if index == len(self.container_lists["STD"]["Long"]) - 1:
+                self.initialization_run_std = False
+
+            # for isotope in df_isotopes:
+            #     if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+            #         self.container_lists["Measured Isotopes"]["All"].append(isotope)
+
+            # if file_std_short not in self.container_measurements["EDITED"]:
+            #     self.container_measurements["EDITED"][file_std_short] = {}
+            #     self.container_measurements["EDITED"]["Time"] = times_std_i.tolist()
 
             if self.container_flags["STD"]["Initialization"] == False:
                 self.container_flags["STD"][file_std_short] = {
@@ -11840,9 +11858,9 @@ class PySILLS(tk.Frame):
             #     self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][isotope] = {
             #         "RAW": None, "SMOOTHED": None}
 
-            if file_std not in self.container_var["SRM"]:
-                self.container_var["SRM"][file_std] = tk.StringVar()
-                self.container_var["SRM"][file_std].set("Select SRM")
+            # if file_std not in self.container_var["SRM"]:
+            #     self.container_var["SRM"][file_std] = tk.StringVar()
+            #     self.container_var["SRM"][file_std].set("Select SRM")
 
             # if file_std_short not in self.container_files["STD"]:
             #     self.container_files["STD"][file_std_short] = {}
@@ -11931,7 +11949,8 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][file_std_short]["SRM"].set(var_text)
 
             opt_srm_i = tk.OptionMenu(
-                frm_files, self.container_var["STD"][file_std]["SRM"], *np.sort(self.container_lists["SRM Library"]),
+                frm_files, self.container_var["STD"][file_std]["SRM"],
+                *np.sort(self.container_lists["SRM Library"]),
                 command=lambda var_opt=self.container_var["STD"][file_std]["SRM"], var_indiv=file_std, mode="STD":
                 self.fi_change_srm_individual(var_opt, var_indiv, mode))
             opt_srm_i["menu"].config(
@@ -12247,22 +12266,34 @@ class PySILLS(tk.Frame):
             parts = file_smpl.split("/")
             file_smpl_short = parts[-1]
 
-            # Assigns isotopic signal intensity and time data for every sample file
-            df_isotopes, times_smpl_i = self.assign_time_and_isotopic_data(filetype="SMPL", filename_long=file_smpl)
-            # Creates all necessary variables that are related to the sample files
-            self.build_all_needed_variables(filetype="SMPL", filename_long=file_smpl, filename_short=file_smpl_short)
+            if self.initialization_run_smpl == True:
+                # Assigns isotopic signal intensity and time data for every sample file
+                df_isotopes, times_smpl_i = self.assign_time_and_isotopic_data(filetype="SMPL", filename_long=file_smpl)
+
+                for isotope in df_isotopes:
+                    if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                        self.container_lists["Measured Isotopes"]["All"].append(isotope)
+
+                if file_smpl_short not in self.container_measurements["EDITED"]:
+                    self.container_measurements["EDITED"][file_smpl_short] = {}
+                    self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
+                # Creates all necessary variables that are related to the sample files
+                self.build_all_needed_variables(filetype="SMPL", filename_long=file_smpl, filename_short=file_smpl_short)
+
+            if index == len(self.container_lists["SMPL"]["Long"]) - 1:
+                self.initialization_run_smpl = False
 
             # if file_smpl_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
             #     self.container_var["Oxides Quantification"]["Total Amounts"][file_smpl_short] = tk.StringVar()
             #     self.container_var["Oxides Quantification"]["Total Amounts"][file_smpl_short].set("100.0")
 
-            for isotope in df_isotopes:
-                if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                    self.container_lists["Measured Isotopes"]["All"].append(isotope)
-
-            if file_smpl_short not in self.container_measurements["EDITED"]:
-                self.container_measurements["EDITED"][file_smpl_short] = {}
-                self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
+            # for isotope in df_isotopes:
+            #     if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+            #         self.container_lists["Measured Isotopes"]["All"].append(isotope)
+            #
+            # if file_smpl_short not in self.container_measurements["EDITED"]:
+            #     self.container_measurements["EDITED"][file_smpl_short] = {}
+            #     self.container_measurements["EDITED"]["Time"] = times_smpl_i.tolist()
 
             if self.container_flags["SMPL"]["Initialization"] == False:
                 self.container_flags["SMPL"][file_smpl_short] = {
