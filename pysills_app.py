@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		25.01.2023
+# Date:		26.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -7433,14 +7433,14 @@ class PySILLS(tk.Frame):
                     self.srm_isotopes[isotope]["Concentration"] = self.srm_actual[var_srm][var_element]
                 else:
                     self.srm_isotopes[isotope]["Concentration"] = 0.0
-        #
+
         ## Window Settings
         window_issetup = tk.Toplevel(self.parent)
         window_issetup.title("Check-Up - Internal Standard Setup")
         window_issetup.geometry("420x450+0+0")
         window_issetup.resizable(False, False)
         window_issetup["bg"] = self.bg_colors["Super Dark"]
-        #
+
         if self.pysills_mode == "MA":
             accent_bg = self.colors_ma["Dark"]
             accent_fg = self.colors_ma["Light Font"]
@@ -7453,42 +7453,42 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "OA":
             accent_bg = self.bg_colors["Dark"]
             accent_fg = self.bg_colors["Light Font"]
-        #
+
         window_width = 420
         window_heigth = 450
         row_min = 25
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(window_issetup, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(window_issetup, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             window_issetup.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             window_issetup.grid_columnconfigure(i, minsize=column_min)
-        #
+
         if len(self.gui_subwindows["Mineral Analysis"]["Check IS"]["Label"]["Permanent"]) > 0:
             gui_elements = ["Label", "Entry", "Option Menu"]
             #
             for gui_element in gui_elements:
                 self.gui_subwindows["Mineral Analysis"]["Check IS"][gui_element]["Permanent"].clear()
-        #
+
         if len(self.gui_subwindows["Mineral Analysis"]["Check IS"]["Label"]["Permanent"]) == 0:
             ## LABELS
             lbl_header_smpl = SE(
                 parent=window_issetup, row_id=0, column_id=0, n_rows=1,
                 n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Internal Standard Setup", relief=tk.FLAT, fontsize="sans 10 bold")
-            #
+
             self.gui_subwindows["Mineral Analysis"]["Check IS"]["Label"]["Permanent"].extend(
                 [lbl_header_smpl])
-            #
+
             frm_iso = SE(
                 parent=window_issetup, row_id=1, column_id=0, n_rows=15, n_columns=20, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Very Light"]).create_frame()
@@ -7498,7 +7498,7 @@ class PySILLS(tk.Frame):
             vsb_iso.config(command=text_iso.yview)
             vsb_iso.pack(side="right", fill="y")
             text_iso.pack(side="left", fill="both", expand=True)
-            #
+
             for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
                 file = self.container_lists["SMPL"]["Long"][index]
 
@@ -7542,14 +7542,14 @@ class PySILLS(tk.Frame):
                 var_text_smpl = self.container_var["IS"]["Default SMPL"].get()
             else:
                 var_text_smpl = "Select IS"
-            #
+
             opt_smpl_def = SE(
                 parent=window_issetup, row_id=16, column_id=8, n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_option_isotope(
                 var_iso=self.container_var["IS"]["Default SMPL"], option_list=var_list_is,
                 text_set=var_text_smpl, fg_active=self.green_dark, bg_active=self.red_dark,
                 command=lambda var_is=self.container_var["IS"]["Default SMPL"]: self.change_is_setup(var_is))
-            #
+
             self.gui_subwindows["Mineral Analysis"]["Check IS"]["Option Menu"]["Permanent"].append(opt_smpl_def)
             #
             ## Entry
@@ -12743,7 +12743,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_entr_is_default = "1000000"
             elif var_key in ["experiments", "custom"]:  # Experimental Data Selection
-                var_list_is = list_possible_elements #self.container_lists["ISOTOPES"]
+                var_list_is = list_possible_elements
                 var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"]
                 if self.pysills_mode == "MA":
                     var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
@@ -12759,7 +12759,10 @@ class PySILLS(tk.Frame):
                     var_entr_i_default = "100.0"
 
                 if self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get() != "1000000":
-                    var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
+                    if self.pysills_mode == "MA":
+                        var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
+                    else:
+                        var_entr_is_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].get()
                 else:
                     var_entr_is_default = "1000000"
 
@@ -13029,9 +13032,15 @@ class PySILLS(tk.Frame):
     def ma_change_is_concentration(self, var_entr, var_file, state_default, event):
         if state_default == True:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
-                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_entr.get())
+                if self.pysills_mode == "MA":
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_entr.get())
+                else:
+                    self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set(var_entr.get())
         else:
-            self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].set(var_entr.get())
+            if self.pysills_mode == "MA":
+                self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].set(var_entr.get())
+            else:
+                self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Concentration"].set(var_entr.get())
     #
     ####################################################################################################################
     #
@@ -24652,9 +24661,14 @@ class PySILLS(tk.Frame):
         n_rows = int(window_heigth/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
+        if self.bool_incl_is_custom == True:
+            str_title = "FLUID INCLUSION ANALYSIS - Custom Data Setup"
+        else:
+            str_title = "FLUID INCLUSION ANALYSIS - Plugin-based Inclusion Setup"
+
         subwindow_fi_inclusion_plugin = tk.Toplevel(self.parent)
-        subwindow_fi_inclusion_plugin.title("FLUID INCLUSION ANALYSIS -  Plugin-based Inclusion Setup")
+        subwindow_fi_inclusion_plugin.title(str_title)
         subwindow_fi_inclusion_plugin.geometry(var_geometry)
         subwindow_fi_inclusion_plugin.resizable(False, False)
         subwindow_fi_inclusion_plugin["bg"] = self.bg_colors["Super Dark"]
@@ -24685,6 +24699,10 @@ class PySILLS(tk.Frame):
                 n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
         else:
+            lbl_02 = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 22, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Default Settings", relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -24749,6 +24767,35 @@ class PySILLS(tk.Frame):
                 n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text="Import Data", bg_active=self.accent_color, fg_active=self.colors_fi["Dark Font"],
                 command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
+
+            # OPTION MENU
+            opt_05a = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column + 22,
+                n_rows=1, n_columns=10, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=self.container_var["fi_setting"]["Salt Correction"]["Default IS"],
+                option_list=self.container_lists["ISOTOPES"],
+                text_set=self.container_var["fi_setting"]["Salt Correction"]["Default IS"].get(),
+                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                command=lambda var_opt=self.container_var["fi_setting"]["Salt Correction"]["Default IS"],
+                               var_key="SMPL":
+                self.fi_change_is_default(var_opt, var_key))
+            opt_05a["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_05a.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
+
+            # ENTRY
+            entr_04a = SE(
+                parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column + 22, n_rows=1,
+                n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+                var=self.container_var["IS SMPL Default"], text_default=self.container_var["IS SMPL Default"].get(),
+                command=lambda event, var_entr=self.container_var["IS SMPL Default"]:
+                self.change_is_value_default(var_entr, event))
 
         if self.str_incl_is_custom_external == "External":
             ## TREEVIEWS
