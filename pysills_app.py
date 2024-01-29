@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		26.01.2023
+# Date:		29.01.2023
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -10247,6 +10247,9 @@ class PySILLS(tk.Frame):
                 self.container_lists["Selected Oxides"]["All"].remove(var_oxide)
 
     def oxides_setup_files(self):
+        """ Definition of the file-specific settings that are necessary for a 100 wt.-% calculation.
+        Parameters:  -
+        """
         # Window Settings
         window_width = 760
         window_height = 425
@@ -10290,6 +10293,8 @@ class PySILLS(tk.Frame):
         var_row_n = 1
         var_header_n = 8
 
+        # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
         # LABELS
         lbl_01 = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=var_columm_start,
@@ -10307,10 +10312,15 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Import data from file", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 4, column_id=3*var_header_n + 1,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 7, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Select Reference Element", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_04 = SE(
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=3*var_header_n + 1,
+            n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Default amount of reference oxide", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # ENTRIES
         var_entr_default = tk.StringVar()
@@ -10323,6 +10333,16 @@ class PySILLS(tk.Frame):
         entr_02a.bind(
             "<Return>", lambda event, var_entr=var_entr_default: self.change_total_oxides_amount(var_entr, event))
 
+        var_entr_03_default = tk.StringVar()
+        var_entr_03_default.set("100.0")
+        entr_03a = SE(
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 6, column_id=3*var_header_n + 1,
+            n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_03_default, text_default=var_entr_03_default.get())
+        entr_03a.bind(
+            "<Return>", lambda event, var_entr=var_entr_03_default: self.change_reference_oxide_amount(var_entr, event))
+
         # BUTTONS
         btn_03a = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 3, column_id=3*var_header_n + 1,
@@ -10333,7 +10353,7 @@ class PySILLS(tk.Frame):
         # OPTION MENUS
         list_opt04a = sorted(self.container_lists["Selected Oxides"]["All"])
         opt_04a = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=3*var_header_n + 1,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 8, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var[var_setting_key]["Oxide"],
@@ -10350,7 +10370,7 @@ class PySILLS(tk.Frame):
 
 
         self.opt_02b = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 6, column_id=3*var_header_n + 1,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 9, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["IS"]["Default SMPL"],
@@ -10393,11 +10413,17 @@ class PySILLS(tk.Frame):
             frm_tv, text="Total amount of oxides (wt.%)", bg=self.bg_colors["Very Light"],
             fg=self.bg_colors["Dark Font"])
         text_tv.window_create("end", window=lbl_i)
+        text_tv.insert("end", "\t")
+        lbl_i = tk.Label(
+            frm_tv, text="Reference oxide amount (wt.%)", bg=self.bg_colors["Very Light"],
+            fg=self.bg_colors["Dark Font"])
+        text_tv.window_create("end", window=lbl_i)
         text_tv.insert("end", "\n")
 
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
-            self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+            if len(self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].get()) == 0:
+                self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
             lbl_i = tk.Label(
                 frm_tv, text=filename_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_tv.window_create("end", window=lbl_i)
@@ -10446,7 +10472,18 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
                 highlightbackground=self.bg_colors["Very Light"])
             text_tv.window_create("insert", window=entr_i)
+            text_tv.insert("end", "\t")
+
+            entr_i = tk.Entry(
+                frm_tv, textvariable=self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"][
+                    "Concentration"], fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                highlightbackground=self.bg_colors["Very Light"])
+            text_tv.window_create("insert", window=entr_i)
             text_tv.insert("end", "\n")
+
+    def change_reference_oxide_amount(self, var_entr, event):
+        for filename_long in self.container_lists["SMPL"]["Long"]:
+            self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set(var_entr.get())
 
     def change_total_oxides_amount(self, var_entr, event):
         for filename_short in self.container_lists["SMPL"]["Short"]:
@@ -12978,8 +13015,6 @@ class PySILLS(tk.Frame):
                                     "Concentration"].get()))/100
                                 is_concentration = round(list_fraction[element]*10**6, 4)
                                 self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
-                                #self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(round(
-                                #    oxide_weight*is_concentration, 4))
                                 var_entr_is_i.set(round(oxide_weight*is_concentration, 4))
 
                         if self.container_var["IS"]["Default STD"].get() == "Select IS":
@@ -15635,6 +15670,8 @@ class PySILLS(tk.Frame):
                     var_ref_oxide = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].get()
                     conversion_factor_ref = self.conversion_factors[var_ref_oxide]
                     conversion_factor_to_ppm = 10**6
+                    amount_reference_oxide = float(
+                        self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Concentration"].get())/100
                     amount_total_oxides = float(
                         self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short].get())/100
                     lower_term = 1
@@ -15652,7 +15689,8 @@ class PySILLS(tk.Frame):
                     var_amount_ref = 1/lower_term
                     var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
                                              conversion_factor_to_ppm)
-                    var_concentration_ref = var_amount_ref*conversion_factor_to_ppm
+                    # var_concentration_ref = var_amount_ref*conversion_factor_to_ppm
+                    var_concentration_ref = amount_reference_oxide*var_concentration_ref
                     max_amount_ref = self.maximum_amounts[ref_element]
 
                     if var_concentration_ref <= max_amount_ref:
