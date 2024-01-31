@@ -13822,6 +13822,11 @@ class PySILLS(tk.Frame):
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
 
+        if str_filetype == "STD":
+            self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
+        elif str_filetype == "SMPL":
+            self.index_file_smpl = self.container_lists[str_filetype]["Long"].index(str_filename_long)
+
         if bool_checkup_mode == True:
             if str_filetype == "STD":
                 str_filename_long = self.ma_current_file_std
@@ -13836,7 +13841,7 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1060
-        window_heigth = 750
+        window_heigth = 800
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
@@ -13867,7 +13872,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
         frm_00 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 8,
+            parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 10,
             n_columns=n_columns - 11, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
             relief=tk.SOLID)
 
@@ -13921,6 +13926,16 @@ class PySILLS(tk.Frame):
             text="Remove Interval", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_remove_interval(var_type, var_file_short))
+        btn_05a = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Previous file", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
+            command=lambda filetype=str_filetype, mode="back": self.switch_to_another_file(filetype, mode))
+        btn_05b = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=7, n_rows=2, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Next file", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
+            command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
         btn_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
@@ -14084,7 +14099,7 @@ class PySILLS(tk.Frame):
 
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=6,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=8,
             n_columns=13, fg=self.bg_colors["Dark Font"],
             bg=self.colors_intervals["BG LB"]).create_simple_listbox_grid(
             include_scrb_x=False)
@@ -14092,7 +14107,7 @@ class PySILLS(tk.Frame):
 
         ## MATRIX INTERVAL
         lb_mat, scrollbar_mat_y = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=6,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=8,
             n_columns=13, fg=self.bg_colors["Dark Font"],
             bg=self.colors_intervals["MAT LB"]).create_simple_listbox_grid(include_scrb_x=False)
         self.container_helper[str_filetype][var_filename_short]["MAT"]["Listbox"] = lb_mat
@@ -14100,6 +14115,38 @@ class PySILLS(tk.Frame):
         ## INITIALIZATION
 
         self.ma_show_time_signal_diagram(var_file=str_filename_long, var_filetype=str_filetype)
+
+    def switch_to_another_file(self, filetype, mode):
+        if filetype == "STD":
+            if mode == "next":
+                self.index_file_std += 1
+                if self.index_file_std >= len(self.container_lists[filetype]["Long"]):
+                    self.index_file_std = 0
+            elif mode == "back":
+                self.index_file_std -= 1
+                if self.index_file_std <= 0:
+                    self.index_file_std = len(self.container_lists[filetype]["Long"]) - 1
+            filename_long = self.container_lists[filetype]["Long"][self.index_file_std]
+        elif filetype == "SMPL":
+            if mode == "next":
+                self.index_file_smpl += 1
+                if self.index_file_smpl >= len(self.container_lists[filetype]["Long"]):
+                    self.index_file_smpl = 0
+            elif mode == "back":
+                self.index_file_smpl -= 1
+                if self.index_file_smpl <= 0:
+                    self.index_file_smpl = len(self.container_lists[filetype]["Long"]) - 1
+            filename_long = self.container_lists[filetype]["Long"][self.index_file_smpl]
+
+        if self.pysills_mode == "MA":
+            self.subwindow_ma_checkfile.destroy()
+            self.ma_check_specific_file(var_filename_long=filename_long, var_filetype=filetype, checkup_mode=False)
+        elif self.pysills_mode == "FI":
+            self.subwindow_fi_checkfile.destroy()
+            self.fi_check_specific_file(var_file=filename_long, var_type=filetype, checkup_mode=False)
+        elif self.pysills_mode == "MI":
+            self.subwindow_fi_checkfile.destroy()
+            self.fi_check_specific_file(var_file=filename_long, var_type=filetype, checkup_mode=False)
 
     def confirm_specific_file_setup(self, var_parent, var_type, var_file_long):
         self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
@@ -22110,6 +22157,11 @@ class PySILLS(tk.Frame):
         str_filename_long = var_file
         str_filetype = var_type
 
+        if str_filetype == "STD":
+            self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
+        elif str_filetype == "SMPL":
+            self.index_file_smpl = self.container_lists[str_filetype]["Long"].index(str_filename_long)
+
         if checkup_mode == True:
             if str_filetype == "STD":
                 str_filename_long = self.fi_current_file_std
@@ -22123,7 +22175,7 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1060
-        window_heigth = 750
+        window_heigth = 800
         var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
@@ -22154,7 +22206,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
         frm_00 = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 8,
+            parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 10,
             n_columns=n_columns - 11, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
             relief=tk.SOLID)
 
@@ -22203,9 +22255,19 @@ class PySILLS(tk.Frame):
             text="Remove Interval", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_remove_interval(var_type, var_file_short))
+        btn_05a = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Previous file", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
+            command=lambda filetype=str_filetype, mode="back": self.switch_to_another_file(filetype, mode))
+        btn_05b = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 28, column_id=7, n_rows=2, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Next file", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
+            command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
         btn_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Medium"]).create_simple_button(
+            fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Confirm and Update \nData", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=lambda var_parent=self.subwindow_fi_checkfile, var_type=str_filetype,
                            var_file_long=str_filename_long:
@@ -22386,21 +22448,21 @@ class PySILLS(tk.Frame):
 
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=6,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=8,
             n_columns=13, fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["BG LB"]).create_simple_listbox_grid(
             include_scrb_x=False)
         self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"] = lb_bg
 
         ## MATRIX INTERVAL
         lb_mat, scrollbar_mat_y = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=6,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=8,
             n_columns=13, fg=self.bg_colors["Dark Font"],
             bg=self.colors_intervals["MAT LB"]).create_simple_listbox_grid(include_scrb_x=False)
         self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"] = lb_mat
 
         ## INCLUSION INTERVAL
         lb_incl, scrollbar_incl_y = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 40, n_rows=6,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column + 40, n_rows=8,
             n_columns=13, fg=self.bg_colors["Dark Font"],
             bg=self.colors_intervals["INCL LB"]).create_simple_listbox_grid(include_scrb_x=False)
         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"] = lb_incl
