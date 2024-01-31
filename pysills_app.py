@@ -227,24 +227,21 @@ class PySILLS(tk.Frame):
             self.container_var[category] = {}
             for subcategory in subcategories:
                 self.container_var[category][subcategory] = []
-        self.container_var["SRM"] = {}
-        self.container_var["SRM"]["default"] = [tk.StringVar(), tk.StringVar()]
+        self.container_var["SRM"] = {"default": [tk.StringVar(), tk.StringVar()]}
         for variable in self.container_var["SRM"]["default"]:
             variable.set("Select SRM")
-        self.container_var["isotopes"] = {}
-        self.container_var["isotopes"]["default"] = tk.StringVar()
+        self.container_var["isotopes"] = {"default": tk.StringVar()}
         self.container_var["acquisition times"] = {"STD": {}, "SMPL": {}}
         self.container_var["mineral"] = tk.StringVar()
         self.container_var["mineral"].set("Select Mineral")
         self.container_var["srm_window"] = {}
-        self.container_var["srm_window"]["Option Menu"] = {"SRM": tk.StringVar(), "Mineral": tk.StringVar()}
-        self.container_var["srm_window"]["Entry"] = {}
+        self.container_var["srm_window"]["Option Menu"] = {
+            "SRM": tk.StringVar(), "Mineral": tk.StringVar(), "Entry": {}}
         self.container_var["ma_setting"] = {}
         self.container_var["ma_datareduction_isotopes"] = {}
         self.container_var["ma_datareduction_files"] = {}
         self.container_var["fi_setting"] = []
         self.container_var["mi_setting"] = []
-        self.container_var["settings"] = {}
         self.container_var["fi_setting"] = {}
         self.container_var["fi_datareduction_isotopes"] = {}
         self.container_var["fi_datareduction_files"] = {}
@@ -312,62 +309,47 @@ class PySILLS(tk.Frame):
         self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
         self.container_var["Detailed Data Analysis"]["Concentration Results"].set("Select Parameter")
 
-        self.container_var["General Settings"] = {}                                 # General Settings
-        self.container_var["General Settings"]["Language"] = tk.StringVar()
+        self.container_var["General Settings"] = {
+            "Language": tk.StringVar(), "Default Author": tk.StringVar(), "Default SRM": tk.StringVar(),
+            "Colormap": tk.StringVar(), "Line width": tk.StringVar(), "File type": tk.StringVar(),
+            "Delimiter": tk.StringVar(), "Default IS MA": tk.StringVar(), "Default IS FI": tk.StringVar(),
+            "Default IS MI": tk.StringVar(), "Accuracy Intensity": tk.IntVar(), "Accuracy Sensitivity": tk.IntVar(),
+            "Accuracy Concentration": tk.IntVar(), "Sensitivity Drift": tk.IntVar(), "LOD Selection": tk.IntVar(),
+            "Desired Average": tk.IntVar(), "Interval Processing": tk.IntVar(), "BG Offset Start": tk.IntVar(),
+            "BG Offset End": tk.IntVar(), "MAT Offset Start": tk.IntVar(), "MAT Offset End": tk.IntVar(),
+            "Calculation Accuracy": tk.IntVar()}
         self.container_var["General Settings"]["Language"].set("English")
-        self.container_var["General Settings"]["Default Author"] = tk.StringVar()
         self.container_var["General Settings"]["Default Author"].set("J. Doe")
-        self.container_var["General Settings"]["Default SRM"] = tk.StringVar()
         self.container_var["General Settings"]["Default SRM"].set("Select SRM")
-        self.container_var["General Settings"]["Colormap"] = tk.StringVar()
         self.container_var["General Settings"]["Colormap"].set("turbo")
-        self.container_var["General Settings"]["Line width"] = tk.StringVar()
         self.container_var["General Settings"]["Line width"].set("1.0")
-        self.container_var["General Settings"]["File type"] = tk.StringVar()
         self.container_var["General Settings"]["File type"].set("*.csv")
-        self.container_var["General Settings"]["Delimiter"] = tk.StringVar()
         self.container_var["General Settings"]["Delimiter"].set("semicolon")
-        self.container_var["General Settings"]["Default IS MA"] = tk.StringVar()
         self.container_var["General Settings"]["Default IS MA"].set("Select IS")
-        self.container_var["General Settings"]["Default IS FI"] = tk.StringVar()
         self.container_var["General Settings"]["Default IS FI"].set("Select IS")
-        self.container_var["General Settings"]["Default IS MI"] = tk.StringVar()
         self.container_var["General Settings"]["Default IS MI"].set("Select IS")
-        self.container_var["General Settings"]["Accuracy Intensity"] = tk.IntVar()
         self.container_var["General Settings"]["Accuracy Intensity"].set(6)
-        self.container_var["General Settings"]["Accuracy Sensitivity"] = tk.IntVar()
         self.container_var["General Settings"]["Accuracy Sensitivity"].set(4)
-        self.container_var["General Settings"]["Accuracy Concentration"] = tk.IntVar()
         self.container_var["General Settings"]["Accuracy Concentration"].set(4)
-        self.container_var["General Settings"]["Sensitivity Drift"] = tk.IntVar()
         self.container_var["General Settings"]["Sensitivity Drift"].set(0)
-        self.container_var["General Settings"]["LOD Selection"] = tk.IntVar()
         self.container_var["General Settings"]["LOD Selection"].set(0)
-        self.container_var["General Settings"]["Desired Average"] = tk.IntVar()
         self.container_var["General Settings"]["Desired Average"].set(1)
-        self.container_var["General Settings"]["Interval Processing"] = tk.IntVar()
         self.container_var["General Settings"]["Interval Processing"].set(1)
-        self.container_var["General Settings"]["BG Offset Start"] = tk.IntVar()
         self.container_var["General Settings"]["BG Offset Start"].set(15)
-        self.container_var["General Settings"]["BG Offset End"] = tk.IntVar()
         self.container_var["General Settings"]["BG Offset End"].set(15)
-        self.container_var["General Settings"]["MAT Offset Start"] = tk.IntVar()
         self.container_var["General Settings"]["MAT Offset Start"].set(15)
-        self.container_var["General Settings"]["MAT Offset End"] = tk.IntVar()
         self.container_var["General Settings"]["MAT Offset End"].set(15)
-        self.container_var["General Settings"]["Calculation Accuracy"] = tk.IntVar()
         self.container_var["General Settings"]["Calculation Accuracy"].set(1)
+
         self.container_var["Plotting"] = {"MA": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
                                           "FI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
                                           "MI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}}}
         self.container_var["Subwindows"] = {"MA": {}, "FI": {}, "MI": {}}
-        self.container_var["Spike Elimination Check"] = {}
-        self.container_var["Spike Elimination Check"]["RB Value STD"] = tk.IntVar()
+
+        self.container_var["Spike Elimination Check"] = {"RB Value STD": tk.IntVar(), "RB Value SMPL": tk.IntVar()}
         self.container_var["Spike Elimination Check"]["RB Value STD"].set(1)
-        self.container_var["Spike Elimination Check"]["RB Value SMPL"] = tk.IntVar()
         self.container_var["Spike Elimination Check"]["RB Value SMPL"].set(1)
-        self.container_var["Geothermometry"] = {}
-        self.container_var["Geothermometry"]["Titanium in Quartz"] = tk.IntVar()
+        self.container_var["Geothermometry"] = {"Titanium in Quartz": tk.IntVar()}
         self.container_var["Geothermometry"]["Titanium in Quartz"].set(0)
         #
         self.container_var["Spike Elimination"] = {"STD": {"State": False}, "SMPL": {"State": False}}
@@ -465,20 +447,16 @@ class PySILLS(tk.Frame):
         self.rb_report.set(0)
 
         ## MINERAL ANALYSIS
-        self.container_var["settings"]["Time BG Start"] = tk.StringVar()
+        self.container_var["settings"] = {
+            "Time BG Start": tk.StringVar(), "Time BG End": tk.StringVar(), "Time SIG Start": tk.StringVar(),
+            "Time SIG End": tk.StringVar(), "Author": tk.StringVar(), "Source ID": tk.StringVar(),
+            "IS Concentration": tk.StringVar(), "SE Alpha": tk.StringVar()}
         self.container_var["settings"]["Time BG Start"].set("Set start time")
-        self.container_var["settings"]["Time BG End"] = tk.StringVar()
         self.container_var["settings"]["Time BG End"].set("Set end time")
-        self.container_var["settings"]["Time SIG Start"] = tk.StringVar()
         self.container_var["settings"]["Time SIG Start"].set("Set start time")
-        self.container_var["settings"]["Time SIG End"] = tk.StringVar()
         self.container_var["settings"]["Time SIG End"].set("Set end time")
-        self.container_var["settings"]["Author"] = tk.StringVar()
-        self.container_var["settings"]["Source ID"] = tk.StringVar()
         self.container_var["settings"]["Source ID"].set("RUR01")
-        self.container_var["settings"]["IS Concentration"] = tk.StringVar()
         self.container_var["settings"]["IS Concentration"].set("0.0")
-        self.container_var["settings"]["SE Alpha"] = tk.StringVar()
         self.container_var["settings"]["SE Alpha"].set("0.05")
         #
         self.container_var["ma_setting"]["Data Type Plot"] = {"STD": {}, "SMPL": {}}
@@ -1188,20 +1166,20 @@ class PySILLS(tk.Frame):
         self.create_srm_data_list()
         #
         window_width = var_window_width
-        window_heigth = var_window_height
+        window_height = var_window_height
         row_min = 25
         row_min = int(var_window_height/40)
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         column_min = int(var_window_width/90)
         n_columns = int(window_width/column_min)
         row_min = 25
         self.n_rows = 38
-        window_heigth = int(row_min*self.n_rows)
+        window_height = int(row_min*self.n_rows)
         column_min = 20
         self.n_columns = 22
         window_width = int(column_min*self.n_columns)
-        var_geometry = str(window_width)+"x"+str(window_heigth)+"+0+0"
+        var_geometry = str(window_width)+"x"+str(window_height)+"+0+0"
         self.parent.geometry(var_geometry)
         #
         for x in range(n_columns):
@@ -1522,10 +1500,10 @@ class PySILLS(tk.Frame):
         """Window for the ICP-MS file setup."""
         ## Window Settings
         window_width = 340
-        window_heigth = 200
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 200
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -1548,30 +1526,30 @@ class PySILLS(tk.Frame):
             self.subwindow_icpms_setup.grid_columnconfigure(i, minsize=column_min)
 
         var_row_start = 0
-        var_columm_start = 0
+        var_column_start = 0
         var_header_n = 16
         int_category_n = 8
 
         # LABELS
         lbl_01 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="ICP-MS File Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Name", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Line of Timestamp", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Skip Header", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Skip Footer", relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -1582,22 +1560,22 @@ class PySILLS(tk.Frame):
         current_val_skipfooter = self.container_var["ICP-MS Info"]["skipfooter"].get()
 
         entr_002 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_columm_start + int_category_n,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_column_start + int_category_n,
             n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ICP-MS Info"]["name"], text_default=current_val_name)
         entr_002 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_columm_start + int_category_n,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_column_start + int_category_n,
             n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ICP-MS Info"]["timestamp"], text_default=current_val_timestamp)
         entr_002 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_columm_start + int_category_n,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_column_start + int_category_n,
             n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ICP-MS Info"]["skipheader"], text_default=current_val_skipheader)
         entr_002 = SE(
-            parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_columm_start + int_category_n,
+            parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_column_start + int_category_n,
             n_rows=1, n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["ICP-MS Info"]["skipfooter"], text_default=current_val_skipfooter)
@@ -1605,14 +1583,14 @@ class PySILLS(tk.Frame):
         # BUTTONS
         btn_02 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
-            column_id=var_columm_start + (var_header_n - int_category_n), n_rows=1,
+            column_id=var_column_start + (var_header_n - int_category_n), n_rows=1,
             n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
             bg=self.accent_color).create_simple_button(
             text="Confirm Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.confirm_icpms_settings)
         btn_002 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
-            column_id=var_columm_start, n_rows=1,
+            column_id=var_column_start, n_rows=1,
             n_columns=(var_header_n - int_category_n), fg=self.bg_colors["Dark Font"],
             bg=self.accent_color).create_simple_button(
             text="Save ICP-MS Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -1644,7 +1622,7 @@ class PySILLS(tk.Frame):
         path = os.getcwd()
 
         if self.file_loaded == False:
-            if self.demo_mode == True:
+            if self.demo_mode:
                 try:
                     var_instrument_raw = var_opt.get()
                 except:
@@ -2347,9 +2325,9 @@ class PySILLS(tk.Frame):
             warning_is["bg"] = self.green_light
             #
             window_width = 250
-            window_heigth = 100
+            window_height = 100
             row_min = 25
-            n_rows = int(window_heigth / row_min)
+            n_rows = int(window_height / row_min)
             column_min = 20
             n_columns = int(window_width / column_min)
             #
@@ -2431,9 +2409,9 @@ class PySILLS(tk.Frame):
             warning_is["bg"] = self.green_light
             #
             window_width = 250
-            window_heigth = 100
+            window_height = 100
             row_min = 25
-            n_rows = int(window_heigth / row_min)
+            n_rows = int(window_height / row_min)
             column_min = 20
             n_columns = int(window_width / column_min)
             #
@@ -2510,8 +2488,8 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1000
-        window_heigth = 700
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 700
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_quickplotter = tk.Toplevel(self.parent)
         subwindow_quickplotter.title("Quick Plotter")
@@ -2520,7 +2498,7 @@ class PySILLS(tk.Frame):
         subwindow_quickplotter["bg"] = self.bg_colors["Very Light"]
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -2711,7 +2689,7 @@ class PySILLS(tk.Frame):
                                                                     relief=tk.GROOVE, fontsize="sans 10 bold")
         self.container_elements["SRM"]["Label"].append(lbl_srm_03)
         #
-        if default == True:
+        if default:
             for file in self.list_std:
                 parts = file.split("/")
                 self.container_var["SRM"][file].set(var_srm)
@@ -3367,7 +3345,7 @@ class PySILLS(tk.Frame):
                     if element == key.group(1):
                         possible_is.append(isotope)
 
-            if fluidinclusion == True:
+            if fluidinclusion:
                 list_fluidchemistry = ["H", "Na", "Mg", "Ca", "K", "Cl", "F", "Br", "I", "At"]
                 for element in list_fluidchemistry:
                     for isotope in self.container_lists["ISOTOPES"]:
@@ -3931,7 +3909,7 @@ class PySILLS(tk.Frame):
 
                 file_isotopes = self.container_lists["Measured Isotopes"][file_std]
                 for isotope in file_isotopes:
-                    if bool(self.spikes_isotopes[filetype][file_std]) == True:
+                    if bool(self.spikes_isotopes[filetype][file_std]):
                         for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_std].items():
                             #
                             if isotope_spiked not in self.container_spikes["Selection"][file_std]:
@@ -4015,7 +3993,7 @@ class PySILLS(tk.Frame):
                 df_isotopes = list_names
 
                 for isotope in df_isotopes:
-                    if bool(self.spikes_isotopes[filetype][file_smpl]) == True:
+                    if bool(self.spikes_isotopes[filetype][file_smpl]):
                         for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_smpl].items():
                             #
                             if isotope_spiked not in self.container_spikes["Selection"][file_smpl]:
@@ -6361,7 +6339,7 @@ class PySILLS(tk.Frame):
                     #
                 ## SPIKE ELIMINATION
                 index = 0
-                if self.old_file == True:
+                if self.old_file:
                     final_line = index_container["END"] - 1
                 else:
                     final_line = index_container["EXPERIMENTAL DATA"] - 1
@@ -6908,7 +6886,7 @@ class PySILLS(tk.Frame):
                 #
                 ## SPIKE ELIMINATION
                 index = 0
-                if self.old_file == True:
+                if self.old_file:
                     final_line = index_container["END"] - 1
                 else:
                     final_line = index_container["EXPERIMENTAL DATA"] - 1
@@ -7456,7 +7434,7 @@ class PySILLS(tk.Frame):
                 #
                 ## SPIKE ELIMINATION
                 index = 0
-                if self.old_file == True:
+                if self.old_file:
                     final_line = index_container["END"] - 1
                 else:
                     final_line = index_container["EXPERIMENTAL DATA"] - 1
@@ -7693,9 +7671,9 @@ class PySILLS(tk.Frame):
         window_dwell["bg"] = self.bg_colors["Super Dark"]
         #
         window_width = 300
-        window_heigth = 450
+        window_height = 450
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -7969,8 +7947,8 @@ class PySILLS(tk.Frame):
                     self.container_var[key_setting]["Time BG End"].set("auto-detection used")
                 else:
                     if n_loops == 1000:
-                        self.container_var[key_setting]["Time BG Start"].set("auto-detection not successfull")
-                        self.container_var[key_setting]["Time BG End"].set("auto-detection not successfull")
+                        self.container_var[key_setting]["Time BG Start"].set("auto-detection not successful")
+                        self.container_var[key_setting]["Time BG End"].set("auto-detection not successful")
                     else:
                         self.container_var[key_setting]["Time BG Start"].set("auto-detection used")
                         self.container_var[key_setting]["Time BG End"].set("auto-detection used")
@@ -8065,9 +8043,9 @@ class PySILLS(tk.Frame):
             accent_fg = self.bg_colors["Light Font"]
 
         window_width = 420
-        window_heigth = 450
+        window_height = 450
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -8218,8 +8196,8 @@ class PySILLS(tk.Frame):
     def srm_window(self):
         ## Window Settings
         window_width = 860
-        window_heigth = 625
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 625
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         window_srm = tk.Toplevel(self.parent)
         window_srm.title("SRM and Mineral Composition Data")
@@ -8228,7 +8206,7 @@ class PySILLS(tk.Frame):
         window_srm["bg"] = self.green_light
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -8386,8 +8364,8 @@ class PySILLS(tk.Frame):
     def subwindow_general_settings(self):
         ## Window Settings
         window_width = 980
-        window_heigth = 375
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 375
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_generalsettings = tk.Toplevel(self.parent)
         subwindow_generalsettings.title("General Settings")
@@ -8396,7 +8374,7 @@ class PySILLS(tk.Frame):
         subwindow_generalsettings["bg"] = self.bg_colors["Super Dark"]
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -8723,8 +8701,8 @@ class PySILLS(tk.Frame):
     def check_srm_settings(self):
         ## Window Settings
         window_width = 640
-        window_heigth = 575
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 575
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         subwindow_srm_checkup = tk.Toplevel(self.parent)
         subwindow_srm_checkup.title("Check-Up - Standard Reference Material")
@@ -8733,7 +8711,7 @@ class PySILLS(tk.Frame):
         subwindow_srm_checkup["bg"] = self.bg_colors["Very Dark"]
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -8846,8 +8824,8 @@ class PySILLS(tk.Frame):
     def check_interval_settings(self):
         ## Window Settings
         window_width = 1080
-        window_heigth = 825
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 825
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         subwindow_intervals = tk.Toplevel(self.parent)
         subwindow_intervals.title("Check-Up - Calculation Intervals")
@@ -8856,7 +8834,7 @@ class PySILLS(tk.Frame):
         subwindow_intervals["bg"] = self.bg_colors["Very Dark"]
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -9119,8 +9097,8 @@ class PySILLS(tk.Frame):
     def check_acquisition_times(self):
         ## Window Settings
         window_width = 520
-        window_heigth = 825
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 825
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_aquisition_times = tk.Toplevel(self.parent)
         subwindow_aquisition_times.title("Check-Up - Acquisition  Times")
@@ -9129,7 +9107,7 @@ class PySILLS(tk.Frame):
         subwindow_aquisition_times["bg"] = self.bg_colors["Very Dark"]
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -9390,8 +9368,8 @@ class PySILLS(tk.Frame):
     def check_imported_files(self):
         ## Window Settings
         window_width = 1080
-        window_heigth = 825
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 825
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         subwindow_imported_files = tk.Toplevel(self.parent)
         subwindow_imported_files.title("Check-Up - Imported Files")
@@ -9400,7 +9378,7 @@ class PySILLS(tk.Frame):
         subwindow_imported_files["bg"] = self.bg_colors["Very Dark"]
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -9799,10 +9777,10 @@ class PySILLS(tk.Frame):
         """Main window of additional analysis tools for a mineral analysis project."""
         ## Window Settings
         window_width = 520
-        window_heigth = 400
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -9825,7 +9803,7 @@ class PySILLS(tk.Frame):
             self.subwindow_ma_extras.grid_columnconfigure(i, minsize=column_min)
 
         var_row_start = 0
-        var_columm_start = 0
+        var_column_start = 0
         var_header_n = 12
         int_category_n = 8
 
@@ -9883,31 +9861,31 @@ class PySILLS(tk.Frame):
 
         # LABELS
         lbl_01 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Geothermometry", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_columm_start + var_header_n + 1,
+            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_column_start + var_header_n + 1,
             n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Geochronology", relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_001 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Ti-in-Quartz", relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_002 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_columm_start + var_header_n + 1,
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start + var_header_n + 1,
             n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="U-Pb Dating", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
         btn_001 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_columm_start + int_category_n,
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start + int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -9915,7 +9893,7 @@ class PySILLS(tk.Frame):
 
         btn_002 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1,
-            column_id=var_columm_start + var_header_n + 1 + int_category_n, n_rows=1,
+            column_id=var_column_start + var_header_n + 1 + int_category_n, n_rows=1,
             n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
@@ -9924,10 +9902,10 @@ class PySILLS(tk.Frame):
         """Window for the Titanium-in-Quartz thermometry."""
         ## Window Settings
         window_width = 800
-        window_heigth = 400
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -9950,26 +9928,26 @@ class PySILLS(tk.Frame):
             self.subwindow_geothermometry_ti_in_qz.grid_columnconfigure(i, minsize=column_min)
 
         var_row_start = 0
-        var_columm_start = 0
+        var_column_start = 0
         var_header_n = 12
         int_category_n = 12
 
         # LABELS
         lbl_01 = SE(
-            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start, column_id=var_columm_start, n_rows=1,
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Titanium-in-Quartz Thermometry", relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_02 = SE(
-            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 6, column_id=var_columm_start,
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 6, column_id=var_column_start,
             n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Additional Settings", relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_03 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start,
-            column_id=var_columm_start + var_header_n + 1, n_rows=1, n_columns=var_header_n + 14,
+            column_id=var_column_start + var_header_n + 1, n_rows=1, n_columns=var_header_n + 14,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Results", relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -9986,7 +9964,7 @@ class PySILLS(tk.Frame):
 
         # RADIOBUTTONS
         rb_001 = SE(
-            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 1, column_id=var_columm_start,
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 1, column_id=var_column_start,
             n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Geothermometry"]["Titanium in Quartz"], value_rb=0,
@@ -9996,7 +9974,7 @@ class PySILLS(tk.Frame):
         ## TREEVIEW
         self.tv_results_ti_in_qz = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 1,
-            column_id=var_columm_start + var_header_n + 1, n_rows=14, n_columns=var_header_n + 14,
+            column_id=var_column_start + var_header_n + 1, n_rows=14, n_columns=var_header_n + 14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
             n_categories=5, text_n=["Filename", "Data Type", "C(ppm)", "T(°C)", "T(K)"],
             width_n=["150", "100", "90", "90", "90"], individual=True)
@@ -10045,11 +10023,11 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
-        if self.file_system_need_update == True:
+        if self.file_system_need_update:
             path = os.getcwd()
             parent = os.path.dirname(path)
 
-            if self.demo_mode == True:
+            if self.demo_mode:
                 self.var_opt_icp.set("Agilent 7900s")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
                 ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
@@ -10076,7 +10054,7 @@ class PySILLS(tk.Frame):
                 if file_std not in self.container_lists["STD"]["Long"]:
                     self.container_lists["STD"]["Long"].append(file_std)
                     self.container_lists["STD"]["Short"].append(file_parts[-1])
-                if self.demo_mode == True:
+                if self.demo_mode:
                     self.lb_std.insert(tk.END, file_parts[-1])
 
                 for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
@@ -10088,7 +10066,7 @@ class PySILLS(tk.Frame):
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
                     self.container_lists["SMPL"]["Long"].append(file_smpl)
                     self.container_lists["SMPL"]["Short"].append(file_parts[-1])
-                if self.demo_mode == True:
+                if self.demo_mode:
                     self.lb_smpl.insert(tk.END, file_parts[-1])
 
             for file_std in self.list_std:
@@ -10199,11 +10177,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1220
-        window_heigth = 950
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 950
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -10285,17 +10263,17 @@ class PySILLS(tk.Frame):
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
 
         for filetype in ["STD", "SMPL"]:
-            if self.container_var["Spike Elimination"][filetype]["State"] == True:
+            if self.container_var["Spike Elimination"][filetype]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
 
-        if self.file_loaded == True:
-            if self.container_var["Spike Elimination"]["STD"]["State"] == True:
+        if self.file_loaded:
+            if self.container_var["Spike Elimination"]["STD"]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                 self.spike_elimination_all(filetype="STD", algorithm=var_method)
-            if self.container_var["Spike Elimination"]["SMPL"]["State"] == True:
+            if self.container_var["Spike Elimination"]["SMPL"]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
@@ -10322,7 +10300,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -10334,16 +10312,16 @@ class PySILLS(tk.Frame):
         str_lbl_03 = self.language_dict["Source ID"][self.var_language]
 
         lbl_01 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -10377,7 +10355,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -10389,17 +10367,17 @@ class PySILLS(tk.Frame):
         str_lbl_03 = self.language_dict["Isotopes"][self.var_language]
 
         lbl_02 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02b = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
@@ -10476,7 +10454,7 @@ class PySILLS(tk.Frame):
             str_btn_01 = self.language_dict["Setup"][self.var_language]
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -10484,7 +10462,7 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_03 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
@@ -10502,7 +10480,7 @@ class PySILLS(tk.Frame):
         list_methods = ["Internal Standard", "100 wt.% Oxides"]
 
         opt_03a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["Quantification Mineral"]["Method"], option_list=list_methods,
@@ -10562,7 +10540,7 @@ class PySILLS(tk.Frame):
             str_method = "100 wt.% Oxides"
 
         var_row_start = 0
-        var_columm_start = 0
+        var_column_start = 0
         var_row_n = 1
         var_header_n = 11
 
@@ -10577,42 +10555,42 @@ class PySILLS(tk.Frame):
             str_btn_01 = self.language_dict["Setup"][self.var_language]
 
             lbl_01 = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_columm_start,
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
             # RADIOBUTTONS
             rb_01a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
-                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_02,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01b = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 2,
-                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_03,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01c = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 4,
-                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_04,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01d = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 5,
-                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_05,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01e = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 3,
-                column_id=var_columm_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=5,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_06,
@@ -10632,14 +10610,14 @@ class PySILLS(tk.Frame):
             str_btn_02 = self.language_dict["File-specific Setup"][self.var_language]
 
             lbl_01 = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_columm_start,
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
             # BUTTONS
             btn_01a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
-                column_id=var_columm_start, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                column_id=var_column_start, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.oxides_setup_composition)
@@ -10690,13 +10668,13 @@ class PySILLS(tk.Frame):
             self.subwindow_oxides_composition.grid_columnconfigure(i, minsize=column_min)
 
         var_row_start = 0
-        var_columm_start = 1
+        var_column_start = 1
         var_row_n = 1
         var_header_n = 8
 
         # FRAMES
         frm_01 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=19,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_column_start, n_rows=19,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
         frm_02 = SE(
@@ -10718,12 +10696,12 @@ class PySILLS(tk.Frame):
 
         # LABELS
         lbl_01 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start, column_id=var_columm_start,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start, column_id=var_column_start,
             n_rows=var_row_n, n_columns=4*var_header_n + 3, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Select all present elements and their oxides", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_columm_start,
+            parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_column_start,
             n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Dark"]).create_simple_label(
             text="Rock-forming Elements", relief=tk.FLAT, fontsize="sans 10 bold")
@@ -10795,7 +10773,7 @@ class PySILLS(tk.Frame):
         for index, oxide in enumerate(list_major_oxides):
             cb_002a = SE(
                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-                column_id=var_columm_start, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
+                column_id=var_column_start, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var["Oxides Quantification"]["Major"][oxide], text=oxide, set_sticky="nesw",
                 own_color=True, command=lambda var_oxide=oxide, var_key="Major": self.select_oxide(var_oxide, var_key))
@@ -10957,7 +10935,7 @@ class PySILLS(tk.Frame):
             self.subwindow_oxides_files.grid_columnconfigure(i, minsize=column_min)
 
         var_row_start = 0
-        var_columm_start = 0
+        var_column_start = 0
         var_row_n = 1
         var_header_n = 8
 
@@ -10965,7 +10943,7 @@ class PySILLS(tk.Frame):
 
         # LABELS
         lbl_01 = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=var_columm_start,
+            parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=var_column_start,
             n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="File-specific Settings", relief=tk.FLAT, fontsize="sans 10 bold")
@@ -11056,7 +11034,7 @@ class PySILLS(tk.Frame):
 
         ## TREEVIEWS
         frm_tv = SE(
-            parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=15,
+            parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=var_column_start, n_rows=15,
             n_columns=3*var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
         vsb_tv = ttk.Scrollbar(master=frm_tv, orient="vertical")
         text_tv = tk.Text(
@@ -11177,7 +11155,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11195,12 +11173,12 @@ class PySILLS(tk.Frame):
 
             # Labels
             lbl_04 = SE(
-                parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_columm_start,
+                parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Inclusion Settings", relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_05 = SE(
-                parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+                parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Quantification Method", relief=tk.FLAT, fontsize="sans 10 bold")
@@ -11214,7 +11192,7 @@ class PySILLS(tk.Frame):
                 list_opt_incl_is_quantification = ["100 wt.% Oxides", "Custom Data", "External Calculation"]
 
             opt_02a = SE(
-                parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+                parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
                 n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_srm(
                 var_srm=self.container_var[key_setting]["Inclusion Setup Option"], text_set=str_default_inclusion_setup,
                 fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color, sort_list=False,
@@ -11236,7 +11214,7 @@ class PySILLS(tk.Frame):
                 "Geometric Approach (Halter et al. 2002)", "Geometric Approach (Borisova et al. 2021)"]
 
             opt_03a = SE(
-                parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+                parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
                 n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_srm(
                 var_srm=self.container_var[key_setting]["Quantification Method Option"],
                 text_set=str_default_quantification_setup, fg_active=self.bg_colors["Dark Font"],
@@ -11281,15 +11259,15 @@ class PySILLS(tk.Frame):
                 self.bool_incl_is_massbalance = True
             else:
                 self.btn_setup_massbalance.grid()
-                if self.bool_incl_is_chargebalance == True:
+                if self.bool_incl_is_chargebalance:
                     self.btn_setup_chargebalance.grid_remove()
-                if self.bool_incl_is_pypitzer == True:
+                if self.bool_incl_is_pypitzer:
                     self.btn_setup_pypitzer.grid_remove()
-                if self.bool_incl_is_custom == True:
+                if self.bool_incl_is_custom:
                     self.btn_setup_customdata.grid_remove()
-                if self.bool_incl_is_external == True:
+                if self.bool_incl_is_external:
                     self.btn_setup_external.grid_remove()
-                if self.bool_incl_is_100pct == True:
+                if self.bool_incl_is_100pct:
                     self.btn_setup_100pct.grid_remove()
         elif var_opt == "Charge Balance":
             if self.bool_incl_is_chargebalance == False:
@@ -11302,15 +11280,15 @@ class PySILLS(tk.Frame):
                 self.bool_incl_is_chargebalance = True
             else:
                 self.btn_setup_chargebalance.grid()
-                if self.bool_incl_is_massbalance == True:
+                if self.bool_incl_is_massbalance:
                     self.btn_setup_massbalance.grid_remove()
-                if self.bool_incl_is_pypitzer == True:
+                if self.bool_incl_is_pypitzer:
                     self.btn_setup_pypitzer.grid_remove()
-                if self.bool_incl_is_custom == True:
+                if self.bool_incl_is_custom:
                     self.btn_setup_customdata.grid_remove()
-                if self.bool_incl_is_external == True:
+                if self.bool_incl_is_external:
                     self.btn_setup_external.grid_remove()
-                if self.bool_incl_is_100pct == True:
+                if self.bool_incl_is_100pct:
                     self.btn_setup_100pct.grid_remove()
         elif var_opt == "PyPitzer (Liu et al. 2024)":
             if self.bool_incl_is_pypitzer == False:
@@ -11323,15 +11301,15 @@ class PySILLS(tk.Frame):
                 self.bool_incl_is_pypitzer = True
             else:
                 self.btn_setup_pypitzer.grid()
-                if self.bool_incl_is_massbalance == True:
+                if self.bool_incl_is_massbalance:
                     self.btn_setup_massbalance.grid_remove()
-                if self.bool_incl_is_chargebalance == True:
+                if self.bool_incl_is_chargebalance:
                     self.btn_setup_chargebalance.grid_remove()
-                if self.bool_incl_is_custom == True:
+                if self.bool_incl_is_custom:
                     self.btn_setup_customdata.grid_remove()
-                if self.bool_incl_is_external == True:
+                if self.bool_incl_is_external:
                     self.btn_setup_external.grid_remove()
-                if self.bool_incl_is_100pct == True:
+                if self.bool_incl_is_100pct:
                     self.btn_setup_100pct.grid_remove()
         elif var_opt == "Custom Data":
             if self.bool_incl_is_custom == False:
@@ -11345,15 +11323,15 @@ class PySILLS(tk.Frame):
                 self.str_incl_is_custom_external = "Custom"
             else:
                 self.btn_setup_customdata.grid()
-                if self.bool_incl_is_massbalance == True:
+                if self.bool_incl_is_massbalance:
                     self.btn_setup_massbalance.grid_remove()
-                if self.bool_incl_is_chargebalance == True:
+                if self.bool_incl_is_chargebalance:
                     self.btn_setup_chargebalance.grid_remove()
-                if self.bool_incl_is_pypitzer == True:
+                if self.bool_incl_is_pypitzer:
                     self.btn_setup_pypitzer.grid_remove()
-                if self.bool_incl_is_external == True:
+                if self.bool_incl_is_external:
                     self.btn_setup_external.grid_remove()
-                if self.bool_incl_is_100pct == True:
+                if self.bool_incl_is_100pct:
                     self.btn_setup_100pct.grid_remove()
         elif var_opt == "External Calculation":
             if self.bool_incl_is_external == False:
@@ -11367,15 +11345,15 @@ class PySILLS(tk.Frame):
                 self.str_incl_is_custom_external = "External"
             else:
                 self.btn_setup_external.grid()
-                if self.bool_incl_is_massbalance == True:
+                if self.bool_incl_is_massbalance:
                     self.btn_setup_massbalance.grid_remove()
-                if self.bool_incl_is_chargebalance == True:
+                if self.bool_incl_is_chargebalance:
                     self.btn_setup_chargebalance.grid_remove()
-                if self.bool_incl_is_pypitzer == True:
+                if self.bool_incl_is_pypitzer:
                     self.btn_setup_pypitzer.grid_remove()
-                if self.bool_incl_is_custom == True:
+                if self.bool_incl_is_custom:
                     self.btn_setup_customdata.grid_remove()
-                if self.bool_incl_is_100pct == True:
+                if self.bool_incl_is_100pct:
                     self.btn_setup_100pct.grid_remove()
         elif var_opt == "100 wt.% Oxides":
             if self.bool_incl_is_100pct == False:
@@ -11389,15 +11367,15 @@ class PySILLS(tk.Frame):
                 self.str_incl_is_custom_external = "100 wt.% Oxides"
             else:
                 self.btn_setup_100pct.grid()
-                if self.bool_incl_is_massbalance == True:
+                if self.bool_incl_is_massbalance:
                     self.btn_setup_massbalance.grid_remove()
-                if self.bool_incl_is_chargebalance == True:
+                if self.bool_incl_is_chargebalance:
                     self.btn_setup_chargebalance.grid_remove()
-                if self.bool_incl_is_pypitzer == True:
+                if self.bool_incl_is_pypitzer:
                     self.btn_setup_pypitzer.grid_remove()
-                if self.bool_incl_is_custom == True:
+                if self.bool_incl_is_custom:
                     self.btn_setup_customdata.grid_remove()
-                if self.bool_incl_is_external == True:
+                if self.bool_incl_is_external:
                     self.btn_setup_external.grid_remove()
 
     def select_opt_inclusion_quantification(self, var_opt, dict_geometry_info):
@@ -11431,11 +11409,11 @@ class PySILLS(tk.Frame):
                         text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                         command=self.fi_setup_matrix_only_tracer)
                     self.bool_matrixonlytracer = True
-                if self.bool_secondinternalstandard == True:
+                if self.bool_secondinternalstandard:
                     self.btn_setup_secondis.grid_remove()
-                if self.bool_halter2002 == True:
+                if self.bool_halter2002:
                     self.btn_setup_halter2002.grid_remove()
-                if self.bool_borisova2021 == True:
+                if self.bool_borisova2021:
                     self.btn_setup_borisova2021.grid_remove()
         elif var_opt == "Second Internal Standard (SILLS)":
             if self.bool_secondinternalstandard == False:
@@ -11448,11 +11426,11 @@ class PySILLS(tk.Frame):
                 self.bool_secondinternalstandard = True
             else:
                 self.btn_setup_secondis.grid()
-                if self.bool_matrixonlytracer == True:
+                if self.bool_matrixonlytracer:
                     self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_halter2002 == True:
+                if self.bool_halter2002:
                     self.btn_setup_halter2002.grid_remove()
-                if self.bool_borisova2021 == True:
+                if self.bool_borisova2021:
                     self.btn_setup_borisova2021.grid_remove()
         elif var_opt == "Geometric Approach (Halter et al. 2002)":
             if self.bool_halter2002 == False:
@@ -11465,11 +11443,11 @@ class PySILLS(tk.Frame):
                 self.bool_halter2002 = True
             else:
                 self.btn_setup_halter2002.grid()
-                if self.bool_matrixonlytracer == True:
+                if self.bool_matrixonlytracer:
                     self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_secondinternalstandard == True:
+                if self.bool_secondinternalstandard:
                     self.btn_setup_secondis.grid_remove()
-                if self.bool_borisova2021 == True:
+                if self.bool_borisova2021:
                     self.btn_setup_borisova2021.grid_remove()
         elif var_opt == "Geometric Approach (Borisova et al. 2021)":
             if self.bool_borisova2021 == False:
@@ -11482,11 +11460,11 @@ class PySILLS(tk.Frame):
                 self.bool_borisova2021 = True
             else:
                 self.btn_setup_borisova2021.grid()
-                if self.bool_matrixonlytracer == True:
+                if self.bool_matrixonlytracer:
                     self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_secondinternalstandard == True:
+                if self.bool_secondinternalstandard:
                     self.btn_setup_secondis.grid_remove()
-                if self.bool_halter2002 == True:
+                if self.bool_halter2002:
                     self.btn_setup_halter2002.grid_remove()
 
     def place_assemblage_setup(self, var_geometry_info):
@@ -11504,7 +11482,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11512,12 +11490,12 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_05 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Assemblage Settings", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -11555,7 +11533,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11563,12 +11541,12 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_06 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Dwell Time Settings", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Isotope Dwell Times", relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -11595,7 +11573,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11603,20 +11581,20 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_07 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Default Time Window (Background)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Start", relief=var_relief, fontsize="sans 10 bold")
         lbl_07b = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=var_relief, fontsize="sans 10 bold")
         lbl_07c = SE(
-            parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
 
@@ -11673,7 +11651,7 @@ class PySILLS(tk.Frame):
             str_header = "Default Time Window (Matrix)"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11681,22 +11659,22 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_08 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_header, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Start", relief=var_relief, fontsize="sans 10 bold")
         lbl_08b = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=var_relief, fontsize="sans 10 bold")
         lbl_08c = SE(
-            parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
@@ -11751,19 +11729,19 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
 
         # Labels
         lbl_09 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Spike Elimination", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09b = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Calculation Method", relief=var_relief, fontsize="sans 10 bold")
 
@@ -11818,7 +11796,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11826,58 +11804,58 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_10 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Check-Up", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_10a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Standard Reference Material", relief=var_relief, fontsize="sans 10 bold")
         lbl_10b = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Internal Standard", relief=var_relief, fontsize="sans 10 bold")
         lbl_10c = SE(
-            parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Calculation Intervals", relief=var_relief, fontsize="sans 10 bold")
         lbl_10d = SE(
-            parent=var_parent, row_id=var_row_start + 4, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Acquisition Times", relief=var_relief, fontsize="sans 10 bold")
         lbl_10e = SE(
-            parent=var_parent, row_id=var_row_start + 5, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Imported Files", relief=var_relief, fontsize="sans 10 bold")
 
         # Buttons
         btn_10a = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_srm_settings)  # Check-Up - SRM Settings
         btn_10b = SE(
-            parent=var_parent, row_id=var_row_start + 2, column_id=var_columm_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.internal_standard_concentration_setup)  # Check-Up - Internal Standard Settings
         btn_10c = SE(
-            parent=var_parent, row_id=var_row_start + 3, column_id=var_columm_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_interval_settings)  # Check-Up - Calculation Interval Settings
         btn_10d = SE(
-            parent=var_parent, row_id=var_row_start + 4, column_id=var_columm_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_acquisition_times)  # Check-Up - Acquisition Times
         btn_10e = SE(
-            parent=var_parent, row_id=var_row_start + 5, column_id=var_columm_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -11898,7 +11876,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -11906,12 +11884,12 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_iso = SE(
-            parent=var_parent, row_id=var_row_start - 1, column_id=var_columm_start, n_rows=1,
+            parent=var_parent, row_id=var_row_start - 1, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         frm_iso = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
@@ -11975,7 +11953,7 @@ class PySILLS(tk.Frame):
                     self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][isotope] = {
                         "RAW": None, "SMOOTHED": None}
             #
-            if self.file_loaded == True:
+            if self.file_loaded:
                 for file_std_short in self.container_lists["STD"]["Short"]:
                     self.build_checkbutton_isotope_visibility(
                         var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
@@ -12074,7 +12052,7 @@ class PySILLS(tk.Frame):
         # Option Menus
         list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
         opt_laser = SE(
-            parent=var_parent, row_id=var_row_start + var_row_n, column_id=var_columm_start + 11, n_rows=1,
+            parent=var_parent, row_id=var_row_start + var_row_n, column_id=var_column_start + 11, n_rows=1,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var["LASER"], option_list=list_opt_gas, text_set="Argon",
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
@@ -12101,7 +12079,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
@@ -12109,14 +12087,14 @@ class PySILLS(tk.Frame):
 
         # Labels
         lbl_01 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Acquisition Times", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Treeviews
         frm_02 = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start,
             n_rows=7, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
         vsb_02 = ttk.Scrollbar(frm_02, orient="vertical")
@@ -12203,34 +12181,34 @@ class PySILLS(tk.Frame):
             row_correction = 1
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
 
         # Labels
         lbl_01 = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Time-Signal Diagram Checker", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Frames
         frm_02 = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start,
             n_rows=11, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
 
         # Radiobuttons
         rb_01 = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=5, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[var_mode_setting]["Time-Signal Checker"], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Standard file", sticky="nesw",
             relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_mode_setting:
             self.change_filetype_time_signal_diagram_checker(var_setting_key))
         rb_02 = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start + 5,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start + 5,
             n_rows=var_row_n, n_columns=5, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[var_mode_setting]["Time-Signal Checker"], value_rb=2,
@@ -12240,14 +12218,14 @@ class PySILLS(tk.Frame):
 
         # Buttons
         btn_01 = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start + 10,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start + 10,
             n_rows=var_row_n, n_columns=4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Before", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_mode="Before", var_setting_key=var_mode_setting:
             self.change_file_time_signal_diagram_checker(var_mode, var_setting_key))
         btn_02 = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start + 14,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start + 14,
             n_rows=var_row_n, n_columns=4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -12262,7 +12240,7 @@ class PySILLS(tk.Frame):
         self.canvas_time_signal_checker = FigureCanvasTkAgg(
             self.fig_time_signal_checker, master=var_parent)
         self.canvas_time_signal_checker.get_tk_widget().grid(
-            row=var_row_start + 2, column=var_columm_start, rowspan=10 + row_correction, columnspan=var_header_n,
+            row=var_row_start + 2, column=var_column_start, rowspan=10 + row_correction, columnspan=var_header_n,
             sticky="nesw")
 
         self.temp_axes_checkup2 = {"STD": {}, "SMPL": {}}
@@ -12435,26 +12413,26 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
 
         # Labels
         lbl_header = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=1, n_columns=var_header_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=1, n_columns=var_header_n,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Standard Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
         btn_confirm = SE(
-            parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_columm_start + var_header_n - 6,
+            parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_column_start + var_header_n - 6,
             n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
         # Frames
         frm_files = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
         vsb_files = ttk.Scrollbar(master=frm_files, orient="vertical")
         text_files = tk.Text(
@@ -12467,7 +12445,7 @@ class PySILLS(tk.Frame):
             parts = file_std.split("/")
             file_std_short = parts[-1]
 
-            if self.initialization_run_std == True:
+            if self.initialization_run_std:
                 # Assigns isotopic signal intensity and time data for every standard/srm file
                 df_isotopes, times_std_i = self.assign_time_and_isotopic_data(filetype="STD", filename_long=file_std)
 
@@ -12626,7 +12604,7 @@ class PySILLS(tk.Frame):
             else:
                 df_i = DE(filename_long=filename_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
         else:
-            if self.old_file == True:
+            if self.old_file:
                 if self.container_icpms["name"] != None:
                     var_skipheader = self.container_icpms["skipheader"]
                     var_skipfooter = self.container_icpms["skipfooter"]
@@ -12848,27 +12826,27 @@ class PySILLS(tk.Frame):
             var_setting_key = "mi_setting"
 
         var_row_start = var_geometry_info["Row start"]
-        var_columm_start = var_geometry_info["Column start"]
+        var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
 
         # Labels
         lbl_header = SE(
-            parent=var_parent, row_id=var_row_start, column_id=var_columm_start, n_rows=1, n_columns=var_header_n,
+            parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=1, n_columns=var_header_n,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Sample Files Setup", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
         btn_confirm = SE(
-            parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_columm_start + var_header_n - 6,
+            parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_column_start + var_header_n - 6,
             n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Confirm All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
 
         # Frames
         frm_files = SE(
-            parent=var_parent, row_id=var_row_start + 1, column_id=var_columm_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
         vsb_files = ttk.Scrollbar(master=frm_files, orient="vertical")
         text_files = tk.Text(
@@ -12881,7 +12859,7 @@ class PySILLS(tk.Frame):
             parts = file_smpl.split("/")
             file_smpl_short = parts[-1]
 
-            if self.initialization_run_smpl == True:
+            if self.initialization_run_smpl:
                 # Assigns isotopic signal intensity and time data for every sample file
                 df_isotopes, times_smpl_i = self.assign_time_and_isotopic_data(filetype="SMPL", filename_long=file_smpl)
 
@@ -13159,11 +13137,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 800
-        window_heigth = 450
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 450
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -13606,7 +13584,7 @@ class PySILLS(tk.Frame):
         else:
             var_key = "Element"
 
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].set(var_opt)
 
@@ -13642,7 +13620,7 @@ class PySILLS(tk.Frame):
         else:
             var_key = "Element"
         #
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Concentration"].set(var_entr.get())
         else:
@@ -13671,7 +13649,7 @@ class PySILLS(tk.Frame):
         #
         self.container_var["IS"]["Default SMPL"].set(var_opt)
         #
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 if self.pysills_mode == "MA":
                     var_opt_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"]
@@ -13766,7 +13744,7 @@ class PySILLS(tk.Frame):
                         self.container_lists["Possible IS"].append(var_is)
 
     def ma_change_is_concentration(self, var_entr, var_file, state_default, event):
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 if self.pysills_mode == "MA":
                     self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_entr.get())
@@ -13827,7 +13805,7 @@ class PySILLS(tk.Frame):
         elif str_filetype == "SMPL":
             self.index_file_smpl = self.container_lists[str_filetype]["Long"].index(str_filename_long)
 
-        if bool_checkup_mode == True:
+        if bool_checkup_mode:
             if str_filetype == "STD":
                 str_filename_long = self.ma_current_file_std
             elif str_filetype == "SMPL":
@@ -13841,11 +13819,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1060
-        window_heigth = 800
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 800
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -14253,7 +14231,7 @@ class PySILLS(tk.Frame):
                     box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
                     var_content["Object"] = box_bg
                     #
-                    if bool_lb_state == True:
+                    if bool_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
                             tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -14281,7 +14259,7 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
                     #
-                    if bool_lb_state == True:
+                    if bool_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -14295,7 +14273,7 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
                     #
-                    if bool_lb_state == True:
+                    if bool_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -14309,7 +14287,7 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
                     #
-                    if bool_lb_state == True:
+                    if bool_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -14331,7 +14309,7 @@ class PySILLS(tk.Frame):
                                           color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
                     #
-                    if bool_lb_state == True:
+                    if bool_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -14346,7 +14324,7 @@ class PySILLS(tk.Frame):
                                           color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
                     #
-                    if bool_lb_state == True:
+                    if bool_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -14772,6 +14750,9 @@ class PySILLS(tk.Frame):
         self.canvas_specific.draw()
     #
     def ma_add_interval_to_diagram(self, var_type, var_file_short, event):
+        filename_index = self.container_lists[var_type]["Short"].index(var_file_short)
+        filename_long = self.container_lists[var_type]["Long"][filename_index]
+
         if self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short].get() == 0:  # BG
             var_key = "BG"
             var_color = self.colors_intervals[var_key]
@@ -14810,6 +14791,34 @@ class PySILLS(tk.Frame):
                 self.container_helper[var_type][var_file_short][var_key]["Indices"].append(key_id)
 
                 self.canvas_specific.draw()
+
+        if var_type == "STD":
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) < 2:
+                self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_yellow)
+            else:
+                if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0:
+                    self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_green, bd=1)
+                    self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_green)
+                else:
+                    self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_yellow)
+            #
+        else:
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) < 2:
+                self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_yellow)
+            else:
+                if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0:
+                    self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_green, bd=1)
+                    self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_green)
+                else:
+                    self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_yellow)
 
     def ma_change_interval_visibility(self, var_key, var_type, var_file_short):
         if self.container_var["ma_setting"]["Calculation Interval Visibility"][var_type][var_file_short][
@@ -15036,7 +15045,7 @@ class PySILLS(tk.Frame):
     #
     def ma_datareduction_tables(self, init=False): # MA - data reduction tables #######################
         ## Initialization
-        if init == True:
+        if init:
             for var_filetype in ["STD", "SMPL"]:
                 for var_file_short in self.container_lists[var_filetype]["Short"]:
                     self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
@@ -15641,7 +15650,7 @@ class PySILLS(tk.Frame):
                         if var_filetype == "SMPL":
                             var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
                             var_id_selected = self.container_var["ID"]["Results Files"].get()
-                            if var_id == var_id_selected or self.var_init_ma_datareduction == True:
+                            if var_id == var_id_selected or self.var_init_ma_datareduction:
                                 condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"][
                                     "BG"]
                                 condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"][
@@ -15764,7 +15773,7 @@ class PySILLS(tk.Frame):
             print(f"Taken time: {time_delta.total_seconds()} ms")
 
         ## CHECK
-        if check == True:
+        if check:
             for key_01, item_01 in self.container_intensity.items():
                 print("Filetype:", key_01)
                 for key_02, item_02 in item_01.items():
@@ -16135,7 +16144,7 @@ class PySILLS(tk.Frame):
                                 list_xi_std_i[isotope].append(None)
 
                 for isotope in file_isotopes_smpl:
-                    a_i, b_i = self.calculate_linar_regression(
+                    a_i, b_i = self.calculate_linear_regression(
                         x_values=list_delta_std_i, y_values=list_xi_std_i[isotope])
                     a_i = round(a_i, 12)
                     b_i = round(b_i, 12)
@@ -16808,11 +16817,11 @@ class PySILLS(tk.Frame):
     def ma_datareduction_files(self):  # MA - DATAREDUCTION FILES ######################################################
         ## Window Settings
         window_width = 1260
-        window_heigth = 625
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 625
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -17055,11 +17064,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 900
-        window_heigth = 600
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 600
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -17455,11 +17464,11 @@ class PySILLS(tk.Frame):
     def about_pysills(self):
         ## Window Settings
         window_width = 620
-        window_heigth = 550
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 550
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -17667,11 +17676,11 @@ class PySILLS(tk.Frame):
     def calculation_report_setup(self):
         ## Window Settings
         window_width = 260
-        window_heigth = 225
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 225
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -17747,10 +17756,10 @@ class PySILLS(tk.Frame):
 # FLUID INCLUSION ANALYSIS #############################################################################################
 ########################################################################################################################
     def fi_settings(self):
-        if self.file_system_need_update == True:
+        if self.file_system_need_update:
             path = os.getcwd()
             parent = os.path.dirname(path)
-            if self.demo_mode == True:
+            if self.demo_mode:
                 self.var_opt_icp.set("Agilent 7900s")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
                 fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
@@ -17777,7 +17786,7 @@ class PySILLS(tk.Frame):
                 if file_std not in self.container_lists["STD"]["Long"]:
                     self.container_lists["STD"]["Long"].append(file_std)
                     self.container_lists["STD"]["Short"].append(file_parts[-1])
-                if self.demo_mode == True:
+                if self.demo_mode:
                     self.lb_std.insert(tk.END, file_parts[-1])
 
                 for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
@@ -17789,7 +17798,7 @@ class PySILLS(tk.Frame):
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
                     self.container_lists["SMPL"]["Long"].append(file_smpl)
                     self.container_lists["SMPL"]["Short"].append(file_parts[-1])
-                if self.demo_mode == True:
+                if self.demo_mode:
                     self.lb_smpl.insert(tk.END, file_parts[-1])
 
             for file_std in self.list_std:
@@ -17873,11 +17882,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1260
-        window_heigth = 1000
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 1000
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -17969,7 +17978,7 @@ class PySILLS(tk.Frame):
             self.fi_select_srm_initialization()
 
         for filetype in ["STD", "SMPL"]:
-            if self.container_var["Spike Elimination"][filetype]["State"] == True:
+            if self.container_var["Spike Elimination"][filetype]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
@@ -17980,7 +17989,7 @@ class PySILLS(tk.Frame):
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
-        if self.demo_mode == True:
+        if self.demo_mode:
             for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
                 if index in [2, 3, 6, 7]:
                     self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
@@ -17998,10 +18007,10 @@ class PySILLS(tk.Frame):
 ########################################################################################################################
 
     def mi_settings(self):
-        if self.file_system_need_update == True:
+        if self.file_system_need_update:
             path = os.getcwd()
             parent = os.path.dirname(path)
-            if self.demo_mode == True:
+            if self.demo_mode:
                 self.var_opt_icp.set("PerkinElmer Syngistix")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
                 mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
@@ -18028,7 +18037,7 @@ class PySILLS(tk.Frame):
                 if file_std not in self.container_lists["STD"]["Long"]:
                     self.container_lists["STD"]["Long"].append(file_std)
                     self.container_lists["STD"]["Short"].append(file_parts[-1])
-                if self.demo_mode == True:
+                if self.demo_mode:
                     self.lb_std.insert(tk.END, file_parts[-1])
 
                 for item in ["Quickview", "File Setup", "Results Intensity", "Results Concentration",
@@ -18040,7 +18049,7 @@ class PySILLS(tk.Frame):
                 if file_smpl not in self.container_lists["SMPL"]["Long"]:
                     self.container_lists["SMPL"]["Long"].append(file_smpl)
                     self.container_lists["SMPL"]["Short"].append(file_parts[-1])
-                if self.demo_mode == True:
+                if self.demo_mode:
                     self.lb_smpl.insert(tk.END, file_parts[-1])
 
             for file_std in self.list_std:
@@ -18124,11 +18133,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1260
-        window_heigth = 1000
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 1000
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -18218,7 +18227,7 @@ class PySILLS(tk.Frame):
             self.select_srm_initialization()
         #
         for filetype in ["STD", "SMPL"]:
-            if self.container_var["Spike Elimination"][filetype]["State"] == True:
+            if self.container_var["Spike Elimination"][filetype]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test"]:
                     var_method = "Grubbs"
                     #
@@ -19578,7 +19587,7 @@ class PySILLS(tk.Frame):
             key_setting = "mi_setting"
 
         ## Initialization
-        if init == True:
+        if init:
             for var_filetype in ["STD", "SMPL"]:
                 for var_file_short in self.container_lists[var_filetype]["Short"]:
                     self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
@@ -20064,11 +20073,11 @@ class PySILLS(tk.Frame):
     def show_diagrams_sensitivity(self):
         ## Window Settings
         window_width = 900
-        window_heigth = 800
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 800
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -20709,11 +20718,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1260
-        window_heigth = 725
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 725
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -21089,11 +21098,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 680
-        window_heigth = 600
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 600
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -21471,11 +21480,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 680
-        window_heigth = 550
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 550
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -21722,11 +21731,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 820
-        window_heigth = 375
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 375
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -21938,11 +21947,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 720
-        window_heigth = 375
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 375
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -22162,7 +22171,7 @@ class PySILLS(tk.Frame):
         elif str_filetype == "SMPL":
             self.index_file_smpl = self.container_lists[str_filetype]["Long"].index(str_filename_long)
 
-        if checkup_mode == True:
+        if checkup_mode:
             if str_filetype == "STD":
                 str_filename_long = self.fi_current_file_std
             elif str_filetype == "SMPL":
@@ -22175,11 +22184,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1060
-        window_heigth = 800
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 800
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -22568,7 +22577,7 @@ class PySILLS(tk.Frame):
                     box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
                     var_content["Object"] = box_bg
 
-                    if var_lb_state == True:
+                    if var_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
                             tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -22594,7 +22603,7 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
 
-                    if var_lb_state == True:
+                    if var_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -22607,7 +22616,7 @@ class PySILLS(tk.Frame):
                     box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
                     var_content["Object"] = box_mat
 
-                    if var_lb_state == True:
+                    if var_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
                             tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -22634,7 +22643,7 @@ class PySILLS(tk.Frame):
                     box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
 
-                    if var_lb_state == True:
+                    if var_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -22647,7 +22656,7 @@ class PySILLS(tk.Frame):
                     box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
                     var_content["Object"] = box_incl
 
-                    if var_lb_state == True:
+                    if var_lb_state:
                         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
                             tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
                                     str(var_content["Times"][1]) + "]")
@@ -23207,7 +23216,6 @@ class PySILLS(tk.Frame):
                 self.helper_intervals[var_key].append([x_nearest, x_id])
                 #
                 key_id = self.container_helper[var_type][var_file_short][var_key]["ID"] + 1
-                #key_id = len(self.container_helper[var_type][var_file_short][var_key]["Content"]) + 1
                 time_0 = self.helper_intervals[var_key][0][0]
                 time_1 = self.helper_intervals[var_key][1][0]
                 index_0 = self.helper_intervals[var_key][0][1]
@@ -23488,11 +23496,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 700
-        window_heigth = 450
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 450
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
         #
@@ -23724,11 +23732,11 @@ class PySILLS(tk.Frame):
         else:
             var_key = "Element"
         #
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].set(var_opt)
                 #
-                if matrix_only == True:
+                if matrix_only:
                     self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].set(var_opt)
             #
             self.container_var[key_setting]["IS MAT Default Concentration"].set(1000000)
@@ -23747,7 +23755,7 @@ class PySILLS(tk.Frame):
             #
             self.container_var[key_setting]["IS MAT Default"].set("Select IS")
             for index, isotope in enumerate(possible_is):
-                if matrix_only == True:
+                if matrix_only:
                     if index == 0:
                         self.opt_01c["menu"].delete(0, "end")
                     #
@@ -23771,7 +23779,7 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
-        if state_default == True:
+        if state_default:
             self.container_var[key_setting]["Host Only"].set(var_opt)
             #
             for file_smpl in self.container_lists["SMPL"]["Long"]:
@@ -23845,7 +23853,7 @@ class PySILLS(tk.Frame):
         #
         self.container_var[key_setting]["IS MAT Default"].set(var_opt)
         #
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].set(var_opt)
                 #
@@ -23895,7 +23903,7 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Name"].set(var_opt)
     #
     def fi_change_matrix_concentration(self, var_entr, var_file, state_default, event):
-        if state_default == True:
+        if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set(var_entr.get())
         else:
@@ -24403,9 +24411,9 @@ class PySILLS(tk.Frame):
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                     for salt in self.container_lists["Selected Salts"]:
                         if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
-                            var_weigth = float(
+                            var_weight = float(
                                 self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                            var_weight_sum = var_weigth*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                            var_weight_sum = var_weight*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
                                 "Total"]
 
                         if salt != "NaCl":
@@ -24466,9 +24474,9 @@ class PySILLS(tk.Frame):
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                     for salt in self.container_lists["Selected Salts"]:
                         if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
-                            var_weigth = float(
+                            var_weight = float(
                                 self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                            var_weight_sum = var_weigth*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                            var_weight_sum = var_weight*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
                                 "Total"]
 
                         if salt != "NaCl":
@@ -24528,9 +24536,9 @@ class PySILLS(tk.Frame):
                 file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                 for salt in self.container_lists["Selected Salts"]:
                     if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
-                        var_weigth = float(
+                        var_weight = float(
                             self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                        var_weight_sum = var_weigth*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
+                        var_weight_sum = var_weight*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
 
                     if salt != "NaCl":
                         molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
@@ -24609,11 +24617,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1200
-        window_heigth = 500
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 500
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -25205,11 +25213,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1020
-        window_heigth = 400
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -25407,11 +25415,11 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 1020
-        window_heigth = 400
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
@@ -25603,15 +25611,15 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 660
-        window_heigth = 280
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 280
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
-        n_rows = int(window_heigth/row_min)
+        n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
 
-        if self.bool_incl_is_custom == True:
+        if self.bool_incl_is_custom:
             if self.pysills_mode == "FI":
                 str_title = "FLUID INCLUSION ANALYSIS - Custom Data Setup"
             elif self.pysills_mode == "MI":
@@ -25805,7 +25813,7 @@ class PySILLS(tk.Frame):
             text_incl_is.window_create("insert", window=entr_is_i)
             text_incl_is.insert("end", "\n")
 
-    def calculate_linar_regression(self, x_values, y_values):
+    def calculate_linear_regression(self, x_values, y_values):
         x_values_updated = [x for x, y in zip(x_values, y_values) if y != None]
         y_values_updated = [y for y, y in zip(x_values, y_values) if y != None]
 
@@ -26157,11 +26165,11 @@ class PySILLS(tk.Frame):
     def custom_spike_check(self, mode="SMPL"):
         ## Window Settings
         window_width = 900
-        window_heigth = 600
-        var_geometry = str(window_width) + "x" + str(window_heigth) + "+" + str(0) + "+" + str(0)
+        window_height = 600
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         row_min = 25
-        n_rows = int(window_heigth / row_min)
+        n_rows = int(window_height / row_min)
         column_min = 20
         n_columns = int(window_width / column_min)
 
@@ -26193,7 +26201,7 @@ class PySILLS(tk.Frame):
 
         var_list_files = self.container_lists[mode]["Short"]
         self.current_file_id = 0
-        self.currest_file_spk = var_list_files[self.current_file_id]
+        self.current_file_spk = var_list_files[self.current_file_id]
         self.current_original_value = 0
         self.current_suggested_value = 0
         self.current_current_value = 0
@@ -26214,7 +26222,7 @@ class PySILLS(tk.Frame):
         self.lbl_01a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 1, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
-            text=self.currest_file_spk, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=self.current_file_spk, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -26325,7 +26333,7 @@ class PySILLS(tk.Frame):
 
     def check_spikes_isotope(self, var_file=None):
         if var_file == None:
-            var_file = self.currest_file_spk
+            var_file = self.current_file_spk
         else:
             var_file = var_file
 
@@ -26388,7 +26396,7 @@ class PySILLS(tk.Frame):
 
     def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
-        var_file = self.currest_file_spk
+        var_file = self.current_file_spk
         self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
         if len(self.list_indices) < 16:
             n_ticks = 1
@@ -26440,7 +26448,7 @@ class PySILLS(tk.Frame):
     def change_spk_id(self, mode=None):
         current_id = self.scl_01.get()
         var_id_real = self.list_indices[current_id - 1]
-        var_file = self.currest_file_spk
+        var_file = self.current_file_spk
         var_isotope = self.var_opt_spk_iso.get()
         val_original = self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real]
         val_corrected = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real]
@@ -26469,7 +26477,7 @@ class PySILLS(tk.Frame):
 
     def change_file_spk(self, mode):
         if mode == "Next":
-            if self.currest_file_spk in self.container_lists["STD"]["Short"]:
+            if self.current_file_spk in self.container_lists["STD"]["Short"]:
                 var_filetype = "STD"
             else:
                 var_filetype = "SMPL"
@@ -26479,10 +26487,10 @@ class PySILLS(tk.Frame):
             elif self.current_file_id == len(self.container_lists[var_filetype]["Short"]) - 1:
                 self.current_file_id = 0
 
-            self.currest_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
-            self.lbl_01a.configure(text=self.currest_file_spk)
+            self.current_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
+            self.lbl_01a.configure(text=self.current_file_spk)
         elif mode == "Before":
-            if self.currest_file_spk in self.container_lists["STD"]["Short"]:
+            if self.current_file_spk in self.container_lists["STD"]["Short"]:
                 var_filetype = "STD"
             else:
                 var_filetype = "SMPL"
@@ -26492,8 +26500,8 @@ class PySILLS(tk.Frame):
             elif self.current_file_id == 0:
                 self.current_file_id = len(self.container_lists[var_filetype]["Short"]) - 1
 
-            self.currest_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
-            self.lbl_01a.configure(text=self.currest_file_spk)
+            self.current_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
+            self.lbl_01a.configure(text=self.current_file_spk)
 
         possible_spk_isotopes = self.check_spikes_isotope()
         if len(possible_spk_isotopes) > 0:
@@ -26517,7 +26525,7 @@ class PySILLS(tk.Frame):
     def replace_spike_value(self, mode):
         current_id = self.scl_01.get()
         var_id_real = self.list_indices[current_id - 1]
-        var_file = self.currest_file_spk
+        var_file = self.current_file_spk
         var_isotope = self.current_isotope
         val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
         val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
@@ -26542,7 +26550,7 @@ class PySILLS(tk.Frame):
         except AttributeError:
             pass
 
-        var_file = self.currest_file_spk
+        var_file = self.current_file_spk
         var_isotope = self.current_isotope
         current_id = self.scl_01.get()
         var_id_real = self.list_indices[current_id - 1]
