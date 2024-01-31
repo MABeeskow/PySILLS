@@ -10514,7 +10514,7 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
             activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
 
-    def mineral_matrix_quantification(self):
+    def mineral_matrix_quantification(self, focus="MAT"):
         # Window Settings
         window_width = 480
         window_height = 175
@@ -10532,7 +10532,10 @@ class PySILLS(tk.Frame):
             str_title_window = "Matrix Quantification"
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
-            str_title_window = "Matrix Quantification"
+            if focus == "MAT":
+                str_title_window = "Matrix Quantification"
+            else:
+                str_title_window = "Inclusion Quantification"
             var_setting_key = "mi_setting"
 
         self.subwindow_mineral_matrix_quantification = tk.Toplevel(self.parent)
@@ -10553,7 +10556,10 @@ class PySILLS(tk.Frame):
         for i in range(0, n_columns):
             self.subwindow_mineral_matrix_quantification.grid_columnconfigure(i, minsize=column_min)
 
-        str_method = self.container_var["Quantification Mineral"]["Method"].get()
+        if focus == "MAT":
+            str_method = self.container_var["Quantification Mineral"]["Method"].get()
+        else:
+            str_method = "100 wt.% Oxides"
 
         var_row_start = 0
         var_columm_start = 0
@@ -11262,6 +11268,7 @@ class PySILLS(tk.Frame):
         self.bool_incl_is_pypitzer = False
         self.bool_incl_is_custom = False
         self.bool_incl_is_external = False
+        self.bool_incl_is_100pct = False
 
         if var_opt == "Mass Balance":
             if self.bool_incl_is_massbalance == False:
@@ -11282,6 +11289,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_customdata.grid_remove()
                 if self.bool_incl_is_external == True:
                     self.btn_setup_external.grid_remove()
+                if self.bool_incl_is_100pct == True:
+                    self.btn_setup_100pct.grid_remove()
         elif var_opt == "Charge Balance":
             if self.bool_incl_is_chargebalance == False:
                 self.btn_setup_chargebalance = SE(
@@ -11301,6 +11310,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_customdata.grid_remove()
                 if self.bool_incl_is_external == True:
                     self.btn_setup_external.grid_remove()
+                if self.bool_incl_is_100pct == True:
+                    self.btn_setup_100pct.grid_remove()
         elif var_opt == "PyPitzer (Liu et al. 2024)":
             if self.bool_incl_is_pypitzer == False:
                 self.btn_setup_pypitzer = SE(
@@ -11320,6 +11331,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_customdata.grid_remove()
                 if self.bool_incl_is_external == True:
                     self.btn_setup_external.grid_remove()
+                if self.bool_incl_is_100pct == True:
+                    self.btn_setup_100pct.grid_remove()
         elif var_opt == "Custom Data":
             if self.bool_incl_is_custom == False:
                 self.btn_setup_customdata = SE(
@@ -11340,6 +11353,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_pypitzer.grid_remove()
                 if self.bool_incl_is_external == True:
                     self.btn_setup_external.grid_remove()
+                if self.bool_incl_is_100pct == True:
+                    self.btn_setup_100pct.grid_remove()
         elif var_opt == "External Calculation":
             if self.bool_incl_is_external == False:
                 self.btn_setup_external = SE(
@@ -11360,6 +11375,30 @@ class PySILLS(tk.Frame):
                     self.btn_setup_pypitzer.grid_remove()
                 if self.bool_incl_is_custom == True:
                     self.btn_setup_customdata.grid_remove()
+                if self.bool_incl_is_100pct == True:
+                    self.btn_setup_100pct.grid_remove()
+        elif var_opt == "100 wt.% Oxides":
+            if self.bool_incl_is_100pct == False:
+                self.btn_setup_100pct = SE(
+                    parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_simple_button(
+                    text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                    command=lambda focus="INCL": self.mineral_matrix_quantification(focus))
+                self.bool_incl_is_100pct = True
+                self.str_incl_is_custom_external = "100 wt.% Oxides"
+            else:
+                self.btn_setup_100pct.grid()
+                if self.bool_incl_is_massbalance == True:
+                    self.btn_setup_massbalance.grid_remove()
+                if self.bool_incl_is_chargebalance == True:
+                    self.btn_setup_chargebalance.grid_remove()
+                if self.bool_incl_is_pypitzer == True:
+                    self.btn_setup_pypitzer.grid_remove()
+                if self.bool_incl_is_custom == True:
+                    self.btn_setup_customdata.grid_remove()
+                if self.bool_incl_is_external == True:
+                    self.btn_setup_external.grid_remove()
 
     def select_opt_inclusion_quantification(self, var_opt, dict_geometry_info):
         var_row_start = dict_geometry_info["Row start"]
@@ -18142,7 +18181,8 @@ class PySILLS(tk.Frame):
         self.file_system_need_update = False
 
         self.select_opt_inclusion_is_quantification(
-            var_opt="Mass Balance", dict_geometry_info=var_quantification_method)
+            var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
+        #self.container_var["Quantification Inclusion"]["Method"].set("100 wt.% Oxides")
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
@@ -25510,9 +25550,15 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         if self.bool_incl_is_custom == True:
-            str_title = "FLUID INCLUSION ANALYSIS - Custom Data Setup"
+            if self.pysills_mode == "FI":
+                str_title = "FLUID INCLUSION ANALYSIS - Custom Data Setup"
+            elif self.pysills_mode == "MI":
+                str_title = "MELT INCLUSION ANALYSIS - Custom Data Setup"
         else:
-            str_title = "FLUID INCLUSION ANALYSIS - Plugin-based Inclusion Setup"
+            if self.pysills_mode == "FI":
+                str_title = "FLUID INCLUSION ANALYSIS - Plugin-based Inclusion Setup"
+            elif self.pysills_mode == "MI":
+                str_title = "MELT INCLUSION ANALYSIS - Plugin-based Inclusion Setup"
 
         subwindow_fi_inclusion_plugin = tk.Toplevel(self.parent)
         subwindow_fi_inclusion_plugin.title(str_title)
