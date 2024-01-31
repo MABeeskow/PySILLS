@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		25.01.2024
+# Date:		31.01.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -575,7 +575,10 @@ class IntensityQuantification:
                     for focus in list_focus:
                         value_is = data_container[filetype][datatype][filename_short][focus][isotope_is]
                         for isotope, value in data_container[filetype][datatype][filename_short][focus].items():
-                            result_i = value/value_is
+                            if value_is > 0:
+                                result_i = value/value_is
+                            else:
+                                result_i = 0.0
                             self.results_container[filetype][datatype][filename_short][focus][isotope] = result_i
 
         return self.results_container
