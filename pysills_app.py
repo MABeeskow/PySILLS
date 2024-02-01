@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		31.01.2023
+# Date:		01.02.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -17972,8 +17972,16 @@ class PySILLS(tk.Frame):
         if self.file_loaded == False:
             self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-            self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-            self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+
+            if self.container_var["SRM"]["default"][0].get() != "Select SRM":
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+            if self.container_var["SRM"]["default"][1].get() != "Select SRM":
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            if self.demo_mode:
+                self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
+                self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
         else:
             self.fi_select_srm_initialization()
 
@@ -17991,6 +17999,7 @@ class PySILLS(tk.Frame):
 
         if self.demo_mode:
             for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
+                self.container_var["STD"][filename_std_long]["SRM"].set("NIST 610 (GeoReM)")
                 if index in [2, 3, 6, 7]:
                     self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
 
@@ -18220,9 +18229,16 @@ class PySILLS(tk.Frame):
         if self.file_loaded == False:
             self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-            self.select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-            self.select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-            #
+
+            if self.container_var["SRM"]["default"][0].get() != "Select SRM":
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+            if self.container_var["SRM"]["default"][1].get() != "Select SRM":
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+            if self.demo_mode:
+                self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
+                self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+                self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
         else:
             self.select_srm_initialization()
         #
