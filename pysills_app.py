@@ -2455,6 +2455,7 @@ class PySILLS(tk.Frame):
                 self.container_var["SRM"]["default"][1].set(var_srm)
                 for isotope in self.container_lists["ISOTOPES"]:
                     self.container_files["SRM"][isotope].set(var_srm)
+
                     try:
                         self.container_var["SRM"][isotope].set(var_srm)
                     except:
@@ -2462,6 +2463,7 @@ class PySILLS(tk.Frame):
         elif key == "isotope":
             for isotope in self.container_lists["ISOTOPES"]:
                 self.container_files["SRM"][isotope].set(var_srm)
+
                 try:
                     self.container_var["SRM"][isotope].set(var_srm)
                 except:
@@ -10068,6 +10070,7 @@ class PySILLS(tk.Frame):
     ########################################################################################################################
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
+
         if self.file_system_need_update:
             path = os.getcwd()
             parent = os.path.dirname(path)
@@ -11947,7 +11950,7 @@ class PySILLS(tk.Frame):
                 var_text = self.container_var["LASER"].get()
             else:
                 var_text = "Select Gas"
-            #
+
             if isotope not in self.container_var["SRM"]:
                 self.container_var["SRM"][isotope] = tk.StringVar()
                 self.container_var["SRM"][isotope].set("Select SRM")
@@ -12053,16 +12056,7 @@ class PySILLS(tk.Frame):
             lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Very Dark"])
             text_iso.window_create("end", window=lbl_i)
             text_iso.insert("end", "\t")
-            #
-            if self.container_var["SRM"][isotope].get() != "Select SRM":
-                var_text = self.container_var["SRM"][isotope].get()
-            else:
-                if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-                    var_text = self.container_var["SRM"]["default"][1].get()
-                    self.container_var["SRM"][isotope].set(var_text)
-                else:
-                    var_text = "Select SRM"
-            #
+
             opt_srm_i = tk.OptionMenu(
                 frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
                 command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
@@ -13816,11 +13810,13 @@ class PySILLS(tk.Frame):
         if mode == "STD":
             for file_std in self.list_std:
                 parts = file_std.split("/")
-                self.container_var["STD"][file_std]["SRM"].set(var_opt)
-                self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
+                if self.container_var["STD"][file_std]["SRM"].get() == "Select SRM":
+                    self.container_var["STD"][file_std]["SRM"].set(var_opt)
+                    self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
         elif mode == "ISOTOPES":
-            for isotope in self.container_lists["ISOTOPES"]:
-                self.container_var["SRM"][isotope].set(var_opt)
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                if self.container_var["SRM"][isotope].get() == "Select SRM":
+                    self.container_var["SRM"][isotope].set(var_opt)
 
         if var_opt not in self.srm_actual and var_opt != "Select SRM":
             self.srm_actual[var_opt] = {}
@@ -21100,12 +21096,14 @@ class PySILLS(tk.Frame):
         if mode == "STD":
             for file_std in self.list_std:
                 parts = file_std.split("/")
-                self.container_var["STD"][file_std]["SRM"].set(var_opt)
-                self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
+                if self.container_var["STD"][file_std]["SRM"].get() == "Select SRM":
+                    self.container_var["STD"][file_std]["SRM"].set(var_opt)
+                    self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
         elif mode == "ISOTOPES":
-            for isotope in self.container_lists["ISOTOPES"]:
-                self.container_var["SRM"][isotope].set(var_opt)
-                self.container_files["SRM"][isotope].set(var_opt)
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                if self.container_var["SRM"][isotope].get() == "Select SRM":
+                    self.container_var["SRM"][isotope].set(var_opt)
+                    self.container_files["SRM"][isotope].set(var_opt)
 
         if var_opt not in self.srm_actual:
             self.srm_actual[var_opt] = {}
