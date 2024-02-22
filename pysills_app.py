@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		21.02.2024
+# Date:		22.02.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -14286,18 +14286,25 @@ class PySILLS(tk.Frame):
         #
         if len(var_check_bg) > 0:
             if self.pysills_mode in ["MA", "FI", "MI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short]["BG"][
                     "Content"].items():
                     times_bg = var_content["Times"]
-                    #
-                    box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
-                    var_content["Object"] = box_bg
-                    #
-                    if bool_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
-                            tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
-                    #
+                    if times_bg[0] != None and times_bg[1] != None:
+                        box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
+                        var_content["Object"] = box_bg
+
+                        if bool_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
+                                tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["BG"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["BG"]["Content"][var_id]
+
             else:
                 times_bg = self.container_helper[str_filetype][str_filename_short]["BG"][1]["Times"]
                 #
@@ -14313,47 +14320,66 @@ class PySILLS(tk.Frame):
         #
         if len(var_check_sig) > 0:
             if self.pysills_mode in ["FI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
-                    #
-                    box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                    var_content["Object"] = box_mat
-                    #
-                    if bool_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
-                            tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
-                    #
+                    if times_sig[0] != None and times_sig[1] != None:
+                        box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                        var_content["Object"] = box_mat
+                        #
+                        if bool_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
+                                tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["MAT"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["MAT"]["Content"][var_id]
             elif self.pysills_mode in ["MI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"][1][
                         "Times"]
                     var_color = self.colors_intervals["MAT"]
-                    #
-                    box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                    var_content["Object"] = box_mat
-                    #
-                    if bool_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
-                            tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
-                    #
+                    if times_sig[0] != None and times_sig[1] != None:
+                        box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                        var_content["Object"] = box_mat
+                        #
+                        if bool_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
+                                tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["MAT"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["MAT"]["Content"][var_id]
             else:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
-                    #
-                    box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                    var_content["Object"] = box_mat
-                    #
-                    if bool_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
-                            tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                    if times_sig[0] != None and times_sig[1] != None:
+                        box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                        var_content["Object"] = box_mat
+                        #
+                        if bool_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
+                                tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["MAT"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["MAT"]["Content"][var_id]
         #
         if self.pysills_mode == "MA":
             inclusion_key = "INCL"
@@ -14364,33 +14390,46 @@ class PySILLS(tk.Frame):
         #
         if len(var_check_incl) > 0:
             if self.pysills_mode in ["FI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
                     times_incl = var_content["Times"]
-                    #
-                    box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35,
-                                          color=self.colors_intervals["INCL"])
-                    var_content["Object"] = box_incl
-                    #
-                    if bool_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
-                            tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
-                    #
+                    if times_incl[0] != None and times_incl[1] != None:
+                        box_incl = ax.axvspan(
+                            times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
+                        var_content["Object"] = box_incl
+                        #
+                        if bool_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
+                                tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["INCL"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["INCL"]["Content"][var_id]
             elif self.pysills_mode in ["MI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
                     times_incl = self.container_helper[str_filetype][str_filename_short][inclusion_key]["Content"][1][
                         "Times"]
-                    #
-                    box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35,
-                                          color=self.colors_intervals["INCL"])
-                    var_content["Object"] = box_incl
-                    #
-                    if bool_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
-                            tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                    if times_incl[0] != None and times_incl[1] != None:
+                        box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35,
+                                              color=self.colors_intervals["INCL"])
+                        var_content["Object"] = box_incl
+                        #
+                        if bool_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
+                                tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["INCL"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["INCL"]["Content"][var_id]
         #
         ax.grid(True)
         ax.set_yscale("log")
@@ -14780,10 +14819,9 @@ class PySILLS(tk.Frame):
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "SMOOTHED"][0].set_visible(True)
                 self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
-        #
+
         self.canvas_specific.draw()
 
-    #
     def ma_hide_all_lines(self, var_type, var_file_short):
         if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -14797,10 +14835,9 @@ class PySILLS(tk.Frame):
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "SMOOTHED"][0].set_visible(False)
                 self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
-        #
+
         self.canvas_specific.draw()
 
-    #
     def ma_change_line_visibility(self, var_type, var_file_short, var_datatype, var_isotope):
         var_key = "Display " + str(var_datatype)
         if self.container_var["ma_setting"][var_key][var_type][var_file_short][var_isotope].get() == 1:
@@ -14814,7 +14851,6 @@ class PySILLS(tk.Frame):
         #
         self.canvas_specific.draw()
 
-    #
     def ma_add_interval_to_diagram(self, var_type, var_file_short, event):
         filename_index = self.container_lists[var_type]["Short"].index(var_file_short)
         filename_long = self.container_lists[var_type]["Long"][filename_index]
@@ -14836,10 +14872,21 @@ class PySILLS(tk.Frame):
                 x_id = self.dataset_time.index(x_nearest)
                 self.helper_intervals[var_key].append([x_nearest, x_id])
                 key_id = self.container_helper[var_type][var_file_short][var_key]["ID"] + 1
-                time_0 = self.helper_intervals[var_key][0][0]
-                time_1 = self.helper_intervals[var_key][1][0]
-                index_0 = self.helper_intervals[var_key][0][1]
-                index_1 = self.helper_intervals[var_key][1][1]
+                time_0_pre = self.helper_intervals[var_key][0][0]
+                time_1_pre = self.helper_intervals[var_key][1][0]
+                index_0_pre = self.helper_intervals[var_key][0][1]
+                index_1_pre = self.helper_intervals[var_key][1][1]
+
+                if time_1_pre < time_0_pre:
+                    time_0 = time_1_pre
+                    time_1 = time_0_pre
+                    index_0 = index_1_pre
+                    index_1 = index_0_pre
+                else:
+                    time_0 = time_0_pre
+                    time_1 = time_1_pre
+                    index_0 = index_0_pre
+                    index_1 = index_1_pre
 
                 box_key = self.container_helper[var_type][var_file_short]["AXES"]["Time-Signal"].axvspan(
                     time_0, time_1, alpha=0.35, color=var_color)
@@ -14849,8 +14896,7 @@ class PySILLS(tk.Frame):
                     "Times": [time_0, time_1], "Indices": [index_0, index_1], "Object": box_key}
 
                 self.container_helper[var_type][var_file_short][var_key]["Listbox"].insert(
-                    tk.END, var_key + str(key_id) + " [" + str(self.helper_intervals[var_key][0][0]) + "-" +
-                            str(self.helper_intervals[var_key][1][0]) + "]")
+                    tk.END, var_key + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
 
                 self.helper_intervals[var_key].clear()
                 self.container_helper[var_type][var_file_short][var_key]["ID"] = key_id
@@ -14871,7 +14917,7 @@ class PySILLS(tk.Frame):
                 else:
                     self.container_var[var_type][filename_long]["Frame"].config(background=self.sign_yellow, bd=1)
                     self.container_var[var_type][filename_long]["Sign Color"].set(self.sign_yellow)
-            #
+
         else:
             if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
                     len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) < 2:
@@ -14892,21 +14938,21 @@ class PySILLS(tk.Frame):
             var_state = False
         else:
             var_state = True
-        #
+
         for var_id, var_content in self.container_helper[var_type][var_file_short][var_key]["Content"].items():
-            var_content["Object"].set_visible(var_state)
-        #
+            if var_content["Object"] != None:
+                var_content["Object"].set_visible(var_state)
+
         self.canvas_specific.draw()
 
-    #
     def ma_remove_interval(self, var_type, var_file_short):
         if self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short].get() == 0:
             var_key = "BG"
         elif self.container_var["ma_setting"]["Calculation Interval"][var_type][var_file_short].get() == 1:
             var_key = "MAT"
-        #
+
         var_lb = self.container_helper[var_type][var_file_short][var_key]["Listbox"]
-        #
+
         item = self.container_helper[var_type][var_file_short][var_key]["Listbox"].curselection()[0]
         value = var_lb.get(item)
         value_parts = value.split(" ")
@@ -14917,10 +14963,31 @@ class PySILLS(tk.Frame):
         var_lb.delete(tk.ANCHOR)
         self.container_helper[var_type][var_file_short][var_key]["Content"][var_id]["Object"].set_visible(False)
         del self.container_helper[var_type][var_file_short][var_key]["Content"][var_id]
-        #
+
         self.canvas_specific.draw()
 
-    #
+    def set_start_interval(self, filetype, filename_long, filename_short):
+        val_entr = self.helper_time_entries["Start"].get()
+
+        if self.container_icpms["name"] != None:
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            df_data = DE(filename_long=filename_long).get_measurements(
+                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        else:
+            df_data = DE(filename_long=filename_long).get_measurements(
+                delimiter=",", skip_header=3, skip_footer=1)
+        dataset_time = list(DE().get_times(dataframe=df_data))
+
+        time = val_entr
+        time = time.replace(",", ".")
+        x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
+
+        if self.container_var["ma_setting"]["Calculation Interval"][filetype][filename_short].get() == 0:
+            var_category = "BG"
+        elif self.container_var["ma_setting"]["Calculation Interval"][filetype][filename_short].get() == 1:
+            var_category = "MAT"
+
     def ma_set_bg_interval(self, var_entr, var_key, mode, var_interval, event):
         if mode == "default":
             time = var_entr.get()
@@ -14979,8 +15046,6 @@ class PySILLS(tk.Frame):
                         elif self.pysills_mode == "MI":
                             self.temp_lines_checkup2[var_type][var_file_short] = 0
                             self.show_time_signal_diagram_checker(var_setting_key="mi_setting")
-                        # self.temp_lines_checkup2[var_type][var_file_short] = 0
-                        # self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
         elif mode in self.container_lists["STD"]["Long"]:
             var_file = mode
             if self.container_icpms["name"] != None:
@@ -15008,43 +15073,128 @@ class PySILLS(tk.Frame):
                 var_id = current_id + 1
             elif var_key == "End":
                 var_id = current_id
+                if var_id == 0:
+                    var_id = 1
+                elif var_id == 1:
+                    if var_id in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][1]["Times"][1] == None:
+                            var_id = var_id
+                        else:
+                            var_id = current_id + 1
+                        if var_id not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(var_id)
+
             var_entr.set(x_nearest)
             var_time = x_nearest
             var_index = dataset_time.index(var_time)
-            #
+
+            if var_id > 1:
+                condition = False
+                var_id_previous = var_id - 1
+                while condition == False:
+                    if var_id_previous in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        condition = True
+                    elif len(self.container_helper["STD"][var_file_short][var_category]["Content"]) == 0:
+                        var_id_previous = 1
+                        if var_id_previous not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id_previous
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(
+                                var_id_previous)
+                        condition = True
+                    else:
+                        var_id_previous -= 1
+
+                if var_key == "Start":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        1] == None:
+                        var_id = var_id_previous
+                    else:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous][
+                            "Times"][0] == None:
+                            var_id = var_id_previous
+                elif var_key == "End":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        0] == None:
+                        var_id = var_id_previous
+                    elif self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][
+                        0] != None and self.container_helper["STD"][var_file_short][var_category]["Content"][var_id][
+                        "Times"][1] != None:
+                            var_id = var_id + 1
+
             if var_id not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id] = {
                     "Times": [None, None], "Indices": [None, None], "Object": None}
                 self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id
                 self.container_helper["STD"][var_file_short][var_category]["Indices"].append(var_id)
-            #
+
             if var_key == "Start":
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0] = var_time
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Indices"][
                     0] = var_index
+
+                time_0 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["STD"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    self.container_helper["STD"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.canvas_specific.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
             elif var_key == "End":
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1] = var_time
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Indices"][
                     1] = var_index
-                #
+
                 time_0 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0]
                 time_1 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1]
-                #
-                box_key = self.container_helper["STD"][var_file_short]["AXES"]["Time-Signal"].axvspan(
-                    time_0, time_1, alpha=0.5, color=self.colors_intervals[var_category])
-                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
-                #
-                self.container_helper["STD"][var_file_short][var_category]["Listbox"].insert(
-                    tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
-                #
-                self.canvas_specific.draw()
-                #
-                for key, item in self.helper_time_entries.items():
-                    if key == "Start":
-                        item.set("Set start value")
-                    elif key == "End":
-                        item.set("Set end value")
-            #
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["STD"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    self.container_helper["STD"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.canvas_specific.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
+
         elif mode in self.container_lists["SMPL"]["Long"]:
             var_file = mode
             if self.container_icpms["name"] != None:
@@ -15066,16 +15216,65 @@ class PySILLS(tk.Frame):
             time = var_entr.get()
             time = time.replace(",", ".")
             x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
-            #
+
             current_id = self.container_helper["SMPL"][var_file_short][var_category]["ID"]
             if var_key == "Start":
                 var_id = current_id + 1
             elif var_key == "End":
                 var_id = current_id
+                if var_id == 0:
+                    var_id = 1
+                elif var_id == 1:
+                    if var_id in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
+                        if self.container_helper["SMPL"][var_file_short][var_category]["Content"][1]["Times"][1] == None:
+                            var_id = var_id
+                        else:
+                            var_id = current_id + 1
+                        if var_id not in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
+                            self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["SMPL"][var_file_short][var_category]["ID"] = var_id
+                            self.container_helper["SMPL"][var_file_short][var_category]["Indices"].append(var_id)
+
             var_entr.set(x_nearest)
             var_time = x_nearest
             var_index = dataset_time.index(var_time)
-            #
+
+            if var_id > 1:
+                condition = False
+                var_id_previous = var_id - 1
+                while condition == False:
+                    if var_id_previous in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
+                        condition = True
+                    elif len(self.container_helper["SMPL"][var_file_short][var_category]["Content"]) == 0:
+                        var_id_previous = 1
+                        if var_id_previous not in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
+                            self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id_previous] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["SMPL"][var_file_short][var_category]["ID"] = var_id_previous
+                            self.container_helper["SMPL"][var_file_short][var_category]["Indices"].append(
+                                var_id_previous)
+                        condition = True
+                    else:
+                        var_id_previous -= 1
+
+                if var_key == "Start":
+                    if self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        1] == None:
+                        var_id = var_id_previous
+                    else:
+                        if self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id_previous][
+                            "Times"][0] == None:
+                            var_id = var_id_previous
+                elif var_key == "End":
+                    if self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        0] == None:
+                        var_id = var_id_previous
+                    elif self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][
+                        0] != None and self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id][
+                        "Times"][1] != None:
+                            var_id = var_id + 1
+
             if var_id not in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id] = {
                     "Times": [None, None], "Indices": [None, None], "Object": None}
@@ -15087,31 +15286,66 @@ class PySILLS(tk.Frame):
                     0] = var_time
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Indices"][
                     0] = var_index
+
+                time_0 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["SMPL"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    self.container_helper["SMPL"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.canvas_specific.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
             elif var_key == "End":
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][
                     1] = var_time
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Indices"][
                     1] = var_index
-                #
+
                 time_0 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][0]
                 time_1 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][1]
-                #
-                box_key = self.container_helper["SMPL"][var_file_short]["AXES"]["Time-Signal"].axvspan(
-                    time_0, time_1, alpha=0.5, color=self.colors_intervals[var_category])
-                self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
-                #
-                self.container_helper["SMPL"][var_file_short][var_category]["Listbox"].insert(
-                    tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
-                #
-                self.canvas_specific.draw()
-                #
-                for key, item in self.helper_time_entries.items():
-                    if key == "Start":
-                        item.set("Set start value")
-                    elif key == "End":
-                        item.set("Set end value")
 
-    #
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["SMPL"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    self.container_helper["SMPL"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.canvas_specific.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
+
     def ma_datareduction_tables(self, init=False):  # MA - data reduction tables #######################
         ## Initialization
         if init:
@@ -22688,16 +22922,24 @@ class PySILLS(tk.Frame):
 
         if len(var_check_bg) > 0:
             if self.pysills_mode in ["FI", "MI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short]["BG"][
                     "Content"].items():
                     times_bg = var_content["Times"]
-                    box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
-                    var_content["Object"] = box_bg
+                    if times_bg[0] != None and times_bg[1] != None:
+                        box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
+                        var_content["Object"] = box_bg
 
-                    if var_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
-                            tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                        if var_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["BG"]["Listbox"].insert(
+                                tk.END, "BG" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
+
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["BG"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["BG"]["Content"][var_id]
             else:
                 times_bg = self.container_helper[str_filetype][str_filename_short]["BG"][1]["Times"]
                 box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
@@ -22712,37 +22954,51 @@ class PySILLS(tk.Frame):
 
         if len(var_check_sig) > 0:
             if self.pysills_mode in ["FI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
+                    if times_sig[0] != None and times_sig[1] != None:
+                        box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                        var_content["Object"] = box_mat
 
-                    box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                    var_content["Object"] = box_mat
+                        if var_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
+                                tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
 
-                    if var_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
-                            tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["MAT"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["MAT"]["Content"][var_id]
             elif self.pysills_mode in ["MI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][signal_key][
                     "Content"].items():
                     times_sig = var_content["Times"]
                     var_color = self.colors_intervals["MAT"]
+                    if times_sig[0] != None and times_sig[1] != None:
+                        box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                        var_content["Object"] = box_mat
 
-                    box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                    var_content["Object"] = box_mat
+                        if var_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
+                                tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
 
-                    if var_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["MAT"]["Listbox"].insert(
-                            tk.END, "MAT" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["MAT"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["MAT"]["Content"][var_id]
             else:
                 times_sig = self.container_helper[str_filetype][str_filename_short][signal_key][1]["Times"]
                 var_color = self.colors_intervals["SIG"]
-
-                box_sig = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                var_content["Object"] = box_sig
+                if times_sig[0] != None and times_sig[1] != None:
+                    box_sig = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                    var_content["Object"] = box_sig
 
         if self.pysills_mode == "MA":
             inclusion_key = "INCL"
@@ -22753,30 +23009,46 @@ class PySILLS(tk.Frame):
 
         if len(var_check_incl) > 0:
             if self.pysills_mode in ["FI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
                     times_incl = var_content["Times"]
+                    if times_incl[0] != None and times_incl[1] != None:
+                        box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals[
+                            "INCL"])
+                        var_content["Object"] = box_incl
 
-                    box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
-                    var_content["Object"] = box_incl
+                        if var_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
+                                tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
 
-                    if var_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
-                            tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["INCL"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["INCL"]["Content"][var_id]
 
             elif self.pysills_mode in ["MI"]:
+                critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short][inclusion_key][
                     "Content"].items():
                     times_incl = var_content["Times"]
+                    if times_incl[0] != None and times_incl[1] != None:
+                        box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals[
+                            "INCL"])
+                        var_content["Object"] = box_incl
 
-                    box_incl = ax.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
-                    var_content["Object"] = box_incl
+                        if var_lb_state:
+                            self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
+                                tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
+                                        str(var_content["Times"][1]) + "]")
+                    else:
+                        critical_id.append(var_id)
 
-                    if var_lb_state:
-                        self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"].insert(
-                            tk.END, "INCL" + str(var_id) + " [" + str(var_content["Times"][0]) + "-" +
-                                    str(var_content["Times"][1]) + "]")
+                for var_id in critical_id:
+                    self.container_helper[str_filetype][str_filename_short]["INCL"]["Indices"].remove(var_id)
+                    del self.container_helper[str_filetype][str_filename_short]["INCL"]["Content"][var_id]
 
         ax.grid(True)
         ax.set_yscale("log")
@@ -23336,11 +23608,22 @@ class PySILLS(tk.Frame):
                 self.helper_intervals[var_key].append([x_nearest, x_id])
                 #
                 key_id = self.container_helper[var_type][var_file_short][var_key]["ID"] + 1
-                time_0 = self.helper_intervals[var_key][0][0]
-                time_1 = self.helper_intervals[var_key][1][0]
-                index_0 = self.helper_intervals[var_key][0][1]
-                index_1 = self.helper_intervals[var_key][1][1]
-                #
+                time_0_pre = self.helper_intervals[var_key][0][0]
+                time_1_pre = self.helper_intervals[var_key][1][0]
+                index_0_pre = self.helper_intervals[var_key][0][1]
+                index_1_pre = self.helper_intervals[var_key][1][1]
+
+                if time_1_pre < time_0_pre:
+                    time_0 = time_1_pre
+                    time_1 = time_0_pre
+                    index_0 = index_1_pre
+                    index_1 = index_0_pre
+                else:
+                    time_0 = time_0_pre
+                    time_1 = time_1_pre
+                    index_0 = index_0_pre
+                    index_1 = index_1_pre
+
                 box_key = self.container_helper[var_type][var_file_short]["AXES"]["Time-Signal"].axvspan(
                     time_0, time_1, alpha=0.35, color=var_color)
                 self.canvas_specific.draw()
@@ -23349,8 +23632,7 @@ class PySILLS(tk.Frame):
                     "Times": [time_0, time_1], "Indices": [index_0, index_1], "Object": box_key}
                 #
                 self.container_helper[var_type][var_file_short][var_key]["Listbox"].insert(
-                    tk.END, var_key + str(key_id) + " [" + str(self.helper_intervals[var_key][0][0]) + "-" +
-                            str(self.helper_intervals[var_key][1][0]) + "]")
+                    tk.END, var_key + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
                 #
                 self.helper_intervals[var_key].clear()
                 self.container_helper[var_type][var_file_short][var_key]["ID"] = key_id
@@ -23491,27 +23773,76 @@ class PySILLS(tk.Frame):
                     delimiter=",", skip_header=3, skip_footer=1)
             dataset_time = list(DE().get_times(dataframe=df_data))
             var_file_short = var_file.split("/")[-1]
-            #
+
             if self.container_var[key_setting]["Calculation Interval"]["STD"][var_file_short].get() == 0:
                 var_category = "BG"
             elif self.container_var[key_setting]["Calculation Interval"]["STD"][var_file_short].get() == 1:
                 var_category = "MAT"
             elif self.container_var[key_setting]["Calculation Interval"]["STD"][var_file_short].get() == 2:
                 var_category = "INCL"
-            #
+
             time = var_entr.get()
             time = time.replace(",", ".")
             x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
-            #
+
             current_id = self.container_helper["STD"][var_file_short][var_category]["ID"]
             if var_key == "Start":
                 var_id = current_id + 1
             elif var_key == "End":
                 var_id = current_id
+                if var_id == 0:
+                    var_id = 1
+                elif var_id == 1:
+                    if var_id in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][1]["Times"][1] == None:
+                            var_id = var_id
+                        else:
+                            var_id = current_id + 1
+                        if var_id not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(var_id)
+
             var_entr.set(x_nearest)
             var_time = x_nearest
             var_index = dataset_time.index(var_time)
-            #
+
+            if var_id > 1:
+                condition = False
+                var_id_previous = var_id - 1
+                while condition == False:
+                    if var_id_previous in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        condition = True
+                    elif len(self.container_helper["STD"][var_file_short][var_category]["Content"]) == 0:
+                        var_id_previous = 1
+                        if var_id_previous not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id_previous
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(
+                                var_id_previous)
+                        condition = True
+                    else:
+                        var_id_previous -= 1
+
+                if var_key == "Start":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        1] == None:
+                        var_id = var_id_previous
+                    else:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous][
+                            "Times"][0] == None:
+                            var_id = var_id_previous
+                elif var_key == "End":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        0] == None:
+                        var_id = var_id_previous
+                    elif self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][
+                        0] != None and self.container_helper["STD"][var_file_short][var_category]["Content"][var_id][
+                        "Times"][1] != None:
+                            var_id = var_id + 1
+
             if var_id not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id] = {
                     "Times": [None, None], "Indices": [None, None], "Object": None}
@@ -23521,27 +23852,63 @@ class PySILLS(tk.Frame):
             if var_key == "Start":
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0] = var_time
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Indices"][0] = var_index
+
+                time_0 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["STD"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    self.container_helper["STD"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.canvas_specific.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
             elif var_key == "End":
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1] = var_time
                 self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Indices"][1] = var_index
                 #
                 time_0 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0]
                 time_1 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1]
-                #
-                box_key = self.container_helper["STD"][var_file_short]["AXES"]["Time-Signal"].axvspan(
-                    time_0, time_1, alpha=0.5, color=self.colors_intervals[var_category])
-                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
-                #
-                self.container_helper["STD"][var_file_short][var_category]["Listbox"].insert(
-                    tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
-                #
-                self.canvas_specific.draw()
-                #
-                for key, item in self.helper_time_entries.items():
-                    if key == "Start":
-                        item.set("Set start value")
-                    elif key == "End":
-                        item.set("Set end value")
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["STD"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+                    #
+                    self.container_helper["STD"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+                    #
+                    self.canvas_specific.draw()
+                    #
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
             #
         elif mode in self.container_lists["SMPL"]["Long"]:
             var_file = mode
@@ -23566,15 +23933,73 @@ class PySILLS(tk.Frame):
             time = var_entr.get()
             time = time.replace(",", ".")
             x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
-            #
+
             current_id = self.container_helper["SMPL"][var_file_short][var_category]["ID"]
             if var_key == "Start":
                 var_id = current_id + 1
             elif var_key == "End":
                 var_id = current_id
+                if var_id == 0:
+                    var_id = 1
+                elif var_id == 1:
+                    if var_id in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
+                        if self.container_helper["SMPL"][var_file_short][var_category]["Content"][1]["Times"][1] == None:
+                            var_id = var_id
+                        else:
+                            var_id = current_id + 1
+                        if var_id not in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
+                            self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["SMPL"][var_file_short][var_category]["ID"] = var_id
+                            self.container_helper["SMPL"][var_file_short][var_category]["Indices"].append(var_id)
+
             var_entr.set(x_nearest)
             var_time = x_nearest
             var_index = dataset_time.index(var_time)
+
+            if var_id > 1:
+                condition = False
+                var_id_previous = var_id - 1
+                while condition == False:
+                    if var_id_previous in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        condition = True
+                    elif len(self.container_helper["STD"][var_file_short][var_category]["Content"]) == 0:
+                        var_id_previous = 1
+                        if var_id_previous not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id_previous
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(
+                                var_id_previous)
+                        condition = True
+                    else:
+                        var_id_previous -= 1
+
+                if var_key == "Start":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        1] == None:
+                        var_id = var_id_previous
+                    else:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous][
+                            "Times"][0] == None:
+                            var_id = var_id_previous
+                elif var_key == "End":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        0] == None:
+                        var_id = var_id_previous
+                    elif self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][
+                        0] != None and self.container_helper["STD"][var_file_short][var_category]["Content"][var_id][
+                        "Times"][1] != None:
+                            var_id = var_id + 1
+
+            # current_id = self.container_helper["SMPL"][var_file_short][var_category]["ID"]
+            # if var_key == "Start":
+            #     var_id = current_id + 1
+            # elif var_key == "End":
+            #     var_id = current_id
+            # var_entr.set(x_nearest)
+            # var_time = x_nearest
+            # var_index = dataset_time.index(var_time)
             #
             if var_id not in self.container_helper["SMPL"][var_file_short][var_category]["Content"]:
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id] = {
@@ -23585,29 +24010,64 @@ class PySILLS(tk.Frame):
             if var_key == "Start":
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][0] = var_time
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Indices"][0] = var_index
+
+                time_0 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["SMPL"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    self.container_helper["SMPL"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.canvas_specific.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
             elif var_key == "End":
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][1] = var_time
                 self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Indices"][1] = var_index
-                #
+
                 time_0 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][0]
                 time_1 = self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"][1]
-                #
-                box_key = self.container_helper["SMPL"][var_file_short]["AXES"]["Time-Signal"].axvspan(
-                    time_0, time_1, alpha=0.5, color=self.colors_intervals[var_category])
-                self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
-                #
-                self.container_helper["SMPL"][var_file_short][var_category]["Listbox"].insert(
-                    tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
-                #
-                self.canvas_specific.draw()
-                #
-                for key, item in self.helper_time_entries.items():
-                    if key == "Start":
-                        item.set("Set start value")
-                    elif key == "End":
-                        item.set("Set end value")
 
-    #
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.container_helper["SMPL"][var_file_short]["AXES"]["Time-Signal"].axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["SMPL"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+                    #
+                    self.container_helper["SMPL"][var_file_short][var_category]["Listbox"].insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+                    #
+                    self.canvas_specific.draw()
+                    #
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
+
     ## MATRIX SETTINGS
     #
     def fi_matrix_concentration_setup(self):
