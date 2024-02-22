@@ -19841,7 +19841,7 @@ class PySILLS(tk.Frame):
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
                                    var_indices[0]:var_indices[1] + 1]
                         var_n_mat += len(var_data)
-                    #
+
                     var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                     var_concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short][
                         var_focus][var_is]
