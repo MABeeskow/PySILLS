@@ -545,6 +545,8 @@ class PySILLS(tk.Frame):
         self.var_mode_ma = False
         self.var_init_ma_setting = False
         self.var_init_ma_datareduction = False
+        self.var_init_fi_datareduction = False
+        self.var_init_mi_datareduction = False
         self.var_init_ma_dataexploration = False
         #
         ## FLUID/MELT INCLUSION ANALYSIS
@@ -15404,9 +15406,12 @@ class PySILLS(tk.Frame):
                 self.ma_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                self.ma_get_lod(
+                # self.ma_get_lod(
+                #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                #     var_file_long=var_file_long, mode="All")
+                self.get_lod(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
+                    var_file_long=var_file_long, var_focus=None, mode="All")
 
         if self.container_var["ma_datareduction_files"]["File Type"].get() == 0:
             var_filetype = "STD"
@@ -17122,6 +17127,199 @@ class PySILLS(tk.Frame):
                         var_result_i = np.median(helper_results)
 
                     self.container_lod[var_filetype][var_datatype][isotope] = var_result_i
+
+    def get_lod(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, mode="Specific"):
+        """ Calculates the Limit of Detection, LoD, based on the following two equations:
+        1) Standard Files:  C_i = C_std_i/C_std_is
+        2) Sample Files:    C_i = C_smpl_i/C_smpl_is
+
+        Parameters
+        ----------
+        var_filetype : str
+            The file category, e.g. STD
+        var_datatype : str
+            The data category, e.g. RAW
+        var_file_short : str
+            The file as a short version (without the complete filepath)
+        var_file_long : str
+            The file as the long version (with the complete filepath)
+
+        Returns
+        -------
+        """
+        if mode == "Specific":
+            if var_filetype == "STD":
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for index, isotope in enumerate(file_isotopes):
+                    var_n_bg = 0
+                    var_n_mat = 0
+                    helper_sigma_i = []
+
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+                    for key, items in condensed_intervals.items():
+                        var_indices = items
+                        var_key = "Data " + str(var_datatype)
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                                   var_indices[0]:var_indices[1] + 1]
+                        var_n_bg += len(var_data)
+                        helper_sigma_i.append(np.std(var_data, ddof=1))
+
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
+                    for key, items in condensed_intervals.items():
+                        var_indices = items
+                        var_key = "Data " + str(var_datatype)
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                                   var_indices[0]:var_indices[1] + 1]
+                        var_n_mat += len(var_data)
+
+                    var_concentration_i = self.container_concentration[var_filetype][var_datatype][var_file_short][
+                        "MAT"][isotope]
+                    var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
+                        "MAT"][isotope]
+
+                    if self.container_var["General Settings"]["LOD Selection"].get() == 0:
+                        var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
+                            isotope]
+                        var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+                        parameter_list = [var_n_bg, var_n_mat, var_tau_i, var_intensity_i]
+                        if any(v == 0 for v in parameter_list) == False:
+                            var_result_i = (3.29*(
+                                    var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
+                                                   var_n_mat*var_tau_i)*(var_concentration_i/var_intensity_i)
+                        else:
+                            var_result_i = 0.0
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                    elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
+                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                            var_sigma_bg_i = np.mean(helper_sigma_i)
+                        else:
+                            var_sigma_bg_i = np.median(helper_sigma_i)
+
+                        var_result_i = (3*var_sigma_bg_i*var_concentration_i)/(var_intensity_i)*(
+                                1/var_n_bg + 1/var_n_mat)**(0.5)
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+            elif var_filetype == "SMPL":
+                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for index, isotope in enumerate(file_isotopes):
+                    var_n_bg = 0
+                    var_n_mat = 0
+                    helper_sigma_i = []
+
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+                    for key, items in condensed_intervals.items():
+                        var_indices = items
+                        var_key = "Data " + str(var_datatype)
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                                   var_indices[0]:var_indices[1] + 1]
+                        var_n_bg += len(var_data)
+                        helper_sigma_i.append(np.std(var_data, ddof=1))
+
+                    if index == 0:
+                        condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                            interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
+                    for key, items in condensed_intervals.items():
+                        var_indices = items
+                        var_key = "Data " + str(var_datatype)
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                                   var_indices[0]:var_indices[1] + 1]
+                        var_n_mat += len(var_data)
+
+                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                    var_concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short][
+                        var_focus][var_is]
+                    var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
+                        var_focus][var_is]
+
+                    if self.container_var["General Settings"]["LOD Selection"].get() == 0:
+                        var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
+                            isotope]
+                        var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+                        if var_sensitivity_i > 0:
+                            var_result_i = (3.29*(
+                                    var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
+                                                   var_n_mat*var_tau_i*var_sensitivity_i)*(
+                                                       var_concentration_is/var_intensity_is)
+                        else:
+                            var_result_i = 0.0
+                        self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = var_result_i
+
+                    elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
+                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                            var_sigma_bg_i = np.mean(helper_sigma_i)
+                        else:
+                            var_sigma_bg_i = np.median(helper_sigma_i)
+
+                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
+
+                        var_result_i = (3*var_sigma_bg_i*var_concentration_is)/(var_sensitivity_i*var_intensity_is)*(
+                                1/var_n_bg + 1/var_n_mat)**(0.5)
+                        self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = var_result_i
+        else:
+            for var_filetype in ["STD", "SMPL"]:
+                if self.pysills_mode == "MA":
+                    list_focus = ["MAT"]
+                    var_init_datareduction = self.var_init_ma_datareduction
+                else:
+                    if var_filetype == "STD":
+                        list_focus = ["MAT"]
+                    else:
+                        list_focus = ["MAT", "INCL"]
+                    if self.pysills_mode == "FI":
+                        var_init_datareduction = self.var_init_fi_datareduction
+                    else:
+                        var_init_datareduction = self.var_init_mi_datareduction
+                for focus in list_focus: #sex
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                        helper_results = []
+                        for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
+                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                var_srm_i = self.container_var["SRM"][isotope].get()
+                                var_srm_file = None
+                                if var_filetype == "STD":
+                                    var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
+                                if var_srm_i == var_srm_file or var_filetype == "SMPL":
+                                    if isotope in file_isotopes:
+                                        if var_filetype == "SMPL":
+                                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                            var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                            if var_id == var_id_selected or var_init_datareduction == True:
+                                                self.get_lod(
+                                                    var_filetype=var_filetype, var_datatype=var_datatype,
+                                                    var_file_short=var_file_short, var_file_long=var_file_long,
+                                                    var_focus=focus)
+                                                var_result_i = self.container_lod[var_filetype][var_datatype][
+                                                    var_file_short][focus][isotope]
+                                                helper_results.append(var_result_i)
+                                        else:
+                                            self.get_lod(
+                                                var_filetype=var_filetype, var_datatype=var_datatype,
+                                                var_file_short=var_file_short, var_file_long=var_file_long,
+                                                var_focus=focus)
+                                            var_result_i = self.container_lod[var_filetype][var_datatype][
+                                                var_file_short][focus][isotope]
+                                            helper_results.append(var_result_i)
+
+                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                            var_result_i = np.mean(helper_results)
+                        else:
+                            var_result_i = np.median(helper_results)
+
+                        self.container_lod[var_filetype][var_datatype][isotope] = var_result_i
 
     def ma_datareduction_files(self):  # MA - DATAREDUCTION FILES ######################################################
         ## Window Settings
@@ -19930,6 +20128,7 @@ class PySILLS(tk.Frame):
             var_file_short = "None"
             var_file_long = "None"
             var_focus = "None"
+            self.var_init_fi_datareduction = True
             #
             for var_datatype in ["RAW", "SMOOTHED"]:
                 # Intensity Results
@@ -19962,9 +20161,12 @@ class PySILLS(tk.Frame):
                 self.fi_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
-                self.fi_get_lod(
+                # self.fi_get_lod(
+                #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                #     var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                self.get_lod(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    var_file_long=var_file_long, var_focus=None, mode="All")
                 self.fi_get_mixed_concentration_ratio(
                     var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
                 self.fi_get_mixing_ratio(
@@ -23334,9 +23536,12 @@ class PySILLS(tk.Frame):
                 self.fi_get_concentration_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
-                self.fi_get_lod(
-                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
-                    var_focus="MAT")
+                # self.fi_get_lod(
+                #     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
+                #     var_focus="MAT")
+                self.get_lod(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                    var_file_long=var_file, var_focus="MAT")
 
                 if var_type == "SMPL":
                     self.fi_get_concentration(
@@ -23345,9 +23550,12 @@ class PySILLS(tk.Frame):
                     self.fi_get_concentration_ratio(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="INCL")
-                    self.fi_get_lod(
+                    self.get_lod(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="INCL")
+                    # self.fi_get_lod(
+                    #     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                    #     var_file_long=var_file, var_focus="INCL")
                     self.fi_get_mixed_concentration_ratio(
                         var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                     self.fi_get_mixing_ratio(
@@ -25740,9 +25948,12 @@ class PySILLS(tk.Frame):
             self.fi_get_concentration_ratio(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                 var_file_long=var_file_long, var_focus=var_focus, mode="All")
-            self.fi_get_lod(
+            self.get_lod(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                var_file_long=var_file_long, var_focus=None, mode="All")
+            # self.fi_get_lod(
+            #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+            #     var_file_long=var_file_long, var_focus=var_focus, mode="All")
             self.fi_get_mixed_concentration_ratio(
                 var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
             self.fi_get_mixing_ratio(
