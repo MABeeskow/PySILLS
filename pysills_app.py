@@ -4925,7 +4925,7 @@ class PySILLS(tk.Frame):
             key_setting = "mi_setting"
 
         header = ["filename", "ID"]
-        #
+
         # Concentration Inclusion
         report_concentration_incl = {}
         report_concentration_incl["Total STD"] = {}
@@ -4942,7 +4942,6 @@ class PySILLS(tk.Frame):
         report_lod_incl = {}
         report_lod_incl["Total STD"] = {}
         report_lod_incl["Total SMPL"] = {}
-        #
         report_lod_mat = {}
         report_lod_mat["Total STD"] = {}
         report_lod_mat["Total SMPL"] = {}
@@ -4950,7 +4949,6 @@ class PySILLS(tk.Frame):
         report_mixingratio_a = {}
         report_mixingratio_a["Total STD"] = {}
         report_mixingratio_a["Total SMPL"] = {}
-        #
         report_mixingratio_x = {}
         report_mixingratio_x["Total STD"] = {}
         report_mixingratio_x["Total SMPL"] = {}
@@ -4982,66 +4980,66 @@ class PySILLS(tk.Frame):
         report_rsf = {}
         report_rsf["Total STD"] = {}
         report_rsf["Total SMPL"] = {}
-        #
+
         for var_filetype in ["STD", "SMPL"]:
             var_key = "Total " + str(var_filetype)
-            #
+
             report_concentration_incl[var_filetype] = {}
             report_concentration_incl[var_key] = {}
             report_concentration_incl[var_key]["filename"] = "All Files"
-            #
+
             report_concentration_mat[var_filetype] = {}
             report_concentration_mat[var_key] = {}
             report_concentration_mat[var_key]["filename"] = "All Files"
-            #
+
             report_concentration_mix[var_filetype] = {}
             report_concentration_mix[var_key] = {}
             report_concentration_mix[var_key]["filename"] = "All Files"
-            #
+
             report_lod_incl[var_filetype] = {}
             report_lod_incl[var_key] = {}
             report_lod_incl[var_key]["filename"] = "All Files"
-            #
+
             report_lod_mat[var_filetype] = {}
             report_lod_mat[var_key] = {}
             report_lod_mat[var_key]["filename"] = "All Files"
-            #
+
             report_mixingratio_a[var_filetype] = {}
             report_mixingratio_a[var_key] = {}
             report_mixingratio_a[var_key]["filename"] = "All Files"
-            #
+
             report_mixingratio_x[var_filetype] = {}
             report_mixingratio_x[var_key] = {}
             report_mixingratio_x[var_key]["filename"] = "All Files"
-            #
+
             report_intensity_incl[var_filetype] = {}
             report_intensity_incl[var_key] = {}
             report_intensity_incl[var_key]["filename"] = "All Files"
-            #
+
             report_intensity_mat[var_filetype] = {}
             report_intensity_mat[var_key] = {}
             report_intensity_mat[var_key]["filename"] = "All Files"
-            #
+
             report_intensity_bg[var_filetype] = {}
             report_intensity_bg[var_key] = {}
             report_intensity_bg[var_key]["filename"] = "All Files"
-            #
+
             report_intensity_mix[var_filetype] = {}
             report_intensity_mix[var_key] = {}
             report_intensity_mix[var_key]["filename"] = "All Files"
-            #
+
             report_analytical_sensitivity[var_filetype] = {}
             report_analytical_sensitivity[var_key] = {}
             report_analytical_sensitivity[var_key]["filename"] = "All Files"
-            #
+
             report_normalized_sensitivity[var_filetype] = {}
             report_normalized_sensitivity[var_key] = {}
             report_normalized_sensitivity[var_key]["filename"] = "All Files"
-            #
+
             report_rsf[var_filetype] = {}
             report_rsf[var_key] = {}
             report_rsf[var_key]["filename"] = "All Files"
-            #
+
             for var_datatype in ["SMOOTHED", "RAW"]:
                 report_concentration_incl[var_filetype][var_datatype] = {}
                 report_concentration_mat[var_filetype][var_datatype] = {}
@@ -5050,16 +5048,16 @@ class PySILLS(tk.Frame):
                 report_lod_mat[var_filetype][var_datatype] = {}
                 report_mixingratio_a[var_filetype][var_datatype] = {}
                 report_mixingratio_x[var_filetype][var_datatype] = {}
-                #
+
                 report_intensity_incl[var_filetype][var_datatype] = {}
                 report_intensity_mat[var_filetype][var_datatype] = {}
                 report_intensity_bg[var_filetype][var_datatype] = {}
                 report_intensity_mix[var_filetype][var_datatype] = {}
-                #
+
                 report_analytical_sensitivity[var_filetype][var_datatype] = {}
                 report_normalized_sensitivity[var_filetype][var_datatype] = {}
                 report_rsf[var_filetype][var_datatype] = {}
-                #
+
                 for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     file_long = self.container_lists[var_filetype]["Long"][index]
                     file_isotopes = self.container_lists["Measured Isotopes"][file_short]
@@ -5078,7 +5076,7 @@ class PySILLS(tk.Frame):
                     report_mixingratio_a[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_mixingratio_x[var_filetype][var_datatype][file_short] = {}
                     report_mixingratio_x[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    #
+
                     if var_filetype == "STD":
                         report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -5102,7 +5100,7 @@ class PySILLS(tk.Frame):
                             var_filetype][file_long]["ID"].get()
                         report_mixingratio_x[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
-                    #
+
                     report_intensity_incl[var_filetype][var_datatype][file_short] = {}
                     report_intensity_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_intensity_mat[var_filetype][var_datatype][file_short] = {}
@@ -5111,7 +5109,7 @@ class PySILLS(tk.Frame):
                     report_intensity_bg[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_intensity_mix[var_filetype][var_datatype][file_short] = {}
                     report_intensity_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    #
+
                     if var_filetype == "STD":
                         report_intensity_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_intensity_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -5126,14 +5124,14 @@ class PySILLS(tk.Frame):
                             var_filetype][file_long]["ID"].get()
                         report_intensity_mix[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
-                    #
+
                     report_analytical_sensitivity[var_filetype][var_datatype][file_short] = {}
                     report_analytical_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_normalized_sensitivity[var_filetype][var_datatype][file_short] = {}
                     report_normalized_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_rsf[var_filetype][var_datatype][file_short] = {}
                     report_rsf[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    #
+
                     if var_filetype == "STD":
                         report_analytical_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_normalized_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -5145,162 +5143,120 @@ class PySILLS(tk.Frame):
                             "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
                         report_rsf[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
                             file_long]["ID"].get()
-                    #
+
                     for isotope in file_isotopes:
                         ## COMPOSITIONAL ANALYSIS
                         # Concentration Inclusion
                         if var_filetype == "SMPL":
                             value_i = self.container_concentration[var_filetype][var_datatype][file_short]["INCL"][
                                 isotope]
-                            value_mean = self.container_concentration[var_filetype][var_datatype]["INCL"][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
-                        #
+
                         n_digits = 5
-                        #
                         report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_concentration_incl[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Concentration Matrix
                         if var_filetype == "STD":
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
                         value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
-                        value_mean = self.container_concentration[var_filetype][var_datatype]["MAT"][isotope]
-                        #
                         n_digits = 5
 
                         if var_filetype == "SMPL":
                             report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
-                            report_concentration_mat[var_key][isotope] = round(value_mean, n_digits)
                         else:
                             if var_srm_i == var_srm_file:
                                 report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                     value_i, n_digits)
                             else:
                                 report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = "undefined"
-                            report_concentration_mat[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Concentration Mixed
                         if var_filetype == "SMPL":
                             value_i = self.container_mixed_concentration[var_filetype][var_datatype][file_short][
                                 isotope]
-                            value_mean = self.container_mixed_concentration[var_filetype][var_datatype][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
-                        #
+
                         n_digits = 5
-                        #
                         report_concentration_mix[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_concentration_mix[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Limit of Detection (Inclusion)
                         if var_filetype == "SMPL":
                             value_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
-                            #value_mean = self.container_lod[var_filetype][var_datatype]["INCL"][isotope]
                         else:
                             value_i = 0.0
-                            #value_mean = 0.0
-                        #
+
                         n_digits = 5
-                        #
                         report_lod_incl[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        #report_lod_incl[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Limit of Detection (Matrix)
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        #value_mean = self.container_lod[var_filetype][var_datatype]["MAT"][isotope]
-                        #
                         n_digits = 5
-                        #
                         report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        #report_lod_mat[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Mixing Ratio (Factor a)
                         if var_filetype == "SMPL":
                             value_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][file_short][
                                 isotope]
-                            value_mean = self.container_mixed_concentration_ratio[var_filetype][var_datatype][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
-                        #
+
                         report_mixingratio_a[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
                             value_i)
-                        report_mixingratio_a[var_key][isotope] = "{:0.5e}".format(value_mean)
-                        #
+
                         # Mixing Ratio (Factor x)
                         if var_filetype == "SMPL":
                             value_i = self.container_mixing_ratio[var_filetype][var_datatype][file_short][isotope]
-                            value_mean = self.container_mixing_ratio[var_filetype][var_datatype][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
-                        #
+
                         report_mixingratio_x[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
                             value_i)
-                        report_mixingratio_x[var_key][isotope] = "{:0.5e}".format(value_mean)
-                        #
+
                         ## INTENSITY ANALYSIS
                         # Intensity Inclusion
                         if var_filetype == "SMPL":
                             value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
                                 "INCL"][isotope]
-                            value_mean = self.container_intensity_corrected[var_filetype][var_datatype]["INCL"][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
-                        #
+
                         n_digits = 5
-                        #
                         report_intensity_incl[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_intensity_incl[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Intensity Matrix
                         value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
-                        value_mean = self.container_intensity_corrected[var_filetype][var_datatype]["MAT"][isotope]
-                        #
                         n_digits = 5
-                        #
                         report_intensity_mat[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_intensity_mat[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Intensity Background
                         value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["BG"][
                             isotope]
-                        value_mean = self.container_intensity_corrected[var_filetype][var_datatype]["BG"][isotope]
-                        #
                         n_digits = 5
-                        #
                         report_intensity_bg[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_intensity_bg[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Intensity Mixed
                         if var_filetype == "SMPL":
                             value_i = self.container_intensity_mix[var_filetype][var_datatype][file_short][isotope]
-                            value_mean = self.container_intensity_mix[var_filetype][var_datatype][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
-                        #
+
                         n_digits = 5
-                        #
                         report_intensity_mix[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_intensity_mix[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         ## SENSITIVITY ANALYSIS
                         # Analytical Sensitivity
                         value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
@@ -5317,10 +5273,6 @@ class PySILLS(tk.Frame):
                                     value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                         filename_short]["MAT"][isotope]
                                     helper_std[isotope].append(value_i)
-                            value_mean = np.nanmean(helper_std[isotope])
-
-                        if var_filetype == "SMPL":
-                            value_mean = self.container_analytical_sensitivity[var_filetype][var_datatype][isotope]
 
                         n_digits = 5
 
@@ -5329,35 +5281,24 @@ class PySILLS(tk.Frame):
                                 value_i, n_digits)
                         else:
                             report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "undefined"
-                        if value_mean != None:
-                            report_analytical_sensitivity[var_key][isotope] = round(value_mean, n_digits)
-                        else:
-                            report_analytical_sensitivity[var_key][isotope] = "undefined"
 
                         # Normalized Sensitivity
                         value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
                             isotope]
-                        value_mean = self.container_normalized_sensitivity[var_filetype][var_datatype][isotope]
-                        #
                         n_digits = 5
-                        #
                         report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_normalized_sensitivity[var_key][isotope] = round(value_mean, n_digits)
-                        #
+
                         # Relative Sensitivity Factor
                         value_i = self.container_rsf[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        value_mean = self.container_rsf[var_filetype][var_datatype][isotope]
-                        #
                         report_rsf[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(value_i)
-                        report_rsf[var_key][isotope] = "{:0.5e}".format(value_mean)
 
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
-        #
+
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
         filename = export_file.name
-        #
+
         with open(filename, "w", newline="") as report_file:
             writer = csv.DictWriter(report_file, fieldnames=header, delimiter=";")
             report_file.write("CALCULATION REPORT\n")
@@ -5365,170 +5306,156 @@ class PySILLS(tk.Frame):
             report_file.write("AUTHOR:;" + str(self.container_var["ma_setting"]["Author"].get()) + "\n")
             report_file.write("SOURCE ID:;" + str(self.container_var["ma_setting"]["Source ID"].get()) + "\n")
             report_file.write("\n")
-            #
+
             for var_datatype in ["SMOOTHED", "RAW"]:
                 report_file.write("DATA TYPE:;" + str(var_datatype) + str(" DATA") + "\n")
                 report_file.write("\n")
-                #
+
                 for var_filetype in ["SMPL", "STD"]:
                     if var_filetype == "SMPL":
                         report_file.write("SAMPLE FILES\n")
                     elif var_filetype == "STD":
                         report_file.write("STANDARD FILES\n")
-                    #
+
                     var_key = "Total " + str(var_filetype)
                     report_file.write("\n")
-                    #
+
                     ## COMPOSITIONAL ANALYSIS
                     report_file.write("COMPOSITIONAL ANALYSIS\n")
                     if var_filetype == "SMPL":
                         report_file.write("Composition (Inclusion)\n")  # Concentration Inclusion
                         report_file.write("(ppm)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_concentration_incl[var_key])
+
                         report_file.write("\n")
-                        #
+
                     report_file.write("Composition (Matrix)\n")  # Concentration Matrix
                     report_file.write("(ppm)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_concentration_mat[var_key])
+
                     report_file.write("\n")
-                    #
+
                     if var_filetype == "SMPL":
                         report_file.write("Composition (Mixed)\n")  # Concentration Mixed
                         report_file.write("(ppm)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_concentration_mix[var_key])
+
                         report_file.write("\n")
-                        #
+
                         report_file.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
                         report_file.write("(ppm)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_lod_incl[var_key])
+
                         report_file.write("\n")
-                        #
+
                     report_file.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file.write("(ppm)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_lod_mat[var_key])
+
                     report_file.write("\n")
-                    #
+
                     if var_filetype == "SMPL":
                         report_file.write("Mixing Ratio a\n")  # Mixing Ratio a
                         report_file.write("(1)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_mixingratio_a[var_key])
+
                         report_file.write("\n")
-                        #
+
                         report_file.write("Mixing Ratio x\n")  # Mixing Ratio x
                         report_file.write("(1)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_mixingratio_x[var_key])
+
                         report_file.write("\n")
-                        #
+
                     report_file.write("INTENSITY ANALYSIS\n")
                     if var_filetype == "SMPL":
                         report_file.write("Intensity (Inclusion)\n")  # Intensity Inclusion
                         report_file.write("(cps)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_intensity_incl[var_key])
+
+
                         report_file.write("\n")
-                        #
+
                     report_file.write("Intensity (Matrix)\n")  # Intensity Matrix
                     report_file.write("(cps)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_intensity_mat[var_key])
+
                     report_file.write("\n")
-                    #
+
                     report_file.write("Intensity (Background)\n")  # Intensity Background
                     report_file.write("(cps)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_intensity_bg[var_key])
+
                     report_file.write("\n")
-                    #
+
                     if var_filetype == "SMPL":
                         report_file.write("Intensity (Mixed)\n")  # Intensity Mixed
                         report_file.write("(cps)\n")
                         writer.writeheader()
-                        #
+
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
-                        #
-                        writer.writerow(report_intensity_mix[var_key])
+
                         report_file.write("\n")
-                        #
+
                     report_file.write("SENSITIVITY ANALYSIS\n")
                     report_file.write("Analytical Sensitivity\n")  # Analytical Sensitivity
                     report_file.write("(1)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_analytical_sensitivity[var_key])
+
                     report_file.write("\n")
-                    #
+
                     report_file.write("Normalized Sensitivity\n")  # Normalized Sensitivity
                     report_file.write("(cps)/(ppm)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_normalized_sensitivity[var_key])
+
                     report_file.write("\n")
-                    #
+
                     report_file.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
                     report_file.write("(1)\n")
                     writer.writeheader()
-                    #
+
                     for file_short in self.container_lists[var_filetype]["Short"]:
                         writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
-                    #
-                    writer.writerow(report_rsf[var_key])
+
                     report_file.write("\n")
 
-    #
     def save_project(self):
         save_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
         # Save information about the project
