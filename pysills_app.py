@@ -16440,7 +16440,8 @@ class PySILLS(tk.Frame):
                     var_is_host = var_is_smpl
                 else:
                     if var_focus == "MAT":
-                        var_is_host = self.container_var[var_filetype][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+                        var_is_host = self.container_var[var_filetype][var_file_long]["Matrix Setup"]["IS"][
+                            "Name"].get()
                         var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                     elif var_focus == "INCL":
                         var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
@@ -16458,7 +16459,8 @@ class PySILLS(tk.Frame):
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
                         self.get_analytical_sensitivity(
                             var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
-                            var_file_long=file_std, var_is_smpl=var_is_smpl, var_focus=var_focus, var_is_host=var_is_host)
+                            var_file_long=file_std, var_is_smpl=var_is_smpl, var_focus="MAT",
+                            var_is_host=var_is_host)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         list_delta_std_i.append(delta_std_i)
@@ -16532,7 +16534,6 @@ class PySILLS(tk.Frame):
                         b_i = round(b_i, 12)
 
                         var_result_is = b_i*delta_i + a_i
-
                         var_result_i = var_result_i_pre/var_result_is
                     else:
                         var_result_i = var_result_i_pre/var_result_is
@@ -17372,7 +17373,7 @@ class PySILLS(tk.Frame):
                         var_init_datareduction = self.var_init_fi_datareduction
                     else:
                         var_init_datareduction = self.var_init_mi_datareduction
-                for focus in list_focus: #sex
+                for focus in list_focus:
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
