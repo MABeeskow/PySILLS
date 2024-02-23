@@ -5203,26 +5203,26 @@ class PySILLS(tk.Frame):
                         # Limit of Detection (Inclusion)
                         if var_filetype == "SMPL":
                             value_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
-                            value_mean = self.container_lod[var_filetype][var_datatype]["INCL"][isotope]
+                            #value_mean = self.container_lod[var_filetype][var_datatype]["INCL"][isotope]
                         else:
                             value_i = 0.0
-                            value_mean = 0.0
+                            #value_mean = 0.0
                         #
                         n_digits = 5
                         #
                         report_lod_incl[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_lod_incl[var_key][isotope] = round(value_mean, n_digits)
+                        #report_lod_incl[var_key][isotope] = round(value_mean, n_digits)
                         #
                         # Limit of Detection (Matrix)
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        value_mean = self.container_lod[var_filetype][var_datatype]["MAT"][isotope]
+                        #value_mean = self.container_lod[var_filetype][var_datatype]["MAT"][isotope]
                         #
                         n_digits = 5
                         #
                         report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
-                        report_lod_mat[var_key][isotope] = round(value_mean, n_digits)
+                        #report_lod_mat[var_key][isotope] = round(value_mean, n_digits)
                         #
                         # Mixing Ratio (Factor a)
                         if var_filetype == "SMPL":
