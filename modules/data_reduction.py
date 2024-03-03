@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		31.01.2024
+# Date:		03.03.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -287,17 +287,21 @@ class IntensityQuantification:
                         result_bg = np.mean(helper_bg_2)
                         #result_bg_1sigma = np.mean(helper_bg_sigma)
                         result_bg_1sigma = np.mean(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
+                        results_bg_sigma = np.std(helper_bg_2, ddof=1)
                     else:
                         #result_bg = np.median(helper_bg)
                         result_bg = np.median(helper_bg_2)
                         #result_bg_1sigma = np.median(helper_bg_sigma)
                         result_bg_1sigma = np.median(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
+                        results_bg_sigma = np.std(helper_bg_2, ddof=1)
 
                     helper_results[isotope]["uncorrected"]["BG"] = result_bg
                     helper_results[isotope]["uncorrected"]["1 SIGMA BG"] = result_bg_1sigma
                     helper_results[isotope]["corrected"]["BG"] = result_bg - result_bg
                     helper_results[isotope]["corrected"]["1 SIGMA BG"] = result_bg_1sigma - result_bg_1sigma
                     self.results_container["BG"][isotope] = result_bg
+                    self.results_container["BG SIGMA"][isotope] = results_bg_sigma
+                    self.results_container["N BG"][isotope] = len(helper_bg_2)
                 elif focus == "MAT":
                     # Mineral/Matrix Signal
                     helper_mat = []
@@ -327,11 +331,13 @@ class IntensityQuantification:
                         result_mat = np.mean(helper_mat_2)
                         #result_mat_1sigma = np.mean(helper_mat_sigma)
                         result_mat_1sigma = np.mean(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
+                        results_mat_sigma = np.std(helper_mat_2, ddof=1)
                     else:
                         #result_mat = np.median(helper_mat)
                         result_mat = np.median(helper_mat_2)
                         #result_mat_1sigma = np.median(helper_mat_sigma)
                         result_mat_1sigma = np.median(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
+                        results_mat_sigma = np.std(helper_mat_2, ddof=1)
 
                     helper_results[isotope]["uncorrected"]["MAT"] = result_mat
                     helper_results[isotope]["uncorrected"]["1 SIGMA MAT"] = result_mat_1sigma
@@ -339,6 +345,8 @@ class IntensityQuantification:
                     helper_results[isotope]["corrected"]["1 SIGMA MAT"] = result_mat_1sigma - result_bg_1sigma
                     self.results_container["MAT"][isotope] = result_mat
                     self.results_container["1 SIGMA MAT"][isotope] = result_mat_1sigma
+                    self.results_container["MAT SIGMA"][isotope] = results_mat_sigma
+                    self.results_container["N MAT"][isotope] = len(helper_mat_2)
                 elif focus == "INCL":
                     # Inclusion Signal
                     helper_incl = []
@@ -379,6 +387,7 @@ class IntensityQuantification:
                     helper_results[isotope]["corrected"]["1 SIGMA MIX"] = result_incl_1sigma - result_bg_1sigma
                     self.results_container["INCL"][isotope] = result_incl
                     self.results_container["1 SIGMA INCL"][isotope] = result_incl_1sigma
+                    self.results_container["N INCL"][isotope] = len(helper_incl_2)
 
             # for key, item in helper_results[isotope].items():
             #     print(key, item)
