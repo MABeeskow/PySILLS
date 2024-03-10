@@ -16878,8 +16878,9 @@ class PySILLS(tk.Frame):
                             var_result_i = np.median(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
 
-    def get_analytical_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific",
-                                   var_is_smpl=None, var_focus=None, var_is_host=None):
+    def get_analytical_sensitivity(
+            self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific", var_is_smpl=None,
+            var_focus=None, var_is_host=None):
         """ Calculates the analytical sensitivity of isotope i with respect to the internal standard IS.
         -------
         Parameters
@@ -16975,21 +16976,13 @@ class PySILLS(tk.Frame):
                 list_valid_std = []
                 list_valid_isotopes = []
 
+                var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                 if self.pysills_mode == "MA":
-                    var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                     var_is_host = var_is_smpl
                 else:
-                    if var_focus == "MAT":
-                        var_is_host = self.container_var[var_filetype][var_file_long]["Matrix Setup"]["IS"][
-                            "Name"].get()
-                        var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                    elif var_focus == "INCL":
-                        var_is_smpl = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                        var_is_host = self.container_var[var_filetype][var_file_long]["Matrix Setup"]["IS"][
-                            "Name"].get()
+                    var_is_host = self.container_var[var_filetype][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
 
                 file_isotopes_smpl = self.container_lists["Measured Isotopes"][var_file_short]
-
                 list_delta_std_i = []
                 list_xi_std_i = {}
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
@@ -17126,9 +17119,8 @@ class PySILLS(tk.Frame):
                                             var_filetype=var_filetype, var_datatype=var_datatype,
                                             var_file_short=var_file_short, var_file_long=var_file_long,
                                             var_focus=var_focus)
-                                        var_result_i = \
-                                        self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                            var_file_short][var_focus][isotope]
+                                        var_result_i = self.container_analytical_sensitivity[var_filetype][
+                                            var_datatype][var_file_short][var_focus][isotope]
                                         helper_results.append(var_result_i)
 
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -19925,8 +19917,9 @@ class PySILLS(tk.Frame):
                         self.container_rsf[var_filetype][var_datatype][isotope] = var_result_i
 
     #
-    def fi_get_concentration(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT",
-                             mode="Specific", pypitzer=False):
+    def fi_get_concentration(
+            self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT", mode="Specific",
+            pypitzer=False):
         """ Calculates the concentration, C, based on the following two equations:
         1) Standard Files:  C_i = SRM_dataset(element)
         2) Sample Files:    C_i = (intensity_smpl_i/intensity_smpl_is)*(concentration_smpl_is/sensitivity_i)
@@ -20028,8 +20021,6 @@ class PySILLS(tk.Frame):
                                     var_file_short]["INCL"][isotope]
                                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["INCL"][var_is]
-                                var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
-                                    var_file_short]["1 SIGMA INCL"][isotope]
                                 var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                     var_file_short]["INCL"][isotope]
 
@@ -21024,15 +21015,19 @@ class PySILLS(tk.Frame):
                 self.fi_get_concentration(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                # SQ(dataframe_01=self.container_intensity_corrected[var_filetype][var_datatype][var_file_short],
+                #    dataframe_02=self.container_concentration[var_filetype][var_datatype][var_file_short],
+                #    results_container=self.container_normalized_sensitivity[var_filetype][
+                #        var_datatype]).get_normalized_sensitivity(
+                #     filename_short=var_file_short, filetype=var_filetype,
+                #     data_sensitivity=self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short],
+                #     dict_is=results_is)
                 self.fi_get_normalized_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
                 self.fi_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
-                # self.fi_get_lod(
-                #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                #     var_file_long=var_file_long, var_focus=var_focus, mode="All")
                 self.get_lod(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=None, mode="All")
@@ -21129,7 +21124,6 @@ class PySILLS(tk.Frame):
                                     entries_container.append("undefined")
                                 else:
                                     entries_container.append("< LoD")
-                                    #entries_container.append("("+f"{value:.{n_digits}f}"+")")
 
                         self.tv_results_files.insert("", tk.END, values=entries_container)
                     else:
@@ -22324,11 +22318,6 @@ class PySILLS(tk.Frame):
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
         ## BUTTONS
-        # btn_06a = SE(
-        #     parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
-        #     n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-        #     text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-        #     command=self.fi_export_calculation_report)
         btn_06a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
