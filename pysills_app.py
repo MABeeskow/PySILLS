@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		04.03.2024
+# Date:		10.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -4512,11 +4512,6 @@ class PySILLS(tk.Frame):
         filename_std = filename_base_parts[0] + "_std" + var_file_extension
         filename_smpl = filename_base_parts[0] + "_smpl" + var_file_extension
 
-        if os.path.exists(filename_base):
-            os.remove(filename_base)
-        else:
-            print("The file does not exist!")
-
         # Standard Files
         with open(filename_std, "w", newline="") as report_file_std:
             writer = csv.DictWriter(report_file_std, fieldnames=header, delimiter=var_delimiter)
@@ -4721,6 +4716,11 @@ class PySILLS(tk.Frame):
                             writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
                         report_file_smpl.write("\n")
 
+        if os.path.exists(filename_base):
+            os.remove(filename_base)
+        else:
+            print("The file does not exist!")
+
     def ma_export_report_2(
             self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
             report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
@@ -4730,11 +4730,6 @@ class PySILLS(tk.Frame):
         filename_base_parts = filename_base.split(".")
         filename_raw = filename_base_parts[0] + "_raw" + var_file_extension
         filename_smoothed = filename_base_parts[0] + "_smoothed" + var_file_extension
-
-        if os.path.exists(filename_base):
-            os.remove(filename_base)
-        else:
-            print("The file does not exist!")
 
         # RAW Data
         with open(filename_raw, "w", newline="") as report_file_raw:
@@ -4918,6 +4913,11 @@ class PySILLS(tk.Frame):
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
                         report_file_smoothed.write("\n")
+
+        if os.path.exists(filename_base):
+            os.remove(filename_base)
+        else:
+            print("The file does not exist!")
 
     def fi_export_calculation_report(self):
         if self.pysills_mode == "FI":
@@ -5297,11 +5297,47 @@ class PySILLS(tk.Frame):
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
 
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
+        var_file_extension_pre = self.container_var["General Settings"]["File type"].get()
+        if var_file_extension_pre == "*.csv":
+            var_file_extension = ".csv"
+        elif var_file_extension_pre == "*.txt":
+            var_file_extension = ".txt"
+
+        var_delimiter_pre = self.container_var["General Settings"]["Delimiter"].get()
+        if var_delimiter_pre == "comma":
+            var_delimiter = ","
+        elif var_delimiter_pre == "semicolon":
+            var_delimiter = ";"
+
+        if self.rb_report.get() == 0:  # All in one
+            self.fi_export_report_0(
+                report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+                report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
+                report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
+                report_rsf, var_file_extension, var_delimiter, header)
+        elif self.rb_report.get() == 1:  # STD vs. SMPL
+            self.fi_export_report_1(
+                report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+                report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
+                report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
+                report_rsf, var_file_extension, var_delimiter, header)
+        elif self.rb_report.get() == 2:  # RAW vs. SMOOTHED
+            self.fi_export_report_2(
+                report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+                report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
+                report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
+                report_rsf, var_file_extension, var_delimiter, header)
+
+    def fi_export_report_0(
+            self, report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+            report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
+            report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
+            report_rsf, var_file_extension, var_delimiter, header):
+        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename = export_file.name
 
         with open(filename, "w", newline="") as report_file:
-            writer = csv.DictWriter(report_file, fieldnames=header, delimiter=";")
+            writer = csv.DictWriter(report_file, fieldnames=header, delimiter=var_delimiter)
             report_file.write("CALCULATION REPORT\n")
             report_file.write("\n")
             report_file.write("AUTHOR:;" + str(self.container_var["ma_setting"]["Author"].get()) + "\n")
@@ -5398,7 +5434,6 @@ class PySILLS(tk.Frame):
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
 
-
                         report_file.write("\n")
 
                     report_file.write("Intensity (Matrix)\n")  # Intensity Matrix
@@ -5456,6 +5491,583 @@ class PySILLS(tk.Frame):
                         writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
+
+    def fi_export_report_1(
+            self, report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+            report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
+            report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
+            report_rsf, var_file_extension, var_delimiter, header):
+        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        filename_base = export_file.name
+        filename_base_parts = filename_base.split(".")
+        filename_std = filename_base_parts[0] + "_std" + var_file_extension
+        filename_smpl = filename_base_parts[0] + "_smpl" + var_file_extension
+
+        # Standard Files
+        with open(filename_std, "w", newline="") as report_file_std:
+            writer = csv.DictWriter(report_file_std, fieldnames=header, delimiter=var_delimiter)
+            report_file_std.write("CALCULATION REPORT\n")
+            report_file_std.write("\n")
+            report_file_std.write("AUTHOR:;" + str(self.container_var["fi_setting"]["Author"].get()) + "\n")
+            report_file_std.write("SOURCE ID:;" + str(self.container_var["fi_setting"]["Source ID"].get()) + "\n")
+            report_file_std.write("\n")
+            for var_datatype in ["SMOOTHED", "RAW"]:
+                report_file_std.write("DATA TYPE:;" + str(var_datatype) + str(" DATA") + "\n")
+                report_file_std.write("\n")
+                for var_filetype in ["STD"]:
+                    report_file_std.write("STANDARD FILES\n")
+                    var_key = "Total " + str(var_filetype)
+                    report_file_std.write("\n")
+
+                    ## COMPOSITIONAL ANALYSIS
+                    report_file_std.write("COMPOSITIONAL ANALYSIS\n")
+                    report_file_std.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_std.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
+                    report_file_std.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("INTENSITY ANALYSIS\n")
+                    report_file_std.write("Intensity (Matrix)\n")  # Intensity Matrix
+                    report_file_std.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("Intensity (Background)\n")  # Intensity Background
+                    report_file_std.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("SENSITIVITY ANALYSIS\n")
+                    report_file_std.write("Analytical Sensitivity\n")  # Analytical Sensitivity
+                    report_file_std.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("Normalized Sensitivity\n")  # Normalized Sensitivity
+                    report_file_std.write("(cps)/(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
+                    report_file_std.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+        # Sample Files
+        with open(filename_smpl, "w", newline="") as report_file_smpl:
+            writer = csv.DictWriter(report_file_smpl, fieldnames=header, delimiter=var_delimiter)
+            report_file_smpl.write("CALCULATION REPORT\n")
+            report_file_smpl.write("\n")
+            report_file_smpl.write("AUTHOR:;" + str(self.container_var["fi_setting"]["Author"].get()) + "\n")
+            report_file_smpl.write("SOURCE ID:;" + str(self.container_var["fi_setting"]["Source ID"].get()) + "\n")
+            report_file_smpl.write("\n")
+            for var_datatype in ["SMOOTHED", "RAW"]:
+                report_file_smpl.write("DATA TYPE:;" + str(var_datatype) + str(" DATA") + "\n")
+                report_file_smpl.write("\n")
+                for var_filetype in ["SMPL"]:
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("SAMPLE FILES\n")
+                    elif var_filetype == "STD":
+                        report_file_smpl.write("STANDARD FILES\n")
+                    var_key = "Total " + str(var_filetype)
+                    report_file_smpl.write("\n")
+
+                    ## COMPOSITIONAL ANALYSIS
+                    report_file_smpl.write("COMPOSITIONAL ANALYSIS\n")
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("Composition (Inclusion)\n")  # Concentration Inclusion
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_smpl.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                        report_file_smpl.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
+                    report_file_smpl.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("Mixing Ratio a\n")  # Mixing Ratio a
+                        report_file_smpl.write("(1)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                        report_file_smpl.write("Mixing Ratio x\n")  # Mixing Ratio x
+                        report_file_smpl.write("(1)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                    report_file_smpl.write("INTENSITY ANALYSIS\n")
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("Intensity (Inclusion)\n")  # Intensity Inclusion
+                        report_file_smpl.write("(cps)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Intensity (Matrix)\n")  # Intensity Matrix
+                    report_file_smpl.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Intensity (Background)\n")  # Intensity Background
+                    report_file_smpl.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("Intensity (Mixed)\n")  # Intensity Mixed
+                        report_file_smpl.write("(cps)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                    report_file_smpl.write("SENSITIVITY ANALYSIS\n")
+                    report_file_smpl.write("Analytical Sensitivity\n")  # Analytical Sensitivity
+                    report_file_smpl.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Normalized Sensitivity\n")  # Normalized Sensitivity
+                    report_file_smpl.write("(cps)/(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
+                    report_file_smpl.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+        if os.path.exists(filename_base):
+            os.remove(filename_base)
+        else:
+            print("The file does not exist!")
+
+    def fi_export_report_2(
+            self, report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+            report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
+            report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
+            report_rsf, var_file_extension, var_delimiter, header):
+        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        filename_base = export_file.name
+        filename_base_parts = filename_base.split(".")
+        filename_raw = filename_base_parts[0] + "_raw" + var_file_extension
+        filename_smoothed = filename_base_parts[0] + "_smoothed" + var_file_extension
+
+        # RAW Data
+        with open(filename_raw, "w", newline="") as report_file_raw:
+            writer = csv.DictWriter(report_file_raw, fieldnames=header, delimiter=var_delimiter)
+            report_file_raw.write("CALCULATION REPORT\n")
+            report_file_raw.write("\n")
+            report_file_raw.write("AUTHOR:;" + str(self.container_var["fi_setting"]["Author"].get()) + "\n")
+            report_file_raw.write("SOURCE ID:;" + str(self.container_var["fi_setting"]["Source ID"].get()) + "\n")
+            report_file_raw.write("\n")
+            for var_datatype in ["RAW"]:
+                report_file_raw.write("DATA TYPE:;" + str(var_datatype) + str(" DATA") + "\n")
+                report_file_raw.write("\n")
+                for var_filetype in ["SMPL", "STD"]:
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("SAMPLE FILES\n")
+                    elif var_filetype == "STD":
+                        report_file_raw.write("STANDARD FILES\n")
+                    var_key = "Total " + str(var_filetype)
+                    report_file_raw.write("\n")
+
+                    ## COMPOSITIONAL ANALYSIS
+                    report_file_raw.write("COMPOSITIONAL ANALYSIS\n")
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("Composition (Inclusion)\n")  # Concentration Inclusion
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                    report_file_raw.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_raw.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                        report_file_raw.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                    report_file_raw.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
+                    report_file_raw.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("Mixing Ratio a\n")  # Mixing Ratio a
+                        report_file_raw.write("(1)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                        report_file_raw.write("Mixing Ratio x\n")  # Mixing Ratio x
+                        report_file_raw.write("(1)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                    report_file_raw.write("INTENSITY ANALYSIS\n")
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("Intensity (Inclusion)\n")  # Intensity Inclusion
+                        report_file_raw.write("(cps)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                    report_file_raw.write("Intensity (Matrix)\n")  # Intensity Matrix
+                    report_file_raw.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    report_file_raw.write("Intensity (Background)\n")  # Intensity Background
+                    report_file_raw.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("Intensity (Mixed)\n")  # Intensity Mixed
+                        report_file_raw.write("(cps)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                    report_file_raw.write("SENSITIVITY ANALYSIS\n")
+                    report_file_raw.write("Analytical Sensitivity\n")  # Analytical Sensitivity
+                    report_file_raw.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    report_file_raw.write("Normalized Sensitivity\n")  # Normalized Sensitivity
+                    report_file_raw.write("(cps)/(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    report_file_raw.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
+                    report_file_raw.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+        # SMOOTHED Data
+        with open(filename_smoothed, "w", newline="") as report_file_smoothed:
+            writer = csv.DictWriter(report_file_smoothed, fieldnames=header, delimiter=var_delimiter)
+            report_file_smoothed.write("CALCULATION REPORT\n")
+            report_file_smoothed.write("\n")
+            report_file_smoothed.write("AUTHOR:;" + str(self.container_var["ma_setting"]["Author"].get()) + "\n")
+            report_file_smoothed.write("SOURCE ID:;" + str(self.container_var["ma_setting"]["Source ID"].get()) + "\n")
+            report_file_smoothed.write("\n")
+            for var_datatype in ["SMOOTHED"]:
+                report_file_smoothed.write("DATA TYPE:;" + str(var_datatype) + str(" DATA") + "\n")
+                report_file_smoothed.write("\n")
+                for var_filetype in ["SMPL", "STD"]:
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("SAMPLE FILES\n")
+                    elif var_filetype == "STD":
+                        report_file_smoothed.write("STANDARD FILES\n")
+                    var_key = "Total " + str(var_filetype)
+                    report_file_smoothed.write("\n")
+
+                    ## COMPOSITIONAL ANALYSIS
+                    report_file_smoothed.write("COMPOSITIONAL ANALYSIS\n")
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("Composition (Inclusion)\n")  # Concentration Inclusion
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_smoothed.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                        report_file_smoothed.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
+                    report_file_smoothed.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("Mixing Ratio a\n")  # Mixing Ratio a
+                        report_file_smoothed.write("(1)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                        report_file_smoothed.write("Mixing Ratio x\n")  # Mixing Ratio x
+                        report_file_smoothed.write("(1)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("INTENSITY ANALYSIS\n")
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("Intensity (Inclusion)\n")  # Intensity Inclusion
+                        report_file_smoothed.write("(cps)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Intensity (Matrix)\n")  # Intensity Matrix
+                    report_file_smoothed.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Intensity (Background)\n")  # Intensity Background
+                    report_file_smoothed.write("(cps)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("Intensity (Mixed)\n")  # Intensity Mixed
+                        report_file_smoothed.write("(cps)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("SENSITIVITY ANALYSIS\n")
+                    report_file_smoothed.write("Analytical Sensitivity\n")  # Analytical Sensitivity
+                    report_file_smoothed.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Normalized Sensitivity\n")  # Normalized Sensitivity
+                    report_file_smoothed.write("(cps)/(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Relative Sensitivity Factor\n")  # Relative Sensitivity Factor
+                    report_file_smoothed.write("(1)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+        if os.path.exists(filename_base):
+            os.remove(filename_base)
+        else:
+            print("The file does not exist!")
 
     def save_project(self):
         save_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
@@ -21712,11 +22324,16 @@ class PySILLS(tk.Frame):
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
 
         ## BUTTONS
+        # btn_06a = SE(
+        #     parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
+        #     n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+        #     text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+        #     command=self.fi_export_calculation_report)
         btn_06a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.fi_export_calculation_report)
+            command=self.calculation_report_setup)
 
         self.var_rb_01 = tk.IntVar()
         self.var_rb_01.set(1)
