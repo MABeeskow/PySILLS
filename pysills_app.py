@@ -24425,7 +24425,7 @@ class PySILLS(tk.Frame):
         #
         ## FRAMES
         frm_quick = SE(
-            parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=30, n_columns=39,
+            parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=39,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
         #
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
