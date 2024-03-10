@@ -19778,44 +19778,55 @@ class PySILLS(tk.Frame):
                             var_result_i = np.median(helper_results)
                         self.container_intensity_ratio[var_filetype][var_datatype][isotope] = var_result_i
 
-    def fi_get_normalized_sensitivity(self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific"):
+    def fi_get_normalized_sensitivity(
+            self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, mode="Specific"):
         if mode == "Specific":
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
                 if var_filetype == "STD":
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    #
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
+
                     var_concentration_i = self.srm_actual[var_srm_i][element]
-                    #
                     var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         "MAT"][isotope]
-                    #
+
                     var_result_i = var_intensity_i/var_concentration_i
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
-                    #
+
                 else:
                     sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
-                        "MAT"][isotope]
-                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                    concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                        var_is]
+                        var_focus][isotope]
 
+                    if var_focus == "INCL":
+                        var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                    else:
+                        var_is = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+                        sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short][var_focus][var_is]#
+                        sensitivity_i = sensitivity_i/sensitivity_is
+
+                    concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short][
+                        var_focus][var_is]
                     intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
-                        "MAT"][var_is]
+                        var_focus][var_is]
 
                     var_result_i = sensitivity_i*(intensity_is/concentration_is)
-                    self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                    self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short][var_focus][
                         isotope] = var_result_i
-            #
         else:
             for var_filetype in ["STD", "SMPL"]:
-                for var_focus in ["MAT"]:
+                if var_filetype == "STD":
+                    list_focus = ["MAT"]
+                else:
+                    list_focus = ["MAT", "INCL"]
+
+                for var_focus in list_focus:
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
-                        #
+
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
@@ -19823,7 +19834,7 @@ class PySILLS(tk.Frame):
                                 if isotope in file_isotopes:
                                     self.fi_get_normalized_sensitivity(
                                         var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_file_long=var_file_long)
+                                        var_file_short=var_file_short, var_file_long=var_file_long, var_focus=var_focus)
                                     var_result_i = self.container_normalized_sensitivity[var_filetype][var_datatype][
                                         var_file_short][var_focus][isotope]
                                     helper_results.append(var_result_i)
@@ -19834,7 +19845,6 @@ class PySILLS(tk.Frame):
                             var_result_i = np.median(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
 
-    #
     def fi_get_rsf(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, mode="Specific"):
         """ Calculates the Relative Sensitivity Factor, RSF, based on the following two equations:
         1) Standard Files:  RSF_i = 1
@@ -20514,25 +20524,25 @@ class PySILLS(tk.Frame):
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                        "MAT"][var_mo]
+                        "INCL"][var_mo]
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                        "MAT"][var_mo]
+                        "INCL"][var_mo]
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                        "MAT"][var_mo]
+                        "INCL"][var_mo]
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                        "MAT"][var_mo]
+                        "INCL"][var_mo]
 
                 var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
                 self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
@@ -20595,8 +20605,8 @@ class PySILLS(tk.Frame):
                         "INCL"][var_is]
 
                     upper_term = var_concentration_host_mo - var_a*var_concentration_host_is
-                    lower_term = var_concentration_host_mo - var_a*(
-                            var_concentration_host_is - var_concentration_incl_is)
+                    lower_term = (var_concentration_host_mo - var_a*
+                                  (var_concentration_host_is - var_concentration_incl_is))
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
@@ -21026,7 +21036,7 @@ class PySILLS(tk.Frame):
                 #     dict_is=results_is)
                 self.fi_get_normalized_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
+                    var_file_long=var_file_long, var_focus=var_focus, mode="All")
                 self.fi_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
@@ -21424,8 +21434,8 @@ class PySILLS(tk.Frame):
                         entries_container = [var_file]
 
                         for isotope in file_isotopes:
-                            value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file]["MAT"][
-                                isotope]
+                            value = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file][
+                                var_focus][isotope]
                             n_digits = 4
                             #
                             entries_container.append(f"{value:.{n_digits}f}")
@@ -21476,15 +21486,15 @@ class PySILLS(tk.Frame):
     #
     def show_diagrams_sensitivity(self):
         ## Window Settings
-        window_width = 900
+        window_width = 1200
         window_height = 800
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_fi_graphical_sensitivity = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
             self.subwindow_fi_graphical_sensitivity.title("MINERAL ANALYSIS - Sensitivity Results")
@@ -21495,30 +21505,30 @@ class PySILLS(tk.Frame):
         self.subwindow_fi_graphical_sensitivity.geometry(var_geometry)
         self.subwindow_fi_graphical_sensitivity.resizable(False, False)
         self.subwindow_fi_graphical_sensitivity["bg"] = self.bg_colors["Very Light"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_graphical_sensitivity, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_fi_graphical_sensitivity, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_fi_graphical_sensitivity.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_fi_graphical_sensitivity.grid_columnconfigure(i, minsize=column_min)
-        #
-        ################################################################################################################
-        #
+
+        # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
         start_row = 0
         start_column = 0
-        #
+
         ## FRAMES
         frm_00 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row, column_id=start_column,
             n_rows=n_rows, n_columns=11, fg=self.bg_colors["Very Light"],
             bg=self.bg_colors["Super Dark"]).create_frame(relief=tk.FLAT)
-        #
+
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row, column_id=start_column, n_rows=1,
@@ -21531,23 +21541,23 @@ class PySILLS(tk.Frame):
         lbl_03 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 6, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Diagram Type", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Focus", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
-            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 10, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Primary Isotope", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
-            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 12, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 11, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Secondary Isotope", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+
         ## RADIOBUTTONS
         self.var_opt_iso_04 = tk.StringVar()
         self.var_opt_iso_04.set(self.container_lists["ISOTOPES"][0])
         self.var_opt_iso_05 = tk.StringVar()
         self.var_opt_iso_05.set(self.container_lists["ISOTOPES"][1])
-        #
-        rb_01a = SE(
+
+        self.rb_01a_std = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_01, value_rb=0, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
@@ -21557,7 +21567,7 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_01, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
             text="Sample Files", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
-        #
+
         rb_02a = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
@@ -21568,28 +21578,21 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_02, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
             text="SMOOTHED Data", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
-        #
+
         rb_03a = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 7, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_03, value_rb=0, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            text="Analytical Sensitivity Drift", sticky="nesw", relief=tk.FLAT)
-        rb_03b = SE(
+            text="Matrix (MAT)", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+        self.rb_03b = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 8, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.var_rb_03, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            text="Histograms", sticky="nesw", relief=tk.FLAT)
-        rb_03c = SE(
-            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 9, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.var_rb_03, value_rb=2, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-            text="Box Plots", sticky="nesw", relief=tk.FLAT)
-        rb_03b.configure(state="disabled")
-        rb_03c.configure(state="disabled")
-        #
+            text="Inclusion (INCL)", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+
         ## OPTION MENUS
         opt_04a = SE(
-            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 11, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 10, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.var_opt_iso_04, option_list=self.container_lists["ISOTOPES"],
             text_set=self.var_opt_iso_04.get(), fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
@@ -21601,9 +21604,9 @@ class PySILLS(tk.Frame):
         opt_04a.config(
             bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
+
         opt_05a = SE(
-            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 13, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=10, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.var_opt_iso_05, option_list=self.container_lists["ISOTOPES"],
             text_set=self.var_opt_iso_05.get(), fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
@@ -21615,55 +21618,63 @@ class PySILLS(tk.Frame):
         opt_05a.config(
             bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
             activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-        #
+
         ## INITIALIZATION
         self.show_sensitivity_drift_diagram()
         self.show_normalized_sensitivity_scatter()
-        #
 
     def show_sensitivity_drift_diagram(self, mode=None):
         if self.var_rb_01.get() == 0:
             var_filetype = "STD"
+            self.rb_03b.configure(state="disabled")
         else:
             var_filetype = "SMPL"
-        #
+            self.rb_03b.configure(state="normal")
+
         if self.var_rb_02.get() == 0:
             var_datatype = "RAW"
         else:
             var_datatype = "SMOOTHED"
-        #
+
         try:
             var_iso_01 = self.var_opt_iso_04.get()
         except:
             var_iso_01 = self.var_opt_iso_04
-        #
+
         self.fig_sensitivity_03a = Figure(
             figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_sensitivity_03a = FigureCanvasTkAgg(
             self.fig_sensitivity_03a, master=self.subwindow_fi_graphical_sensitivity)
         self.canvas_sensitivity_03a.get_tk_widget().grid(row=0, column=11, rowspan=16, columnspan=34, sticky="nesw")
         self.ax_sensitivity_03a = self.fig_sensitivity_03a.add_subplot(label=np.random.uniform())
-        #
+
         self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Drift"][
             "FIG"] = self.fig_sensitivity_03a
         self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Drift"][
             "CANVAS"] = self.canvas_sensitivity_03a
         self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Drift"][
             "AX"] = self.ax_sensitivity_03a
-        #
+
         x_values = []
         y_values = []
-        #
+
+        if self.var_rb_03.get() == 0:
+            str_focus = "MAT"
+            self.rb_01a_std.configure(state="normal")
+        elif self.var_rb_03.get() == 1:
+            str_focus = "INCL"
+            self.rb_01a_std.configure(state="disabled")
+
         for key, value in self.container_lists["Acquisition Times Delta"].items():
             var_file = key
-            #
+
             if var_file in self.container_lists["STD"]["Short"]:
                 var_filetype_2 = "STD"
             elif var_file in self.container_lists["SMPL"]["Short"]:
                 var_filetype_2 = "SMPL"
             var_index = self.container_lists[var_filetype_2]["Short"].index(var_file)
             var_file_long = self.container_lists[var_filetype_2]["Long"][var_index]
-            #
+
             if self.container_var[var_filetype_2][var_file_long]["Checkbox"].get() == 1:
                 if var_filetype == "STD" and var_file in self.container_lists[var_filetype]["Short"]:
                     var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
@@ -21673,11 +21684,18 @@ class PySILLS(tk.Frame):
                         y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
                             var_iso_01]
                         x_values.append(x_value)
+
+                        if str_focus == "MAT":
+                            str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                            str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                "Name"].get()
+                            y_value_is = self.container_analytical_sensitivity["STD"][var_datatype][var_file][
+                                "MAT"][str_is_host]
+                            y_value = y_value/y_value_is
+
                         self.ax_sensitivity_03a.scatter(
                             x=x_value, y=y_value, color=self.bg_colors["Dark"], edgecolor="black", s=80, marker="o")
                 elif var_filetype == "SMPL":
-                    # x_value = value
-                    # x_values.append(x_value)
                     if (var_file in self.container_analytical_sensitivity["STD"][var_datatype]
                             and var_file in self.container_lists["STD"]["Short"]):
                         var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
@@ -21687,6 +21705,15 @@ class PySILLS(tk.Frame):
                             x_values.append(x_value)
                             y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
                                 var_iso_01]
+
+                            if str_focus == "MAT":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_analytical_sensitivity["STD"][var_datatype][var_file][
+                                    "MAT"][str_is_host]
+                                y_value = y_value/y_value_is
+
                             dot_color = self.bg_colors["Dark"]
                             self.ax_sensitivity_03a.scatter(
                                 x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
@@ -21694,32 +21721,72 @@ class PySILLS(tk.Frame):
                           and var_file in self.container_lists["SMPL"]["Short"]):
                         x_value = value
                         x_values.append(x_value)
-                        y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["MAT"][
+                        y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file][str_focus][
                             var_iso_01]
                         dot_color = self.bg_colors["Light"]
                         self.ax_sensitivity_03a.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="D")
+
                 if var_file in self.container_lists["SMPL"]["Short"]:
                     if var_datatype == "RAW":
                         y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
-                                      "a"]*x_value + \
-                                  self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
+                                      "a"]*x_value + self.container_lists[
+                            "Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
+
+                        if str_focus == "MAT":
+                            str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                            str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                "Name"].get()
+                            y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
+                                             "a"]*x_value + self.container_lists[
+                                             "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
+                            y_value = y_value/y_value_is
+
                     elif var_datatype == "SMOOTHED":
                         y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
-                                      "a"]*x_value + \
-                                  self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
+                                      "a"]*x_value + self.container_lists[
+                            "Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
+
+                        if str_focus == "MAT":
+                            str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                            str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                "Name"].get()
+                            y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                             str_is_host]["a"]*x_value + self.container_lists[
+                                             "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
+                            y_value = y_value/y_value_is
+
                     y_values.append(y_value)
                 else:
                     if var_srm_isotope == var_srm_file:
                         if var_datatype == "RAW":
                             y_value = self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
-                                          "a"]*x_value + \
-                                      self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
+                                          "a"]*x_value + self.container_lists[
+                                "Analytical Sensitivity Regression RAW"][var_iso_01]["b"]
+
+                            if str_focus == "MAT":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
+                                                 "a"]*x_value + self.container_lists[
+                                    "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
+                                y_value = y_value/y_value_is
+
                         elif var_datatype == "SMOOTHED":
                             y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
-                                          "a"]*x_value + \
-                                      self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
-                                          "b"]
+                                          "a"]*x_value + self.container_lists[
+                                "Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
+
+                            if str_focus == "MAT":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                                 str_is_host]["a"]*x_value + self.container_lists[
+                                    "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
+                                y_value = y_value/y_value_is
+
                         y_values.append(y_value)
 
         var_lw = float(self.container_var["General Settings"]["Line width"].get())
@@ -21736,8 +21803,9 @@ class PySILLS(tk.Frame):
             for element in sorted_zipped_lists:
                 x_data.append(element[0])
                 y_data.append(element[1])
-            #
-            self.ax_sensitivity_03a.plot(x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
+
+            self.ax_sensitivity_03a.plot(
+                x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
         else:
             if var_srm_isotope == var_srm_file:
                 zipped_lists = zip(x_values, y_values)
@@ -21747,10 +21815,10 @@ class PySILLS(tk.Frame):
                 for element in sorted_zipped_lists:
                     x_data.append(element[0])
                     y_data.append(element[1])
-                #
+
                 self.ax_sensitivity_03a.plot(
                     x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
-        #
+
         self.ax_sensitivity_03a.grid(True)
         self.ax_sensitivity_03a.grid(which="major", linestyle="-", linewidth=1)
         self.ax_sensitivity_03a.minorticks_on()
@@ -21762,45 +21830,53 @@ class PySILLS(tk.Frame):
             "Analytical Sensitivity $\\xi$ of " + str(var_iso_01) + " (1)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a.yaxis.set_tick_params(labelsize=8)
-        #
+
         self.canvas_sensitivity_03a.draw()
 
-    #
     def fi_change_sensitivity_drift_diagram(self, mode=None):
         try:
             self.ax_sensitivity_03a.clear()
         except AttributeError:
             pass
-        #
+
         if self.var_rb_01.get() == 0:
             var_filetype = "STD"
+            self.rb_03b.configure(state="disabled")
         else:
             var_filetype = "SMPL"
-        #
+            self.rb_03b.configure(state="normal")
+
         if self.var_rb_02.get() == 0:
             var_datatype = "RAW"
         else:
             var_datatype = "SMOOTHED"
-        #
+
         x_values = []
         y_values = []
-        #
+
+        if self.var_rb_03.get() == 0:
+            str_focus = "MAT"
+            self.rb_01a_std.configure(state="normal")
+        elif self.var_rb_03.get() == 1:
+            str_focus = "INCL"
+            self.rb_01a_std.configure(state="disabled")
+
         try:
             var_iso_01 = self.var_opt_iso_04.get()
         except:
             var_iso_01 = self.var_opt_iso_04
-        #
+
         for key, value in self.container_lists["Acquisition Times Delta"].items():
             var_file = key
-            #
+
             if var_file in self.container_lists["STD"]["Short"]:
                 var_filetype_2 = "STD"
             elif var_file in self.container_lists["SMPL"]["Short"]:
                 var_filetype_2 = "SMPL"
-            #
+
             var_index = self.container_lists[var_filetype_2]["Short"].index(var_file)
             var_file_long = self.container_lists[var_filetype_2]["Long"][var_index]
-            #
+
             if self.container_var[var_filetype_2][var_file_long]["Checkbox"].get() == 1:
                 if var_filetype == "STD" and var_file in self.container_lists[var_filetype]["Short"]:
                     var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
@@ -21813,18 +21889,38 @@ class PySILLS(tk.Frame):
                             x=x_value_std, y=y_value_std, color=self.bg_colors["Dark"], edgecolor="black", s=80,
                             marker="o")
                         x_value = value
+
                         if var_datatype == "RAW":
                             y_value = (self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*
                                        x_value + self.container_lists["Analytical Sensitivity Regression RAW"][
                                            var_iso_01]["b"])
+
+                            if str_focus == "MAT" and var_filetype == "SMPL":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
+                                                 "a"]*x_value + self.container_lists[
+                                                 "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
+                                y_value = y_value/y_value_is
+
                         elif var_datatype == "SMOOTHED":
                             y_value = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
                                           "a"]*x_value + self.container_lists[
                                           "Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"]
+
+                            if str_focus == "MAT" and var_filetype == "SMPL":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                                 str_is_host]["a"]*x_value + self.container_lists[
+                                    "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
+                                y_value = y_value/y_value_is
+
                         x_values.append(x_value)
                         y_values.append(y_value)
                 elif var_filetype == "SMPL":
-                    # x_value = value
                     if (var_file in self.container_analytical_sensitivity["STD"][var_datatype]
                             and var_file in self.container_lists["STD"]["Short"]):
                         var_srm_isotope = self.container_var["SRM"][var_iso_01].get()
@@ -21833,43 +21929,90 @@ class PySILLS(tk.Frame):
                             x_value = value
                             y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
                                 var_iso_01]
+
+                            if str_focus == "MAT" and var_filetype == "SMPL":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_analytical_sensitivity["STD"][var_datatype][var_file][
+                                    "MAT"][str_is_host]
+                                y_value = y_value/y_value_is
+
                             dot_color = self.bg_colors["Dark"]
                             self.ax_sensitivity_03a.scatter(
                                 x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                     elif (var_file in self.container_analytical_sensitivity["SMPL"][var_datatype]
                           and var_file in self.container_lists["SMPL"]["Short"]):
                         x_value = value
-                        y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["MAT"][
+                        y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file][str_focus][
                             var_iso_01]
                         dot_color = self.bg_colors["Light"]
                         self.ax_sensitivity_03a.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="D")
+
                     if var_file in self.container_lists["SMPL"]["Short"]:
                         if var_datatype == "RAW":
                             y_value = (self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01]["a"]*
                                        x_value +
                                        self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
                                            "b"])
+
+                            if str_focus == "MAT" and var_filetype == "SMPL":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
+                                                 "a"]*x_value + self.container_lists[
+                                                 "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
+                                y_value = y_value/y_value_is
+
                         elif var_datatype == "SMOOTHED":
                             y_value = (self.container_lists["Analytical Sensitivity Regression SMOOTHED"][var_iso_01][
                                            "a"]*
                                        x_value + self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
                                            var_iso_01]["b"])
+
+                            if str_focus == "MAT" and var_filetype == "SMPL":
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                                y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                                 str_is_host]["a"]*x_value + self.container_lists[
+                                    "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
+                                y_value = y_value/y_value_is
+
                         x_values.append(x_value)
                         y_values.append(y_value)
                     else:
                         if var_srm_isotope == var_srm_file:
                             if var_datatype == "RAW":
                                 y_value = (self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
-                                               "a"]*
-                                           x_value +
-                                           self.container_lists["Analytical Sensitivity Regression RAW"][var_iso_01][
-                                               "b"])
+                                               "a"]*x_value + self.container_lists[
+                                    "Analytical Sensitivity Regression RAW"][var_iso_01]["b"])
+
+                                if str_focus == "MAT" and var_filetype == "SMPL":
+                                    str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
+                                    y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][
+                                                     str_is_host]["a"]*x_value + self.container_lists[
+                                        "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
+                                    y_value = y_value/y_value_is
+
                             elif var_datatype == "SMOOTHED":
                                 y_value = (self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
-                                               var_iso_01]["a"]*
-                                           x_value + self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
-                                               var_iso_01]["b"])
+                                               var_iso_01]["a"]*x_value + self.container_lists[
+                                    "Analytical Sensitivity Regression SMOOTHED"][var_iso_01]["b"])
+
+                                if str_focus == "MAT" and var_filetype == "SMPL":
+                                    str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
+                                    y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
+                                                     str_is_host]["a"]*x_value + self.container_lists[
+                                        "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
+                                    y_value = y_value/y_value_is
+
                             x_values.append(x_value)
                             y_values.append(y_value)
 
@@ -21887,7 +22030,7 @@ class PySILLS(tk.Frame):
             for element in sorted_zipped_lists:
                 x_data.append(element[0])
                 y_data.append(element[1])
-            #
+
             self.ax_sensitivity_03a.plot(
                 x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
         else:
@@ -21899,10 +22042,10 @@ class PySILLS(tk.Frame):
                 for element in sorted_zipped_lists:
                     x_data.append(element[0])
                     y_data.append(element[1])
-                #
+
                 self.ax_sensitivity_03a.plot(
                     x_data, y_data, color=self.accent_color, linewidth=var_lw, linestyle="dashed")
-        #
+
         self.ax_sensitivity_03a.grid(True)
         self.ax_sensitivity_03a.grid(which="major", linestyle="-", linewidth=1)
         self.ax_sensitivity_03a.minorticks_on()
@@ -21914,12 +22057,11 @@ class PySILLS(tk.Frame):
             "Analytical Sensitivity $\\xi$ of " + str(var_iso_01) + " (1)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a.yaxis.set_tick_params(labelsize=8)
-        #
+
         self.canvas_sensitivity_03a.draw()
-        #
+
         self.change_normalized_sensitivity_scatter()
 
-    #
     def show_normalized_sensitivity_scatter(self, mode=None):
         if self.var_rb_01.get() == 0:
             var_filetype = "STD"
@@ -24393,12 +24535,15 @@ class PySILLS(tk.Frame):
                 self.fi_get_concentration(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 # Normalized Sensitivity
-                SQ(dataframe_01=self.container_intensity_corrected[var_type]["RAW"][var_file_short],
-                   dataframe_02=self.container_concentration[var_type]["RAW"][var_file_short],
-                   results_container=self.container_normalized_sensitivity[var_type]["RAW"]).get_normalized_sensitivity(
-                    filename_short=var_file_short, filetype=var_type,
-                    data_sensitivity=self.container_analytical_sensitivity[var_type]["RAW"][var_file_short],
-                    dict_is=results_is)
+                # SQ(dataframe_01=self.container_intensity_corrected[var_type]["RAW"][var_file_short],
+                #    dataframe_02=self.container_concentration[var_type]["RAW"][var_file_short],
+                #    results_container=self.container_normalized_sensitivity[var_type]["RAW"]).get_normalized_sensitivity(
+                #     filename_short=var_file_short, filetype=var_type,
+                #     data_sensitivity=self.container_analytical_sensitivity[var_type]["RAW"][var_file_short],
+                #     dict_is=results_is)
+                self.fi_get_normalized_sensitivity(
+                    var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                    var_file_long=var_file, var_focus="MAT")
                 self.fi_get_concentration_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
@@ -24411,6 +24556,9 @@ class PySILLS(tk.Frame):
 
                 if var_type == "SMPL":
                     self.fi_get_concentration(
+                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                        var_file_long=var_file, var_focus="INCL")
+                    self.fi_get_normalized_sensitivity(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="INCL")
                     self.fi_get_concentration_ratio(
@@ -24445,6 +24593,8 @@ class PySILLS(tk.Frame):
                 if var_type == "SMPL":
                     entries_intensity_incl_i = ["Intensity INCL"]
                     entries_intensity_ratio_incl_i = ["Intensity Ratio INCL"]
+                    entries_analytical_sensitivity_incl_i = ["Analytical Sensitivity INCL"]
+                    entries_normalized_sensitivity_incl_i = ["Normalized Sensitivity INCL"]
                     entries_concentration_incl_i = ["Concentration INCL"]
                     entries_concentration_sigma_incl_i = ["Concentration 1 SIGMA INCL"]
                     entries_concentration_mix_i = ["Concentration MIX"]
@@ -24460,20 +24610,34 @@ class PySILLS(tk.Frame):
                     intensity_mat_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["MAT"][
                         isotope]
                     intensity_ratio_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                    #
+
                     if var_type == "SMPL":
                         intensity_incl_i = self.container_intensity_corrected[var_type]["RAW"][var_file_short]["INCL"][
                             isotope]
                         intensity_mix_i = self.container_intensity_mix[var_type]["RAW"][var_file_short][isotope]
                         intensity_ratio_incl_i = self.container_intensity_ratio[var_type]["RAW"][var_file_short][
                             "INCL"][isotope]
-                    #
+
                     # Sensitivity Results
                     analytical_sensitivity_i = self.container_analytical_sensitivity[var_type]["RAW"][var_file_short][
                         "MAT"][isotope]
+
+                    if var_type == "SMPL":
+                        var_is = self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Name"].get()
+                        analytical_sensitivity_is = self.container_analytical_sensitivity[var_type]["RAW"][
+                            var_file_short]["MAT"][var_is]
+                        analytical_sensitivity_i = analytical_sensitivity_i/analytical_sensitivity_is
+
                     normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short][
                         "MAT"][isotope]
                     rsf_i = self.container_rsf[var_type]["RAW"][var_file_short]["MAT"][isotope]
+
+                    if var_type == "SMPL":
+                        analytical_sensitivity_incl_i = self.container_analytical_sensitivity[var_type]["RAW"][
+                            var_file_short]["INCL"][isotope]
+                        normalized_sensitivity_incl_i = self.container_normalized_sensitivity[var_type]["RAW"][
+                            var_file_short]["INCL"][isotope]
+
                     # Concentration Results
                     concentration_i = self.container_concentration[var_type]["RAW"][var_file_short]["MAT"][isotope]
                     concentration_sigma_mat_i = self.container_concentration[var_type]["RAW"][var_file_short][
@@ -24481,7 +24645,7 @@ class PySILLS(tk.Frame):
                     concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short]["MAT"][
                         isotope]
                     lod_i = self.container_lod[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                    #
+
                     if var_type == "SMPL":
                         concentration_incl_i = self.container_concentration[var_type]["RAW"][var_file_short]["INCL"][
                             isotope]
@@ -24508,6 +24672,8 @@ class PySILLS(tk.Frame):
                     entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
 
                     if var_type == "SMPL":
+                        entries_analytical_sensitivity_incl_i.append(f"{analytical_sensitivity_incl_i:.{4}f}")
+                        entries_normalized_sensitivity_incl_i.append(f"{normalized_sensitivity_incl_i:.{4}f}")
                         entries_rsf_i.append(f"{rsf_i:.{4}E}")
 
                     entries_concentration_i.append(f"{concentration_i:.{4}f}")
@@ -24541,6 +24707,8 @@ class PySILLS(tk.Frame):
                 self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
 
                 if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
 
                 self.tv_results_quick.insert("", tk.END, values=entries_empty)
