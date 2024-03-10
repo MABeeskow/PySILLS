@@ -5502,6 +5502,7 @@ class PySILLS(tk.Frame):
         filename_base_parts = filename_base.split(".")
         filename_std = filename_base_parts[0] + "_std" + var_file_extension
         filename_smpl = filename_base_parts[0] + "_smpl" + var_file_extension
+        export_file.close()
 
         # Standard Files
         with open(filename_std, "w", newline="") as report_file_std:
@@ -5755,6 +5756,7 @@ class PySILLS(tk.Frame):
         filename_base_parts = filename_base.split(".")
         filename_raw = filename_base_parts[0] + "_raw" + var_file_extension
         filename_smoothed = filename_base_parts[0] + "_smoothed" + var_file_extension
+        export_file.close()
 
         # RAW Data
         with open(filename_raw, "w", newline="") as report_file_raw:
