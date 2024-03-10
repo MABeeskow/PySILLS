@@ -707,6 +707,7 @@ class PySILLS(tk.Frame):
         self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"] = {
             "Sensitivity Drift": {"FIG": None, "CANVAS": None, "AX": None},
             "Sensitivity Drift Change": {"FIG": None, "CANVAS": None, "AX": None},
+            "Sensitivity Comparison": {"FIG": None, "CANVAS": None, "AX": None},
             "Histograms": {"FIG": None, "CANVAS": None, "AX": None},
             "Box Plots": {"FIG": None, "CANVAS": None, "AX": None}}
         #
@@ -21486,7 +21487,7 @@ class PySILLS(tk.Frame):
     #
     def show_diagrams_sensitivity(self):
         ## Window Settings
-        window_width = 1200
+        window_width = 1400
         window_height = 800
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -21622,6 +21623,7 @@ class PySILLS(tk.Frame):
         ## INITIALIZATION
         self.show_sensitivity_drift_diagram()
         self.show_normalized_sensitivity_scatter()
+        self.show_relative_sensitivity_comparison()
 
     def show_sensitivity_drift_diagram(self, mode=None):
         if self.var_rb_01.get() == 0:
@@ -21645,7 +21647,7 @@ class PySILLS(tk.Frame):
             figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_sensitivity_03a = FigureCanvasTkAgg(
             self.fig_sensitivity_03a, master=self.subwindow_fi_graphical_sensitivity)
-        self.canvas_sensitivity_03a.get_tk_widget().grid(row=0, column=11, rowspan=16, columnspan=34, sticky="nesw")
+        self.canvas_sensitivity_03a.get_tk_widget().grid(row=0, column=11, rowspan=16, columnspan=28, sticky="nesw")
         self.ax_sensitivity_03a = self.fig_sensitivity_03a.add_subplot(label=np.random.uniform())
 
         self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Drift"][
@@ -21832,6 +21834,9 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a.yaxis.set_tick_params(labelsize=8)
 
         self.canvas_sensitivity_03a.draw()
+
+        if self.pysills_mode == "MA":
+            self.rb_03b.configure(state="disabled")
 
     def fi_change_sensitivity_drift_diagram(self, mode=None):
         try:
@@ -22061,6 +22066,10 @@ class PySILLS(tk.Frame):
         self.canvas_sensitivity_03a.draw()
 
         self.change_normalized_sensitivity_scatter()
+        #self.change_sensitivity_drift_comparison()
+
+        if self.pysills_mode == "MA":
+            self.rb_03b.configure(state="disabled")
 
     def show_normalized_sensitivity_scatter(self, mode=None):
         if self.var_rb_01.get() == 0:
@@ -22086,7 +22095,7 @@ class PySILLS(tk.Frame):
             figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_sensitivity_03a2 = FigureCanvasTkAgg(
             self.fig_sensitivity_03a2, master=self.subwindow_fi_graphical_sensitivity)
-        self.canvas_sensitivity_03a2.get_tk_widget().grid(row=16, column=11, rowspan=16, columnspan=34, sticky="nesw")
+        self.canvas_sensitivity_03a2.get_tk_widget().grid(row=16, column=11, rowspan=16, columnspan=28, sticky="nesw")
         self.ax_sensitivity_03a2 = self.fig_sensitivity_03a2.add_subplot(label=np.random.uniform())
         #
         self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Drift Change"][
@@ -22166,7 +22175,9 @@ class PySILLS(tk.Frame):
         #
         self.canvas_sensitivity_03a2.draw()
 
-    #
+        if self.pysills_mode == "MA":
+            self.rb_03b.configure(state="disabled")
+
     def change_normalized_sensitivity_scatter(self, mode=None):
         try:
             self.ax_sensitivity_03a2.clear()
@@ -22262,7 +22273,190 @@ class PySILLS(tk.Frame):
         #
         self.canvas_sensitivity_03a2.draw()
 
-    #
+        if self.pysills_mode == "MA":
+            self.rb_03b.configure(state="disabled")
+
+    def show_relative_sensitivity_comparison(self, mode=None):
+        if self.var_rb_01.get() == 0:
+            var_filetype = "STD"
+        else:
+            var_filetype = "SMPL"
+
+        if self.var_rb_02.get() == 0:
+            var_datatype = "RAW"
+        else:
+            var_datatype = "SMOOTHED"
+
+        try:
+            var_iso_01 = self.var_opt_iso_04.get()
+        except:
+            var_iso_01 = self.var_opt_iso_04
+        try:
+            var_iso_02 = self.var_opt_iso_05.get()
+        except:
+            var_iso_02 = self.var_opt_iso_05
+
+        if self.var_rb_03.get() == 0:
+            str_focus = "MAT"
+            self.rb_01a_std.configure(state="normal")
+        elif self.var_rb_03.get() == 1:
+            str_focus = "INCL"
+            self.rb_01a_std.configure(state="disabled")
+
+        self.fig_sensitivity_03a3 = Figure(
+            figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        self.canvas_sensitivity_03a3 = FigureCanvasTkAgg(
+            self.fig_sensitivity_03a3, master=self.subwindow_fi_graphical_sensitivity)
+        self.canvas_sensitivity_03a3.get_tk_widget().grid(row=0, column=39, rowspan=16, columnspan=31, sticky="nesw")
+        self.ax_sensitivity_03a3 = self.fig_sensitivity_03a3.add_subplot(label=np.random.uniform())
+
+        self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Comparison"][
+            "FIG"] = self.fig_sensitivity_03a3
+        self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Comparison"][
+            "CANVAS"] = self.canvas_sensitivity_03a3
+        self.container_var["fi_datareduction_isotopes"]["Sensitivity Plots"]["Sensitivity Comparison"][
+            "AX"] = self.ax_sensitivity_03a3
+
+        helper_srm_isotopes = {}
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            var_srm_i = self.container_var["SRM"][isotope].get()
+            if var_srm_i not in helper_srm_isotopes:
+                helper_srm_isotopes[var_srm_i] = []
+            if isotope not in helper_srm_isotopes[var_srm_i]:
+                helper_srm_isotopes[var_srm_i].append(isotope)
+
+        helper_srm_files = {}
+        for index, file_long in enumerate(self.container_lists["STD"]["Long"]):
+            file_short = self.container_lists["STD"]["Short"][index]
+            var_srm_i = self.container_var["STD"][file_long]["SRM"].get()
+            if var_srm_i not in helper_srm_files:
+                helper_srm_files[var_srm_i] = []
+            if file_short not in helper_srm_files[var_srm_i]:
+                helper_srm_files[var_srm_i].append(file_short)
+
+        self.helper_xi_files = {}
+        for srm_file, list_files in helper_srm_files.items():
+            self.helper_xi_files[srm_file] = {"Start": None, "End": None, "Counter": 0}
+            for file_short in list_files:
+                var_id = self.container_lists["STD"]["Short"].index(file_short)
+                file_long = self.container_lists["STD"]["Long"][var_id]
+                cb_i = self.container_var["STD"][file_long]["Checkbox"].get()
+                if cb_i == 1 and self.helper_xi_files[srm_file]["Counter"] == 0:
+                    self.helper_xi_files[srm_file]["Start"] = file_short
+                    self.helper_xi_files[srm_file]["Counter"] += 1
+                elif cb_i == 1:
+                    self.helper_xi_files[srm_file]["End"] = file_short
+
+        var_is = self.container_var["SMPL"][self.container_lists["SMPL"]["Long"][0]]["IS Data"]["IS"].get()
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            var_srm_i = self.container_var["SRM"][isotope].get()
+            file_short_first = self.helper_xi_files[var_srm_i]["Start"]
+            file_short_last = self.helper_xi_files[var_srm_i]["End"]
+
+            sensitivity_i_first = self.container_analytical_sensitivity["STD"][var_datatype][file_short_first][
+                "MAT"][isotope]
+            sensitivity_is_first = self.container_analytical_sensitivity["STD"][var_datatype][file_short_first][
+                "MAT"][var_is]
+            sensitivity_i_last = self.container_analytical_sensitivity["STD"][var_datatype][file_short_last][
+                "MAT"][isotope]
+            sensitivity_is_last = self.container_analytical_sensitivity["STD"][var_datatype][file_short_last][
+                "MAT"][var_is]
+            sensitivity_i_first = sensitivity_i_first/sensitivity_is_first
+            sensitivity_i_last = sensitivity_i_last/sensitivity_is_last
+            sensitivity_change_i = (sensitivity_i_last/sensitivity_i_first - 1)*100
+
+            self.ax_sensitivity_03a3.bar(
+                x=isotope, height=sensitivity_change_i, color=self.isotope_colors[isotope], edgecolor="black")
+
+        self.ax_sensitivity_03a3.axhline(0, color="black", linestyle="dashed")
+
+        if len(self.container_lists["Measured Isotopes"]["All"]) > 20:
+            self.ax_sensitivity_03a3.set_xticklabels(self.container_lists["Measured Isotopes"]["All"], rotation=90)
+        else:
+            self.ax_sensitivity_03a3.set_xticklabels(self.container_lists["Measured Isotopes"]["All"], rotation=45)
+
+        self.ax_sensitivity_03a3.grid(True)
+        self.ax_sensitivity_03a3.grid(which="major", linestyle="-", linewidth=1)
+        self.ax_sensitivity_03a3.minorticks_on()
+        self.ax_sensitivity_03a3.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+        self.ax_sensitivity_03a3.set_axisbelow(True)
+        self.ax_sensitivity_03a3.set_title("% drift in analytical sensitivity", fontsize=9)
+        self.ax_sensitivity_03a3.set_xlabel(
+            "Isotope", labelpad=0.5, fontsize=8)
+        self.ax_sensitivity_03a3.set_ylabel(
+            "% change in analytical sensitivity", labelpad=0.5, fontsize=8)
+        self.ax_sensitivity_03a3.xaxis.set_tick_params(labelsize=8)
+        self.ax_sensitivity_03a3.yaxis.set_tick_params(labelsize=8)
+
+        self.canvas_sensitivity_03a3.draw()
+
+    def change_sensitivity_drift_comparison(self, mode=None):
+        try:
+            self.ax_sensitivity_03a3.clear()
+        except AttributeError:
+            pass
+
+        if self.var_rb_01.get() == 0:
+            var_filetype = "STD"
+        else:
+            var_filetype = "SMPL"
+
+        if self.var_rb_02.get() == 0:
+            var_datatype = "RAW"
+        else:
+            var_datatype = "SMOOTHED"
+
+        try:
+            var_iso_01 = self.var_opt_iso_04.get()
+        except:
+            var_iso_01 = self.var_opt_iso_04
+        try:
+            var_iso_02 = self.var_opt_iso_05.get()
+        except:
+            var_iso_02 = self.var_opt_iso_05
+
+        if self.var_rb_03.get() == 0:
+            str_focus = "MAT"
+            self.rb_01a_std.configure(state="normal")
+        elif self.var_rb_03.get() == 1:
+            str_focus = "INCL"
+            self.rb_01a_std.configure(state="disabled")
+
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            var_srm_i = self.container_var["SRM"][isotope].get()
+            file_short_first = self.helper_xi_files[var_srm_i]["Start"]
+            file_short_last = self.helper_xi_files[var_srm_i]["End"]
+
+            sensitivity_i_first = self.container_analytical_sensitivity["STD"][var_datatype][file_short_first][
+                "MAT"][isotope]
+            sensitivity_i_last = self.container_analytical_sensitivity["STD"][var_datatype][file_short_last][
+                "MAT"][isotope]
+
+            sensitivity_change_i = (sensitivity_i_last/sensitivity_i_first - 1)*100
+
+            self.ax_sensitivity_03a3.bar(
+                x=isotope, height=sensitivity_change_i, color=self.isotope_colors[isotope], edgecolor="black")
+
+        if len(self.container_lists["Measured Isotopes"]["All"]) > 20:
+            self.ax_sensitivity_03a3.set_xticklabels(self.container_lists["Measured Isotopes"]["All"], rotation=90)
+        else:
+            self.ax_sensitivity_03a3.set_xticklabels(self.container_lists["Measured Isotopes"]["All"], rotation=45)
+
+        self.ax_sensitivity_03a3.grid(True)
+        self.ax_sensitivity_03a3.grid(which="major", linestyle="-", linewidth=1)
+        self.ax_sensitivity_03a3.minorticks_on()
+        self.ax_sensitivity_03a3.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+        self.ax_sensitivity_03a3.set_axisbelow(True)
+        self.ax_sensitivity_03a3.set_title("% drift in analytical sensitivity", fontsize=9)
+        self.ax_sensitivity_03a3.set_xlabel(
+            "Isotope", labelpad=0.5, fontsize=8)
+        self.ax_sensitivity_03a3.set_ylabel(
+            "% change in analytical sensitivity", labelpad=0.5, fontsize=8)
+        self.ax_sensitivity_03a3.xaxis.set_tick_params(labelsize=8)
+        self.ax_sensitivity_03a3.yaxis.set_tick_params(labelsize=8)
+
+        self.canvas_sensitivity_03a3.draw()
+
     def fi_show_diagrams_concentration(self):
         pass
 
