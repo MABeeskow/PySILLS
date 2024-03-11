@@ -21726,8 +21726,11 @@ class PySILLS(tk.Frame):
 
                         if str_focus == "MAT":
                             str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                            str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                "Name"].get()
+                            if self.pysills_mode == "MA":
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                            else:
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
                             y_value_is = self.container_analytical_sensitivity["STD"][var_datatype][var_file][
                                 "MAT"][str_is_host]
                             y_value = y_value/y_value_is
@@ -21747,8 +21750,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 y_value_is = self.container_analytical_sensitivity["STD"][var_datatype][var_file][
                                     "MAT"][str_is_host]
                                 y_value = y_value/y_value_is
@@ -21774,8 +21780,11 @@ class PySILLS(tk.Frame):
 
                         if str_focus == "MAT":
                             str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                            str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                "Name"].get()
+                            if self.pysills_mode == "MA":
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                            else:
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
                             y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
                                              "a"]*x_value + self.container_lists[
                                              "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
@@ -21788,8 +21797,11 @@ class PySILLS(tk.Frame):
 
                         if str_focus == "MAT":
                             str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                            str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                "Name"].get()
+                            if self.pysills_mode == "MA":
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                            else:
+                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                    "Name"].get()
                             y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
                                              str_is_host]["a"]*x_value + self.container_lists[
                                              "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
@@ -21805,8 +21817,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
                                                  "a"]*x_value + self.container_lists[
                                     "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
@@ -21819,8 +21834,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
                                                  str_is_host]["a"]*x_value + self.container_lists[
                                     "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
@@ -21939,8 +21957,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT" and var_filetype == "SMPL":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][str_is_host][
                                                  "a"]*x_value + self.container_lists[
                                                  "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
@@ -21953,8 +21974,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT" and var_filetype == "SMPL":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
                                                  str_is_host]["a"]*x_value + self.container_lists[
                                     "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
@@ -21973,8 +21997,12 @@ class PySILLS(tk.Frame):
                             y_value = self.container_analytical_sensitivity["STD"][var_datatype][var_file]["MAT"][
                                 var_iso_01]
                             if str_focus == "MAT" and var_filetype == "SMPL":
-                                str_is_host = self.container_var["SMPL"][self.container_lists["SMPL"]["Long"][0]][
-                                    "Matrix Setup"]["IS"]["Name"].get()
+                                str_file_smpl = self.container_lists["SMPL"]["Long"][0]
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 if str_is_host in self.container_analytical_sensitivity["STD"][var_datatype][var_file][
                                     "MAT"]:
                                     y_value_is = self.container_analytical_sensitivity["STD"][var_datatype][var_file][
@@ -22014,8 +22042,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT" and var_filetype == "SMPL":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 var_srm_host = self.container_var["SRM"][str_is_host].get()
                                 var_srm_iso_01 = self.container_var["SRM"][var_iso_01].get()
                                 if var_srm_host != var_srm_iso_01 and y_value_true_smpl != y_value:
@@ -22034,8 +22065,11 @@ class PySILLS(tk.Frame):
 
                             if str_focus == "MAT" and var_filetype == "SMPL":
                                 str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                    "Name"].get()
+                                if self.pysills_mode == "MA":
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                else:
+                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                        "Name"].get()
                                 y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
                                                  str_is_host]["a"]*x_value + self.container_lists[
                                     "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
@@ -22052,8 +22086,11 @@ class PySILLS(tk.Frame):
 
                                 if str_focus == "MAT" and var_filetype == "SMPL":
                                     str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                        "Name"].get()
+                                    if self.pysills_mode == "MA":
+                                        str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                    else:
+                                        str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                            "Name"].get()
                                     y_value_is = self.container_lists["Analytical Sensitivity Regression RAW"][
                                                      str_is_host]["a"]*x_value + self.container_lists[
                                         "Analytical Sensitivity Regression RAW"][str_is_host]["b"]
@@ -22066,8 +22103,11 @@ class PySILLS(tk.Frame):
 
                                 if str_focus == "MAT" and var_filetype == "SMPL":
                                     str_file_smpl = self.container_lists["SMPL"]["Long"][0]
-                                    str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
-                                        "Name"].get()
+                                    if self.pysills_mode == "MA":
+                                        str_is_host = self.container_var["SMPL"][str_file_smpl]["IS Data"]["IS"].get()
+                                    else:
+                                        str_is_host = self.container_var["SMPL"][str_file_smpl]["Matrix Setup"]["IS"][
+                                            "Name"].get()
                                     y_value_is = self.container_lists["Analytical Sensitivity Regression SMOOTHED"][
                                                      str_is_host]["a"]*x_value + self.container_lists[
                                         "Analytical Sensitivity Regression SMOOTHED"][str_is_host]["b"]
