@@ -665,17 +665,17 @@ class PySILLS(tk.Frame):
                     self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
                 else:
                     self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"].set(0)
-                    self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
+                    self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].set("0.5")
             for salt in salt_carbonates:
                 self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt] = {
                     "State": tk.IntVar(), "Weight": tk.StringVar()}
                 self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt]["State"].set(0)
-                self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt]["Weight"].set("1.0")
+                self.container_var[key_setting]["Salt Correction"]["Carbonates"][salt]["Weight"].set("0.5")
             for salt in salt_sulfates:
                 self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt] = {
                     "State": tk.IntVar(), "Weight": tk.StringVar()}
                 self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt]["State"].set(0)
-                self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt]["Weight"].set("1.0")
+                self.container_var[key_setting]["Salt Correction"]["Sulfates"][salt]["Weight"].set("0.5")
             self.container_var[key_setting]["Data Type Plot"] = {"STD": {}, "SMPL": {}}
             self.container_var[key_setting]["Analyse Mode Plot"] = {"STD": {}, "SMPL": {}}
             self.container_var[key_setting]["Display RAW"] = {"STD": {}, "SMPL": {}}
