@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.03.2024
+# Date:		12.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -13527,7 +13527,11 @@ class PySILLS(tk.Frame):
             categories = ["BG", "MAT", "INCL", "SPK", "ISORAT"]
             for category in categories:
                 self.container_listboxes["SMPL"][file_smpl_short][category] = None
-            #
+
+            if file_smpl not in self.container_var["SMPL"]:
+                self.build_all_needed_variables(
+                    filetype="SMPL", filename_long=file_smpl, filename_short=file_smpl_short)
+
             cb_i = tk.Checkbutton(
                 master=frm_files, text=file_smpl_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
                 variable=self.container_var["SMPL"][file_smpl]["Checkbox"], onvalue=1, offvalue=0,
@@ -28808,6 +28812,11 @@ class PySILLS(tk.Frame):
             self.container_lod[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}, "INCL": {}}
         #
         for isotope in self.container_lists["ISOTOPES"]:
+            if var_file_short not in self.container_measurements["EDITED"]:
+                self.container_measurements["EDITED"][var_file_short] = {}
+                n_file = len(var_file_short)
+                original_name = var_file_short[:int(n_file - 9)] + ".csv"
+                print("Original name:", var_file_short[:int(n_file - 9)]+".csv")
             self.container_measurements["EDITED"][var_file_short][isotope] = {}
             self.container_measurements["EDITED"][var_file_short][isotope]["BG"] = []
             self.container_measurements["EDITED"][var_file_short][isotope]["MAT"] = []
