@@ -27091,8 +27091,7 @@ class PySILLS(tk.Frame):
             "FeSO4-H2O", "FeSO4-7H2O"]
 
         self.dict_species_helper = {}
-        print(self.container_lists["Selected Cations"])
-        print(self.container_lists["Selected Anions"])
+
         for cation in self.container_lists["Selected Cations"]:
             if cation in ["Li", "Na", "K", "Rb", "Cs"]:
                 self.dict_species_helper[cation] = cation + "+"
@@ -27240,7 +27239,7 @@ class PySILLS(tk.Frame):
                 var_file_long=var_file_long, var_focus=var_focus, mode="All", pypitzer=bool_pypitzer)
             self.fi_get_normalized_sensitivity(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                var_file_long=var_file_long, mode="All")
+                var_file_long=var_file_long, var_focus=None, mode="All")
             self.fi_get_concentration_ratio(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                 var_file_long=var_file_long, var_focus=var_focus, mode="All")
