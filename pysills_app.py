@@ -26221,6 +26221,10 @@ class PySILLS(tk.Frame):
                     "H": 1.008, "Li": 6.941, "C": 12.010, "O": 16.000, "Na": 22.990, "Mg": 24.300, "S": 32.070,
                     "Cl": 35.45, "K": 39.100, "Ca": 40.080, "Fe": 55.850}
 
+            val_molar_mass_na = elements_masses["Na"]
+            val_molar_mass_cl = elements_masses["Cl"]
+            val_molar_mass_nacl = val_molar_mass_na + val_molar_mass_cl
+
             if self.init_fi_chargebalance == False:
                 var_filetype = "None"
                 var_file_short = "None"
@@ -26252,11 +26256,11 @@ class PySILLS(tk.Frame):
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                     file_smpl = self.container_lists["SMPL"]["Long"][index]
                     var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                    var_nacl_equiv = amount_nacl_equiv*total_ppm
-                    var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
-                        "Total"])
+                    var_nacl_equiv = amount_nacl_equiv*(val_molar_mass_na/val_molar_mass_nacl)
+                    var_na_true_base = var_nacl_equiv
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                     salt_factor = 1
+                    salt_contribution = 0
                     for salt in self.container_lists["Selected Salts"]:
                         if salt != "NaCl":
                             molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
@@ -26287,13 +26291,20 @@ class PySILLS(tk.Frame):
 
                                     salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
                                                    (molar_mass_na/molar_mass_element)
+                                    var_conc_ratio = (var_intensity_i)/(var_intensity_na*var_sensitivity_i)
+                                    salt_contribution += charge_i*var_conc_ratio*(val_molar_mass_na/molar_mass_element)
                         else:
                             salt_factor += 0
 
-                    var_na_true_final = var_na_true_base/salt_factor
+                    var_na_true_final = (var_na_true_base/salt_factor)*total_ppm
 
                     var_concentration_is = round(var_na_true_final, 4)
-                    helper.append(var_concentration_is)
+                    b_nacl = amount_nacl_equiv/val_molar_mass_nacl
+                    b_cl = b_nacl
+                    b_na = b_cl/(1 + salt_contribution)
+                    val_concentration_is = b_na*val_molar_mass_na*10**6
+                    var_concentration_is2 = var_nacl_equiv*(val_molar_mass_na/val_molar_mass_nacl)/(salt_contribution)*total_ppm
+                    helper.append(val_concentration_is)
 
                 try:
                     for row in self.tv_salt_cb.get_children():
@@ -26316,6 +26327,7 @@ class PySILLS(tk.Frame):
                         "Total"])
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                     salt_factor = 1
+                    salt_contribution = 0
                     for salt in self.container_lists["Selected Salts"]:
                         if salt != "NaCl":
                             molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
@@ -26346,20 +26358,26 @@ class PySILLS(tk.Frame):
 
                                     salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
                                                    (molar_mass_na/molar_mass_element)
+                                    var_conc_ratio = (var_intensity_i)/(var_intensity_na*var_sensitivity_i)
+                                    salt_contribution += charge_i*var_conc_ratio*(val_molar_mass_na/molar_mass_element)
                         else:
                             salt_factor += 0
 
                     var_na_true_final = var_na_true_base/salt_factor
 
                     var_concentration_is = round(var_na_true_final, 4)
-                    helper.append(var_concentration_is)
+                    b_nacl = amount_nacl_equiv/val_molar_mass_nacl
+                    b_cl = b_nacl
+                    b_na = b_cl/(1 + salt_contribution)
+                    val_concentration_is = b_na*val_molar_mass_na*10**6
+                    helper.append(val_concentration_is)
 
                     self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
                         var_entr.get())
 
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                     if file_smpl_short in self.container_files["SMPL"]:
-                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -26375,6 +26393,7 @@ class PySILLS(tk.Frame):
                 var_na_true_base = var_nacl_equiv*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"]["Total"])
                 file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                 salt_factor = 1
+                salt_contribution = 0
                 for salt in self.container_lists["Selected Salts"]:
                     if salt != "NaCl":
                         molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
@@ -26404,16 +26423,21 @@ class PySILLS(tk.Frame):
 
                                 salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
                                                (molar_mass_na/molar_mass_element)
+                                var_conc_ratio = (var_intensity_i)/(var_intensity_na*var_sensitivity_i)
+                                salt_contribution += charge_i*var_conc_ratio*(val_molar_mass_na/molar_mass_element)
                     else:
                         salt_factor += 0
 
                 var_na_true_final = var_na_true_base/salt_factor
-
+                b_nacl = amount_nacl_equiv/val_molar_mass_nacl
+                b_cl = b_nacl
+                b_na = b_cl/(1 + salt_contribution)
+                val_concentration_is = b_na*val_molar_mass_na*10**6
                 var_concentration_is = round(var_na_true_final, 4)
 
-                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                 if file_smpl_short in self.container_files["SMPL"]:
-                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
     def check_file_flags(self):
         helper_flags = {"STD": {"Total": 0, "Currently": 0}, "SMPL": {"Total": 0, "Currently": 0}}
@@ -26466,6 +26490,10 @@ class PySILLS(tk.Frame):
                     "H": 1.008, "Li": 6.941, "C": 12.010, "O": 16.000, "Na": 22.990, "Mg": 24.300, "S": 32.070,
                     "Cl": 35.45, "K": 39.100, "Ca": 40.080, "Fe": 55.850}
 
+            val_molar_mass_na = elements_masses["Na"]
+            val_molar_mass_cl = elements_masses["Cl"]
+            val_molar_mass_nacl = val_molar_mass_na + val_molar_mass_cl
+
             if self.init_fi_massbalance == False:
                 var_filetype = "None"
                 var_file_short = "None"
@@ -26497,9 +26525,10 @@ class PySILLS(tk.Frame):
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                     file_smpl = self.container_lists["SMPL"]["Long"][index]
                     var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                    var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
+                    var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
                     var_na_true_base = var_na_equiv
                     var_salt_contribution = 0
+                    var_salt_contribution_2 = 0
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                     for salt in self.container_lists["Selected Salts"]:
                         if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
@@ -26532,6 +26561,10 @@ class PySILLS(tk.Frame):
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
                                     try:
+                                        var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                        var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                                val_molar_mass_na*molar_mass_salt)/(
+                                                val_molar_mass_nacl*molar_mass_element)
                                         var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*(
                                                 1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
                                     except:
@@ -26542,7 +26575,8 @@ class PySILLS(tk.Frame):
 
                     var_salt_contribution_final = var_salt_contribution + 1
                     var_concentration_is = var_na_true_base/var_salt_contribution_final
-                    helper.append(var_concentration_is)
+                    val_concentration_is = (var_na_equiv/(1 + var_salt_contribution_2))*total_ppm
+                    helper.append(val_concentration_is)
 
                 try:
                     for row in self.tv_salt.get_children():
@@ -26560,9 +26594,10 @@ class PySILLS(tk.Frame):
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                     file_smpl = self.container_lists["SMPL"]["Long"][index]
                     var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                    var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
+                    var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv*total_ppm
                     var_na_true_base = var_na_equiv
                     var_salt_contribution = 0
+                    var_salt_contribution_2 = 0
                     file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                     for salt in self.container_lists["Selected Salts"]:
                         if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
@@ -26595,6 +26630,10 @@ class PySILLS(tk.Frame):
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
 
+                                    var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                    var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                            val_molar_mass_na*molar_mass_salt)/(
+                                                                       val_molar_mass_nacl*molar_mass_element)
                                     var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
                                                              (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
                         else:
@@ -26603,7 +26642,8 @@ class PySILLS(tk.Frame):
                     var_salt_contribution_final = var_salt_contribution + 1
                     var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
                     # var_concentration_is = var_na_true_base
-                    helper.append(var_concentration_is)
+                    val_concentration_is = (var_na_equiv/(1 + var_salt_contribution_2))*total_ppm
+                    helper.append(val_concentration_is)
 
                     self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
                         var_entr.get())
@@ -26622,9 +26662,10 @@ class PySILLS(tk.Frame):
                 file_smpl = var_file
                 file_smpl_short = file_smpl.split("/")[-1]
                 var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                var_na_equiv = self.molar_masses_compounds["NaCl"]["Na"]*amount_nacl_equiv*total_ppm
+                var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv*total_ppm
                 var_na_true_base = var_na_equiv
                 var_salt_contribution = 0
+                var_salt_contribution_2 = 0
                 file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
                 for salt in self.container_lists["Selected Salts"]:
                     if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
@@ -26657,6 +26698,10 @@ class PySILLS(tk.Frame):
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][isotope]
 
+                                var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                        val_molar_mass_na*molar_mass_salt)/(
+                                                                   val_molar_mass_nacl*molar_mass_element)
                                 var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
                                                          (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
 
@@ -26666,10 +26711,11 @@ class PySILLS(tk.Frame):
                 var_salt_contribution_final = var_salt_contribution + 1
 
                 var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
+                val_concentration_is = (var_na_equiv/(1 + var_salt_contribution_2))*total_ppm
 
-                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                 if file_smpl_short in self.container_files["SMPL"]:
-                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                    self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
     def fi_set_concentration_is_massbalance(self, event):
         if self.pysills_mode == "FI":
