@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		12.03.2024
+# Date:		15.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -26276,14 +26276,14 @@ class PySILLS(tk.Frame):
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
                                     except:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
 
                                     salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
                                                    (molar_mass_na/molar_mass_element)
@@ -26335,14 +26335,14 @@ class PySILLS(tk.Frame):
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
                                     except:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
 
                                     salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
                                                    (molar_mass_na/molar_mass_element)
@@ -26393,14 +26393,14 @@ class PySILLS(tk.Frame):
                                     var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                         file_smpl_short]["INCL"][var_is_i]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["MAT"][isotope]
+                                        file_smpl_short]["INCL"][isotope]
                                 except:
                                     var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][isotope]
                                     var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][var_is_i]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                        file_smpl_short]["MAT"][isotope]
+                                        file_smpl_short]["INCL"][isotope]
 
                                 salt_factor += (charge_i/var_sensitivity_i)*(var_intensity_i/var_intensity_na)* \
                                                (molar_mass_na/molar_mass_element)
@@ -26523,14 +26523,14 @@ class PySILLS(tk.Frame):
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
                                     except:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
                                     try:
                                         var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*(
                                                 1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
@@ -26586,14 +26586,14 @@ class PySILLS(tk.Frame):
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                            file_smpl_short]["MAT"][isotope]  # SMOOTHED
+                                            file_smpl_short]["INCL"][isotope]  # SMOOTHED
                                     except:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][var_is_i]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                            file_smpl_short]["MAT"][isotope]
+                                            file_smpl_short]["INCL"][isotope]
 
                                     var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
                                                              (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
@@ -26648,14 +26648,14 @@ class PySILLS(tk.Frame):
                                     var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                         file_smpl_short]["INCL"][var_is_i]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["MAT"][isotope]
+                                        file_smpl_short]["INCL"][isotope]
                                 except:
                                     var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][isotope]
                                     var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][var_is_i]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
-                                        file_smpl_short]["MAT"][isotope]
+                                        file_smpl_short]["INCL"][isotope]
 
                                 var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
                                                          (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
