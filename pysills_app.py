@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		15.03.2024
+# Date:		20.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -4930,14 +4930,17 @@ class PySILLS(tk.Frame):
 
         # Concentration Inclusion
         report_concentration_incl = {}
+        report_concentration_incl_1_sigma = {}
         report_concentration_incl["Total STD"] = {}
         report_concentration_incl["Total SMPL"] = {}
         # Concentration Matrix
         report_concentration_mat = {}
+        report_concentration_mat_1_sigma = {}
         report_concentration_mat["Total STD"] = {}
         report_concentration_mat["Total SMPL"] = {}
-        # Concentration Ratio
+        # Mixed Concentration
         report_concentration_mix = {}
+        report_concentration_mix_1_sigma = {}
         report_concentration_mix["Total STD"] = {}
         report_concentration_mix["Total SMPL"] = {}
         # Limit of Detection
@@ -4988,14 +4991,20 @@ class PySILLS(tk.Frame):
 
             report_concentration_incl[var_filetype] = {}
             report_concentration_incl[var_key] = {}
+            report_concentration_incl_1_sigma[var_filetype] = {}
+            report_concentration_incl_1_sigma[var_key] = {}
             report_concentration_incl[var_key]["filename"] = "All Files"
 
             report_concentration_mat[var_filetype] = {}
             report_concentration_mat[var_key] = {}
+            report_concentration_mat_1_sigma[var_filetype] = {}
+            report_concentration_mat_1_sigma[var_key] = {}
             report_concentration_mat[var_key]["filename"] = "All Files"
 
             report_concentration_mix[var_filetype] = {}
             report_concentration_mix[var_key] = {}
+            report_concentration_mix_1_sigma[var_filetype] = {}
+            report_concentration_mix_1_sigma[var_key] = {}
             report_concentration_mix[var_key]["filename"] = "All Files"
 
             report_lod_incl[var_filetype] = {}
@@ -5044,8 +5053,11 @@ class PySILLS(tk.Frame):
 
             for var_datatype in ["SMOOTHED", "RAW"]:
                 report_concentration_incl[var_filetype][var_datatype] = {}
+                report_concentration_incl_1_sigma[var_filetype][var_datatype] = {}
                 report_concentration_mat[var_filetype][var_datatype] = {}
+                report_concentration_mat_1_sigma[var_filetype][var_datatype] = {}
                 report_concentration_mix[var_filetype][var_datatype] = {}
+                report_concentration_mix_1_sigma[var_filetype][var_datatype] = {}
                 report_lod_incl[var_filetype][var_datatype] = {}
                 report_lod_mat[var_filetype][var_datatype] = {}
                 report_mixingratio_a[var_filetype][var_datatype] = {}
@@ -5066,10 +5078,16 @@ class PySILLS(tk.Frame):
 
                     report_concentration_incl[var_filetype][var_datatype][file_short] = {}
                     report_concentration_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
+                    report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short] = {}
+                    report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_concentration_mat[var_filetype][var_datatype][file_short] = {}
                     report_concentration_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
+                    report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short] = {}
+                    report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_concentration_mix[var_filetype][var_datatype][file_short] = {}
                     report_concentration_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
+                    report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short] = {}
+                    report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_lod_incl[var_filetype][var_datatype][file_short] = {}
                     report_lod_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_lod_mat[var_filetype][var_datatype][file_short] = {}
@@ -5081,8 +5099,11 @@ class PySILLS(tk.Frame):
 
                     if var_filetype == "STD":
                         report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = "---"
@@ -5090,10 +5111,16 @@ class PySILLS(tk.Frame):
                     else:
                         report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
+                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][
+                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
                         report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
+                        report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][
+                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
                         report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
+                        report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short][
+                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
                         report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
                         report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
@@ -5152,12 +5179,17 @@ class PySILLS(tk.Frame):
                         if var_filetype == "SMPL":
                             value_i = self.container_concentration[var_filetype][var_datatype][file_short]["INCL"][
                                 isotope]
+                            value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
+                                "1 SIGMA INCL"][isotope]
                         else:
                             value_i = 0.0
+                            value_sigma_i = 0.0
 
                         n_digits = 5
                         report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
                             value_i, n_digits)
+                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
+                            value_sigma_i, n_digits)
 
                         # Concentration Matrix
                         if var_filetype == "STD":
@@ -5168,8 +5200,13 @@ class PySILLS(tk.Frame):
                         n_digits = 5
 
                         if var_filetype == "SMPL":
+                            value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
+                                "1 SIGMA MAT"][isotope]
                             report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
+                            report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_sigma_i, n_digits)
+
                         else:
                             if var_srm_i == var_srm_file:
                                 report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
@@ -5312,25 +5349,29 @@ class PySILLS(tk.Frame):
 
         if self.rb_report.get() == 0:  # All in one
             self.fi_export_report_0(
-                report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+                report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
+                report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
                 report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
                 report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
                 report_rsf, var_file_extension, var_delimiter, header)
         elif self.rb_report.get() == 1:  # STD vs. SMPL
             self.fi_export_report_1(
-                report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+                report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
+                report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
                 report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
                 report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
                 report_rsf, var_file_extension, var_delimiter, header)
         elif self.rb_report.get() == 2:  # RAW vs. SMOOTHED
             self.fi_export_report_2(
-                report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+                report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
+                report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
                 report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
                 report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
                 report_rsf, var_file_extension, var_delimiter, header)
 
     def fi_export_report_0(
-            self, report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+            self, report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
+            report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
             report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
             report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
             report_rsf, var_file_extension, var_delimiter, header):
@@ -5370,22 +5411,12 @@ class PySILLS(tk.Frame):
 
                         report_file.write("\n")
 
-                    report_file.write("Composition (Matrix)\n")  # Concentration Matrix
-                    report_file.write("(ppm)\n")
-                    writer.writeheader()
-
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
-
-                    report_file.write("\n")
-
-                    if var_filetype == "SMPL":
-                        report_file.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file.write("1-Sigma Composition (Inclusion)\n")  # Concentration Inclusion (1-Sigma)
                         report_file.write("(ppm)\n")
                         writer.writeheader()
 
                         for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5398,6 +5429,25 @@ class PySILLS(tk.Frame):
 
                         report_file.write("\n")
 
+                    report_file.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file.write("1-Sigma Composition (Matrix)\n")  # Concentration Matrix (1-Sigma)
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+
+                    report_file.write("\n")
+
                     report_file.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file.write("(ppm)\n")
                     writer.writeheader()
@@ -5406,6 +5456,16 @@ class PySILLS(tk.Frame):
                         writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file.write("\n")
 
                     if var_filetype == "SMPL":
                         report_file.write("Mixing Ratio a\n")  # Mixing Ratio a
@@ -5494,7 +5554,8 @@ class PySILLS(tk.Frame):
                     report_file.write("\n")
 
     def fi_export_report_1(
-            self, report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+            self, report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
+            report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
             report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
             report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
             report_rsf, var_file_extension, var_delimiter, header):
@@ -5619,22 +5680,12 @@ class PySILLS(tk.Frame):
 
                         report_file_smpl.write("\n")
 
-                    report_file_smpl.write("Composition (Matrix)\n")  # Concentration Matrix
-                    report_file_smpl.write("(ppm)\n")
-                    writer.writeheader()
-
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
-
-                    report_file_smpl.write("\n")
-
-                    if var_filetype == "SMPL":
-                        report_file_smpl.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_smpl.write("1-Sigma Composition (Inclusion)\n")  # Concentration Inclusion (1-Sigma)
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
 
                         for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5647,6 +5698,24 @@ class PySILLS(tk.Frame):
 
                         report_file_smpl.write("\n")
 
+                    report_file_smpl.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_smpl.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    report_file_smpl.write("1-Sigma Composition (Matrix)\n")  # Concentration Matrix (1-Sigma)
+                    report_file_smpl.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
                     report_file_smpl.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_smpl.write("(ppm)\n")
                     writer.writeheader()
@@ -5655,6 +5724,16 @@ class PySILLS(tk.Frame):
                         writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smpl.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
 
                     if var_filetype == "SMPL":
                         report_file_smpl.write("Mixing Ratio a\n")  # Mixing Ratio a
@@ -5748,7 +5827,8 @@ class PySILLS(tk.Frame):
             print("The file does not exist!")
 
     def fi_export_report_2(
-            self, report_concentration_incl, report_concentration_mat, report_concentration_mix, report_mixingratio_a,
+            self, report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
+            report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
             report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
             report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
             report_rsf, var_file_extension, var_delimiter, header):
@@ -5790,22 +5870,12 @@ class PySILLS(tk.Frame):
 
                         report_file_raw.write("\n")
 
-                    report_file_raw.write("Composition (Matrix)\n")  # Concentration Matrix
-                    report_file_raw.write("(ppm)\n")
-                    writer.writeheader()
-
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
-
-                    report_file_raw.write("\n")
-
-                    if var_filetype == "SMPL":
-                        report_file_raw.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_raw.write("1-Sigma Composition (Inclusion)\n")  # Concentration Inclusion (1-Sigma)
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
 
                         for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -5818,6 +5888,25 @@ class PySILLS(tk.Frame):
 
                         report_file_raw.write("\n")
 
+                    report_file_raw.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_raw.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("1-Sigma Composition (Matrix)\n")  # Concentration Matrix (1-Sigma)
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
                     report_file_raw.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_raw.write("(ppm)\n")
                     writer.writeheader()
@@ -5826,6 +5915,16 @@ class PySILLS(tk.Frame):
                         writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_raw.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
 
                     if var_filetype == "SMPL":
                         report_file_raw.write("Mixing Ratio a\n")  # Mixing Ratio a
@@ -5944,22 +6043,12 @@ class PySILLS(tk.Frame):
 
                         report_file_smoothed.write("\n")
 
-                    report_file_smoothed.write("Composition (Matrix)\n")  # Concentration Matrix
-                    report_file_smoothed.write("(ppm)\n")
-                    writer.writeheader()
-
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
-
-                    report_file_smoothed.write("\n")
-
-                    if var_filetype == "SMPL":
-                        report_file_smoothed.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_smoothed.write("1-Sigma Composition (Inclusion)\n")  # Concentration Inclusion (1-Sigma)
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
 
                         for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -5972,6 +6061,25 @@ class PySILLS(tk.Frame):
 
                         report_file_smoothed.write("\n")
 
+                    report_file_smoothed.write("Composition (Matrix)\n")  # Concentration Matrix
+                    report_file_smoothed.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for file_short in self.container_lists[var_filetype]["Short"]:
+                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("1-Sigma Composition (Matrix)\n")  # Concentration Matrix (1-Sigma)
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
                     report_file_smoothed.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_smoothed.write("(ppm)\n")
                     writer.writeheader()
@@ -5980,6 +6088,16 @@ class PySILLS(tk.Frame):
                         writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
+
+                    if var_filetype == "SMPL":
+                        report_file_smoothed.write("Composition (Mixed)\n")  # Concentration Mixed
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
 
                     if var_filetype == "SMPL":
                         report_file_smoothed.write("Mixing Ratio a\n")  # Mixing Ratio a
