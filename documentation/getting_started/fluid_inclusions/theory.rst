@@ -251,13 +251,13 @@ Calculation of the 1-Sigma concentration
 It is possible to calculate the so-called 1-:math:`\sigma` concentration :math:`C_i^{\sigma}` for the inclusion, matrix and mixed concentration.
 
 .. math::
-    C_i^{\sigma, a} = \frac{C_{IS}^{a}}{I_{IS}^{a} \xi_i^{IS, a}} \cdot \sqrt{\sigma_i^{BG}^2 + \sigma_i^{a}^2}
+    C_i^{\sigma, a} = \frac{C_{IS}^{a}}{I_{IS}^{a} \xi_i^{IS, a}} \cdot \sqrt{\sigma_{BG,i}^2 + \sigma_{a,i}^2}
 
 .. math::
-    \sigma_i^{BG} = \frac{1}{\tau_i} \cdot \sqrt{\frac{I_i^{BG} \tau_i}{N_{BG}}}
+    \sigma_{BG,i} = \frac{1}{\tau_i} \cdot \sqrt{\frac{I_i^{BG} \tau_i}{N_{BG}}}
 
 .. math::
-    \sigma_i^{a} = \frac{1}{\tau_i} \cdot \sqrt{\frac{I_i^{a} \tau_i}{N_{a}}}
+    \sigma_{a,i} = \frac{1}{\tau_i} \cdot \sqrt{\frac{I_i^{a} \tau_i}{N_{a}}}
 
 :math:`a` stands for the tags INCL, MAT or MIX.
 
