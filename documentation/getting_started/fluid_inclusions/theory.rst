@@ -231,6 +231,36 @@ The mixed concentration ratio :math:`a` is necessary for the determination of th
 .. math::
     x = \frac{C_{IS2}^{MAT} -  a \cdot C_{IS1}^{MAT}}{C_{IS2}^{MAT} - C_{IS2}^{INCL} - a \cdot C_{IS1}^{MAT} + a \cdot C_{IS1}^{INCL}}
 
+Determination of the internal standard concentration
+''''''''''''''
+It is necessary to know the fluid inclusion concentration of the internal standard, in order to be able to quantify the
+concentration values of all other elements. From a first point of view, it is not possible to determine the fluid
+inclusion concentration without its destruction. Therefore, different approaches were developed that allows to estimate
+the fluid inclusion concentration of the internal standard.
+
+.. rubric:: Method 1 - Mass Balance (based on the NaCl equivalents)
+.. math::
+    C_{Na} = C_{Na}^{eq} \cdot \left( 1 + A \cdot \frac{M_{Na}}{M_{NaCl}} \cdot \sum_j \frac{I_{i}^{INCL}}{I_{Na}^{INCL}} \cdot \frac{1}{\xi_{j}^{IS}} \cdot \frac{M_{X_{j}Cl_{nj}}}{M_{X_j}} \right)^{-1}
+
+.. rubric:: Method 2 - Charge Balance (based on the NaCl equivalents)
+.. math::
+    C_{Na} = C_{NaCl}^{eq} \cdot \left( 1 + \sum_{j} \frac{I_{i}^{INCL}}{I_{Na}^{INCL}} \cdot \frac{z_j}{\xi_{j}^{IS}} \cdot \frac{M_{Na}}{M_{X_j}} \right)^{-1} \cdot 10^6
+
+Calculation of the 1-Sigma concentration
+''''''''''''''
+It is possible to calculate the so-called 1-:math:`\sigma` concentration :math:`C_i^{\sigma}` for the inclusion, matrix and mixed concentration.
+
+.. math::
+    C_i^{\sigma, a} = \frac{C_{IS}^{a}}{I_{IS}^{a} \xi_i^{IS, a}} \cdot \sqrt{\sigma_i^{BG}^2 + \sigma_i^{a}^2}
+
+.. math::
+    \sigma_i^{BG} = \frac{1}{\tau_i} \cdot \sqrt{\frac{I_i^{BG} \tau_i}{N_{BG}}}
+
+.. math::
+    \sigma_i^{a} = \frac{1}{\tau_i} \cdot \sqrt{\frac{I_i^{a} \tau_i}{N_{a}}}
+
+:math:`a` stands for the tags INCL, MAT or MIX.
+
 Limit of Detection
 ^^^^^^^^^^^^^^^^^^^^
 Standard Files
