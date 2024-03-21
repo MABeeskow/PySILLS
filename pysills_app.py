@@ -17710,6 +17710,12 @@ class PySILLS(tk.Frame):
                 self.container_concentration[filetype][datatype][filename_short][key_sigma][
                     isotope] = var_result_sigma_i
 
+                index = self.container_lists[filetype]["Short"].index(filename_short)
+                filename_long = self.container_lists[filetype]["Long"][index]
+                var_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
+                if focus == "INCL" and isotope == var_is:
+                    self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].set(var_result_i)
+
     def ma_get_concentration_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                    mode="Specific"):
         """ Calculates the concentration ratio, C_i/C_is, based on the following two equations:
