@@ -127,6 +127,13 @@ class PySILLS(tk.Frame):
             "O": 16.000, "Na": 22.990, "Mg": 24.300, "Al": 26.980, "Si": 28.090, "P": 30.970, "K": 39.100, "Ca": 40.080,
             "Ti": 47.870, "Cr": 52.000, "Mn": 54.940, "Fe": 55.850, "Ga": 69.720, "Ge": 72.610, "Zr": 91.220,
             "Ba": 137.300}
+        self.chemistry_data_oxides = {
+            "SiO2": 60.083, "Al2O3": 101.961, "Fe2O3": 159.687, "FeO": 71.844, "Na2O": 61.979, "TiO2": 79.865,
+            "MnO": 70.937, "Mn2O3": 157.873, "SnO": 134.709, "Li2O": 29.879, "Ga2O3": 187.443, "B2O3": 69.617,
+            "BeO": 25.0112, "GeO2": 104.628, "CaO": 56.077, "Rb2O": 186.935, "AgO": 123.869, "As2O3": 197.841,
+            "Au2O": 409.939, "BaO": 153.32, "Br2O": 175.807, "Cl2O": 86.899, "Cs2O": 281.819, "CuO": 79.545,
+            "PbO": 223.199, "SO3": 80.057, "Sb2O3": 291.517, "SrO": 103.619, "WO3": 231.837, "ZnO": 81.379,
+            "MgO": 40.304, "K2O": 55.097}
         #
         # General Settings
         self.parent = parent
@@ -269,7 +276,7 @@ class PySILLS(tk.Frame):
         # 100 wt.% Oxides
         self.container_var["Oxides Quantification"] = {"Major": {}, "Minor": {}, "Ratios": {}, "Total Amounts": {}}
         list_major_oxides = [
-            "SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "MnO2", "MgO", "CaO", "Na2O", "K2O", "P2O5", "SO3"]
+            "SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "Mn2O3", "MgO", "CaO", "Na2O", "K2O", "P2O5", "SO3"]
         list_industrial_metal_oxides = [
             "CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO2", "MoO3"]
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
@@ -277,7 +284,8 @@ class PySILLS(tk.Frame):
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
             "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
         list_other_elements = [
-            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O"]
+            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O", "Rb2O",
+            "Cs2O", "Fr2O",]
         list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "Pb-Ratio", "Pr-Ratio", "Tb-Ratio"]
         for oxide in list_major_oxides:
             self.container_var["Oxides Quantification"]["Major"][oxide] = tk.IntVar()
@@ -928,12 +936,12 @@ class PySILLS(tk.Frame):
         self.container_lists["Selected Oxides"] = {"All": [], "Conversion Factor": {"SiO2", 2.1392}}
 
         self.conversion_factors = {
-            "Ag2O": 1.0741, "Al2O3": 1.8895, "As2O3": 1.3203, "Au2O": 1.0406, "B2O3": 3.2202, "BaO": 1.1165,
+            "Ag2O": 1.0741, "Al2O3": 1.8894, "As2O3": 1.3203, "Au2O": 1.0406, "B2O3": 3.2202, "BaO": 1.1165,
             "BeO": 2.7758, "CO2": 3.6644, "CaO": 1.3992, "CdO": 1.1423, "Ce2O3": 1.1713, "CeO2": 1.2284, "CoO": 1.2715,
             "Cr2O3": 1.4615, "Cs2O": 1.0602, "CuO": 1.2518, "Dy2O3": 1.1477, "Er2O3": 1.1435, "Eu2O3": 1.1579,
             "FeO": 1.2865, "Fe2O3": 1.4297, "Ga2O3": 1.3442, "Gd2O3": 1.1526, "GeO2": 1.4408, "HfO2": 1.1793,
             "HgO": 1.0798, "Ho2O3": 1.1455, "In2O3": 1.2091, "IrO": 1.0832, "K2O": 1.2046, "La2O3": 1.1728,
-            "Li2O": 2.1527, "Lu2O3": 1.1371, "MgO": 1.6582, "MnO": 1.2912, "MnO2": 1.5825, "MoO3": 1.5003,
+            "Li2O": 2.1527, "Lu2O3": 1.1371, "MgO": 1.6582, "MnO": 1.2912, "Mn2O3": 1.4368, "MoO3": 1.5003,
             "N2O5": 3.8551, "Na2O": 1.3480, "Nb2O5": 1.4305, "Nd2O3": 1.1664, "NiO": 1.2725, "OsO": 1.0841,
             "P2O5": 2.2916, "PbO": 1.0772, "PbO2": 1.1544, "PdO": 1.1504, "Pr2O3": 1.1703, "Pr6O11": 1.2082,
             "PtO": 1.0820, "Rb2O": 1.0936, "ReO": 1.0859, "RhO": 1.5555, "RuO": 1.1583, "SO3": 2.4972, "Sb2O5": 1.3284,
@@ -1393,11 +1401,9 @@ class PySILLS(tk.Frame):
 
         # RADIOBUTTONS
         if self.var_language == "English":
-            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions (not ready)",
-                         "Output Analysis (not ready)"]
+            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
         elif self.var_language == "German":
-            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse",
-                         "Output Analysis (not ready)"]
+            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse", "Output Analysis"]
 
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
@@ -1407,7 +1413,7 @@ class PySILLS(tk.Frame):
                 var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
                 text=mode, sticky="NESW", relief=tk.FLAT, font=font_elements, command=lambda var_rb=self.var_rb_mode:
                 self.select_experiment(var_rb))
-            if mode in ["Output Analysis (not ready)"]:
+            if mode in ["Output Analysis"]:
                 rb_mode.configure(state="disabled")
 
             self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
@@ -9681,7 +9687,7 @@ class PySILLS(tk.Frame):
                 text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda var_file=self.fi_current_file_smpl, var_type="SMPL", checkup_mode=True:
                 self.fi_check_specific_file(var_file, var_type, checkup_mode))
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode == "MI":
             btn_smpl_03 = SE(
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
@@ -11450,22 +11456,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_oxides_composition, row_id=var_row_start + 3, column_id=5*var_header_n + 6,
             n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="MnO/(MnO + MnO2)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 4, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="PbO2/(PbO + PbO2)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 5, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="Pr6O11/(Pr2O3 + Pr6O11)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_06c = SE(
-            parent=self.subwindow_oxides_composition, row_id=var_row_start + 6, column_id=5*var_header_n + 6,
-            n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="Tb4O7/(Tb2O3 + Tb4O7)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="MnO/(MnO + Mn2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
         btn_01a = SE(
@@ -11479,7 +11470,7 @@ class PySILLS(tk.Frame):
         self.container_checkboxes = {}
         ## Major Oxides
         list_major_oxides = [
-            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "MnO2", "SO3"]
+            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "Mn2O3", "SO3"]
         list_major_oxides = sorted(list_major_oxides)
         for index, oxide in enumerate(list_major_oxides):
             cb_002a = SE(
@@ -11541,7 +11532,8 @@ class PySILLS(tk.Frame):
 
         ## Other Elements
         list_other_elements = [
-            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O"]
+            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O", "Rb2O",
+            "Cs2O", "Fr2O", ]
         list_other_elements = sorted(list_other_elements)
         for index, oxide in enumerate(list_other_elements):
             cb_005a = SE(
@@ -11556,7 +11548,7 @@ class PySILLS(tk.Frame):
                 cb_005a.select()
 
         # ENTRIES
-        list_oxideratios = ["Fe-Ratio", "Mn-Ratio", "Pb-Ratio", "Pr-Ratio", "Tb-Ratio"]
+        list_oxideratios = ["Fe-Ratio", "Mn-Ratio"]
         for index, ratio in enumerate(list_oxideratios):
             if ratio in ["Mn-Ratio"]:
                 self.container_var["Oxides Quantification"]["Ratios"][ratio].set("1.0")
@@ -11570,14 +11562,15 @@ class PySILLS(tk.Frame):
 
     def guess_composition(self):
         list_major_oxides = [
-            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "MnO2", "SO3"]
+            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "Mn2O3", "SO3"]
         list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO", "WO3", "MoO3"]
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
         list_rareearth_metals = [
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
             "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
         list_other_elements = [
-            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O"]
+            "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O", "Rb2O",
+            "Cs2O", "Fr2O", ]
         all_lists = [
             list_major_oxides, list_industrial_metals, list_precious_metals, list_rareearth_metals, list_other_elements]
 
@@ -11586,7 +11579,7 @@ class PySILLS(tk.Frame):
                 key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
                 element_oxide = key.group(1)
                 if element_oxide in self.container_lists["Measured Elements"]["All"]:
-                    if oxide not in ["FeO", "MnO2", "PbO2", "Pr6O11", "Tb4O7"]:
+                    if oxide not in ["PbO2", "Pr6O11", "Tb4O7"]:
                         self.container_checkboxes[oxide].select()
 
                         if oxide not in self.container_lists["Selected Oxides"]["All"]:
@@ -14077,7 +14070,7 @@ class PySILLS(tk.Frame):
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
 
-        ## SAMPLE FILES sex
+        ## SAMPLE FILES
         frm_smpl = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column, n_rows=16,
             n_columns=29, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
@@ -15249,7 +15242,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
         frm_quick = SE(
-            parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=30, n_columns=39,
+            parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=39,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
 
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
@@ -17543,147 +17536,9 @@ class PySILLS(tk.Frame):
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
                                 isotope] = var_result_sigma_i
                 else:
-                    var_ref = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                    key_element = re.search("(\D+)(\d+)", var_ref)
-                    ref_element = key_element.group(1)
-                    var_ref_oxide = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Name"].get()
-                    conversion_factor_ref = self.conversion_factors[var_ref_oxide]
-                    conversion_factor_to_ppm = 10**6
-                    amount_reference_oxide = float(
-                        self.container_var["SMPL"][var_file_long]["Matrix Setup"]["Oxide"]["Concentration"].get())/100
-                    amount_total_oxides = float(
-                        self.container_var["Oxides Quantification"]["Total Amounts"][var_file_short].get())/100
-                    lower_term = 1
-                    for isotope in file_isotopes:
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
-                        var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][var_ref]
-                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
-
-                        if var_sensitivity_i > 0 and var_intensity_ref > 0 and isotope != var_ref:
-                            lower_term += (var_intensity_i/var_intensity_ref)/var_sensitivity_i
-
-                    var_amount_ref = 1/lower_term
-                    var_concentration_ref = (amount_total_oxides*(var_amount_ref/conversion_factor_ref)*
-                                             conversion_factor_to_ppm)
-                    var_concentration_ref = amount_reference_oxide*var_concentration_ref
-                    max_amount_ref = self.maximum_amounts[ref_element]
-                    var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
-                                                     "Concentration"].get())
-                    var_concentration_ref = var_concentration_is
-                    if var_concentration_ref <= max_amount_ref:
-                        correction_factor_i = 1
-                        for isotope in file_isotopes:
-                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][var_ref]
-                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-
-                            var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "BG SIGMA"][isotope]
-                            var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "MAT SIGMA"][isotope]
-                            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "N BG"][isotope]
-                            var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "N MAT"][isotope]
-                            var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
-                            var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
-                            var_sigma = var_sigma_bg_i + var_sigma_mat_i
-
-                            if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
-                                var_result_i = ((var_intensity_i/var_intensity_ref)*
-                                                (var_concentration_ref/var_sensitivity_i))
-                                var_result_sigma_i = (var_sigma*var_result_i)/var_intensity_i
-                            else:
-                                var_result_i = 0.0
-                                var_result_sigma_i = 0.0
-
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                                isotope] = var_result_i
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                                isotope] = var_result_sigma_i
-
-                            key_element = re.search("(\D+)(\d+)", isotope)
-                            element = key_element.group(1)
-                            max_amount_i = self.maximum_amounts[element]
-
-                            if var_result_i > max_amount_i:
-                                correction_factor_i = max_amount_i/var_result_i
-                                break
-
-                        if correction_factor_i != 1:
-                            for isotope in file_isotopes:
-                                var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short]["MAT"][isotope]
-                                var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short]["MAT"][var_ref]
-                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short]["MAT"][isotope]
-
-                                var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                    "BG SIGMA"][isotope]
-                                var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                    "MAT SIGMA"][isotope]
-                                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                    "N BG"][isotope]
-                                var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                    "N MAT"][isotope]
-                                var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
-                                var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
-                                var_sigma = var_sigma_bg_i + var_sigma_mat_i
-
-                                if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
-                                    var_result_i = correction_factor_i*(var_intensity_i/var_intensity_ref)*(
-                                            var_concentration_ref/var_sensitivity_i)
-                                    var_result_sigma_i = (var_sigma*var_result_i)/var_intensity_i
-                                else:
-                                    var_result_i = 0.0
-                                    var_result_sigma_i = 0.0
-
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                                    isotope] = var_result_sigma_i
-                    else:
-                        correction_factor = max_amount_ref/var_concentration_ref
-                        var_concentration_ref = correction_factor*var_concentration_ref
-                        for isotope in file_isotopes:
-                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_intensity_ref = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][var_ref]
-                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-
-                            var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "BG SIGMA"][isotope]
-                            var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "MAT SIGMA"][isotope]
-                            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "N BG"][isotope]
-                            var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "N MAT"][isotope]
-                            var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
-                            var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
-                            var_sigma = var_sigma_bg_i + var_sigma_mat_i
-
-                            if var_sensitivity_i > 0 and var_intensity_ref > 0 and var_intensity_i > 0:
-                                var_result_i = (var_intensity_i/var_intensity_ref)*(
-                                        var_concentration_ref/var_sensitivity_i)
-                                var_result_sigma_i = (var_sigma*var_result_i)/var_intensity_i
-                            else:
-                                var_result_i = 0.0
-                                var_result_sigma_i = 0.0
-
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                                isotope] = var_result_i
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                                isotope] = var_result_sigma_i
+                    self.run_total_oxides_calculation(
+                        filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
+                        list_isotopes=file_isotopes)
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -17717,6 +17572,143 @@ class PySILLS(tk.Frame):
                         var_result_i = np.median(helper_results)
 
                     self.container_concentration[var_filetype][var_datatype][isotope] = var_result_i
+
+    def run_total_oxides_calculation(self, filetype, datatype, filename_short, list_isotopes, focus="MAT"):
+        """ Calculates the element concentrations based on a normalized total oxide approach.
+        Parameters
+        ----------
+        filetype : str
+            The file category, e.g. STD
+        datatype : str
+            The data category, e.g. RAW
+        filename_short : str
+            The file as a short version (without the complete filepath)
+        list_isotopes : list
+            The list contains all measured isotopes that belong to the file.
+        Returns
+        -------
+        """
+        helper_oxides = {}
+        helper_oxides2 = {}
+        for oxide in self.container_lists["Selected Oxides"]["All"]:
+            if oxide not in helper_oxides:
+                helper_oxides[oxide] = {
+                    "Element": None, "Isotopes": [], "Intensities": {}, "Sensitivities": {}, "a": {},
+                    "b": {}, "c": {}, "d": {}, "e": {}, "Concentrations": {}}
+            key_element = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+            ref_element = key_element.group(1)
+            if helper_oxides[oxide]["Element"] == None:
+                helper_oxides[oxide]["Element"] = ref_element
+            if ref_element not in helper_oxides2:
+                helper_oxides2[ref_element] = []
+            helper_oxides2[ref_element].append(oxide)
+
+        for isotope in list_isotopes:
+            key_element = re.search("(\D+)(\d+)", isotope)
+            ref_element = key_element.group(1)
+            for oxide in helper_oxides2[ref_element]:
+                helper_oxides[oxide]["Isotopes"].append(isotope)
+
+        var_c = 0
+        for oxide, oxide_container in helper_oxides.items():
+            for isotope in oxide_container["Isotopes"]:
+                var_intensity_i = self.container_intensity_corrected[filetype][datatype][filename_short][focus][isotope]
+                var_sensitivity_i = self.container_analytical_sensitivity[filetype][datatype][filename_short][focus][
+                    isotope]
+                if oxide == "Fe2O3":
+                    r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
+                    if r == 0:
+                        gamma = 0
+                    else:
+                        gamma = (1 + (2*self.chemistry_data_oxides["FeO"])/(
+                            self.chemistry_data_oxides["Fe2O3"])*(1 - r)/(r))**(-1)
+                    var_a = (var_intensity_i/var_sensitivity_i)*(1 - gamma)
+                elif oxide == "FeO":
+                    r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
+                    if r == 0:
+                        gamma = 0
+                    else:
+                        gamma = (1 + (2*self.chemistry_data_oxides["FeO"])/(
+                            self.chemistry_data_oxides["Fe2O3"])*(1 - r)/(r))**(-1)
+                    var_a = (var_intensity_i/var_sensitivity_i)*gamma
+                elif oxide == "Mn2O3":
+                    r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
+                    if r == 0:
+                        gamma = 0
+                    else:
+                        gamma = (1 + (2*self.chemistry_data_oxides["MnO"])/(
+                            self.chemistry_data_oxides["Mn2O3"])*(1 - r)/(r))**(-1)
+                    var_a = (var_intensity_i/var_sensitivity_i)*(1 - gamma)
+                elif oxide == "MnO":
+                    r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
+                    if r == 0:
+                        gamma = 0
+                    else:
+                        gamma = (1 + (2*self.chemistry_data_oxides["MnO"])/(
+                            self.chemistry_data_oxides["Mn2O3"])*(1 - r)/(r))**(-1)
+                    var_a = (var_intensity_i/var_sensitivity_i)*gamma
+                else:
+                    var_a = var_intensity_i/var_sensitivity_i
+                molar_mass_oxide = self.chemistry_data_oxides[oxide]
+                molar_mass_element = self.chemistry_data[oxide_container["Element"]]
+                var_b = var_a*molar_mass_oxide/molar_mass_element
+                var_c += var_b
+
+                oxide_container["Intensities"][isotope] = var_intensity_i
+                oxide_container["Sensitivities"][isotope] = var_sensitivity_i
+                oxide_container["a"][isotope] = var_a
+                oxide_container["b"][isotope] = var_b
+
+        w_total_oxides = float(self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].get())
+        var_d = w_total_oxides/var_c
+        largest_value = {"Isotope": None, "Value": 0, "Oxide": None}
+        for oxide, oxide_container in helper_oxides.items():
+            for isotope in oxide_container["Isotopes"]:
+                var_e = oxide_container["b"][isotope]*var_d
+                oxide_container["c"][isotope] = var_c
+                oxide_container["d"][isotope] = var_d
+                oxide_container["e"][isotope] = var_e
+
+                var_concentration_i = oxide_container["a"][isotope]*var_d*10**4
+                oxide_container["Concentrations"][isotope] = var_concentration_i
+                if var_concentration_i > largest_value["Value"]:
+                    largest_value["Isotope"] = isotope
+                    largest_value["Value"] = var_concentration_i
+                    largest_value["Oxide"] = oxide
+
+        element_largest_oxide = helper_oxides[largest_value["Oxide"]]["Element"]
+        max_amount_element = self.maximum_amounts[element_largest_oxide]
+        if largest_value["Value"] > max_amount_element:
+            correction_factor = max_amount_element/largest_value["Value"]
+            for oxide, oxide_container in helper_oxides.items():
+                for isotope in oxide_container["Isotopes"]:
+                    old_value = oxide_container["Concentrations"][isotope]
+                    new_value = correction_factor*old_value
+                    oxide_container["Concentrations"][isotope] = new_value
+
+        for oxide, oxide_container in helper_oxides.items():
+            for isotope in oxide_container["Isotopes"]:
+                var_intensity_i = self.container_intensity_corrected[filetype][datatype][filename_short][focus][isotope]
+                var_std_bg_i = self.container_intensity[filetype][datatype][filename_short]["BG SIGMA"][isotope]
+                key_std = focus + " SIGMA"
+                var_std_mat_i = self.container_intensity[filetype][datatype][filename_short][key_std][isotope]
+                var_n_bg = self.container_intensity[filetype][datatype][filename_short]["N BG"][isotope]
+                key_n = "N " + focus
+                var_n_mat = self.container_intensity[filetype][datatype][filename_short][key_n][isotope]
+                var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
+                var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
+                var_sigma = var_sigma_bg_i + var_sigma_mat_i
+                var_result_i = oxide_container["Concentrations"][isotope]
+
+                if var_intensity_i > 0:
+                    var_result_sigma_i = (var_sigma*var_result_i)/var_intensity_i
+                else:
+                    var_result_sigma_i = 0.0
+
+                self.container_concentration[filetype][datatype][filename_short][focus][isotope] = var_result_i
+                key_sigma = "1 SIGMA " + focus
+                self.container_concentration[filetype][datatype][filename_short][key_sigma][
+                    isotope] = var_result_sigma_i
 
     def ma_get_concentration_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                    mode="Specific"):
@@ -19603,7 +19595,6 @@ class PySILLS(tk.Frame):
 
         self.select_opt_inclusion_is_quantification(
             var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
-        # self.container_var["Quantification Inclusion"]["Method"].set("100 wt.% Oxides")
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
@@ -20133,45 +20124,51 @@ class PySILLS(tk.Frame):
                 for index, isotope in enumerate(file_isotopes):
                     if var_focus == "MAT":
                         # Classical Mineral Analysis
-                        # Internal standard for the matrix (e.g. Si)
-                        var_host_is = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
-                        var_concentration_host_is = float(
-                            self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
-                        var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
-                        var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                            var_file_short]["MAT"][var_host_is]
-                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]
-                        var_sensitivity_ishost = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["MAT"][var_host_is]
-                        var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
+                        if self.container_var["Quantification Mineral"]["Method"].get() == "Internal Standard":
+                            # Internal standard for the matrix (e.g. Si)
+                            var_host_is = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+                            var_concentration_host_is = float(
+                                self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
+                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_host_is]
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]
+                            var_sensitivity_ishost = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_host_is]
+                            var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
 
-                        var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
-                            isotope]
-                        var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                            "MAT"][isotope]
-                        var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][isotope]
-                        var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short]["N MAT"][
-                            isotope]
-                        var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                        var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                        var_sigma_mat_i = ((((var_intensity_mat_i*var_tau_i)/var_n_mat)**0.5/var_tau_i)**2)**0.5
-                        var_sigma = (var_sigma_bg_i**2 + var_sigma_mat_i**2)**0.5
+                            var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
+                                isotope]
+                            var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                "MAT"][isotope]
+                            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][isotope]
+                            var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short]["N MAT"][
+                                isotope]
+                            var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+                            var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+                            var_sigma_mat_i = ((((var_intensity_mat_i*var_tau_i)/var_n_mat)**0.5/var_tau_i)**2)**0.5
+                            var_sigma = (var_sigma_bg_i**2 + var_sigma_mat_i**2)**0.5
 
-                        if var_intensity_host_is > 0 and var_sensitivity_host_is > 0:
-                            var_result_i = (var_intensity_i/var_intensity_host_is)* \
-                                           (var_concentration_host_is/var_sensitivity_host_is)
-                            var_result_sigma_i = (var_concentration_host_is/(
-                                    var_intensity_host_is*var_sensitivity_host_is))*var_sigma
+                            if var_intensity_host_is > 0 and var_sensitivity_host_is > 0:
+                                var_result_i = (var_intensity_i/var_intensity_host_is)* \
+                                               (var_concentration_host_is/var_sensitivity_host_is)
+                                var_result_sigma_i = (var_concentration_host_is/(
+                                        var_intensity_host_is*var_sensitivity_host_is))*var_sigma
+                            else:
+                                var_result_i = np.nan
+                                var_result_sigma_i = 0.0
+
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+                                isotope] = var_result_sigma_i
                         else:
-                            var_result_i = np.nan
-                            var_result_sigma_i = 0.0
-
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                            isotope] = var_result_sigma_i
+                            # 100 wt.% total oxides
+                            self.run_total_oxides_calculation(
+                                filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
+                                list_isotopes=file_isotopes)
                     else:
                         # Matrix-only Tracer Method
                         if self.container_var[key_setting][
