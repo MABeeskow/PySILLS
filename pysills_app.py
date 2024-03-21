@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		20.03.2024
+# Date:		21.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -14077,7 +14077,7 @@ class PySILLS(tk.Frame):
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
 
-        ## SAMPLE FILES
+        ## SAMPLE FILES sex
         frm_smpl = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column, n_rows=16,
             n_columns=29, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
@@ -17570,7 +17570,9 @@ class PySILLS(tk.Frame):
                                              conversion_factor_to_ppm)
                     var_concentration_ref = amount_reference_oxide*var_concentration_ref
                     max_amount_ref = self.maximum_amounts[ref_element]
-
+                    var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
+                                                     "Concentration"].get())
+                    var_concentration_ref = var_concentration_is
                     if var_concentration_ref <= max_amount_ref:
                         correction_factor_i = 1
                         for isotope in file_isotopes:
@@ -23826,6 +23828,10 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=lbl_i)
             text_smpl.insert("end", "\t")
 
+            if self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Concentration"].get() != "100":
+                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].set(
+                    self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Concentration"].get())
+
             entr_1_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"],
                 width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
@@ -23833,6 +23839,10 @@ class PySILLS(tk.Frame):
                 "<Return>", lambda event, var_file=file_smpl_long: self.change_specific_matrix_amount(var_file, event))
             text_smpl.window_create("insert", window=entr_1_i)
             text_smpl.insert("end", "\t")
+
+            if self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Name"].get() != "Select Oxide":
+                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Matrix"].set(
+                    self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Name"].get())
 
             opt_1_i = tk.OptionMenu(
                 frm_smpl, self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Matrix"],
@@ -23846,6 +23856,10 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=opt_1_i)
             text_smpl.insert("end", "\t")
 
+            if self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Name"].get() != "Select Isotope":
+                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Name"].set(
+                    self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Name"].get())
+
             opt_2_i = tk.OptionMenu(
                 frm_smpl, self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Name"],
                 *np.sort(self.container_lists["ISOTOPES"]))
@@ -23857,6 +23871,10 @@ class PySILLS(tk.Frame):
                 activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
             text_smpl.window_create("end", window=opt_2_i)
             text_smpl.insert("end", "\t")
+
+            if self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Concentration"].get() != "1000000":
+                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Value"].set(
+                    self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Concentration"].get())
 
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Value"],
