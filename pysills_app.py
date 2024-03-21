@@ -20170,6 +20170,12 @@ class PySILLS(tk.Frame):
                                 filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
                                 list_isotopes=file_isotopes)
                     else:
+                        if self.pysills_mode == "MI":
+                            if self.container_var[key_setting]["Inclusion Setup Option"].get() == "100 wt.% Oxides":
+                                # 100 wt.% total oxides
+                                self.run_total_oxides_calculation(
+                                    filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
+                                    list_isotopes=file_isotopes, focus="INCL")
                         # Matrix-only Tracer Method
                         if self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
