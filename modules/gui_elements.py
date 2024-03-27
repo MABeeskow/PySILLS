@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 06.12.2023
+# 27.03.2024
 # ----------------------
 #
 ## MODULES
@@ -496,7 +496,6 @@ class SimpleElements:
         return opt_menu_min
     #
     def create_option_isotope(self, var_iso, text_set, command=None, option_list=None, fg_active="black", bg_active="white"):
-        #
         var_iso.set(text_set)
         if option_list == None:
             option_list_iso = ["Si29"]

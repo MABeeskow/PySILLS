@@ -143,7 +143,34 @@ class PySILLS(tk.Frame):
             "Sm2O3": 348.717, "Ta2O5": 441.895, "Tb2O3": 365.857, "Tb4O7": 747.713, "TeO3": 175.597, "ThO2": 264.038,
             "Tl2O3": 456.757, "Tm2O3": 385.857, "UO2": 270.048, "UO3": 286.047, "U3O8": 842.142, "V2O5": 181.879,
             "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222}
-        #
+        self.chemistry_oxides_sorted = {
+            "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
+            "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO"],
+            "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["ClO2", "Cl2O3", "Cl2O5", "Cl2O7"], "K": ["K2O"],
+            "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
+            "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3", "MnO2", "MnO3", "Mn2O7"],
+            "Fe": ["FeO", "Fe2O3", "FeO3"], "Co": ["CoO", "Co2O3"], "Ni": ["NiO", "Ni2O3"], "Cu": ["Cu2O", "CuO"],
+            "Zn": ["ZnO"], "Ga": ["Ga2O3"], "Ge": ["GeO2"], "As": ["As2O3", "As2O5"], "Se": ["SeO2", "SiO3"],
+            "Br": ["Br2O", "Br2O3", "Br2O5", "Br2O7"], "Kr": ["KrO"], "Rb": ["Rb2O"], "Sr": ["SrO"], "Y": ["Y2O3"],
+            "Zr": ["ZrO2"], "Nb": ["Nb2O3", "Nb2O5"], "Mo": ["MoO", "Mo2O3", "MoO2", "Mo2O5", "MoO3"], "Tc": ["Tc2O7"],
+            "Ru": ["RuO", "Ru2O3", "RuO2", "RuO3", "RuO4"], "Rh": ["Rh2O", "RhO", "Rh2O3", "RhO2", "Rh2O5"],
+            "Pd": ["PdO", "PdO2"], "Ag": ["Ag2O", "AgO"], "Cd": ["CdO"], "In": ["In2O3"], "Sn": ["SnO", "SnO2"],
+            "Sb": ["Sb2O3", "Sb2O5"], "Te": ["TeO2", "TeO3"], "I": ["I2O", "I2O5", "I2O7"],
+            "Xe": ["XeO", "XeO2", "XeO3"], "Cs": ["Cs2O"], "Ba": ["BaO"], "La": ["La2O3"], "Ce": ["Ce2O3", "CeO2"],
+            "Pr": ["Pr2O3", "PrO2"], "Nd": ["Nd2O3"], "Pm": ["Pm2O3"], "Sm": ["SmO", "Sm2O3"], "Eu": ["EuO", "Eu2O3"],
+            "Gd": ["Gd2O3"], "Tb": ["Tb2O3", "TbO2"], "Dy": ["Dy2O3"], "Ho": ["Ho2O3"], "Er": ["Er2O3"],
+            "Tm": ["TmO", "Tm2O3"], "Yb": ["YbO", "Yb2O3"], "Lu": ["Lu2O3"], "Hf": ["HfO2"], "Ta": ["Ta2O5"],
+            "W": ["WO", "WO2O3", "WO2", "W2O5", "WO3"], "Re": ["ReO", "ReO2", "ReO3", "Re2O7"],
+            "Os": ["OsO", "Os2O3", "OsO2", "OsO3", "OsO4"], "Ir": ["Ir2O", "IrO", "Ir2O3", "IrO2", "IrO3"],
+            "Pt": ["PtO", "PtO2"], "Au": ["Au2O", "Au2O3"], "Hg": ["Hg2O", "HgO"], "Tl": ["Tl2O", "Tl2O3"],
+            "Pb": ["PbO", "PbO2"], "Bi": ["Bi2O3", "B2O5"], "Po": ["PoO", "PoO2", "PoO3"],
+            "At": ["At2O", "At2O3", "At2O5", "At2O7"], "Rn": ["RnO"], "Fr": ["Fr2O"], "Ra": ["RaO"], "Ac": ["Ac2O3"],
+            "Th": ["ThO2"], "Pa": ["PaO2", "Pa2O5"], "U": ["U2O3", "UO2", "U2O5", "UO3"],
+            "Np": ["Np2O3", "NpO2", "Np2O5", "NpO3"], "Pu": ["Pu2O3", "PuO2", "Pu2O5", "PuO3"],
+            "Am": ["Am2O3", "AmO2", "Am2O5", "AmO3"], "Cm": ["Cm2O3", "CmO2"], "Bk": ["Bk2O3", "BkO2"],
+            "Cf": ["Cf2O3", "CfO2"], "Es": ["Es2O3"], "Fm": ["Fm2O3"], "Md": ["Md2O3"], "No": ["NoO", "No2O3"],
+            "Lr": ["Lr2O3"]}
+
         # General Settings
         self.parent = parent
         # self.parent.tk.call("tk", "scaling", var_scaling)
@@ -933,9 +960,10 @@ class PySILLS(tk.Frame):
         self.helper_checkbuttons = {"Isotopes": {}, "On": [], "Off": []}
         self.temp_checkbuttons_pypitzer = {}
 
-        self.container_lists["Oxides"] = [
-            "SiO2", "TiO2", "Al2O3", "Fe2O3", "Fe3O4", "FeO", "MgO", "MnO", "CaO", "BaO", "Na2O", "K2O", "P2O5",
-            "Cr2O3", "ZrO2"]
+        self.container_lists["Oxides"] = []
+        #self.container_lists["Oxides"] = [
+        #    "SiO2", "TiO2", "Al2O3", "Fe2O3", "Fe3O4", "FeO", "MgO", "MnO", "CaO", "BaO", "Na2O", "K2O", "P2O5",
+        #    "Cr2O3", "ZrO2"]
         self.container_lists["Sulfides"] = [
             "FeS2", "ZnS" "PbS", "Ag2S", "Na2S", "MoS2", "CdS", "SeS2", "BaS", "BeS", "CoS", "Cu2S", "CuS", "FeS",
             "Fe2S3", "Hg2S", "HgS", "MnS", "NiS", "Tl2S", "SnS", "SnS2"]
@@ -12609,7 +12637,7 @@ class PySILLS(tk.Frame):
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
-        #
+
         for index, isotope in enumerate(self.container_lists["Measured Isotopes"]["All"]):
             if self.container_var["LASER"].get() != "Select Gas":
                 var_text = self.container_var["LASER"].get()
@@ -12738,7 +12766,10 @@ class PySILLS(tk.Frame):
             key_element = re.search("(\D+)(\d+)", isotope)
             element = key_element.group(1)
             self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
-            #
+
+            for oxide in self.chemistry_oxides_sorted[element]:
+                self.container_lists["Oxides"].append(oxide)
+
             if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
                     and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
                                                                                    element]):
@@ -13233,11 +13264,25 @@ class PySILLS(tk.Frame):
             for category in categories:
                 self.container_listboxes["STD"][file_std_short][category] = None
 
-            cb_i = tk.Checkbutton(
-                master=frm_files, text=file_std_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["STD"][file_std]["Checkbox"], onvalue=1, offvalue=0,
-                selectcolor=self.bg_colors["White"], activebackground=self.bg_colors["Very Light"],
-                activeforeground=self.bg_colors["Very Dark"], anchor=tk.CENTER, highlightthickness=0, bd=0)
+            try:
+                cb_i = tk.Checkbutton(
+                    master=frm_files, text=file_std_short, fg=self.bg_colors["Very Dark"],
+                    bg=self.bg_colors["Very Light"], variable=self.container_var["STD"][file_std]["Checkbox"],
+                    onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
+                    activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
+                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+            except:
+                self.check_variable_on_existence(
+                    var_name_check=self.container_var["STD"], filetype="STD", filename_long=file_std,
+                    filename_short=file_std_short)
+
+                cb_i = tk.Checkbutton(
+                    master=frm_files, text=file_std_short, fg=self.bg_colors["Very Dark"],
+                    bg=self.bg_colors["Very Light"], variable=self.container_var["STD"][file_std]["Checkbox"],
+                    onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
+                    activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
+                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
 
@@ -13299,6 +13344,11 @@ class PySILLS(tk.Frame):
             text_files.insert("end", "\n")
 
             self.container_var["STD"][file_std]["Frame"] = frm_i
+
+    def check_variable_on_existence(self, var_name_check, filetype, filename_long, filename_short):
+        if filename_long not in var_name_check:
+            self.build_all_needed_variables(
+                filetype=filetype, filename_long=filename_long, filename_short=filename_short)
 
     def assign_time_and_isotopic_data(self, filetype, filename_long):
         parts = filename_long.split("/")
@@ -13652,6 +13702,8 @@ class PySILLS(tk.Frame):
                 self.build_all_needed_variables(
                     filetype="SMPL", filename_long=file_smpl, filename_short=file_smpl_short)
 
+            file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+
             cb_i = tk.Checkbutton(
                 master=frm_files, text=file_smpl_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
                 variable=self.container_var["SMPL"][file_smpl]["Checkbox"], onvalue=1, offvalue=0,
@@ -13659,12 +13711,14 @@ class PySILLS(tk.Frame):
                 activeforeground=self.bg_colors["Very Dark"], anchor=tk.CENTER, highlightthickness=0, bd=0)
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
+
             if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
                 var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
             else:
                 var_text = "Select IS"
+
             opt_is_i = tk.OptionMenu(
-                frm_files, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *self.container_lists["ISOTOPES"])
+                frm_files, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *file_isotopes)
             opt_is_i["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                 activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
@@ -13879,7 +13933,7 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         ## INITIAL VALUES
-        list_oxides = np.sort(list(self.chemistry_data_oxides.keys()))
+        list_oxides = sorted(self.container_lists["Oxides"])
 
         ## LABELS
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1:
@@ -23723,7 +23777,7 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         ## INITIAL VALUES
-        list_oxides = np.sort(list(self.chemistry_data_oxides.keys()))
+        list_oxides = sorted(self.container_lists["Oxides"])
 
         ## LABELS
         lbl_01 = SE(
@@ -25787,7 +25841,7 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         ## INITIAL VALUES
-        list_oxides = np.sort(list(self.chemistry_data_oxides.keys()))
+        list_oxides = sorted(self.container_lists["Oxides"])
 
         ## LABELS
         lbl_01 = SE(
