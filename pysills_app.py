@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		21.03.2024
+# Date:		27.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -133,7 +133,16 @@ class PySILLS(tk.Frame):
             "BeO": 25.0112, "GeO2": 104.628, "CaO": 56.077, "Rb2O": 186.935, "AgO": 123.869, "As2O3": 197.841,
             "Au2O": 409.939, "BaO": 153.32, "Br2O": 175.807, "Cl2O": 86.899, "Cs2O": 281.819, "CuO": 79.545,
             "PbO": 223.199, "SO3": 80.057, "Sb2O3": 291.517, "SrO": 103.619, "WO3": 231.837, "ZnO": 81.379,
-            "MgO": 40.304, "K2O": 55.097}
+            "MgO": 40.304, "K2O": 55.097, "SnO2": 150.708, "Ag2O": 231.739, "Bi2O5": 497.955, "CO2": 44.009,
+            "CdO": 128.409, "Ce2O3": 328.237, "CeO2": 172.118, "CoO": 74.932, "Cr2O3": 151.989, "Dy2O3": 372.997,
+            "Er2O3": 382.517, "Eu2O3": 351.917, "Gd2O3": 362.497, "HfO2": 404.977, "HgO": 216.589, "Ho2O3": 377.857,
+            "In2O3": 277.637, "IrO": 208.219, "La2O3": 325.817, "Lu2O3": 397.937, "MnO2": 86.936, "MoO3": 143.959,
+            "N2O5": 108.009, "Nb2O5": 265.807, "Nd2O3": 336.477, "NiO": 74.692, "OsO": 206.229, "P2O5": 141.943,
+            "PbO2": 239.198, "PdO": 122.419, "Pr2O3": 329.817, "Pr6O11": 1021.449, "PtO": 211.079, "ReO": 202.209,
+            "RhO": 118.909, "RuO": 117.069, "SO4": 96.056, "Sb2O5": 323.515, "Sc2O3": 137.909, "SeO3": 126.957,
+            "Sm2O3": 348.717, "Ta2O5": 441.895, "Tb2O3": 365.857, "Tb4O7": 747.713, "TeO3": 175.597, "ThO2": 264.038,
+            "Tl2O3": 456.757, "Tm2O3": 385.857, "UO2": 270.048, "UO3": 286.047, "U3O8": 842.142, "V2O5": 181.879,
+            "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222}
         #
         # General Settings
         self.parent = parent
@@ -13869,6 +13878,9 @@ class PySILLS(tk.Frame):
         start_row = 0
         start_column = 0
 
+        ## INITIAL VALUES
+        list_oxides = np.sort(list(self.chemistry_data_oxides.keys()))
+
         ## LABELS
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1:
             var_text_02 = "Oxide Settings (default)"
@@ -13925,13 +13937,13 @@ class PySILLS(tk.Frame):
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
                     list_elements.append(element_isotope)
-            for oxide in self.container_lists["Oxides"]:
+            for oxide in list_oxides:
                 key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
                 element_oxide = key.group(1)
                 if element_oxide in list_elements:
                     if oxide not in list_compound:
                         list_compound.append(oxide)
-            var_list_is = self.container_lists["Oxides"]
+            var_list_is = list_oxides
             var_opt_default = self.container_var[var_setting_key]["Oxide"]
             var_entr_default = self.container_var[var_setting_key]["Oxide Concentration"]
 
@@ -13962,7 +13974,7 @@ class PySILLS(tk.Frame):
             var_entr_default = self.container_var[var_setting_key]["Element Concentration"]
 
             if self.container_var[var_setting_key]["Element"].get() != "Select Element" \
-                    and self.container_var[var_setting_key]["Element"].get() not in self.container_lists["Oxides"]:
+                    and self.container_var[var_setting_key]["Element"].get() not in list_oxides:
                 var_opt_default_text = self.container_var[var_setting_key]["Element"].get()
             else:
                 var_opt_default_text = "Select Element"
@@ -14090,7 +14102,7 @@ class PySILLS(tk.Frame):
 
             if var_key == "oxides":  # Oxide Selection
                 var_list_is = list_possible_elements
-                var_list_comp = self.container_lists["Oxides"]
+                var_list_comp = list_oxides
                 var_opt_comp_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Name"]
                 var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"]["Concentration"]
 
@@ -14145,8 +14157,7 @@ class PySILLS(tk.Frame):
                     var_opt_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
                         "Name"].get()
                 else:
-                    if var_opt_default.get() != "Select Element" \
-                            and var_opt_default.get() not in self.container_lists["Oxides"]:
+                    if var_opt_default.get() != "Select Element" and var_opt_default.get() not in list_oxides:
                         var_opt_i_default = var_opt_default.get()
                     else:
                         var_opt_i_default = "Select Element"
@@ -14282,6 +14293,19 @@ class PySILLS(tk.Frame):
                             self.container_var["STD"][file_std]["IS Data"]["IS"].set(df_expdata["isotope"][index])
 
     def ma_change_matrix_compound(self, var_opt, var_file=None, state_default=False):
+        """ Defines which oxide was selected by the user and calculates the concentration of the internal standard.
+        -------
+        Parameters
+        var_opt : str
+            Contains the option menu variable.
+        var_file : str
+            The filename as long version (the whole path).
+        state_default : boolean
+            Specifies if the selection is valid for all files or only for one.
+        -------
+        Returns
+        -------
+        """
         str_method = self.container_var["Quantification Mineral"]["Method"].get()
         if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1 or str_method != "Internal Standard":
             var_key = "Oxide"
@@ -14298,8 +14322,8 @@ class PySILLS(tk.Frame):
                 var_opt_element = key.group(1)
             else:
                 var_opt_element = var_opt
-            possible_is = []
 
+            possible_is = []
             for isotope in self.container_lists["ISOTOPES"]:
                 key_02 = re.search("(\D+)(\d+)", isotope)
                 element = key_02.group(1)
@@ -14310,21 +14334,19 @@ class PySILLS(tk.Frame):
             for index, isotope in enumerate(possible_is):
                 if index == 0:
                     self.opt_02b["menu"].delete(0, "end")
-                #
+
                 self.opt_02b["menu"].add_command(
                     label=isotope, command=lambda var_opt=isotope, var_file=None, state_default=True:
                     self.ma_change_is_smpl(var_opt, var_file, state_default))
-            #
         else:
             self.container_var["SMPL"][var_file]["Matrix Setup"][var_key]["Name"].set(var_opt)
 
-    #
     def ma_change_matrix_concentration(self, var_entr, var_file, state_default, event):
         if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
             var_key = "Oxide"
         else:
             var_key = "Element"
-        #
+
         if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Concentration"].set(var_entr.get())
@@ -14334,16 +14356,25 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].set(
                 int(float(var_entr.get())/100*float(self.container_var["IS"]["Default SMPL Concentration"].get())))
 
-    #
     def ma_change_is_smpl(self, var_opt, var_file=None, state_default=False):
+        """ Defines which internal standard was selected and calculates its concentration based on further information.
+        -------
+        Parameters
+        var_opt : str
+            Contains the option menu variable.
+        var_file : str
+            The filename as long version (the whole path).
+        state_default : boolean
+            Specifies if the selection is valid for all files or only for one.
+        -------
+        Returns
+        -------
+        """
         if self.pysills_mode == "MA":
-            var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
         elif self.pysills_mode == "FI":
-            var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
-            var_parent = self.subwindow_mi_settings
             var_setting_key = "mi_setting"
 
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1:
@@ -14352,9 +14383,9 @@ class PySILLS(tk.Frame):
             var_key = "Element"
         elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 4:
             var_key = "custom"
-        #
+
         self.container_var["IS"]["Default SMPL"].set(var_opt)
-        #
+
         if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 if self.pysills_mode == "MA":
@@ -14363,7 +14394,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_opt_is_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"]
                     var_entr_is_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"]
-                # self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_opt)
+
                 var_opt_is_i.set(var_opt)
                 if var_key == "Oxide":
                     var_oxide = self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].get()
@@ -14372,7 +14403,7 @@ class PySILLS(tk.Frame):
                         list_elements = []
                         list_amounts = []
                         list_fraction = {}
-                        #
+
                         for index, item in enumerate(key.groups()):
                             if index in [0, 2]:
                                 list_elements.append(item)
@@ -14381,21 +14412,21 @@ class PySILLS(tk.Frame):
                                     list_amounts.append(1)
                                 else:
                                     list_amounts.append(int(item))
-                        #
+
                         mass_total = 0
                         for index, element in enumerate(list_elements):
                             if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
                                 mass_total += list_amounts[index]*self.chemistry_data[element]
                             else:
                                 mass_total += list_amounts[index]*self.chemistry_data_sills[element]
-                        #
+
                         for index, element in enumerate(list_elements):
                             if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
                                 list_fraction[element] = (list_amounts[index]*self.chemistry_data[element])/mass_total
                             else:
                                 list_fraction[element] = (list_amounts[index]*self.chemistry_data_sills[
                                     element])/mass_total
-                            #
+
                             if index == 0:
                                 oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"][
                                                           "Concentration"].get()))/100
@@ -14416,14 +14447,12 @@ class PySILLS(tk.Frame):
                             for file_std in self.container_lists["STD"]["Long"]:
                                 if self.container_var["STD"][file_std]["IS Data"]["IS"].get() == "Select IS":
                                     self.container_var["STD"][file_std]["IS Data"]["IS"].set(var_opt)
-                #
+
                 else:
                     oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
                                               "Concentration"].get()))/100
                     is_concentration = round(1*10**6, 4)
                     self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
-                    # self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(
-                    #    round(oxide_weight*is_concentration, 4))
                     var_entr_is_i.set(round(oxide_weight*is_concentration, 4))
 
                     if self.container_var["IS"]["Default STD"].get() == "Select IS":
@@ -14434,11 +14463,9 @@ class PySILLS(tk.Frame):
         else:
             if self.pysills_mode == "MA":
                 var_opt_is_i = self.container_var["SMPL"][var_file]["IS Data"]["IS"]
-                var_entr_is_i = self.container_var["SMPL"][var_file]["IS Data"]["Concentration"]
             else:
                 var_opt_is_i = self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Name"]
-                var_entr_is_i = self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Concentration"]
-            # self.container_var["SMPL"][var_file]["IS Data"]["IS"].set(var_opt)
+
             var_opt_is_i.set(var_opt)
             self.container_var["SMPL"][var_file]["IS"].set(var_opt)
 
@@ -23695,6 +23722,9 @@ class PySILLS(tk.Frame):
         start_row = 0
         start_column = 0
 
+        ## INITIAL VALUES
+        list_oxides = np.sort(list(self.chemistry_data_oxides.keys()))
+
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column, n_rows=1,
@@ -23791,7 +23821,7 @@ class PySILLS(tk.Frame):
         opt_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column + 13,
             n_rows=1, n_columns=12, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.container_var[key_setting]["Oxide"], option_list=self.container_lists["Oxides"],
+            var_iso=self.container_var[key_setting]["Oxide"], option_list=list_oxides,
             text_set=var_text_01b, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var[key_setting]["Oxide"], var_file=None, state_default=True,
                            matrix_only=True:
@@ -23855,7 +23885,7 @@ class PySILLS(tk.Frame):
 
             opt_1_i = tk.OptionMenu(
                 frm_smpl, self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Matrix"],
-                *np.sort(self.container_lists["Oxides"]))
+                *np.sort(list_oxides))
             opt_1_i["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                 activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
@@ -25755,7 +25785,10 @@ class PySILLS(tk.Frame):
         #
         start_row = 0
         start_column = 0
-        #
+
+        ## INITIAL VALUES
+        list_oxides = np.sort(list(self.chemistry_data_oxides.keys()))
+
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_fi_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1, n_columns=24,
@@ -25775,13 +25808,13 @@ class PySILLS(tk.Frame):
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
                     list_elements.append(element_isotope)
-            for oxide in self.container_lists["Oxides"]:
+            for oxide in list_oxides:
                 key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
                 element_oxide = key.group(1)
                 if element_oxide in list_elements:
                     if oxide not in var_list_comp:
                         var_list_comp.append(oxide)
-            # var_list_comp = self.container_lists["Oxides"]
+
             var_list_is = self.container_lists["ISOTOPES"]
             var_opt_default_comp = self.container_var[key_setting]["Oxide"]
             var_opt_default_is = self.container_var[key_setting]["IS MAT Default"]
