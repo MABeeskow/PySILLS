@@ -26476,12 +26476,10 @@ class PySILLS(tk.Frame):
 
                     var_na_true_final = (var_na_true_base/salt_factor)*total_ppm
 
-                    var_concentration_is = round(var_na_true_final, 4)
                     b_nacl = amount_nacl_equiv/val_molar_mass_nacl
                     b_cl = b_nacl
                     b_na = b_cl/(1 + salt_contribution)
                     val_concentration_is = b_na*val_molar_mass_na*10**6
-                    var_concentration_is2 = var_nacl_equiv*(val_molar_mass_na/val_molar_mass_nacl)/(salt_contribution)*total_ppm
                     helper.append(val_concentration_is)
 
                 try:
@@ -26494,6 +26492,11 @@ class PySILLS(tk.Frame):
                     self.tv_salt_cb.insert("", tk.END, values=[str("Na"), round(np.mean(helper), 4)])
                 else:
                     self.tv_salt_cb.insert("", tk.END, values=[str("Na"), round(np.median(helper), 4)])
+
+                self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set(amount_nacl_equiv*100)
+                self.fi_calculate_chargebalance(
+                    var_entr=self.container_var[key_setting]["Salt Correction"]["Default Salinity"], mode="default",
+                    var_file=None, event="")
 
             elif mode == "default":
                 helper = []
@@ -26543,11 +26546,10 @@ class PySILLS(tk.Frame):
 
                     var_na_true_final = var_na_true_base/salt_factor
 
-                    var_concentration_is = round(var_na_true_final, 4)
                     b_nacl = amount_nacl_equiv/val_molar_mass_nacl
                     b_cl = b_nacl
                     b_na = b_cl/(1 + salt_contribution)
-                    val_concentration_is = b_na*val_molar_mass_na*10**6
+                    val_concentration_is = round(b_na*val_molar_mass_na*10**6, 4)
                     helper.append(val_concentration_is)
 
                     self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
@@ -26610,8 +26612,7 @@ class PySILLS(tk.Frame):
                 b_nacl = amount_nacl_equiv/val_molar_mass_nacl
                 b_cl = b_nacl
                 b_na = b_cl/(1 + salt_contribution)
-                val_concentration_is = b_na*val_molar_mass_na*10**6
-                var_concentration_is = round(var_na_true_final, 4)
+                val_concentration_is = round(b_na*val_molar_mass_na*10**6, 4)
 
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                 if file_smpl_short in self.container_files["SMPL"]:
@@ -26751,9 +26752,7 @@ class PySILLS(tk.Frame):
                         else:
                             var_na_true_base *= 1
 
-                    var_salt_contribution_final = var_salt_contribution + 1
-                    var_concentration_is = var_na_true_base/var_salt_contribution_final
-                    val_concentration_is = (var_na_equiv/(1 + var_salt_contribution_2))*total_ppm
+                    val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
                     helper.append(val_concentration_is)
 
                 try:
@@ -26766,6 +26765,11 @@ class PySILLS(tk.Frame):
                     self.tv_salt.insert("", tk.END, values=[str("Na"), round(np.mean(helper), 4)])
                 else:
                     self.tv_salt.insert("", tk.END, values=[str("Na"), round(np.median(helper), 4)])
+
+                self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set(amount_nacl_equiv*100)
+                self.fi_calculate_massbalance(
+                    var_entr=self.container_var[key_setting]["Salt Correction"]["Default Salinity"], mode="default",
+                    var_file=None, event="")
 
             elif mode == "default":
                 helper = []
@@ -26817,18 +26821,15 @@ class PySILLS(tk.Frame):
                         else:
                             var_na_true_base *= 1
 
-                    var_salt_contribution_final = var_salt_contribution + 1
-                    var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
-                    # var_concentration_is = var_na_true_base
-                    val_concentration_is = (var_na_equiv/(1 + var_salt_contribution_2))*total_ppm
+                    val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2)), 4)
                     helper.append(val_concentration_is)
 
                     self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
                         var_entr.get())
                     self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
-                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_concentration_is)
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                     if file_smpl_short in self.container_files["SMPL"]:
-                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(var_concentration_is)
+                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -26886,10 +26887,7 @@ class PySILLS(tk.Frame):
                     else:
                         var_na_true_base *= 1
 
-                var_salt_contribution_final = var_salt_contribution + 1
-
-                var_concentration_is = round(var_na_true_base/var_salt_contribution_final, 4)
-                val_concentration_is = (var_na_equiv/(1 + var_salt_contribution_2))*total_ppm
+                val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2)), 4)
 
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                 if file_smpl_short in self.container_files["SMPL"]:
