@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.03.2024
+# Date:		28.03.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -7163,7 +7163,7 @@ class PySILLS(tk.Frame):
                             self.container_measurements["RAW"][key] = {}
                             self.container_measurements["EDITED"][key] = {}
                             self.container_measurements["SELECTED"][key] = {}
-                        self.container_measurements["RAW"][key]["Time"] = times.tolist() # sex
+                        self.container_measurements["RAW"][key]["Time"] = times.tolist()
                         self.container_measurements["EDITED"][key]["Time"] = times.tolist()
                         self.container_measurements["SELECTED"][key]["Time"] = times.tolist()
 
@@ -13243,6 +13243,10 @@ class PySILLS(tk.Frame):
                 self.spikes_isotopes["STD"][file_std_short] = {}
             elif len(self.container_lists["STD"]["Long"]) == len(self.list_std) and self.file_loaded == True:
                 for item_01 in ["BG", "MAT"]:
+                    if file_std_short not in self.container_helper["STD"]:
+                        self.build_container_helper(mode="STD")
+                    if item_01 not in self.container_helper["STD"][file_std_short]:
+                        self.container_helper["STD"][file_std_short][item_01] = {}
                     for item_02 in ["Listbox", "Content", "ID", "Indices"]:
                         if item_02 not in self.container_helper["STD"][file_std_short][item_01]:
                             if item_02 == "Listbox":
@@ -13357,6 +13361,10 @@ class PySILLS(tk.Frame):
             self.build_all_needed_variables(
                 filetype=filetype, filename_long=filename_long, filename_short=filename_short)
 
+        if "Checkbox" not in var_name_check[filename_long]:
+            self.build_all_needed_variables(
+                filetype=filetype, filename_long=filename_long, filename_short=filename_short)
+
     def assign_time_and_isotopic_data(self, filetype, filename_long):
         parts = filename_long.split("/")
         filename_short = parts[-1]
@@ -13422,7 +13430,7 @@ class PySILLS(tk.Frame):
         if filename_long not in self.container_var[filetype]:
             self.container_var[filetype][filename_long] = {}
 
-        if self.file_loaded == False:
+        if self.file_loaded == False or "IS Data" not in self.container_var[filetype][filename_long]:
             self.container_var[filetype][filename_long]["IS Data"] = {
                 "IS": tk.StringVar(), "Concentration": tk.StringVar(),
                 "RAW": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
@@ -13453,7 +13461,7 @@ class PySILLS(tk.Frame):
                 self.container_files["STD"][filename_short]["IS"] = tk.StringVar()
 
         if filetype == "SMPL":
-            if self.file_loaded == False:
+            if self.file_loaded == False or "Matrix Setup" not in self.container_var[filetype][filename_long]:
                 self.container_var[filetype][filename_long]["ID"] = tk.StringVar()
                 self.container_var[filetype][filename_long]["ID"].set("A")
                 self.container_var[filetype][filename_long]["Matrix Setup"] = {
@@ -13468,7 +13476,8 @@ class PySILLS(tk.Frame):
                 self.container_var[filetype][filename_long]["Matrix Setup"]["Element"]["Concentration"].set("100.0")
 
             if filename_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
-                if self.file_loaded == False:
+                if self.file_loaded == False or filename_short not in self.container_var["Oxides Quantification"][
+                    "Total Amounts"]:
                     self.container_var["Oxides Quantification"]["Total Amounts"][filename_short] = tk.StringVar()
                     self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].set("100.0")
 
@@ -13677,6 +13686,10 @@ class PySILLS(tk.Frame):
                 else:
                     list_focus = ["BG", "MAT"]
                 for item_01 in list_focus:
+                    if file_smpl_short not in self.container_helper["SMPL"]:
+                        self.build_container_helper(mode="SMPL")
+                    if item_01 not in self.container_helper["SMPL"][file_smpl_short]:
+                        self.container_helper["SMPL"][file_smpl_short][item_01] = {}
                     for item_02 in ["Listbox", "Content", "ID", "Indices"]:
                         if item_02 not in self.container_helper["SMPL"][file_smpl_short][item_01]:
                             if item_02 == "Listbox":
@@ -13711,11 +13724,25 @@ class PySILLS(tk.Frame):
 
             file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
 
-            cb_i = tk.Checkbutton(
-                master=frm_files, text=file_smpl_short, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var["SMPL"][file_smpl]["Checkbox"], onvalue=1, offvalue=0,
-                selectcolor=self.bg_colors["White"], activebackground=self.bg_colors["Very Light"],
-                activeforeground=self.bg_colors["Very Dark"], anchor=tk.CENTER, highlightthickness=0, bd=0)
+            try:
+                cb_i = tk.Checkbutton(
+                    master=frm_files, text=file_smpl_short, fg=self.bg_colors["Very Dark"],
+                    bg=self.bg_colors["Very Light"], variable=self.container_var["SMPL"][file_smpl]["Checkbox"],
+                    onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
+                    activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
+                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+            except:
+                self.check_variable_on_existence(
+                    var_name_check=self.container_var["SMPL"], filetype="SMPL", filename_long=file_smpl,
+                    filename_short=file_smpl_short)
+
+                cb_i = tk.Checkbutton(
+                    master=frm_files, text=file_smpl_short, fg=self.bg_colors["Very Dark"],
+                    bg=self.bg_colors["Very Light"], variable=self.container_var["SMPL"][file_smpl]["Checkbox"],
+                    onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
+                    activebackground=self.bg_colors["Very Light"], activeforeground=self.bg_colors["Very Dark"],
+                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
 
@@ -13863,15 +13890,15 @@ class PySILLS(tk.Frame):
             if var_file_short not in self.container_helper[mode]:
                 self.container_helper[mode][var_file_short] = {}
 
-            self.container_helper[mode][var_file_short]["FIGURE"] = None
-            self.container_helper[mode][var_file_short]["CANVAS"] = None
-            self.container_helper[mode][var_file_short]["TOOLBARFRAME"] = None
-            self.container_helper[mode][var_file_short]["AXES"] = {}
-            self.container_helper[mode][var_file_short]["RESULTS FRAME"] = None
-            self.container_helper[mode][var_file_short]["FIGURE RATIO"] = None
-            self.container_helper[mode][var_file_short]["CANVAS RATIO"] = None
-            self.container_helper[mode][var_file_short]["TOOLBARFRAME RATIO"] = None
-            self.container_helper[mode][var_file_short]["AXES RATIO"] = {}
+                self.container_helper[mode][var_file_short]["FIGURE"] = None
+                self.container_helper[mode][var_file_short]["CANVAS"] = None
+                self.container_helper[mode][var_file_short]["TOOLBARFRAME"] = None
+                self.container_helper[mode][var_file_short]["AXES"] = {}
+                self.container_helper[mode][var_file_short]["RESULTS FRAME"] = None
+                self.container_helper[mode][var_file_short]["FIGURE RATIO"] = None
+                self.container_helper[mode][var_file_short]["CANVAS RATIO"] = None
+                self.container_helper[mode][var_file_short]["TOOLBARFRAME RATIO"] = None
+                self.container_helper[mode][var_file_short]["AXES RATIO"] = {}
 
     def build_matrix_setup_variables(self):
         for var_file in self.container_lists["SMPL"]["Long"]:
