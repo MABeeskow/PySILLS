@@ -1265,6 +1265,7 @@ class PySILLS(tk.Frame):
             "General Settings": {"English": "Main Settings", "German": "Haupteinstellungen"},
             "About": {"English": "About PySILLS", "German": "Über PySILLS"},
             "Quit": {"English": "Quit", "German": "Beenden"},
+            "Manager": {"English": "Manager", "German": "Manager"},
             "Setup": {"English": "Setup", "German": "Einstellungen"},
             "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
             "Mineral Analysis": {"English": "Mineral Analysis", "German": "Minerale"},
@@ -1466,44 +1467,56 @@ class PySILLS(tk.Frame):
         var_btn_08 = self.language_dict["About"][self.var_language]
         var_btn_09 = self.language_dict["Quit"][self.var_language]
         var_btn_10 = self.language_dict["Setup"][self.var_language]
+        var_btn_11 = self.language_dict["Manager"][self.var_language]
 
         SE(
             parent=self.parent, row_id=start_row + 20, column_id=start_column, n_rows=common_n_rows,
-            n_columns=2*n_columns_button, fg=font_color_dark,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="STD":
             self.open_csv(datatype))
         SE(
             parent=self.parent, row_id=start_row + 21, column_id=start_column, n_rows=common_n_rows,
-            n_columns=2*n_columns_button, fg=font_color_dark,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="STD":
             self.copy_file(filetype))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=6, n_rows=common_n_rows + 1,
-            n_columns=n_columns_button + 1, fg=font_color_dark,
+            parent=self.parent, row_id=start_row + 20, column_id=n_columns_button + 2, n_rows=common_n_rows,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_03, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_std, var_list=self.list_std: self.delete_csv(var_lb, var_list))
+        btn_11_std = SE(
+            parent=self.parent, row_id=start_row + 21, column_id=n_columns_button + 2, n_rows=common_n_rows,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark)
+        btn_11_std.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows,
-            n_columns=2*n_columns_button, fg=font_color_dark,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="SMPL":
             self.open_csv(datatype))
         SE(
             parent=self.parent, row_id=start_row + 21, column_id=11, n_rows=common_n_rows,
-            n_columns=2*n_columns_button, fg=font_color_dark,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="SMPL":
             self.copy_file(filetype))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=17, n_rows=common_n_rows + 1,
-            n_columns=n_columns_button + 1, fg=font_color_dark,
+            parent=self.parent, row_id=start_row + 20, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_03, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_smpl, var_list=self.list_smpl: self.delete_csv(var_lb, var_list))
-
+        btn_11_smpl = SE(
+            parent=self.parent, row_id=start_row + 21, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
+            n_columns=n_columns_button + 2, fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark)
+        btn_11_smpl.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
