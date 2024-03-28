@@ -1721,11 +1721,16 @@ class PySILLS(tk.Frame):
         file_short_original = file_parts[-1]
         file_isotopes_original = self.container_lists["Measured Isotopes"][file_short_original]
 
-        with open(var_file_long, "r") as file:
-            content = file.read()
+        problem_present = False
+        try:
+            with open(var_file_long, "r") as file:
+                content = file.read()
 
-        with open(var_file_long_copy, "w") as copied_file:
-            copied_file.write(content)
+            with open(var_file_long_copy, "w") as copied_file:
+                copied_file.write(content)
+        except:
+            problem_present = True
+            print("File cannot be read.")
 
         if var_file_long_copy not in var_list:
             var_list.append(var_file_long_copy)
@@ -1745,8 +1750,18 @@ class PySILLS(tk.Frame):
             var_timestamp = self.container_icpms["timestamp"]
             var_icpms = self.container_icpms["name"]
 
-            dates, times = Data(filename=var_file_long_copy).import_as_list(
-                skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+            if problem_present == False:
+                dates, times = Data(filename=var_file_long_copy).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+            else:
+                try:
+                    dates, times = Data(filename=var_file_long).import_as_list(
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+                except:
+                    dates = 0
+                    times_input = self.container_var["acquisition times"][filetype][file_short_original].get()
+                    times_input_parts = times_input.split(":")
+                    times = [[times_input_parts[0], times_input_parts[1], times_input_parts[2]]]
 
             t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
 
@@ -1755,15 +1770,23 @@ class PySILLS(tk.Frame):
                 self.container_var["acquisition times"][filetype][var_file_short_copy].set(
                     times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
-            if self.pysills_mode == "MA":
-                self.subwindow_ma_settings.destroy()
-                self.ma_settings()
-            elif self.pysills_mode == "FI":
-                self.subwindow_fi_settings.destroy()
-                self.fi_settings()
-            elif self.pysills_mode == "MI":
-                self.subwindow_mi_settings.destroy()
-                self.mi_settings()
+            try:
+                if self.pysills_mode == "MA":
+                    self.subwindow_ma_settings.destroy()
+                    self.ma_settings()
+                elif self.pysills_mode == "FI":
+                    self.subwindow_fi_settings.destroy()
+                    self.fi_settings()
+                elif self.pysills_mode == "MI":
+                    self.subwindow_mi_settings.destroy()
+                    self.mi_settings()
+            except:
+                if self.pysills_mode == "MA":
+                    self.ma_settings()
+                elif self.pysills_mode == "FI":
+                    self.fi_settings()
+                elif self.pysills_mode == "MI":
+                    self.mi_settings()
 
     def add_needed_variables_for_later_added_files(self, filename_long, filename_short, filetype, file_isotopes):
         if self.pysills_mode == "MA":
@@ -2128,7 +2151,12 @@ class PySILLS(tk.Frame):
                             df_data = DE(filename_long=filename_long).get_measurements(
                                 delimiter=",", skip_header=3, skip_footer=1)
                     else:
-                        df_data = self.container_measurements["Dataframe"][filename_short]
+                        if "_copy" in filename_short:
+                            filename_short_original = filename_short.replace("_copy", "")
+                            filename_short = filename_short_original
+                            df_data = self.container_measurements["Dataframe"][filename_short]
+                        else:
+                            df_data = self.container_measurements["Dataframe"][filename_short]
 
                     list_names = list(df_data.columns.values)
                     list_names.pop(0)
@@ -2594,7 +2622,11 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=file_long).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][file_short]
+            if file_short not in self.container_measurements["Dataframe"] and "_copy" in file_short:
+                file_short_original = file_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][file_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][file_short]
 
         list_keys = list(df_data.columns.values)
         del list_keys[0]
@@ -4043,7 +4075,9 @@ class PySILLS(tk.Frame):
                 corrected_isotopes = []
                 not_corrected_isotopes = []
                 self.container_spikes[file_smpl] = {}
-                #
+                if len(isotopes_spiked_list) == 0 and "_copy" in file_smpl:
+                    file_smpl_original = file_smpl.replace("_copy", "")
+                    isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl_original]]
                 if file_smpl not in self.container_spikes["Selection"]:
                     self.container_spikes["Selection"][file_smpl] = {}
 
@@ -4057,27 +4091,44 @@ class PySILLS(tk.Frame):
                         df_data = DE(filename_long=filename_long).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    df_data = self.container_measurements["Dataframe"][file_smpl]
+                    if "_copy" in file_smpl:
+                        filename_original = file_smpl.replace("_copy", "")
+                        #file_smpl = filename_original
+                        df_data = self.container_measurements["Dataframe"][filename_original]
+                    else:
+                        df_data = self.container_measurements["Dataframe"][file_smpl]
 
                 list_names = list(df_data.columns.values)
                 list_names.pop(0)
                 df_isotopes = list_names
 
                 for isotope in df_isotopes:
+                    if bool(self.spikes_isotopes[filetype][file_smpl]) == False and "_copy" in file_smpl:
+                        file_smpl_original = file_smpl.replace("_copy", "")
+                        self.spikes_isotopes[filetype][file_smpl] = self.spikes_isotopes[filetype][file_smpl_original]
                     if bool(self.spikes_isotopes[filetype][file_smpl]):
                         for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_smpl].items():
-                            #
                             if isotope_spiked not in self.container_spikes["Selection"][file_smpl]:
                                 self.container_spikes["Selection"][file_smpl][isotope_spiked] = {}
-                            #
+
                             if isotope in isotopes_spiked_list:
                                 if isotope not in corrected_isotopes:
                                     corrected_isotopes.append(isotope)
                                     spike_intervals = np.array(intervals)
                                     merged_intervals = ES(variable=spike_intervals).merge_times()
                                     for interval in merged_intervals:
-                                        dataset_raw = self.container_measurements["RAW"][file_smpl][isotope][
-                                                      interval[0]:interval[1]]
+                                        if (isotope not in self.container_measurements["RAW"][file_smpl] and
+                                                "_copy" in file_smpl):
+                                            file_smpl_original = file_smpl.replace("_copy", "")
+                                            dataset_raw = self.container_measurements["RAW"][file_smpl_original][
+                                                              isotope][interval[0]:interval[1]]
+                                            self.container_measurements["RAW"][file_smpl][
+                                                isotope] = self.container_measurements["RAW"][file_smpl_original][
+                                                isotope]
+                                        else:
+                                            dataset_raw = self.container_measurements["RAW"][file_smpl][isotope][
+                                                          interval[0]:interval[1]]
+
                                         dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
                                         if var_method == 0:
                                             data_smoothed, indices_outl = GrubbsTestSILLS(
@@ -4104,9 +4155,22 @@ class PySILLS(tk.Frame):
                                                         #
                                                         for index in range(var_indices[0], var_indices[1] + 1):
                                                             data_smoothed[index] = data_raw[index]
-                                        #
-                                        self.container_measurements["EDITED"][file_smpl][isotope][
-                                            "Uncut"] = data_smoothed
+
+                                        if (isotope not in self.container_measurements["EDITED"][file_smpl] and
+                                                "_copy" in file_smpl):
+                                            self.container_measurements["EDITED"][file_smpl][isotope] = {"Uncut": None}
+                                            self.container_measurements["EDITED"][file_smpl][isotope][
+                                                "Uncut"] = data_smoothed
+                                        else:
+                                            self.container_measurements["EDITED"][file_smpl][isotope][
+                                                "Uncut"] = data_smoothed
+
+                                        if ("Time" not in self.container_measurements["SELECTED"][file_smpl] and
+                                                "_copy" in file_smpl):
+                                            self.container_measurements["SELECTED"][file_smpl][
+                                                "Time"] = self.container_measurements["SELECTED"][file_smpl_original][
+                                                "Time"]
+
                                         self.container_spikes[file_smpl][isotope] = {
                                             "Data RAW": self.container_measurements["RAW"][file_smpl][isotope],
                                             "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
@@ -8514,6 +8578,10 @@ class PySILLS(tk.Frame):
                         delimiter=",", skip_header=3, skip_footer=1)
                 dataset_time = list(DE().get_times(dataframe=df_data))
             else:
+                if "Time" not in self.container_measurements["RAW"][file_short] and "_copy" in file_short:
+                    file_short_original = file_short.replace("_copy", "")
+                    self.container_measurements["RAW"][file_short]["Time"] = self.container_measurements["RAW"][
+                        file_short_original]["Time"]
                 dataset_time = self.container_measurements["RAW"][file_short]["Time"]
                 df_data = self.container_measurements["RAW"][file_short]
 
@@ -13393,7 +13461,12 @@ class PySILLS(tk.Frame):
                 if filename_short not in self.container_measurements["Dataframe"]:
                     self.container_measurements["Dataframe"][filename_short] = df_i
             else:
-                df_i = self.container_measurements["Dataframe"][filename_short]
+                if "_copy" in filename_short:
+                    filename_short_original = filename_short.replace("_copy", "")
+                    filename_short = filename_short_original
+                    df_i = self.container_measurements["Dataframe"][filename_short]
+                else:
+                    df_i = self.container_measurements["Dataframe"][filename_short]
 
         df_isotopes_i = DE().get_isotopes(dataframe=df_i)
         self.container_lists["Measured Isotopes"][filename_short] = df_isotopes_i
@@ -15020,7 +15093,11 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][str_filename_short]
+            if str_filename_short not in self.container_measurements["Dataframe"] and "_copy" in str_filename_short:
+                str_filename_short_original = str_filename_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][str_filename_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][str_filename_short]
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
         df_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
@@ -15290,7 +15367,11 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][var_file_short]
+            if var_file_short not in self.container_measurements["Dataframe"] and "_copy" in var_file_short:
+                file_short_original = var_file_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][file_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][var_file_short]
 
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
@@ -19277,7 +19358,10 @@ class PySILLS(tk.Frame):
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
                     file_parts = file_std.split("/")
-                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    try:
+                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    except:
+                        print("File cannot be read. (Error #FI_STD_01)")
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -19298,7 +19382,10 @@ class PySILLS(tk.Frame):
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
                     file_parts = file_smpl.split("/")
-                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    try:
+                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    except:
+                        print("File cannot be read. (Error #FI_SMPL_01)")
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -24606,7 +24693,11 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=str_filename_long).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][str_filename_short]
+            if str_filename_short not in self.container_measurements["Dataframe"] and "_copy" in str_filename_short:
+                str_filename_short_original = str_filename_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][str_filename_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][str_filename_short]
 
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
@@ -24867,7 +24958,11 @@ class PySILLS(tk.Frame):
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
         else:
-            df_data = self.container_measurements["Dataframe"][var_file_short]
+            if var_file_short not in self.container_measurements["Dataframe"] and "_copy" in var_file_short:
+                file_short_original = var_file_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][file_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][var_file_short]
 
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
@@ -28749,7 +28844,6 @@ class PySILLS(tk.Frame):
             var_file = var_file
 
         helper_list = []
-
         df_isotopes = self.container_lists["Measured Isotopes"][var_file]
         for var_isotope in df_isotopes:
             list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
@@ -28791,19 +28885,19 @@ class PySILLS(tk.Frame):
                         if self.file_loaded == False:
                             self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
 
-    def helper_fill_container_spike_values(self, mode="SMPL"):
+    def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
         for var_file_short in self.container_lists[mode]["Short"]:
-            df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            for var_isotope in df_isotopes:
-                # for var_isotope in self.container_lists["ISOTOPES"]:
-                list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
-                if len(list_indices) > 0:
-                    for var_index in list_indices:
-                        value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][var_index]
-                        value_smoothed = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_index]
-                        self.helper_spike_values(
-                            var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
-                            var_value_smoothed=value_smoothed, mode=mode)
+            if file == "all" or file == var_file_short:
+                df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                for var_isotope in df_isotopes:
+                    list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
+                    if len(list_indices) > 0:
+                        for var_index in list_indices:
+                            value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][var_index]
+                            value_smoothed = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_index]
+                            self.helper_spike_values(
+                                var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
+                                var_value_smoothed=value_smoothed, mode=mode)
 
     def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
@@ -29124,8 +29218,7 @@ class PySILLS(tk.Frame):
             if var_file_short not in self.container_measurements["EDITED"]:
                 self.container_measurements["EDITED"][var_file_short] = {}
                 n_file = len(var_file_short)
-                original_name = var_file_short[:int(n_file - 9)] + ".csv"
-                print("Original name:", var_file_short[:int(n_file - 9)]+".csv")
+
             self.container_measurements["EDITED"][var_file_short][isotope] = {}
             self.container_measurements["EDITED"][var_file_short][isotope]["BG"] = []
             self.container_measurements["EDITED"][var_file_short][isotope]["MAT"] = []
@@ -29213,8 +29306,6 @@ class PySILLS(tk.Frame):
             if mode != "MA":
                 self.container_lod[var_filetype]["RAW"][var_file_short]["INCL"][isotope] = None
                 self.container_lod[var_filetype]["SMOOTHED"][var_file_short]["INCL"][isotope] = None
-    #
-
 
 if __name__ == "__main__":
     root = tk.Tk()
