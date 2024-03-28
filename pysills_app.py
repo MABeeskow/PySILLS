@@ -1728,7 +1728,19 @@ class PySILLS(tk.Frame):
         var_file_long = var_list[item[0]]
         var_file_long_parts = var_file_long.split(".")
         var_file_extension = var_file_long_parts[-1]
-        var_file_long_copy = var_file_long_parts[0] + "_copy" + "." + var_file_extension
+        if "_copy" in var_file_long_parts[0]:
+            if "_copy" == var_file_long_parts[0][-5:]:
+                str_added = "_copy2"
+                file_base = var_file_long_parts[0][:-5]
+            else:
+                number_current = var_file_long_parts[0][-5:][-1]
+                new_number = int(number_current) + 1
+                str_added = "_copy" + str(new_number)
+                file_base = var_file_long_parts[0][:-6]
+        else:
+            str_added = "_copy"
+            file_base = var_file_long_parts[0]
+        var_file_long_copy = file_base + str_added + "." + var_file_extension
 
         file_parts = var_file_long.split("/")
         file_short_original = file_parts[-1]
@@ -1800,6 +1812,11 @@ class PySILLS(tk.Frame):
                     self.fi_settings()
                 elif self.pysills_mode == "MI":
                     self.mi_settings()
+        else:
+            file_parts_copy = var_file_long_copy.split("/")
+            var_file_short_copy = file_parts_copy[-1]
+            print(var_file_short_copy, "exists already. Please copy the file with the same root (the part before "
+                  "'_copy') and the highest number after '_copy' or add the file manually. Thanks!")
 
     def add_needed_variables_for_later_added_files(self, filename_long, filename_short, filetype, file_isotopes):
         if self.pysills_mode == "MA":
