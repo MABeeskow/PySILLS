@@ -145,7 +145,7 @@ class PySILLS(tk.Frame):
             "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222}
         self.chemistry_oxides_sorted = {
             "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
-            "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO"],
+            "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO2"],
             "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["ClO2", "Cl2O3", "Cl2O5", "Cl2O7"], "K": ["K2O"],
             "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
             "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3", "MnO2", "MnO3", "Mn2O7"],
@@ -7163,7 +7163,7 @@ class PySILLS(tk.Frame):
                             self.container_measurements["RAW"][key] = {}
                             self.container_measurements["EDITED"][key] = {}
                             self.container_measurements["SELECTED"][key] = {}
-                        self.container_measurements["RAW"][key]["Time"] = times.tolist()
+                        self.container_measurements["RAW"][key]["Time"] = times.tolist() # sex
                         self.container_measurements["EDITED"][key]["Time"] = times.tolist()
                         self.container_measurements["SELECTED"][key]["Time"] = times.tolist()
 
@@ -8502,16 +8502,20 @@ class PySILLS(tk.Frame):
             list_files.extend(self.container_lists["SMPL"]["Long"])
 
         for file_long in list_files:
-            if self.container_icpms["name"] != None:
-                var_skipheader = self.container_icpms["skipheader"]
-                var_skipfooter = self.container_icpms["skipfooter"]
-                df_data = DE(filename_long=file_long).get_measurements(
-                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-            else:
-                df_data = DE(filename_long=file_long).get_measurements(
-                    delimiter=",", skip_header=3, skip_footer=1)
-            dataset_time = list(DE().get_times(dataframe=df_data))
             file_short = file_long.split("/")[-1]
+            if self.file_loaded == False:
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data = DE(filename_long=file_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data = DE(filename_long=file_long).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
+                dataset_time = list(DE().get_times(dataframe=df_data))
+            else:
+                dataset_time = self.container_measurements["RAW"][file_short]["Time"]
+                df_data = self.container_measurements["RAW"][file_short]
 
             condition = False
             index_isotope = 0
@@ -8530,15 +8534,18 @@ class PySILLS(tk.Frame):
 
             if isotope_is == "Select IS":
                 file_dummy = file_long
-
-                if self.container_icpms["name"] != None:
-                    var_skipheader = self.container_icpms["skipheader"]
-                    var_skipfooter = self.container_icpms["skipfooter"]
-                    df_data_dummy = DE(filename_long=file_dummy).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                file_dummy_short = file_dummy.split("/")[-1]
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data_dummy = DE(filename_long=file_dummy).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data_dummy = DE(filename_long=file_dummy).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
                 else:
-                    df_data_dummy = DE(filename_long=file_dummy).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
+                    df_data_dummy = self.container_measurements["RAW"][file_dummy_short]
 
                 max_values = {"Last": 0}
                 for isotope in list(df_data_dummy.keys())[1:]:
