@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		28.03.2024
+# Date:		02.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -1525,10 +1525,11 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_05, bg_active=accent_color, fg_active=font_color_dark, command=self.open_project)
-        SE(
+        self.btn_save_project = SE(
             parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_06, bg_active=accent_color, fg_active=font_color_dark, command=self.save_project)
+        self.btn_save_project.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 8, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -6537,8 +6538,12 @@ class PySILLS(tk.Frame):
 
         for index, filename_smpl_long in enumerate(self.container_lists["SMPL"]["Long"]):
             filename_smpl_short = self.container_lists["SMPL"]["Short"][index]
-            var_last_compound = self.container_var["SMPL"][filename_smpl_long]["Last compound"].get()
-            var_melting_temperature = self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].get()
+            try:
+                var_last_compound = self.container_var["SMPL"][filename_smpl_long]["Last compound"].get()
+                var_melting_temperature = self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].get()
+            except:
+                var_last_compound = "Undefined"
+                var_melting_temperature = "Undefined"
             str_file = filename_smpl_short + ";" + var_last_compound + ";" + var_melting_temperature + "\n"
 
             save_file.write(str_file)
@@ -6624,11 +6629,20 @@ class PySILLS(tk.Frame):
 
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
-            val_a_i = self.container_var["SMPL"][filename_long]["Halter2002"]["a"].get()
-            val_b_i = self.container_var["SMPL"][filename_long]["Halter2002"]["b"].get()
-            val_rho_host_i = self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].get()
-            val_rho_incl_i = self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].get()
-            val_r_i = self.container_var["SMPL"][filename_long]["Halter2002"]["R"].get()
+
+            try:
+                val_a_i = self.container_var["SMPL"][filename_long]["Halter2002"]["a"].get()
+                val_b_i = self.container_var["SMPL"][filename_long]["Halter2002"]["b"].get()
+                val_rho_host_i = self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].get()
+                val_rho_incl_i = self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].get()
+                val_r_i = self.container_var["SMPL"][filename_long]["Halter2002"]["R"].get()
+            except:
+                val_a_i = "Undefined"
+                val_b_i = "Undefined"
+                val_rho_host_i = "Undefined"
+                val_rho_incl_i = "Undefined"
+                val_r_i = "Undefined"
+
             str_i = (str(filename_short) + ";" + str(val_a_i) + ";" + str(val_b_i) + ";" + str(val_rho_host_i) +
                      ";" + str(val_rho_incl_i) + ";" + str(val_r_i) + "\n")
             save_file.write(str_i)
@@ -6650,10 +6664,18 @@ class PySILLS(tk.Frame):
 
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
-            val_r_host_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].get()
-            val_r_incl_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].get()
-            val_rho_host_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].get()
-            val_rho_incl_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].get()
+
+            try:
+                val_r_host_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].get()
+                val_r_incl_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].get()
+                val_rho_host_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].get()
+                val_rho_incl_i = self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].get()
+            except:
+                val_r_host_i = "Undefined"
+                val_r_incl_i = "Undefined"
+                val_rho_host_i = "Undefined"
+                val_rho_incl_i = "Undefined"
+
             str_i = (str(filename_short) + ";" + str(val_r_host_i) + ";" + str(val_r_incl_i) + ";" +
                      str(val_rho_host_i) + ";" + str(val_rho_incl_i) + "\n")
             save_file.write(str_i)
@@ -7771,16 +7793,18 @@ class PySILLS(tk.Frame):
                         header_names.extend(self.container_lists["ISOTOPES"])
                         dataframe = pd.read_csv(
                             filename, sep=";", header=0, skiprows=data[0], nrows=data[1] - data[0],
-                            usecols=header_names,
-                            engine="python")
+                            usecols=header_names, engine="python")
+
                         dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
                         if len(dataframe_blank) > 0:
                             first_blank_index = dataframe_blank.index[0]
                             dataframe = dataframe[:first_blank_index]
                         var_columns = dataframe.columns
+
                         for column in var_columns:
                             dataframe[column] = dataframe[column].astype(float)
                         df_isotopes = DE().get_isotopes(dataframe=dataframe)
+
                         times = DE().get_times(dataframe=dataframe)
                         self.container_lists["Measured Isotopes"][key] = df_isotopes
 
@@ -11144,6 +11168,8 @@ class PySILLS(tk.Frame):
         self.build_srm_database()
         self.file_system_need_update = False
 
+        self.btn_save_project.configure(state="normal")
+
     def place_project_information(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Project Information'
         Parameters:  var_geometry_info  -   contains information for the widget setup
@@ -13849,10 +13875,8 @@ class PySILLS(tk.Frame):
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
 
-            if self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get() != "Select IS":
-                var_text = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-            else:
-                var_text = "Select IS"
+            if len(file_isotopes) == 0:
+                pass #sex
 
             opt_is_i = tk.OptionMenu(
                 frm_files, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *file_isotopes)
@@ -19591,6 +19615,8 @@ class PySILLS(tk.Frame):
 
         self.build_srm_database()
 
+        self.btn_save_project.configure(state="normal")
+
     ########################################################################################################################
     ### MELT INCLUSIONS ####################################################################################################
     ########################################################################################################################
@@ -19835,6 +19861,8 @@ class PySILLS(tk.Frame):
             var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
+
+        self.btn_save_project.configure(state="normal")
 
     def change_rb_inclusion_setup(self):
         if self.pysills_mode == "FI":
