@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		02.04.2024
+# Date:		03.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -20163,17 +20163,21 @@ class PySILLS(tk.Frame):
                 else:
                     var_intensity_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
                         var_focus][isotope]
-                #
-                var_result = var_intensity_i/var_intensity_is
+
+                if var_intensity_is > 0:
+                    var_result = var_intensity_i/var_intensity_is
+                else:
+                    var_result = 0.0
+
                 self.container_intensity_ratio[var_filetype][var_datatype][var_file_short][var_focus][
                     isotope] = var_result
-            #
+
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["BG", "MAT", "INCL"]:
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
-                        #
+
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
                                 var_file_short = self.container_lists[var_filetype]["Short"][index]
