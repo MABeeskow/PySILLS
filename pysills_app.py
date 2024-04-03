@@ -9074,32 +9074,45 @@ class PySILLS(tk.Frame):
                 value_is = self.mineral_chem["Unknown"][var_is]
             except:
                 value_is = 0.0
-            #
+
             self.container_var["IS SMPL Default"].set(value_is)
-            #
+
             for file in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file]["IS Data"]["IS"].set(var_is)
                 self.container_var["SMPL"][file]["IS Data"]["Concentration"].set(value_is)
-                #
+
                 file_short = file.split("/")[-1]
-                self.container_files["SMPL"][file_short]["IS"].set(var_is)
-                self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
-                #
+                if file_short not in self.container_files["SMPL"]:
+                    self.container_files["SMPL"][file_short] = {
+                        "IS": tk.StringVar(), "IS Concentration": tk.StringVar()}
+                    self.container_files["SMPL"][file_short]["IS"].set(var_is)
+                    self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
+                else:
+                    self.container_files["SMPL"][file_short]["IS"].set(var_is)
+                    self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
+
                 self.container_var["SMPL"][file]["IS"].set(var_is)
-            #
+
         else:
             try:
                 value_is = self.mineral_chem["Unknown"][var_is]
             except:
                 value_is = 0.0
-            #
+
             self.container_var["SMPL"][var_file]["IS Data"]["IS"].set(var_is)
             self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].set(value_is)
-            #
+
             file_short = var_file.split("/")[-1]
-            self.container_files["SMPL"][file_short]["IS"].set(var_is)
-            self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
-            #
+
+            if file_short not in self.container_files["SMPL"]:
+                self.container_files["SMPL"][file_short] = {
+                    "IS": tk.StringVar(), "IS Concentration": tk.StringVar()}
+                self.container_files["SMPL"][file_short]["IS"].set(var_is)
+                self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
+            else:
+                self.container_files["SMPL"][file_short]["IS"].set(var_is)
+                self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
+
             self.container_var["SMPL"][var_file]["IS"].set(var_is)
 
     def srm_window(self):
@@ -11528,6 +11541,7 @@ class PySILLS(tk.Frame):
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_matrix_concentration_setup)
         elif str_method == "100 wt.% Oxides":
+            str_focus = focus
             # LABELS
             str_lbl_01 = self.language_dict["Oxide Setup"][self.var_language]
             str_btn_01 = self.language_dict["Composition Setup"][self.var_language]
@@ -11544,13 +11558,13 @@ class PySILLS(tk.Frame):
                 column_id=var_column_start, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=lambda focus=focus: self.oxides_setup_composition(focus))
+                command=lambda focus=str_focus: self.oxides_setup_composition(focus))
             btn_01b = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
                 column_id=var_header_n + 1, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=lambda focus=focus: self.oxides_setup_files(focus))
+                command=lambda focus=str_focus: self.oxides_setup_files(focus))
 
     def oxides_setup_composition(self, focus="MAT"):
         # Window Settings
@@ -11598,6 +11612,8 @@ class PySILLS(tk.Frame):
         var_column_start = 1
         var_row_n = 1
         var_header_n = 8
+
+        str_focus = focus
 
         # FRAMES
         frm_01 = SE(
@@ -11693,7 +11709,7 @@ class PySILLS(tk.Frame):
                 column_id=var_column_start, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=var_cb_002a, text=oxide, set_sticky="nesw", own_color=True,
-                command=lambda var_oxide=oxide, var_key="Major", focus=focus:
+                command=lambda var_oxide=oxide, var_key="Major", focus=str_focus:
                 self.select_oxide(var_oxide, var_key, focus))
             self.container_checkboxes[oxide] = cb_002a
 
@@ -11714,7 +11730,7 @@ class PySILLS(tk.Frame):
                 column_id=var_header_n + 2, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=var_cb_003a, text=oxide, set_sticky="nesw", own_color=True,
-                command=lambda var_oxide=oxide, var_key="Minor", focus=focus:
+                command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
                 self.select_oxide(var_oxide, var_key, focus))
             self.container_checkboxes[oxide] = cb_003a
 
@@ -11735,7 +11751,7 @@ class PySILLS(tk.Frame):
                 column_id=2*var_header_n + 3, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=var_cb_004a, text=oxide, set_sticky="nesw", own_color=True,
-                command=lambda var_oxide=oxide, var_key="Minor", focus=focus:
+                command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
                 self.select_oxide(var_oxide, var_key, focus))
             self.container_checkboxes[oxide] = cb_004a
 
@@ -11757,7 +11773,7 @@ class PySILLS(tk.Frame):
                 column_id=3*var_header_n + 4, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=var_cb_005a, text=oxide, set_sticky="nesw", own_color=True,
-                command=lambda var_oxide=oxide, var_key="Minor", focus=focus:
+                command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
                 self.select_oxide(var_oxide, var_key, focus))
             self.container_checkboxes[oxide] = cb_005a
 
@@ -11780,7 +11796,7 @@ class PySILLS(tk.Frame):
                 column_id=4*var_header_n + 5, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=var_cb_006a, text=oxide, set_sticky="nesw", own_color=True,
-                command=lambda var_oxide=oxide, var_key="Minor", focus=focus:
+                command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
                 self.select_oxide(var_oxide, var_key, focus))
             self.container_checkboxes[oxide] = cb_006a
 
@@ -11900,6 +11916,8 @@ class PySILLS(tk.Frame):
         var_row_n = 1
         var_header_n = 8
 
+        str_focus = focus
+
         # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
         # LABELS
@@ -11938,7 +11956,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_default, text_default=var_entr_default.get())
         entr_02a.bind(
-            "<Return>", lambda event, var_entr=var_entr_default, focus=focus:
+            "<Return>", lambda event, var_entr=var_entr_default, focus=str_focus:
             self.change_total_oxides_amount(var_entr, focus, event))
 
         var_entr_03_default = tk.StringVar()
@@ -17601,7 +17619,10 @@ class PySILLS(tk.Frame):
                         b_i = round(b_i, 12)
 
                         var_result_is = b_i*delta_i + a_i
-                        var_result_i = var_result_i_pre/var_result_is
+                        if var_result_is > 0:
+                            var_result_i = var_result_i_pre/var_result_is
+                        else:
+                            var_result_i = 0.0
                     else:
                         var_result_i = var_result_i_pre/var_result_is
 
@@ -18486,8 +18507,12 @@ class PySILLS(tk.Frame):
                         var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                             isotope]
                         var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["MAT"][isotope]/var_sensitivity_is
+
+                        if var_sensitivity_is > 0:
+                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                var_file_short]["MAT"][isotope]/var_sensitivity_is
+                        else:
+                            var_sensitivity_i = 0.0
 
                         if var_sensitivity_i > 0:
                             var_result_i = (3.29*(
@@ -20465,22 +20490,22 @@ class PySILLS(tk.Frame):
                 for isotope in file_isotopes:
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
-                    #
+
                     var_srm_i = self.container_var["SRM"][isotope].get()
                     key_element = re.search("(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     var_concentration_i = self.srm_actual[var_srm_i][element]
-                    #
+
                     var_intensity_i = self.container_intensity_corrected["STD"][var_datatype]["MAT"][isotope]
-                    #
+
                     if var_concentration_is > 0 and var_intensity_i > 0:
-                        var_result_i = var_sensitivity_i*(var_concentration_i/var_intensity_i)* \
-                                       (var_intensity_is/var_concentration_is)
+                        var_result_i = (var_sensitivity_i*(var_concentration_i/var_intensity_i)*
+                                        (var_intensity_is/var_concentration_is))
                     else:
                         var_result_i = 0
-                    #
+
                     self.container_rsf[var_filetype][var_datatype][var_file_short][var_focus][isotope] = var_result_i
-            #
+
         else:
             for var_filetype in ["STD", "SMPL"]:
                 if var_filetype == "STD":
@@ -25229,39 +25254,38 @@ class PySILLS(tk.Frame):
     def fi_show_quick_results(self, var_type, var_file):
         parts = var_file.split("/")
         var_file_short = parts[-1]
-        #
+
         ## Cleaning
         try:
             canvas = self.container_helper[var_type][var_file_short]["CANVAS"]
             toolbarframe = self.container_helper[var_type][var_file_short]["TOOLBARFRAME"]
-            #
+
             if canvas == None:
                 canvas.get_tk_widget().grid_remove()
                 toolbarframe.grid_remove()
         except AttributeError:
             pass
-        #
+
         try:
             canvas_ratio = self.container_helper[var_type][var_file_short]["CANVAS RATIO"]
             toolbarframe_ratio = self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"]
-            #
+
             if canvas_ratio == None:
                 canvas_ratio.get_tk_widget().grid_remove()
                 toolbarframe_ratio.grid_remove()
         except AttributeError:
             pass
-        #
-        ##
+
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
-        #
+
         ## FRAMES
         frm_quick = SE(
             parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=39,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
-        #
+
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
-        #
+
         ## TREEVIEWS
         list_categories = ["Category"]
         if var_type == "STD":
@@ -25276,6 +25300,7 @@ class PySILLS(tk.Frame):
                 var_srm_i = self.container_var["SRM"][isotope].get()
                 if var_srm_i == var_srm_file:
                     list_considered_isotopes.append(isotope)
+
             list_categories.extend(list_considered_isotopes)
 
             key_element_is = re.search("(\D+)(\d+)", var_is)
