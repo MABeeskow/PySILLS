@@ -1440,7 +1440,8 @@ class PySILLS(tk.Frame):
         lbl_dev = SE(
             parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
-            text="developed by: Maximilian Alexander Beeskow", relief=tk.FLAT, fontsize="sans 8", sticky="news")
+            text="developed by: Maximilian A. Beeskow - based on: SILLS", relief=tk.FLAT, fontsize="sans 8",
+            sticky="news")
 
         # LISTBOXES
         self.lb_std = SE(
@@ -6878,6 +6879,12 @@ class PySILLS(tk.Frame):
         try:
             file_loaded = open(str(filename), "r")
             loaded_lines = file_loaded.readlines()
+
+            if ",,\n" in loaded_lines:
+                loaded_lines = [sub.replace(",,\n", "") for sub in loaded_lines]
+            elif ";;\n" in loaded_lines:
+                loaded_lines = [sub.replace(";;\n", "") for sub in loaded_lines]
+
             n_settings = 0
             strings = ["PROJECT INFORMATION", "STANDARD FILES"]
             index_container = {}
@@ -6918,15 +6925,14 @@ class PySILLS(tk.Frame):
             self.select_experiment(var_rb=self.var_rb_mode)
 
             n_settings = 0
-            if "EXPERIMENTAL DATA\n" in loaded_lines:
+            if "EXPERIMENTAL DATA\n" in loaded_lines or "EXPERIMENTAL DATA" in loaded_lines:
                 if self.pysills_mode == "MA":
                     strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
                                "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
                                "END"]
                 else:
-                    if (
-                            "PYPITZER SETTINGS\n" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)\n" in loaded_lines
-                            and "QUANTIFICATION SETTINGS (BORISOVA2021)\n" in loaded_lines):
+                    if ("PYPITZER SETTINGS\n" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)\n"
+                            in loaded_lines and "QUANTIFICATION SETTINGS (BORISOVA2021)\n" in loaded_lines):
                         strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
                                    "INCLUSION SETTINGS", "PYPITZER SETTINGS",
                                    "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
@@ -7474,18 +7480,19 @@ class PySILLS(tk.Frame):
                         self.container_var[key_setting]["Inclusion Setup Selection"] = tk.IntVar()
                         self.container_var[key_setting]["Inclusion Setup Selection"].set(splitted_data[1])
                     else:
-                        info_file = splitted_data[0]
-                        info_file_short = info_file.split("/")[-1]
-                        info_is = splitted_data[1]
-                        info_concentration = splitted_data[2]
-                        info_salinity = splitted_data[3]
+                        if len(splitted_data) == 4:
+                            info_file = splitted_data[0]
+                            info_file_short = info_file.split("/")[-1]
+                            info_is = splitted_data[1]
+                            info_concentration = splitted_data[2]
+                            info_salinity = splitted_data[3]
 
-                        self.container_var["SMPL"][info_file]["IS Data"]["IS"].set(info_is)
-                        self.container_var["SMPL"][info_file]["IS Data"]["Concentration"].set(info_concentration)
-                        self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
-                            info_file_short] = tk.StringVar()
-                        self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][info_file_short].set(
-                            info_salinity)
+                            self.container_var["SMPL"][info_file]["IS Data"]["IS"].set(info_is)
+                            self.container_var["SMPL"][info_file]["IS Data"]["Concentration"].set(info_concentration)
+                            self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
+                                info_file_short] = tk.StringVar()
+                            self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][info_file_short].set(
+                                info_salinity)
 
                     index += 1
 
@@ -7574,15 +7581,16 @@ class PySILLS(tk.Frame):
                         else:
                             self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
                     else:
-                        info_file = splitted_data[0]
-                        info_isotope = splitted_data[1]
-                        info_concentration = splitted_data[2]
-                        #
-                        self.container_var["SMPL"][info_file]["Second Internal Standard"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar()}
-                        self.container_var["SMPL"][info_file]["Second Internal Standard"]["Name"].set(info_isotope)
-                        self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
-                            info_concentration)
+                        if len(splitted_data) == 3:
+                            info_file = splitted_data[0]
+                            info_isotope = splitted_data[1]
+                            info_concentration = splitted_data[2]
+
+                            self.container_var["SMPL"][info_file]["Second Internal Standard"] = {
+                                "Name": tk.StringVar(), "Value": tk.StringVar()}
+                            self.container_var["SMPL"][info_file]["Second Internal Standard"]["Name"].set(info_isotope)
+                            self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
+                                info_concentration)
                     #
                     index += 1
 
@@ -7686,7 +7694,7 @@ class PySILLS(tk.Frame):
                     line_std = str(loaded_lines[i].strip())
                     splitted_std = line_std.split(";")
                     #
-                    if splitted_std[-1] in ["STD", "SMPL"]:
+                    if splitted_std[1] in ["STD", "SMPL"]:
                         var_filetype = splitted_std[1]
                         var_file_long = splitted_std[0]
                         var_file_short = splitted_std[0].split("/")[-1]
@@ -7799,6 +7807,7 @@ class PySILLS(tk.Frame):
                             if var_isotope not in self.container_spike_values[var_file]:
                                 self.container_spike_values[var_file][var_isotope] = {
                                     "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+
                             for var_index in range(0, len(list_values), 2):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
@@ -7835,7 +7844,11 @@ class PySILLS(tk.Frame):
                         var_columns = dataframe.columns
 
                         for column in var_columns:
-                            dataframe[column] = dataframe[column].astype(float)
+                            if (list(dataframe[var_columns[0]])[-1] == ",,"
+                                    or list(dataframe[var_columns[0]])[-1] == ";;"):
+                                dataframe[column] = dataframe[column][:-1].astype(float)
+                            else:
+                                dataframe[column] = dataframe[column].astype(float)
                         df_isotopes = DE().get_isotopes(dataframe=dataframe)
 
                         times = DE().get_times(dataframe=dataframe)
@@ -19750,6 +19763,8 @@ class PySILLS(tk.Frame):
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
         ## INITIALIZATION
+        self.btn_save_project.configure(state="normal")
+
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="FI")
@@ -19780,6 +19795,7 @@ class PySILLS(tk.Frame):
 
         self.select_opt_inclusion_is_quantification(var_opt="Mass Balance",
                                                     dict_geometry_info=var_quantification_method)
+
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
@@ -19796,8 +19812,6 @@ class PySILLS(tk.Frame):
             self.container_var["SRM"]["Br81"].set("Scapolite 17")
 
         self.build_srm_database()
-
-        self.btn_save_project.configure(state="normal")
 
     ########################################################################################################################
     ### MELT INCLUSIONS ####################################################################################################
