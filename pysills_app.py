@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		03.04.2024
+# Date:		04.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -27135,10 +27135,16 @@ class PySILLS(tk.Frame):
 
             if mode == "demonstration":
                 helper = []
+                helper_cl = []
+                helper_salts = {}
+                helper2 = {}
+                helper3 = {}
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    helper2[file_smpl_short] = {}
                     file_smpl = self.container_lists["SMPL"]["Long"][index]
                     var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
                     var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                    var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
                     var_na_true_base = var_na_equiv
                     var_salt_contribution = 0
                     var_salt_contribution_2 = 0
@@ -27159,6 +27165,7 @@ class PySILLS(tk.Frame):
 
                                 if element == isotope_atom:
                                     molar_mass_element = elements_masses[element]
+                                    helper3[salt] = molar_mass_element/molar_mass_salt
                                     try:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                             file_smpl_short]["INCL"][isotope]
@@ -27175,11 +27182,11 @@ class PySILLS(tk.Frame):
                                             file_smpl_short]["INCL"][isotope]
                                     try:
                                         var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                        var_salt_contribution_3 = var_conc_ratio*(molar_mass_salt/molar_mass_element)
+                                        helper2[file_smpl_short][salt] = var_salt_contribution_3
                                         var_salt_contribution_2 += var_weight*var_conc_ratio*(
                                                 val_molar_mass_na*molar_mass_salt)/(
                                                 val_molar_mass_nacl*molar_mass_element)
-                                        var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)*(
-                                                1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
                                     except:
                                         print("Error Mass Balance:", var_weight_sum, var_intensity_i, var_intensity_na,
                                               var_sensitivity_i, molar_mass_salt, molar_mass_element)
@@ -27187,8 +27194,15 @@ class PySILLS(tk.Frame):
                             var_na_true_base *= 1
 
                     val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                    val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                    print(file_smpl_short, "Na", val_concentration_is, "Cl", val_concentration_cl)
                     helper.append(val_concentration_is)
+                    helper_cl.append(val_concentration_cl)
 
+                    for file, salt_data in helper2.items():
+                        if file_smpl_short == file:
+                            for salt, value in salt_data.items():
+                                print(salt, round(value, 4), round(helper3[salt]*value*val_concentration_is, 4))
                 try:
                     for row in self.tv_salt.get_children():
                         self.tv_salt.delete(row)
