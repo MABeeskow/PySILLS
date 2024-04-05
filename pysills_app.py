@@ -20158,6 +20158,18 @@ class PySILLS(tk.Frame):
                 self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
                 self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
+                for isotope in self.container_lists["Measured Isotopes"][file_parts[-1]]:
+                    if isotope.isdigit():
+                        print("There is a problem with an isotope that is probably just a number. "
+                              "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
+                        self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
+                    else:
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        if key_element != None:
+                            element = key_element.group(1)
+                            if element not in self.container_lists["Measured Elements"]["All"]:
+                                self.container_lists["Measured Elements"]["All"].append(element)
+
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
                 if self.file_loaded == False:
@@ -20179,35 +20191,56 @@ class PySILLS(tk.Frame):
                 self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
                 self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
+                for isotope in self.container_lists["Measured Isotopes"][file_parts[-1]]:
+                    if isotope.isdigit():
+                        print("There is a problem with an isotope that is probably just a number. "
+                              "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
+                        self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
+                    else:
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        if key_element != None:
+                            element = key_element.group(1)
+                            if element not in self.container_lists["Measured Elements"]["All"]:
+                                self.container_lists["Measured Elements"]["All"].append(element)
+
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
-                element = key_element.group(1)
-                if element not in self.container_lists["Measured Elements"]["All"]:
-                    self.container_lists["Measured Elements"]["All"].append(element)
+                if isotope.isdigit():
+                    pass
+                else:
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"]["All"]:
+                        self.container_lists["Measured Elements"]["All"].append(element)
 
             for filename_short in self.container_lists["STD"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
                 for isotope in self.container_lists["Measured Isotopes"][filename_short]:
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    if element not in self.container_lists["Measured Elements"][filename_short]:
-                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    if isotope.isdigit():
+                        pass
                     else:
-                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
-                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element not in self.container_lists["Measured Elements"][filename_short]:
+                            self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                        else:
+                            if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                                self.container_lists["Measured Elements"][filename_short][element].append(isotope)
 
             for filename_short in self.container_lists["SMPL"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
                 for isotope in self.container_lists["Measured Isotopes"][filename_short]:
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    if element not in self.container_lists["Measured Elements"][filename_short]:
-                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    if isotope.isdigit():
+                        pass
                     else:
-                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
-                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element not in self.container_lists["Measured Elements"][filename_short]:
+                            self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                        else:
+                            if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                                self.container_lists["Measured Elements"][filename_short][element].append(isotope)
 
             self.define_isotope_colors()
         else:
@@ -20244,12 +20277,14 @@ class PySILLS(tk.Frame):
             self.subwindow_mi_settings.grid_columnconfigure(i, minsize=column_min)
         #
         ## INITIALIZATION
-        for isotope in self.container_lists["ISOTOPES"]:
-            key_element = re.search("(\D+)(\d+)", isotope)
-            element = key_element.group(1)
-            #
-            if element not in self.container_lists["Elements"]:
-                self.container_lists["Elements"].append(element)
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            if isotope.isdigit():
+                pass
+            else:
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+                if element not in self.container_lists["Elements"]:
+                    self.container_lists["Elements"].append(element)
 
         ## Static
         # Build section 'Project Information'
@@ -20797,23 +20832,26 @@ class PySILLS(tk.Frame):
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     var_focus][var_is]
                 for isotope in file_isotopes:
-                    var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                        var_file_short]["MAT"][isotope]
-
-                    var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    var_concentration_i = self.srm_actual[var_srm_i][element]
-
-                    var_intensity_i = self.container_intensity_corrected["STD"][var_datatype]["MAT"][isotope]
-
-                    if var_concentration_is > 0 and var_intensity_i > 0:
-                        var_result_i = (var_sensitivity_i*(var_concentration_i/var_intensity_i)*
-                                        (var_intensity_is/var_concentration_is))
+                    if isotope.isdigit():
+                        pass
                     else:
-                        var_result_i = 0
+                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                            var_file_short]["MAT"][isotope]
 
-                    self.container_rsf[var_filetype][var_datatype][var_file_short][var_focus][isotope] = var_result_i
+                        var_srm_i = self.container_var["SRM"][isotope].get()
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        var_concentration_i = self.srm_actual[var_srm_i][element]
+
+                        var_intensity_i = self.container_intensity_corrected["STD"][var_datatype]["MAT"][isotope]
+
+                        if var_concentration_is > 0 and var_intensity_i > 0:
+                            var_result_i = (var_sensitivity_i*(var_concentration_i/var_intensity_i)*
+                                            (var_intensity_is/var_concentration_is))
+                        else:
+                            var_result_i = 0
+
+                        self.container_rsf[var_filetype][var_datatype][var_file_short][var_focus][isotope] = var_result_i
 
         else:
             for var_filetype in ["STD", "SMPL"]:
