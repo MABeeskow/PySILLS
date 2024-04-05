@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		04.04.2024
+# Date:		05.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -4046,201 +4046,204 @@ class PySILLS(tk.Frame):
                 var_method = 1
 
         if filetype == "STD":
-            for file_std in self.container_lists["STD"]["Short"]:
-                isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_std]]
-                corrected_isotopes = []
-                not_corrected_isotopes = []
-                self.container_spikes[file_std] = {}
+            for index, file_std in enumerate(self.container_lists["STD"]["Short"]):
+                file_long = self.container_lists[filetype]["Long"][index]
+                if self.container_var[filetype][file_long]["Checkbox"].get() == 1:
+                    isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_std]]
+                    corrected_isotopes = []
+                    not_corrected_isotopes = []
+                    self.container_spikes[file_std] = {}
 
-                if file_std not in self.container_spikes["Selection"]:
-                    self.container_spikes["Selection"][file_std] = {}
+                    if file_std not in self.container_spikes["Selection"]:
+                        self.container_spikes["Selection"][file_std] = {}
 
-                file_isotopes = self.container_lists["Measured Isotopes"][file_std]
-                for isotope in file_isotopes:
-                    if bool(self.spikes_isotopes[filetype][file_std]):
-                        for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_std].items():
-                            #
-                            if isotope_spiked not in self.container_spikes["Selection"][file_std]:
-                                self.container_spikes["Selection"][file_std][isotope_spiked] = {}
-                            #
-                            if isotope in isotopes_spiked_list:
-                                if isotope not in corrected_isotopes:
-                                    corrected_isotopes.append(isotope)
-                                    spike_intervals = np.array(intervals)
-                                    merged_intervals = ES(variable=spike_intervals).merge_times()
-                                    for interval in merged_intervals:
-                                        dataset_raw = self.container_measurements["RAW"][file_std][isotope][
-                                                      interval[0]:interval[1]]
-                                        dataset_complete = self.container_measurements["RAW"][file_std][isotope]
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_std]
+                    for isotope in file_isotopes:
+                        if bool(self.spikes_isotopes[filetype][file_std]):
+                            for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_std].items():
+                                #
+                                if isotope_spiked not in self.container_spikes["Selection"][file_std]:
+                                    self.container_spikes["Selection"][file_std][isotope_spiked] = {}
+                                #
+                                if isotope in isotopes_spiked_list:
+                                    if isotope not in corrected_isotopes:
+                                        corrected_isotopes.append(isotope)
+                                        spike_intervals = np.array(intervals)
+                                        merged_intervals = ES(variable=spike_intervals).merge_times()
+                                        for interval in merged_intervals:
+                                            dataset_raw = self.container_measurements["RAW"][file_std][isotope][
+                                                          interval[0]:interval[1]]
+                                            dataset_complete = self.container_measurements["RAW"][file_std][isotope]
 
-                                        if var_method == 0:
-                                            data_smoothed, indices_outl = GrubbsTestSILLS(
-                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                                start_index=interval[0],
-                                                dataset_complete=dataset_complete).determine_outlier()
-                                        elif var_method == 1:
-                                            data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
-                                                alpha=var_alpha, dataset_complete=dataset_complete,
-                                                threshold=var_threshold)
+                                            if var_method == 0:
+                                                data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                    raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                    start_index=interval[0],
+                                                    dataset_complete=dataset_complete).determine_outlier()
+                                            elif var_method == 1:
+                                                data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                    alpha=var_alpha, dataset_complete=dataset_complete,
+                                                    threshold=var_threshold)
 
-                                        self.container_measurements["EDITED"][file_std][isotope][
-                                            "Uncut"] = data_smoothed
+                                            self.container_measurements["EDITED"][file_std][isotope][
+                                                "Uncut"] = data_smoothed
+                                            #
+                                            self.container_spikes[file_std][isotope] = {
+                                                "Data RAW": self.container_measurements["RAW"][file_std][isotope],
+                                                "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
+                                                "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
                                         #
-                                        self.container_spikes[file_std][isotope] = {
-                                            "Data RAW": self.container_measurements["RAW"][file_std][isotope],
-                                            "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
-                                            "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
-                                    #
-                                    for var_index in indices_outl:
-                                        self.container_spikes["Selection"][file_std][isotope][
-                                            var_index] = data_smoothed[var_index]
-                                    #
+                                        for var_index in indices_outl:
+                                            self.container_spikes["Selection"][file_std][isotope][
+                                                var_index] = data_smoothed[var_index]
+                                        #
+                                    else:
+                                        pass
                                 else:
-                                    pass
-                            else:
-                                if isotope not in not_corrected_isotopes:
-                                    not_corrected_isotopes.append(isotope)
-                                    self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
-                                        self.container_measurements["RAW"][file_std][isotope]
-                                else:
-                                    pass
-                    else:
-                        if isotope not in not_corrected_isotopes:
-                            not_corrected_isotopes.append(isotope)
-                            self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
-                                self.container_measurements["RAW"][file_std][isotope]
+                                    if isotope not in not_corrected_isotopes:
+                                        not_corrected_isotopes.append(isotope)
+                                        self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
+                                            self.container_measurements["RAW"][file_std][isotope]
+                                    else:
+                                        pass
                         else:
-                            pass
+                            if isotope not in not_corrected_isotopes:
+                                not_corrected_isotopes.append(isotope)
+                                self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
+                                    self.container_measurements["RAW"][file_std][isotope]
+                            else:
+                                pass
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
         elif filetype == "SMPL":
             for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
                 filename_long = self.container_lists["SMPL"]["Long"][index]
-                isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl]]
-                corrected_isotopes = []
-                not_corrected_isotopes = []
-                self.container_spikes[file_smpl] = {}
-                if len(isotopes_spiked_list) == 0 and "_copy" in file_smpl:
-                    file_smpl_original = file_smpl.replace("_copy", "")
-                    isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl_original]]
-                if file_smpl not in self.container_spikes["Selection"]:
-                    self.container_spikes["Selection"][file_smpl] = {}
-
-                if self.file_loaded == False:
-                    if self.container_icpms["name"] != None:
-                        var_skipheader = self.container_icpms["skipheader"]
-                        var_skipfooter = self.container_icpms["skipfooter"]
-                        df_data = DE(filename_long=filename_long).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                    else:
-                        df_data = DE(filename_long=filename_long).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
-                else:
-                    if "_copy" in file_smpl:
-                        filename_original = file_smpl.replace("_copy", "")
-                        #file_smpl = filename_original
-                        df_data = self.container_measurements["Dataframe"][filename_original]
-                    else:
-                        df_data = self.container_measurements["Dataframe"][file_smpl]
-
-                list_names = list(df_data.columns.values)
-                list_names.pop(0)
-                df_isotopes = list_names
-
-                for isotope in df_isotopes:
-                    if bool(self.spikes_isotopes[filetype][file_smpl]) == False and "_copy" in file_smpl:
+                if self.container_var[filetype][filename_long]["Checkbox"].get() == 1:
+                    isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl]]
+                    corrected_isotopes = []
+                    not_corrected_isotopes = []
+                    self.container_spikes[file_smpl] = {}
+                    if len(isotopes_spiked_list) == 0 and "_copy" in file_smpl:
                         file_smpl_original = file_smpl.replace("_copy", "")
-                        self.spikes_isotopes[filetype][file_smpl] = self.spikes_isotopes[filetype][file_smpl_original]
-                    if bool(self.spikes_isotopes[filetype][file_smpl]):
-                        for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_smpl].items():
-                            if isotope_spiked not in self.container_spikes["Selection"][file_smpl]:
-                                self.container_spikes["Selection"][file_smpl][isotope_spiked] = {}
+                        isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl_original]]
+                    if file_smpl not in self.container_spikes["Selection"]:
+                        self.container_spikes["Selection"][file_smpl] = {}
 
-                            if isotope in isotopes_spiked_list:
-                                if isotope not in corrected_isotopes:
-                                    corrected_isotopes.append(isotope)
-                                    spike_intervals = np.array(intervals)
-                                    merged_intervals = ES(variable=spike_intervals).merge_times()
-                                    for interval in merged_intervals:
-                                        if (isotope not in self.container_measurements["RAW"][file_smpl] and
-                                                "_copy" in file_smpl):
-                                            file_smpl_original = file_smpl.replace("_copy", "")
-                                            dataset_raw = self.container_measurements["RAW"][file_smpl_original][
-                                                              isotope][interval[0]:interval[1]]
-                                            self.container_measurements["RAW"][file_smpl][
-                                                isotope] = self.container_measurements["RAW"][file_smpl_original][
-                                                isotope]
-                                        else:
-                                            dataset_raw = self.container_measurements["RAW"][file_smpl][isotope][
-                                                          interval[0]:interval[1]]
-
-                                        dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
-                                        if var_method == 0:
-                                            data_smoothed, indices_outl = GrubbsTestSILLS(
-                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                                start_index=interval[0],
-                                                dataset_complete=dataset_complete).determine_outlier()
-                                        elif var_method == 1:
-                                            data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
-                                                alpha=var_alpha, dataset_complete=dataset_complete,
-                                                threshold=var_threshold)
-                                        #
-                                        if self.pysills_mode == "FI":
-                                            if self.container_var[key_setting][
-                                                "Spike Elimination Inclusion"].get() == 2:
-                                                length_incl_datasets = len(
-                                                    self.container_helper["SMPL"][file_smpl]["INCL"]["Content"])
-                                                #
-                                                if length_incl_datasets > 0:
-                                                    for key, items in self.container_helper["SMPL"][file_smpl]["INCL"][
-                                                        "Content"].items():
-                                                        var_indices = items["Indices"]
-                                                        data_raw = self.container_measurements["RAW"][file_smpl][
-                                                            isotope]
-                                                        #
-                                                        for index in range(var_indices[0], var_indices[1] + 1):
-                                                            data_smoothed[index] = data_raw[index]
-
-                                        if (isotope not in self.container_measurements["EDITED"][file_smpl] and
-                                                "_copy" in file_smpl):
-                                            self.container_measurements["EDITED"][file_smpl][isotope] = {"Uncut": None}
-                                            self.container_measurements["EDITED"][file_smpl][isotope][
-                                                "Uncut"] = data_smoothed
-                                        else:
-                                            self.container_measurements["EDITED"][file_smpl][isotope][
-                                                "Uncut"] = data_smoothed
-
-                                        if ("Time" not in self.container_measurements["SELECTED"][file_smpl] and
-                                                "_copy" in file_smpl):
-                                            self.container_measurements["SELECTED"][file_smpl][
-                                                "Time"] = self.container_measurements["SELECTED"][file_smpl_original][
-                                                "Time"]
-
-                                        self.container_spikes[file_smpl][isotope] = {
-                                            "Data RAW": self.container_measurements["RAW"][file_smpl][isotope],
-                                            "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
-                                            "Times": self.container_measurements["SELECTED"][file_smpl]["Time"]}
-                                    #
-                                    for var_index in indices_outl:
-                                        self.container_spikes["Selection"][file_smpl][isotope][
-                                            var_index] = data_smoothed[var_index]
-                                    #
-                                else:
-                                    pass
-                            else:
-                                if isotope not in not_corrected_isotopes:
-                                    not_corrected_isotopes.append(isotope)
-                                    self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
-                                        self.container_measurements["RAW"][file_smpl][isotope]
-                                else:
-                                    pass
-                    else:
-                        if isotope not in not_corrected_isotopes:
-                            not_corrected_isotopes.append(isotope)
-                            self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
-                                self.container_measurements["RAW"][file_smpl][isotope]
+                    if self.file_loaded == False:
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            df_data = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
                         else:
-                            pass
+                            df_data = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=3, skip_footer=1)
+                    else:
+                        if "_copy" in file_smpl:
+                            filename_original = file_smpl.replace("_copy", "")
+                            #file_smpl = filename_original
+                            df_data = self.container_measurements["Dataframe"][filename_original]
+                        else:
+                            df_data = self.container_measurements["Dataframe"][file_smpl]
+
+                    list_names = list(df_data.columns.values)
+                    list_names.pop(0)
+                    df_isotopes = list_names
+
+                    for isotope in df_isotopes:
+                        if bool(self.spikes_isotopes[filetype][file_smpl]) == False and "_copy" in file_smpl:
+                            file_smpl_original = file_smpl.replace("_copy", "")
+                            self.spikes_isotopes[filetype][file_smpl] = self.spikes_isotopes[filetype][file_smpl_original]
+                        if bool(self.spikes_isotopes[filetype][file_smpl]):
+                            for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_smpl].items():
+                                if isotope_spiked not in self.container_spikes["Selection"][file_smpl]:
+                                    self.container_spikes["Selection"][file_smpl][isotope_spiked] = {}
+
+                                if isotope in isotopes_spiked_list:
+                                    if isotope not in corrected_isotopes:
+                                        corrected_isotopes.append(isotope)
+                                        spike_intervals = np.array(intervals)
+                                        merged_intervals = ES(variable=spike_intervals).merge_times()
+                                        for interval in merged_intervals:
+                                            if (isotope not in self.container_measurements["RAW"][file_smpl] and
+                                                    "_copy" in file_smpl):
+                                                file_smpl_original = file_smpl.replace("_copy", "")
+                                                dataset_raw = self.container_measurements["RAW"][file_smpl_original][
+                                                                  isotope][interval[0]:interval[1]]
+                                                self.container_measurements["RAW"][file_smpl][
+                                                    isotope] = self.container_measurements["RAW"][file_smpl_original][
+                                                    isotope]
+                                            else:
+                                                dataset_raw = self.container_measurements["RAW"][file_smpl][isotope][
+                                                              interval[0]:interval[1]]
+
+                                            dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
+                                            if var_method == 0:
+                                                data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                    raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                    start_index=interval[0],
+                                                    dataset_complete=dataset_complete).determine_outlier()
+                                            elif var_method == 1:
+                                                data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                    alpha=var_alpha, dataset_complete=dataset_complete,
+                                                    threshold=var_threshold)
+                                            #
+                                            if self.pysills_mode == "FI":
+                                                if self.container_var[key_setting][
+                                                    "Spike Elimination Inclusion"].get() == 2:
+                                                    length_incl_datasets = len(
+                                                        self.container_helper["SMPL"][file_smpl]["INCL"]["Content"])
+                                                    #
+                                                    if length_incl_datasets > 0:
+                                                        for key, items in self.container_helper["SMPL"][file_smpl]["INCL"][
+                                                            "Content"].items():
+                                                            var_indices = items["Indices"]
+                                                            data_raw = self.container_measurements["RAW"][file_smpl][
+                                                                isotope]
+                                                            #
+                                                            for index in range(var_indices[0], var_indices[1] + 1):
+                                                                data_smoothed[index] = data_raw[index]
+
+                                            if (isotope not in self.container_measurements["EDITED"][file_smpl] and
+                                                    "_copy" in file_smpl):
+                                                self.container_measurements["EDITED"][file_smpl][isotope] = {"Uncut": None}
+                                                self.container_measurements["EDITED"][file_smpl][isotope][
+                                                    "Uncut"] = data_smoothed
+                                            else:
+                                                self.container_measurements["EDITED"][file_smpl][isotope][
+                                                    "Uncut"] = data_smoothed
+
+                                            if ("Time" not in self.container_measurements["SELECTED"][file_smpl] and
+                                                    "_copy" in file_smpl):
+                                                self.container_measurements["SELECTED"][file_smpl][
+                                                    "Time"] = self.container_measurements["SELECTED"][file_smpl_original][
+                                                    "Time"]
+
+                                            self.container_spikes[file_smpl][isotope] = {
+                                                "Data RAW": self.container_measurements["RAW"][file_smpl][isotope],
+                                                "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
+                                                "Times": self.container_measurements["SELECTED"][file_smpl]["Time"]}
+                                        #
+                                        for var_index in indices_outl:
+                                            self.container_spikes["Selection"][file_smpl][isotope][
+                                                var_index] = data_smoothed[var_index]
+                                        #
+                                    else:
+                                        pass
+                                else:
+                                    if isotope not in not_corrected_isotopes:
+                                        not_corrected_isotopes.append(isotope)
+                                        self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
+                                            self.container_measurements["RAW"][file_smpl][isotope]
+                                    else:
+                                        pass
+                        else:
+                            if isotope not in not_corrected_isotopes:
+                                not_corrected_isotopes.append(isotope)
+                                self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
+                                    self.container_measurements["RAW"][file_smpl][isotope]
+                            else:
+                                pass
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
 
@@ -5228,261 +5231,262 @@ class PySILLS(tk.Frame):
                     file_long = self.container_lists[var_filetype]["Long"][index]
                     file_isotopes = self.container_lists["Measured Isotopes"][file_short]
 
-                    report_concentration_incl[var_filetype][var_datatype][file_short] = {}
-                    report_concentration_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short] = {}
-                    report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_concentration_mat[var_filetype][var_datatype][file_short] = {}
-                    report_concentration_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short] = {}
-                    report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_concentration_mix[var_filetype][var_datatype][file_short] = {}
-                    report_concentration_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short] = {}
-                    report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_lod_incl[var_filetype][var_datatype][file_short] = {}
-                    report_lod_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_lod_mat[var_filetype][var_datatype][file_short] = {}
-                    report_lod_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_mixingratio_a[var_filetype][var_datatype][file_short] = {}
-                    report_mixingratio_a[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_mixingratio_x[var_filetype][var_datatype][file_short] = {}
-                    report_mixingratio_x[var_filetype][var_datatype][file_short]["filename"] = file_short
+                    if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                        report_concentration_incl[var_filetype][var_datatype][file_short] = {}
+                        report_concentration_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short] = {}
+                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_concentration_mat[var_filetype][var_datatype][file_short] = {}
+                        report_concentration_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short] = {}
+                        report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_concentration_mix[var_filetype][var_datatype][file_short] = {}
+                        report_concentration_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short] = {}
+                        report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_lod_incl[var_filetype][var_datatype][file_short] = {}
+                        report_lod_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_lod_mat[var_filetype][var_datatype][file_short] = {}
+                        report_lod_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_mixingratio_a[var_filetype][var_datatype][file_short] = {}
+                        report_mixingratio_a[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_mixingratio_x[var_filetype][var_datatype][file_short] = {}
+                        report_mixingratio_x[var_filetype][var_datatype][file_short]["filename"] = file_short
 
-                    if var_filetype == "STD":
-                        report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_mixingratio_x[var_filetype][var_datatype][file_short]["ID"] = "---"
-                    else:
-                        report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][
-                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
-                        report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][
-                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
-                        report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short][
-                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
-                        report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_mixingratio_x[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-
-                    report_intensity_incl[var_filetype][var_datatype][file_short] = {}
-                    report_intensity_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_intensity_mat[var_filetype][var_datatype][file_short] = {}
-                    report_intensity_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_intensity_bg[var_filetype][var_datatype][file_short] = {}
-                    report_intensity_bg[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_intensity_mix[var_filetype][var_datatype][file_short] = {}
-                    report_intensity_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
-
-                    if var_filetype == "STD":
-                        report_intensity_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_intensity_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_intensity_bg[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_intensity_mix[var_filetype][var_datatype][file_short]["ID"] = "---"
-                    else:
-                        report_intensity_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_intensity_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_intensity_bg[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-                        report_intensity_mix[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
-                            var_filetype][file_long]["ID"].get()
-
-                    report_analytical_sensitivity[var_filetype][var_datatype][file_short] = {}
-                    report_analytical_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_normalized_sensitivity[var_filetype][var_datatype][file_short] = {}
-                    report_normalized_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
-                    report_rsf[var_filetype][var_datatype][file_short] = {}
-                    report_rsf[var_filetype][var_datatype][file_short]["filename"] = file_short
-
-                    if var_filetype == "STD":
-                        report_analytical_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_normalized_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
-                        report_rsf[var_filetype][var_datatype][file_short]["ID"] = "---"
-                    else:
-                        report_analytical_sensitivity[var_filetype][var_datatype][file_short][
-                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
-                        report_normalized_sensitivity[var_filetype][var_datatype][file_short][
-                            "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
-                        report_rsf[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
-                            file_long]["ID"].get()
-
-                    for isotope in file_isotopes:
-                        ## COMPOSITIONAL ANALYSIS
-                        # Concentration Inclusion
-                        if var_filetype == "SMPL":
-                            value_i = self.container_concentration[var_filetype][var_datatype][file_short]["INCL"][
-                                isotope]
-                            value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
-                                "1 SIGMA INCL"][isotope]
-                        else:
-                            value_i = 0.0
-                            value_sigma_i = 0.0
-
-                        n_digits = 5
-                        report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-                        report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_sigma_i, n_digits)
-
-                        # Concentration Matrix
                         if var_filetype == "STD":
-                            var_srm_i = self.container_var["SRM"][isotope].get()
-                            var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
-                        value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
-                            isotope]
-                        n_digits = 5
+                            report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_mixingratio_x[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        else:
+                            report_concentration_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][
+                                "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
+                            report_concentration_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][
+                                "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
+                            report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short][
+                                "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
+                            report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_mixingratio_x[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
 
-                        if var_filetype == "SMPL":
-                            value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
-                                "1 SIGMA MAT"][isotope]
-                            report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                        report_intensity_incl[var_filetype][var_datatype][file_short] = {}
+                        report_intensity_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_intensity_mat[var_filetype][var_datatype][file_short] = {}
+                        report_intensity_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_intensity_bg[var_filetype][var_datatype][file_short] = {}
+                        report_intensity_bg[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_intensity_mix[var_filetype][var_datatype][file_short] = {}
+                        report_intensity_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
+
+                        if var_filetype == "STD":
+                            report_intensity_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_intensity_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_intensity_bg[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_intensity_mix[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        else:
+                            report_intensity_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_intensity_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_intensity_bg[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_intensity_mix[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+
+                        report_analytical_sensitivity[var_filetype][var_datatype][file_short] = {}
+                        report_analytical_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_normalized_sensitivity[var_filetype][var_datatype][file_short] = {}
+                        report_normalized_sensitivity[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_rsf[var_filetype][var_datatype][file_short] = {}
+                        report_rsf[var_filetype][var_datatype][file_short]["filename"] = file_short
+
+                        if var_filetype == "STD":
+                            report_analytical_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_normalized_sensitivity[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_rsf[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        else:
+                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][
+                                "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
+                            report_normalized_sensitivity[var_filetype][var_datatype][file_short][
+                                "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
+                            report_rsf[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
+                                file_long]["ID"].get()
+
+                        for isotope in file_isotopes:
+                            ## COMPOSITIONAL ANALYSIS
+                            # Concentration Inclusion
+                            if var_filetype == "SMPL":
+                                value_i = self.container_concentration[var_filetype][var_datatype][file_short]["INCL"][
+                                    isotope]
+                                value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
+                                    "1 SIGMA INCL"][isotope]
+                            else:
+                                value_i = 0.0
+                                value_sigma_i = 0.0
+
+                            n_digits = 5
+                            report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
-                            report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
+                            report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_sigma_i, n_digits)
 
-                        else:
-                            if var_srm_i == var_srm_file:
+                            # Concentration Matrix
+                            if var_filetype == "STD":
+                                var_srm_i = self.container_var["SRM"][isotope].get()
+                                var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+                            value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
+                                isotope]
+                            n_digits = 5
+
+                            if var_filetype == "SMPL":
+                                value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
+                                    "1 SIGMA MAT"][isotope]
                                 report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                     value_i, n_digits)
+                                report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_sigma_i, n_digits)
+
                             else:
-                                report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = "undefined"
+                                if var_srm_i == var_srm_file:
+                                    report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                        value_i, n_digits)
+                                else:
+                                    report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = "undefined"
 
-                        # Concentration Mixed
-                        if var_filetype == "SMPL":
-                            value_i = self.container_mixed_concentration[var_filetype][var_datatype][file_short][
-                                isotope]
-                        else:
-                            value_i = 0.0
+                            # Concentration Mixed
+                            if var_filetype == "SMPL":
+                                value_i = self.container_mixed_concentration[var_filetype][var_datatype][file_short][
+                                    isotope]
+                            else:
+                                value_i = 0.0
 
-                        n_digits = 5
-                        report_concentration_mix[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        # Limit of Detection (Inclusion)
-                        if var_filetype == "SMPL":
-                            value_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
-                        else:
-                            value_i = 0.0
-
-                        n_digits = 5
-                        report_lod_incl[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        # Limit of Detection (Matrix)
-                        value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        n_digits = 5
-                        report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        # Mixing Ratio (Factor a)
-                        if var_filetype == "SMPL":
-                            value_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][file_short][
-                                isotope]
-                        else:
-                            value_i = 0.0
-
-                        report_mixingratio_a[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
-                            value_i)
-
-                        # Mixing Ratio (Factor x)
-                        if var_filetype == "SMPL":
-                            value_i = self.container_mixing_ratio[var_filetype][var_datatype][file_short][isotope]
-                        else:
-                            value_i = 0.0
-
-                        report_mixingratio_x[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
-                            value_i)
-
-                        ## INTENSITY ANALYSIS
-                        # Intensity Inclusion
-                        if var_filetype == "SMPL":
-                            value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
-                                "INCL"][isotope]
-                        else:
-                            value_i = 0.0
-
-                        n_digits = 5
-                        report_intensity_incl[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        # Intensity Matrix
-                        value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["MAT"][
-                            isotope]
-                        n_digits = 5
-                        report_intensity_mat[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        # Intensity Background
-                        value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["BG"][
-                            isotope]
-                        n_digits = 5
-                        report_intensity_bg[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        # Intensity Mixed
-                        if var_filetype == "SMPL":
-                            value_i = self.container_intensity_mix[var_filetype][var_datatype][file_short][isotope]
-                        else:
-                            value_i = 0.0
-
-                        n_digits = 5
-                        report_intensity_mix[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
-
-                        ## SENSITIVITY ANALYSIS
-                        # Analytical Sensitivity
-                        value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
-                            isotope]
-
-                        if var_filetype == "STD" and index == 0:
-                            helper_std = {}
-                            helper_std[isotope] = []
-                            var_srm_i = self.container_var["SRM"][isotope].get()
-                            for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
-                                filename_long = self.container_lists["STD"]["Long"][index]
-                                var_srm_file = self.container_var["STD"][filename_long]["SRM"].get()
-                                if var_srm_file == var_srm_i:
-                                    value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                        filename_short]["MAT"][isotope]
-                                    helper_std[isotope].append(value_i)
-
-                        n_digits = 5
-
-                        if value_i != None:
-                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
+                            n_digits = 5
+                            report_concentration_mix[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
-                        else:
-                            report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "undefined"
 
-                        # Normalized Sensitivity
-                        value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
-                            isotope]
-                        n_digits = 5
-                        report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_digits)
+                            # Limit of Detection (Inclusion)
+                            if var_filetype == "SMPL":
+                                value_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
+                            else:
+                                value_i = 0.0
 
-                        # Relative Sensitivity Factor
-                        value_i = self.container_rsf[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        report_rsf[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(value_i)
+                            n_digits = 5
+                            report_lod_incl[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Limit of Detection (Matrix)
+                            value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
+                            n_digits = 5
+                            report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Mixing Ratio (Factor a)
+                            if var_filetype == "SMPL":
+                                value_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][file_short][
+                                    isotope]
+                            else:
+                                value_i = 0.0
+
+                            report_mixingratio_a[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
+                                value_i)
+
+                            # Mixing Ratio (Factor x)
+                            if var_filetype == "SMPL":
+                                value_i = self.container_mixing_ratio[var_filetype][var_datatype][file_short][isotope]
+                            else:
+                                value_i = 0.0
+
+                            report_mixingratio_x[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(
+                                value_i)
+
+                            ## INTENSITY ANALYSIS
+                            # Intensity Inclusion
+                            if var_filetype == "SMPL":
+                                value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short][
+                                    "INCL"][isotope]
+                            else:
+                                value_i = 0.0
+
+                            n_digits = 5
+                            report_intensity_incl[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Intensity Matrix
+                            value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["MAT"][
+                                isotope]
+                            n_digits = 5
+                            report_intensity_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Intensity Background
+                            value_i = self.container_intensity_corrected[var_filetype][var_datatype][file_short]["BG"][
+                                isotope]
+                            n_digits = 5
+                            report_intensity_bg[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Intensity Mixed
+                            if var_filetype == "SMPL":
+                                value_i = self.container_intensity_mix[var_filetype][var_datatype][file_short][isotope]
+                            else:
+                                value_i = 0.0
+
+                            n_digits = 5
+                            report_intensity_mix[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            ## SENSITIVITY ANALYSIS
+                            # Analytical Sensitivity
+                            value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
+                                isotope]
+
+                            if var_filetype == "STD" and index == 0:
+                                helper_std = {}
+                                helper_std[isotope] = []
+                                var_srm_i = self.container_var["SRM"][isotope].get()
+                                for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+                                    filename_long = self.container_lists["STD"]["Long"][index]
+                                    var_srm_file = self.container_var["STD"][filename_long]["SRM"].get()
+                                    if var_srm_file == var_srm_i:
+                                        value_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                            filename_short]["MAT"][isotope]
+                                        helper_std[isotope].append(value_i)
+
+                            n_digits = 5
+
+                            if value_i != None:
+                                report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_i, n_digits)
+                            else:
+                                report_analytical_sensitivity[var_filetype][var_datatype][file_short][isotope] = "undefined"
+
+                            # Normalized Sensitivity
+                            value_i = self.container_normalized_sensitivity[var_filetype][var_datatype][file_short]["MAT"][
+                                isotope]
+                            n_digits = 5
+                            report_normalized_sensitivity[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Relative Sensitivity Factor
+                            value_i = self.container_rsf[var_filetype][var_datatype][file_short]["MAT"][isotope]
+                            report_rsf[var_filetype][var_datatype][file_short][isotope] = "{:0.5e}".format(value_i)
 
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
@@ -5558,8 +5562,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5567,8 +5573,11 @@ class PySILLS(tk.Frame):
                         report_file.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][
+                                                    file_short])
 
                         report_file.write("\n")
 
@@ -5576,8 +5585,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5585,8 +5596,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5595,8 +5608,11 @@ class PySILLS(tk.Frame):
                         report_file.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][
+                                                    file_short])
 
                     report_file.write("\n")
 
@@ -5604,8 +5620,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5614,8 +5632,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5624,8 +5644,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5633,8 +5655,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5644,8 +5668,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5653,8 +5679,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5662,8 +5690,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5672,8 +5702,10 @@ class PySILLS(tk.Frame):
                         report_file.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -5682,8 +5714,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5691,8 +5725,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(cps)/(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5700,8 +5736,10 @@ class PySILLS(tk.Frame):
                     report_file.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -5740,8 +5778,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5749,8 +5789,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5759,8 +5801,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5768,8 +5812,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5778,8 +5824,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5787,8 +5835,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(cps)/(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5796,8 +5846,10 @@ class PySILLS(tk.Frame):
                     report_file_std.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -5827,8 +5879,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5836,8 +5890,11 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][
+                                                    file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5845,8 +5902,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5854,8 +5913,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5863,8 +5924,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5872,8 +5935,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5882,8 +5947,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5892,8 +5959,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5901,8 +5970,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5912,8 +5983,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5921,8 +5994,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5930,8 +6005,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5940,8 +6017,10 @@ class PySILLS(tk.Frame):
                         report_file_smpl.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -5950,8 +6029,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5959,8 +6040,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(cps)/(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -5968,8 +6051,10 @@ class PySILLS(tk.Frame):
                     report_file_smpl.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -6017,8 +6102,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6026,8 +6113,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6035,8 +6124,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6044,8 +6135,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6054,8 +6147,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6063,8 +6158,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6073,8 +6170,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6083,8 +6182,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6092,8 +6193,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6103,8 +6206,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6112,8 +6217,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6121,8 +6228,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6131,8 +6240,10 @@ class PySILLS(tk.Frame):
                         report_file_raw.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -6141,8 +6252,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6150,8 +6263,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(cps)/(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6159,8 +6274,10 @@ class PySILLS(tk.Frame):
                     report_file_raw.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -6190,8 +6307,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6199,8 +6318,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6208,8 +6329,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6217,8 +6340,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_concentration_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -6227,8 +6352,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6236,8 +6363,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -6246,8 +6375,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_concentration_mix[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6256,8 +6387,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_a[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6265,8 +6398,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(1)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_mixingratio_x[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6276,8 +6411,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6285,8 +6422,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -6294,8 +6433,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(cps)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_intensity_bg[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -6304,8 +6445,10 @@ class PySILLS(tk.Frame):
                         report_file_smoothed.write("(cps)\n")
                         writer.writeheader()
 
-                        for file_short in self.container_lists[var_filetype]["Short"]:
-                            writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_intensity_mix[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -6314,8 +6457,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_analytical_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -6323,8 +6468,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(cps)/(ppm)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_normalized_sensitivity[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -6332,8 +6479,10 @@ class PySILLS(tk.Frame):
                     report_file_smoothed.write("(1)\n")
                     writer.writeheader()
 
-                    for file_short in self.container_lists[var_filetype]["Short"]:
-                        writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_rsf[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -29152,31 +29301,36 @@ class PySILLS(tk.Frame):
 
         if mode != None:
             for index_file, var_file_short in enumerate(self.container_lists[mode]["Short"]):
-                if var_file_short not in self.container_spike_values:
-                    self.container_spike_values[var_file_short] = {}
-                list_spk_isotopes = self.check_spikes_isotope(var_file=var_file_short)
-                for var_isotope in list_spk_isotopes:
-                    if var_isotope not in self.container_spike_values[var_file_short]:
-                        self.container_spike_values[var_file_short][var_isotope] = {
-                            "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
-                    for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
-                        val_id = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_id]
-                        if self.file_loaded == False:
-                            self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
+                file_long = self.container_lists[mode]["Long"][index_file]
+                if self.container_var[mode][file_long]["Checkbox"].get() == 1:
+                    if var_file_short not in self.container_spike_values:
+                        self.container_spike_values[var_file_short] = {}
+                    list_spk_isotopes = self.check_spikes_isotope(var_file=var_file_short)
+                    for var_isotope in list_spk_isotopes:
+                        if var_isotope not in self.container_spike_values[var_file_short]:
+                            self.container_spike_values[var_file_short][var_isotope] = {
+                                "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
+                        for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
+                            val_id = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_id]
+                            if self.file_loaded == False:
+                                self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
 
     def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
-        for var_file_short in self.container_lists[mode]["Short"]:
-            if file == "all" or file == var_file_short:
-                df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-                for var_isotope in df_isotopes:
-                    list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
-                    if len(list_indices) > 0:
-                        for var_index in list_indices:
-                            value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][var_index]
-                            value_smoothed = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_index]
-                            self.helper_spike_values(
-                                var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
-                                var_value_smoothed=value_smoothed, mode=mode)
+        for index, var_file_short in enumerate(self.container_lists[mode]["Short"]):
+            file_long = self.container_lists[mode]["Long"][index]
+            if self.container_var[mode][file_long]["Checkbox"].get() == 1:
+                if file == "all" or file == var_file_short:
+                    df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                    for var_isotope in df_isotopes:
+                        list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
+                        if len(list_indices) > 0:
+                            for var_index in list_indices:
+                                value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][var_index]
+                                value_smoothed = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][
+                                    var_index]
+                                self.helper_spike_values(
+                                    var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
+                                    var_value_smoothed=value_smoothed, mode=mode)
 
     def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
