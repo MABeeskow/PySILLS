@@ -526,12 +526,15 @@ class IntensityQuantification:
                     helper_results[isotope].append(intensity_mat_i)
 
         for isotope, item in helper_results.items():
-            if average_type == "arithmetic mean":
-                result_i = np.mean(item)
-            elif average_type == "median":
-                result_i = np.median(item)
+            if isotope.isdigit():
+                pass
+            else:
+                if average_type == "arithmetic mean":
+                    result_i = np.mean(item)
+                elif average_type == "median":
+                    result_i = np.median(item)
 
-            self.results_container[isotope] = result_i
+                self.results_container[isotope] = result_i
 
         return self.results_container
 
