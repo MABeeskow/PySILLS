@@ -17156,19 +17156,58 @@ class PySILLS(tk.Frame):
             else:
                 list_filetypes = ["STD", "SMPL"]
 
+            run_calculation = True
             for var_filetype in list_filetypes:
                 for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                    if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                        var_file_short = self.container_lists[var_filetype]["Short"][index]
+                    if run_calculation == True:
+                        if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                            var_file_short = self.container_lists[var_filetype]["Short"][index]
 
-                        self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
-                        condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
-                        condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
+                            self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+                            condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"]["BG"]
+                            condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
 
-                        if var_filetype == "SMPL":
-                            var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-                            var_id_selected = self.container_var["ID"]["Results Files"].get()
-                            if var_id == var_id_selected or self.var_init_ma_datareduction:
+                            if var_filetype == "SMPL":
+                                var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
+                                var_id_selected = self.container_var["ID"]["Results Files"].get()
+                                if var_id == var_id_selected or self.var_init_ma_datareduction:
+                                    condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"][
+                                        "BG"]
+                                    condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"][
+                                        "MAT"]
+                                    str_datakey = "Data " + str(var_datatype)
+
+                                    if self.pysills_mode in ["FI", "MI"]:
+                                        condensed_intervals_incl = self.container_var[var_filetype][var_file_short][
+                                            "Intervals"]["INCL"]
+                                    else:
+                                        condensed_intervals_incl = None
+
+                                    if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                        str_averagetype = "arithmetic mean"
+                                    else:
+                                        str_averagetype = "median"
+
+                                    if self.container_var["General Settings"]["Interval Processing"].get() == 1:
+                                        bool_intervalstack = False
+                                    else:
+                                        bool_intervalstack = True
+
+                                    if var_file_short in self.container_spikes:
+                                        IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
+                                           results_container=self.container_intensity[var_filetype][var_datatype][
+                                               var_file_short]).get_intensity(
+                                            interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
+                                            interval_incl=condensed_intervals_incl, data_key=str_datakey,
+                                            average_type=str_averagetype,
+                                            stack_intervals=bool_intervalstack)
+                                    else:
+                                        print("The file", var_file_short,
+                                              "is missing. Please refresh the spike elimination for the", var_filetype,
+                                              "files. Thank you!")
+                                        run_calculation = False
+                                        self.parent.bell()
+                            else:
                                 condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"][
                                     "BG"]
                                 condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"][
@@ -17198,107 +17237,87 @@ class PySILLS(tk.Frame):
                                     interval_incl=condensed_intervals_incl, data_key=str_datakey,
                                     average_type=str_averagetype,
                                     stack_intervals=bool_intervalstack)
-                        else:
-                            condensed_intervals_bg = self.container_var[var_filetype][var_file_short]["Intervals"][
-                                "BG"]
-                            condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"][
-                                "MAT"]
-                            str_datakey = "Data " + str(var_datatype)
 
-                            if self.pysills_mode in ["FI", "MI"]:
-                                condensed_intervals_incl = self.container_var[var_filetype][var_file_short][
-                                    "Intervals"]["INCL"]
+                            if self.pysills_mode == "FI" and run_calculation == True:
+                                mode_id = self.container_var[key_setting]["Inclusion Intensity Calculation"].get()
+                                if var_filetype == "SMPL":
+                                    var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                                    var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                                    if self.container_var[key_setting][
+                                        "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                                        var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                                    elif self.container_var[key_setting][
+                                        "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                                        var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
+                                            "Name"].get()
+                                    elif self.container_var[key_setting][
+                                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                                        var_t = self.container_var["Halter2002"]["Name"].get()
+                                    elif self.container_var[key_setting][
+                                        "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                                        var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                                    if var_t != "Select Isotope":
+                                        IQ(dataframe=None, project_type=self.pysills_mode,
+                                           results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                               var_file_short]).get_intensity_corrected(
+                                            data_container=self.container_intensity[var_filetype][var_datatype][
+                                                var_file_short], mode=mode_id, isotope_t=var_t)
+                                    else:
+                                        self.create_popup_window_before_error(
+                                            var_text="It seems that a variable was still not defined. Please check if the "
+                                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
+                                                     "standard method or for the methods from Halter or Borisova was already "
+                                                     "defined.")
+                            elif self.pysills_mode == "MI" and run_calculation == True:
+                                mode_id = self.container_var["mi_setting"]["Inclusion Intensity Calculation"].get()
+
+                                if var_filetype == "SMPL":
+                                    var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                                    var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                                    if self.container_var[key_setting][
+                                        "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                                        var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                                    elif self.container_var["mi_setting"][
+                                        "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                                        var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
+                                            "Name"].get()
+                                    elif self.container_var["mi_setting"][
+                                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                                        var_t = self.container_var["Halter2002"]["Name"].get()
+                                    elif self.container_var["mi_setting"][
+                                        "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                                        var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                                    if var_t != "Select Isotope":
+                                        IQ(dataframe=None, project_type=self.pysills_mode,
+                                           results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                               var_file_short]).get_intensity_corrected(
+                                            data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                                            mode=mode_id, isotope_t=var_t)
+                                    else:
+                                        self.create_popup_window_before_error(
+                                            var_text="It seems that a variable was still not defined. Please check if the "
+                                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
+                                                     "standard method or for the methods from Halter or Borisova was already "
+                                                     "defined.")
                             else:
-                                condensed_intervals_incl = None
-
-                            if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                                str_averagetype = "arithmetic mean"
-                            else:
-                                str_averagetype = "median"
-
-                            if self.container_var["General Settings"]["Interval Processing"].get() == 1:
-                                bool_intervalstack = False
-                            else:
-                                bool_intervalstack = True
-
-                            IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
-                               results_container=self.container_intensity[var_filetype][var_datatype][
-                                   var_file_short]).get_intensity(
-                                interval_bg=condensed_intervals_bg, interval_min=condensed_intervals_mat,
-                                interval_incl=condensed_intervals_incl, data_key=str_datakey,
-                                average_type=str_averagetype,
-                                stack_intervals=bool_intervalstack)
-
-                        if self.pysills_mode == "FI":
-                            mode_id = self.container_var[key_setting]["Inclusion Intensity Calculation"].get()
-                            if var_filetype == "SMPL":
-                                var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
-                                var_file_long = self.container_lists[var_filetype]["Long"][var_index]
-
-                                if self.container_var[key_setting][
-                                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                                    var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                                elif self.container_var[key_setting][
-                                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                                    var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
-                                        "Name"].get()
-                                elif self.container_var[key_setting][
-                                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                                    var_t = self.container_var["Halter2002"]["Name"].get()
-                                elif self.container_var[key_setting][
-                                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
-                                    var_t = self.container_var["Borisova2021"]["Name"].get()
-
-                                if var_t != "Select Isotope":
+                                if run_calculation == True:
                                     IQ(dataframe=None, project_type=self.pysills_mode,
                                        results_container=self.container_intensity_corrected[var_filetype][var_datatype][
                                            var_file_short]).get_intensity_corrected(
-                                        data_container=self.container_intensity[var_filetype][var_datatype][
-                                            var_file_short], mode=mode_id, isotope_t=var_t)
+                                        data_container=self.container_intensity[var_filetype][var_datatype][var_file_short])
                                 else:
-                                    self.create_popup_window_before_error(
-                                        var_text="It seems that a variable was still not defined. Please check if the "
-                                                 "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                                 "standard method or for the methods from Halter or Borisova was already "
-                                                 "defined.")
-                        elif self.pysills_mode == "MI":
-                            mode_id = self.container_var["mi_setting"]["Inclusion Intensity Calculation"].get()
-
-                            if var_filetype == "SMPL":
-                                var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
-                                var_file_long = self.container_lists[var_filetype]["Long"][var_index]
-
-                                if self.container_var[key_setting][
-                                    "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                                    var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                                elif self.container_var["mi_setting"][
-                                    "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                                    var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
-                                        "Name"].get()
-                                elif self.container_var["mi_setting"][
-                                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                                    var_t = self.container_var["Halter2002"]["Name"].get()
-                                elif self.container_var["mi_setting"][
-                                    "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
-                                    var_t = self.container_var["Borisova2021"]["Name"].get()
-
-                                if var_t != "Select Isotope":
-                                    IQ(dataframe=None, project_type=self.pysills_mode,
-                                       results_container=self.container_intensity_corrected[var_filetype][var_datatype][
-                                           var_file_short]).get_intensity_corrected(
-                                        data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
-                                        mode=mode_id, isotope_t=var_t)
-                                else:
-                                    self.create_popup_window_before_error(
-                                        var_text="It seems that a variable was still not defined. Please check if the "
-                                                 "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                                 "standard method or for the methods from Halter or Borisova was already "
-                                                 "defined.")
-                        else:
-                            IQ(dataframe=None, project_type=self.pysills_mode,
-                               results_container=self.container_intensity_corrected[var_filetype][var_datatype][
-                                   var_file_short]).get_intensity_corrected(
-                                data_container=self.container_intensity[var_filetype][var_datatype][var_file_short])
+                                    print(
+                                        "To avoid the appearance of additional calculation problems, please check if the previous "
+                                        "problem can be solved due to the given instructions if present.")
+                                    break
+                    else:
+                        print("To avoid the appearance of additional calculation problems, please check if the previous "
+                              "problem can be solved due to the given instructions if present.")
+                        break
 
             time_end = datetime.datetime.now()
             time_delta = (time_end - time_start)*1000
@@ -20311,85 +20330,96 @@ class PySILLS(tk.Frame):
             key_setting = "mi_setting"
 
         if mode == "Specific":
+            run_calculation = True
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-                var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
-                    isotope]
-                var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
-                    isotope]
-                if var_focus == "MAT":
-                    var_result = var_intensity_mat_i - var_intensity_bg_i
-                elif var_focus == "INCL":
-                    var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
-                    var_file_long = self.container_lists[var_filetype]["Long"][var_index]
-
-                    if self.container_var[key_setting][
-                        "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                        var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                    elif self.container_var[key_setting][
-                        "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                        var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
-                    elif self.container_var[key_setting][
-                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                        var_t = self.container_var["Halter2002"]["Name"].get()
-                    elif self.container_var[key_setting][
-                        "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
-                        var_t = self.container_var["Borisova2021"]["Name"].get()
-
-                    var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
+                if run_calculation == True:
+                    var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                         isotope]
-                    if var_t != "Select Isotope":
-                        var_intensity_bg_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
-                            var_t]
-                        var_intensity_mat_t = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                            "MAT"][var_t]
-                        var_intensity_incl_t = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                            "INCL"][var_t]
+                    var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["MAT"][
+                        isotope]
+                    if var_focus == "MAT":
+                        var_result = var_intensity_mat_i - var_intensity_bg_i
+                    elif var_focus == "INCL":
+                        var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
+                        var_file_long = self.container_lists[var_filetype]["Long"][var_index]
+
+                        if self.container_var[key_setting][
+                            "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+                            var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+                        elif self.container_var[key_setting][
+                            "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                            var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
+                        elif self.container_var[key_setting][
+                            "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                            var_t = self.container_var["Halter2002"]["Name"].get()
+                        elif self.container_var[key_setting][
+                            "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+                            var_t = self.container_var["Borisova2021"]["Name"].get()
+
+                        var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
+                            isotope]
+                        if var_t != "Select Isotope":
+                            var_intensity_bg_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
+                                var_t]
+                            var_intensity_mat_t = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                "MAT"][var_t]
+                            var_intensity_incl_t = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                "INCL"][var_t]
+                        else:
+                            self.create_popup_window_before_error(
+                                var_text="It seems that a variable was still not defined. Please check if the "
+                                         "reference isotope for the matrix-only tracer method, the 2nd internal "
+                                         "standard method or for the methods from Halter or Borisova was already "
+                                         "defined.")
+
+                        var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
+                        var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                        var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                        var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                        var_intensity_mix_t = var_intensity_incl_host_t
+                        var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
+
+                        if self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 0:
+                            # Heinrich (2003)
+                            var_result = round(self.calculate_intensity_incl_heinrich(
+                                intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
+                                intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
+                        elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 1:
+                            # SILLS Equation Sheet
+                            ## without R
+                            var_result = round(self.calculate_intensity_incl_sills(
+                                intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+                        elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 2:
+                            # SILLS Equation Sheet
+                            ## with R
+                            var_result = round(self.calculate_intensity_incl_sills(
+                                intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
+                                intensity_mat_i=var_intensity_host_i, with_r=True), 6)
+                        elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 3:
+                            # Theory
+                            var_result = round(self.calculate_intensity_incl_theory(
+                                intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
+                                intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+
+                    elif var_focus == "BG":
+                        var_result = var_intensity_bg_i
+
+                    if var_result != None:
+                        if var_result < 0:
+                            var_result = 0.0
                     else:
-                        self.create_popup_window_before_error(
-                            var_text="It seems that a variable was still not defined. Please check if the "
-                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                     "standard method or for the methods from Halter or Borisova was already "
-                                     "defined.")
+                        print(
+                            "There is a problem with the result for file", var_file_short, var_datatype,
+                            ". Please check if all variables are set and if the spike elimination was refreshed. Thank you!"
+                        )
+                        run_calculation = False
+                        self.parent.bell()
 
-                    var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
-                    var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
-                    var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                    var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
-                    var_intensity_mix_t = var_intensity_incl_host_t
-                    var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
-
-                    if self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 0:
-                        # Heinrich (2003)
-                        var_result = round(self.calculate_intensity_incl_heinrich(
-                            intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
-                            intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
-                    elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 1:
-                        # SILLS Equation Sheet
-                        ## without R
-                        var_result = round(self.calculate_intensity_incl_sills(
-                            intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i), 6)
-                    elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 2:
-                        # SILLS Equation Sheet
-                        ## with R
-                        var_result = round(self.calculate_intensity_incl_sills(
-                            intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
-                            intensity_mat_i=var_intensity_host_i, with_r=True), 6)
-                    elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 3:
-                        # Theory
-                        var_result = round(self.calculate_intensity_incl_theory(
-                            intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
-                            intensity_incl_mat_i=var_intensity_incl_host_i), 6)
-
-                elif var_focus == "BG":
-                    var_result = var_intensity_bg_i
-
-                if var_result < 0:
-                    var_result = 0.0
-
-                self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][var_focus][
-                    isotope] = var_result
+                    self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][var_focus][
+                        isotope] = var_result
         elif mode == "All":
+            run_calculation = True
             for var_filetype in ["STD", "SMPL"]:
                 if var_filetype == "STD":
                     focus_set = ["BG", "MAT"]
@@ -20399,25 +20429,35 @@ class PySILLS(tk.Frame):
                     if var_focus not in self.container_intensity_corrected[var_filetype][var_datatype]:
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus] = {}
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                        helper_results = []
-                        for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                                var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-                                if isotope in file_isotopes:
-                                    self.fi_get_intensity_corrected(
-                                        var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_focus=var_focus)
-                                    var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short][var_focus][isotope]
-                                    helper_results.append(var_result_i)
+                        if run_calculation == True:
+                            helper_results = []
+                            for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
+                                if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+                                    var_file_short = self.container_lists[var_filetype]["Short"][index]
+                                    file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+                                    if isotope in file_isotopes:
+                                        self.fi_get_intensity_corrected(
+                                            var_filetype=var_filetype, var_datatype=var_datatype,
+                                            var_file_short=var_file_short, var_focus=var_focus)
+                                        try:
+                                            var_result_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                                var_file_short][var_focus][isotope]
+                                            helper_results.append(var_result_i)
+                                        except:
+                                            print(
+                                                "There is a problem with the calculated value for:", var_filetype,
+                                                var_datatype, var_file_short, var_focus, isotope,
+                                                "- Please check if a problem was already mentioned before and follow if "
+                                                "possible the instructions. Thank you!")
+                                            run_calculation = False
+                                            self.parent.bell()
 
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result_i = np.mean(helper_results)
-                        else:
-                            var_result_i = np.median(helper_results)
-                        self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
-                            isotope] = var_result_i
+                            if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                var_result_i = np.mean(helper_results)
+                            else:
+                                var_result_i = np.median(helper_results)
+                            self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
+                                isotope] = var_result_i
         elif mode == "only STD":
             for var_filetype in ["STD"]:
                 for var_focus in ["MAT"]:
