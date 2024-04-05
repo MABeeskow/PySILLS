@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		04.03.2024
+# Date:		05.03.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -417,84 +417,87 @@ class IntensityQuantification:
             list_focus = ["MAT", "INCL"]
 
         for isotope in data_container["BG"].keys():
-            intensity_bg_i = data_container["BG"][isotope]
-            for focus in list_focus:
-                if focus == "MAT":
-                    intensity_sig2_i = data_container[focus][isotope]
-                    value_mat_i = intensity_sig2_i - intensity_bg_i
+            if isotope.isdigit():
+                pass
+            else:
+                intensity_bg_i = data_container["BG"][isotope]
+                for focus in list_focus:
+                    if focus == "MAT":
+                        intensity_sig2_i = data_container[focus][isotope]
+                        value_mat_i = intensity_sig2_i - intensity_bg_i
 
-                    if value_mat_i > 0:
-                        result_mat_i = value_mat_i
-                    else:
-                        result_mat_i = 0.0
+                        if value_mat_i > 0:
+                            result_mat_i = value_mat_i
+                        else:
+                            result_mat_i = 0.0
 
-                    self.results_container["BG"][isotope] = 0.0
-                    self.results_container[focus][isotope] = result_mat_i
-                elif focus == "INCL":
-                    intensity_sig2_i = data_container["MAT"][isotope]
-                    intensity_sig3_i = data_container[focus][isotope]
-                    intensity_mix_i = intensity_sig3_i - intensity_bg_i
-                    intensity_mat_i = intensity_sig2_i - intensity_bg_i
+                        self.results_container["BG"][isotope] = 0.0
+                        self.results_container[focus][isotope] = result_mat_i
+                    elif focus == "INCL":
+                        intensity_sig2_i = data_container["MAT"][isotope]
+                        intensity_sig3_i = data_container[focus][isotope]
+                        intensity_mix_i = intensity_sig3_i - intensity_bg_i
+                        intensity_mat_i = intensity_sig2_i - intensity_bg_i
 
-                    intensity_bg_t = data_container["BG"][isotope_t]
-                    intensity_sig2_t = data_container["MAT"][isotope_t]
-                    intensity_sig3_t = data_container[focus][isotope_t]
-                    intensity_mat_t = intensity_sig2_t - intensity_bg_t
+                        intensity_bg_t = data_container["BG"][isotope_t]
+                        intensity_sig2_t = data_container["MAT"][isotope_t]
+                        intensity_sig3_t = data_container[focus][isotope_t]
+                        intensity_mat_t = intensity_sig2_t - intensity_bg_t
 
-                    if intensity_mix_i > 0:
-                        intensity_mix_i = intensity_mix_i
-                    else:
-                        intensity_mix_i = 0.0
+                        if intensity_mix_i > 0:
+                            intensity_mix_i = intensity_mix_i
+                        else:
+                            intensity_mix_i = 0.0
 
-                    if intensity_mat_i > 0:
-                        intensity_mat_i = intensity_mat_i
-                    else:
-                        intensity_mat_i = 0.0
+                        if intensity_mat_i > 0:
+                            intensity_mat_i = intensity_mat_i
+                        else:
+                            intensity_mat_i = 0.0
 
-                    if intensity_mat_t > 0:
-                        intensity_mat_t = intensity_mat_t
-                    else:
-                        intensity_mat_t = 0.0
+                        if intensity_mat_t > 0:
+                            intensity_mat_t = intensity_mat_t
+                        else:
+                            intensity_mat_t = 0.0
 
-                    if mode == 0:   # Heinrich et al. (2003)
-                        intensity_mix_t = intensity_sig3_t - intensity_bg_t
-                        value_incl_i = intensity_mix_i - intensity_mix_t*(intensity_mat_i/intensity_mat_t)
-                    elif mode == 1: # "SILLS (without R)"
-                        intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
-                        intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
-                        value_incl_i = intensity_mix_i - intensity_incl_mat_i
-                    elif mode == 2: # "SILLS (with R)"
-                        intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
-                        intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
-                        factor_r = intensity_incl_mat_i/intensity_mat_i
-                        value_incl_i = intensity_mix_i - factor_r*intensity_mat_i
-                    elif mode == 3: # "Theory"
-                        intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
-                        intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
-                        value_incl_i = intensity_sig3_i - intensity_bg_i - intensity_incl_mat_i
+                        if mode == 0:   # Heinrich et al. (2003)
+                            intensity_mix_t = intensity_sig3_t - intensity_bg_t
+                            value_incl_i = intensity_mix_i - intensity_mix_t*(intensity_mat_i/intensity_mat_t)
+                        elif mode == 1: # "SILLS (without R)"
+                            intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
+                            intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                            value_incl_i = intensity_mix_i - intensity_incl_mat_i
+                        elif mode == 2: # "SILLS (with R)"
+                            intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
+                            intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                            factor_r = intensity_incl_mat_i/intensity_mat_i
+                            value_incl_i = intensity_mix_i - factor_r*intensity_mat_i
+                        elif mode == 3: # "Theory"
+                            intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
+                            intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                            value_incl_i = intensity_sig3_i - intensity_bg_i - intensity_incl_mat_i
 
-                    if value_incl_i > 0:
-                        result_incl_i = value_incl_i
-                    else:
-                        result_incl_i = 0.0
+                        if value_incl_i > 0:
+                            result_incl_i = value_incl_i
+                        else:
+                            result_incl_i = 0.0
 
-                    self.results_container[focus][isotope] = result_incl_i
+                        self.results_container[focus][isotope] = result_incl_i
 
-                    if "MIX" not in self.results_container:
-                        self.results_container["MIX"] = {}
+                        if "MIX" not in self.results_container:
+                            self.results_container["MIX"] = {}
 
-                    if isotope not in self.results_container["MIX"]:
-                        self.results_container["MIX"][isotope] = intensity_mix_i
+                        if isotope not in self.results_container["MIX"]:
+                            self.results_container["MIX"][isotope] = intensity_mix_i
 
-                    if "MAT-INCL" not in self.results_container:
-                        self.results_container["MAT-INCL"] = {}
+                        if "MAT-INCL" not in self.results_container:
+                            self.results_container["MAT-INCL"] = {}
 
-                    if isotope not in self.results_container["MAT-INCL"]:
-                        try:
-                            self.results_container["MAT-INCL"][isotope] = intensity_incl_mat_i
-                        except:
-                            intensity_incl_mat_i = intensity_sig3_i - result_incl_i - intensity_bg_i
-                            self.results_container["MAT-INCL"][isotope] = intensity_incl_mat_i
+                        if isotope not in self.results_container["MAT-INCL"]:
+                            try:
+                                self.results_container["MAT-INCL"][isotope] = intensity_incl_mat_i
+                            except:
+                                intensity_incl_mat_i = intensity_sig3_i - result_incl_i - intensity_bg_i
+                                self.results_container["MAT-INCL"][isotope] = intensity_incl_mat_i
 
         return self.results_container
 

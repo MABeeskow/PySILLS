@@ -6617,12 +6617,15 @@ class PySILLS(tk.Frame):
         save_file.write("ISOTOPES" + "\n")
 
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
-            info_srm = self.container_var["SRM"][isotope].get()
+            if isotope.isdigit():
+                pass
+            else:
+                info_srm = self.container_var["SRM"][isotope].get()
 
-            str_iso = str(isotope) + ";" + str(info_srm)
-            str_iso += "\n"
+                str_iso = str(isotope) + ";" + str(info_srm)
+                str_iso += "\n"
 
-            save_file.write(str_iso)
+                save_file.write(str_iso)
 
         save_file.write("\n")
 
@@ -6881,9 +6884,12 @@ class PySILLS(tk.Frame):
         save_file.write("DWELL TIME SETTINGS" + "\n")
 
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
-            info_dwell = self.container_var["dwell_times"]["Entry"][isotope].get()
-            str_dwell = str(isotope) + ";" + str(info_dwell) + "\n"
-            save_file.write(str_dwell)
+            if isotope.isdigit():
+                pass
+            else:
+                info_dwell = self.container_var["dwell_times"]["Entry"][isotope].get()
+                str_dwell = str(isotope) + ";" + str(info_dwell) + "\n"
+                save_file.write(str_dwell)
 
         save_file.write("\n")
 
@@ -13053,155 +13059,157 @@ class PySILLS(tk.Frame):
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
         for index, isotope in enumerate(self.container_lists["Measured Isotopes"]["All"]):
-
-            if self.container_var["LASER"].get() != "Select Gas":
-                var_text = self.container_var["LASER"].get()
+            if isotope.isdigit():
+                pass
             else:
-                var_text = "Select Gas"
+                if self.container_var["LASER"].get() != "Select Gas":
+                    var_text = self.container_var["LASER"].get()
+                else:
+                    var_text = "Select Gas"
 
-            if isotope not in self.container_var["SRM"]:
-                self.container_var["SRM"][isotope] = tk.StringVar()
-                self.container_var["SRM"][isotope].set("Select SRM")
+                if isotope not in self.container_var["SRM"]:
+                    self.container_var["SRM"][isotope] = tk.StringVar()
+                    self.container_var["SRM"][isotope].set("Select SRM")
+                    #
+                    self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
+                    self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
+                    #
+                    for file_std_short in self.container_lists["STD"]["Short"]:
+                        self.build_checkbutton_isotope_visibility(
+                            var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
+                            var_isotope=isotope)
+
+                        if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
+                            self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                            self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+                            self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
+                                file_std_short] = {}
+
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][
+                            isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                    #
+                    for file_smpl_short in self.container_lists["SMPL"]["Short"]:
+                        self.build_checkbutton_isotope_visibility(
+                            var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
+                            var_isotope=isotope)
+
+                        if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
+                            self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
+                                file_smpl_short] = tk.IntVar()
+                            self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                            self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
+                                file_smpl_short] = {}
+
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
+                            isotope] = {
+                            "RAW": None, "SMOOTHED": None}
                 #
-                self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
-                self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
+                if self.file_loaded:
+                    for file_std_short in self.container_lists["STD"]["Short"]:
+                        self.build_checkbutton_isotope_visibility(
+                            var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
+                            var_isotope=isotope)
+
+                        if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
+                            self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
+                            self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
+                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
+                            self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
+                                file_std_short] = {}
+
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][
+                            isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                    #
+                    for file_smpl_short in self.container_lists["SMPL"]["Short"]:
+                        self.build_checkbutton_isotope_visibility(
+                            var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
+                            var_isotope=isotope)
+
+                        if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
+                            self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
+                                file_smpl_short] = tk.IntVar()
+                            self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
+                            self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
+                                file_smpl_short] = {}
+
+                        self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
+                            isotope] = {
+                            "RAW": None, "SMOOTHED": None}
+
+                frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                                 highlightbackground="black", bd=1)
+                text_iso.window_create("end", window=frm_i)
+                text_iso.insert("end", "")
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Very Dark"])
+                text_iso.window_create("end", window=lbl_i)
+                text_iso.insert("end", "\t")
+
+                opt_srm_i = tk.OptionMenu(
+                    frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
+                    command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
+                    self.ma_change_srm_individual(var_opt, var_indiv, mode))
+                opt_srm_i["menu"].config(
+                    fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
+                    activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+                opt_srm_i.config(
+                    bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
+                    activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+                text_iso.window_create("end", window=opt_srm_i)
+                text_iso.insert("end", "\t")
                 #
-                for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
-                        var_isotope=isotope)
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
 
-                    if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
-                        self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
-                            file_std_short] = {}
+                self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
 
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][
-                        isotope] = {
-                        "RAW": None, "SMOOTHED": None}
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    self.container_lists["Oxides"].append(oxide)
+
+                if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
+                        and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
+                                                                                       element]):
+                    self.container_var["charge"][isotope]["textvar"].set("2+ charged")
+                    charge_fg = self.accent_color
+                else:
+                    self.container_var["charge"][isotope]["textvar"].set("1+ charged")
+                    charge_fg = self.bg_colors["Very Dark"]
                 #
-                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
-                        var_isotope=isotope)
-
-                    if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
-                        self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
-                            file_smpl_short] = tk.IntVar()
-                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
-                            file_smpl_short] = {}
-
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
-                        isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-            #
-            if self.file_loaded:
-                for file_std_short in self.container_lists["STD"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
-                        var_isotope=isotope)
-
-                    if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
-                        self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
-                        self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
-                        self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
-                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
-                            file_std_short] = {}
-
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][
-                        isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                #
-                for file_smpl_short in self.container_lists["SMPL"]["Short"]:
-                    self.build_checkbutton_isotope_visibility(
-                        var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
-                        var_isotope=isotope)
-
-                    if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
-                        self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                        self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
-                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
-                            file_smpl_short] = tk.IntVar()
-                        self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
-                        self.container_var[var_setting_key]["Calculation Interval Visibility"]["SMPL"][
-                            file_smpl_short] = {}
-
-                    self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short][isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-                    self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
-                        isotope] = {
-                        "RAW": None, "SMOOTHED": None}
-
-            frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_iso.window_create("end", window=frm_i)
-            text_iso.insert("end", "")
-            lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Very Dark"])
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\t")
-
-            opt_srm_i = tk.OptionMenu(
-                frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
-                command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
-                self.ma_change_srm_individual(var_opt, var_indiv, mode))
-            opt_srm_i["menu"].config(
-                fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_srm_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], activebackground=self.accent_color,
-                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
-            text_iso.window_create("end", window=opt_srm_i)
-            text_iso.insert("end", "\t")
-            #
-            key_element = re.search("(\D+)(\d+)", isotope)
-            element = key_element.group(1)
-
-            self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
-
-            for oxide in self.chemistry_oxides_sorted[element]:
-                self.container_lists["Oxides"].append(oxide)
-
-            if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
-                    and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
-                                                                                   element]):
-                self.container_var["charge"][isotope]["textvar"].set("2+ charged")
-                charge_fg = self.accent_color
-            else:
-                self.container_var["charge"][isotope]["textvar"].set("1+ charged")
-                charge_fg = self.bg_colors["Very Dark"]
-            #
-            lbl_i = tk.Label(
-                frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
-                textvariable=self.container_var["charge"][isotope]["textvar"], bg=self.bg_colors["Very Light"],
-                fg=charge_fg)
-            self.container_var["charge"][isotope]["labelvar"] = lbl_i
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\n")
+                lbl_i = tk.Label(
+                    frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
+                    textvariable=self.container_var["charge"][isotope]["textvar"], bg=self.bg_colors["Very Light"],
+                    fg=charge_fg)
+                self.container_var["charge"][isotope]["labelvar"] = lbl_i
+                text_iso.window_create("end", window=lbl_i)
+                text_iso.insert("end", "\n")
 
         # Option Menus
         list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
@@ -14835,10 +14843,13 @@ class PySILLS(tk.Frame):
 
             possible_is = []
             for isotope in self.container_lists["ISOTOPES"]:
-                key_02 = re.search("(\D+)(\d+)", isotope)
-                element = key_02.group(1)
-                if element == var_opt_element:
-                    possible_is.append(isotope)
+                if isotope.isdigit():
+                    pass
+                else:
+                    key_02 = re.search("(\D+)(\d+)", isotope)
+                    element = key_02.group(1)
+                    if element == var_opt_element:
+                        possible_is.append(isotope)
 
             self.container_var["IS"]["Default SMPL"].set("Select IS")
             for index, isotope in enumerate(possible_is):
@@ -17638,77 +17649,81 @@ class PySILLS(tk.Frame):
                 self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].set(var_is)
 
                 for isotope in file_isotopes:
-                    var_srm_i = self.container_var["SRM"][isotope].get()
-
-                    if var_srm_i == var_srm_file:
-                        if element_is in self.srm_actual[var_srm_i]:
-                            var_concentration_is = self.srm_actual[var_srm_i][element_is]
-                        else:
-                            var_concentration_is = 0.0
-
-                        key_element = re.search("(\D+)(\d+)", isotope)
-                        element = key_element.group(1)
-                        if element in self.srm_actual[var_srm_i]:
-                            if var_is_host == isotope:
-                                var_concentration_i = self.srm_actual[var_srm_file][element]
-                            else:
-                                var_concentration_i = self.srm_actual[var_srm_i][element]
-                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
-                        else:
-                            var_result_i = 0.0
-                        self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
-                        self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
-
-                        if var_is_smpl != None:
-                            var_result_is = 1.0
-                            self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                                var_is] = var_result_is
-                    elif var_srm_i != var_srm_file and var_is_host == isotope:
-                        if element_is in self.srm_actual[var_srm_file]:
-                            var_concentration_is = self.srm_actual[var_srm_file][element_is]
-                        else:
-                            var_concentration_is = 0.0
-
-                        key_element = re.search("(\D+)(\d+)", isotope)
-                        element = key_element.group(1)
-                        if element in self.srm_actual[var_srm_file]:
-                            if var_is_host == isotope:
-                                var_concentration_i = self.srm_actual[var_srm_file][element]
-                            else:
-                                var_concentration_i = self.srm_actual[var_srm_i][element]
-                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
-                        else:
-                            var_result_i = 0.0
-
-                        self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
-                        self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
-
-                        if var_is_smpl != None:
-                            var_result_is = 1.0
-                            self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                                var_is] = var_result_is
+                    if isotope.isdigit():
+                        self.container_lists["Measured Isotopes"][var_file_short].remove(isotope)
+                        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                     else:
-                        if element_is in self.srm_actual[var_srm_file]:
-                            var_concentration_is = self.srm_actual[var_srm_file][element_is]
-                        else:
-                            var_concentration_is = 0.0
+                        var_srm_i = self.container_var["SRM"][isotope].get()
 
-                        key_element = re.search("(\D+)(\d+)", isotope)
-                        element = key_element.group(1)
-                        if element in self.srm_actual[var_srm_file]:
-                            var_concentration_i = self.srm_actual[var_srm_file][element]
-                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                        if var_srm_i == var_srm_file:
+                            if element_is in self.srm_actual[var_srm_i]:
+                                var_concentration_is = self.srm_actual[var_srm_i][element_is]
+                            else:
+                                var_concentration_is = 0.0
+
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            if element in self.srm_actual[var_srm_i]:
+                                if var_is_host == isotope:
+                                    var_concentration_i = self.srm_actual[var_srm_file][element]
+                                else:
+                                    var_concentration_i = self.srm_actual[var_srm_i][element]
+                                var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                            else:
+                                var_result_i = 0.0
+                            self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
+
+                            if var_is_smpl != None:
+                                var_result_is = 1.0
+                                self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                                    var_is] = var_result_is
+                        elif var_srm_i != var_srm_file and var_is_host == isotope:
+                            if element_is in self.srm_actual[var_srm_file]:
+                                var_concentration_is = self.srm_actual[var_srm_file][element_is]
+                            else:
+                                var_concentration_is = 0.0
+
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            if element in self.srm_actual[var_srm_file]:
+                                if var_is_host == isotope:
+                                    var_concentration_i = self.srm_actual[var_srm_file][element]
+                                else:
+                                    var_concentration_i = self.srm_actual[var_srm_i][element]
+                                var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                            else:
+                                var_result_i = 0.0
+
+                            self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                                isotope] = var_result_i
+                            self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
+
+                            if var_is_smpl != None:
+                                var_result_is = 1.0
+                                self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
+                                    var_is] = var_result_is
                         else:
-                            var_result_i = 0.0
-                        self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
+                            if element_is in self.srm_actual[var_srm_file]:
+                                var_concentration_is = self.srm_actual[var_srm_file][element_is]
+                            else:
+                                var_concentration_is = 0.0
+
+                            key_element = re.search("(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+                            if element in self.srm_actual[var_srm_file]:
+                                var_concentration_i = self.srm_actual[var_srm_file][element]
+                                var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                            else:
+                                var_result_i = 0.0
+                            self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
 
             else:
                 self.calculate_acquisition_time_deltas()
@@ -18703,7 +18718,7 @@ class PySILLS(tk.Frame):
                         else:
                             var_sensitivity_i = 0.0
 
-                        if var_sensitivity_i > 0:
+                        if var_sensitivity_i > 0 and var_intensity_is > 0 and var_n_bg > 0:
                             var_result_i = (3.29*(
                                     var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
                                                    var_n_mat*var_tau_i*var_sensitivity_i)*(
@@ -19796,11 +19811,10 @@ class PySILLS(tk.Frame):
 
                 for isotope in self.container_lists["Measured Isotopes"][file_parts[-1]]:
                     if isotope.isdigit():
-                        if int(isotope) == 128:
-                            target_index = self.container_lists["Measured Isotopes"][file_parts[-1]].index(isotope)
-                            self.container_lists["Measured Isotopes"][file_parts[-1]][target_index] = "I128"
-                            isotope = "I128"
-
+                        print("There is a problem with an isotope that is probably just a number. "
+                              "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
+                        self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
+                    else:
                         key_element = re.search("(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
@@ -19833,11 +19847,10 @@ class PySILLS(tk.Frame):
 
                 for isotope in self.container_lists["Measured Isotopes"][file_parts[-1]]:
                     if isotope.isdigit():
-                        if int(isotope) == 128:
-                            target_index = self.container_lists["Measured Isotopes"][file_parts[-1]].index(isotope)
-                            self.container_lists["Measured Isotopes"][file_parts[-1]][target_index] = "I128"
-                            isotope = "I128"
-
+                        print("There is a problem with an isotope that is probably just a number. "
+                              "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
+                        self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
+                    else:
                         key_element = re.search("(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
@@ -19851,12 +19864,9 @@ class PySILLS(tk.Frame):
                     if element not in self.container_lists["Measured Elements"]["All"]:
                         self.container_lists["Measured Elements"]["All"].append(element)
                 if isotope.isdigit():
-                    print(isotope, "is missing its element. Let's hope it will get it back.")
-                    if int(isotope) == 128:
-                        target_index = self.container_lists["Measured Isotopes"]["All"].index(isotope)
-                        self.container_lists["Measured Isotopes"]["All"][target_index] = "I128"
-                        isotope = "I128"
-
+                    print("There is a problem with an isotope (->", isotope, "<-) that is probably just a number. "
+                          "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
+                else:
                     key_element = re.search("(\D+)(\d+)", isotope)
                     if key_element != None:
                         element = key_element.group(1)
@@ -19867,25 +19877,31 @@ class PySILLS(tk.Frame):
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
                 for isotope in self.container_lists["Measured Isotopes"][filename_short]:
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    if element not in self.container_lists["Measured Elements"][filename_short]:
-                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    if isotope.isdigit():
+                        pass
                     else:
-                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
-                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element not in self.container_lists["Measured Elements"][filename_short]:
+                            self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                        else:
+                            if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                                self.container_lists["Measured Elements"][filename_short][element].append(isotope)
 
             for filename_short in self.container_lists["SMPL"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
                 self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
                 for isotope in self.container_lists["Measured Isotopes"][filename_short]:
-                    key_element = re.search("(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-                    if element not in self.container_lists["Measured Elements"][filename_short]:
-                        self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                    if isotope.isdigit():
+                        pass
                     else:
-                        if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
-                            self.container_lists["Measured Elements"][filename_short][element].append(isotope)
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element not in self.container_lists["Measured Elements"][filename_short]:
+                            self.container_lists["Measured Elements"][filename_short][element] = [isotope]
+                        else:
+                            if isotope not in self.container_lists["Measured Elements"][filename_short][element]:
+                                self.container_lists["Measured Elements"][filename_short][element].append(isotope)
 
             self.define_isotope_colors()
         else:
@@ -19923,11 +19939,14 @@ class PySILLS(tk.Frame):
         #
         ## INITIALIZATION
         for isotope in self.container_lists["ISOTOPES"]:
-            key_element = re.search("(\D+)(\d+)", isotope)
-            element = key_element.group(1)
-            #
-            if element not in self.container_lists["Elements"]:
-                self.container_lists["Elements"].append(element)
+            if isotope.isdigit():
+                pass
+            else:
+                key_element = re.search("(\D+)(\d+)", isotope)
+                element = key_element.group(1)
+
+                if element not in self.container_lists["Elements"]:
+                    self.container_lists["Elements"].append(element)
 
         ## Static
         # Build section 'Project Information'
@@ -23625,9 +23644,12 @@ class PySILLS(tk.Frame):
                     self.container_files["STD"][parts[-1]]["SRM"].set(var_opt)
         elif mode == "ISOTOPES":
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                if self.container_var["SRM"][isotope].get() == "Select SRM":
-                    self.container_var["SRM"][isotope].set(var_opt)
-                    self.container_files["SRM"][isotope].set(var_opt)
+                if isotope.isdigit():
+                    pass
+                else:
+                    if self.container_var["SRM"][isotope].get() == "Select SRM":
+                        self.container_var["SRM"][isotope].set(var_opt)
+                        self.container_files["SRM"][isotope].set(var_opt)
 
         if var_opt not in self.srm_actual:
             self.srm_actual[var_opt] = {}
@@ -25082,6 +25104,8 @@ class PySILLS(tk.Frame):
             if isotope.isdigit():
                 print("There is a problem with an isotope that is probably just a number. "
                       "Please check this and correct it. Thank you!")
+                self.container_lists["Measured Isotopes"][str_filename_short].remove(isotope)
+                file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
             else:
                 frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
                                  highlightbackground="black", bd=1)
@@ -25219,18 +25243,22 @@ class PySILLS(tk.Frame):
         ax = self.fig_specific.add_subplot(label=np.random.uniform())
         self.container_helper[str_filetype][str_filename_short]["AXES"] = {"Time-Signal": ax}
         for isotope in file_isotopes:
-            ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope,
-                             color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-            self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                "RAW"] = ln_raw
-
-            if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
-                ln_smoothed = ax.plot(
-                    self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope]["Uncut"],
-                    label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+            if isotope.isdigit():
+                print("There is a problem with an isotope that is probably just a number. "
+                      "Please check this and correct it. Thank you!")
+            else:
+                ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope,
+                                 color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
                 self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                    "SMOOTHED"] = ln_smoothed
-                self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
+                    "RAW"] = ln_raw
+
+                if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
+                    ln_smoothed = ax.plot(
+                        self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope]["Uncut"],
+                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                    self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                        "SMOOTHED"] = ln_smoothed
+                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -25551,9 +25579,13 @@ class PySILLS(tk.Frame):
             list_considered_isotopes = []
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-                var_srm_i = self.container_var["SRM"][isotope].get()
-                if var_srm_i == var_srm_file:
-                    list_considered_isotopes.append(isotope)
+                if isotope.isdigit():
+                    print("There is a problem with an isotope that is probably just a number. "
+                          "Please check this and correct it. Thank you!")
+                else:
+                    var_srm_i = self.container_var["SRM"][isotope].get()
+                    if var_srm_i == var_srm_file:
+                        list_considered_isotopes.append(isotope)
 
             list_categories.extend(list_considered_isotopes)
 
@@ -26701,10 +26733,13 @@ class PySILLS(tk.Frame):
             possible_is = []
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_02 = re.search("(\D+)(\d+)", isotope)
-                element = key_02.group(1)
-                if element == var_opt_element:
-                    possible_is.append(isotope)
+                if isotope.isdigit():
+                    pass
+                else:
+                    key_02 = re.search("(\D+)(\d+)", isotope)
+                    element = key_02.group(1)
+                    if element == var_opt_element:
+                        possible_is.append(isotope)
             #
             self.container_var[key_setting]["IS MAT Default"].set("Select IS")
             for index, isotope in enumerate(possible_is):
