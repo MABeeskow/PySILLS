@@ -13052,8 +13052,8 @@ class PySILLS(tk.Frame):
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
-
         for index, isotope in enumerate(self.container_lists["Measured Isotopes"]["All"]):
+
             if self.container_var["LASER"].get() != "Select Gas":
                 var_text = self.container_var["LASER"].get()
             else:
@@ -13180,6 +13180,7 @@ class PySILLS(tk.Frame):
             #
             key_element = re.search("(\D+)(\d+)", isotope)
             element = key_element.group(1)
+
             self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
 
             for oxide in self.chemistry_oxides_sorted[element]:
@@ -13605,8 +13606,11 @@ class PySILLS(tk.Frame):
                 df_isotopes, times_std_i = self.assign_time_and_isotopic_data(filetype="STD", filename_long=file_std)
 
                 for isotope in df_isotopes:
-                    if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                        self.container_lists["Measured Isotopes"]["All"].append(isotope)
+                    if isotope.isdigit():
+                        print(isotope, "in file", file_std_short,"is missing its element. Let's hope it will get it back.")
+                    else:
+                        if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                            self.container_lists["Measured Isotopes"]["All"].append(isotope)
 
                 if file_std_short not in self.container_measurements["EDITED"]:
                     self.container_measurements["EDITED"][file_std_short] = {}
@@ -14058,8 +14062,12 @@ class PySILLS(tk.Frame):
                 df_isotopes, times_smpl_i = self.assign_time_and_isotopic_data(filetype="SMPL", filename_long=file_smpl)
 
                 for isotope in df_isotopes:
-                    if isotope not in self.container_lists["Measured Isotopes"]["All"]:
-                        self.container_lists["Measured Isotopes"]["All"].append(isotope)
+                    if isotope.isdigit():
+                        print(isotope, "in file", file_smpl_short,
+                              "is missing its element. Let's hope it will get it back.")
+                    else:
+                        if isotope not in self.container_lists["Measured Isotopes"]["All"]:
+                            self.container_lists["Measured Isotopes"]["All"].append(isotope)
 
                 if file_smpl_short not in self.container_measurements["EDITED"]:
                     self.container_measurements["EDITED"][file_smpl_short] = {}
@@ -19786,6 +19794,19 @@ class PySILLS(tk.Frame):
                 self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
                 self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
+                for isotope in self.container_lists["Measured Isotopes"][file_parts[-1]]:
+                    if isotope.isdigit():
+                        if int(isotope) == 128:
+                            target_index = self.container_lists["Measured Isotopes"][file_parts[-1]].index(isotope)
+                            self.container_lists["Measured Isotopes"][file_parts[-1]][target_index] = "I128"
+                            isotope = "I128"
+
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        if key_element != None:
+                            element = key_element.group(1)
+                            if element not in self.container_lists["Measured Elements"]["All"]:
+                                self.container_lists["Measured Elements"]["All"].append(element)
+
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
                 if self.file_loaded == False:
@@ -19810,11 +19831,37 @@ class PySILLS(tk.Frame):
                 self.container_lists["Measured Isotopes"][file_parts[-1]] = df_isotopes
                 self.container_lists["Measured Isotopes"]["All"] = self.container_lists["ISOTOPES"]
 
+                for isotope in self.container_lists["Measured Isotopes"][file_parts[-1]]:
+                    if isotope.isdigit():
+                        if int(isotope) == 128:
+                            target_index = self.container_lists["Measured Isotopes"][file_parts[-1]].index(isotope)
+                            self.container_lists["Measured Isotopes"][file_parts[-1]][target_index] = "I128"
+                            isotope = "I128"
+
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        if key_element != None:
+                            element = key_element.group(1)
+                            if element not in self.container_lists["Measured Elements"]["All"]:
+                                self.container_lists["Measured Elements"]["All"].append(element)
+
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
                 key_element = re.search("(\D+)(\d+)", isotope)
-                element = key_element.group(1)
-                if element not in self.container_lists["Measured Elements"]["All"]:
-                    self.container_lists["Measured Elements"]["All"].append(element)
+                if key_element != None:
+                    element = key_element.group(1)
+                    if element not in self.container_lists["Measured Elements"]["All"]:
+                        self.container_lists["Measured Elements"]["All"].append(element)
+                if isotope.isdigit():
+                    print(isotope, "is missing its element. Let's hope it will get it back.")
+                    if int(isotope) == 128:
+                        target_index = self.container_lists["Measured Isotopes"]["All"].index(isotope)
+                        self.container_lists["Measured Isotopes"]["All"][target_index] = "I128"
+                        isotope = "I128"
+
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    if key_element != None:
+                        element = key_element.group(1)
+                        if element not in self.container_lists["Measured Elements"]["All"]:
+                            self.container_lists["Measured Elements"]["All"].append(element)
 
             for filename_short in self.container_lists["STD"]["Short"]:
                 self.container_lists["Measured Elements"][filename_short] = {}
@@ -25032,41 +25079,45 @@ class PySILLS(tk.Frame):
         file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
 
         for index, isotope in enumerate(file_isotopes):
-            frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
-                             highlightbackground="black", bd=1)
-            text_iso.window_create("end", window=frm_i)
-            text_iso.insert("end", "")
+            if isotope.isdigit():
+                print("There is a problem with an isotope that is probably just a number. "
+                      "Please check this and correct it. Thank you!")
+            else:
+                frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                                 highlightbackground="black", bd=1)
+                text_iso.window_create("end", window=frm_i)
+                text_iso.insert("end", "")
 
-            lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\t")
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+                text_iso.window_create("end", window=lbl_i)
+                text_iso.insert("end", "\t")
 
-            if isotope not in self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short]:
-                self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][
-                    isotope] = tk.IntVar()
+                if isotope not in self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short]:
+                    self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][
+                        isotope] = tk.IntVar()
 
-            cb_raw_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][
-                    isotope], text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
-                fg=self.bg_colors["Dark Font"], command=lambda var_type=str_filetype, var_file_short=str_filename_short,
-                                                               var_datatype="RAW", var_isotope=isotope:
-                self.fi_change_line_visibility(var_type, var_file_short, var_datatype, var_isotope))
-            text_iso.window_create("end", window=cb_raw_i)
-            text_iso.insert("end", "\t")
+                cb_raw_i = tk.Checkbutton(
+                    frm_iso, variable=self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][
+                        isotope], text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
+                    fg=self.bg_colors["Dark Font"], command=lambda var_type=str_filetype, var_file_short=str_filename_short,
+                                                                   var_datatype="RAW", var_isotope=isotope:
+                    self.fi_change_line_visibility(var_type, var_file_short, var_datatype, var_isotope))
+                text_iso.window_create("end", window=cb_raw_i)
+                text_iso.insert("end", "\t")
 
-            if isotope not in self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short]:
-                self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
-                    isotope] = tk.IntVar()
+                if isotope not in self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short]:
+                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                        isotope] = tk.IntVar()
 
-            cb_smoothed_i = tk.Checkbutton(
-                frm_iso, variable=self.container_var[key_setting]["Display SMOOTHED"][str_filetype][
-                    str_filename_short][isotope], text="SMOOTHED", onvalue=1, offvalue=0,
-                bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
-                               var_isotope=isotope: self.fi_change_line_visibility(
-                    var_type, var_file_short, var_datatype, var_isotope))
-            text_iso.window_create("end", window=cb_smoothed_i)
-            text_iso.insert("end", "\n")
+                cb_smoothed_i = tk.Checkbutton(
+                    frm_iso, variable=self.container_var[key_setting]["Display SMOOTHED"][str_filetype][
+                        str_filename_short][isotope], text="SMOOTHED", onvalue=1, offvalue=0,
+                    bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
+                    command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
+                                   var_isotope=isotope: self.fi_change_line_visibility(
+                        var_type, var_file_short, var_datatype, var_isotope))
+                text_iso.window_create("end", window=cb_smoothed_i)
+                text_iso.insert("end", "\n")
 
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
