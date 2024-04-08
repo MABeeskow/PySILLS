@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		05.04.2024
+# Date:		09.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -660,11 +660,11 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Element"] = tk.StringVar()
             self.container_var[key_setting]["Element"].set("Select Element")
             self.container_var[key_setting]["Element Concentration"] = tk.StringVar()
-            self.container_var[key_setting]["Element Concentration"].set("1000000")
+            self.container_var[key_setting]["Element Concentration"].set("100")
             self.container_var[key_setting]["Sulfide"] = tk.StringVar()
             self.container_var[key_setting]["Sulfide"].set("Select Sulfide")
             self.container_var[key_setting]["Sulfide Concentration"] = tk.StringVar()
-            self.container_var[key_setting]["Sulfide Concentration"].set("1000000")
+            self.container_var[key_setting]["Sulfide Concentration"].set("100")
             self.container_var[key_setting]["Halide"] = tk.StringVar()
             self.container_var[key_setting]["Halide"].set("Select Halide")
             self.container_var[key_setting]["Halide Concentration"] = tk.StringVar()
@@ -10980,12 +10980,6 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Ti-in-Quartz", relief=tk.FLAT, fontsize="sans 10 bold")
 
-        lbl_002 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start + var_header_n + 1,
-            n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_label(
-            text="U-Pb Dating", relief=tk.FLAT, fontsize="sans 10 bold")
-
         # BUTTONS
         btn_001 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start + int_category_n,
@@ -10993,13 +10987,6 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.geothermometry_titanium_in_quartz)
-
-        btn_002 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1,
-            column_id=var_column_start + var_header_n + 1 + int_category_n, n_rows=1,
-            n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
-            bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
     def geothermometry_titanium_in_quartz(self):
         """Window for the Titanium-in-Quartz thermometry."""
@@ -11352,6 +11339,10 @@ class PySILLS(tk.Frame):
                 #
                 if element not in self.container_lists["Elements"]:
                     self.container_lists["Elements"].append(element)
+                if element not in self.container_lists["Measured Elements"]:
+                    self.container_lists["Measured Elements"][element] = []
+                if isotope not in self.container_lists["Measured Elements"][element]:
+                    self.container_lists["Measured Elements"][element].append(isotope)
 
         ## Static
         # Build section 'Project Information'
@@ -14442,7 +14433,7 @@ class PySILLS(tk.Frame):
             var_text_02 = "Oxide Settings (default)"
             var_key = "oxides"
         elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 2:
-            var_text_02 = "Element Settings (default)"
+            var_text_02 = "Element Settings (default) (wt.%)"
             var_key = "elements"
         elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 3:
             var_text_02 = "Experimental data"
@@ -14862,32 +14853,52 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+
         str_method = self.container_var["Quantification Mineral"]["Method"].get()
-        if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1 or str_method != "Internal Standard":
+        total_ppm = 10**6
+
+        if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1 or str_method != "Internal Standard":
             var_key = "Oxide"
+            value_default = 100
         else:
             var_key = "Element"
+            value_default = float(self.container_var[var_setting_key]["Element Concentration"].get())
+
+        if value_default > 100:
+            value_default = 100
+        elif value_default < 0:
+            value_default = 0
 
         if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
                 self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].set(var_opt)
 
-            self.container_var["IS"]["Default SMPL Concentration"].set(1000000)
+            value_default_is = total_ppm*value_default/100
+            self.container_var["IS"]["Default SMPL Concentration"].set(value_default_is)
+
             if var_key == "Oxide":
                 key = re.search("(\D+)(\d*)(\D+)(\d*)", var_opt)
                 var_opt_element = key.group(1)
             else:
                 var_opt_element = var_opt
 
-            possible_is = []
-            for isotope in self.container_lists["ISOTOPES"]:
-                if isotope.isdigit():
-                    pass
-                else:
-                    key_02 = re.search("(\D+)(\d+)", isotope)
-                    element = key_02.group(1)
-                    if element == var_opt_element:
-                        possible_is.append(isotope)
+
+            possible_is = self.container_lists["Measured Elements"][var_opt_element]
+            # possible_is = []
+            # for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            #     if isotope.isdigit():
+            #         pass
+            #     else:
+            #         key_02 = re.search("(\D+)(\d+)", isotope)
+            #         element = key_02.group(1)
+            #         if element == var_opt_element:
+            #             possible_is.append(isotope)
 
             self.container_var["IS"]["Default SMPL"].set("Select IS")
             for index, isotope in enumerate(possible_is):
@@ -14901,19 +14912,38 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][var_file]["Matrix Setup"][var_key]["Name"].set(var_opt)
 
     def ma_change_matrix_concentration(self, var_entr, var_file, state_default, event):
-        if self.container_var["ma_setting"]["Host Setup Selection"].get() == 1:
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+
+        if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1:
             var_key = "Oxide"
         else:
             var_key = "Element"
 
+        value = float(var_entr.get())
+        total_ppm = 10**6
+
+        if value > 100:
+            value = 100
+        elif value < 0:
+            value = 0
+
+        value_is_default = total_ppm*value/100
+        self.container_var["IS"]["Default SMPL Concentration"].set(value_is_default)
+
         if state_default:
             for file_smpl in self.container_lists["SMPL"]["Long"]:
-                self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Concentration"].set(var_entr.get())
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Concentration"].set(value)
+                self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].set(value_is_default)
+                self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(value_is_default)
         else:
-            self.container_var["SMPL"][var_file]["Matrix Setup"][var_key]["Concentration"].set(var_entr.get())
-            #
-            self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].set(
-                int(float(var_entr.get())/100*float(self.container_var["IS"]["Default SMPL Concentration"].get())))
+            self.container_var["SMPL"][var_file]["Matrix Setup"][var_key]["Concentration"].set(value)
+            self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Concentration"].set(value_is_default)
+            self.container_var["SMPL"][var_file]["IS Data"]["Concentration"].set(value_is_default)
 
     def ma_change_is_smpl(self, var_opt, var_file=None, state_default=False):
         """ Defines which internal standard was selected and calculates its concentration based on further information.
@@ -14990,7 +15020,8 @@ class PySILLS(tk.Frame):
                                 oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Oxide"][
                                                           "Concentration"].get()))/100
                                 is_concentration = round(list_fraction[element]*10**6, 4)
-                                self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
+                                self.container_var["IS"]["Default SMPL Concentration"].set(
+                                    round(oxide_weight*is_concentration, 4))
                                 var_entr_is_i.set(round(oxide_weight*is_concentration, 4))
 
                         if self.container_var["IS"]["Default STD"].get() == "Select IS":
@@ -15011,7 +15042,7 @@ class PySILLS(tk.Frame):
                     oxide_weight = (float(self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"][
                                               "Concentration"].get()))/100
                     is_concentration = round(1*10**6, 4)
-                    self.container_var["IS"]["Default SMPL Concentration"].set(is_concentration)
+                    self.container_var["IS"]["Default SMPL Concentration"].set(round(oxide_weight*is_concentration, 4))
                     var_entr_is_i.set(round(oxide_weight*is_concentration, 4))
 
                     if self.container_var["IS"]["Default STD"].get() == "Select IS":
@@ -15049,9 +15080,6 @@ class PySILLS(tk.Frame):
             else:
                 self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Concentration"].set(var_entr.get())
 
-    #
-    ####################################################################################################################
-    #
     def ma_select_srm_default(self, var_opt, mode="STD"):
         if mode == "STD":
             for file_std in self.list_std:
@@ -19987,6 +20015,10 @@ class PySILLS(tk.Frame):
 
                 if element not in self.container_lists["Elements"]:
                     self.container_lists["Elements"].append(element)
+                if element not in self.container_lists["Measured Elements"]:
+                    self.container_lists["Measured Elements"][element] = []
+                if isotope not in self.container_lists["Measured Elements"][element]:
+                    self.container_lists["Measured Elements"][element].append(isotope)
 
         ## Static
         # Build section 'Project Information'
@@ -20285,6 +20317,10 @@ class PySILLS(tk.Frame):
                 element = key_element.group(1)
                 if element not in self.container_lists["Elements"]:
                     self.container_lists["Elements"].append(element)
+                if element not in self.container_lists["Measured Elements"]:
+                    self.container_lists["Measured Elements"][element] = []
+                if isotope not in self.container_lists["Measured Elements"][element]:
+                    self.container_lists["Measured Elements"][element].append(isotope)
 
         ## Static
         # Build section 'Project Information'
