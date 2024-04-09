@@ -9230,12 +9230,10 @@ class PySILLS(tk.Frame):
             #
             self.gui_subwindows["Mineral Analysis"]["Check IS"]["Entry"]["Permanent"].append(entr_smpl_def)
 
-    #
     def change_is_value_default(self, var_entr, event):
         for file_smpl in self.container_lists["SMPL"]["Long"]:
             self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(var_entr.get())
 
-    #
     def change_is_setup(self, var_is, var_file=None, mode="Default"):
         if mode == "Default":
             try:
@@ -9258,8 +9256,6 @@ class PySILLS(tk.Frame):
                 else:
                     self.container_files["SMPL"][file_short]["IS"].set(var_is)
                     self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
-
-                self.container_var["SMPL"][file]["IS"].set(var_is)
 
         else:
             try:
