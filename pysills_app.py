@@ -12440,7 +12440,7 @@ class PySILLS(tk.Frame):
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                    command=self.fi_mass_balance)
+                    command=self.fi_mass_balance_new)
                 self.bool_incl_is_massbalance = True
             else:
                 self.btn_setup_massbalance.grid()
@@ -27550,7 +27550,6 @@ class PySILLS(tk.Frame):
             if mode == "demonstration":
                 helper = []
                 helper_cl = []
-                helper_salts = {}
                 helper2 = {}
                 helper3 = {}
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
@@ -27648,10 +27647,18 @@ class PySILLS(tk.Frame):
 
             elif mode == "default":
                 helper = []
+                helper_is = []
+                helper_cl = []
+                helper2 = {}
+                helper3 = {}
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    helper2[file_smpl_short] = {}
                     file_smpl = self.container_lists["SMPL"]["Long"][index]
                     var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                    var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv*total_ppm
+                    var_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"][0]
+                    var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                    var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
+                    #var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv*total_ppm
                     var_na_true_base = var_na_equiv
                     var_salt_contribution = 0
                     var_salt_contribution_2 = 0
@@ -27666,38 +27673,79 @@ class PySILLS(tk.Frame):
                         if salt != "NaCl":
                             molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
                             element = self.molar_masses_compounds[salt]["Cation"]
+
                             for isotope in file_isotopes:
                                 key_isotope = re.search("(\D+)(\d+)", isotope)
                                 isotope_atom = key_isotope.group(1)
 
                                 if element == isotope_atom:
                                     molar_mass_element = elements_masses[element]
+                                    helper3[salt] = molar_mass_element/molar_mass_salt
                                     try:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                             file_smpl_short]["INCL"][isotope]
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                            file_smpl_short]["INCL"][var_is_i]
+                                            file_smpl_short]["INCL"][var_na]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
-                                            file_smpl_short]["INCL"][isotope]  # SMOOTHED
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_na]  # SMOOTHED
                                     except:
                                         var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
                                         var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                            file_smpl_short]["INCL"][var_is_i]
+                                            file_smpl_short]["INCL"][var_na]
                                         var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                             file_smpl_short]["INCL"][isotope]
+                                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_na]
 
-                                    var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
-                                    var_salt_contribution_2 += var_weight*var_conc_ratio*(
-                                            val_molar_mass_na*molar_mass_salt)/(
-                                                                       val_molar_mass_nacl*molar_mass_element)
-                                    var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
-                                                             (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
+                                    var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                                    try:
+                                        var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                        var_salt_contribution_3 = var_conc_ratio*(molar_mass_salt/molar_mass_element)
+                                        helper2[file_smpl_short][salt] = var_salt_contribution_3
+                                        var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                                val_molar_mass_na*molar_mass_salt)/(
+                                                val_molar_mass_nacl*molar_mass_element)
+                                    except:
+                                        print("Error Mass Balance:", var_weight_sum, var_intensity_i, var_intensity_na,
+                                              var_sensitivity_i, molar_mass_salt, molar_mass_element, val_molar_mass_na, val_molar_mass_nacl)
                         else:
-                            var_na_true_base *= 1
+                            var_na_equiv *= 1
 
-                    val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2)), 4)
+                    val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                    val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                    concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
+                    concentration_na_true = val_concentration_is
+                    concentration_cl_true = (val_molar_mass_cl/val_molar_mass_nacl)*concentration_nacl
                     helper.append(val_concentration_is)
+                    helper_cl.append(val_concentration_cl)
+
+                    if var_is_i != var_na:
+                        try:
+                            var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_na]
+                            var_intensity_is = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                        except:
+                            var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_na]
+                            var_intensity_is = self.container_intensity_corrected["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_na]
+
+                        val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
+                                var_sensitivity_is/var_sensitivity_na)), 4)
+
+                    helper_is.append(val_concentration_is)
 
                     self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
                         var_entr.get())
@@ -27708,15 +27756,24 @@ class PySILLS(tk.Frame):
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
-                        round(np.mean(helper), 4))
+                        round(np.mean(helper_is), 4))
                 else:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
-                        round(np.median(helper), 4))
+                        round(np.median(helper_is), 4))
             elif mode == "specific":
+                helper = []
+                helper_cl = []
+                helper2 = {}
+                helper3 = {}
+
                 file_smpl = var_file
                 file_smpl_short = file_smpl.split("/")[-1]
+                helper2[file_smpl_short] = {}
                 var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
-                var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv*total_ppm
+                var_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"][0]
+                var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
+                #var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv*total_ppm
                 var_na_true_base = var_na_equiv
                 var_salt_contribution = 0
                 var_salt_contribution_2 = 0
@@ -27737,32 +27794,71 @@ class PySILLS(tk.Frame):
 
                             if element == isotope_atom:
                                 molar_mass_element = elements_masses[element]
+                                helper3[salt] = molar_mass_element/molar_mass_salt
                                 try:
                                     var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
                                         file_smpl_short]["INCL"][isotope]
                                     var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
-                                        file_smpl_short]["INCL"][var_is_i]
+                                        file_smpl_short]["INCL"][var_na]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
                                         file_smpl_short]["INCL"][isotope]
+                                    var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                        file_smpl_short]["INCL"][var_na]  # SMOOTHED
                                 except:
                                     var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][isotope]
                                     var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
-                                        file_smpl_short]["INCL"][var_is_i]
+                                        file_smpl_short]["INCL"][var_na]
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
                                         file_smpl_short]["INCL"][isotope]
+                                    var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                        file_smpl_short]["INCL"][var_na]
 
-                                var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
-                                var_salt_contribution_2 += var_weight*var_conc_ratio*(
-                                        val_molar_mass_na*molar_mass_salt)/(
-                                                                   val_molar_mass_nacl*molar_mass_element)
-                                var_salt_contribution += var_weight_sum*(var_intensity_i/var_intensity_na)* \
-                                                         (1/var_sensitivity_i)*(molar_mass_salt/molar_mass_element)
-
+                                var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                                try:
+                                    var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                    var_salt_contribution_3 = var_conc_ratio*(molar_mass_salt/molar_mass_element)
+                                    helper2[file_smpl_short][salt] = var_salt_contribution_3
+                                    var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                            val_molar_mass_na*molar_mass_salt)/(
+                                            val_molar_mass_nacl*molar_mass_element)
+                                except:
+                                    print("Error Mass Balance:", var_weight_sum, var_intensity_i, var_intensity_na,
+                                          var_sensitivity_i, molar_mass_salt, molar_mass_element, val_molar_mass_na,
+                                          val_molar_mass_nacl)
                     else:
-                        var_na_true_base *= 1
+                        var_na_equiv *= 1
 
-                val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2)), 4)
+                val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
+                concentration_na_true = val_concentration_is
+                concentration_cl_true = (val_molar_mass_cl/val_molar_mass_nacl)*concentration_nacl
+                helper.append(val_concentration_is)
+                helper_cl.append(val_concentration_cl)
+
+                if var_is_i != var_na:
+                    try:
+                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                            file_smpl_short]["INCL"][var_na]
+                        var_intensity_is = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                            file_smpl_short]["INCL"][var_is_i]
+                        var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                            file_smpl_short]["INCL"][var_is_i]
+                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                            file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                    except:
+                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                            file_smpl_short]["INCL"][var_na]
+                        var_intensity_is = self.container_intensity_corrected["SMPL"]["RAW"][
+                            file_smpl_short]["INCL"][var_is_i]
+                        var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                            file_smpl_short]["INCL"][var_is_i]
+                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                            file_smpl_short]["INCL"][var_na]
+
+                    val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
+                            var_sensitivity_is/var_sensitivity_na)), 4)
 
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                 if file_smpl_short in self.container_files["SMPL"]:
@@ -28637,6 +28733,32 @@ class PySILLS(tk.Frame):
         start_chlorides = 1
         n_header = 16
 
+        if self.init_fi_massbalance == False:
+            var_filetype = "None"
+            var_file_short = "None"
+            var_file_long = "None"
+            var_focus = "None"
+            if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
+                    self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
+                list_datatype = ["RAW"]
+            else:
+                list_datatype = ["RAW", "SMOOTHED"]
+
+            for var_datatype in list_datatype:
+                # Intensity Analysis
+                self.get_intensity(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_focus=var_focus, mode="All")
+                self.fi_get_intensity_corrected(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_focus=var_focus, mode="All")
+                # Sensitivity Results
+                self.get_analytical_sensitivity(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+
+            self.init_fi_massbalance = True
+
         ## Labels sex
         lbl_01 = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row, column_id=start_column, n_rows=1,
@@ -28658,7 +28780,8 @@ class PySILLS(tk.Frame):
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header - 10, n_rows=1,
             n_columns=n_header - (n_header - 10), fg=self.bg_colors["Dark Font"],
             bg=self.accent_color).create_simple_button(
-            text="Guess the composition", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Guess the composition", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.guess_salt_composition)
 
         ## Option Menus
         opt_05a = SE(
@@ -28718,7 +28841,11 @@ class PySILLS(tk.Frame):
         vsb_01.pack(side="right", fill="y")
         text_01.pack(side="left", fill="both", expand=True)
 
+        self.helper_salt_selection = {}
         for salt in list_salts:
+            if salt not in self.helper_salt_selection:
+                self.helper_salt_selection[salt] = 0
+
             if salt not in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
                 self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt] = {
                     "State": tk.IntVar(), "Weight": tk.StringVar()}
@@ -28727,45 +28854,61 @@ class PySILLS(tk.Frame):
 
             cb_i = tk.Checkbutton(
                 master=frm_01, text=salt+"\t", fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"],
-                variable=self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"])
+                variable=self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"],
+                command=self.fi_check_elements_checkbutton)
             text_01.window_create("end", window=cb_i)
             text_01.insert("end", "\t")
 
             entr_i = tk.Entry(
                 frm_01, textvariable=self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"],
-                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
+                width=5, highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_01.window_create("insert", window=entr_i)
             text_01.insert("end", "\t")
 
             element = dict_salts[salt]
-            ratio_i = []
+            incl_i = []
+            incl_na = []
             for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                 list_isotopes = self.container_lists["Measured Elements"][file_smpl_short][element]
+                list_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"]
                 if index == 0:
                     text = ""
                     for isotope in list_isotopes:
                         text += isotope + ","
                     text = text[:-1]
 
+                for isotope_na in list_na:
+                    intensity_incl_na = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        isotope_na]
+                    if intensity_incl_na != None:
+                        incl_na.append(intensity_incl_na)
+                    else:
+                        incl_na.append(0.0)
+
                 for isotope in list_isotopes:
                     intensity_incl_i = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["INCL"][
                         isotope]
-                    intensity_mat_i = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["MAT"][isotope]
-                    if intensity_mat_i != None and intensity_incl_i != None:
-                        if intensity_mat_i > 0:
-                            ratio_i.append(intensity_incl_i/intensity_mat_i)
+                    if intensity_incl_i != None:
+                        if intensity_incl_i > 0:
+                            incl_i.append(intensity_incl_i)
                         else:
-                            ratio_i.append(0.0)
+                            incl_i.append(0.0)
                     else:
-                        ratio_i.append(0.0)
+                        incl_i.append(0.0)
 
-            ratio_i = round(np.mean(ratio_i), 1)
+            incl_i = round(np.mean(incl_i), 1)
+            incl_na = round(np.mean(incl_na), 1)
+            if incl_na > 0:
+                magic_factor = round((incl_i/incl_na)*1000, 1)
+            else:
+                magic_factor = 0.0
+            self.helper_salt_selection[salt] = magic_factor
 
             lbl_i = tk.Label(frm_01, text=text+"\t", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_01.window_create("end", window=lbl_i)
             text_01.insert("end", "\t")
 
-            lbl2_i = tk.Label(frm_01, text=ratio_i, bg=self.bg_colors["Very Light"],
+            lbl2_i = tk.Label(frm_01, text=magic_factor, bg=self.bg_colors["Very Light"],
                               fg=self.bg_colors["Dark Font"])
             text_01.window_create("end", window=lbl2_i)
             text_01.insert("end", "\n")
@@ -28796,7 +28939,7 @@ class PySILLS(tk.Frame):
 
             opt_is_i = tk.OptionMenu(
                 frm_02, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"],
-                *self.container_lists["ISOTOPES"])
+                *self.container_lists["Measured Isotopes"][file_smpl_short])
             opt_is_i["menu"].config(fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                                     activeforeground=self.bg_colors["Dark Font"],
                                     activebackground=self.accent_color)
@@ -28810,7 +28953,7 @@ class PySILLS(tk.Frame):
 
             entr_i = tk.Entry(
                 frm_02, textvariable=self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
-                    file_smpl_short], width=10, highlightthickness=0, bg=self.bg_colors["White"],
+                    file_smpl_short], width=5, highlightthickness=0, bg=self.bg_colors["White"],
                 fg=self.bg_colors["Dark Font"])
             entr_i.bind("<Return>", lambda event, var_entr=self.container_var[key_setting]["Salt Correction"][
                 "Salinity SMPL"][file_smpl_short], mode="specific", var_file=file_smpl:
@@ -28819,10 +28962,25 @@ class PySILLS(tk.Frame):
             text_02.insert("end", "\t")
 
             entr_i = tk.Entry(
-                frm_02, textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"], width=15,
+                frm_02, textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"], width=10,
                 highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
+
+        ## INITIALIZATION
+        self.fi_check_elements_checkbutton()
+
+    def guess_salt_composition(self):
+        if self.pysills_mode == "FI":
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
+        for salt, value in self.helper_salt_selection.items():
+            if value >= 10:
+                self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"].set(1)
+
+        self.fi_check_elements_checkbutton()
 
     def fi_mass_balance(self):
         self.fi_mass_balance_new()
