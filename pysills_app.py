@@ -2060,6 +2060,64 @@ class PySILLS(tk.Frame):
             for var_srm in helper_list:
                 self.fill_srm_values(var_srm=var_srm)
 
+    def load_data_as_dataframe(self, filename_short, filename_long):
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
+        else:
+            df_data = self.container_measurements["Dataframe"][filename_short]
+
+        times = DE().get_times(dataframe=df_data)
+
+        return df_data, times
+
+    def build_container_measurements(self, filetype, filename_short):
+        index_filename = self.container_lists[filetype]["Short"].index(filename_short)
+        filename_long = self.container_lists[filetype]["Long"][index_filename]
+
+        self.container_measurements["RAW"][filename_short] = {}
+        self.container_measurements["EDITED"][filename_short] = {}
+        self.container_measurements["SELECTED"][filename_short] = {}
+        self.container_measurements["SELECTED"][filename_short]["RAW"] = {}
+        self.container_measurements["SELECTED"][filename_short]["SMOOTHED"] = {}
+
+        df_data, times = self.load_data_as_dataframe(filename_short=filename_short, filename_long=filename_long)
+
+        self.container_measurements["RAW"][filename_short]["Time"] = times.tolist()
+        self.container_measurements["EDITED"][filename_short]["Time"] = times.tolist()
+        self.container_measurements["SELECTED"][filename_short]["Time"] = times.tolist()
+
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+        for isotope in file_isotopes:
+            self.container_measurements["RAW"][filename_short][isotope] = df_data[isotope].tolist()
+            self.container_measurements["EDITED"][filename_short][isotope] = {}
+            self.container_measurements["SELECTED"][filename_short]["RAW"][isotope] = {}
+            self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope] = {}
+            self.container_measurements["EDITED"][filename_short][isotope]["BG"] = []
+            self.container_measurements["SELECTED"][filename_short]["RAW"][isotope]["BG"] = []
+            self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["BG"] = []
+
+            if self.pysills_mode == "MA":
+                self.container_measurements["EDITED"][filename_short][isotope]["MAT"] = []
+                self.container_measurements["SELECTED"][filename_short]["RAW"][isotope]["MAT"] = []
+                self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
+                self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
+            elif self.pysills_mode in ["FI", "MI"]:
+                self.container_measurements["EDITED"][filename_short][isotope]["MAT"] = []
+                self.container_measurements["SELECTED"][filename_short]["RAW"][isotope]["MAT"] = []
+                self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
+                self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
+                self.container_measurements["EDITED"][filename_short][isotope]["INCL"] = []
+                self.container_measurements["SELECTED"][filename_short]["RAW"][isotope]["INCL"] = []
+                self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["INCL"] = []
+                self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["INCL"] = []
+
     def spike_elimination_all(self, filetype, algorithm, mode="MA"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
@@ -4016,7 +4074,7 @@ class PySILLS(tk.Frame):
             else:
                 pass
 
-    def do_spike_elimination_all_grubbs(self, filetype):
+    def do_spike_elimination_all_grubbs(self, filetype, spike_elimination_performed=True):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
         elif self.pysills_mode == "FI":
@@ -4079,28 +4137,32 @@ class PySILLS(tk.Frame):
                                                           interval[0]:interval[1]]
                                             dataset_complete = self.container_measurements["RAW"][file_std][isotope]
 
-                                            if var_method == 0:
-                                                data_smoothed, indices_outl = GrubbsTestSILLS(
-                                                    raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                                    start_index=interval[0],
-                                                    dataset_complete=dataset_complete).determine_outlier()
-                                            elif var_method == 1:
-                                                data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
-                                                    alpha=var_alpha, dataset_complete=dataset_complete,
-                                                    threshold=var_threshold)
+                                            if spike_elimination_performed == True:
+                                                if var_method == 0:
+                                                    data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                        raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                        start_index=interval[0],
+                                                        dataset_complete=dataset_complete).determine_outlier()
+                                                elif var_method == 1:
+                                                    data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                        alpha=var_alpha, dataset_complete=dataset_complete,
+                                                        threshold=var_threshold)
+                                            else:
+                                                data_smoothed = dataset_raw
+                                                indices_outl = []
 
                                             self.container_measurements["EDITED"][file_std][isotope][
                                                 "Uncut"] = data_smoothed
-                                            #
+
                                             self.container_spikes[file_std][isotope] = {
                                                 "Data RAW": self.container_measurements["RAW"][file_std][isotope],
                                                 "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
                                                 "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
-                                        #
+
                                         for var_index in indices_outl:
                                             self.container_spikes["Selection"][file_std][isotope][
                                                 var_index] = data_smoothed[var_index]
-                                        #
+
                                     else:
                                         pass
                                 else:
@@ -4113,8 +4175,20 @@ class PySILLS(tk.Frame):
                         else:
                             if isotope not in not_corrected_isotopes:
                                 not_corrected_isotopes.append(isotope)
-                                self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = \
-                                    self.container_measurements["RAW"][file_std][isotope]
+                                if "Uncut" not in self.container_measurements["EDITED"][file_std][isotope]:
+                                    self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = None
+
+                                if file_std not in self.container_measurements["RAW"]:
+                                    self.build_container_measurements(filetype=filetype, filename_short=file_std)
+
+                                self.container_measurements["EDITED"][file_std][isotope]["Uncut"] = (
+                                    self.container_measurements["RAW"][file_std][isotope])
+
+                                self.container_spikes[file_std][isotope] = {
+                                    "Data RAW": self.container_measurements["RAW"][file_std][isotope],
+                                    "Data SMOOTHED": self.container_measurements["RAW"][file_std][isotope],
+                                    "Indices": [],
+                                    "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
                             else:
                                 pass
             # Fill container_spike_values
@@ -4182,16 +4256,20 @@ class PySILLS(tk.Frame):
                                                               interval[0]:interval[1]]
 
                                             dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
-                                            if var_method == 0:
-                                                data_smoothed, indices_outl = GrubbsTestSILLS(
-                                                    raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
-                                                    start_index=interval[0],
-                                                    dataset_complete=dataset_complete).determine_outlier()
-                                            elif var_method == 1:
-                                                data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
-                                                    alpha=var_alpha, dataset_complete=dataset_complete,
-                                                    threshold=var_threshold)
-                                            #
+                                            if spike_elimination_performed == True:
+                                                if var_method == 0:
+                                                    data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                        raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                        start_index=interval[0],
+                                                        dataset_complete=dataset_complete).determine_outlier()
+                                                elif var_method == 1:
+                                                    data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                        alpha=var_alpha, dataset_complete=dataset_complete,
+                                                        threshold=var_threshold)
+                                            else:
+                                                data_smoothed = dataset_raw
+                                                indices_outl = []
+
                                             if self.pysills_mode == "FI":
                                                 if self.container_var[key_setting][
                                                     "Spike Elimination Inclusion"].get() == 2:
@@ -4244,8 +4322,21 @@ class PySILLS(tk.Frame):
                         else:
                             if isotope not in not_corrected_isotopes:
                                 not_corrected_isotopes.append(isotope)
+
+                                if "Uncut" not in self.container_measurements["EDITED"][file_smpl][isotope]:
+                                    self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = None
+
+                                if file_smpl not in self.container_measurements["RAW"]:
+                                    self.build_container_measurements(filetype=filetype, filename_short=file_smpl)
+
                                 self.container_measurements["EDITED"][file_smpl][isotope]["Uncut"] = \
                                     self.container_measurements["RAW"][file_smpl][isotope]
+
+                                self.container_spikes[file_smpl][isotope] = {
+                                    "Data RAW": self.container_measurements["RAW"][file_smpl][isotope],
+                                    "Data SMOOTHED": self.container_measurements["RAW"][file_smpl][isotope],
+                                    "Indices": [],
+                                    "Times": self.container_measurements["SELECTED"][file_smpl]["Time"]}
                             else:
                                 pass
             # Fill container_spike_values
@@ -15550,23 +15641,24 @@ class PySILLS(tk.Frame):
                              linewidth=var_lw, visible=True)
             self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                 "RAW"] = ln_raw
-            #
-            if isotope in self.container_measurements["EDITED"][str_filename_short]:
-                if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
-                    ln_smoothed = ax.plot(
-                        self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope]["Uncut"],
-                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                    self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                        "SMOOTHED"] = ln_smoothed
-                    self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(
-                        1)
-                    #
-        #
+
+            if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
+                if isotope in self.container_measurements["EDITED"][str_filename_short]:
+                    if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
+                        ln_smoothed = ax.plot(
+                            self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
+                                "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                            visible=True)
+                        self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
+                            isotope]["SMOOTHED"] = ln_smoothed
+                        self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
+                            isotope].set(1)
+
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
         else:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
-        #
+
         if len(var_check_bg) > 0:
             if self.pysills_mode in ["MA", "FI", "MI"]:
                 critical_id = []
@@ -15713,7 +15805,7 @@ class PySILLS(tk.Frame):
                 for var_id in critical_id:
                     self.container_helper[str_filetype][str_filename_short]["INCL"]["Indices"].remove(var_id)
                     del self.container_helper[str_filetype][str_filename_short]["INCL"]["Content"][var_id]
-        #
+
         ax.grid(True)
         ax.set_yscale("log")
         ax.set_xlim(left=0, right=x_max)
@@ -15735,7 +15827,6 @@ class PySILLS(tk.Frame):
             "button_press_event", lambda event, var_type=str_filetype, var_file_short=str_filename_short:
             self.ma_add_interval_to_diagram(var_type, var_file_short, event))
 
-    #
     def ma_show_time_ratio_diagram(self, var_file, var_type):
         parts = var_file.split("/")
         var_file_short = parts[-1]
@@ -17113,6 +17204,10 @@ class PySILLS(tk.Frame):
     ## Data Reduction ##
     ####################
 
+    def accept_no_spike_elimination(self):
+        self.do_spike_elimination_all_grubbs(filetype="STD", spike_elimination_performed=False)
+        self.do_spike_elimination_all_grubbs(filetype="SMPL", spike_elimination_performed=False)
+
     def get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus=None, mode="Specific", check=False):
         """ Collect the signal intensities from all defined calculation intervals.
         -------
@@ -17158,6 +17253,9 @@ class PySILLS(tk.Frame):
                 bool_intervalstack = False
             else:
                 bool_intervalstack = True
+
+            if var_file_short not in self.container_spikes:
+                self.accept_no_spike_elimination()
 
             IQ(dataframe=self.container_spikes[var_file_short], project_type=self.pysills_mode,
                results_container=self.container_intensity[var_filetype][var_datatype][
@@ -25272,6 +25370,12 @@ class PySILLS(tk.Frame):
                     command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
                                    var_isotope=isotope: self.fi_change_line_visibility(
                         var_type, var_file_short, var_datatype, var_isotope))
+
+                if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
+                    cb_smoothed_i.configure(state="disabled")
+                else:
+                    cb_smoothed_i.configure(state="normal")
+
                 text_iso.window_create("end", window=cb_smoothed_i)
                 text_iso.insert("end", "\n")
 
@@ -25384,13 +25488,16 @@ class PySILLS(tk.Frame):
                 self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                     "RAW"] = ln_raw
 
-                if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
-                    ln_smoothed = ax.plot(
-                        self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope]["Uncut"],
-                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                    self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                        "SMOOTHED"] = ln_smoothed
-                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
+                if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
+                    if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
+                        ln_smoothed = ax.plot(
+                            self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
+                                "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                            visible=True)
+                        self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                            "SMOOTHED"] = ln_smoothed
+                        self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                            isotope].set(1)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -30079,15 +30186,17 @@ class PySILLS(tk.Frame):
                 if file == "all" or file == var_file_short:
                     df_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                     for var_isotope in df_isotopes:
-                        list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
-                        if len(list_indices) > 0:
-                            for var_index in list_indices:
-                                value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][var_index]
-                                value_smoothed = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][
-                                    var_index]
-                                self.helper_spike_values(
-                                    var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
-                                    var_value_smoothed=value_smoothed, mode=mode)
+                        if var_isotope in self.container_spikes[var_file_short]:
+                            list_indices = self.container_spikes[var_file_short][var_isotope]["Indices"]
+                            if len(list_indices) > 0:
+                                for var_index in list_indices:
+                                    value_raw = self.container_spikes[var_file_short][var_isotope]["Data RAW"][
+                                        var_index]
+                                    value_smoothed = self.container_spikes[var_file_short][var_isotope][
+                                        "Data SMOOTHED"][var_index]
+                                    self.helper_spike_values(
+                                        var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
+                                        var_value_smoothed=value_smoothed, mode=mode)
 
     def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
