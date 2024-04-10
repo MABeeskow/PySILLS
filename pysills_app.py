@@ -9086,7 +9086,7 @@ class PySILLS(tk.Frame):
             self.srm_isotopes
         except:
             self.srm_isotopes = {}
-            for isotope in self.container_lists["ISOTOPES"]:
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
                 self.srm_isotopes[isotope] = {}
                 var_srm = self.container_var["SRM"][isotope].get()
                 key_element = re.search("(\D+)(\d+)", isotope)
@@ -9138,7 +9138,7 @@ class PySILLS(tk.Frame):
 
         if len(self.gui_subwindows["Mineral Analysis"]["Check IS"]["Label"]["Permanent"]) > 0:
             gui_elements = ["Label", "Entry", "Option Menu"]
-            #
+
             for gui_element in gui_elements:
                 self.gui_subwindows["Mineral Analysis"]["Check IS"][gui_element]["Permanent"].clear()
 
@@ -9171,7 +9171,7 @@ class PySILLS(tk.Frame):
                 text_iso.insert("end", "\t")
 
                 if len(self.container_lists["Possible IS"]) == 0:
-                    var_list_is = self.container_lists["ISOTOPES"]
+                    var_list_is = self.container_lists["Measured Isotopes"][file_smpl]
                 else:
                     var_list_is = self.container_lists["Possible IS"]
 
@@ -9206,28 +9206,30 @@ class PySILLS(tk.Frame):
             else:
                 var_text_smpl = "Select IS"
 
+            var_list_is = self.container_lists["Measured Isotopes"]["All"]
+
             opt_smpl_def = SE(
                 parent=window_issetup, row_id=16, column_id=8, n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_option_isotope(
                 var_iso=self.container_var["IS"]["Default SMPL"], option_list=var_list_is,
-                text_set=var_text_smpl, fg_active=self.green_dark, bg_active=self.red_dark,
+                text_set=var_text_smpl, fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
                 command=lambda var_is=self.container_var["IS"]["Default SMPL"]: self.change_is_setup(var_is))
 
             self.gui_subwindows["Mineral Analysis"]["Check IS"]["Option Menu"]["Permanent"].append(opt_smpl_def)
-            #
+
             ## Entry
             if self.container_var["IS SMPL Default"].get() != "0.0":
                 var_txt_default_smpl = self.container_var["IS SMPL Default"].get()
             else:
                 var_txt_default_smpl = "0.0"
-            #
+
             entr_smpl_def = SE(
                 parent=window_issetup, row_id=16, column_id=14, n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var["IS SMPL Default"], text_default=var_txt_default_smpl,
                 command=lambda event, var_entr=self.container_var["IS SMPL Default"]:
                 self.change_is_value_default(var_entr, event))
-            #
+
             self.gui_subwindows["Mineral Analysis"]["Check IS"]["Entry"]["Permanent"].append(entr_smpl_def)
 
     def change_is_value_default(self, var_entr, event):
