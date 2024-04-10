@@ -15531,7 +15531,7 @@ class PySILLS(tk.Frame):
                     self.index_file_std = 0
             elif mode == "back":
                 self.index_file_std -= 1
-                if self.index_file_std <= 0:
+                if self.index_file_std < 0:
                     self.index_file_std = len(self.container_lists[filetype]["Long"]) - 1
             filename_long = self.container_lists[filetype]["Long"][self.index_file_std]
         elif filetype == "SMPL":
@@ -15541,7 +15541,7 @@ class PySILLS(tk.Frame):
                     self.index_file_smpl = 0
             elif mode == "back":
                 self.index_file_smpl -= 1
-                if self.index_file_smpl <= 0:
+                if self.index_file_smpl < 0:
                     self.index_file_smpl = len(self.container_lists[filetype]["Long"]) - 1
             filename_long = self.container_lists[filetype]["Long"][self.index_file_smpl]
 
