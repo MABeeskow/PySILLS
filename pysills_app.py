@@ -21141,11 +21141,12 @@ class PySILLS(tk.Frame):
                                 var_file_short]["MAT"][var_host_is]
                             var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
 
-                            var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
-                                isotope]
+                            var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                "BG"][isotope]
                             var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                 "MAT"][isotope]
-                            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][isotope]
+                            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+                                isotope]
                             var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short]["N MAT"][
                                 isotope]
                             var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
@@ -21937,9 +21938,11 @@ class PySILLS(tk.Frame):
                     break
             else:
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+
             var_concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short][var_focus][
                 var_is]
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
             for isotope in file_isotopes:
                 var_concentration_i = self.container_concentration[var_filetype][var_datatype][var_file_short][
                     var_focus][isotope]
@@ -22650,7 +22653,6 @@ class PySILLS(tk.Frame):
     def fi_show_diagrams_intensity(self):
         pass
 
-    #
     def show_diagrams_sensitivity(self):
         ## Window Settings
         window_width = 1400
@@ -28734,6 +28736,8 @@ class PySILLS(tk.Frame):
                 helper_molalities_na[file_smpl_short] = {"Na": b_na, "Cl": b_cl}
 
                 self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(val_concentration_incl_is)
+                self.container_var["SMPL"][file_smpl_long]["IS Data"][var_datatype]["Concentration"].set(
+                    val_concentration_incl_is)
 
             #     print(file_smpl_short)
             #     print("Species input:", self.dict_species_pypitzer[var_datatype][file_smpl_short])
