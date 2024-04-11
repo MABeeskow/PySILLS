@@ -1128,9 +1128,12 @@ class PySILLS(tk.Frame):
              ["USGS GSD-1G (GeoReM)"], ["USGS GSE-1G (GeoReM)"], ["B6"], ["Durango Apatite"], ["Scapolite 17"],
              ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
              ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0]
-        self.path_pysills = os.getcwd()
+        self.path_pysills = os.path.dirname(os.path.realpath(sys.argv[0]))
         helper_srm_library = []
-        helper_srm_library = os.listdir(self.path_pysills + str("/lib/srm/"))
+        try:
+            helper_srm_library = os.listdir(self.path_pysills + str("/lib/srm/"))
+        except:
+            helper_srm_library = os.listdir(self.path_pysills + str("/PycharmProjects/PySILLS_Github") + str("/lib/srm/"))
         helper_srm_library.remove("__init__.py")
         try:
             helper_srm_library.remove(".DS_Store")
@@ -1174,8 +1177,15 @@ class PySILLS(tk.Frame):
             self.container_lists["SRM Library"].append(var_srm_new)
 
         helper_icpms_library = []
-        helper_icpms_library = os.listdir(self.path_pysills + str("/lib/icpms/"))
-        helper_icpms_library.remove("__init__.py")
+        try:
+            helper_icpms_library = os.listdir(self.path_pysills + str("/lib/icpms/"))
+        except:
+            helper_icpms_library = os.listdir(self.path_pysills + str("/PycharmProjects/PySILLS_Github") + str("/lib/icpms/"))
+
+        if "__init__.py" in helper_icpms_library:
+            helper_icpms_library.remove("__init__.py")
+        if ".DS_Store" in helper_icpms_library:
+            helper_icpms_library.remove(".DS_Store")
         try:
             helper_icpms_library.remove(".DS_Store")
         except:
@@ -1336,7 +1346,7 @@ class PySILLS(tk.Frame):
         #
         ## USER SETTINGS
         try:
-            file_usersettings = open("user_settings.txt", "r")
+            file_usersettings = open(self.path_pysills + str("/user_settings.txt"), "r")
             for index, file_data in enumerate(file_usersettings):
                 file_data_splitted = file_data.split(";")
                 try:
@@ -1381,7 +1391,7 @@ class PySILLS(tk.Frame):
 
         ## Logo
         try:
-            self.path_pysills = os.getcwd()
+            #self.path_pysills = os.getcwd()
             pysills_logo = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Logo.png"))
             pysills_logo = pysills_logo.subsample(1, 1)
             img = tk.Label(self.parent, image=pysills_logo, bg=background_color_header)
@@ -1700,6 +1710,7 @@ class PySILLS(tk.Frame):
 
     def select_icp_ms(self, var_opt):
         path = os.getcwd()
+        path = self.path_pysills
 
         if self.file_loaded == False:
             if self.demo_mode:
@@ -9896,15 +9907,14 @@ class PySILLS(tk.Frame):
 
     def confirm_general_settings(self):
         path_pysills = os.path.dirname(os.path.realpath(__file__))
+        path_pysills = self.path_pysills
         filename = os.path.join(path_pysills, "user_settings.txt")
         with open(filename, "w") as file_settings:
             file_settings.write("GENERAL SETTINGS" + ";\n")
-            #
             for key, value in self.container_var["General Settings"].items():
                 str_key = str(key) + ";" + str(value.get()) + ";\n"
                 file_settings.write(str_key)
 
-    #
     def check_srm_settings(self):
         ## Window Settings
         window_width = 640
@@ -11228,6 +11238,7 @@ class PySILLS(tk.Frame):
         """Main settings window of a mineral analysis project."""
         if self.file_system_need_update:
             path = os.getcwd()
+            path = self.path_pysills
             parent = os.path.dirname(path)
 
             if self.demo_mode:
@@ -19951,6 +19962,7 @@ class PySILLS(tk.Frame):
     def fi_settings(self):
         if self.file_system_need_update:
             path = os.getcwd()
+            path = self.path_pysills
             parent = os.path.dirname(path)
             if self.demo_mode:
                 self.var_opt_icp.set("Agilent 7900s")
@@ -20283,6 +20295,7 @@ class PySILLS(tk.Frame):
     def mi_settings(self):
         if self.file_system_need_update:
             path = os.getcwd()
+            path = self.path_pysills
             parent = os.path.dirname(path)
             if self.demo_mode:
                 self.var_opt_icp.set("PerkinElmer Syngistix")

@@ -6,12 +6,12 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		10.08.2023
+# Date:		11.04.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES
-import re, os
+import re, os, sys
 import tkinter as tk
 import numpy as np
 from modules import data
@@ -325,7 +325,7 @@ class Essentials:
         A = np.vstack([x, np.ones(len(x))]).T
         m, c = np.linalg.lstsq(A, y, rcond=None)[0] # m*x + c
         xi_opt[var_i] = [m, c]
-#
+
 class EssentialsSRM:
     #
     def __init__(self):
@@ -334,13 +334,15 @@ class EssentialsSRM:
     def place_srm_values(self, srm_name, srm_dict):
         path = os.getcwd()
         parent = os.path.dirname(path)
-        #
+        path = os.path.dirname(os.path.realpath(sys.argv[0]))
         try:
             path_app = os.getcwd()
             path = os.path.dirname(path_app)
+            path = os.path.dirname(os.path.realpath(sys.argv[0]))
             data_srm = data.general().importSRM(filename=path + str("/lib/srm/NIST_606.csv"))
         except:
             path = os.getcwd()
+            path = os.path.dirname(os.path.realpath(sys.argv[0]))
             data_srm = data.general().importSRM(filename=path + str("/lib/srm/NIST_606.csv"))
         #
         if srm_name == "NIST 606":
