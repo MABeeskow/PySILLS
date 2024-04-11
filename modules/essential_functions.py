@@ -138,7 +138,7 @@ class Essentials:
     #
     def do_grubbs_test(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
         dataset = self.variable
-        #
+
         outlier_indices_pre = two_sided_test_indices(data=dataset, alpha=alpha)
         outlier_values_pre = two_sided_test_outliers(data=dataset, alpha=alpha)
         outlier_indices = []
@@ -146,7 +146,7 @@ class Essentials:
             if value > threshold:
                 outlier_indices.append(outlier_indices_pre[index])
         outlier_indices.sort()
-        #
+
         data_smoothed = []
         for index, value in enumerate(dataset_complete):
             if value > threshold:
@@ -154,18 +154,58 @@ class Essentials:
                     average_dataset_new = self.determine_surrounded_values(
                         dataset_complete=dataset_complete, index=index)
                     if value in average_dataset_new["All"]:
-                        var_index = average_dataset_new["All"].index(value)
-                        value_popped = average_dataset_new["All"].pop(var_index)
-                        value_corrected = np.mean(average_dataset_new["SP"])
+                        value_corrected = np.min(average_dataset_new["SP"])
                         data_smoothed.append(value_corrected)
                 else:
                     data_smoothed.append(value)
             else:
                 data_smoothed.append(value)
-        #
+
         return data_smoothed, outlier_indices
 
+    def determine_surrounding_values(self, dataset_complete, index_poi):
+        # POI   - Point Of Interest
+        # SP    - Surrounding Points
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = dataset_complete[index_poi]
+        helper_values["POI"] = val_poi
+        n_data = len(dataset_complete)
+
+        if 1 < index_poi and index_poi < n_data - 3:
+            val_prev_2 = dataset_complete[index_poi - 2]
+            val_prev_1 = dataset_complete[index_poi - 1]
+            val_next_1 = dataset_complete[index_poi + 1]
+            val_next_2 = dataset_complete[index_poi + 2]
+            helper_values["SP"] = [val_prev_2, val_prev_1, val_next_1, val_next_2]
+            helper_values["All"] = [val_prev_2, val_prev_1, val_poi, val_next_1, val_next_2]
+        elif index_poi == 0:
+            val_next_1 = dataset_complete[index_poi + 1]
+            val_next_2 = dataset_complete[index_poi + 2]
+            helper_values["SP"] = [val_next_1, val_next_2]
+            helper_values["All"] = [val_poi, val_next_1, val_next_2]
+        elif index_poi == n_data - 1:
+            val_prev_2 = dataset_complete[index_poi - 2]
+            val_prev_1 = dataset_complete[index_poi - 1]
+            helper_values["SP"] = [val_prev_2, val_prev_1]
+            helper_values["All"] = [val_prev_2, val_prev_1, val_poi]
+        elif index_poi == 1:
+            val_prev_1 = dataset_complete[index_poi - 1]
+            val_next_1 = dataset_complete[index_poi + 1]
+            val_next_2 = dataset_complete[index_poi + 2]
+            helper_values["SP"] = [val_prev_1, val_next_1, val_next_2]
+            helper_values["All"] = [val_prev_1, val_poi, val_next_1, val_next_2]
+        elif index_poi == n_data - 2:
+            val_prev_2 = dataset_complete[index_poi - 2]
+            val_prev_1 = dataset_complete[index_poi - 1]
+            val_next_1 = dataset_complete[index_poi + 1]
+            helper_values["SP"] = [val_prev_2, val_prev_1, val_next_1]
+            helper_values["All"] = [val_prev_2, val_prev_1, val_poi, val_next_1]
+
+        return helper_values
+
     def determine_surrounded_values(self, dataset_complete, index, stepsize=4):
+        # POI   - Point Of Interest
+        # SP    - Surrounding Points
         helper_values = {"POI": 0, "SP": [], "All": []}
         val_poi = dataset_complete[index]
         helper_values["POI"] = val_poi
@@ -189,77 +229,95 @@ class Essentials:
         indices_outl = []
         data_corrected = []
         helper_interval = np.arange(interval[0], interval[1])
-        for i in range(0, len(data)):
-            if i == 0:
-                data_ref = []
-                data_ref.extend(data[1:3])
-                data_ref = np.mean(data_ref)
-            elif i == 1:
-                data_ref = []
-                data_ref.extend(data[0:1])
-                data_ref.extend(data[2:4])
-                data_ref = np.mean(data_ref)
-            elif i >= 2 and i <= len(data)-3:
-                data_ref = []
-                data_ref.extend(data[i-2:i])
-                data_ref.extend(data[i+1:i+3])
-                data_ref = np.mean(data_ref)
-            elif i == len(data)-2:
-                data_ref = []
-                data_ref.extend(data[i-2:i])
-                data_ref.extend(data[i+1:i+2])
-                data_ref = np.mean(data_ref)
-            elif i == len(data)-1:
-                data_ref = []
-                data_ref.extend(data[i-2:i])
-                data_ref = np.mean(data_ref)
-            if isinstance(data, list):
-                data_invest = data[i]
-            else:
-                data_invest = data.iloc[i]
-            #if data.iloc[i] >= threshold:
-            if data_invest >= threshold:
-                if data_invest > data_ref*(1+limit/100) and data_invest > data_ref:
-                    n_outl += 1
-                    indices_outl.append(helper_interval[i])
-                    if i == 0:
-                        data_corrected.append(data_ref)
-                    elif i == 1:
-                        data_corrected.append(data_ref)
-                    elif i >= 2 and i <= len(data)-3:
-                        data_corrected.append(data_ref)
-                    elif i == len(data)-2:
-                        data_corrected.append(data_ref)
-                    elif i == len(data)-1:
-                        data_corrected.append(data_ref)
-                elif data_invest < data_ref*(1-limit/100) and data_invest < data_ref:
-                    n_outl += 1
-                    indices_outl.append(helper_interval[i])
-                    if i == 0:
-                        data_corrected.append(data_ref)
-                    elif i == 1:
-                        data_corrected.append(data_ref)
-                    elif i >= 2 and i <= len(data)-3:
-                        data_corrected.append(data_ref)
-                    elif i == len(data)-2:
-                        data_corrected.append(data_ref)
-                    elif i == len(data)-1:
-                        data_corrected.append(data_ref)
+
+        outlier_indices_pre = two_sided_test_indices(data=data, alpha=limit)
+        outlier_values_pre = two_sided_test_outliers(data=data, alpha=limit)
+
+        outlier_indices = []
+        for index, value in enumerate(outlier_values_pre):
+            if value > threshold:
+                outlier_indices.append(outlier_indices_pre[index])
+        outlier_indices.sort()
+        limit = abs(100 - limit*100)
+        helper_outlier = {}
+
+        if len(outlier_indices) > 0:
+            for i in outlier_indices:
+                if i == 0:
+                    data_ref = []
+                    data_ref.extend(data[1:3])
+                    data_ref = np.min(data_ref)
+                elif i == 1:
+                    data_ref = []
+                    data_ref.extend(data[0:1])
+                    data_ref.extend(data[2:4])
+                    data_ref = np.min(data_ref)
+                elif i >= 2 and i <= len(data)-3:
+                    data_ref = []
+                    data_ref.extend(data[i-2:i])
+                    data_ref.extend(data[i+1:i+3])
+                    data_ref = np.min(data_ref)
+                elif i == len(data)-2:
+                    data_ref = []
+                    data_ref.extend(data[i-2:i])
+                    data_ref.extend(data[i+1:i+2])
+                    data_ref = np.min(data_ref)
+                elif i == len(data)-1:
+                    data_ref = []
+                    data_ref.extend(data[i-2:i])
+                    data_ref = np.min(data_ref)
+
+                if isinstance(data, list) or isinstance(data, np.ndarray):
+                    data_invest = data[i]
                 else:
-                    #data_corrected.append(data.iloc[i])
+                    data_invest = data.iloc[i]
+
+                if data_invest >= threshold:
+                    if data_invest > data_ref*(1+limit/100) and data_invest > data_ref:
+                        n_outl += 1
+                        indices_outl.append(helper_interval[i])
+                        if i == 0:
+                            data_corrected.append(data_ref)
+                        elif i == 1:
+                            data_corrected.append(data_ref)
+                        elif i >= 2 and i <= len(data)-3:
+                            data_corrected.append(data_ref)
+                        elif i == len(data)-2:
+                            data_corrected.append(data_ref)
+                        elif i == len(data)-1:
+                            data_corrected.append(data_ref)
+                        helper_outlier[i] = data_ref
+                    elif data_invest < data_ref*(1-limit/100) and data_invest < data_ref:
+                        n_outl += 1
+                        indices_outl.append(helper_interval[i])
+                        if i == 0:
+                            data_corrected.append(data_ref)
+                        elif i == 1:
+                            data_corrected.append(data_ref)
+                        elif i >= 2 and i <= len(data)-3:
+                            data_corrected.append(data_ref)
+                        elif i == len(data)-2:
+                            data_corrected.append(data_ref)
+                        elif i == len(data)-1:
+                            data_corrected.append(data_ref)
+                        helper_outlier[i] = data_ref
+                    else:
+                        data_corrected.append(data_invest)
+                else:
                     data_corrected.append(data_invest)
-            else:
-                #data_corrected.append(data.iloc[i])
-                data_corrected.append(data_invest)
-        #
-        data_smoothed = np.array(data_total[isotope])
-        data_smoothed[interval[0]:interval[1]] = data_corrected
-        data_smoothed.tolist()
-        #data_smoothed = data_total[isotope].replace(
-        #    data_total[isotope][interval[0]:interval[1]].tolist(), data_corrected)
-        #
+
+            data_smoothed = np.array(data_total[isotope])
+
+            for index, value_outlier in helper_outlier.items():
+                data_smoothed[index] = value_outlier
+
+            data_smoothed.tolist()
+        else:
+            data_smoothed = np.array(data_total[isotope])
+            data_smoothed.tolist()
+
         return data_smoothed, indices_outl
-    #
+
     def calculate_sensitivity_regression(self, xi_time, var_i, xi_opt):
         xi_time = np.array(xi_time[var_i])
         x = xi_time[:, 0]
