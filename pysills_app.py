@@ -1465,9 +1465,9 @@ class PySILLS(tk.Frame):
 
         # RADIOBUTTONS
         if self.var_language == "English":
-            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Output Analysis"]
+            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions"]
         elif self.var_language == "German":
-            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse", "Output Analysis"]
+            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse"]
 
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
