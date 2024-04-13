@@ -4140,10 +4140,10 @@ class PySILLS(tk.Frame):
                     for isotope in file_isotopes:
                         if bool(self.spikes_isotopes[filetype][file_std]):
                             for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_std].items():
-                                #
+
                                 if isotope_spiked not in self.container_spikes["Selection"][file_std]:
                                     self.container_spikes["Selection"][file_std][isotope_spiked] = {}
-                                #
+
                                 if isotope in isotopes_spiked_list:
                                     if isotope not in corrected_isotopes:
                                         corrected_isotopes.append(isotope)
@@ -4180,7 +4180,8 @@ class PySILLS(tk.Frame):
 
                                             self.container_spikes[file_std][isotope] = {
                                                 "Data RAW": self.container_measurements["RAW"][file_std][isotope],
-                                                "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
+                                                "Data SMOOTHED": data_smoothed, "Data IMPROVED": data_smoothed, 
+                                                "Indices": indices_outl,
                                                 "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
 
                                         for var_index in indices_outl:
@@ -4211,6 +4212,7 @@ class PySILLS(tk.Frame):
                                 self.container_spikes[file_std][isotope] = {
                                     "Data RAW": self.container_measurements["RAW"][file_std][isotope],
                                     "Data SMOOTHED": self.container_measurements["RAW"][file_std][isotope],
+                                    "Data IMPROVED": self.container_measurements["RAW"][file_std][isotope],
                                     "Indices": [],
                                     "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
                             else:
@@ -4255,7 +4257,8 @@ class PySILLS(tk.Frame):
                     for isotope in df_isotopes:
                         if bool(self.spikes_isotopes[filetype][file_smpl]) == False and "_copy" in file_smpl:
                             file_smpl_original = file_smpl.replace("_copy", "")
-                            self.spikes_isotopes[filetype][file_smpl] = self.spikes_isotopes[filetype][file_smpl_original]
+                            self.spikes_isotopes[filetype][file_smpl] = self.spikes_isotopes[filetype][
+                                file_smpl_original]
                         if bool(self.spikes_isotopes[filetype][file_smpl]):
                             for isotope_spiked, intervals in self.spikes_isotopes[filetype][file_smpl].items():
                                 if isotope_spiked not in self.container_spikes["Selection"][file_smpl]:
@@ -4281,6 +4284,7 @@ class PySILLS(tk.Frame):
 
                                             dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
                                             dataset_complete_all = self.container_measurements["RAW"][file_smpl]
+
                                             if spike_elimination_performed == True:
                                                 if var_method == 0:
                                                     data_smoothed, indices_outl = GrubbsTestSILLS(
@@ -4288,7 +4292,8 @@ class PySILLS(tk.Frame):
                                                         start_index=interval[0],
                                                         dataset_complete=dataset_complete).determine_outlier()
                                                 elif var_method == 1:
-                                                    data_smoothed, indices_outl = ES(variable=dataset_raw).do_grubbs_test(
+                                                    data_smoothed, indices_outl = ES(
+                                                        variable=dataset_raw).do_grubbs_test(
                                                         alpha=var_alpha, dataset_complete=dataset_complete,
                                                         threshold=var_threshold)
                                                 elif var_method == 2:
@@ -4299,26 +4304,28 @@ class PySILLS(tk.Frame):
                                             else:
                                                 data_smoothed = dataset_raw
                                                 indices_outl = []
-
-                                            if self.pysills_mode == "FI":
+                                            
+                                            data_improved = data_smoothed.copy()
+                                            if self.pysills_mode in ["FI", "MI"]:
                                                 if self.container_var[key_setting][
                                                     "Spike Elimination Inclusion"].get() == 2:
                                                     length_incl_datasets = len(
                                                         self.container_helper["SMPL"][file_smpl]["INCL"]["Content"])
-                                                    #
                                                     if length_incl_datasets > 0:
-                                                        for key, items in self.container_helper["SMPL"][file_smpl]["INCL"][
-                                                            "Content"].items():
+                                                        for key, items in self.container_helper["SMPL"][file_smpl][
+                                                            "INCL"]["Content"].items():
                                                             var_indices = items["Indices"]
                                                             data_raw = self.container_measurements["RAW"][file_smpl][
                                                                 isotope]
-                                                            #
+
                                                             for index in range(var_indices[0], var_indices[1] + 1):
-                                                                data_smoothed[index] = data_raw[index]
+                                                                value_raw = data_raw[index]
+                                                                data_improved[index] = value_raw
 
                                             if (isotope not in self.container_measurements["EDITED"][file_smpl] and
                                                     "_copy" in file_smpl):
-                                                self.container_measurements["EDITED"][file_smpl][isotope] = {"Uncut": None}
+                                                self.container_measurements["EDITED"][file_smpl][isotope] = {
+                                                    "Uncut": None}
                                                 self.container_measurements["EDITED"][file_smpl][isotope][
                                                     "Uncut"] = data_smoothed
                                             else:
@@ -4328,18 +4335,19 @@ class PySILLS(tk.Frame):
                                             if ("Time" not in self.container_measurements["SELECTED"][file_smpl] and
                                                     "_copy" in file_smpl):
                                                 self.container_measurements["SELECTED"][file_smpl][
-                                                    "Time"] = self.container_measurements["SELECTED"][file_smpl_original][
-                                                    "Time"]
+                                                    "Time"] = self.container_measurements["SELECTED"][
+                                                    file_smpl_original]["Time"]
 
                                             self.container_spikes[file_smpl][isotope] = {
                                                 "Data RAW": self.container_measurements["RAW"][file_smpl][isotope],
-                                                "Data SMOOTHED": data_smoothed, "Indices": indices_outl,
+                                                "Data SMOOTHED": data_smoothed, "Data IMPROVED": data_improved, 
+                                                "Indices": indices_outl,
                                                 "Times": self.container_measurements["SELECTED"][file_smpl]["Time"]}
-                                        #
+
                                         for var_index in indices_outl:
                                             self.container_spikes["Selection"][file_smpl][isotope][
                                                 var_index] = data_smoothed[var_index]
-                                        #
+
                                     else:
                                         pass
                                 else:
@@ -4365,6 +4373,7 @@ class PySILLS(tk.Frame):
                                 self.container_spikes[file_smpl][isotope] = {
                                     "Data RAW": self.container_measurements["RAW"][file_smpl][isotope],
                                     "Data SMOOTHED": self.container_measurements["RAW"][file_smpl][isotope],
+                                    "Data IMPROVED": self.container_measurements["RAW"][file_smpl][isotope], 
                                     "Indices": [],
                                     "Times": self.container_measurements["SELECTED"][file_smpl]["Time"]}
                             else:
@@ -25557,9 +25566,12 @@ class PySILLS(tk.Frame):
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
                     if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
                         ln_smoothed = ax.plot(
-                            self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
-                                "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
-                            visible=True)
+                            self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"], label=isotope,
+                            color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                        # ln_smoothed = ax.plot(
+                        #     self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
+                        #         "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                        #     visible=True)
                         self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                             "SMOOTHED"] = ln_smoothed
                         self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
@@ -30435,6 +30447,8 @@ class PySILLS(tk.Frame):
                                         var_index]
                                     value_smoothed = self.container_spikes[var_file_short][var_isotope][
                                         "Data SMOOTHED"][var_index]
+                                    # value_smoothed = self.container_spikes[var_file_short][var_isotope][
+                                    #     "Data IMPROVED"][var_index]
                                     self.helper_spike_values(
                                         var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
                                         var_value_smoothed=value_smoothed, mode=mode)
@@ -30573,14 +30587,14 @@ class PySILLS(tk.Frame):
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
         val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
-        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
+        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 2]
 
         if mode == "RAW":
             val_updated = val_original
         else:
             val_updated = val_corrected
 
-        self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real] = val_updated
+        self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id_real] = val_updated
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
         self.lbl_03c.configure(text=val_updated)
         self.container_spike_values[var_file][var_isotope]["Save"][var_id_real] = val_updated
@@ -30618,13 +30632,26 @@ class PySILLS(tk.Frame):
         x_max = max(data_x)
         data_y_raw = self.container_spikes[var_file][var_isotope]["Data RAW"]
         data_y_smoothed = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"]
+        data_y_valid = self.container_spikes[var_file][var_isotope]["Data IMPROVED"]
         y_min = min(data_y_raw)
         y_max = max(data_y_raw)
 
-        self.ax_spikes.plot(data_x, data_y_raw, color=self.bg_colors["Super Dark"], label="Original data", linewidth=2)
-        self.ax_spikes.plot(data_x, data_y_smoothed, color=self.accent_color, label="Smoothed data", linewidth=2)
-        self.ax_spikes.axvline(x=data_x[var_id_real], color=self.bg_colors["Medium"], label="Current spike",
-                               linewidth=2, linestyle="dotted")
+        self.ax_spikes.scatter(
+            data_x, data_y_raw, color=self.blue_dark, label="Original data")
+        self.ax_spikes.plot(
+            data_x, data_y_raw, color=self.blue_dark, linewidth=2, alpha=0.75)
+        self.ax_spikes.scatter(data_x, data_y_smoothed, color=self.yellow_dark, label="Smoothed data")
+        self.ax_spikes.plot(
+            data_x, data_y_smoothed, color=self.yellow_dark, linewidth=2, alpha=0.75)
+        self.ax_spikes.plot(
+            data_x, data_y_valid, color=self.accent_color, label="Improved data", linewidth=2)
+
+        # self.ax_spikes.plot(
+        #     data_x, data_y_raw, color=self.bg_colors["Super Dark"], label="Original data", linewidth=2) sex
+        # self.ax_spikes.plot(data_x, data_y_smoothed, color=self.accent_color, label="Smoothed data", linewidth=2)
+        self.ax_spikes.axvline(
+            x=data_x[var_id_real], color=self.bg_colors["Medium"], label="Current spike", linewidth=2,
+            linestyle="dotted")
 
         self.ax_spikes.grid(True)
         self.ax_spikes.set_yscale("log")
