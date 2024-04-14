@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		05.03.2024
+# Date:		15.04.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -244,6 +244,9 @@ class IntensityQuantification:
             list_focus = ["BG", "MAT"]
         else:
             list_focus = ["BG", "MAT", "INCL"]
+
+        if data_key == "Data SMOOTHED":
+            data_key = "Data IMPROVED"
 
         helper_results = {}
 

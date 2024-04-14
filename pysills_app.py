@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.04.2024
+# Date:		15.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -8101,6 +8101,7 @@ class PySILLS(tk.Frame):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
                                 self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+                                #self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id] = val_id
 
                 if self.old_file == False:
                     # EXPERIMENTAL DATA
@@ -30429,6 +30430,7 @@ class PySILLS(tk.Frame):
                                 "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
                         for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
                             val_id = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_id]
+                            self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][var_id] = val_id
                             if self.file_loaded == False:
                                 self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
 
@@ -30647,7 +30649,7 @@ class PySILLS(tk.Frame):
             data_x, data_y_valid, color=self.accent_color, label="Improved data", linewidth=2)
 
         # self.ax_spikes.plot(
-        #     data_x, data_y_raw, color=self.bg_colors["Super Dark"], label="Original data", linewidth=2) sex
+        #     data_x, data_y_raw, color=self.bg_colors["Super Dark"], label="Original data", linewidth=2)
         # self.ax_spikes.plot(data_x, data_y_smoothed, color=self.accent_color, label="Smoothed data", linewidth=2)
         self.ax_spikes.axvline(
             x=data_x[var_id_real], color=self.bg_colors["Medium"], label="Current spike", linewidth=2,
