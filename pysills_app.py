@@ -1362,10 +1362,14 @@ class PySILLS(tk.Frame):
             file_usersettings = open(self.path_pysills + str("/user_settings.txt"), "r")
             for index, file_data in enumerate(file_usersettings):
                 file_data_splitted = file_data.split(";")
+
                 try:
                     self.container_var["General Settings"][file_data_splitted[0]].set(file_data_splitted[1])
                 except:
                     pass
+
+                if "Dwell Times" in file_data_splitted:
+                    self.container_var["dwell_times"]["Entry"]["Default"].set(file_data_splitted[1])
         except:
             print("There is no user_settings file!")
 
@@ -9604,8 +9608,8 @@ class PySILLS(tk.Frame):
     #
     def subwindow_general_settings(self):
         ## Window Settings
-        window_width = 980
-        window_height = 375
+        window_width = 700
+        window_height = 550
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_generalsettings = tk.Toplevel(self.parent)
@@ -9646,136 +9650,151 @@ class PySILLS(tk.Frame):
         str_lbl_08 = self.language_dict["Plotting Setup"][self.var_language]
         str_lbl_09 = self.language_dict["Language Selection"][self.var_language]
         str_lbl_10 = self.language_dict["Data Processing"][self.var_language]
+        str_lbl_11 = "Dwell times"
+        str_lbl_12 = "Default value"
 
         lbl_01 = SE(
-            parent=subwindow_generalsettings, row_id=0, column_id=start_column, n_rows=2, n_columns=9,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=subwindow_generalsettings, row_id=4, column_id=start_column, n_rows=2, n_columns=9,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=5, column_id=start_column, n_rows=2, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Standard Reference\n Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_04 = SE(
-            parent=subwindow_generalsettings, row_id=8, column_id=start_column, n_rows=2, n_columns=9,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_05 = SE(
-            parent=subwindow_generalsettings, row_id=0, column_id=start_column + 10, n_rows=2, n_columns=16,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_04 = SE(
+        #     parent=subwindow_generalsettings, row_id=8, column_id=start_column, n_rows=2, n_columns=9,
+        #     fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+        #     text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_05 = SE(
+        #     parent=subwindow_generalsettings, row_id=0, column_id=start_column + 10, n_rows=2, n_columns=16,
+        #     fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+        #     text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06 = SE(
-            parent=subwindow_generalsettings, row_id=5, column_id=start_column + 10, n_rows=2, n_columns=16,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=0, column_id=11, n_rows=1, n_columns=13,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07 = SE(
-            parent=subwindow_generalsettings, row_id=10, column_id=start_column + 10, n_rows=2, n_columns=16,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=5, column_id=11, n_rows=2, n_columns=13,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08 = SE(
-            parent=subwindow_generalsettings, row_id=0, column_id=start_column + 27, n_rows=2, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=9, column_id=start_column, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09 = SE(
-            parent=subwindow_generalsettings, row_id=5, column_id=start_column + 27, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=18, column_id=start_column, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_10 = SE(
-            parent=subwindow_generalsettings, row_id=9, column_id=start_column + 27, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
-            parent=subwindow_generalsettings, row_id=12, column_id=start_column + 27, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=0, column_id=start_column, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
-            parent=subwindow_generalsettings, row_id=0, column_id=start_column + 38, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
+            parent=subwindow_generalsettings, row_id=13, column_id=start_column, n_rows=1, n_columns=10,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=str_lbl_10, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_11 = SE(
+            parent=subwindow_generalsettings, row_id=9, column_id=11, n_rows=1, n_columns=13,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text=str_lbl_11, relief=tk.FLAT, fontsize="sans 10 bold")
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01, lbl_02, lbl_04, lbl_05, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
+            [lbl_01, lbl_02, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
 
+        lbl_11a = SE(
+            parent=subwindow_generalsettings, row_id=10, column_id=11, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text=str_lbl_12, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
-            parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=3, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Default Author", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Default Author", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
-            parent=subwindow_generalsettings, row_id=6, column_id=start_column, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Default SRM", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_05a = SE(
-            parent=subwindow_generalsettings, row_id=2, column_id=start_column + 10, n_rows=1, n_columns=16,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Transform time values into ...", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Default SRM", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_05a = SE(
+        #     parent=subwindow_generalsettings, row_id=2, column_id=start_column + 10, n_rows=1, n_columns=16,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+        #     text="Transform time values into ...", relief=tk.GROOVE, fontsize="sans 10 bold")
         lbl_06a = SE(
-            parent=subwindow_generalsettings, row_id=7, column_id=start_column + 10, n_rows=1, n_columns=16,
+            parent=subwindow_generalsettings, row_id=1, column_id=11, n_rows=1, n_columns=13,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Calculation formula from ...", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Calculation formula from ...", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_07a = SE(
-            parent=subwindow_generalsettings, row_id=12, column_id=start_column + 10, n_rows=1, n_columns=6,
+            parent=subwindow_generalsettings, row_id=7, column_id=11, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Background", relief=tk.GROOVE, fontsize="sans 10 bold")
+            text="Background", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07b = SE(
-            parent=subwindow_generalsettings, row_id=13, column_id=start_column + 10, n_rows=1, n_columns=6,
+            parent=subwindow_generalsettings, row_id=8, column_id=11, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Signal", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_08a = SE(
-            parent=subwindow_generalsettings, row_id=2, column_id=start_column + 27, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Main signal", relief=tk.FLAT, fontsize="sans 10 bold")
+        # lbl_08a = SE(
+        #     parent=subwindow_generalsettings, row_id=2, column_id=start_column + 27, n_rows=1, n_columns=10,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+        #     text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09a = SE(
-            parent=subwindow_generalsettings, row_id=6, column_id=start_column + 27, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=19, column_id=start_column, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="File type", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09b = SE(
-            parent=subwindow_generalsettings, row_id=7, column_id=start_column + 27, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=20, column_id=start_column, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Delimiter", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_10a = SE(
-            parent=subwindow_generalsettings, row_id=10, column_id=start_column + 27, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=12, column_id=start_column, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Line width", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+
         self.gui_elements["general_settings"]["Label"]["General"].extend(
-            [lbl_01a, lbl_02a, lbl_05a, lbl_06a, lbl_07a, lbl_07b, lbl_08a, lbl_09a, lbl_09b, lbl_10a])
-        #
+            [lbl_01a, lbl_02a, lbl_06a, lbl_07a, lbl_07b, lbl_09a, lbl_09b, lbl_10a])
+
         ## Entries
+        entr_11a = SE(
+            parent=subwindow_generalsettings, row_id=10, column_id=18, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["dwell_times"]["Entry"]["Default"],
+            text_default=self.container_var["dwell_times"]["Entry"]["Default"].get(), command=None)
         entr_01a = SE(
-            parent=subwindow_generalsettings, row_id=3, column_id=start_column, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=4, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["Default Author"],
             text_default=self.container_var["General Settings"]["Default Author"].get(), command=None)
         entr_07a = SE(
-            parent=subwindow_generalsettings, row_id=12, column_id=start_column + 16, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=7, column_id=18, n_rows=1, n_columns=3,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["BG Offset Start"],
             text_default=self.container_var["General Settings"]["BG Offset Start"].get(), command=None)
         entr_07b = SE(
-            parent=subwindow_generalsettings, row_id=12, column_id=start_column + 21, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=7, column_id=21, n_rows=1, n_columns=3,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["BG Offset End"],
             text_default=self.container_var["General Settings"]["BG Offset End"].get(), command=None)
         entr_07c = SE(
-            parent=subwindow_generalsettings, row_id=13, column_id=start_column + 16, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=8, column_id=18, n_rows=1, n_columns=3,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["MAT Offset Start"],
             text_default=self.container_var["General Settings"]["MAT Offset Start"].get(), command=None)
         entr_07d = SE(
-            parent=subwindow_generalsettings, row_id=13, column_id=start_column + 21, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=8, column_id=21, n_rows=1, n_columns=3,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["MAT Offset End"],
             text_default=self.container_var["General Settings"]["MAT Offset End"].get(), command=None)
         entr_10a = SE(
-            parent=subwindow_generalsettings, row_id=10, column_id=start_column + 32, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=12, column_id=5, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["General Settings"]["Line width"],
             text_default=self.container_var["General Settings"]["Line width"].get(),
             command=lambda event, var_entr=self.container_var["General Settings"]["Line width"]:
             self.check_lw_value(var_entr, event))
-        #
+
         self.gui_elements["general_settings"]["Entry"]["General"].extend(
             [entr_01a, entr_07a, entr_07b, entr_07c, entr_07d, entr_10a])
-        #
+
         ## Option Menus
         list_srm = list(np.sort(self.list_srm))
         list_srm.insert(0, "Select SRM")
@@ -9792,34 +9811,34 @@ class PySILLS(tk.Frame):
         list_languages.sort()
 
         opt_srm = SE(
-            parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=8, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["Default SRM"],
             var_default=self.container_var["General Settings"]["Default SRM"].get(), var_list=list_srm,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
         opt_colormaps = SE(
-            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 27, n_rows=1, n_columns=10,
+            parent=subwindow_generalsettings, row_id=10, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["Colormap"],
             var_default=self.container_var["General Settings"]["Colormap"].get(), var_list=list_colormaps,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["General Settings"]["Colormap"]: self.change_colormap(var_opt))
         opt_filetype = SE(
-            parent=subwindow_generalsettings, row_id=6, column_id=start_column + 32, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=19, column_id=5, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["File type"],
             var_default=self.container_var["General Settings"]["File type"].get(), var_list=list_filetypes,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["General Settings"]["File type"]: self.change_filetype(var_opt))
         opt_delimiter = SE(
-            parent=subwindow_generalsettings, row_id=7, column_id=start_column + 32, n_rows=1, n_columns=5,
+            parent=subwindow_generalsettings, row_id=20, column_id=5, n_rows=1, n_columns=5,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["Delimiter"],
             var_default=self.container_var["General Settings"]["Delimiter"].get(), var_list=list_delimiter,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var["General Settings"]["Delimiter"]: self.change_delimiter(var_opt))
         opt_language = SE(
-            parent=subwindow_generalsettings, row_id=13, column_id=start_column + 27, n_rows=1, n_columns=10,
+            parent=subwindow_generalsettings, row_id=1, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
             var_opt=self.container_var["General Settings"]["Language"],
             var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
@@ -9834,82 +9853,83 @@ class PySILLS(tk.Frame):
 
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
             [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
-        #
+
         ## Radiobuttons
-        rb_04a = SE(
-            parent=subwindow_generalsettings, row_id=10, column_id=start_column, n_rows=1, n_columns=9,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["General Settings"]["Calculation Accuracy"], value_rb=0,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_04b = SE(
-            parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=9,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["General Settings"]["Calculation Accuracy"], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="PySILLS",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_05a = SE(
-            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 10, n_rows=1, n_columns=16,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["General Settings"]["Sensitivity Drift"], value_rb=0,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="seconds",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_05b = SE(
-            parent=subwindow_generalsettings, row_id=4, column_id=start_column + 10, n_rows=1, n_columns=16,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["General Settings"]["Sensitivity Drift"], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="decimal numbers", sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold")
+        # rb_04a = SE(
+        #     parent=subwindow_generalsettings, row_id=10, column_id=start_column, n_rows=1, n_columns=9,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+        #     var_rb=self.container_var["General Settings"]["Calculation Accuracy"], value_rb=0,
+        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS",
+        #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        # rb_04b = SE(
+        #     parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=9,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+        #     var_rb=self.container_var["General Settings"]["Calculation Accuracy"], value_rb=1,
+        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="PySILLS",
+        #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        # rb_05a = SE(
+        #     parent=subwindow_generalsettings, row_id=3, column_id=start_column + 10, n_rows=1, n_columns=16,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+        #     var_rb=self.container_var["General Settings"]["Sensitivity Drift"], value_rb=0,
+        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="seconds",
+        #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        # rb_05b = SE(
+        #     parent=subwindow_generalsettings, row_id=4, column_id=start_column + 10, n_rows=1, n_columns=16,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+        #     var_rb=self.container_var["General Settings"]["Sensitivity Drift"], value_rb=1,
+        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="decimal numbers", sticky="nesw",
+        #     relief=tk.FLAT, font="sans 10 bold")
         #
         rb_06a = SE(
-            parent=subwindow_generalsettings, row_id=8, column_id=start_column + 10, n_rows=1, n_columns=16,
+            parent=subwindow_generalsettings, row_id=2, column_id=11, n_rows=1, n_columns=13,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["General Settings"]["LOD Selection"], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Pettke et al. (2012)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_06b = SE(
-            parent=subwindow_generalsettings, row_id=9, column_id=start_column + 10, n_rows=1, n_columns=16,
+            parent=subwindow_generalsettings, row_id=3, column_id=11, n_rows=1, n_columns=13,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["General Settings"]["LOD Selection"], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Longerich et al. (1996)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
         rb_06b = SE(
-            parent=subwindow_generalsettings, row_id=1, column_id=start_column + 38, n_rows=1, n_columns=10,
+            parent=subwindow_generalsettings, row_id=14, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Arithmetic Mean",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_06b = SE(
-            parent=subwindow_generalsettings, row_id=2, column_id=start_column + 38, n_rows=1, n_columns=10,
+            parent=subwindow_generalsettings, row_id=15, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Median",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
-        rb_07 = SE(
-            parent=subwindow_generalsettings, row_id=3, column_id=start_column + 38, n_rows=1, n_columns=10,
+        rb_07a = SE(
+            parent=subwindow_generalsettings, row_id=16, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Interval Processing"], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Average of every interval",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_07 = SE(
-            parent=subwindow_generalsettings, row_id=4, column_id=start_column + 38, n_rows=1, n_columns=10,
+        rb_07b = SE(
+            parent=subwindow_generalsettings, row_id=17, column_id=start_column, n_rows=1, n_columns=10,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Interval Processing"], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Stack all intervals into one",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        #
+        rb_07a.configure(state="disabled")
+        rb_07b.configure(state="disabled")
         self.gui_elements["general_settings"]["Radiobutton"]["General"].extend(
-            [rb_05a, rb_05b, rb_06a, rb_06b])
+            [rb_06a, rb_06b])
         #
         ## Buttons
         btn_01 = SE(
-            parent=subwindow_generalsettings, row_id=13, column_id=start_column, n_rows=1, n_columns=9,
+            parent=subwindow_generalsettings, row_id=19, column_id=25, n_rows=2, n_columns=9,
             fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Save Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.confirm_general_settings)
-        #
+
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
 
         self.check_lw_value(var_entr=self.container_var["General Settings"]["Line width"], event="")
@@ -9938,6 +9958,8 @@ class PySILLS(tk.Frame):
             for key, value in self.container_var["General Settings"].items():
                 str_key = str(key) + ";" + str(value.get()) + ";\n"
                 file_settings.write(str_key)
+            str_key = str("Dwell Times") + ";" + str(self.container_var["dwell_times"]["Entry"]["Default"].get()) + ";\n"
+            file_settings.write(str_key)
 
     def check_srm_settings(self):
         ## Window Settings
@@ -11573,10 +11595,11 @@ class PySILLS(tk.Frame):
             if filename_short not in self.helper_scatter_points:
                 self.helper_scatter_points[filename_short] = []
 
+            str_filename_short = filename_short
             cb_i = tk.Checkbutton(
                 master=frm_01, text=filename_short, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"],
                 variable=self.helper_halogen_ratios[filename_short],
-                command=lambda filename_short=filename_short: self.select_file_halogen_ratio(filename_short))
+                command=lambda filename_short=str_filename_short: self.select_file_halogen_ratio(filename_short))
             text_01.window_create("end", window=cb_i)
             text_01.insert("end", "\n")
 
@@ -15488,10 +15511,11 @@ class PySILLS(tk.Frame):
 
         # Finishing
         for var_file_smpl in self.container_var["SMPL"].keys():
-            if "IS Data" in self.container_var["SMPL"][var_file_smpl]:
-                var_is = self.container_var["SMPL"][var_file_smpl]["IS Data"]["IS"].get()
-                if var_is not in self.container_lists["Possible IS"]:
-                    self.container_lists["Possible IS"].append(var_is)
+            if var_file_smpl in self.container_lists["SMPL"]["Short"]:
+                if "IS Data" in self.container_var["SMPL"][var_file_smpl]:
+                    var_is = self.container_var["SMPL"][var_file_smpl]["IS Data"]["IS"].get()
+                    if var_is not in self.container_lists["Possible IS"]:
+                        self.container_lists["Possible IS"].append(var_is)
 
     def import_is_data(self, parent, mode="MA"):
         self.pypitzer_performed = False
