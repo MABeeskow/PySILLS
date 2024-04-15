@@ -687,6 +687,8 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["IS Selection"].set(1)
             self.container_var[key_setting]["Spike Elimination Inclusion"] = tk.IntVar()
             self.container_var[key_setting]["Spike Elimination Inclusion"].set(2)
+            self.container_var[key_setting]["Check Inclusion Exclusion"] = tk.BooleanVar()
+            self.container_var[key_setting]["Check Inclusion Exclusion"].set(True)
             self.container_var[key_setting]["SE Alpha"] = tk.StringVar()
             self.container_var[key_setting]["SE Alpha"].set("0.05")
             self.container_var[key_setting]["SE Threshold"] = tk.StringVar()
@@ -4317,7 +4319,6 @@ class PySILLS(tk.Frame):
                                                             var_indices = items["Indices"]
                                                             data_raw = self.container_measurements["RAW"][file_smpl][
                                                                 isotope]
-
                                                             for index in range(var_indices[0], var_indices[1] + 1):
                                                                 value_raw = data_raw[index]
                                                                 data_improved[index] = value_raw
@@ -8101,7 +8102,6 @@ class PySILLS(tk.Frame):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
                                 self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
-                                #self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id] = val_id
 
                 if self.old_file == False:
                     # EXPERIMENTAL DATA
@@ -13094,19 +13094,33 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode != "MA":
             # Radiobuttons
-            rb_09a = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=0, n_rows=1, n_columns=var_header_n - 9,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Spike Elimination Inclusion"], value_rb=1,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Include Inclusion",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_09b = SE(
-                parent=var_parent, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=1,
-                n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Spike Elimination Inclusion"], value_rb=2,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Exclude Inclusion",
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            # rb_09a = SE(
+            #     parent=var_parent, row_id=var_row_start + 2, column_id=0, n_rows=1, n_columns=var_header_n - 9,
+            #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            #     var_rb=self.container_var[var_setting_key]["Spike Elimination Inclusion"], value_rb=1,
+            #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Include Inclusion",
+            #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            # rb_09b = SE(
+            #     parent=var_parent, row_id=var_row_start + 2, column_id=var_header_n - 9, n_rows=1,
+            #     n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"],
+            #     bg=self.bg_colors["Light"]).create_radiobutton(
+            #     var_rb=self.container_var[var_setting_key]["Spike Elimination Inclusion"], value_rb=2,
+            #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Exclude Inclusion",
+            #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            # Checkboxes
+            cb_09b = SE(
+                parent=var_parent, row_id=var_row_start + 2, column_id=0, fg=self.bg_colors["Dark Font"], n_rows=1,
+                n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=self.container_var[var_setting_key]["Check Inclusion Exclusion"], text="Exclude inclusion",
+                set_sticky="nesw", own_color=True, command=lambda setting_key=var_setting_key:
+                self.change_inclusion_consideration(setting_key))
+            self.change_inclusion_consideration(setting_key=var_setting_key)
+
+    def change_inclusion_consideration(self, setting_key):
+        if self.container_var[setting_key]["Check Inclusion Exclusion"].get() == True:
+            self.container_var[setting_key]["Spike Elimination Inclusion"].set(2)
+        else:
+            self.container_var[setting_key]["Spike Elimination Inclusion"].set(1)
 
     def place_checkup_feature(self, var_geometry_info, var_relief=tk.FLAT):
         """Creates and places the necessary tkinter widgets for the section: 'Check-Up'
@@ -30399,6 +30413,11 @@ class PySILLS(tk.Frame):
         return helper_list
 
     def helper_spike_values(self, var_file_short, var_isotope, var_value_raw, var_value_smoothed, mode=None):
+        if self.pysills_mode == "FI":
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
         if var_file_short not in self.container_spike_values:
             self.container_spike_values[var_file_short] = {}
         if var_isotope not in self.container_spike_values[var_file_short]:
@@ -30430,9 +30449,11 @@ class PySILLS(tk.Frame):
                                 "RAW": [], "SMOOTHED": [], "Current": [], "Save": {}}
                         for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
                             val_id = self.container_spikes[var_file_short][var_isotope]["Data SMOOTHED"][var_id]
-                            self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][var_id] = val_id
                             if self.file_loaded == False:
                                 self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
+                            else:
+                                val_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
+                                self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][var_id] = val_saved
 
     def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
         for index, var_file_short in enumerate(self.container_lists[mode]["Short"]):
@@ -30449,8 +30470,6 @@ class PySILLS(tk.Frame):
                                         var_index]
                                     value_smoothed = self.container_spikes[var_file_short][var_isotope][
                                         "Data SMOOTHED"][var_index]
-                                    # value_smoothed = self.container_spikes[var_file_short][var_isotope][
-                                    #     "Data IMPROVED"][var_index]
                                     self.helper_spike_values(
                                         var_file_short=var_file_short, var_isotope=var_isotope, var_value_raw=value_raw,
                                         var_value_smoothed=value_smoothed, mode=mode)
