@@ -1987,8 +1987,9 @@ class PySILLS(tk.Frame):
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-            btn_03.configure(state="disabled")
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda init=True: self.fi_extras(init))
+            #btn_03.configure(state="disabled")
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
         #
@@ -11025,7 +11026,7 @@ class PySILLS(tk.Frame):
     def ma_extras(self):
         """Main window of additional analysis tools for a mineral analysis project."""
         ## Window Settings
-        window_width = 520
+        window_width = 500
         window_height = 400
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         row_min = 25
@@ -11113,22 +11114,22 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Geothermometry", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Mineral classification", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_column_start + var_header_n + 1,
-            n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Geochronology", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Geothermometry", relief=tk.FLAT, fontsize="sans 10 bold")
 
-        lbl_001 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
+        lbl_002 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_header_n, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
             text="Ti-in-Quartz", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
-        btn_001 = SE(
-            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start + int_category_n,
+        btn_002 = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
@@ -11254,9 +11255,529 @@ class PySILLS(tk.Frame):
                                      round(val_temperature_i_celsius, 2), round(val_temperature_i_kelvin, 2)]
                     self.tv_results_ti_in_qz.insert("", tk.END, values=entry_results)
 
-    ########################################################################################################################
-    # MINERAL ANALYSIS #####################################################################################################
-    ########################################################################################################################
+    def fi_extras(self, init=False):
+        """Main window of additional analysis tools for a fluid inclusion analysis project."""
+        ## Window Settings
+        window_width = 660
+        window_height = 225
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_fi_extras = tk.Toplevel(self.parent)
+        self.subwindow_fi_extras.title("FLUID INCLUSION ANALYSIS - Extras")
+        self.subwindow_fi_extras.geometry(var_geometry)
+        self.subwindow_fi_extras.resizable(False, False)
+        self.subwindow_fi_extras["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_fi_extras, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_fi_extras, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_fi_extras.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_fi_extras.grid_columnconfigure(i, minsize=column_min)
+
+        ## Initialization
+        if init:
+            for var_filetype in ["STD", "SMPL"]:
+                for var_file_short in self.container_lists[var_filetype]["Short"]:
+                    self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+
+                if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
+                    list_datatype = ["RAW"]
+                else:
+                    list_datatype = ["RAW", "SMOOTHED"]
+
+            var_filetype = "None"
+            var_file_short = "None"
+            var_file_long = "None"
+            var_focus = "None"
+
+            for var_datatype in list_datatype:
+                if len(self.container_spikes) > 0:
+                    # Intensity Results
+                    self.get_intensity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    self.fi_get_intensity_corrected(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    self.fi_get_intensity_mix(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
+                    # Sensitivity Results
+                    self.get_analytical_sensitivity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, mode="All")
+                    results_is = self.determine_possible_is(filetype="ALL")
+                    IQ(dataframe=None, project_type=self.pysills_mode,
+                       results_container=self.container_intensity_ratio).get_intensity_ratio(
+                        data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
+                    self.fi_get_rsf(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    # Concentration Results
+                    self.fi_get_concentration(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    self.fi_get_normalized_sensitivity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    self.fi_get_concentration_ratio(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    self.get_lod(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=None, mode="All")
+                    self.fi_get_mixed_concentration_ratio(
+                        var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long,
+                        mode="All")
+                    self.fi_get_mixing_ratio(
+                        var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long,
+                        mode="All")
+                    self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short,
+                                                    mode="All")
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 16
+        int_category_n = 12
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Matrix classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_02 = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Fluid classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001a = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001b = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001c = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001d = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001e = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001f = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002a = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002b = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002c = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002d = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002e = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002f = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002g = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 7, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Halogen ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        # BUTTONS
+        btn_001a = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001b = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001c = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001d = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001e = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001f = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+
+        btn_001a.configure(state="disabled")
+        btn_001b.configure(state="disabled")
+        btn_001c.configure(state="disabled")
+        btn_001d.configure(state="disabled")
+        btn_001e.configure(state="disabled")
+        btn_001f.configure(state="disabled")
+
+        btn_002a = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002b = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002c = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002d = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002e = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002f = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002g = SE(
+            parent=self.subwindow_fi_extras, row_id=var_row_start + 7, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.halogen_ratios_diagram)
+
+        btn_002a.configure(state="disabled")
+        btn_002b.configure(state="disabled")
+        btn_002c.configure(state="disabled")
+        btn_002d.configure(state="disabled")
+        btn_002e.configure(state="disabled")
+        btn_002f.configure(state="disabled")
+
+    def halogen_ratios_diagram(self):
+        ## Window Settings
+        window_width = 800
+        window_height = 600
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_halogen_ratios = tk.Toplevel(self.parent)
+        subwindow_halogen_ratios.title("FLUID INCLUSION ANALYSIS - Extras")
+        subwindow_halogen_ratios.geometry(var_geometry)
+        subwindow_halogen_ratios.resizable(False, False)
+        subwindow_halogen_ratios["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_halogen_ratios, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_halogen_ratios, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_halogen_ratios.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_halogen_ratios.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 10
+        int_category_n = 6
+
+        self.helper_scatter_points = {}
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_halogen_ratios, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="File manager", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        ## TABLES
+        frm_01 = SE(
+            parent=subwindow_halogen_ratios, row_id=var_row_start + 1, column_id=var_column_start,
+            n_rows=n_rows - 2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_01 = ttk.Scrollbar(master=frm_01, orient="vertical")
+        text_01 = tk.Text(
+            master=frm_01, width=30, height=25, yscrollcommand=vsb_01.set, bg=self.bg_colors["Very Light"])
+        vsb_01.config(command=text_01.yview)
+        vsb_01.pack(side="right", fill="y")
+        text_01.pack(side="left", fill="both", expand=True)
+
+        self.helper_halogen_ratios = {"Checkboxes": {}, "Results": {}}
+        for filename_short in self.container_lists["SMPL"]["Short"]:
+            if filename_short not in self.helper_halogen_ratios:
+                self.helper_halogen_ratios[filename_short] = tk.IntVar()
+                self.helper_halogen_ratios[filename_short].set(1)
+
+            if filename_short not in self.helper_scatter_points:
+                self.helper_scatter_points[filename_short] = []
+
+            cb_i = tk.Checkbutton(
+                master=frm_01, text=filename_short, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"],
+                variable=self.helper_halogen_ratios[filename_short],
+                command=lambda filename_short=filename_short: self.select_file_halogen_ratio(filename_short))
+            text_01.window_create("end", window=cb_i)
+            text_01.insert("end", "\n")
+
+        ## INITIALIZATION
+        frm_02= SE(
+            parent=subwindow_halogen_ratios, row_id=var_row_start, column_id=var_header_n,
+            n_rows=n_rows, n_columns=n_columns - var_header_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame()
+
+        self.create_halogen_ratio_diagram(
+            parent=subwindow_halogen_ratios, var_row_start=var_row_start, var_header_n=var_header_n, n_rows=n_rows,
+            n_columns=n_columns)
+    def create_halogen_ratio_diagram(self, parent, var_row_start, var_header_n, n_rows, n_columns):
+        self.fig_halogen_ratios = Figure(figsize=(10,5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+
+        self.canvas_halogen_ratios = FigureCanvasTkAgg(self.fig_halogen_ratios, master=parent)
+        self.canvas_halogen_ratios.get_tk_widget().grid(
+            row=var_row_start, column=var_header_n, rowspan=n_rows - 2, columnspan=n_columns - var_header_n,
+            sticky="nesw")
+
+        self.toolbarFrame_halogen_ratios = tk.Frame(master=parent)
+        self.toolbarFrame_halogen_ratios.grid(
+            row=n_rows - 2, column=var_header_n, rowspan=1, columnspan=n_columns - var_header_n, sticky="ew")
+
+        self.toolbar_halogen_ratios = NavigationToolbar2Tk(self.canvas_halogen_ratios, self.toolbarFrame_halogen_ratios)
+        self.toolbar_halogen_ratios.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        self.toolbar_halogen_ratios._message_label.config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        self.toolbar_halogen_ratios.winfo_children()[-2].config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+
+        ax = self.fig_halogen_ratios.add_subplot(label=np.random.uniform())
+        ax2 = ax.twiny()
+
+        ax.set_xscale("log")
+        ax2.set_xscale("log")
+        ax.set_yscale("log")
+        ax.set_xlim(4*10**(-1), 3*10**5)
+        ax.set_ylim(8*10**(-2), 3*10**2)
+        ax2.set_xlim(7*10**(4), 1*10**-1)
+        ax.grid()
+
+        ax.set_xlabel("I/Cl ($\\mu$mol)")
+        ax.set_ylabel("Br/Cl (mmol)")
+        ax2.set_xlabel("Br/I (mol)")
+        ax.set_title("Halogen systematics of natural fluid inclusions")
+
+        data_icl = self.create_iodine_chlorine_ratio()
+        data_brcl = self.create_bromine_chlorine_ratio()
+
+        data_icl = data_icl*10**6
+        data_brcl = data_brcl*10**3
+
+        data_halite = [0.788390, 0.098038]
+        data_sylvite = [0.774990, 0.392940]
+        data_seawater = [0.751910, 1.522500]
+
+        data_x_set = [0.75828, 1.5245, 2.3861, 3.0648, 3.2736, 3.4056, 3.6857, 4.0955, 4.4324, 4.6723, 5.0566, 5.9229,
+                      6.8467, 6.6686, 6.4101, 6.3262]
+        data_y_set = [1.522500, 1.522500, 1.522500, 1.522500, 1.7425, 1.9953, 2.4781, 3.4068, 4.289, 5.1147, 6.4391,
+                      6.6159, 6.7976, 7.9973, 9.4087, 10.275]
+
+        data_icl2 = np.linspace(data_seawater[0], 10**6, 7500)
+
+        a_lower = 0.5*10**(-3)
+        a_upper = 2.5*10**(-3)
+        a_upper2 = 2.5*10**(-3)
+        b = data_seawater[1]
+
+        x = data_icl[:len(data_brcl)]
+
+        ax.scatter(data_halite[0], data_halite[1], marker="D", s=67, color="lightgrey", edgecolor="black",
+                   label="Halite", zorder=2)
+        ax.scatter(data_sylvite[0], data_sylvite[1], marker="s", s=67, color="lightgrey", edgecolor="black",
+                   label="Sylvite", zorder=2)
+        ax.scatter(data_seawater[0], data_seawater[1], marker="*", s=175, color="lightgrey", edgecolor="black",
+                   label="Seawater", zorder=2)
+
+        ax.fill_between(data_icl2, a_upper*data_icl2 + b, a_lower*data_icl2 + b, color="0.75", alpha=0.25, zorder=0)
+        ax.plot(data_icl2, a_lower*data_icl2 + b, linestyle="dotted", color="black", linewidth=2, alpha=0.75, zorder=1,
+                label="Br/I=0.5")
+        ax.plot(data_icl2, a_upper*data_icl2 + b, linestyle="dashed", color="black", linewidth=2, alpha=0.75, zorder=1,
+                label="Br/I=2.5")
+
+        ax.plot(data_x_set, data_y_set, linestyle="solid", color="black", linewidth=2, alpha=1, zorder=1, label="SET")
+
+        ax.plot(data_icl, data_icl*10**(3), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(2), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(1), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(0), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(-1), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(-2), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(-3), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(-4), linestyle="dashed", color="grey", alpha=0.5)
+        ax.plot(data_icl, data_icl*10**(-5), linestyle="dashed", color="grey", alpha=0.5)
+
+        ax.set_axisbelow(True)
+
+        ax.legend(loc="lower right", fontsize="small", framealpha=1.0)
+        self.ax_halogen_ratio = ax
+
+    def create_iodine_chlorine_ratio(self):
+        start_data = np.linspace(0.01, 1, 100)
+        factor_data = [10**x for x in range(1, 6)]
+        new_data = list(start_data)
+
+        for value_start in start_data:
+            for factor in factor_data:
+                value = factor*value_start*10**(-6)
+                new_data.append(value)
+        final_data = np.sort(new_data)
+
+        return final_data
+
+    def create_bromine_chlorine_ratio(self):
+        start_data = np.linspace(0.01, 1, 100)
+        factor_data = [10**x for x in range(1, 3)]
+        new_data = list(start_data)
+
+        for value_start in start_data:
+            for factor in factor_data:
+                value = factor*value_start*10**(-3)
+                new_data.append(value)
+        final_data = np.sort(new_data)
+
+        return final_data
+
+    def iodine_to_bromine(self, x):
+        return x
+
+    def rad2deg(self, x):
+        return x*180/np.pi
+
+    def select_file_halogen_ratio(self, filename_short):
+        if self.helper_halogen_ratios[filename_short].get() == 1:
+            if ("Cl" in self.container_lists["Measured Elements"] and
+                    "Br" in self.container_lists["Measured Elements"] and
+                    "I" in self.container_lists["Measured Elements"]):
+                elements_list = ["Cl", "Br", "I"]
+                isotopes_dict = {"Cl": [], "Br": [], "I": []}
+                for element in elements_list:
+                    isotopes_list = self.container_lists["Measured Elements"][filename_short][element]
+                    isotopes_dict[element] = isotopes_list
+
+                helper_icl = []
+                helper_brcl = []
+                for isotope_cl in isotopes_dict["Cl"]:
+                    concentration_cl = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                        "INCL"][isotope_cl]
+                    for isotope_i in isotopes_dict["I"]:
+                        concentration_i = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                            "INCL"][isotope_i]
+                        val_icl = (concentration_i/concentration_cl)*10**6
+                        helper_icl.append(val_icl)
+                        for isotope_br in isotopes_dict["Br"]:
+                            concentration_br = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                                "INCL"][isotope_br]
+                            val_brcl = (concentration_br/concentration_cl)*10**3
+                            helper_brcl.append(val_brcl)
+
+                            sct = self.ax_halogen_ratio.scatter(
+                                val_icl, val_brcl, s=50, color=self.accent_color, edgecolor="black", zorder=2,
+                                alpha=0.75)
+                            self.helper_scatter_points[filename_short].append(sct)
+            else:
+                if "I" not in self.container_lists["Measured Elements"]:
+                    elements_list = ["Cl", "Br"]
+                    isotopes_dict = {"Cl": [], "Br": []}
+                    for element in elements_list:
+                        isotopes_list = self.container_lists["Measured Elements"][filename_short][element]
+                        isotopes_dict[element] = isotopes_list
+
+                    helper_icl = []
+                    helper_brcl = []
+                    for isotope_cl in isotopes_dict["Cl"]:
+                        concentration_cl = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                            "INCL"][isotope_cl]
+                        concentration_i = 100
+                        val_icl = (concentration_i/concentration_cl)*10**6
+                        helper_icl.append(val_icl)
+                        for isotope_br in isotopes_dict["Br"]:
+                            concentration_br = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                                "INCL"][isotope_br]
+                            val_brcl = (concentration_br/concentration_cl)*10**3
+                            helper_brcl.append(val_brcl)
+
+                            sct = self.ax_halogen_ratio.scatter(
+                                val_icl, val_brcl, s=50, color=self.accent_color, edgecolor="black", zorder=2,
+                                alpha=0.75)
+                            self.helper_scatter_points[filename_short].append(sct)
+        else:
+            for sct_item in self.helper_scatter_points[filename_short]:
+                sct_item.set_visible(False)
+
+        self.canvas_halogen_ratios.draw()
+
+    ####################################################################################################################
+    # MINERAL ANALYSIS #################################################################################################
+    ####################################################################################################################
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
         if self.file_system_need_update:
