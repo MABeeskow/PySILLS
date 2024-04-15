@@ -306,6 +306,7 @@ class PySILLS(tk.Frame):
         self.container_var["IS SMPL Default"].set("0.0")
 
         self.helper_salt_composition = {}
+        self.charge_balance_check = {}
 
         # Quantification Method
         self.container_var["Quantification Mineral"] = {"Method": tk.StringVar()}
@@ -836,8 +837,13 @@ class PySILLS(tk.Frame):
         self.container_var["ID"]["Results Isotopes"].set("A")
         self.container_var["ID"]["Results Files"] = tk.StringVar()
         self.container_var["ID"]["Results Files"].set("A")
-        self.container_var["STD"] = {}
-        self.container_var["SMPL"] = {}
+        #self.container_var["STD"] = {}
+        #self.container_var["SMPL"] = {}
+        for type in ["STD", "SMPL"]:
+            if type not in self.container_var:
+                self.container_var[type] = {}
+                self.container_var[type]["Project manager"] = tk.IntVar()
+                self.container_var[type]["Project manager"].set(0)
         self.container_var["LASER"] = tk.StringVar()
         self.container_var["LASER"].set("Argon")
         self.container_var["charge"] = {}
@@ -1286,6 +1292,7 @@ class PySILLS(tk.Frame):
             "Add": {"English": "Add", "German": "Hinzufügen"},
             "Copy": {"English": "Copy", "German": "Kopieren"},
             "Delete": {"English": "Delete", "German": "Löschen"},
+            "Rename": {"English": "Rename", "German": "Umbenennen"},
             "New Project": {"English": "New Project", "German": "Neues Projekt"},
             "Load Project": {"English": "Open Project", "German": "Projekt laden"},
             "Save Project": {"English": "Save Project", "German": "Projekt speichern"},
@@ -1519,8 +1526,9 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 21, column_id=n_columns_button + 2, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark)
-        btn_11_std.configure(state="disabled")
+            text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
+            command=lambda type="STD": self.project_manager(type))
+        #btn_11_std.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
@@ -1543,8 +1551,9 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 21, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark)
-        btn_11_smpl.configure(state="disabled")
+            text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
+            command=lambda type="SMPL": self.project_manager(type))
+        #btn_11_smpl.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -27781,6 +27790,7 @@ class PySILLS(tk.Frame):
                         self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
                     self.helper_salt_composition[file_smpl_short].set(salt_composition)
+                    self.check_chargebalance(filename_long=file_smpl)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -27902,6 +27912,8 @@ class PySILLS(tk.Frame):
                 if file_smpl_short in self.container_files["SMPL"]:
                     self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
+                self.check_chargebalance(filename_long=file_smpl)
+
                 self.helper_salt_composition[file_smpl_short].set(salt_composition)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
@@ -27937,6 +27949,57 @@ class PySILLS(tk.Frame):
                 is_defined = False
 
         return is_defined
+
+    def check_chargebalance(self, filename_long):
+        file_id = self.container_lists["SMPL"]["Long"].index(filename_long)
+        filename_short = self.container_lists["SMPL"]["Short"][file_id]
+        val_a = 0
+        val_b = 0
+
+        for salt in ["NaCl"]:
+            element = self.molar_masses_compounds[salt]["Cation"]
+            molar_mass_na = self.chemistry_data[element]
+            charge_na = self.molar_masses_compounds[salt]["Cation Charge"]
+            concentration_na = float(self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].get())
+            val_a += concentration_na/(molar_mass_na*charge_na)
+            var_na = self.container_lists["Measured Elements"][filename_short]["Na"][0]
+
+            var_cl = self.container_lists["Measured Elements"][filename_short]["Cl"][0]
+            molar_mass_cl = self.chemistry_data["Cl"]
+            charge_cl = -1
+            intensity_cl = self.container_intensity_corrected["SMPL"]["SMOOTHED"][filename_short][
+                "INCL"][var_cl]
+            intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][filename_short][
+                "INCL"][var_na]
+            var_sensitivity_cl = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][filename_short][
+                "INCL"][var_cl]
+            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][filename_short][
+                "INCL"][var_na]
+            sensitivity_cl = var_sensitivity_cl/var_sensitivity_na
+            concentration_cl = (intensity_cl/intensity_na)*(concentration_na/sensitivity_cl)
+            val_b += concentration_cl/(molar_mass_cl*charge_cl)
+
+
+        for salt in self.container_lists["Selected Salts"]:
+            element = self.molar_masses_compounds[salt]["Cation"]
+            molar_mass_i = self.chemistry_data[element]
+            charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
+            if salt != "NaCl":
+                for isotope in self.container_lists["Measured Elements"][filename_short][element]:
+                    intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][filename_short][
+                        "INCL"][isotope]
+                    intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][filename_short][
+                        "INCL"][var_na]
+                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][filename_short][
+                        "INCL"][isotope]
+                    var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][filename_short][
+                        "INCL"][var_na]
+                    sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                    concentration_i = (intensity_i/intensity_na)*(concentration_na/sensitivity_i)
+                    val_a += concentration_i/(molar_mass_i*charge_i)
+
+        val_c = -val_a/val_b
+        self.charge_balance_check[filename_short].set(round(val_c, 3))
 
     def fi_calculate_massbalance(self, var_entr, mode, var_file, event):
         if self.pysills_mode == "FI":
@@ -28074,6 +28137,7 @@ class PySILLS(tk.Frame):
                 helper_cl = []
                 helper2 = {}
                 helper3 = {}
+                # helper_cb_check = {"Cations": 0, "Anions": 0}
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                     salt_composition = "NaCl"
                     helper2[file_smpl_short] = {}
@@ -28185,6 +28249,7 @@ class PySILLS(tk.Frame):
                         self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
                     self.helper_salt_composition[file_smpl_short].set(salt_composition)
+                    self.check_chargebalance(filename_long=file_smpl)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -28295,6 +28360,8 @@ class PySILLS(tk.Frame):
                 self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                 if file_smpl_short in self.container_files["SMPL"]:
                     self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
+
+                self.check_chargebalance(filename_long=file_smpl)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
             self.parent.bell()
@@ -29129,7 +29196,7 @@ class PySILLS(tk.Frame):
 
     def fi_mass_balance_new(self, mode="mass balance"):
         ## Window Settings
-        window_width = 1000
+        window_width = 1100
         window_height = 600
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -29378,7 +29445,7 @@ class PySILLS(tk.Frame):
 
         frm_02 = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row + 1, column_id=start_column + n_header + 1,
-            n_rows=n_rows - 3, n_columns=int(2*n_header), fg=self.bg_colors["Dark Font"],
+            n_rows=n_rows - 3, n_columns=int(2*n_header + 5), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
         vsb_02 = ttk.Scrollbar(master=frm_02, orient="vertical")
         text_02 = tk.Text(
@@ -29391,6 +29458,9 @@ class PySILLS(tk.Frame):
             if file_smpl_short not in self.helper_salt_composition:
                 self.helper_salt_composition[file_smpl_short] = tk.StringVar()
                 self.helper_salt_composition[file_smpl_short].set("unknown composition")
+            if file_smpl_short not in self.charge_balance_check:
+                self.charge_balance_check[file_smpl_short] = tk.StringVar()
+                self.charge_balance_check[file_smpl_short].set("1.0")
 
             file_smpl = self.container_lists["SMPL"]["Long"][index]
             lbl_i = tk.Label(frm_02, text=file_smpl_short + "\t", bg=self.bg_colors["Very Light"],
@@ -29440,12 +29510,20 @@ class PySILLS(tk.Frame):
             text_02.insert("end", "\t")
 
             entr3_i = tk.Entry(
-                frm_02, textvariable=self.helper_salt_composition[file_smpl_short], width=35,
+                frm_02, textvariable=self.charge_balance_check[file_smpl_short], width=5,
                 highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
             text_02.window_create("insert", window=entr3_i)
-            text_02.insert("end", "\n")
+            text_02.insert("end", "\t")
 
             entr3_i.configure(state="disabled")
+
+            entr4_i = tk.Entry(
+                frm_02, textvariable=self.helper_salt_composition[file_smpl_short], width=40,
+                highlightthickness=0, bg=self.bg_colors["White"], fg=self.bg_colors["Dark Font"])
+            text_02.window_create("insert", window=entr4_i)
+            text_02.insert("end", "\n")
+
+            entr4_i.configure(state="disabled")
 
         ## INITIALIZATION
         self.fi_check_elements_checkbutton()
@@ -30763,6 +30841,131 @@ class PySILLS(tk.Frame):
            n_columns=var_header_n + 5, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Close window", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=self.subwindow_popup.destroy)
+
+    def project_manager(self, type="STD"):
+        """Project manager that allows to check, copy and remove files and to check measured data."""
+        ## Window Settings
+        window_width = 1000
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_manager = tk.Toplevel(self.parent)
+        self.subwindow_manager.title("PySILLS - Project manager")
+        self.subwindow_manager.geometry(var_geometry)
+        self.subwindow_manager.resizable(False, False)
+        self.subwindow_manager["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_manager.attributes("-topmost", "true")
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_manager, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_manager, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_manager.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_manager.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 15
+        int_category_n = 5
+
+        ## LABELS
+        if type == "STD":
+            str_lbl_01 = "Standard files"
+        else:
+            str_lbl_01 = "Sample files"
+
+        lbl_01 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+
+        ## LISTBOXES
+        if type == "STD":
+            self.lb_std_manager = SE(
+                parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
+                n_columns=3*int_category_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Very Light"]).create_simple_listbox()
+        else:
+            self.lb_smpl_manager = SE(
+                parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
+                n_columns=3*int_category_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Very Light"]).create_simple_listbox()
+
+        ## BUTTONS
+        var_btn_01 = self.language_dict["Add"][self.var_language]
+        var_btn_02 = self.language_dict["Copy"][self.var_language]
+        var_btn_03 = self.language_dict["Delete"][self.var_language]
+        var_btn_04 = self.language_dict["Rename"][self.var_language]
+
+        btn_01 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=var_column_start, n_rows=2,
+            n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text=var_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda datatype=type: self.open_csv(datatype))
+        btn_02 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text=var_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda filetype=type: self.copy_file(filetype))
+        btn_03 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=2*int_category_n, n_rows=2,
+            n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text=var_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda type=type: self.delete_file_manager(type))
+        btn_04 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text=var_btn_04, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda type=type: self.rename_file_manager(type))
+
+        ## RADIOBUTTONS
+        rb_01a = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=3*int_category_n + 1, n_rows=1,
+            n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var[type]["Project manager"], value_rb=0, color_bg=self.bg_colors["Light"],
+            fg=self.bg_colors["Dark Font"], text="File manager", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01b = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=3*int_category_n + 1, n_rows=1,
+            n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var[type]["Project manager"], value_rb=1, color_bg=self.bg_colors["Light"],
+            fg=self.bg_colors["Dark Font"], text="Data manager", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
+        ## INITIALIZATION
+        self.fill_lb_manager(type=type, init=True)
+
+    def fill_lb_manager(self, type, init=False):
+        if type == "STD":
+            var_lb_manager = self.lb_std_manager
+        else:
+            var_lb_manager = self.lb_smpl_manager
+
+        var_lb_manager.delete(0, tk.END)
+
+        for filename_short in self.container_lists[type]["Short"]:
+            if init == True:
+                var_lb_manager.insert(tk.END, filename_short)
+
+    def delete_file_manager(self, type):
+        if type == "STD":
+            print(type)
+        else:
+            print(type)
+
+    def rename_file_manager(self, type):
+        if type == "STD":
+            print(type)
+        else:
+            print(type)
 
     def create_container_results(self, var_filetype, var_file_short, mode="MA"):
         ## Intensity
