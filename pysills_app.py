@@ -36,7 +36,7 @@ from modules.fluid_inclusions import FluidInclusions
 from modules.gui_elements import SimpleElements as SE
 from modules.mineral_analysis import MineralAnalysis
 from modules.spike_elimination import GrubbsTestSILLS
-
+import subprocess
 
 ###############
 ### PySILLS ###
@@ -51,7 +51,11 @@ class PySILLS(tk.Frame):
         var_scaling_vertical = round(1080/var_screen_height, 2)
         if var_scaling_horizontal == 1.0 and var_scaling_vertical == 1.0:
             var_scaling = 1.3
-        #
+
+        ## Current version
+        val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
+        self.val_version = val_version.decode("utf-8")
+
         ## Colors
         self.green_dark = "#282D28"
         self.green_medium = "#616D61"
@@ -772,7 +776,7 @@ class PySILLS(tk.Frame):
             "Sensitivity Comparison": {"FIG": None, "CANVAS": None, "AX": None},
             "Histograms": {"FIG": None, "CANVAS": None, "AX": None},
             "Box Plots": {"FIG": None, "CANVAS": None, "AX": None}}
-        #
+
         self.container_var["fi_datareduction_files"]["File Type"] = tk.IntVar()  # e.g. Sample files
         self.container_var["fi_datareduction_files"]["File Type"].set(1)
         self.container_var["fi_datareduction_files"]["Data Type"] = tk.IntVar()  # e.g. RAW data
@@ -1452,12 +1456,12 @@ class PySILLS(tk.Frame):
             n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=var_lbl_04c, relief=tk.FLAT, fontsize=font_elements)
-        now = datetime.datetime.now()
-        now = now.strftime("%Y/%m/%d-%H%M")
+        #now = datetime.datetime.now()
+        #now = now.strftime("%Y/%m/%d-%H%M")
         lbl_version = SE(
             parent=self.parent, row_id=self.n_rows - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Version: pre-release " + now, relief=tk.FLAT, fontsize="sans 8")
+            text="Version: pre-release - " + self.val_version, relief=tk.FLAT, fontsize="sans 8")
         lbl_dev = SE(
             parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
