@@ -21,6 +21,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 from matplotlib.figure import Figure
 import tkinter as tk
 from tkinter import filedialog, ttk, font
+import random as rd
 # internal
 from pypitzer.Pitzer.models import FluidPitzer
 from modules.chemistry import PeriodicSystem
@@ -36,7 +37,8 @@ from modules.fluid_inclusions import FluidInclusions
 from modules.gui_elements import SimpleElements as SE
 from modules.mineral_analysis import MineralAnalysis
 from modules.spike_elimination import GrubbsTestSILLS
-import subprocess
+# import subprocess
+import string
 
 ###############
 ### PySILLS ###
@@ -53,8 +55,9 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
-        self.val_version = val_version.decode("utf-8")
+        # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
+        # self.val_version = val_version.decode("utf-8")
+        self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
 
         ## Colors
         self.green_dark = "#282D28"
