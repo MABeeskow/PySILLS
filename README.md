@@ -82,10 +82,26 @@ following packages:
 ![macOS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=macos&logoColor=F0F0F0) &nbsp;
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 
+#### Running PySILLS
+
+PySILLS can be started by running the command <code> python pysills_app.py </code>. If possible, use the newest version 
+of PySILLS.
+
+#### Attention (only for Mac OS users)
+There is unfortunately a bug concerning the GUI library tkinter and default Python version that is installed on a Mac. 
+You will notice this bug for example when you click on a button and for some cases, it will work directly, and for other
+cases, you have to click several times on the button or after moving the window a little bit.
+In order to avoid this bug, there is the following workaround until Apple will fix this one day:
+1) Install the newest version of PySILLS (it will work with Python 3.12). There are several ways to do this but I would
+recommend to install it via Homebrew which is a package manager for Mac OS.
+2) Install all needed packages explicitly for this newly installed Python version, for example via pip. Example command 
+for the installation of numpy for Python 3.12: <code> python3.12 -m pip install numpy </code>.
+3) If you run PySILLS now by the command <code> python3.12 pysills_app.py </code>, the previously described bug should 
+not appear anymore!
+
 ## 💻 Resources
 
-Coming soon ...
-
+[PySILLS manual](https://docs.google.com/document/d/15dqejKteG7hTiImd5IzyIQJBEtDjFNNw8B1161cvPsY/) |
 [PySILLS on ReadTheDocs](https://pysills.readthedocs.io/en/latest/) |
 [PySILLS on Blogger](https://pysills.blogspot.com/) | 
 [PySILLS on YouTube](https://www.youtube.com/@PySILLS)
@@ -246,4 +262,4 @@ https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
 ---
 
 Version: Pre-Release  
-Last updated: 23.01.2024
+Last updated: 17.04.2024
