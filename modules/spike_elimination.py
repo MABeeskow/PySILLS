@@ -18,6 +18,99 @@ from collections import defaultdict
 import pandas as pd
 
 ## CLASSES
+class OutlierDetection:
+    def __init__(self, raw_data, alpha, threshold, isotope, dataset_complete):
+        self.raw_data = raw_data
+        self.alpha = alpha
+        self.threshold = threshold
+        self.smoothed_data = []
+        self.spike_indices = []
+        self.isotope = isotope
+        self.dataset_complete = dataset_complete
+        print(self.isotope)
+
+    def calculate_whisker_statistcs(self, helper_values, init=True):
+        helper_dataset = helper_values
+        val_quartile_first = np.quantile(helper_dataset, 0.25)
+        val_quartile_third = np.quantile(helper_dataset, 0.75)
+        val_iqr = val_quartile_third - val_quartile_first
+        factor = abs(self.alpha + 1)
+        val_lower_limit = val_quartile_first - factor*val_iqr
+        val_upper_limit = val_quartile_third + factor*val_iqr
+
+        if init == True:
+            lower_outliers = [index for index, value in enumerate(helper_dataset) if value < val_lower_limit and
+                              value > self.threshold]
+            upper_outliers = [index for index, value in enumerate(helper_dataset) if value > val_upper_limit and
+                              value > self.threshold]
+
+            outlier_indices = lower_outliers
+            outlier_indices.extend(upper_outliers)
+            outlier_indices.sort()
+        else:
+            value_poi = helper_dataset[0]
+            print(helper_dataset, helper_dataset[0:])
+            val_mean = np.mean(helper_dataset[0:])
+            values_sp = helper_dataset[0:]
+
+    def find_outlier(self):
+        val_quartile_first = np.quantile(self.dataset_complete, 0.25)
+        val_quartile_third = np.quantile(self.dataset_complete, 0.75)
+        val_iqr = val_quartile_third - val_quartile_first
+        factor = abs(self.alpha + 1)
+        val_lower_limit = val_quartile_first - factor*val_iqr
+        val_upper_limit = val_quartile_third + factor*val_iqr
+
+        lower_outliers = [index for index, value in enumerate(self.dataset_complete) if value < val_lower_limit and
+                          value > self.threshold]
+        upper_outliers = [index for index, value in enumerate(self.dataset_complete) if value > val_upper_limit and
+                          value > self.threshold]
+
+        data_smoothed = self.dataset_complete.copy()
+        outlier_indices = lower_outliers
+        outlier_indices.extend(upper_outliers)
+        outlier_indices.sort()
+
+        for index in outlier_indices:
+            helper_values = self.determine_surrounded_values(var_index=index, stepsize=4)
+            #self.calculate_whisker_statistcs(helper_values=helper_values)
+
+            if index in lower_outliers:
+                corrected_value = np.min(helper_values["SP"])
+            elif index in upper_outliers:
+                corrected_value = np.min(helper_values["SP"])
+
+            data_smoothed[index] = corrected_value
+
+        return data_smoothed, outlier_indices
+    def determine_surrounded_values(self, var_index, stepsize=3):
+        # POI   - Point Of Interest
+        # SP    - Surrounding Points
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = self.dataset_complete[var_index]
+        helper_values["POI"] = val_poi
+        helper_values["All"].append(val_poi)
+
+        for step in range(1, stepsize):
+            step_before = var_index - step
+            step_after = var_index + step
+            if step_before >= 0:
+                helper_values["SP"].append(self.dataset_complete[step_before])
+                helper_values["All"].append(self.dataset_complete[step_before])
+            if step_after < len(self.dataset_complete):
+                helper_values["SP"].append(self.dataset_complete[step_after])
+                helper_values["All"].append(self.dataset_complete[step_after])
+
+        return helper_values
+
+    def calculate_grubbs_critical_value(self, size):
+        t_dist = stats.t.ppf(1 - self.alpha/(2*size), size - 2)
+        numerator = (size - 1)*np.sqrt(np.square(t_dist))
+        denominator = np.sqrt(size)*np.sqrt(size - 2 + np.square(t_dist))
+        critical_value = numerator/denominator
+
+        return critical_value
+
 class GrubbsTestSILLS:
     def __init__(self, raw_data, alpha, threshold, start_index, dataset_complete):
         self.raw_data = raw_data

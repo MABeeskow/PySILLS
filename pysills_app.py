@@ -36,7 +36,7 @@ from modules.essential_functions import EssentialsSRM as ESRM
 from modules.fluid_inclusions import FluidInclusions
 from modules.gui_elements import SimpleElements as SE
 from modules.mineral_analysis import MineralAnalysis
-from modules.spike_elimination import GrubbsTestSILLS
+from modules.spike_elimination import GrubbsTestSILLS, OutlierDetection
 # import subprocess
 import string
 
@@ -861,7 +861,7 @@ class PySILLS(tk.Frame):
         self.container_var["Gas Energy"].set("15.760")
         self.container_var["Spike Elimination Method"] = tk.StringVar()
         self.container_var["Spike Elimination Method"].set("Grubbs-Test")
-        self.list_se_methods = ["Grubbs-Test", "Grubbs-Test (SILLS)"]
+        self.list_se_methods = ["Grubbs-Test", "Grubbs-Test (SILLS)", "PySILLS Spike Finder"]
         self.list_isotopes = []
         self.srm_actual = {}
         self.container_files = {}
@@ -4210,10 +4210,14 @@ class PySILLS(tk.Frame):
                                                         alpha=var_alpha, dataset_complete=dataset_complete,
                                                         threshold=var_threshold)
                                                 elif var_method == 2:
-                                                    data_smoothed, indices_outl = ES(
-                                                        variable=dataset_raw).find_outlier(
-                                                        limit=var_alpha, threshold=var_threshold, interval=interval,
-                                                        data_total=dataset_complete_all, isotope=isotope)
+                                                    data_smoothed, indices_outl = OutlierDetection(
+                                                        raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                        isotope=isotope,
+                                                        dataset_complete=dataset_complete).find_outlier()
+                                                    # data_smoothed, indices_outl = ES(
+                                                    #     variable=dataset_raw).find_outlier(
+                                                    #     limit=var_alpha, threshold=var_threshold, interval=interval,
+                                                    #     data_total=dataset_complete_all, isotope=isotope)
                                             else:
                                                 data_smoothed = dataset_raw
                                                 indices_outl = []
@@ -4340,10 +4344,14 @@ class PySILLS(tk.Frame):
                                                         alpha=var_alpha, dataset_complete=dataset_complete,
                                                         threshold=var_threshold)
                                                 elif var_method == 2:
-                                                    data_smoothed, indices_outl = ES(
-                                                        variable=dataset_raw).find_outlier(
-                                                        limit=var_alpha, threshold=var_threshold, interval=interval,
-                                                        data_total=dataset_complete_all, isotope=isotope)
+                                                    data_smoothed, indices_outl = OutlierDetection(
+                                                        raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                        isotope=isotope,
+                                                        dataset_complete=dataset_complete).find_outlier()
+                                                    # data_smoothed, indices_outl = ES(
+                                                    #     variable=dataset_raw).find_outlier(
+                                                    #     limit=var_alpha, threshold=var_threshold, interval=interval,
+                                                    #     data_total=dataset_complete_all, isotope=isotope)
                                             else:
                                                 data_smoothed = dataset_raw
                                                 indices_outl = []
