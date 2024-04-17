@@ -1503,7 +1503,7 @@ class PySILLS(tk.Frame):
                 var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
                 text=mode, sticky="NESW", relief=tk.FLAT, font=font_elements, command=lambda var_rb=self.var_rb_mode:
                 self.select_experiment(var_rb))
-            if mode in ["Output Analysis"]:
+            if mode in ["Report Analysis"]:
                 rb_mode.configure(state="disabled")
 
             self.gui_elements["main"]["Radiobutton"]["General"].append(rb_mode)
@@ -2043,7 +2043,7 @@ class PySILLS(tk.Frame):
             #
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
         #
-        elif var_rb.get() == 3:  # Output Analysis
+        elif var_rb.get() == 3:  # Report Analysis
             self.pysills_mode = "OA"
             ## Cleaning
             for gui_category in ["Label", "Button"]:
@@ -2056,7 +2056,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text="Output Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
+                text="Report Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
             #
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
             #
@@ -21400,7 +21400,16 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="FI")
 
-        if self.file_loaded == False:
+        if self.file_loaded:
+            self.fi_select_srm_initialization()
+
+            for filetype in ["STD", "SMPL"]:
+                if self.container_var["Spike Elimination"][filetype]["State"]:
+                    if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
+                                                                                "PySILLS Spike Finder"]:
+                        var_method = "Grubbs"
+                        self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        else:
             self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
@@ -21413,16 +21422,30 @@ class PySILLS(tk.Frame):
                 self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        else:
-            self.select_srm_initialization()
+
+        # if self.file_loaded == False:
+        #     self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+        #     self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
         #
-        for filetype in ["STD", "SMPL"]:
-            if self.container_var["Spike Elimination"][filetype]["State"]:
-                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-                                                                            "PySILLS Spike Finder"]:
-                    var_method = "Grubbs"
-                    #
-                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        #     if self.container_var["SRM"]["default"][0].get() != "Select SRM":
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+        #     if self.container_var["SRM"]["default"][1].get() != "Select SRM":
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+        #     if self.demo_mode:
+        #         self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
+        #         self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+        # else:
+        #     self.select_srm_initialization()
+        #
+        # for filetype in ["STD", "SMPL"]:
+        #     if self.container_var["Spike Elimination"][filetype]["State"]:
+        #         if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
+        #                                                                     "PySILLS Spike Finder"]:
+        #             var_method = "Grubbs"
+        #             #
+        #             self.spike_elimination_all(filetype=filetype, algorithm=var_method)
 
         self.build_srm_database()
         self.file_system_need_update = False
