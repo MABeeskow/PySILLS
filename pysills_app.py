@@ -12,7 +12,7 @@
 
 ## MODULES
 # external
-import os, pathlib, sys, re, datetime, csv, string, math, webbrowser
+import os, pathlib, sys, re, datetime, csv, string, math, webbrowser, time
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -275,6 +275,7 @@ class PySILLS(tk.Frame):
         subcategories = ["Label", "Entry", "Radiobutton", "Checkbox"]
 
         self.helper_option_menus = {}
+        self.container_listbox_files = {"STD": None, "SMPL": None, "STD Manager": None, "SMPL Manager": None}
 
         self.container_var = {}
         for category in categories:
@@ -1485,6 +1486,9 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 22, column_id=start_column + 11, n_rows=self.n_rows - 26,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
 
+        self.container_listbox_files["STD"] = self.lb_std
+        self.container_listbox_files["SMPL"] = self.lb_smpl
+
         # RADIOBUTTONS
         if self.var_language == "English":
             list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions"]
@@ -2096,7 +2100,7 @@ class PySILLS(tk.Frame):
             for var_srm in helper_list:
                 self.fill_srm_values(var_srm=var_srm)
 
-    def load_data_as_dataframe(self, filename_short, filename_long):
+    def load_data_as_dataframe(self, filename_short, filename_long, with_isotopes=False):
         if self.file_loaded == False:
             if self.container_icpms["name"] != None:
                 var_skipheader = self.container_icpms["skipheader"]
@@ -2111,7 +2115,13 @@ class PySILLS(tk.Frame):
 
         times = DE().get_times(dataframe=df_data)
 
-        return df_data, times
+        if with_isotopes == True:
+            isotopes = DE().get_isotopes(dataframe=df_data)
+
+        if with_isotopes == True:
+            return df_data, times, isotopes
+        else:
+            return df_data, times
 
     def build_container_measurements(self, filetype, filename_short):
         index_filename = self.container_lists[filetype]["Short"].index(filename_short)
@@ -2703,9 +2713,17 @@ class PySILLS(tk.Frame):
         if var_filetype == "STD":
             click_id = self.lb_std.curselection()
             var_fig = self.quick_plot_figure_std
+        elif var_filetype == "STD Manager":
+            click_id = self.lb_std_manager.curselection()
+            var_fig = self.quick_plot_figure_std
+            var_filetype = "STD"
         elif var_filetype == "SMPL":
             click_id = self.lb_smpl.curselection()
             var_fig = self.quick_plot_figure_smpl
+        elif var_filetype == "SMPL Manager":
+            click_id = self.lb_smpl_manager.curselection()
+            var_fig = self.quick_plot_figure_smpl
+            var_filetype = "SMPL"
 
         click_id = click_id[0]
         file_long = self.container_lists[var_filetype]["Long"][click_id]
@@ -7186,7 +7204,7 @@ class PySILLS(tk.Frame):
                     save_file.write("\n")
 
     #
-    def open_project(self):
+    def open_project(self): # sex
         filename = filedialog.askopenfilename()
 
         try:
@@ -7291,7 +7309,10 @@ class PySILLS(tk.Frame):
                     index_container[strings[n_settings]] += index
                     n_settings += 1
 
+            time_start = datetime.datetime.now()
+
             if self.pysills_mode == "MA":
+                time_start0 = datetime.datetime.now()
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
                                index_container["STANDARD FILES"] - 1):
@@ -7305,6 +7326,10 @@ class PySILLS(tk.Frame):
                         self.var_opt_icp.set(splitted_std[3])
                     except:
                         self.var_opt_icp.set("Select ICP-MS")
+
+                time_end0 = datetime.datetime.now()
+                time_delta0 = (time_end0 - time_start0)*1000
+                print(f"Process time (opening project - part 'Project Information'):", time_delta0.total_seconds(), "ms")
                 ## STANDARD FILES
                 for i in range(index_container["STANDARD FILES"] + 1,
                                index_container["SAMPLE FILES"] - 1):
@@ -7350,7 +7375,10 @@ class PySILLS(tk.Frame):
                             times[0][0] + ":" + times[0][1] + ":" + times[0][2])
 
                     self.ma_current_file_std = self.list_std[0]
-                    #
+
+                time_end1 = datetime.datetime.now()
+                time_delta1 = (time_end1 - time_end0)*1000
+                print(f"Process time (opening project - part 'Standard Files'):", time_delta1.total_seconds(), "ms")
                 ## SAMPLE FILES
                 for i in range(index_container["SAMPLE FILES"] + 1,
                                index_container["ISOTOPES"] - 1):
@@ -7438,6 +7466,10 @@ class PySILLS(tk.Frame):
                         self.container_var["Oxides Quantification INCL"]["Total Amounts"][var_file_short].set("100.0")
 
                     self.ma_current_file_smpl = self.list_smpl[0]
+
+                time_end2 = datetime.datetime.now()
+                time_delta2 = (time_end2 - time_end1)*1000
+                print(f"Process time (opening project - part 'Sample Files'):", time_delta2.total_seconds(), "ms")
                 ## ISOTOPES
                 for i in range(index_container["ISOTOPES"] + 1,
                                index_container["SAMPLE SETTINGS"] - 1):
@@ -7453,7 +7485,10 @@ class PySILLS(tk.Frame):
 
                         if len(oxide) > 0:
                             self.container_lists["Selected Oxides"]["All"].append(oxide)
-                    #
+
+                time_end3 = datetime.datetime.now()
+                time_delta3 = (time_end3 - time_end2)*1000
+                print(f"Process time (opening project - part 'Isotopes'):", time_delta3.total_seconds(), "ms")
                 ## SAMPLE/MATRIX SETTINGS
                 for i in range(index_container["SAMPLE SETTINGS"] + 1,
                                index_container["DWELL TIME SETTINGS"] - 1):
@@ -7471,6 +7506,9 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(
                         info_concentration)
 
+                time_end4 = datetime.datetime.now()
+                time_delta4 = (time_end4 - time_end3)*1000
+                print(f"Process time (opening project - part 'Sample Settings'):", time_delta4.total_seconds(), "ms")
                 ## DWELL TIME SETTINGS
                 for i in range(index_container["DWELL TIME SETTINGS"] + 1,
                                index_container["INTERVAL SETTINGS"] - 1):
@@ -7480,7 +7518,10 @@ class PySILLS(tk.Frame):
                     isotope = splitted_std[0]
                     self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
                     self.container_var["dwell_times"]["Entry"][isotope].set(splitted_std[1])
-                    #
+
+                time_end5 = datetime.datetime.now()
+                time_delta5 = (time_end5 - time_end4)*1000
+                print(f"Process time (opening project - part 'Dwell Time Settings'):", time_delta5.total_seconds(), "ms")
                 ## INTERVAL SETTINGS
                 for i in range(index_container["INTERVAL SETTINGS"] + 1,
                                index_container["SPIKE ELIMINATION"] - 1):
@@ -7532,7 +7573,10 @@ class PySILLS(tk.Frame):
                             self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id][
                                 "Indices"] = helper_indices
                             self.container_helper[var_filetype][var_file_short]["MAT"]["Indices"].append(var_id)
-                    #
+
+                time_end6 = datetime.datetime.now()
+                time_delta6 = (time_end6 - time_end5)*1000
+                print(f"Process time (opening project - part 'Interval Settings'):", time_delta6.total_seconds(), "ms")
                 ## SPIKE ELIMINATION
                 index = 0
                 if self.old_file:
@@ -7567,6 +7611,11 @@ class PySILLS(tk.Frame):
                                 var_id = int(list_values[var_index])
                                 val_id = float(list_values[var_index + 1])
                                 self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+
+                time_end7 = datetime.datetime.now()
+                time_delta7 = (time_end7 - time_end6)*1000
+                print(f"Process time (opening project - part 'Spike Elimination'):", time_delta7.total_seconds(), "ms")
+
                 if self.old_file == False:
                     # EXPERIMENTAL DATA
                     helper_indices = {}
@@ -7638,6 +7687,12 @@ class PySILLS(tk.Frame):
                             self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
                             self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
 
+                time_end8 = datetime.datetime.now()
+                time_delta8 = (time_end8 - time_end7)*1000
+                print(f"Process time (opening project - part 'Experimental Data'):", time_delta8.total_seconds(), "ms")
+                time_end = datetime.datetime.now()
+                time_delta = (time_end - time_start)*1000
+                print(f"Process time (opening project - total):", time_delta.total_seconds(), "ms")
             elif self.pysills_mode == "FI":
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
@@ -8203,6 +8258,9 @@ class PySILLS(tk.Frame):
                             self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
                             self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
 
+                time_end = datetime.datetime.now()
+                time_delta = (time_end - time_start)*1000
+                print(f"Process time (opening project):", time_delta.total_seconds(), "ms")
             elif self.pysills_mode == "MI":
                 ## PROJECT INFORMATION
                 for i in range(index_container["PROJECT INFORMATION"] + 2,
@@ -8758,7 +8816,12 @@ class PySILLS(tk.Frame):
                             self.container_measurements["SELECTED"][key]["RAW"][isotope] = {}
                             self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
 
+                time_end = datetime.datetime.now()
+                time_delta = (time_end - time_start)*1000
+                print(f"Process time (opening project):", time_delta.total_seconds(), "ms")
+
             # Initialization
+            time_start = datetime.datetime.now()
             self.file_loaded = True
             self.demo_mode = False
 
@@ -8774,6 +8837,9 @@ class PySILLS(tk.Frame):
             elif self.pysills_mode == "MI":
                 self.mi_settings()
 
+            time_end = datetime.datetime.now()
+            time_delta = (time_end - time_start)*1000
+            print(f"Process time (opening project - part 'Initialization'):", time_delta.total_seconds(), "ms")
         except FileNotFoundError:
             print("File not found!")
 
@@ -8808,7 +8874,7 @@ class PySILLS(tk.Frame):
     ####################
     ## DATA PROCESSING #
     ####################
-    def open_csv(self, datatype):
+    def open_csv(self, datatype): # sex
         if datatype == "STD":
             if "Default_STD_01.csv" in self.list_std:
                 self.list_std.clear()
@@ -17937,6 +18003,19 @@ class PySILLS(tk.Frame):
         self.do_spike_elimination_all_grubbs(filetype="STD", spike_elimination_performed=False)
         self.do_spike_elimination_all_grubbs(filetype="SMPL", spike_elimination_performed=False)
 
+    def background_datareduction(self, var_filetype, var_datatype, var_file_short=None, mode="specific"):
+        if mode == "specific":
+            pass
+        else:
+            for filename_short in self.container_lists[var_filetype]["Short"]:
+                pass
+
+    def mineral_datareduction(self, var_filetype, var_datatype, var_file_short):
+        pass
+
+    def inclusion_datareduction(self, var_filetype, var_datatype, var_file_short):
+        pass
+
     def get_intensity(self, var_filetype, var_datatype, var_file_short, var_focus=None, mode="Specific", check=False):
         """ Collect the signal intensities from all defined calculation intervals.
         -------
@@ -18069,9 +18148,6 @@ class PySILLS(tk.Frame):
                        var_file_short]).get_intensity_corrected(
                     data_container=self.container_intensity[var_filetype][var_datatype][var_file_short])
         else:
-            # Alternative
-            time_start = datetime.datetime.now()
-
             if var_focus == "STD":
                 list_filetypes = ["STD"]
             elif var_focus == "SMPL":
@@ -18253,10 +18329,6 @@ class PySILLS(tk.Frame):
                         print("To avoid the appearance of additional calculation problems, please check if the previous "
                               "problem can be solved due to the given instructions if present.")
                         break
-
-            time_end = datetime.datetime.now()
-            time_delta = (time_end - time_start)*1000
-            print(f"Taken time: {time_delta.total_seconds()} ms")
 
         ## CHECK
         if check:
@@ -27325,17 +27397,6 @@ class PySILLS(tk.Frame):
                 filename_short=filename_short, filename_long=filename_long)
             dataset_time = list(times)
 
-            # if self.container_icpms["name"] != None:
-            #     var_skipheader = self.container_icpms["skipheader"]
-            #     var_skipfooter = self.container_icpms["skipfooter"]
-            #     df_data = DE(filename_long=var_file).get_measurements(
-            #         delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-            # else:
-            #     df_data = DE(filename_long=var_file).get_measurements(
-            #         delimiter=",", skip_header=3, skip_footer=1)
-            #
-            # dataset_time = list(DE().get_times(dataframe=df_data))
-            # var_file_short = var_file.split("/")[-1]
             var_file_short = filename_short
 
             if self.container_var[key_setting]["Calculation Interval"][filetype][var_file_short].get() == 0:
@@ -31505,6 +31566,239 @@ class PySILLS(tk.Frame):
             text="Close window", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=self.subwindow_popup.destroy)
 
+    def run_datareduction_intensity(self, filetype):
+        time_start = datetime.datetime.now()
+
+        for var_file_short in self.container_lists[filetype]["Short"]:
+            self.get_condensed_intervals_of_file(filetype=filetype, filename_short=var_file_short)
+
+        var_file_short = "None"
+
+        for var_datatype in ["RAW", "SMOOTHED"]:
+            print(filetype, var_datatype)
+            # Extract signal intensity values
+            self.get_intensity(
+                var_filetype=filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_focus=filetype, mode="All")
+
+            if self.pysills_mode == "MA":
+                if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    str_averagetype = "arithmetic mean"
+                else:
+                    str_averagetype = "median"
+
+                # Calculate corrected signal intensity values
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_corrected[filetype][var_datatype]).get_averaged_intensities(
+                    data_container=self.container_intensity_corrected[filetype][var_datatype],
+                    average_type=str_averagetype)
+
+                # Calculate signal intensity ratios
+                self.ma_get_intensity_ratio(
+                    var_filetype=filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long="None", var_focus="None", mode="All")
+
+        time_end = datetime.datetime.now()
+        time_delta = (time_end - time_start)*1000
+        print(f"Process time:", filetype, "-", time_delta.total_seconds(), "ms")
+
+    def run_datareduction(self, filetype, focus_intensity=False, focus_sensitivity=False, focus_concentration=False):
+        str_filetype = filetype
+        if focus_intensity == True:
+            self.run_datareduction_intensity(filetype=str_filetype)
+            time.sleep(1)
+            self.lbl_prg.configure(text=filetype + ": completed 'Intensity data reduction'")
+        elif focus_sensitivity == True:
+            # Extract signal intensity values
+            # Calculate corrected signal intensity values
+            # Calculate signal intensity ratios
+            time.sleep(1)
+            self.lbl_prg.configure(text=filetype + ": completed 'Sensitivity data reduction'")
+        elif focus_concentration == True:
+            # Calculate concentration values
+            # Calculate concentration ratios
+            # Calculate limit of detection values
+            time.sleep(1)
+            self.lbl_prg.configure(text=filetype + ": completed 'Composition data reduction'")
+
+    def update_progress(self, parent, variable, value):
+        variable["value"] = value
+        parent.update()
+
+    def create_progress_bar_window_datareduction(self, mode="complete"):
+        ## Window Settings
+        window_width = 400
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_progressbar_datareduction = tk.Toplevel(self.parent)
+        self.subwindow_progressbar_datareduction.title("Please wait ...")
+        self.subwindow_progressbar_datareduction.geometry(var_geometry)
+        self.subwindow_progressbar_datareduction.resizable(False, False)
+        self.subwindow_progressbar_datareduction["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_progressbar_datareduction, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_progressbar_datareduction, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_progressbar_datareduction.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_progressbar_datareduction.grid_columnconfigure(i, minsize=column_min)
+
+        ## Progress bar
+        self.prgbar = ttk.Progressbar(master=self.subwindow_progressbar_datareduction, maximum=100)
+        self.prgbar.grid(row=1, column=1, rowspan=1, columnspan=16, sticky="nesw")
+
+        ## LABELS
+        self.helper_lbl_progress = tk.StringVar()
+        self.helper_lbl_progress.set("Process has started!")
+        self.lbl_prg = SE(
+            parent=self.subwindow_progressbar_datareduction, row_id=2, column_id=1, n_rows=1, n_columns=16,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text=self.helper_lbl_progress.get(), relief=tk.FLAT, fontsize="sans 10 bold")
+
+
+        if mode == "complete":
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=0)
+            ## STD
+            # Complete signal intensity data reduction
+            self.run_datareduction(filetype="STD", focus_intensity=True)
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=20)
+            # Complete sensitivity data reduction
+            self.run_datareduction(filetype="STD", focus_sensitivity=True)
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=40)
+            # Complete concentration data reduction
+            self.run_datareduction(filetype="STD", focus_concentration=True)
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=50)
+            ## SMPL
+            # Complete signal intensity data reduction
+            self.run_datareduction(filetype="SMPL", focus_intensity=True)
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=70)
+            # Complete sensitivity data reduction
+            self.run_datareduction(filetype="SMPL", focus_sensitivity=True)
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=90)
+            # Complete concentration data reduction
+            self.run_datareduction(filetype="SMPL", focus_concentration=True)
+            self.update_progress(parent=self.subwindow_progressbar_datareduction, variable=self.prgbar, value=99.9)
+        elif mode == "only intensity-related":
+            ## STD
+            # Extract signal intensity values
+            # Calculate corrected signal intensity values
+            # Calculate signal intensity ratios
+            ## SMPL
+            # Extract signal intensity values
+            # Calculate corrected signal intensity values
+            # Calculate signal intensity ratios
+            pass
+        elif mode == "only sensitivity-related":
+            ## STD
+            # Calculate analytical sensitivity values
+            # Calculate normalized sensitivity values
+            # Calculate relative sensitivity factor values
+            ## SMPL
+            # Calculate analytical sensitivity values
+            # Calculate normalized sensitivity values
+            # Calculate relative sensitivity factor values
+            pass
+        elif mode == "only concentration-related":
+            ## STD
+            # Calculate concentration values
+            # Calculate concentration ratios
+            # Calculate limit of detection values
+            ## SMPL
+            # Calculate concentration values
+            # Calculate concentration ratios
+            # Calculate limit of detection values
+            pass
+
+    def extract_filename_information(self, variable):
+        """Extracts the long and short filename and also its file ending."""
+        filename_long = variable
+        filename_short = filename_long.split("/")[-1]
+        filename_ending = filename_short.split(".")[-1]
+
+        return filename_long, filename_short, filename_ending
+
+    def add_file_manager(self, filetype): # sex
+        """Adds a file or multiple files to the related listbox and table within the PySILLS file manager."""
+
+        output_filenames = filedialog.askopenfilenames(
+            parent=self.parent,
+            filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
+                       ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
+
+        for output_filename in output_filenames:
+            filename_long, filename_short, filename_ending = self.extract_filename_information(variable=output_filename)
+
+            if filename_short not in self.container_lists[filetype]["Short"]:
+                self.container_lists[filetype]["Short"].append(filename_short)
+                self.container_lists[filetype]["Long"].append(filename_long)
+                self.container_listbox_files[filetype].insert(tk.END, filename_short)
+                self.container_listbox_files[filetype + " Manager"].insert(tk.END, str(filename_short))
+
+                str_filename_short = filename_short
+                str_filename_long = filename_long
+                str_filetype = filetype
+                df_data, df_times, df_isotopes = self.load_data_as_dataframe(
+                    filename_short=str_filename_short, filename_long=str_filename_long, with_isotopes=True)
+
+                if "Dataframe" not in self.container_measurements:
+                    self.container_measurements["Dataframe"] = {}
+                if str_filename_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][filename_short] = df_data
+
+                self.container_lists["Measured Isotopes"][filename_short] = df_isotopes
+                self.add_needed_variables_for_later_added_files(
+                    filename_long=str_filename_long, filename_short=str_filename_short, filetype=str_filetype,
+                    file_isotopes=df_isotopes)
+
+                if (self.container_icpms["name"] != None and
+                        self.container_icpms["name"] not in ["PerkinElmer Syngistix"]):
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    var_timestamp = self.container_icpms["timestamp"]
+                    var_icpms = self.container_icpms["name"]
+
+                    dates, times = Data(filename=str_filename_long).import_as_list(
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                        icpms=var_icpms)
+                elif self.container_icpms["name"] == "PerkinElmer Syngistix":
+                    create_time = os.path.getctime(str_filename_long)
+                    create_date = datetime.datetime.fromtimestamp(create_time)
+                    times = [[str(create_date.hour), str(create_date.minute), str(create_date.second)]]
+                    dates = [str(create_date.year), str(create_date.month), str(create_date.day)]
+                else:
+                    dates, times = Data(filename=str_filename_long).import_as_list(
+                        skip_header=3, skip_footer=1, timestamp=2,
+                        icpms="Agilent 7900s")
+
+                if str_filename_short not in self.container_var["acquisition times"][filetype]:
+                    self.container_var["acquisition times"][filetype][str_filename_short] = tk.StringVar()
+                    self.container_var["acquisition times"][filetype][str_filename_short].set(
+                        times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+
+        self.demo_mode = False
+
+    def copy_file_manager(self, filetype):
+        """Copies a file and adds it to the related listbox and table within the PySILLS file manager."""
+        pass
+
+    def rename_file_manager(self, filetype):
+        """Renames a file and updates the result."""
+        pass
+
+    def remove_file_manager(self, filetype):
+        """Removes a file and updates the result."""
+        pass
+
     def project_manager(self, type="STD"):
         """Project manager that allows to check, copy and remove files and to check measured data."""
         ## Window Settings
@@ -31515,13 +31809,12 @@ class PySILLS(tk.Frame):
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-
+        self.create_progress_bar_window_datareduction()
         self.subwindow_manager = tk.Toplevel(self.parent)
         self.subwindow_manager.title("PySILLS - Project manager")
         self.subwindow_manager.geometry(var_geometry)
         self.subwindow_manager.resizable(False, False)
         self.subwindow_manager["bg"] = self.bg_colors["Super Dark"]
-        self.subwindow_manager.attributes("-topmost", "true")
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_manager, x, weight=1)
@@ -31558,11 +31851,17 @@ class PySILLS(tk.Frame):
                 parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
                 n_columns=3*int_category_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Very Light"]).create_simple_listbox()
+            self.container_listbox_files["STD Manager"] = self.lb_std_manager
+            self.lb_std_manager.bind(
+                "<Double-1>", lambda event, var_filetype="STD Manager": self.quick_plot_file(var_filetype, event))
         else:
             self.lb_smpl_manager = SE(
                 parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
                 n_columns=3*int_category_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Very Light"]).create_simple_listbox()
+            self.container_listbox_files["SMPL Manager"] = self.lb_smpl_manager
+            self.lb_smpl_manager.bind(
+                "<Double-1>", lambda event, var_filetype="SMPL": self.quick_plot_file(var_filetype, event))
 
         ## BUTTONS
         var_btn_01 = self.language_dict["Add"][self.var_language]
@@ -31574,22 +31873,22 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=var_column_start, n_rows=2,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda datatype=type: self.open_csv(datatype))
+            command=lambda filetype=type: self.add_file_manager(filetype))
         btn_02 = SE(
             parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=int_category_n, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda filetype=type: self.copy_file(filetype))
+            command=lambda filetype=type: self.copy_file_manager(filetype))
         btn_03 = SE(
             parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=2*int_category_n, n_rows=2,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda type=type: self.delete_file_manager(type))
+            command=lambda filetype=type: self.remove_file_manager(filetype))
         btn_04 = SE(
             parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=int_category_n, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_04, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda type=type: self.rename_file_manager(type))
+            command=lambda filetype=type: self.rename_file_manager(filetype))
 
         ## RADIOBUTTONS
         rb_01a = SE(
