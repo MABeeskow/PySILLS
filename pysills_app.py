@@ -7218,7 +7218,7 @@ class PySILLS(tk.Frame):
             except:
                 self.var_opt_icp.set("Select ICP-MS")
 
-    def open_project(self): # sex
+    def open_project(self):
         filename = filedialog.askopenfilename()
 
         try:
@@ -8876,7 +8876,7 @@ class PySILLS(tk.Frame):
     ####################
     ## DATA PROCESSING #
     ####################
-    def open_csv(self, datatype): # sex
+    def open_csv(self, datatype):
         if datatype == "STD":
             if "Default_STD_01.csv" in self.list_std:
                 self.list_std.clear()
@@ -11888,6 +11888,8 @@ class PySILLS(tk.Frame):
     ####################################################################################################################
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
+        time_start = datetime.datetime.now()
+        helper_times = {}
         if self.file_system_need_update:
             path = os.getcwd()
             path = self.path_pysills
@@ -12076,6 +12078,10 @@ class PySILLS(tk.Frame):
 
             self.define_isotope_colors()
 
+        time_start1 = datetime.datetime.now()
+        time_delta1 = (time_start1 - time_start)*1000
+        helper_times["File system update"] = time_delta1.total_seconds()
+
         ## Window Settings
         window_width = 1220
         window_height = 950
@@ -12120,83 +12126,178 @@ class PySILLS(tk.Frame):
                 if isotope not in self.container_lists["Measured Elements"][element]:
                     self.container_lists["Measured Elements"][element].append(isotope)
 
+        time_start2 = datetime.datetime.now()
+        time_delta2 = (time_start2 - time_start1)*1000
+        helper_times["GUI initialization"] = time_delta2.total_seconds()
+
         ## Static
         # Build section 'Project Information'
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_project_information(var_geometry_info=var_project_information)
+        time_start3 = datetime.datetime.now()
+        time_delta3 = (time_start3 - time_start2)*1000
+        helper_times["Project information"] = time_delta3.total_seconds()
         # Build section 'Standard Reference Material'
         var_standard_reference_material = {"Row start": 3, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_standard_reference_material(var_geometry_info=var_standard_reference_material)
+        time_start4 = datetime.datetime.now()
+        time_delta4 = (time_start4 - time_start3)*1000
+        helper_times["Standard Reference Material"] = time_delta4.total_seconds()
         # Build section 'Matrix Settings'
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_sample_settings(var_geometry_info=var_sample_settings)
+        time_start5 = datetime.datetime.now()
+        time_delta5 = (time_start5 - time_start4)*1000
+        helper_times["Sample Settings"] = time_delta5.total_seconds()
         # Build section 'Assemblage Setup'
         var_assemblage_setup = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_start5)*1000
+        time_previous = time_new
+        helper_times["Assemblage Setup"] = time_delta_new.total_seconds()
         # Build section 'Dwell Time Setup'
         var_dwell_time_setup = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Dwell Time Setup"] = time_delta_new.total_seconds()
         # Build section 'Calculation Window (Background) Setup'
         var_calculation_window_bg_setup = {"Row start": 12, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Calculation window BG"] = time_delta_new.total_seconds()
         # Build section 'Calculation Window (Sample) Setup'
         var_calculation_window_smpl_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_smpl_setup)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Calculation window SMPL"] = time_delta_new.total_seconds()
         # Build section 'Spike Elimination Setup'
         var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Spike elimination"] = time_delta_new.total_seconds()
         # Build section 'Check-Up'
         var_checkup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Check-up GUI"] = time_delta_new.total_seconds()
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 17, "Column start": 42, "N rows": 1, "N columns": 18}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Acquisition Times"] = time_delta_new.total_seconds()
         # Build section 'Standard Files'
         var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 15, "N columns": 22}
         self.place_standard_files_table(var_geometry_info=var_standard_files)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Table STD"] = time_delta_new.total_seconds()
         # Build section 'Sample Files'
         var_sample_files = {"Row start": 17, "Column start": 19, "N rows": 18, "N columns": 22}
         self.place_sample_files_table(var_geometry_info=var_sample_files)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Table SMPL"] = time_delta_new.total_seconds()
         # Build section 'Time-Signal Diagram Checker'
         self.define_isotope_colors()
         var_time_signal_diagram_check = {"Row start": 25, "Column start": 42, "N rows": 1, "N columns": 18}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        helper_times["Time-signal Diagram checker"] = time_delta_new.total_seconds()
         # Build section 'Measured Isotopes'
         var_measured_isotopes = {"Row start": 1, "Column start": 42, "N rows": 15, "N columns": 18}
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        time_previous0 = time_previous
+        helper_times["Table Isotopes"] = time_delta_new.total_seconds()
+
+        # time_new = datetime.datetime.now()
+        # time_delta_new = (time_new - time_previous)*1000
+        # time_previous = time_new
+        # title = "G"
+        # helper_times[title] = time_delta_new.total_seconds()
+        # print(f"Process time (t-I diagram checker - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         ## INITIALIZATION
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
 
-        for filetype in ["STD", "SMPL"]:
-            if self.container_var["Spike Elimination"][filetype]["State"]:
-                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-                                                                            "PySILLS Spike Finder"]:
-                    var_method = "Grubbs"
-                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        helper_times_init = {}
+        time_new0 = datetime.datetime.now()
+        time_delta_new = (time_new0 - time_previous)*1000
+        time_previous = time_new0
+        title = "A"
+        helper_times_init[title] = time_delta_new.total_seconds()
+        print(f"Process time (Main settings window - Initialization - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         if self.file_loaded:
             if self.container_var["Spike Elimination"]["STD"]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
                                                                             "PySILLS Spike Finder"]:
                     var_method = "Grubbs"
-                self.spike_elimination_all(filetype="STD", algorithm=var_method)
+                    self.spike_elimination_all(filetype="STD", algorithm=var_method)
             if self.container_var["Spike Elimination"]["SMPL"]["State"]:
                 if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
                                                                             "PySILLS Spike Finder"]:
                     var_method = "Grubbs"
-                self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+                    self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
         else:
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
             self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        title = "B"
+        helper_times_init[title] = time_delta_new.total_seconds()
+        print(f"Process time (Main settings window - Initialization - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
+
         self.build_srm_database()
         self.file_system_need_update = False
-
         self.btn_save_project.configure(state="normal")
+
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        title = "C"
+        helper_times_init[title] = time_delta_new.total_seconds()
+        print(f"Process time (Main settings window - Initialization - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
+
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous0)*1000
+        time_previous = time_new
+        helper_times_init["Initialization"] = time_delta_new.total_seconds()
+
+        time_end = datetime.datetime.now()
+        time_delta = (time_end - time_start)*1000
+        print(f"Process time (opening project - part 'Total'):", time_delta.total_seconds(), "ms")
+
+        print("")
+        print("Evaluation: process time (main settings window")
+        for key, value in helper_times.items():
+            amount = round(value/time_delta.total_seconds()*100, 2)
+            if amount > 1.0:
+                print(key, amount, "%")
 
     def place_project_information(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Project Information'
@@ -14254,10 +14355,7 @@ class PySILLS(tk.Frame):
                 axis_item.axis("off")
                 axis_item.set_visible(False)
 
-            if filetype == "STD":
-                self.canvas_time_signal_checker.draw()
-            else:
-                self.canvas_time_signal_checker.draw()
+            self.canvas_time_signal_checker.draw()
 
         var_file_long = self.container_lists[var_filetype]["Long"][self.current_file_id_checker]
         var_file_short = self.container_lists[var_filetype]["Short"][self.current_file_id_checker]
@@ -14280,6 +14378,7 @@ class PySILLS(tk.Frame):
                         delimiter=",", skip_header=3, skip_footer=1)
             else:
                 df_data = self.container_measurements["Dataframe"][var_file_short]
+
             dataset_time = list(DE().get_times(dataframe=df_data))
             x_max = max(dataset_time)
             icp_measurements = np.array(
@@ -14371,19 +14470,13 @@ class PySILLS(tk.Frame):
             ax.xaxis.set_tick_params(labelsize=8)
             ax.yaxis.set_tick_params(labelsize=8)
 
-            if var_filetype == "STD":
-                self.canvas_time_signal_checker.draw()
-            else:
-                self.canvas_time_signal_checker.draw()
-
+            self.canvas_time_signal_checker.draw()
             self.temp_lines_checkup2[var_filetype][var_file_short] = 1
         else:
             self.temp_axes_checkup2[var_filetype][var_file_short].axis("on")
             self.temp_axes_checkup2[var_filetype][var_file_short].set_visible(True)
-            if var_filetype == "STD":
-                self.canvas_time_signal_checker.draw()
-            else:
-                self.canvas_time_signal_checker.draw()
+
+            self.canvas_time_signal_checker.draw()
 
     def place_standard_files_table(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Standard Files'
@@ -16440,16 +16533,13 @@ class PySILLS(tk.Frame):
                 "RAW"] = ln_raw
 
             if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
-                if isotope in self.container_measurements["EDITED"][str_filename_short]:
-                    if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
-                        ln_smoothed = ax.plot(
-                            self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
-                                "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
-                            visible=True)
-                        self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
-                            isotope]["SMOOTHED"] = ln_smoothed
-                        self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
-                            isotope].set(1)
+                ln_smoothed = ax.plot(
+                    self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                    label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
+                    isotope]["SMOOTHED"] = ln_smoothed
+                self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
+                    isotope].set(1)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -21013,7 +21103,16 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="FI")
 
-        if self.file_loaded == False:
+        if self.file_loaded:
+            self.fi_select_srm_initialization()
+
+            for filetype in ["STD", "SMPL"]:
+                if self.container_var["Spike Elimination"][filetype]["State"]:
+                    if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
+                                                                                "PySILLS Spike Finder"]:
+                        var_method = "Grubbs"
+                        self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        else:
             self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
@@ -21026,21 +21125,10 @@ class PySILLS(tk.Frame):
                 self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        else:
-            self.fi_select_srm_initialization()
-
-        for filetype in ["STD", "SMPL"]:
-            if self.container_var["Spike Elimination"][filetype]["State"]:
-                if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-                                                                            "PySILLS Spike Finder"]:
-                    var_method = "Grubbs"
-                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
 
         self.file_system_need_update = False
-
-        self.select_opt_inclusion_is_quantification(var_opt="Mass Balance",
-                                                    dict_geometry_info=var_quantification_method)
-
+        self.select_opt_inclusion_is_quantification(
+            var_opt="Mass Balance", dict_geometry_info=var_quantification_method)
         self.select_opt_inclusion_quantification(
             var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
@@ -26325,18 +26413,18 @@ class PySILLS(tk.Frame):
                     "RAW"] = ln_raw
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
-                    if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
-                        ln_smoothed = ax.plot(
-                            self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"], label=isotope,
-                            color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                        # ln_smoothed = ax.plot(
-                        #     self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
-                        #         "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
-                        #     visible=True)
-                        self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                            "SMOOTHED"] = ln_smoothed
-                        self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
-                            isotope].set(1)
+                    #if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
+                    ln_smoothed = ax.plot(
+                        self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"], label=isotope,
+                        color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                    # ln_smoothed = ax.plot(
+                    #     self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
+                    #         "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                    #     visible=True)
+                    self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                        "SMOOTHED"] = ln_smoothed
+                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                        isotope].set(1)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -31022,13 +31110,23 @@ class PySILLS(tk.Frame):
                 command=lambda mode="SMPL": self.custom_spike_check(mode))
 
             # Frames
+            if self.container_var["Spike Elimination"]["STD"]["State"]:
+                color_std = self.sign_green
+            else:
+                color_std = self.sign_red
+
+            if self.container_var["Spike Elimination"]["SMPL"]["State"]:
+                color_smpl = self.sign_green
+            else:
+                color_smpl = self.sign_red
+
             self.frm_spk_std = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=17, n_rows=1, n_columns=1,
-                fg=self.bg_colors["Very Dark"], bg=self.sign_red).create_frame(relief=tk.SOLID)
+                fg=self.bg_colors["Very Dark"], bg=color_std).create_frame(relief=tk.SOLID)
             self.frm_spk_std.config(highlightbackground="black", bd=1)
             self.frm_spk_smpl = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=17, n_rows=1, n_columns=1,
-                fg=self.bg_colors["Very Dark"], bg=self.sign_red).create_frame(relief=tk.SOLID)
+                fg=self.bg_colors["Very Dark"], bg=color_smpl).create_frame(relief=tk.SOLID)
             self.frm_spk_smpl.config(highlightbackground="black", bd=1)
 
     def custom_spike_check(self, mode="SMPL"):
@@ -31729,7 +31827,7 @@ class PySILLS(tk.Frame):
 
         return filename_long, filename_short, filename_ending
 
-    def add_file_manager(self, filetype): # sex
+    def add_file_manager(self, filetype):
         """Adds a file or multiple files to the related listbox and table within the PySILLS file manager."""
 
         output_filenames = filedialog.askopenfilenames(
