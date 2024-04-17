@@ -7203,7 +7203,21 @@ class PySILLS(tk.Frame):
                         save_file.write(str(file_content_line) + "\n")
                     save_file.write("\n")
 
-    #
+    def open_project_part_01(self, key_setting, index_container, loaded_lines):
+        ## PROJECT INFORMATION
+        for i in range(index_container["PROJECT INFORMATION"] + 2,
+                       index_container["STANDARD FILES"] - 1):
+            line_std = str(loaded_lines[i].strip())
+            splitted_std = line_std.split(";")
+
+            self.container_var[key_setting]["Author"].set(splitted_std[0])
+            self.container_var[key_setting]["Source ID"].set(splitted_std[1])
+            self.container_var["LASER"].set(splitted_std[2])
+            try:
+                self.var_opt_icp.set(splitted_std[3])
+            except:
+                self.var_opt_icp.set("Select ICP-MS")
+
     def open_project(self): # sex
         filename = filedialog.askopenfilename()
 
@@ -7313,19 +7327,7 @@ class PySILLS(tk.Frame):
 
             if self.pysills_mode == "MA":
                 time_start0 = datetime.datetime.now()
-                ## PROJECT INFORMATION
-                for i in range(index_container["PROJECT INFORMATION"] + 2,
-                               index_container["STANDARD FILES"] - 1):
-                    line_std = str(loaded_lines[i].strip())
-                    splitted_std = line_std.split(";")
-                    #
-                    self.container_var["ma_setting"]["Author"].set(splitted_std[0])
-                    self.container_var["ma_setting"]["Source ID"].set(splitted_std[1])
-                    self.container_var["LASER"].set(splitted_std[2])
-                    try:
-                        self.var_opt_icp.set(splitted_std[3])
-                    except:
-                        self.var_opt_icp.set("Select ICP-MS")
+                self.open_project_part_01(key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
 
                 time_end0 = datetime.datetime.now()
                 time_delta0 = (time_end0 - time_start0)*1000
