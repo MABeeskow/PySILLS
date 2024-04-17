@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		15.04.2024
+# Date:		17.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -273,7 +273,9 @@ class PySILLS(tk.Frame):
         ## Container (Variables)
         categories = ["main"]
         subcategories = ["Label", "Entry", "Radiobutton", "Checkbox"]
-        #
+
+        self.helper_option_menus = {}
+
         self.container_var = {}
         for category in categories:
             self.container_var[category] = {}
@@ -11526,7 +11528,7 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=self.halogen_ratios_diagram)
+            command=lambda init=True: self.halogen_ratios_diagram(init))
 
         btn_002a.configure(state="disabled")
         btn_002b.configure(state="disabled")
@@ -11535,7 +11537,7 @@ class PySILLS(tk.Frame):
         btn_002e.configure(state="disabled")
         btn_002f.configure(state="disabled")
 
-    def halogen_ratios_diagram(self):
+    def halogen_ratios_diagram(self, init=False):
         ## Window Settings
         window_width = 800
         window_height = 600
@@ -11615,6 +11617,11 @@ class PySILLS(tk.Frame):
         self.create_halogen_ratio_diagram(
             parent=subwindow_halogen_ratios, var_row_start=var_row_start, var_header_n=var_header_n, n_rows=n_rows,
             n_columns=n_columns)
+
+        if init == True:
+            for filename_short in self.container_lists["SMPL"]["Short"]:
+                self.select_file_halogen_ratio(filename_short, initialization=init)
+
     def create_halogen_ratio_diagram(self, parent, var_row_start, var_header_n, n_rows, n_columns):
         self.fig_halogen_ratios = Figure(figsize=(10,5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
 
@@ -11738,8 +11745,15 @@ class PySILLS(tk.Frame):
     def rad2deg(self, x):
         return x*180/np.pi
 
-    def select_file_halogen_ratio(self, filename_short):
-        if self.helper_halogen_ratios[filename_short].get() == 1:
+    def select_file_halogen_ratio(self, filename_short, initialization=False):
+        molar_mass_cl = self.chemistry_data["Cl"]
+        molar_mass_br = self.chemistry_data["Br"]
+        molar_mass_i = self.chemistry_data["I"]
+        conversion_cl = 1/(molar_mass_cl)
+        conversion_br = 1/(molar_mass_br)
+        conversion_i = 1/(molar_mass_i)
+
+        if self.helper_halogen_ratios[filename_short].get() == 1 or initialization == True:
             if ("Cl" in self.container_lists["Measured Elements"] and
                     "Br" in self.container_lists["Measured Elements"] and
                     "I" in self.container_lists["Measured Elements"]):
@@ -11752,16 +11766,16 @@ class PySILLS(tk.Frame):
                 helper_icl = []
                 helper_brcl = []
                 for isotope_cl in isotopes_dict["Cl"]:
-                    concentration_cl = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                    concentration_cl = conversion_cl*self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
                         "INCL"][isotope_cl]
                     for isotope_i in isotopes_dict["I"]:
-                        concentration_i = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
+                        concentration_i = conversion_i*self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
                             "INCL"][isotope_i]
                         val_icl = (concentration_i/concentration_cl)*10**6
                         helper_icl.append(val_icl)
                         for isotope_br in isotopes_dict["Br"]:
-                            concentration_br = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
-                                "INCL"][isotope_br]
+                            concentration_br = conversion_br*self.container_concentration["SMPL"]["SMOOTHED"][
+                                filename_short]["INCL"][isotope_br]
                             val_brcl = (concentration_br/concentration_cl)*10**3
                             helper_brcl.append(val_brcl)
 
@@ -11780,14 +11794,14 @@ class PySILLS(tk.Frame):
                     helper_icl = []
                     helper_brcl = []
                     for isotope_cl in isotopes_dict["Cl"]:
-                        concentration_cl = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
-                            "INCL"][isotope_cl]
-                        concentration_i = 100
+                        concentration_cl = conversion_cl*self.container_concentration["SMPL"]["SMOOTHED"][
+                            filename_short]["INCL"][isotope_cl]
+                        concentration_i = conversion_i*100
                         val_icl = (concentration_i/concentration_cl)*10**6
                         helper_icl.append(val_icl)
                         for isotope_br in isotopes_dict["Br"]:
-                            concentration_br = self.container_concentration["SMPL"]["SMOOTHED"][filename_short][
-                                "INCL"][isotope_br]
+                            concentration_br = conversion_br*self.container_concentration["SMPL"]["SMOOTHED"][
+                                filename_short]["INCL"][isotope_br]
                             val_brcl = (concentration_br/concentration_cl)*10**3
                             helper_brcl.append(val_brcl)
 
@@ -13932,7 +13946,8 @@ class PySILLS(tk.Frame):
                 self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
 
                 for oxide in self.chemistry_oxides_sorted[element]:
-                    self.container_lists["Oxides"].append(oxide)
+                    if oxide not in self.container_lists["Oxides"]:
+                        self.container_lists["Oxides"].append(oxide)
 
                 if float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["First"][element]) \
                         and float(self.container_var["Gas Energy"].get()) >= float(self.ionization_energies["Second"][
@@ -15352,6 +15367,12 @@ class PySILLS(tk.Frame):
         text_smpl.pack(side="left", fill="both", expand=True)
 
         for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            if file_smpl_short not in self.helper_option_menus:
+                self.helper_option_menus[file_smpl_short] = {}
+
+            if "Matrix Setup IS" not in self.helper_option_menus[file_smpl_short]:
+                self.helper_option_menus[file_smpl_short]["Matrix Setup IS"] = None
+
             file_smpl = self.container_lists["SMPL"]["Long"][index]
             lbl_i = tk.Label(frm_smpl, text=file_smpl_short, bg=self.bg_colors["Very Light"],
                              fg=self.bg_colors["Dark Font"])
@@ -15465,8 +15486,8 @@ class PySILLS(tk.Frame):
 
                 opt_comp_i = tk.OptionMenu(
                     frm_smpl, var_opt_comp_i, *var_list_comp,
-                    command=lambda var_opt=var_opt_comp_i, var_file=file_smpl, state_default=False:
-                    self.ma_change_matrix_compound(var_opt, var_file, state_default))
+                    command=lambda event, filename_short=file_smpl_short, mode=var_key:
+                    self.update_list_of_possible_is(filename_short, mode, event))
                 opt_comp_i["menu"].config(fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                                           activeforeground=self.bg_colors["Dark Font"],
                                           activebackground=self.accent_color)
@@ -15485,21 +15506,22 @@ class PySILLS(tk.Frame):
                     frm_smpl, textvariable=var_entr_i, width=15, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["White"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"])
                 entr_i.bind(
-                    "<Return>", lambda event, var_entr=var_entr_i, var_file=file_smpl, state_default=False:
-                    self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
+                    "<Return>", lambda event, filename_short=file_smpl_short, mode=var_key:
+                    self.update_concentration_value(filename_short, mode, event))
                 text_smpl.window_create("insert", window=entr_i)
                 text_smpl.insert("end", "\t")
 
             opt_is_i = tk.OptionMenu(
                 frm_smpl, var_opt_is_i, *var_list_is,
-                command=lambda var_opt=var_opt_is_i, var_file=file_smpl, state_default=False:
-                self.ma_change_matrix_compound(var_opt, var_file, state_default))
+                command=lambda variable=var_opt_is_i, filename_short=file_smpl_short, mode=var_key:
+                self.run_update_concentration_value(variable, filename_short, mode))
             opt_is_i["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                 activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
             opt_is_i.config(
                 bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
                 activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
+            self.helper_option_menus[file_smpl_short]["Matrix Setup IS"] = opt_is_i
             text_smpl.window_create("end", window=opt_is_i)
             text_smpl.insert("end", " \t")
 
@@ -15519,6 +15541,66 @@ class PySILLS(tk.Frame):
                     var_is = self.container_var["SMPL"][var_file_smpl]["IS Data"]["IS"].get()
                     if var_is not in self.container_lists["Possible IS"]:
                         self.container_lists["Possible IS"].append(var_is)
+
+    def run_update_concentration_value(self, variable, filename_short, mode):
+        index_file = self.container_lists["SMPL"]["Short"].index(filename_short)
+        filename_long = self.container_lists["SMPL"]["Long"][index_file]
+
+        if mode == "oxides":
+            oxide_i = self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"].get()
+            amount_oxide_i = float(self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"][
+                                       "Concentration"].get())/100
+            if amount_oxide_i > 1:
+                amount_oxide_i = 1.0
+                self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+            elif amount_oxide_i < 0:
+                amount_oxide_i = 0.0
+                self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("0.0")
+
+            key_oxide = re.search("(\D+)(\d*)(\D+)(\d*)", oxide_i)
+            name_cation = key_oxide.group(1)
+            name_anion = key_oxide.group(3)
+
+            if len(key_oxide.group(2)) == 0:
+                amount_cation = 1
+            else:
+                amount_cation = int(key_oxide.group(2))
+
+            if len(key_oxide.group(4)) == 0:
+                amount_anion = 1
+            else:
+                amount_anion = int(key_oxide.group(4))
+
+            molar_mass_cation = self.chemistry_data[name_cation]
+            molar_mass_anion = self.chemistry_data[name_anion]
+            molar_mass_oxide = amount_cation*molar_mass_cation + amount_anion*molar_mass_anion
+            mass_amount_cation = round(amount_oxide_i*(amount_cation*molar_mass_cation/molar_mass_oxide)*10**6, 4)
+
+            if self.pysills_mode == "MA":
+                self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].set(mass_amount_cation)
+                if variable != None and variable != "Select IS":
+                    self.container_var["SMPL"][filename_long]["IS Data"]["IS"].set(variable)
+            else:
+                self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Concentration"].set(mass_amount_cation)
+                if variable != None and variable != "Select IS":
+                    self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].set(variable)
+
+    def update_concentration_value(self, filename_short, mode, event):
+        """ Calculates the cation concentration for a given oxide and oxide amount.
+        -------
+        Parameters
+        var_opt : str
+            Contains the variable.
+        filename_short : str
+            The filename as short version.
+        mode : str
+            Specifies the calculation (oxides, elements, minerals).
+        -------
+        Returns
+        -------
+        """
+
+        self.run_update_concentration_value(variable=None, filename_short=filename_short, mode=mode)
 
     def import_is_data(self, parent, mode="MA"):
         self.pypitzer_performed = False
@@ -15574,6 +15656,10 @@ class PySILLS(tk.Frame):
 
         str_method = self.container_var["Quantification Mineral"]["Method"].get()
         total_ppm = 10**6
+        if var_file in self.container_lists["SMPL"]["Long"]:
+            index_file = self.container_lists["SMPL"]["Long"].index(var_file)
+            filename_short = self.container_lists["SMPL"]["Short"][index_file]
+            self.update_concentration_value(filename_short=filename_short, mode="Oxides")
 
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 1 or str_method != "Internal Standard":
             var_key = "Oxide"
@@ -15602,15 +15688,6 @@ class PySILLS(tk.Frame):
 
 
             possible_is = self.container_lists["Measured Elements"][var_opt_element]
-            # possible_is = []
-            # for isotope in self.container_lists["Measured Isotopes"]["All"]:
-            #     if isotope.isdigit():
-            #         pass
-            #     else:
-            #         key_02 = re.search("(\D+)(\d+)", isotope)
-            #         element = key_02.group(1)
-            #         if element == var_opt_element:
-            #             possible_is.append(isotope)
 
             self.container_var["IS"]["Default SMPL"].set("Select IS")
             for index, isotope in enumerate(possible_is):
@@ -15622,6 +15699,39 @@ class PySILLS(tk.Frame):
                     self.ma_change_is_smpl(var_opt, var_file, state_default))
         else:
             self.container_var["SMPL"][var_file]["Matrix Setup"][var_key]["Name"].set(var_opt)
+
+    def update_list_of_possible_is(self, filename_short, mode, event):
+        index_file = self.container_lists["SMPL"]["Short"].index(filename_short)
+        filename_long = self.container_lists["SMPL"]["Long"][index_file]
+        str_filename_short = filename_short
+        str_mode = mode
+
+        if mode == "oxides":
+            oxide_i = self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"].get()
+            key_oxide = re.search("(\D+)(\d*)(\D+)(\d*)", oxide_i)
+            name_cation = key_oxide.group(1)
+            name_anion = key_oxide.group(3)
+            possible_is = self.container_lists["Measured Elements"][filename_short][name_cation]
+
+            if name_anion in self.container_lists["Measured Elements"][filename_short]:
+                possible_is.extend(self.container_lists["Measured Elements"][filename_short])
+                possible_is.sort()
+
+            for index, isotope in enumerate(possible_is):
+                menu_i = self.helper_option_menus[filename_short]["Matrix Setup IS"]["menu"]
+                if index == 0:
+                    menu_i.delete(0, "end")
+
+                menu_i.add_command(
+                    label=isotope, command=lambda variable=isotope, filename_short=str_filename_short, mode=str_mode:
+                    self.run_update_concentration_value(variable, filename_short, mode))
+
+        if self.pysills_mode == "MA":
+            self.container_var["SMPL"][filename_long]["IS Data"]["IS"].set("Select IS")
+            self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].set("0.0")
+        else:
+            self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].set("Select IS")
+            self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Concentration"].set("0.0")
 
     def ma_change_matrix_concentration(self, var_entr, var_file, state_default, event):
         if self.pysills_mode == "MA":
@@ -15699,6 +15809,7 @@ class PySILLS(tk.Frame):
                 var_opt_is_i.set(var_opt)
                 if var_key == "Oxide":
                     var_oxide = self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].get()
+
                     if var_oxide != "Select Oxide":
                         key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
                         list_elements = []
