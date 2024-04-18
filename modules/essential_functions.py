@@ -6,12 +6,12 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.04.2024
+# Date:		18.04.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES
-import re, os, sys
+import re, os, sys, datetime
 import tkinter as tk
 import numpy as np
 from modules import data
@@ -137,15 +137,31 @@ class Essentials:
                 self.entr_t_end_sig.insert(0, t_end)
     #
     def do_grubbs_test(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
+        time_start = datetime.datetime.now()
+        time_previous = time_start
+        helper_times = {}
         dataset = self.variable
 
         outlier_indices_pre = two_sided_test_indices(data=dataset, alpha=alpha)
         outlier_values_pre = two_sided_test_outliers(data=dataset, alpha=alpha)
         outlier_indices = []
+
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        title = "A"
+        helper_times[title] = time_delta_new.total_seconds()
+
         for index, value in enumerate(outlier_values_pre):
             if value > threshold:
                 outlier_indices.append(outlier_indices_pre[index])
         outlier_indices.sort()
+
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        title = "B"
+        helper_times[title] = time_delta_new.total_seconds()
 
         data_smoothed = []
         for index, value in enumerate(dataset_complete):
@@ -160,6 +176,24 @@ class Essentials:
                     data_smoothed.append(value)
             else:
                 data_smoothed.append(value)
+
+        time_new = datetime.datetime.now()
+        time_delta_new = (time_new - time_previous)*1000
+        time_previous = time_new
+        title = "C"
+        helper_times[title] = time_delta_new.total_seconds()
+
+        time_end = datetime.datetime.now()
+        time_delta_new = (time_end - time_start)*1000
+        time_previous = time_end
+        title = "Total"
+        helper_times[title] = time_delta_new.total_seconds()
+
+        print("")
+        print("Evaluation: process time (main settings window")
+        for key, value in helper_times.items():
+            amount = round(value/time_delta_new.total_seconds()*100, 2)
+            print(key, value, "ms", amount, "%")
 
         return data_smoothed, outlier_indices
 
@@ -210,16 +244,32 @@ class Essentials:
         val_poi = dataset_complete[index]
         helper_values["POI"] = val_poi
         helper_values["All"].append(val_poi)
+        last_index = len(dataset_complete) - 1
 
-        for step in range(1, stepsize):
-            step_before = index - step
-            step_after = index + step
-            if step_before >= 0:
-                helper_values["SP"].append(dataset_complete[step_before])
-                helper_values["All"].append(dataset_complete[step_before])
-            if step_after < len(dataset_complete):
-                helper_values["SP"].append(dataset_complete[step_after])
-                helper_values["All"].append(dataset_complete[step_after])
+        if index == 0 or index == last_index:
+            datapoints = [dataset_complete[1], dataset_complete[2]]
+        elif index == last_index:
+            datapoints = [dataset_complete[-3], dataset_complete[-2]]
+        elif index == 1:
+            datapoints = [dataset_complete[0], dataset_complete[2], dataset_complete[3]]
+        elif index == last_index - 1:
+            datapoints = [dataset_complete[-4], dataset_complete[-3], dataset_complete[-1]]
+        else:
+            datapoints = [dataset_complete[index - 2], dataset_complete[index - 1], dataset_complete[index + 1],
+                          dataset_complete[index + 2]]
+
+        helper_values["SP"].extend(datapoints)
+        helper_values["All"].extend(datapoints)
+
+        # for step in range(1, stepsize):
+        #     step_before = index - step
+        #     step_after = index + step
+        #     if step_before >= 0:
+        #         helper_values["SP"].append(dataset_complete[step_before])
+        #         helper_values["All"].append(dataset_complete[step_before])
+        #     if step_after < len(dataset_complete):
+        #         helper_values["SP"].append(dataset_complete[step_after])
+        #         helper_values["All"].append(dataset_complete[step_after])
 
         return helper_values
 
