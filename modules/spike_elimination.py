@@ -6,7 +6,7 @@
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.07.2023
+# Date:		18.04.2024
 
 #-----------------------------------------------
 
@@ -27,7 +27,6 @@ class OutlierDetection:
         self.spike_indices = []
         self.isotope = isotope
         self.dataset_complete = dataset_complete
-        print(self.isotope)
 
     def calculate_whisker_statistcs(self, helper_values, init=True):
         helper_dataset = helper_values
