@@ -8682,7 +8682,7 @@ class PySILLS(tk.Frame):
 
                 n_loops += 1
 
-                if n_loops == 1000:
+                if n_loops == 100:
                     break
 
         if mode == "BG":
@@ -8694,7 +8694,7 @@ class PySILLS(tk.Frame):
                     self.container_var[key_setting]["Time BG Start"].set("auto-detection used")
                     self.container_var[key_setting]["Time BG End"].set("auto-detection used")
                 else:
-                    if n_loops == 1000:
+                    if n_loops == 100:
                         self.container_var[key_setting]["Time BG Start"].set("auto-detection not successful")
                         self.container_var[key_setting]["Time BG End"].set("auto-detection not successful")
                     else:
@@ -16395,7 +16395,9 @@ class PySILLS(tk.Frame):
                     self.ma_get_intensity_ratio(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="MAT")
-                # Sensitivity-related parameters
+                    # Sensitivity-related parameters
+                    self.get_analytical_sensitivity_std(var_datatype="RAW", mode="all")
+
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
                 results_is = self.determine_possible_is(filetype="ALL")
@@ -17072,9 +17074,22 @@ class PySILLS(tk.Frame):
     def ma_datareduction_tables(self, init=False):  # MA - data reduction tables #######################
         ## Initialization
         if init:
+            helper_times_init = {}
+            time_start = datetime.datetime.now()
+            time_previous = time_start
+
             for var_filetype in ["STD", "SMPL"]:
                 for var_file_short in self.container_lists[var_filetype]["Short"]:
                     self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+
+            time_new = datetime.datetime.now()
+            time_delta_new = (time_new - time_previous)*1000
+            time_previous = time_new
+            title = "A"
+            helper_times_init[title] = time_delta_new.total_seconds()
+            print(f"Process time (Final calculation - part '" + title + "'):",
+                  time_delta_new.total_seconds(), "ms")
+
             var_filetype = "None"
             var_file_short = "None"
             var_file_long = "None"
@@ -17087,6 +17102,14 @@ class PySILLS(tk.Frame):
                 if str_is not in list_is["SMPL"]:
                     list_is["SMPL"].append(str_is)
 
+            time_new = datetime.datetime.now()
+            time_delta_new = (time_new - time_previous)*1000
+            time_previous = time_new
+            title = "B"
+            helper_times_init[title] = time_delta_new.total_seconds()
+            print(f"Process time (Final calculation - part '" + title + "'):",
+                  time_delta_new.total_seconds(), "ms")
+
             for var_datatype in ["RAW", "SMOOTHED"]:
                 # Intensity Analysis
                 self.get_intensity(
@@ -17098,41 +17121,133 @@ class PySILLS(tk.Frame):
                 else:
                     str_averagetype = "median"
 
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "C " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_corrected["STD"][var_datatype]).get_averaged_intensities(
                     data_container=self.container_intensity_corrected["STD"][var_datatype],
                     average_type=str_averagetype)
 
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "D " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 self.ma_get_intensity_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "E " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 # Sensitivity Analysis
                 self.get_analytical_sensitivity(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
                 results_is = self.determine_possible_is(filetype="ALL")
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "F " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_ratio).get_intensity_ratio(
                     data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "G " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 self.ma_get_rsf(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "H " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 # Compositional Analysis
                 self.ma_get_concentration(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "I " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 SQ(dataframe_01=self.container_intensity_corrected, dataframe_02=self.container_concentration,
                    results_container=self.container_normalized_sensitivity).get_normalized_sensitivity(
                     datatype=var_datatype, data_sensitivity=self.container_analytical_sensitivity, dict_is=results_is)
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "J " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 self.ma_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, mode="All")
-                # self.ma_get_lod(
-                #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                #     var_file_long=var_file_long, mode="All")
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "K " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
                 self.get_lod(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=None, mode="All")
+
+                time_new = datetime.datetime.now()
+                time_delta_new = (time_new - time_previous)*1000
+                time_previous = time_new
+                title = "L " + var_datatype
+                helper_times_init[title] = time_delta_new.total_seconds()
+                print(f"Process time (Final calculation - part '" + title + "'):",
+                      time_delta_new.total_seconds(), "ms")
+
+            time_new = datetime.datetime.now()
+            time_delta_new = (time_new - time_start)*1000
+            time_previous = time_new
+            title = "Total"
+            helper_times_init[title] = time_delta_new.total_seconds()
+            print(f"Process time (Final calculation -" + title + "'):",
+                  time_delta_new.total_seconds(), "ms")
 
         if self.container_var["ma_datareduction_files"]["File Type"].get() == 0:
             var_filetype = "STD"
@@ -18138,6 +18253,138 @@ class PySILLS(tk.Frame):
                             var_result_i = np.median(helper_results)
                         self.container_normalized_sensitivity[var_filetype][var_datatype][isotope] = var_result_i
 
+    def get_analytical_sensitivity_std(
+            self, var_datatype=None, var_file_short=None, mode="specific", var_is_host=None, var_is_smpl=None):
+        """ Calculates the analytical sensitivity of isotope i with respect to the internal standard IS.
+        -------
+        Parameters
+        var_filetype : str
+            The file category, e.g. STD
+        var_datatype : str
+            The data category, e.g. RAW
+        var_file_short : str
+            The file as a short version (without the complete filepath)
+        mode : str
+            It specifies if the data reduction has to be done for all files or only one specific file
+        var_is_host : str
+            It defines the internal standard of the host in a sample file
+        var_is_smpl : str
+            It defines the internal standard of a sample file
+        -------
+        Returns
+        -------
+        """
+        if mode == "specific":
+            filename_short = var_file_short
+            index_filename = self.container_lists["STD"]["Short"].index(filename_short)
+            filename_long = self.container_lists["STD"]["Long"][index_filename]
+            isotopes_file = self.container_lists["Measured Isotopes"][filename_short]
+            elements_file = self.container_lists["Measured Elements"][filename_short]
+
+            srm_file = self.container_var["STD"][filename_long]["SRM"].get()
+            if srm_file not in self.container_analytical_sensitivity:
+                self.container_analytical_sensitivity[srm_file] = {}
+            if filename_short not in self.container_analytical_sensitivity[srm_file]:
+                self.container_analytical_sensitivity[srm_file][filename_short] = {}
+
+            if var_is_smpl == None:
+                for element, value in sorted(
+                        self.srm_actual[srm_file].items(), key=lambda item: item[1], reverse=True):
+                    if element in elements_file:
+                        var_is = elements_file[element][0]
+                    break
+            else:
+                var_is = var_is_smpl
+
+            key_element_is = re.search("(\D+)(\d+)", var_is)
+            element_is = key_element_is.group(1)
+            var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][var_is]
+            self.container_var["STD"][filename_long]["IS Data"]["IS"].set(var_is)
+
+            for isotope in isotopes_file:
+                if isotope.isdigit():
+                    self.container_lists["Measured Isotopes"][filename_short].remove(isotope)
+                    isotopes_file = self.container_lists["Measured Isotopes"][filename_short]
+                else:
+                    srm_isotope = self.container_var["SRM"][isotope].get()
+
+                    if srm_isotope == srm_file:
+                        if element_is in self.srm_actual[srm_isotope]:
+                            var_concentration_is = self.srm_actual[srm_isotope][element_is]
+                        else:
+                            var_concentration_is = 0.0
+
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element in self.srm_actual[srm_isotope]:
+                            if var_is_host == isotope:
+                                var_concentration_i = self.srm_actual[srm_file][element]
+                            else:
+                                var_concentration_i = self.srm_actual[srm_isotope][element]
+                            var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][
+                                filename_short]["MAT"][isotope]
+                            var_result_i = (var_intensity_i/var_intensity_is)*(
+                                    var_concentration_is/var_concentration_i)
+                        else:
+                            var_result_i = 0.0
+                        self.container_analytical_sensitivity["STD"][var_datatype][filename_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_analytical_sensitivity[srm_file][filename_short][isotope] = var_result_i
+
+                        if var_is_smpl != None:
+                            var_result_is = 1.0
+                            self.container_analytical_sensitivity["STD"][var_datatype][filename_short]["MAT"][
+                                var_is] = var_result_is
+                    elif srm_isotope != srm_file and var_is_host == isotope:
+                        if element_is in self.srm_actual[srm_file]:
+                            var_concentration_is = self.srm_actual[srm_file][element_is]
+                        else:
+                            var_concentration_is = 0.0
+
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element in self.srm_actual[srm_file]:
+                            if var_is_host == isotope:
+                                var_concentration_i = self.srm_actual[srm_file][element]
+                            else:
+                                var_concentration_i = self.srm_actual[srm_isotope][element]
+                            var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][
+                                filename_short]["MAT"][isotope]
+                            var_result_i = (var_intensity_i/var_intensity_is)*(
+                                    var_concentration_is/var_concentration_i)
+                        else:
+                            var_result_i = 0.0
+
+                        self.container_analytical_sensitivity["STD"][var_datatype][filename_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_analytical_sensitivity[srm_file][filename_short][isotope] = var_result_i
+
+                        if var_is_smpl != None:
+                            var_result_is = 1.0
+                            self.container_analytical_sensitivity["STD"][var_datatype][filename_short][
+                                "MAT"][var_is] = var_result_is
+                    else:
+                        if element_is in self.srm_actual[srm_file]:
+                            var_concentration_is = self.srm_actual[srm_file][element_is]
+                        else:
+                            var_concentration_is = 0.0
+
+                        key_element = re.search("(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element in self.srm_actual[srm_file]:
+                            var_concentration_i = self.srm_actual[srm_file][element]
+                            var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][filename_short][
+                                "MAT"][isotope]
+                            var_result_i = (var_intensity_i/var_intensity_is)*(
+                                    var_concentration_is/var_concentration_i)
+                        else:
+                            var_result_i = 0.0
+                        self.container_analytical_sensitivity[srm_file][filename_short][isotope] = var_result_i
+        else:
+            str_datatype = var_datatype
+            for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+                self.get_analytical_sensitivity_std(var_datatype=str_datatype, var_file_short=filename_short)
+
     def get_analytical_sensitivity(
             self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific", var_is_smpl=None,
             var_focus=None, var_is_host=None):
@@ -18208,7 +18455,8 @@ class PySILLS(tk.Frame):
                                     var_concentration_i = self.srm_actual[var_srm_i][element]
                                 var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["MAT"][isotope]
-                                var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                                var_result_i = (var_intensity_i/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_i)
                             else:
                                 var_result_i = 0.0
                             self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
@@ -18217,8 +18465,8 @@ class PySILLS(tk.Frame):
 
                             if var_is_smpl != None:
                                 var_result_is = 1.0
-                                self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                                    var_is] = var_result_is
+                                self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
+                                    "MAT"][var_is] = var_result_is
                         elif var_srm_i != var_srm_file and var_is_host == isotope:
                             if element_is in self.srm_actual[var_srm_file]:
                                 var_concentration_is = self.srm_actual[var_srm_file][element_is]
@@ -18234,7 +18482,8 @@ class PySILLS(tk.Frame):
                                     var_concentration_i = self.srm_actual[var_srm_i][element]
                                 var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["MAT"][isotope]
-                                var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                                var_result_i = (var_intensity_i/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_i)
                             else:
                                 var_result_i = 0.0
 
@@ -18244,8 +18493,8 @@ class PySILLS(tk.Frame):
 
                             if var_is_smpl != None:
                                 var_result_is = 1.0
-                                self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
-                                    var_is] = var_result_is
+                                self.container_analytical_sensitivity[var_filetype][var_datatype][var_file_short][
+                                    "MAT"][var_is] = var_result_is
                         else:
                             if element_is in self.srm_actual[var_srm_file]:
                                 var_concentration_is = self.srm_actual[var_srm_file][element_is]
@@ -18258,7 +18507,8 @@ class PySILLS(tk.Frame):
                                 var_concentration_i = self.srm_actual[var_srm_file][element]
                                 var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["MAT"][isotope]
-                                var_result_i = (var_intensity_i/var_intensity_is)*(var_concentration_is/var_concentration_i)
+                                var_result_i = (var_intensity_i/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_i)
                             else:
                                 var_result_i = 0.0
                             self.container_analytical_sensitivity[var_srm_file][var_file_short][isotope] = var_result_i
@@ -18279,15 +18529,16 @@ class PySILLS(tk.Frame):
                 file_isotopes_smpl = self.container_lists["Measured Isotopes"][var_file_short]
                 list_delta_std_i = []
                 list_xi_std_i = {}
+
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
                     file_std_short = self.container_lists["STD"]["Short"][index]
                     file_isotopes = self.container_lists["Measured Isotopes"][file_std_short]
                     var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
-                        self.get_analytical_sensitivity(
-                            var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
-                            var_file_long=file_std, var_is_smpl=var_is_smpl, var_focus="MAT",
-                            var_is_host=var_is_host)
+                        # self.get_analytical_sensitivity(
+                        #     var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
+                        #     var_file_long=file_std, var_is_smpl=var_is_smpl, var_focus="MAT",
+                        #     var_is_host=var_is_host)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         list_delta_std_i.append(delta_std_i)
@@ -18384,6 +18635,8 @@ class PySILLS(tk.Frame):
                     except:
                         pass
         else:
+            str_datatype = var_datatype
+            self.get_analytical_sensitivity_std(var_datatype=str_datatype, mode="all")
             for var_filetype in ["SMPL"]:
                 if self.pysills_mode == "MA":
                     list_focus = ["MAT"]
@@ -18392,7 +18645,6 @@ class PySILLS(tk.Frame):
                 for var_focus in list_focus:
                     for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         helper_results = []
-                        var_srm_i = self.container_var["SRM"][isotope].get()
                         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                             var_file_short = self.container_lists[var_filetype]["Short"][index]
                             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -18401,24 +18653,13 @@ class PySILLS(tk.Frame):
                                 var_id_selected = self.container_var["ID"]["Results Files"].get()
                                 if (self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1
                                         and var_id == var_id_selected):
-                                    if var_filetype == "STD":
-                                        var_srm_file = self.container_var["STD"][var_file_long]["SRM"].get()
-                                        if var_srm_i == var_srm_file or self.var_init_ma_datareduction == True:
-                                            self.get_analytical_sensitivity(
-                                                var_filetype=var_filetype, var_datatype=var_datatype,
-                                                var_file_short=var_file_short, var_file_long=var_file_long,
-                                                var_is_smpl=var_is_smpl)
-                                            var_result_i = self.container_analytical_sensitivity[var_filetype][
-                                                var_datatype][var_file_short][var_focus][isotope]
-                                            helper_results.append(var_result_i)
-                                    else:
-                                        self.get_analytical_sensitivity(
-                                            var_filetype=var_filetype, var_datatype=var_datatype,
-                                            var_file_short=var_file_short, var_file_long=var_file_long,
-                                            var_focus=var_focus)
-                                        var_result_i = self.container_analytical_sensitivity[var_filetype][
-                                            var_datatype][var_file_short][var_focus][isotope]
-                                        helper_results.append(var_result_i)
+                                    self.get_analytical_sensitivity(
+                                        var_filetype=var_filetype, var_datatype=var_datatype,
+                                        var_file_short=var_file_short, var_file_long=var_file_long,
+                                        var_focus=var_focus)
+                                    var_result_i = self.container_analytical_sensitivity[var_filetype][
+                                        var_datatype][var_file_short][var_focus][isotope]
+                                    helper_results.append(var_result_i)
 
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
                             var_result_i = np.mean(helper_results)
@@ -20610,9 +20851,9 @@ class PySILLS(tk.Frame):
 
         self.build_srm_database()
 
-    ########################################################################################################################
-    ### MELT INCLUSIONS ####################################################################################################
-    ########################################################################################################################
+    ####################################################################################################################
+    ### MELT INCLUSIONS ################################################################################################
+    ####################################################################################################################
 
     def mi_settings(self):
         if self.file_system_need_update:
@@ -26314,6 +26555,7 @@ class PySILLS(tk.Frame):
                         var_file_long=var_file, var_focus="INCL")
                     self.fi_get_intensity_mix(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
+                    self.get_analytical_sensitivity_std(var_datatype="RAW", mode="all")
                     #
                 self.fi_get_intensity_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
