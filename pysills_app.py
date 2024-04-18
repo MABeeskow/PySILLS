@@ -11360,8 +11360,11 @@ class PySILLS(tk.Frame):
                 self.list_std = ma_demo_files["STD"]
                 self.list_smpl = ma_demo_files["SMPL"]
 
-            self.ma_current_file_std = self.list_std[0]
-            self.ma_current_file_smpl = self.list_smpl[0]
+            if len(self.list_std) > 0:
+                self.ma_current_file_std = self.list_std[0]
+
+            if len(self.list_smpl) > 0:
+                self.ma_current_file_smpl = self.list_smpl[0]
 
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
@@ -13750,6 +13753,12 @@ class PySILLS(tk.Frame):
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Sample file", sticky="nesw",
             relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_mode_setting:
             self.change_filetype_time_signal_diagram_checker(var_setting_key))
+
+        if len(self.container_lists["STD"]["Short"]) == 0:
+            rb_01.configure(state="disabled")
+
+        if len(self.container_lists["SMPL"]["Short"]) == 0:
+            rb_02.configure(state="disabled")
 
         # Buttons
         btn_01 = SE(
@@ -20292,8 +20301,11 @@ class PySILLS(tk.Frame):
                 self.list_std = fi_demo_files["STD"]
                 self.list_smpl = fi_demo_files["SMPL"]
 
-            self.fi_current_file_std = self.list_std[0]
-            self.fi_current_file_smpl = self.list_smpl[0]
+            if len(self.list_std) > 0:
+                self.fi_current_file_std = self.list_std[0]
+
+            if len(self.list_smpl) > 0:
+                self.fi_current_file_smpl = self.list_smpl[0]
 
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
@@ -20626,8 +20638,11 @@ class PySILLS(tk.Frame):
                 self.list_std = mi_demo_files["STD"]
                 self.list_smpl = mi_demo_files["SMPL"]
 
-            self.mi_current_file_std = self.list_std[0]
-            self.mi_current_file_smpl = self.list_smpl[0]
+            if len(self.list_std) > 0:
+                self.mi_current_file_std = self.list_std[0]
+
+            if len(self.list_smpl) > 0:
+                self.mi_current_file_smpl = self.list_smpl[0]
 
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
