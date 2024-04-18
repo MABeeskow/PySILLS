@@ -136,33 +136,20 @@ class Essentials:
                 self.entr_t_end_sig.delete(0, tk.END)
                 self.entr_t_end_sig.insert(0, t_end)
 
-    def do_grubbs_test(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
-        time_start = datetime.datetime.now()
-        time_previous = time_start
-        helper_times = {}
+    def do_grubbs_test2(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
         dataset = self.variable
 
         outlier_indices_pre = two_sided_test_indices(data=dataset, alpha=alpha)
         outlier_values_pre = two_sided_test_outliers(data=dataset, alpha=alpha)
         outlier_indices = []
 
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "A"
-        helper_times[title] = time_delta_new.total_seconds()
-
         for index, value in enumerate(outlier_values_pre):
             if value > threshold:
                 outlier_indices.append(outlier_indices_pre[index])
         outlier_indices.sort()
 
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "B"
-        helper_times[title] = time_delta_new.total_seconds()
-
+        if len(outlier_indices) > 0:
+            print(outlier_indices)
         data_smoothed = []
         for index, value in enumerate(dataset_complete):
             if value > threshold:
@@ -177,74 +164,25 @@ class Essentials:
             else:
                 data_smoothed.append(value)
 
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "C"
-        helper_times[title] = time_delta_new.total_seconds()
-
-        time_end = datetime.datetime.now()
-        time_delta_new = (time_end - time_start)*1000
-        time_previous = time_end
-        title = "Total"
-        helper_times[title] = time_delta_new.total_seconds()
-
-        print("")
-        print("Evaluation: process time (main settings window")
-        for key, value in helper_times.items():
-            if value > 1 and time_delta_new.total_seconds() > 0:
-                amount = round(value/time_delta_new.total_seconds()*100, 2)
-                print(key, value, "ms", amount, "%")
-        #print(len(data_smoothed), type(data_smoothed), len(outlier_indices), type(outlier_indices), outlier_indices)
-
         return data_smoothed, outlier_indices
 
-    def do_grubbs_test2(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
-        time_start = datetime.datetime.now()
-        time_previous = time_start
-        helper_times = {}
+    def do_grubbs_test(self, dataset_complete, alpha=0.05, threshold=1000, n_range=3):
         dataset = self.variable
 
         outlier_indices_pre = two_sided_test_indices(data=dataset, alpha=alpha)
         outlier_indices = outlier_indices_pre
         outlier_indices.sort()
 
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "A"
-        helper_times[title] = time_delta_new.total_seconds()
+        data_smoothed = dataset_complete.copy()
 
-        data_smoothed = dataset_complete
         for index_outlier in outlier_indices:
             value_outlier = dataset_complete[index_outlier]
             if value_outlier > threshold:
                 average_dataset_new = self.determine_surrounded_values(
                     dataset_complete=dataset_complete, index=index_outlier)
                 if value_outlier in average_dataset_new["All"]:
-                    value_corrected = np.mean(average_dataset_new["SP"])
+                    value_corrected = np.min(average_dataset_new["SP"])
                     data_smoothed[index_outlier] = value_corrected
-
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "B"
-        helper_times[title] = time_delta_new.total_seconds()
-
-        time_end = datetime.datetime.now()
-        time_delta_new = (time_end - time_start)*1000
-        time_previous = time_end
-        title = "Total"
-        helper_times[title] = time_delta_new.total_seconds()
-
-        print("")
-        print("Evaluation: process time (main settings window")
-        for key, value in helper_times.items():
-            if value > 0:
-                amount = round(value/time_delta_new.total_seconds()*100, 2)
-                print(key, value, "ms", amount, "%")
-
-        print(len(data_smoothed), type(data_smoothed), len(outlier_indices), type(outlier_indices), outlier_indices)
 
         return data_smoothed, outlier_indices
 

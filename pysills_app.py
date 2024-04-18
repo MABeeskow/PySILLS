@@ -11334,8 +11334,6 @@ class PySILLS(tk.Frame):
     ####################################################################################################################
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
-        time_start = datetime.datetime.now()
-        helper_times = {}
         if self.file_system_need_update:
             path = os.getcwd()
             path = self.path_pysills
@@ -11527,10 +11525,6 @@ class PySILLS(tk.Frame):
 
             self.define_isotope_colors()
 
-        time_start1 = datetime.datetime.now()
-        time_delta1 = (time_start1 - time_start)*1000
-        helper_times["File system update"] = time_delta1.total_seconds()
-
         ## Window Settings
         window_width = 1220
         window_height = 950
@@ -11575,128 +11569,55 @@ class PySILLS(tk.Frame):
                 if isotope not in self.container_lists["Measured Elements"][element]:
                     self.container_lists["Measured Elements"][element].append(isotope)
 
-        time_start2 = datetime.datetime.now()
-        time_delta2 = (time_start2 - time_start1)*1000
-        helper_times["GUI initialization"] = time_delta2.total_seconds()
-
         ## Static
         # Build section 'Project Information'
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_project_information(var_geometry_info=var_project_information)
-        time_start3 = datetime.datetime.now()
-        time_delta3 = (time_start3 - time_start2)*1000
-        helper_times["Project information"] = time_delta3.total_seconds()
         # Build section 'Standard Reference Material'
         var_standard_reference_material = {"Row start": 3, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_standard_reference_material(var_geometry_info=var_standard_reference_material)
-        time_start4 = datetime.datetime.now()
-        time_delta4 = (time_start4 - time_start3)*1000
-        helper_times["Standard Reference Material"] = time_delta4.total_seconds()
         # Build section 'Matrix Settings'
         var_sample_settings = {"Row start": 6, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_sample_settings(var_geometry_info=var_sample_settings)
-        time_start5 = datetime.datetime.now()
-        time_delta5 = (time_start5 - time_start4)*1000
-        helper_times["Sample Settings"] = time_delta5.total_seconds()
         # Build section 'Assemblage Setup'
         var_assemblage_setup = {"Row start": 8, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_assemblage_setup(var_geometry_info=var_assemblage_setup)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_start5)*1000
-        time_previous = time_new
-        helper_times["Assemblage Setup"] = time_delta_new.total_seconds()
         # Build section 'Dwell Time Setup'
         var_dwell_time_setup = {"Row start": 10, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_dwell_time_setup(var_geometry_info=var_dwell_time_setup)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Dwell Time Setup"] = time_delta_new.total_seconds()
         # Build section 'Calculation Window (Background) Setup'
         var_calculation_window_bg_setup = {"Row start": 12, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Calculation window BG"] = time_delta_new.total_seconds()
         # Build section 'Calculation Window (Sample) Setup'
         var_calculation_window_smpl_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_smpl_setup)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Calculation window SMPL"] = time_delta_new.total_seconds()
         # Build section 'Spike Elimination Setup'
         var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Spike elimination"] = time_delta_new.total_seconds()
         # Build section 'Check-Up'
         var_checkup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Check-up GUI"] = time_delta_new.total_seconds()
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 17, "Column start": 42, "N rows": 1, "N columns": 18}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Acquisition Times"] = time_delta_new.total_seconds()
         # Build section 'Standard Files'
         var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 15, "N columns": 22}
         self.place_standard_files_table(var_geometry_info=var_standard_files)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Table STD"] = time_delta_new.total_seconds()
         # Build section 'Sample Files'
         var_sample_files = {"Row start": 17, "Column start": 19, "N rows": 18, "N columns": 22}
         self.place_sample_files_table(var_geometry_info=var_sample_files)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Table SMPL"] = time_delta_new.total_seconds()
         # Build section 'Time-Signal Diagram Checker'
         self.define_isotope_colors()
         var_time_signal_diagram_check = {"Row start": 25, "Column start": 42, "N rows": 1, "N columns": 18}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        helper_times["Time-signal Diagram checker"] = time_delta_new.total_seconds()
         # Build section 'Measured Isotopes'
         var_measured_isotopes = {"Row start": 1, "Column start": 42, "N rows": 15, "N columns": 18}
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        time_previous0 = time_previous
-        helper_times["Table Isotopes"] = time_delta_new.total_seconds()
-
-        # time_new = datetime.datetime.now()
-        # time_delta_new = (time_new - time_previous)*1000
-        # time_previous = time_new
-        # title = "G"
-        # helper_times[title] = time_delta_new.total_seconds()
-        # print(f"Process time (t-I diagram checker - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         ## INITIALIZATION
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
-
-        helper_times_init = {}
-        time_new0 = datetime.datetime.now()
-        time_delta_new = (time_new0 - time_previous)*1000
-        time_previous = time_new0
-        title = "A"
-        helper_times_init[title] = time_delta_new.total_seconds()
-        print(f"Process time (Main settings window - Initialization - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         if self.file_loaded:
             if len(self.container_spikes[filename_short]) > 0:
@@ -11717,39 +11638,9 @@ class PySILLS(tk.Frame):
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
             self.ma_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "B"
-        helper_times_init[title] = time_delta_new.total_seconds()
-        print(f"Process time (Main settings window - Initialization - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
-
         self.build_srm_database()
         self.file_system_need_update = False
         self.btn_save_project.configure(state="normal")
-
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous)*1000
-        time_previous = time_new
-        title = "C"
-        helper_times_init[title] = time_delta_new.total_seconds()
-        print(f"Process time (Main settings window - Initialization - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
-
-        time_new = datetime.datetime.now()
-        time_delta_new = (time_new - time_previous0)*1000
-        time_previous = time_new
-        helper_times_init["Initialization"] = time_delta_new.total_seconds()
-
-        time_end = datetime.datetime.now()
-        time_delta = (time_end - time_start)*1000
-        print(f"Process time (opening project - part 'Total'):", time_delta.total_seconds(), "ms")
-
-        print("")
-        print("Evaluation: process time (main settings window")
-        for key, value in helper_times.items():
-            amount = round(value/time_delta.total_seconds()*100, 2)
-            if amount > 1.0:
-                print(key, amount, "%")
 
     def place_project_information(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Project Information'
