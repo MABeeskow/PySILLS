@@ -11620,19 +11620,28 @@ class PySILLS(tk.Frame):
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
 
         if self.file_loaded:
-            if len(self.container_spikes[filename_short]) > 0:
-                pass
-            else:
-                if self.container_var["Spike Elimination"]["STD"]["State"]:
-                    if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-                                                                                "PySILLS Spike Finder"]:
-                        var_method = "Grubbs"
-                        self.spike_elimination_all(filetype="STD", algorithm=var_method)
-                if self.container_var["Spike Elimination"]["SMPL"]["State"]:
-                    if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-                                                                                "PySILLS Spike Finder"]:
-                        var_method = "Grubbs"
-                        self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+            list_files = []
+            list_files_std = self.container_lists["STD"]["Short"].copy()
+            list_files_smpl = self.container_lists["SMPL"]["Short"].copy()
+            list_files.extend(list_files_std)
+            list_files.extend(list_files_smpl)
+            for filename_short in list_files:
+                if filename_short in self.container_spikes:
+                    if len(self.container_spikes[filename_short]) > 0:
+                        pass
+                    else:
+                        if self.container_var["Spike Elimination"]["STD"]["State"]:
+                            if self.container_var["Spike Elimination Method"].get() in [
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                var_method = "Grubbs"
+                                self.spike_elimination_all(filetype="STD", algorithm=var_method)
+                        if self.container_var["Spike Elimination"]["SMPL"]["State"]:
+                            if self.container_var["Spike Elimination Method"].get() in [
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                var_method = "Grubbs"
+                                self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+                else:
+                    self.container_spikes[filename_short] = {}
         else:
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
             self.ma_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
@@ -15708,40 +15717,42 @@ class PySILLS(tk.Frame):
 
         df_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
         for index, isotope in enumerate(df_isotopes):
-            frm_i = tk.Frame(
-                frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
-                highlightbackground="black", bd=1)
-            text_iso.window_create("end", window=frm_i)
-            text_iso.insert("end", "")
+            if isotope in self.isotope_colors:
+                frm_i = tk.Frame(
+                    frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                    highlightbackground="black", bd=1)
+                text_iso.window_create("end", window=frm_i)
+                text_iso.insert("end", "")
 
-            lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-            text_iso.window_create("end", window=lbl_i)
-            text_iso.insert("end", "\t")
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+                text_iso.window_create("end", window=lbl_i)
+                text_iso.insert("end", "\t")
 
-            cb_raw_i = tk.Checkbutton(
-                frm_iso,
-                variable=self.container_var["ma_setting"]["Display RAW"][str_filetype][var_filename_short][isotope],
-                text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="RAW",
-                               var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
-                                                                                   var_datatype, var_isotope))
-            text_iso.window_create("end", window=cb_raw_i)
-            text_iso.insert("end", "\t")
+                cb_raw_i = tk.Checkbutton(
+                    frm_iso,
+                    variable=self.container_var["ma_setting"]["Display RAW"][str_filetype][var_filename_short][isotope],
+                    text="RAW", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"],
+                    command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="RAW",
+                                   var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
+                                                                                       var_datatype, var_isotope))
+                text_iso.window_create("end", window=cb_raw_i)
+                text_iso.insert("end", "\t")
 
-            cb_smoothed_i = tk.Checkbutton(
-                frm_iso,
-                variable=self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][var_filename_short][
-                    isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
-                fg=self.bg_colors["Dark Font"],
-                command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="SMOOTHED",
-                               var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
-                                                                                   var_datatype, var_isotope))
-            if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
-                cb_smoothed_i.configure(state="disabled")
-            else:
-                cb_smoothed_i.configure(state="normal")
-            text_iso.window_create("end", window=cb_smoothed_i)
-            text_iso.insert("end", "\n")
+                cb_smoothed_i = tk.Checkbutton(
+                    frm_iso,
+                    variable=self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][var_filename_short][
+                        isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=self.bg_colors["Very Light"],
+                    fg=self.bg_colors["Dark Font"],
+                    command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="SMOOTHED",
+                                   var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
+                                                                                       var_datatype, var_isotope))
+
+                if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
+                    cb_smoothed_i.configure(state="disabled")
+                else:
+                    cb_smoothed_i.configure(state="normal")
+                text_iso.window_create("end", window=cb_smoothed_i)
+                text_iso.insert("end", "\n")
 
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
@@ -15811,16 +15822,16 @@ class PySILLS(tk.Frame):
         try:
             canvas_ratio = self.container_helper[str_filetype][str_filename_short]["CANVAS RATIO"]
             toolbarframe_ratio = self.container_helper[str_filetype][str_filename_short]["TOOLBARFRAME RATIO"]
-            #
+
             if canvas_ratio == None:
                 canvas_ratio.get_tk_widget().grid_remove()
                 toolbarframe_ratio.grid_remove()
         except AttributeError:
             pass
-        #
+
         try:
             resultsframe = self.container_helper[str_filetype][str_filename_short]["RESULTS FRAME"]
-            #
+
             if resultsframe != None:
                 resultsframe.destroy()
         except AttributeError:
@@ -15876,19 +15887,21 @@ class PySILLS(tk.Frame):
             var_lw = 2.5
 
         for isotope in df_isotopes:
-            ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                             linewidth=var_lw, visible=True)
-            self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                "RAW"] = ln_raw
+            if isotope in self.isotope_colors:
+                ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
+                                 linewidth=var_lw, visible=True)
+                self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                    "RAW"] = ln_raw
 
-            if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
-                ln_smoothed = ax.plot(
-                    self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
-                    label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
-                    isotope]["SMOOTHED"] = ln_smoothed
-                self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
-                    isotope].set(1)
+                if (self.container_var["Spike Elimination"][str_filetype]["State"] == True and
+                        isotope in self.container_spikes[str_filename_short]):
+                    ln_smoothed = ax.plot(
+                        self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                    self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
+                        isotope]["SMOOTHED"] = ln_smoothed
+                    self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
+                        isotope].set(1)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -15918,10 +15931,10 @@ class PySILLS(tk.Frame):
 
             else:
                 times_bg = self.container_helper[str_filetype][str_filename_short]["BG"][1]["Times"]
-                #
+
                 box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
                 self.container_helper[str_filetype][str_filename_short]["BG"][1]["Object"] = box_bg
-        #
+
         if self.pysills_mode == "MA":
             signal_key = "MAT"
             var_check_sig = self.container_helper[str_filetype][str_filename_short][signal_key]["Content"]
@@ -16426,15 +16439,17 @@ class PySILLS(tk.Frame):
         if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-                self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                    "RAW"][0].set_visible(True)
-                self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(1)
+                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                        "RAW"][0].set_visible(True)
+                    self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(1)
         elif self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 1:
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-                self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                    "SMOOTHED"][0].set_visible(True)
-                self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
+                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                        "SMOOTHED"][0].set_visible(True)
+                    self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
 
         self.canvas_specific.draw()
 
@@ -16442,15 +16457,17 @@ class PySILLS(tk.Frame):
         if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-                self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                    "RAW"][0].set_visible(False)
-                self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(0)
+                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                        "RAW"][0].set_visible(False)
+                    self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(0)
         elif self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 1:
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
-                self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                    "SMOOTHED"][0].set_visible(False)
-                self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
+                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                        "SMOOTHED"][0].set_visible(False)
+                    self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
 
         self.canvas_specific.draw()
 
