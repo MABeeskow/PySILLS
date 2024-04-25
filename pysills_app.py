@@ -18443,10 +18443,6 @@ class PySILLS(tk.Frame):
                     file_isotopes = self.container_lists["Measured Isotopes"][file_std_short]
                     var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                     if self.container_var["STD"][file_std]["Checkbox"].get() == 1:
-                        # self.get_analytical_sensitivity(
-                        #     var_filetype="STD", var_datatype=var_datatype, var_file_short=file_std_short,
-                        #     var_file_long=file_std, var_is_smpl=var_is_smpl, var_focus="MAT",
-                        #     var_is_host=var_is_host)
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         list_delta_std_i.append(delta_std_i)
@@ -18467,6 +18463,10 @@ class PySILLS(tk.Frame):
 
                                 sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
                                     file_std_short]["MAT"][isotope]
+                                sensitivity_is = self.container_analytical_sensitivity["STD"][var_datatype][
+                                    file_std_short]["MAT"][var_is_host]
+                                if sensitivity_is != None:
+                                    sensitivity_i = sensitivity_i/sensitivity_is
                                 list_xi_std_i[isotope].append(sensitivity_i)
 
                                 xi_std_helper[file_std_short][isotope] = [delta_std_i, sensitivity_i]
@@ -23409,6 +23409,17 @@ class PySILLS(tk.Frame):
                         x_values.append(x_value)
                         y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file][str_focus][
                             var_iso_01]
+
+                        if str_focus == "MAT":
+                            if self.pysills_mode == "MA":
+                                str_is_host = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+                            else:
+                                str_is_host = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"][
+                                    "Name"].get()
+                            y_value_is = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file][
+                                "MAT"][str_is_host]
+                            y_value = y_value/y_value_is
+
                         dot_color = self.bg_colors["Light"]
                         self.ax_sensitivity_03a.scatter(
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="D")
