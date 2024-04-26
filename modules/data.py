@@ -68,6 +68,11 @@ class Data:
                 key_start = re.search(
                     "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( AM)?( PM)?( using Batch )(\w+)",
                     line_time_start)
+                date_start = ["01", "01", "2000"]
+                date_end = ["31", "12", "2000"]
+                time_start = ["00", "00", "00"]
+                time_end = ["23", "59", "59"]
+
                 if key_start:
                     date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
                     time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
