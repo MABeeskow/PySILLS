@@ -20241,15 +20241,18 @@ class PySILLS(tk.Frame):
             self.last_category_parameter = "Sensitivity"
             if var_opt == "Analytical Sensitivity":
                 for isotope in file_isotopes:
-                    if str_filetype == "SMPL":
-                        if str_focus in ["BG", "INCL", "MIX"]:
-                            str_focus = "MAT"
-                    value_i = self.container_analytical_sensitivity[str_filetype][str_datatype][str_filename_short][
-                        str_focus][isotope]
+                    if str_focus in self.container_analytical_sensitivity[str_filetype][str_datatype][
+                        str_filename_short]:
+                        value_i = self.container_analytical_sensitivity[str_filetype][str_datatype][str_filename_short][
+                            str_focus][isotope]
+                    else:
+                        value_i = None
+
                     if value_i != None:
                         entries_i = [isotope, round(value_i, 4)]
                     else:
                         entries_i = [isotope, "undefined"]
+
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
             elif var_opt == "Normalized Sensitivity":
                 for isotope in file_isotopes:
