@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		25.04.2024
+# Date:		26.04.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -18202,22 +18202,25 @@ class PySILLS(tk.Frame):
             if filename_short not in self.container_analytical_sensitivity[srm_file]:
                 self.container_analytical_sensitivity[srm_file][filename_short] = {}
 
+            var_is = None
             if var_is_smpl == None:
                 for element, value in sorted(
                         self.srm_actual[srm_file].items(), key=lambda item: item[1], reverse=True):
                     if element in elements_file:
                         var_is = elements_file[element][0]
-                    break
+                        break
             else:
                 if var_is_host != None:
                     var_is = var_is_host
                 else:
                     var_is = var_is_smpl
 
-            key_element_is = re.search("(\D+)(\d+)", var_is)
-            element_is = key_element_is.group(1)
-            var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][var_is]
-            self.container_var["STD"][filename_long]["IS Data"]["IS"].set(var_is)
+            if var_is != None:
+                key_element_is = re.search("(\D+)(\d+)", var_is)
+                element_is = key_element_is.group(1)
+                var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
+                    var_is]
+                self.container_var["STD"][filename_long]["IS Data"]["IS"].set(var_is)
 
             element_is_smpl = None
             if var_is_smpl != None:
@@ -23230,8 +23233,8 @@ class PySILLS(tk.Frame):
                             value = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file][
                                 var_focus][isotope]
                             if var_filetype == "SMPL":
-                                y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["INCL"][isotope]
-                                print("B1", var_file, isotope, y_value)
+                                y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["INCL"][
+                                    isotope]
 
                             if var_is_file != None:
                                 value_is = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file][
