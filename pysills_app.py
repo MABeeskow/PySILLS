@@ -18178,12 +18178,14 @@ class PySILLS(tk.Frame):
             if filename_short not in self.container_analytical_sensitivity[srm_file]:
                 self.container_analytical_sensitivity[srm_file][filename_short] = {}
 
+            var_is = None
             if var_is_smpl == None:
                 for element, value in sorted(
                         self.srm_actual[srm_file].items(), key=lambda item: item[1], reverse=True):
                     if element in elements_file:
                         var_is = elements_file[element][0]
-                    break
+                    if var_is != None:
+                        break
             else:
                 var_is = var_is_smpl
 
