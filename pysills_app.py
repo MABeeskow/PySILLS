@@ -18208,6 +18208,8 @@ class PySILLS(tk.Frame):
                         self.srm_actual[srm_file].items(), key=lambda item: item[1], reverse=True):
                     if element in elements_file:
                         var_is = elements_file[element][0]
+
+                    if var_is != None:
                         break
             else:
                 if var_is_host != None:
@@ -18516,7 +18518,6 @@ class PySILLS(tk.Frame):
                             if isotope not in list_xi_std_i:
                                 list_xi_std_i[isotope] = []
                             if var_srm_i == var_srm_file:
-
                                 if isotope not in list_valid_isotopes:
                                     list_valid_isotopes.append(isotope)
 
@@ -18528,14 +18529,16 @@ class PySILLS(tk.Frame):
 
                                 sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
                                     file_std_short]["MAT"][isotope]
-
                                 if var_srm_host == var_srm_i:
                                     sensitivity_is = self.container_analytical_sensitivity["STD"][var_datatype][
                                         file_std_short]["MAT"][var_is_host]
                                 else:
                                     sensitivity_is = self.container_analytical_sensitivity["STD"][var_datatype][
-                                        file_std_short]["MAT"][var_is_smpl]
-                                    sensitivity_is = 1.0
+                                        file_std_short]["MAT"][var_is_host]
+                                    if sensitivity_is != 1.0:
+                                        pass
+                                    else:
+                                        sensitivity_is = 1.0
 
                                 if sensitivity_is != None:
                                     sensitivity_i = sensitivity_i/sensitivity_is
@@ -23956,8 +23959,8 @@ class PySILLS(tk.Frame):
                                 y_value_is = 1.0
 
                             y_value = y_value/y_value_is
-                            y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file][str_focus][var_iso_01]
-                            print("B", var_file, var_iso_01, str_focus, y_value)
+                            y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file][str_focus][
+                                var_iso_01]
 
                         dot_color = self.bg_colors["Light"]
                         self.ax_sensitivity_03a.scatter(
