@@ -31331,8 +31331,9 @@ class PySILLS(tk.Frame):
                 self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_smoothed)
             else:
                 for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
-                    var_value_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
-                    self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_saved)
+                    if var_id in self.container_spike_values[var_file_short][var_isotope]["Save"]:
+                        var_value_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
+                        self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_saved)
 
         if mode != None:
             for index_file, var_file_short in enumerate(self.container_lists[mode]["Short"]):
@@ -31350,8 +31351,10 @@ class PySILLS(tk.Frame):
                             if self.file_loaded == False:
                                 self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
                             else:
-                                val_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
-                                self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][var_id] = val_saved
+                                if var_id in self.container_spike_values[var_file_short][var_isotope]["Save"]:
+                                    val_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
+                                    self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][
+                                        var_id] = val_saved
 
     def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
         for index, var_file_short in enumerate(self.container_lists[mode]["Short"]):
