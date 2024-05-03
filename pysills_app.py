@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		26.04.2024
+# Date:		03.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -4602,12 +4602,14 @@ class PySILLS(tk.Frame):
                         else:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+
                             if var_srm_i == var_srm_file:
                                 value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                                     isotope]
                                 value_lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             else:
                                 value_i = None
+
                         if value_i != None:
                             if value_i >= value_lod_i:
                                 report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
@@ -5520,13 +5522,21 @@ class PySILLS(tk.Frame):
                             if var_filetype == "SMPL":
                                 value_i = self.container_concentration[var_filetype][var_datatype][file_short]["INCL"][
                                     isotope]
+                                lod_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
                                 value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
                                     "1 SIGMA INCL"][isotope]
                             else:
                                 value_i = 0.0
+                                lod_i = 0.0
                                 value_sigma_i = 0.0
 
                             n_digits = 5
+
+                            if value_i >= lod_i:
+                                value_i = value_i
+                            else:
+                                value_i *= -1
+
                             report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
                             report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
@@ -5538,7 +5548,13 @@ class PySILLS(tk.Frame):
                                 var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
                             value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                                 isotope]
+                            lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
+
+                            if value_i >= lod_i:
+                                value_i = value_i
+                            else:
+                                value_i *= -1
 
                             if var_filetype == "SMPL":
                                 value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
