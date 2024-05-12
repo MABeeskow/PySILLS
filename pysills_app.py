@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		03.05.2024
+# Date:		12.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -21402,12 +21402,39 @@ class PySILLS(tk.Frame):
                                   "standard method or for the methods from Halter or Borisova was already defined.")
                             self.parent.bell()
 
-                        var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
-                        var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
-                        var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                        var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                        # var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
+                        # var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                        # var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                        # var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+
+                        if var_intensity_mat_i > var_intensity_bg_i:
+                            var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
+                        else:
+                            var_intensity_host_i = 0.0
+
+                        if var_intensity_incl_i > var_intensity_bg_i:
+                            var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                        else:
+                            var_intensity_mix_i = 0.0
+
+                        if var_intensity_mat_t > var_intensity_bg_t:
+                            var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                        else:
+                            var_intensity_host_t = 0.0
+
+                        if var_intensity_incl_t > var_intensity_bg_t:
+                            var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                        else:
+                            var_intensity_incl_host_t = 0.0
+
                         var_intensity_mix_t = var_intensity_incl_host_t
-                        var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
+                        # var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
+
+                        if var_intensity_host_t > 0:
+                            var_intensity_incl_host_i = ((var_intensity_incl_host_t/var_intensity_host_t)*
+                                                         var_intensity_host_i)
+                        else:
+                            var_intensity_incl_host_i = 0.0
 
                         if self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 0:
                             # Heinrich (2003)
