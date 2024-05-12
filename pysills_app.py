@@ -21577,7 +21577,11 @@ class PySILLS(tk.Frame):
         if with_r == False:
             intensity_incl_i = intensity_mix_i - intensity_incl_mat_i
         else:
-            factor_r = intensity_incl_mat_i/intensity_mat_i
+            if intensity_mat_i > 0:
+                factor_r = intensity_incl_mat_i/intensity_mat_i
+            else:
+                factor_r = 0.0
+
             intensity_incl_i = intensity_mix_i - factor_r*intensity_mat_i
         return intensity_incl_i
 
