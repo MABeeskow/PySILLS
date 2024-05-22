@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		12.05.2024
+# Date:		22.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -21862,7 +21862,11 @@ class PySILLS(tk.Frame):
                                 var_file_short]["MAT"][isotope]
                             var_sensitivity_ishost = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                 var_file_short]["MAT"][var_host_is]
-                            var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
+
+                            if var_sensitivity_ishost > 0:
+                                var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
+                            else:
+                                var_sensitivity_host_is = 0.0
 
                             var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                 "BG"][isotope]
