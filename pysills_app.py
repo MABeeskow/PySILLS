@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		26.04.2024
+# Date:		22.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -4602,12 +4602,14 @@ class PySILLS(tk.Frame):
                         else:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
+
                             if var_srm_i == var_srm_file:
                                 value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                                     isotope]
                                 value_lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             else:
                                 value_i = None
+
                         if value_i != None:
                             if value_i >= value_lod_i:
                                 report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
@@ -5520,13 +5522,21 @@ class PySILLS(tk.Frame):
                             if var_filetype == "SMPL":
                                 value_i = self.container_concentration[var_filetype][var_datatype][file_short]["INCL"][
                                     isotope]
+                                lod_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
                                 value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
                                     "1 SIGMA INCL"][isotope]
                             else:
                                 value_i = 0.0
+                                lod_i = 0.0
                                 value_sigma_i = 0.0
 
                             n_digits = 5
+
+                            if value_i >= lod_i:
+                                value_i = value_i
+                            else:
+                                value_i *= -1
+
                             report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
                             report_concentration_incl_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
@@ -5538,7 +5548,13 @@ class PySILLS(tk.Frame):
                                 var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
                             value_i = self.container_concentration[var_filetype][var_datatype][file_short]["MAT"][
                                 isotope]
+                            lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
+
+                            if value_i >= lod_i:
+                                value_i = value_i
+                            else:
+                                value_i *= -1
 
                             if var_filetype == "SMPL":
                                 value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
@@ -21386,12 +21402,39 @@ class PySILLS(tk.Frame):
                                   "standard method or for the methods from Halter or Borisova was already defined.")
                             self.parent.bell()
 
-                        var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
-                        var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
-                        var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                        var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                        # var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
+                        # var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                        # var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                        # var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+
+                        if var_intensity_mat_i > var_intensity_bg_i:
+                            var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
+                        else:
+                            var_intensity_host_i = 0.0
+
+                        if var_intensity_incl_i > var_intensity_bg_i:
+                            var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                        else:
+                            var_intensity_mix_i = 0.0
+
+                        if var_intensity_mat_t > var_intensity_bg_t:
+                            var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                        else:
+                            var_intensity_host_t = 0.0
+
+                        if var_intensity_incl_t > var_intensity_bg_t:
+                            var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                        else:
+                            var_intensity_incl_host_t = 0.0
+
                         var_intensity_mix_t = var_intensity_incl_host_t
-                        var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
+                        # var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
+
+                        if var_intensity_host_t > 0:
+                            var_intensity_incl_host_i = ((var_intensity_incl_host_t/var_intensity_host_t)*
+                                                         var_intensity_host_i)
+                        else:
+                            var_intensity_incl_host_i = 0.0
 
                         if self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 0:
                             # Heinrich (2003)
@@ -21534,7 +21577,11 @@ class PySILLS(tk.Frame):
         if with_r == False:
             intensity_incl_i = intensity_mix_i - intensity_incl_mat_i
         else:
-            factor_r = intensity_incl_mat_i/intensity_mat_i
+            if intensity_mat_i > 0:
+                factor_r = intensity_incl_mat_i/intensity_mat_i
+            else:
+                factor_r = 0.0
+
             intensity_incl_i = intensity_mix_i - factor_r*intensity_mat_i
         return intensity_incl_i
 
@@ -21815,7 +21862,11 @@ class PySILLS(tk.Frame):
                                 var_file_short]["MAT"][isotope]
                             var_sensitivity_ishost = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                 var_file_short]["MAT"][var_host_is]
-                            var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
+
+                            if var_sensitivity_ishost > 0:
+                                var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
+                            else:
+                                var_sensitivity_host_is = 0.0
 
                             var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                 "BG"][isotope]
@@ -31331,8 +31382,9 @@ class PySILLS(tk.Frame):
                 self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_smoothed)
             else:
                 for var_id in self.container_spikes[var_file_short][var_isotope]["Indices"]:
-                    var_value_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
-                    self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_saved)
+                    if var_id in self.container_spike_values[var_file_short][var_isotope]["Save"]:
+                        var_value_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
+                        self.container_spike_values[var_file_short][var_isotope]["Current"].append(var_value_saved)
 
         if mode != None:
             for index_file, var_file_short in enumerate(self.container_lists[mode]["Short"]):
@@ -31350,8 +31402,10 @@ class PySILLS(tk.Frame):
                             if self.file_loaded == False:
                                 self.container_spike_values[var_file_short][var_isotope]["Save"][var_id] = val_id
                             else:
-                                val_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
-                                self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][var_id] = val_saved
+                                if var_id in self.container_spike_values[var_file_short][var_isotope]["Save"]:
+                                    val_saved = self.container_spike_values[var_file_short][var_isotope]["Save"][var_id]
+                                    self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][
+                                        var_id] = val_saved
 
     def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
         for index, var_file_short in enumerate(self.container_lists[mode]["Short"]):

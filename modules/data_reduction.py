@@ -472,7 +472,10 @@ class IntensityQuantification:
                         elif mode == 2: # "SILLS (with R)"
                             intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
                             intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
-                            factor_r = intensity_incl_mat_i/intensity_mat_i
+                            if intensity_mat_i > 0:
+                                factor_r = intensity_incl_mat_i/intensity_mat_i
+                            else:
+                                factor_r = 0.0
                             value_incl_i = intensity_mix_i - factor_r*intensity_mat_i
                         elif mode == 3: # "Theory"
                             intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
