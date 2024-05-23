@@ -4199,6 +4199,7 @@ class PySILLS(tk.Frame):
                                             dataset_complete_all = self.container_measurements["RAW"][file_std]
 
                                             if spike_elimination_performed == True:
+                                                time_start = datetime.datetime.now()
                                                 if var_method == 0:
                                                     data_smoothed, indices_outl = GrubbsTestSILLS(
                                                         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
@@ -4214,10 +4215,8 @@ class PySILLS(tk.Frame):
                                                         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
                                                         isotope=isotope,
                                                         dataset_complete=dataset_complete).find_outlier()
-                                                    # data_smoothed, indices_outl = ES(
-                                                    #     variable=dataset_raw).find_outlier(
-                                                    #     limit=var_alpha, threshold=var_threshold, interval=interval,
-                                                    #     data_total=dataset_complete_all, isotope=isotope)
+                                                time_end = datetime.datetime.now()
+                                                time_delta = (time_end - time_start)*1000
                                             else:
                                                 data_smoothed = dataset_raw
                                                 indices_outl = []
@@ -4268,7 +4267,9 @@ class PySILLS(tk.Frame):
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
         elif filetype == "SMPL":
+            list_times = {}
             for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
+                list_times[file_smpl] = []
                 filename_long = self.container_lists["SMPL"]["Long"][index]
                 if self.container_var[filetype][filename_long]["Checkbox"].get() == 1:
                     isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl]]
@@ -4334,6 +4335,7 @@ class PySILLS(tk.Frame):
                                             dataset_complete_all = self.container_measurements["RAW"][file_smpl]
 
                                             if spike_elimination_performed == True:
+                                                time_start = datetime.datetime.now()
                                                 if var_method == 0:
                                                     data_smoothed, indices_outl = GrubbsTestSILLS(
                                                         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
@@ -4349,10 +4351,9 @@ class PySILLS(tk.Frame):
                                                         raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
                                                         isotope=isotope,
                                                         dataset_complete=dataset_complete).find_outlier()
-                                                    # data_smoothed, indices_outl = ES(
-                                                    #     variable=dataset_raw).find_outlier(
-                                                    #     limit=var_alpha, threshold=var_threshold, interval=interval,
-                                                    #     data_total=dataset_complete_all, isotope=isotope)
+                                                time_end = datetime.datetime.now()
+                                                time_delta = (time_end - time_start)*1000
+                                                list_times[file_smpl].append(time_delta.total_seconds())
                                             else:
                                                 data_smoothed = dataset_raw
                                                 indices_outl = []
@@ -4429,6 +4430,9 @@ class PySILLS(tk.Frame):
                                     "Times": self.container_measurements["SELECTED"][file_smpl]["Time"]}
                             else:
                                 pass
+
+            # for file, dataset in list_times.items():
+            #     print(file, round(np.mean(dataset), 3), "ms")
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
 
