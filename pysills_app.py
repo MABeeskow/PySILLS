@@ -16320,7 +16320,8 @@ class PySILLS(tk.Frame):
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="MAT")
                     # Sensitivity-related parameters
-                    self.get_analytical_sensitivity_std(var_datatype="RAW", mode="all")
+                    # self.get_analytical_sensitivity_std(var_datatype="RAW", mode="all")
+                    self.get_analytical_sensitivity_std_alternative(var_datatype="RAW", mode="all")
 
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
@@ -18377,6 +18378,121 @@ class PySILLS(tk.Frame):
                 else:
                     self.get_analytical_sensitivity_std(var_datatype=str_datatype, var_file_short=filename_short)
 
+    def get_analytical_sensitivity_std_alternative(
+            self, var_datatype=None, var_file_short=None, mode="specific", var_is_host=None, var_is_smpl=None):
+        """ Calculates the analytical sensitivity of isotope i with respect to the internal standard IS.
+        -------
+        Parameters
+        var_filetype : str
+            The file category, e.g. STD
+        var_datatype : str
+            The data category, e.g. RAW
+        var_file_short : str
+            The file as a short version (without the complete filepath)
+        mode : str
+            It specifies if the data reduction has to be done for all files or only one specific file
+        var_is_host : str
+            It defines the internal standard of the host in a sample file
+        var_is_smpl : str
+            It defines the internal standard of a sample file
+        -------
+        Returns
+        -------
+        """
+        if mode == "specific":
+            filename_short = var_file_short
+            index_filename = self.container_lists["STD"]["Short"].index(filename_short)
+            filename_long = self.container_lists["STD"]["Long"][index_filename]
+            isotopes_file = self.container_lists["Measured Isotopes"][filename_short]
+            elements_file = self.container_lists["Measured Elements"][filename_short]
+
+            srm_file = self.container_var["STD"][filename_long]["SRM"].get()
+            if srm_file not in self.container_analytical_sensitivity:
+                self.container_analytical_sensitivity[srm_file] = {}
+
+            if filename_short not in self.container_analytical_sensitivity[srm_file]:
+                self.container_analytical_sensitivity[srm_file][filename_short] = {}
+
+            var_is = None
+            if var_is_smpl == None:
+                for element, value in sorted(
+                        self.srm_actual[srm_file].items(), key=lambda item: item[1], reverse=True):
+                    if element in elements_file:
+                        var_is = elements_file[element][0]
+
+                    if var_is != None:
+                        break
+            else:
+                if var_is_host != None:
+                    var_is = var_is_host
+                else:
+                    var_is = var_is_smpl
+
+            if var_is != None:
+                key_element_is = re.search("(\D+)(\d+)", var_is)
+                element_is = key_element_is.group(1)
+                var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
+                    var_is]
+                self.container_var["STD"][filename_long]["IS Data"]["IS"].set(var_is)
+
+            element_is_smpl = None
+            if var_is_smpl != None:
+                key_element_is_smpl = re.search("(\D+)(\d+)", var_is_smpl)
+                element_is_smpl = key_element_is_smpl.group(1)
+                var_intensity_is_smpl = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
+                    var_is_smpl]
+
+            for isotope in isotopes_file:
+                if isotope.isdigit():
+                    self.container_lists["Measured Isotopes"][filename_short].remove(isotope)
+                    isotopes_file = self.container_lists["Measured Isotopes"][filename_short]
+                else:
+                    srm_isotope = self.container_var["SRM"][isotope].get()
+                    key_element = re.search("(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+
+                    if element_is in self.srm_actual[srm_isotope]:
+                        var_concentration_is = self.srm_actual[srm_isotope][element_is]
+                    else:
+                        var_concentration_is = 0.0
+
+                    if element_is_smpl != None:
+                        if element_is_smpl in self.srm_actual[srm_isotope]:
+                            var_concentration_is_smpl = self.srm_actual[srm_isotope][element_is_smpl]
+                        else:
+                            var_concentration_is_smpl = 0.0
+
+                    if element in self.srm_actual[srm_file]:
+                        var_concentration_i = self.srm_actual[srm_file][element]
+                        var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][filename_short][
+                            "MAT"][isotope]
+
+                        var_result_i = (var_intensity_i/var_intensity_is)*(
+                                var_concentration_is/var_concentration_i)
+
+                    if var_is_smpl != None:
+                        var_result_is_smpl = (var_intensity_is_smpl/var_intensity_is)*(
+                                var_concentration_is/var_concentration_is_smpl)
+                    else:
+                        var_result_is_smpl = 0.0
+
+                    self.container_analytical_sensitivity["STD"][var_datatype][filename_short]["MAT"][
+                        isotope] = var_result_i
+                    self.container_analytical_sensitivity[srm_file][filename_short][isotope] = var_result_i
+                    self.container_analytical_sensitivity["STD"][var_datatype][filename_short]["MAT"][
+                        var_is_smpl] = var_result_is_smpl
+                    self.container_analytical_sensitivity[srm_file][filename_short][
+                        var_is_smpl] = var_result_is_smpl
+        else:
+            str_datatype = var_datatype
+            for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
+                if var_is_host != None and var_is_smpl != None:
+                    self.get_analytical_sensitivity_std_alternative(
+                        var_datatype=str_datatype, var_file_short=filename_short, var_is_host=var_is_host,
+                        var_is_smpl=var_is_smpl)
+                else:
+                    self.get_analytical_sensitivity_std_alternative(var_datatype=str_datatype, var_file_short=filename_short)
+
     def get_analytical_sensitivity(
             self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific", var_is_smpl=None,
             var_focus=None, var_is_host=None):
@@ -18731,7 +18847,8 @@ class PySILLS(tk.Frame):
                     #         pass
         else:
             str_datatype = var_datatype
-            self.get_analytical_sensitivity_std(var_datatype=str_datatype, mode="all")
+            # self.get_analytical_sensitivity_std(var_datatype=str_datatype, mode="all")
+            self.get_analytical_sensitivity_std_alternative(var_datatype=str_datatype, mode="all")
             for var_filetype in ["SMPL"]:
                 if self.pysills_mode == "MA":
                     list_focus = ["MAT"]
@@ -26891,9 +27008,11 @@ class PySILLS(tk.Frame):
                         var_file_long=var_file, var_focus="INCL")
                     self.fi_get_intensity_mix(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
-                    self.get_analytical_sensitivity_std(
+                    # self.get_analytical_sensitivity_std(
+                    #     var_datatype="RAW", mode="all", var_is_host=var_is_host, var_is_smpl=var_is_smpl)
+                    self.get_analytical_sensitivity_std_alternative(
                         var_datatype="RAW", mode="all", var_is_host=var_is_host, var_is_smpl=var_is_smpl)
-                    #
+
                 self.fi_get_intensity_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
