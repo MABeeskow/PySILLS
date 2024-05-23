@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		22.05.2024
+# Date:		23.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -18557,7 +18557,10 @@ class PySILLS(tk.Frame):
                                         sensitivity_is = 1.0
 
                                 if sensitivity_is != None:
-                                    sensitivity_i = sensitivity_i/sensitivity_is
+                                    if sensitivity_is > 0:
+                                        sensitivity_i = sensitivity_i/sensitivity_is
+                                    else:
+                                        sensitivity_i = 0.0
 
                                 list_xi_std_i[isotope].append(sensitivity_i)
 
@@ -18612,13 +18615,14 @@ class PySILLS(tk.Frame):
                                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                                 value_i = self.container_analytical_sensitivity[var_srm_file][file_std_short][isotope]
                                 value_is = self.container_analytical_sensitivity[var_srm_file][file_std_short][var_is]
-                                value_i = value_i/value_is
+                                if value_is > 0:
+                                    value_i = value_i/value_is
+                                else:
+                                    value_i = 0.0
+
                                 xi_opt_host_is.append(value_i)
                                 caution = True
                                 var_focus2 = "INCL"
-
-                                #value_i = self.container_analytical_sensitivity[var_srm_i][file_std_short][var_is]
-                                #xi_opt_host_is.append(value_i)
 
                         a_i, b_i = self.calculate_linear_regression(x_values=list_delta_std_i, y_values=xi_opt_host_is)
                         a_i = round(a_i, 12)
@@ -21662,7 +21666,11 @@ class PySILLS(tk.Frame):
                     var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         "MAT"][isotope]
 
-                    var_result_i = var_intensity_i/var_concentration_i
+                    if var_concentration_i > 0:
+                        var_result_i = var_intensity_i/var_concentration_i
+                    else:
+                        var_result_i = 0.0
+
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short]["MAT"][
                         isotope] = var_result_i
 
@@ -21675,15 +21683,22 @@ class PySILLS(tk.Frame):
                     else:
                         var_is = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
                         sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short][var_focus][var_is]#
-                        sensitivity_i = sensitivity_i/sensitivity_is
+                            var_file_short][var_focus][var_is]
+                        if sensitivity_is > 0:
+                            sensitivity_i = sensitivity_i/sensitivity_is
+                        else:
+                            sensitivity_i = 0.0
 
                     concentration_is = self.container_concentration[var_filetype][var_datatype][var_file_short][
                         var_focus][var_is]
                     intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         var_focus][var_is]
 
-                    var_result_i = sensitivity_i*(intensity_is/concentration_is)
+                    if concentration_is > 0:
+                        var_result_i = sensitivity_i*(intensity_is/concentration_is)
+                    else:
+                        var_result_i = 0.0
+
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short][var_focus][
                         isotope] = var_result_i
         else:
@@ -26982,7 +26997,10 @@ class PySILLS(tk.Frame):
                         var_is = self.container_var["SMPL"][var_file]["Matrix Setup"]["IS"]["Name"].get()
                         analytical_sensitivity_is = self.container_analytical_sensitivity[var_type]["RAW"][
                             var_file_short]["MAT"][var_is]
-                        analytical_sensitivity_i = analytical_sensitivity_i/analytical_sensitivity_is
+                        if analytical_sensitivity_is > 0:
+                            analytical_sensitivity_i = analytical_sensitivity_i/analytical_sensitivity_is
+                        else:
+                            analytical_sensitivity_i = 0.0
 
                     normalized_sensitivity_i = self.container_normalized_sensitivity[var_type]["RAW"][var_file_short][
                         "MAT"][isotope]
