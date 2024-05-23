@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		18.04.2024
+# Date:		23.05.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +14,7 @@
 import re, os, sys, datetime
 import tkinter as tk
 import numpy as np
+import scipy.stats as stats
 from modules import data
 import tkinter.filedialog as fd
 from modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
@@ -146,11 +147,14 @@ class Essentials:
         for index, value in enumerate(outlier_values_pre):
             if value > threshold:
                 outlier_indices.append(outlier_indices_pre[index])
+
         outlier_indices.sort()
 
         if len(outlier_indices) > 0:
             print(outlier_indices)
+
         data_smoothed = []
+
         for index, value in enumerate(dataset_complete):
             if value > threshold:
                 if index in outlier_indices:
@@ -180,11 +184,34 @@ class Essentials:
             if value_outlier > threshold:
                 average_dataset_new = self.determine_surrounded_values(
                     dataset_complete=dataset_complete, index=index_outlier)
-                if value_outlier in average_dataset_new["All"]:
-                    value_corrected = np.min(average_dataset_new["SP"])
-                    data_smoothed[index_outlier] = value_corrected
+                mean = np.mean(average_dataset_new["All"])
+                std = np.std(average_dataset_new["All"], ddof=1)
+                val_poi = round(abs(value_outlier - mean)/std, 3)
+                val_critical = self.calculate_grubbs_critical_value(alpha=alpha, size=len(average_dataset_new["SP"]))
+                if val_poi > val_critical:
+                    if value_outlier in average_dataset_new["All"]:
+                        value_corrected = np.mean(average_dataset_new["SP"])
+                        data_smoothed[index_outlier] = value_corrected
 
         return data_smoothed, outlier_indices
+
+    def calculate_grubbs_critical_value(self, alpha, size):
+        t_dist = stats.t.ppf(1 - alpha/(2*size), size - 2)
+        numerator = (size - 1)*np.sqrt(np.square(t_dist))
+        denominator = np.sqrt(size)*np.sqrt(size - 2 + np.square(t_dist))
+        critical_value = numerator/denominator
+
+        return critical_value
+
+    def calculate_grubbs_value(self, dataset_raw):
+        std_dev = np.std(dataset_raw, ddof=1)
+        avg_y = np.mean(dataset_raw)
+        abs_val_minus_avg = abs(np.array(dataset_raw) - avg_y)
+        max_of_deviations = max(abs_val_minus_avg)
+        max_ind = np.argmax(abs_val_minus_avg)
+        Gcal = max_of_deviations/std_dev
+
+        return Gcal, max_ind
 
     def determine_surrounding_values(self, dataset_complete, index_poi):
         # POI   - Point Of Interest
