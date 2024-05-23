@@ -18224,6 +18224,7 @@ class PySILLS(tk.Frame):
                 self.container_analytical_sensitivity[srm_file][filename_short] = {}
 
             var_is = None
+            element_is_smpl = None
             if var_is_smpl == None:
                 for element, value in sorted(
                         self.srm_actual[srm_file].items(), key=lambda item: item[1], reverse=True):
@@ -18233,6 +18234,11 @@ class PySILLS(tk.Frame):
                     if var_is != None:
                         break
             else:
+                key_element_is_smpl = re.search("(\D+)(\d+)", var_is_smpl)
+                element_is_smpl = key_element_is_smpl.group(1)
+                var_intensity_is_smpl = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
+                    var_is_smpl]
+
                 if var_is_host != None:
                     var_is = var_is_host
                 else:
@@ -18241,16 +18247,18 @@ class PySILLS(tk.Frame):
             if var_is != None:
                 key_element_is = re.search("(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
+
+                if element_is in self.srm_actual[srm_file]:
+                    pass
+                else:
+                    var_is = var_is_smpl
+
+                key_element_is = re.search("(\D+)(\d+)", var_is)
+                element_is = key_element_is.group(1)
+
                 var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
                     var_is]
                 self.container_var["STD"][filename_long]["IS Data"]["IS"].set(var_is)
-
-            element_is_smpl = None
-            if var_is_smpl != None:
-                key_element_is_smpl = re.search("(\D+)(\d+)", var_is_smpl)
-                element_is_smpl = key_element_is_smpl.group(1)
-                var_intensity_is_smpl = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
-                    var_is_smpl]
 
             for isotope in isotopes_file:
                 if isotope.isdigit():
@@ -18300,11 +18308,6 @@ class PySILLS(tk.Frame):
                             var_is_smpl] = var_result_is_smpl
                         self.container_analytical_sensitivity[srm_file][filename_short][
                             var_is_smpl] = var_result_is_smpl
-
-                        # if var_is_smpl != None:
-                        #     var_result_is = 1.0
-                        #     self.container_analytical_sensitivity["STD"][var_datatype][filename_short]["MAT"][
-                        #         var_is] = var_result_is
                     elif srm_isotope != srm_file and var_is_host == isotope:
                         if element_is in self.srm_actual[srm_file]:
                             var_concentration_is = self.srm_actual[srm_file][element_is]
@@ -18803,6 +18806,7 @@ class PySILLS(tk.Frame):
                                     value_i = 0.0
 
                                 xi_opt_host_is.append(value_i)
+                                #xi_opt_host_is.append(value_is)
                                 caution = True
                                 var_focus2 = "INCL"
 
@@ -18833,6 +18837,7 @@ class PySILLS(tk.Frame):
                                 value_is = self.container_analytical_sensitivity[var_srm_file][file_std_short][var_is]
                                 value_i = value_i/value_is
                                 xi_opt_host_is.append(value_i)
+                                #xi_opt_host_is.append(value_is)
                                 caution = True
                                 var_focus2 = "INCL"
 
