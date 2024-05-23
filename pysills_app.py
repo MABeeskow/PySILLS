@@ -16320,8 +16320,8 @@ class PySILLS(tk.Frame):
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="MAT")
                     # Sensitivity-related parameters
-                    # self.get_analytical_sensitivity_std(var_datatype="RAW", mode="all")
-                    self.get_analytical_sensitivity_std_alternative(var_datatype="RAW", mode="all")
+                    self.get_analytical_sensitivity_std(var_datatype="RAW", mode="all")
+                    #self.get_analytical_sensitivity_std_alternative(var_datatype="RAW", mode="all")
 
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
@@ -18889,8 +18889,8 @@ class PySILLS(tk.Frame):
                             pass
         else:
             str_datatype = var_datatype
-            #self.get_analytical_sensitivity_std(var_datatype=str_datatype, mode="all")
-            self.get_analytical_sensitivity_std_alternative(var_datatype=str_datatype, mode="all")
+            self.get_analytical_sensitivity_std(var_datatype=str_datatype, mode="all")
+            #self.get_analytical_sensitivity_std_alternative(var_datatype=str_datatype, mode="all")
             for var_filetype in ["SMPL"]:
                 if self.pysills_mode == "MA":
                     list_focus = ["MAT"]
@@ -21064,16 +21064,18 @@ class PySILLS(tk.Frame):
 
         if self.file_loaded:
             self.fi_select_srm_initialization()
-
-            if len(self.container_spikes[filename_short]) > 0:
-                pass
-            else:
-                for filetype in ["STD", "SMPL"]:
-                    if self.container_var["Spike Elimination"][filetype]["State"]:
-                        if self.container_var["Spike Elimination Method"].get() in [
-                            "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
-                            var_method = "Grubbs"
-                            self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+            try:
+                if len(self.container_spikes[filename_short]) > 0:
+                    pass
+                else:
+                    for filetype in ["STD", "SMPL"]:
+                        if self.container_var["Spike Elimination"][filetype]["State"]:
+                            if self.container_var["Spike Elimination Method"].get() in [
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                var_method = "Grubbs"
+                                self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+            except:
+                print("Problem with settings window creation. It has to be fixed one day.")
         else:
             self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
@@ -27050,10 +27052,10 @@ class PySILLS(tk.Frame):
                         var_file_long=var_file, var_focus="INCL")
                     self.fi_get_intensity_mix(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, mode="Specific")
-                    #self.get_analytical_sensitivity_std(
-                    #    var_datatype="RAW", mode="all", var_is_host=var_is_host, var_is_smpl=var_is_smpl)
-                    self.get_analytical_sensitivity_std_alternative(
+                    self.get_analytical_sensitivity_std(
                         var_datatype="RAW", mode="all", var_is_host=var_is_host, var_is_smpl=var_is_smpl)
+                    #self.get_analytical_sensitivity_std_alternative(
+                    #    var_datatype="RAW", mode="all", var_is_host=var_is_host, var_is_smpl=var_is_smpl)
 
                 self.fi_get_intensity_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
