@@ -22625,7 +22625,10 @@ class PySILLS(tk.Frame):
                 var_sigma_mix_i = ((((var_intensity_mix_i*var_tau_i)/var_n_mix)**0.5/var_tau_i)**2)**0.5
                 var_sigma = (var_sigma_bg_i**2 + var_sigma_mix_i**2)**0.5
 
-                var_result_sigma_i = (var_concentration_mix_is/(var_intensity_mix_is*var_sensitivity_i))*var_sigma
+                if (var_intensity_mix_is*var_sensitivity_i) > 0:
+                    var_result_sigma_i = (var_concentration_mix_is/(var_intensity_mix_is*var_sensitivity_i))*var_sigma
+                else:
+                    var_result_sigma_i = 0.0
 
                 self.container_mixed_concentration["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
                 self.container_mixed_concentration_error["SMPL"][var_datatype][var_file_short][
@@ -28252,7 +28255,7 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[salt]["Total"] = total
                     self.molar_masses_compounds[salt]["Cation"] = "Li"
                     self.molar_masses_compounds[salt]["Cation Charge"] = 1
-                if salt == "NaCl":
+                elif salt == "NaCl":
                     total = round(elements_masses["Na"] + elements_masses["Cl"], 3)
                     self.molar_masses_compounds[salt]["Na"] = round((elements_masses["Na"])/total, 3)
                     self.molar_masses_compounds[salt]["Cl"] = round((elements_masses["Cl"])/total, 3)
@@ -28316,6 +28319,20 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[salt]["Total"] = total
                     self.molar_masses_compounds[salt]["Cation"] = "Fe"
                     self.molar_masses_compounds[salt]["Cation Charge"] = 2
+                elif salt == "CoCl2":
+                    total = round(elements_masses["Co"] + 2*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Co"] = round((elements_masses["Co"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((2*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Co"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 2
+                elif salt == "NiCl2":
+                    total = round(elements_masses["Ni"] + 2*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Ni"] = round((elements_masses["Ni"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((2*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Ni"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 2
                 elif salt == "CuCl2":
                     total = round(elements_masses["Cu"] + 2*elements_masses["Cl"], 3)
                     self.molar_masses_compounds[salt]["Cu"] = round((elements_masses["Cu"])/total, 3)
@@ -28336,6 +28353,13 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[salt]["Cl"] = round((2*elements_masses["Cl"])/total, 3)
                     self.molar_masses_compounds[salt]["Total"] = total
                     self.molar_masses_compounds[salt]["Cation"] = "Sr"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 2
+                elif salt == "SnCl2":
+                    total = round(elements_masses["Sn"] + 2*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Sn"] = round((elements_masses["Sn"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((2*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Sn"
                     self.molar_masses_compounds[salt]["Cation Charge"] = 2
                 elif salt == "BaCl2":
                     total = round(elements_masses["Ba"] + 2*elements_masses["Cl"], 3)
@@ -28366,12 +28390,33 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[salt]["Total"] = total
                     self.molar_masses_compounds[salt]["Cation"] = "B"
                     self.molar_masses_compounds[salt]["Cation Charge"] = 3
+                elif salt == "AlCl3":
+                    total = round(elements_masses["Al"] + 3*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Al"] = round((elements_masses["Al"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Al"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 3
+                elif salt == "ScCl3":
+                    total = round(elements_masses["Sc"] + 3*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Sc"] = round((elements_masses["Sc"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Sc"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 3
                 elif salt == "TiCl3":
                     total = round(elements_masses["Ti"] + 3*elements_masses["Cl"], 3)
                     self.molar_masses_compounds[salt]["Ti"] = round((elements_masses["Ti"])/total, 3)
                     self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
                     self.molar_masses_compounds[salt]["Total"] = total
                     self.molar_masses_compounds[salt]["Cation"] = "Ti"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 3
+                elif salt == "VCl3":
+                    total = round(elements_masses["V"] + 3*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["V"] = round((elements_masses["V"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "V"
                     self.molar_masses_compounds[salt]["Cation Charge"] = 3
                 elif salt == "AuCl3":
                     total = round(elements_masses["Au"] + 3*elements_masses["Cl"], 3)
@@ -28381,6 +28426,35 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[salt]["Cation"] = "Au"
                     self.molar_masses_compounds[salt]["Cation Charge"] = 3
                 # tetravalent compounds
+                elif salt == "ZrCl4":
+                    total = round(elements_masses["Zr"] + 4*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Zr"] = round((elements_masses["Zr"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Zr"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 4
+                elif salt == "HfCl4":
+                    total = round(elements_masses["Hf"] + 4*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Hf"] = round((elements_masses["Hf"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Hf"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 4
+                # pentavalent compounds
+                elif salt == "NbCl5":
+                    total = round(elements_masses["Nb"] + 5*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Nb"] = round((elements_masses["Nb"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Nb"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 5
+                elif salt == "TaCl5":
+                    total = round(elements_masses["Ta"] + 5*elements_masses["Cl"], 3)
+                    self.molar_masses_compounds[salt]["Ta"] = round((elements_masses["Ta"])/total, 3)
+                    self.molar_masses_compounds[salt]["Cl"] = round((3*elements_masses["Cl"])/total, 3)
+                    self.molar_masses_compounds[salt]["Total"] = total
+                    self.molar_masses_compounds[salt]["Cation"] = "Ta"
+                    self.molar_masses_compounds[salt]["Cation Charge"] = 5
 
     def prepare_nacl_equivalents(self, amount_fluid, amount_nacl_equiv, total_ppm):
         if self.pysills_mode == "FI":
@@ -29021,6 +29095,7 @@ class PySILLS(tk.Frame):
                 helper2 = {}
                 helper3 = {}
                 # helper_cb_check = {"Cations": 0, "Anions": 0}
+                molar_mass_nacl = self.molar_masses_compounds["NaCl"]["Total"]
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                     salt_composition = "NaCl"
                     helper2[file_smpl_short] = {}
@@ -29035,8 +29110,7 @@ class PySILLS(tk.Frame):
                         if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
                             var_weight = float(
                                 self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
-                            var_weight_sum = var_weight*elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
-                                "Total"]
+                            var_weight_sum = var_weight*elements_masses["Na"]/molar_mass_nacl
 
                         if salt != "NaCl":
                             molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
