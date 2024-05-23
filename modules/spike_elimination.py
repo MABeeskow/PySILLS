@@ -6,7 +6,7 @@
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		18.04.2024
+# Date:		23.05.2024
 
 #-----------------------------------------------
 
@@ -72,12 +72,11 @@ class OutlierDetection:
 
         for index in outlier_indices:
             helper_values = self.determine_surrounded_values(var_index=index, stepsize=4)
-            #self.calculate_whisker_statistcs(helper_values=helper_values)
 
             if index in lower_outliers:
-                corrected_value = np.min(helper_values["SP"])
+                corrected_value = np.mean(helper_values["SP"])
             elif index in upper_outliers:
-                corrected_value = np.min(helper_values["SP"])
+                corrected_value = np.mean(helper_values["SP"])
 
             data_smoothed[index] = corrected_value
 
