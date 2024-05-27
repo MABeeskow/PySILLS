@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		24.05.2024
+# Date:		27.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -8973,7 +8973,7 @@ class PySILLS(tk.Frame):
                 self.container_files["SMPL"][file_short]["IS"].set(var_is)
                 self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
 
-            self.container_var["SMPL"][var_file]["IS"].set(var_is)
+            #self.container_var["SMPL"][var_file]["IS"].set(var_is)
 
     def srm_window(self):
         ## Window Settings
@@ -18297,8 +18297,11 @@ class PySILLS(tk.Frame):
                             var_result_i = 0.0
 
                         if var_is_smpl != None:
-                            var_result_is_smpl = (var_intensity_is_smpl/var_intensity_is)*(
-                                    var_concentration_is/var_concentration_is_smpl)
+                            if var_intensity_is > 0 and var_concentration_is_smpl > 0:
+                                var_result_is_smpl = (var_intensity_is_smpl/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_is_smpl)
+                            else:
+                                var_result_is_smpl = np.nan
                         else:
                             var_result_is_smpl = 0.0
 
@@ -18836,7 +18839,12 @@ class PySILLS(tk.Frame):
                                         isotope]
                                     value_is = self.container_analytical_sensitivity[var_srm_file][file_std_short][
                                         var_incl_is]
-                                    value_i = value_i/value_is
+
+                                    if value_is > 0:
+                                        value_i = value_i/value_is
+                                    else:
+                                        value_i = np.nan
+
                                     xi_opt_host_is.append(value_i)
 
                             a_i, b_i = self.calculate_linear_regression(x_values=list_delta_std_i,
@@ -18863,7 +18871,12 @@ class PySILLS(tk.Frame):
                                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                                 value_i = self.container_analytical_sensitivity[var_srm_file][file_std_short][isotope]
                                 value_is = self.container_analytical_sensitivity[var_srm_file][file_std_short][var_is]
-                                value_i = value_i/value_is
+
+                                if value_is > 0:
+                                    value_i = value_i/value_is
+                                else:
+                                    value_i = np.nan
+
                                 xi_opt_host_is.append(value_i)
                                 caution = True
                                 var_focus2 = "INCL"
@@ -21163,7 +21176,7 @@ class PySILLS(tk.Frame):
             path = self.path_pysills
             parent = os.path.dirname(path)
             if self.demo_mode:
-                self.var_opt_icp.set("PerkinElmer Syngistix")
+                self.var_opt_icp.set("Agilent 7900s")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
                 mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
@@ -21174,9 +21187,9 @@ class PySILLS(tk.Frame):
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             mi_demo_files["ALL"].append(str(path_raw.as_posix()))
                 mi_demo_files["ALL"].sort()
-                mi_demo_files["STD"].extend(mi_demo_files["ALL"][:2])
-                mi_demo_files["STD"].extend(mi_demo_files["ALL"][-2:])
-                mi_demo_files["SMPL"].extend(mi_demo_files["ALL"][2:-2])
+                mi_demo_files["STD"].extend(mi_demo_files["ALL"][:5])
+                mi_demo_files["STD"].extend(mi_demo_files["ALL"][-5:])
+                mi_demo_files["SMPL"].extend(mi_demo_files["ALL"][5:-5])
 
                 self.list_std = mi_demo_files["STD"]
                 self.list_smpl = mi_demo_files["SMPL"]
@@ -21433,29 +21446,18 @@ class PySILLS(tk.Frame):
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
 
-        # if self.file_loaded == False:
-        #     self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        #     self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-        #
-        #     if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #     if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #     if self.demo_mode:
-        #         self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
-        #         self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        # else:
-        #     self.select_srm_initialization()
-        #
-        # for filetype in ["STD", "SMPL"]:
-        #     if self.container_var["Spike Elimination"][filetype]["State"]:
-        #         if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-        #                                                                     "PySILLS Spike Finder"]:
-        #             var_method = "Grubbs"
-        #             #
-        #             self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        if self.demo_mode:
+            for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
+                self.container_var["STD"][filename_std_long]["SRM"].set("NIST 610 (GeoReM)")
+                if index in [3, 4, 8, 9]:
+                    self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
+
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["IS Data"]["IS"].set("Ca43")
+
+            self.container_var["SRM"]["Cl35"].set("Scapolite 17")
+            self.container_var["SRM"]["Br81"].set("Scapolite 17")
+            self.container_var["SRM"]["I127"].set("Scapolite 17")
 
         self.build_srm_database()
         self.file_system_need_update = False
@@ -23339,8 +23341,8 @@ class PySILLS(tk.Frame):
                         entries_container = [var_file]
 
                         for isotope in file_isotopes:
-                            value = self.container_concentration_ratio[var_filetype][var_datatype][var_focus][isotope]
-
+                            value = self.container_concentration_ratio[var_filetype][var_datatype][var_file][var_focus][
+                                isotope]
                             entries_container.append(f"{value:.{4}E}")
                             helper_values[isotope].append(value)
 
@@ -27234,6 +27236,7 @@ class PySILLS(tk.Frame):
                     entries_analytical_sensitivity_incl_i = ["Analytical Sensitivity INCL"]
                     entries_normalized_sensitivity_incl_i = ["Normalized Sensitivity INCL"]
                     entries_concentration_incl_i = ["Concentration INCL"]
+                    entries_concentration_ratio__incl_i = ["Concentration Ratio INCL"]
                     entries_concentration_sigma_incl_i = ["Concentration 1 SIGMA INCL"]
                     entries_concentration_mix_i = ["Concentration MIX"]
                     entries_concentration_sigma_mix_i = ["Concentration 1 SIGMA MIX"]
@@ -27290,6 +27293,8 @@ class PySILLS(tk.Frame):
                     if var_type == "SMPL":
                         concentration_incl_i = self.container_concentration[var_type]["RAW"][var_file_short]["INCL"][
                             isotope]
+                        concentration_ratio_incl_i = self.container_concentration_ratio[var_type]["RAW"][
+                            var_file_short]["INCL"][isotope]
                         concentration_sigma_incl_i = self.container_concentration[var_type]["RAW"][var_file_short][
                             "1 SIGMA INCL"][isotope]
                         concentration_mix_i = self.container_mixed_concentration["SMPL"]["RAW"][var_file_short][isotope]
@@ -27324,6 +27329,7 @@ class PySILLS(tk.Frame):
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
                         entries_lod_i.append(f"{lod_i:.{4}f}")
                         entries_concentration_incl_i.append(f"{concentration_incl_i:.{4}f}")
+                        entries_concentration_ratio__incl_i.append(f"{concentration_ratio_incl_i:.{4}E}")
                         entries_concentration_sigma_incl_i.append(f"{concentration_sigma_incl_i:.{4}f}")
                         entries_concentration_mix_i.append(f"{concentration_mix_i:.{4}f}")
                         entries_concentration_sigma_mix_i.append(f"{concentration_sigma_mix_i:.{4}f}")
@@ -27363,6 +27369,7 @@ class PySILLS(tk.Frame):
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio__incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_mix_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mix_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_incl_i)
@@ -31801,6 +31808,7 @@ class PySILLS(tk.Frame):
 
         value_0 = self.list_indices[0]
         current_id = self.scl_01.get()
+
         self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
         self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
         val_corrected = self.current_suggested_value
@@ -31810,7 +31818,6 @@ class PySILLS(tk.Frame):
             if value_current == self.current_original_value:
                 self.replace_spike_value(mode="RAW")
         else:
-            # self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][value_0]
             if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
                 self.current_current_value = val_corrected
             else:
@@ -31916,7 +31923,7 @@ class PySILLS(tk.Frame):
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
         val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
-        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 2]
+        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
 
         if mode == "RAW":
             val_updated = val_original
