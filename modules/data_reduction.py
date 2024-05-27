@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		15.04.2024
+# Date:		27.05.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -571,14 +571,22 @@ class IntensityQuantification:
                 for focus in ["MAT"]:
                     value_is = data_container[filename_short][focus][isotope_is]
                     for isotope, value in data_container[filename_short][focus].items():
-                        result_i = value/value_is
+                        if value_is > 0:
+                            result_i = value/value_is
+                        else:
+                            result_i = np.nan
+
                         self.results_container[filename_short][focus][isotope] = result_i
             elif filename_short in dict_is["SMPL"]:
                 isotope_is = dict_is["SMPL"][filename_short]
                 for focus in list_focus:
                     value_is = data_container[filename_short][focus][isotope_is]
                     for isotope, value in data_container[filename_short][focus].items():
-                        result_i = value/value_is
+                        if value_is > 0:
+                            result_i = value/value_is
+                        else:
+                            result_i = np.nan
+
                         self.results_container[filename_short][focus][isotope] = result_i
             else:
                 print("File", filename_short, "was not found!")
@@ -600,7 +608,8 @@ class IntensityQuantification:
                                 if value_is > 0:
                                     result_i = value/value_is
                                 else:
-                                    result_i = 0.0
+                                    result_i = np.nan
+
                                 self.results_container[filetype][datatype][filename_short][focus][isotope] = result_i
 
         return self.results_container
