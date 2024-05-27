@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		24.05.2024
+# Date:		25.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -8973,7 +8973,7 @@ class PySILLS(tk.Frame):
                 self.container_files["SMPL"][file_short]["IS"].set(var_is)
                 self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
 
-            self.container_var["SMPL"][var_file]["IS"].set(var_is)
+            #self.container_var["SMPL"][var_file]["IS"].set(var_is)
 
     def srm_window(self):
         ## Window Settings
@@ -18297,8 +18297,11 @@ class PySILLS(tk.Frame):
                             var_result_i = 0.0
 
                         if var_is_smpl != None:
-                            var_result_is_smpl = (var_intensity_is_smpl/var_intensity_is)*(
-                                    var_concentration_is/var_concentration_is_smpl)
+                            if var_intensity_is > 0 and var_concentration_is_smpl > 0:
+                                var_result_is_smpl = (var_intensity_is_smpl/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_is_smpl)
+                            else:
+                                var_result_is_smpl = np.nan
                         else:
                             var_result_is_smpl = 0.0
 
@@ -18836,7 +18839,12 @@ class PySILLS(tk.Frame):
                                         isotope]
                                     value_is = self.container_analytical_sensitivity[var_srm_file][file_std_short][
                                         var_incl_is]
-                                    value_i = value_i/value_is
+
+                                    if value_is > 0:
+                                        value_i = value_i/value_is
+                                    else:
+                                        value_i = np.nan
+
                                     xi_opt_host_is.append(value_i)
 
                             a_i, b_i = self.calculate_linear_regression(x_values=list_delta_std_i,
@@ -18863,7 +18871,12 @@ class PySILLS(tk.Frame):
                                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
                                 value_i = self.container_analytical_sensitivity[var_srm_file][file_std_short][isotope]
                                 value_is = self.container_analytical_sensitivity[var_srm_file][file_std_short][var_is]
-                                value_i = value_i/value_is
+
+                                if value_is > 0:
+                                    value_i = value_i/value_is
+                                else:
+                                    value_i = np.nan
+
                                 xi_opt_host_is.append(value_i)
                                 caution = True
                                 var_focus2 = "INCL"
@@ -23339,8 +23352,8 @@ class PySILLS(tk.Frame):
                         entries_container = [var_file]
 
                         for isotope in file_isotopes:
-                            value = self.container_concentration_ratio[var_filetype][var_datatype][var_focus][isotope]
-
+                            value = self.container_concentration_ratio[var_filetype][var_datatype][var_file][var_focus][
+                                isotope]
                             entries_container.append(f"{value:.{4}E}")
                             helper_values[isotope].append(value)
 
@@ -27234,6 +27247,7 @@ class PySILLS(tk.Frame):
                     entries_analytical_sensitivity_incl_i = ["Analytical Sensitivity INCL"]
                     entries_normalized_sensitivity_incl_i = ["Normalized Sensitivity INCL"]
                     entries_concentration_incl_i = ["Concentration INCL"]
+                    entries_concentration_ratio__incl_i = ["Concentration Ratio INCL"]
                     entries_concentration_sigma_incl_i = ["Concentration 1 SIGMA INCL"]
                     entries_concentration_mix_i = ["Concentration MIX"]
                     entries_concentration_sigma_mix_i = ["Concentration 1 SIGMA MIX"]
@@ -27290,6 +27304,8 @@ class PySILLS(tk.Frame):
                     if var_type == "SMPL":
                         concentration_incl_i = self.container_concentration[var_type]["RAW"][var_file_short]["INCL"][
                             isotope]
+                        concentration_ratio_incl_i = self.container_concentration_ratio[var_type]["RAW"][
+                            var_file_short]["INCL"][isotope]
                         concentration_sigma_incl_i = self.container_concentration[var_type]["RAW"][var_file_short][
                             "1 SIGMA INCL"][isotope]
                         concentration_mix_i = self.container_mixed_concentration["SMPL"]["RAW"][var_file_short][isotope]
@@ -27324,6 +27340,7 @@ class PySILLS(tk.Frame):
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
                         entries_lod_i.append(f"{lod_i:.{4}f}")
                         entries_concentration_incl_i.append(f"{concentration_incl_i:.{4}f}")
+                        entries_concentration_ratio__incl_i.append(f"{concentration_ratio_incl_i:.{4}E}")
                         entries_concentration_sigma_incl_i.append(f"{concentration_sigma_incl_i:.{4}f}")
                         entries_concentration_mix_i.append(f"{concentration_mix_i:.{4}f}")
                         entries_concentration_sigma_mix_i.append(f"{concentration_sigma_mix_i:.{4}f}")
@@ -27363,6 +27380,7 @@ class PySILLS(tk.Frame):
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio__incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_mix_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mix_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_incl_i)
