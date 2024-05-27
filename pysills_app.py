@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		25.05.2024
+# Date:		27.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -21176,7 +21176,7 @@ class PySILLS(tk.Frame):
             path = self.path_pysills
             parent = os.path.dirname(path)
             if self.demo_mode:
-                self.var_opt_icp.set("PerkinElmer Syngistix")
+                self.var_opt_icp.set("Agilent 7900s")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
                 mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
                 demo_files = os.listdir(path=path + str("/demo_files/"))
@@ -21187,9 +21187,9 @@ class PySILLS(tk.Frame):
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             mi_demo_files["ALL"].append(str(path_raw.as_posix()))
                 mi_demo_files["ALL"].sort()
-                mi_demo_files["STD"].extend(mi_demo_files["ALL"][:2])
-                mi_demo_files["STD"].extend(mi_demo_files["ALL"][-2:])
-                mi_demo_files["SMPL"].extend(mi_demo_files["ALL"][2:-2])
+                mi_demo_files["STD"].extend(mi_demo_files["ALL"][:5])
+                mi_demo_files["STD"].extend(mi_demo_files["ALL"][-5:])
+                mi_demo_files["SMPL"].extend(mi_demo_files["ALL"][5:-5])
 
                 self.list_std = mi_demo_files["STD"]
                 self.list_smpl = mi_demo_files["SMPL"]
