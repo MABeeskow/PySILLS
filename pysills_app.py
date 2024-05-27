@@ -21446,29 +21446,18 @@ class PySILLS(tk.Frame):
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
 
-        # if self.file_loaded == False:
-        #     self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        #     self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-        #
-        #     if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #     if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #     if self.demo_mode:
-        #         self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
-        #         self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        # else:
-        #     self.select_srm_initialization()
-        #
-        # for filetype in ["STD", "SMPL"]:
-        #     if self.container_var["Spike Elimination"][filetype]["State"]:
-        #         if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-        #                                                                     "PySILLS Spike Finder"]:
-        #             var_method = "Grubbs"
-        #             #
-        #             self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        if self.demo_mode:
+            for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
+                self.container_var["STD"][filename_std_long]["SRM"].set("NIST 610 (GeoReM)")
+                if index in [3, 4, 8, 9]:
+                    self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
+
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["IS Data"]["IS"].set("Ca43")
+
+            self.container_var["SRM"]["Cl35"].set("Scapolite 17")
+            self.container_var["SRM"]["Br81"].set("Scapolite 17")
+            self.container_var["SRM"]["I127"].set("Scapolite 17")
 
         self.build_srm_database()
         self.file_system_need_update = False
