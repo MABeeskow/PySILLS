@@ -31819,6 +31819,7 @@ class PySILLS(tk.Frame):
 
         value_0 = self.list_indices[0]
         current_id = self.scl_01.get()
+
         self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
         self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
         val_corrected = self.current_suggested_value
@@ -31828,7 +31829,6 @@ class PySILLS(tk.Frame):
             if value_current == self.current_original_value:
                 self.replace_spike_value(mode="RAW")
         else:
-            # self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][value_0]
             if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
                 self.current_current_value = val_corrected
             else:
@@ -31934,7 +31934,7 @@ class PySILLS(tk.Frame):
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
         val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
-        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 2]
+        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
 
         if mode == "RAW":
             val_updated = val_original
