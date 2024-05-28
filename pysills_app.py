@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.05.2024
+# Date:		28.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -15294,7 +15294,14 @@ class PySILLS(tk.Frame):
         elif value < 0:
             value = 0
 
-        value_is_default = total_ppm*value/100
+        concentration_default_smpl = float(self.container_var["IS"]["Default SMPL Concentration"].get())
+
+        if "Matrix Maximum Concentration" in self.container_var["IS"]:
+            concentration_default_smpl = float(self.container_var["IS"]["Matrix Maximum Concentration"].get())
+            value_is_default = round(concentration_default_smpl*value/100, 4)
+        else:
+            value_is_default = round(total_ppm*value/100, 2)
+
         self.container_var["IS"]["Default SMPL Concentration"].set(value_is_default)
 
         if state_default:
@@ -15385,6 +15392,12 @@ class PySILLS(tk.Frame):
                                 is_concentration = round(list_fraction[element]*10**6, 4)
                                 self.container_var["IS"]["Default SMPL Concentration"].set(
                                     round(oxide_weight*is_concentration, 4))
+
+                                if "Matrix Maximum Concentration" not in self.container_var["IS"]:
+                                    self.container_var["IS"]["Matrix Maximum Concentration"] = tk.StringVar()
+                                    self.container_var["IS"]["Matrix Maximum Concentration"].set(
+                                        round(oxide_weight*is_concentration, 4))
+
                                 var_entr_is_i.set(round(oxide_weight*is_concentration, 4))
 
                         if self.container_var["IS"]["Default STD"].get() == "Select IS":
@@ -21335,30 +21348,30 @@ class PySILLS(tk.Frame):
         window_width = 1260
         window_height = 1000
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_mi_settings = tk.Toplevel(self.parent)
         self.subwindow_mi_settings.title("MELT INCLUSION ANALYSIS - Setup")
         self.subwindow_mi_settings.geometry(var_geometry)
         self.subwindow_mi_settings.resizable(False, False)
         self.subwindow_mi_settings["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_mi_settings, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_mi_settings, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_mi_settings.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_mi_settings.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ## INITIALIZATION
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
             if isotope.isdigit():
@@ -21395,11 +21408,14 @@ class PySILLS(tk.Frame):
         # Build section 'Calculation Window (Background) Setup'
         var_calculation_window_bg_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
+        # Build section 'Calculation Window (Matrix) Setup'
+        var_calculation_window_mat_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_mat_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 24, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 27, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
