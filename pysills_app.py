@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.05.2024
+# Date:		28.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -15294,7 +15294,14 @@ class PySILLS(tk.Frame):
         elif value < 0:
             value = 0
 
-        value_is_default = total_ppm*value/100
+        concentration_default_smpl = float(self.container_var["IS"]["Default SMPL Concentration"].get())
+
+        if "Matrix Maximum Concentration" in self.container_var["IS"]:
+            concentration_default_smpl = float(self.container_var["IS"]["Matrix Maximum Concentration"].get())
+            value_is_default = round(concentration_default_smpl*value/100, 4)
+        else:
+            value_is_default = round(total_ppm*value/100, 2)
+
         self.container_var["IS"]["Default SMPL Concentration"].set(value_is_default)
 
         if state_default:
@@ -15385,6 +15392,12 @@ class PySILLS(tk.Frame):
                                 is_concentration = round(list_fraction[element]*10**6, 4)
                                 self.container_var["IS"]["Default SMPL Concentration"].set(
                                     round(oxide_weight*is_concentration, 4))
+
+                                if "Matrix Maximum Concentration" not in self.container_var["IS"]:
+                                    self.container_var["IS"]["Matrix Maximum Concentration"] = tk.StringVar()
+                                    self.container_var["IS"]["Matrix Maximum Concentration"].set(
+                                        round(oxide_weight*is_concentration, 4))
+
                                 var_entr_is_i.set(round(oxide_weight*is_concentration, 4))
 
                         if self.container_var["IS"]["Default STD"].get() == "Select IS":
@@ -21335,30 +21348,30 @@ class PySILLS(tk.Frame):
         window_width = 1260
         window_height = 1000
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_mi_settings = tk.Toplevel(self.parent)
         self.subwindow_mi_settings.title("MELT INCLUSION ANALYSIS - Setup")
         self.subwindow_mi_settings.geometry(var_geometry)
         self.subwindow_mi_settings.resizable(False, False)
         self.subwindow_mi_settings["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_mi_settings, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_mi_settings, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_mi_settings.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_mi_settings.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ## INITIALIZATION
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
             if isotope.isdigit():
@@ -21395,11 +21408,14 @@ class PySILLS(tk.Frame):
         # Build section 'Calculation Window (Background) Setup'
         var_calculation_window_bg_setup = {"Row start": 16, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_calculation_window_bg(var_geometry_info=var_calculation_window_bg_setup)
+        # Build section 'Calculation Window (Matrix) Setup'
+        var_calculation_window_mat_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        self.place_calculation_window_smpl(var_geometry_info=var_calculation_window_mat_setup)
         # Build section 'Spike Elimination Setup'
-        var_spike_elimination_setup = {"Row start": 20, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_spike_elimination_setup = {"Row start": 24, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_spike_elimination_setup(var_geometry_info=var_spike_elimination_setup)
         # Build section 'Check-Up'
-        var_checkup = {"Row start": 27, "Column start": 0, "N rows": 1, "N columns": 18}
+        var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
         var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
@@ -21446,29 +21462,18 @@ class PySILLS(tk.Frame):
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
 
-        # if self.file_loaded == False:
-        #     self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        #     self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-        #
-        #     if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #     if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #     if self.demo_mode:
-        #         self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
-        #         self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        # else:
-        #     self.select_srm_initialization()
-        #
-        # for filetype in ["STD", "SMPL"]:
-        #     if self.container_var["Spike Elimination"][filetype]["State"]:
-        #         if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-        #                                                                     "PySILLS Spike Finder"]:
-        #             var_method = "Grubbs"
-        #             #
-        #             self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        if self.demo_mode:
+            for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
+                self.container_var["STD"][filename_std_long]["SRM"].set("NIST 610 (GeoReM)")
+                if index in [3, 4, 8, 9]:
+                    self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
+
+            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                self.container_var["SMPL"][filename_smpl_long]["IS Data"]["IS"].set("Ca43")
+
+            self.container_var["SRM"]["Cl35"].set("Scapolite 17")
+            self.container_var["SRM"]["Br81"].set("Scapolite 17")
+            self.container_var["SRM"]["I127"].set("Scapolite 17")
 
         self.build_srm_database()
         self.file_system_need_update = False
@@ -31819,6 +31824,7 @@ class PySILLS(tk.Frame):
 
         value_0 = self.list_indices[0]
         current_id = self.scl_01.get()
+
         self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
         self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
         val_corrected = self.current_suggested_value
@@ -31828,7 +31834,6 @@ class PySILLS(tk.Frame):
             if value_current == self.current_original_value:
                 self.replace_spike_value(mode="RAW")
         else:
-            # self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][value_0]
             if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
                 self.current_current_value = val_corrected
             else:
@@ -31934,7 +31939,7 @@ class PySILLS(tk.Frame):
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
         val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
-        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 2]
+        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
 
         if mode == "RAW":
             val_updated = val_original
