@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		28.05.2024
+# Date:		29.05.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -11079,6 +11079,72 @@ class PySILLS(tk.Frame):
         btn_002d.configure(state="disabled")
         btn_002e.configure(state="disabled")
         btn_002f.configure(state="disabled")
+
+    def diagram_xy(self, mode, init=False):
+        ## Window Settings
+        window_width = 800
+        window_height = 600
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_diagram_xy = tk.Toplevel(self.parent)
+
+        if self.pysills_mode == "MA":
+            subwindow_diagram_xy.title("MINERAL ANALYSIS - Extras")
+        elif self.pysills_mode == "FI":
+            subwindow_diagram_xy.title("FLUID INCLUSION ANALYSIS - Extras")
+        elif self.pysills_mode == "MI":
+            subwindow_diagram_xy.title("MELT INCLUSION ANALYSIS - Extras")
+
+        subwindow_diagram_xy.geometry(var_geometry)
+        subwindow_diagram_xy.resizable(False, False)
+        subwindow_diagram_xy["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_diagram_xy, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_diagram_xy, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_diagram_xy.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_diagram_xy.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 10
+        int_category_n = 6
+
+        ## LABELS
+        if mode == "elements":
+            lbl_01 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Elements", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        elif mode == "element ratios":
+            lbl_01 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Element ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        elif mode == "oxides":
+            lbl_01 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        elif mode == "oxide ratios":
+            lbl_01 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Oxide ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
     def halogen_ratios_diagram(self, init=False):
         ## Window Settings
