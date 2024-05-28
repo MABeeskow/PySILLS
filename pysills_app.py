@@ -329,7 +329,8 @@ class PySILLS(tk.Frame):
         list_major_oxides = [
             "SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "Mn2O3", "MgO", "CaO", "Na2O", "K2O", "P2O5", "SO3"]
         list_industrial_metal_oxides = [
-            "CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO2", "MoO3", "V2O5"]
+            "CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO2", "MoO3", "V2O5", "ZrO2",
+            "Nb2O5", "HfO2", "Ta2O5"]
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
         list_rareearth_metals = [
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
@@ -671,6 +672,10 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Oxide"].set("Select Oxide")
             self.container_var[key_setting]["Oxide Concentration"] = tk.StringVar()
             self.container_var[key_setting]["Oxide Concentration"].set("100")
+            self.container_var[key_setting]["Oxide Inclusion"] = tk.StringVar()
+            self.container_var[key_setting]["Oxide Inclusion"].set("Select Oxide")
+            self.container_var[key_setting]["Oxide Inclusion Concentration"] = tk.StringVar()
+            self.container_var[key_setting]["Oxide Inclusion Concentration"].set("100")
             self.container_var[key_setting]["Element"] = tk.StringVar()
             self.container_var[key_setting]["Element"].set("Select Element")
             self.container_var[key_setting]["Element Concentration"] = tk.StringVar()
@@ -6711,16 +6716,19 @@ class PySILLS(tk.Frame):
         if self.pysills_mode in ["FI", "MI"]:
             # Save information about 'Inclusion Setup'
             self.save_inclusion_information_in_file(save_file=save_file)
-            # Save information about 'PyPitzer'
-            self.save_pypitzer_settings_in_file(save_file=save_file)
+            if self.pysills_mode == "FI":
+                # Save information about 'PyPitzer'
+                self.save_pypitzer_settings_in_file(save_file=save_file)
+
             # Save information about 'Quantification Setup (Matrix-Only Tracer)'
             self.save_quantification_method_matrix_only_in_file(save_file=save_file)
             # Save information about 'Quantification Setup (Second Internal Standard)'
             self.save_quantification_method_second_internal_in_file(save_file=save_file)
-            # Save information about 'Geometric Approach (Halter2002)'
-            self.save_quantification_method_halter2002(save_file=save_file)
-            # Save information about 'Geometric Approach (Borisova2021)'
-            self.save_quantification_method_borisova2021(save_file=save_file)
+            if self.pysills_mode == "FI":
+                # Save information about 'Geometric Approach (Halter2002)'
+                self.save_quantification_method_halter2002(save_file=save_file)
+                # Save information about 'Geometric Approach (Borisova2021)'
+                self.save_quantification_method_borisova2021(save_file=save_file)
 
         # Save information about 'Sample/Matrix Setup'
         self.save_mineralphase_information_in_file(save_file=save_file)
@@ -12167,7 +12175,8 @@ class PySILLS(tk.Frame):
                 cb_002a.select()
 
         ## Industrial Metals
-        list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO3", "V2O5"]
+        list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO3", "V2O5", "ZrO2",
+            "Nb2O5", "HfO2", "Ta2O5"]
         list_industrial_metals = sorted(list_industrial_metals)
         for index, oxide in enumerate(list_industrial_metals):
             if focus == "MAT":
@@ -12280,7 +12289,8 @@ class PySILLS(tk.Frame):
     def guess_composition(self):
         list_major_oxides = [
             "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "Mn2O3", "SO3"]
-        list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO3", "V2O5"]
+        list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO3", "V2O5", "ZrO2",
+            "Nb2O5", "HfO2", "Ta2O5"]
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
         list_rareearth_metals = [
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
@@ -12428,14 +12438,18 @@ class PySILLS(tk.Frame):
 
         # OPTION MENUS
         list_opt04a = sorted(self.container_lists["Selected Oxides"]["All"])
+        if focus == "MAT":
+            var_opt_04 = self.container_var[var_setting_key]["Oxide"]
+        elif focus == "INCL":
+            var_opt_04 = self.container_var[var_setting_key]["Oxide Inclusion"]
+
         opt_04a = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 8, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.container_var[var_setting_key]["Oxide"],
-            option_list=list_opt04a, text_set=self.container_var[var_setting_key]["Oxide"].get(),
+            var_iso=var_opt_04, option_list=list_opt04a, text_set=var_opt_04.get(),
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-            command=lambda var_opt=self.container_var[var_setting_key]["Oxide"], var_file=None, state_default=True:
+            command=lambda var_opt=var_opt_04, var_file=None, state_default=True:
             self.ma_change_matrix_compound(var_opt, var_file, state_default))
         opt_04a["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
@@ -12496,8 +12510,20 @@ class PySILLS(tk.Frame):
 
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
-            if len(self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].get()) == 0:
-                self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
+            if focus == "INCL":
+                if "Inclusion Setup" not in self.container_var["SMPL"][filename_long]:
+                    self.container_var["SMPL"][filename_long]["Inclusion Setup"] = {
+                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+
+            if focus == "MAT":
+                key_setup = "Matrix Setup"
+            elif focus == "INCL":
+                key_setup = "Inclusion Setup"
+
+            if len(self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Concentration"].get()) == 0:
+                self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Concentration"].set("100.0")
             lbl_i = tk.Label(
                 frm_tv, text=filename_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_tv.window_create("end", window=lbl_i)
@@ -12505,9 +12531,9 @@ class PySILLS(tk.Frame):
 
             list_opt_oxide_i = sorted(self.container_lists["Selected Oxides"]["All"])
             opt_oxide_i = tk.OptionMenu(
-                frm_tv, self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"],
+                frm_tv, self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Name"],
                 *list_opt_oxide_i,
-                command=lambda var_opt=self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"],
+                command=lambda var_opt=self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Name"],
                                var_file=filename_long, state_default=False:
                 self.ma_change_matrix_compound(var_opt, var_file, state_default))
             opt_oxide_i["menu"].config(
@@ -12522,7 +12548,7 @@ class PySILLS(tk.Frame):
             if self.pysills_mode == "MA":
                 var_opt_is_i = self.container_var["SMPL"][filename_long]["IS Data"]["IS"]
             else:
-                var_opt_is_i = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"]
+                var_opt_is_i = self.container_var["SMPL"][filename_long][key_setup]["IS"]["Name"]
 
             opt_ref_i = tk.OptionMenu(
                 frm_tv, var_opt_is_i, *self.container_lists["Measured Isotopes"]["All"],
@@ -12560,8 +12586,8 @@ class PySILLS(tk.Frame):
             text_tv.insert("end", "\t")
 
             entr_i = tk.Entry(
-                frm_tv, textvariable=self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"][
-                    "Concentration"], fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                frm_tv, textvariable=self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Concentration"],
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
                 highlightbackground=self.bg_colors["Very Light"])
             text_tv.window_create("insert", window=entr_i)
             text_tv.insert("end", "\n")
@@ -19362,7 +19388,7 @@ class PySILLS(tk.Frame):
                     if r == 0:
                         gamma = 0
                     else:
-                        if r > 0 and (self.chemistry_data_oxides["Mn2O3"])*(1 - r) > 0:
+                        if r > 0 and (self.chemistry_data_oxides["Mn2O3"]) > 0:
                             gamma = (1 + (2*self.chemistry_data_oxides["MnO"])/(
                                 self.chemistry_data_oxides["Mn2O3"])*(1 - r)/(r))**(-1)
                         else:
@@ -19380,6 +19406,7 @@ class PySILLS(tk.Frame):
 
                 molar_mass_oxide = self.chemistry_data_oxides[oxide]
                 molar_mass_element = self.chemistry_data[oxide_container["Element"]]
+
                 var_b = var_a*molar_mass_oxide/molar_mass_element
                 var_c += var_b
 
@@ -19394,7 +19421,11 @@ class PySILLS(tk.Frame):
             w_total_oxides = float(self.container_var["Oxides Quantification INCL"]["Total Amounts"][
                                        filename_short].get())
 
-        var_d = w_total_oxides/var_c
+        if var_c > 0:
+            var_d = w_total_oxides/var_c
+        else:
+            var_d = np.nan
+
         largest_value = {"Isotope": None, "Value": 0, "Oxide": None}
         for oxide, oxide_container in helper_oxides.items():
             for isotope in oxide_container["Isotopes"]:
@@ -19405,6 +19436,7 @@ class PySILLS(tk.Frame):
 
                 var_concentration_i = oxide_container["a"][isotope]*var_d*10**4
                 oxide_container["Concentrations"][isotope] = var_concentration_i
+
                 if var_concentration_i > largest_value["Value"]:
                     largest_value["Isotope"] = isotope
                     largest_value["Value"] = var_concentration_i
@@ -21435,22 +21467,29 @@ class PySILLS(tk.Frame):
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
         ## INITIALIZATION
+        self.btn_save_project.configure(state="normal")
+
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="FI")
 
         if self.file_loaded:
             self.fi_select_srm_initialization()
-
-            for filetype in ["STD", "SMPL"]:
-                if self.container_var["Spike Elimination"][filetype]["State"]:
-                    if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-                                                                                "PySILLS Spike Finder"]:
-                        var_method = "Grubbs"
-                        self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+            try:
+                if len(self.container_spikes[filename_short]) > 0:
+                    pass
+                else:
+                    for filetype in ["STD", "SMPL"]:
+                        if self.container_var["Spike Elimination"][filetype]["State"]:
+                            if self.container_var["Spike Elimination Method"].get() in [
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                var_method = "Grubbs"
+                                self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+            except:
+                print("Problem with settings window creation. It has to be fixed one day.")
         else:
-            self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-            self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+            self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+            self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
 
             if self.container_var["SRM"]["default"][0].get() != "Select SRM":
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
@@ -21461,6 +21500,12 @@ class PySILLS(tk.Frame):
                 self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+
+        self.file_system_need_update = False
+        self.select_opt_inclusion_is_quantification(
+            var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
+        self.select_opt_inclusion_quantification(
+            var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
 
         if self.demo_mode:
             for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
@@ -21476,14 +21521,57 @@ class PySILLS(tk.Frame):
             self.container_var["SRM"]["I127"].set("Scapolite 17")
 
         self.build_srm_database()
-        self.file_system_need_update = False
 
-        self.select_opt_inclusion_is_quantification(
-            var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
-        self.select_opt_inclusion_quantification(
-            var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
-
-        self.btn_save_project.configure(state="normal")
+        # ## INITIALIZATION
+        # self.select_spike_elimination(
+        #     var_opt=self.container_var["Spike Elimination Method"].get(),
+        #     start_row=var_spike_elimination_setup["Row start"], mode="FI")
+        #
+        # if self.file_loaded:
+        #     self.fi_select_srm_initialization()
+        #
+        #     for filetype in ["STD", "SMPL"]:
+        #         if self.container_var["Spike Elimination"][filetype]["State"]:
+        #             if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
+        #                                                                         "PySILLS Spike Finder"]:
+        #                 var_method = "Grubbs"
+        #                 self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+        # else:
+        #     self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
+        #     self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
+        #
+        #     if self.container_var["SRM"]["default"][0].get() != "Select SRM":
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+        #     if self.container_var["SRM"]["default"][1].get() != "Select SRM":
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+        #     if self.demo_mode:
+        #         self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
+        #         self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
+        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
+        #
+        # if self.demo_mode:
+        #     for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
+        #         self.container_var["STD"][filename_std_long]["SRM"].set("NIST 610 (GeoReM)")
+        #         if index in [3, 4, 8, 9]:
+        #             self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
+        #
+        #     for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+        #         self.container_var["SMPL"][filename_smpl_long]["IS Data"]["IS"].set("Ca43")
+        #
+        #     self.container_var["SRM"]["Cl35"].set("Scapolite 17")
+        #     self.container_var["SRM"]["Br81"].set("Scapolite 17")
+        #     self.container_var["SRM"]["I127"].set("Scapolite 17")
+        #
+        # self.build_srm_database()
+        # self.file_system_need_update = False
+        #
+        # self.select_opt_inclusion_is_quantification(
+        #     var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
+        # self.select_opt_inclusion_quantification(
+        #     var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
+        #
+        # self.btn_save_project.configure(state="normal")
 
     def change_rb_inclusion_setup(self):
         if self.pysills_mode == "FI":
