@@ -11188,8 +11188,7 @@ class PySILLS(tk.Frame):
         ## OPTION MENUS
         self.container_var["x-y diagram"]["x"].set("Select x")
         self.container_var["x-y diagram"]["y"].set("Select y")
-        if "ratios" in mode:
-            self.container_var["x-y diagram"]["z"].set("Select z")
+        self.container_var["x-y diagram"]["z"].set("Select z")
 
         if self.oxides_xy == False:
             list_options = self.container_lists["Measured Isotopes"]["All"]
@@ -11285,18 +11284,76 @@ class PySILLS(tk.Frame):
 
             self.ax_diagram_xy.clear()
             for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
-                concentration_x = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
-                                            var_opt_x], 4)
-                concentration_y = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
-                                            var_opt_y], 4)
+                if self.oxides_xy == True:
+                    isotope_x = self.container_oxides[var_opt_x]["Isotopes"][0]
+                    isotope_y = self.container_oxides[var_opt_y]["Isotopes"][0]
+
+                    if "Fe" in isotope_x:
+                        r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
+                        if "Fe2O3" == var_opt_x:
+                            factor_x = 1 - r
+                        else:
+                            factor_x = r
+                    else:
+                        factor_x = 1
+
+                    if "Mn" in isotope_x:
+                        r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
+                        if "Mn2O3" == var_opt_x:
+                            factor_x = 1 - r
+                        else:
+                            factor_x = r
+                    else:
+                        factor_x = 1
+
+                    if "Fe" in isotope_y:
+                        r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
+                        if "Fe2O3" == var_opt_y:
+                            factor_y = 1 - r
+                        else:
+                            factor_y = r
+                    else:
+                        factor_y = 1
+
+                    if "Mn" in isotope_y:
+                        r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
+                        if "Mn2O3" == var_opt_y:
+                            factor_y = 1 - r
+                        else:
+                            factor_y = r
+                    else:
+                        factor_y = 1
+
+                    concentration_x = round(factor_x*self.container_concentration["SMPL"]["RAW"][str_filename_short][
+                        focus][isotope_x], 4)
+                    concentration_y = round(factor_y*self.container_concentration["SMPL"]["RAW"][str_filename_short][
+                        focus][isotope_y], 4)
+                else:
+                    concentration_x = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                                var_opt_x], 4)
+                    concentration_y = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                                var_opt_y], 4)
+
+                if self.oxides_xy == True:
+                    factor_x = 1/self.conversion_factors[var_opt_x]
+                    factor_y = 1/self.conversion_factors[var_opt_y]
+                    concentration_x = round(concentration_x/factor_x, 4)
+                    concentration_y = round(concentration_y/factor_y, 4)
 
                 if self.container_var["x-y diagram"]["z"].get() != "Select z":
                     var_z = True
 
                 if var_z == True:
                     var_opt_z = self.container_var["x-y diagram"]["z"].get()
-                    concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
-                                            var_opt_z], 4)
+                    if self.oxides_xy == True:
+                        isotope_z = self.container_oxides[var_opt_z]["Isotopes"][0]
+                        concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                                isotope_z], 4)
+                        factor_z = 1/self.conversion_factors[var_opt_z]
+                        concentration_z = round(concentration_z/factor_z, 4)
+                    else:
+                        concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                                var_opt_z], 4)
                     if concentration_z > 0:
                         ratio_x = "{:0.4e}".format(concentration_x/concentration_z)
                         ratio_y = "{:0.4e}".format(concentration_y/concentration_z)
@@ -19618,6 +19675,7 @@ class PySILLS(tk.Frame):
                 print("ATTENTION - The element", element,
                       "is not part of the list of elements for the 100 wt.% oxides calculation.")
 
+        self.container_oxides = helper_oxides
         var_c = 0
         for oxide, oxide_container in helper_oxides.items():
             for isotope in oxide_container["Isotopes"]:
