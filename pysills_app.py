@@ -664,6 +664,10 @@ class PySILLS(tk.Frame):
         self.container_var["ma_setting"]["Element"].set("Select Element")
         self.container_var["ma_setting"]["Element Concentration"] = tk.StringVar()
         self.container_var["ma_setting"]["Element Concentration"].set("1000000")
+        self.container_var["ma_setting"]["Mineral"] = tk.StringVar()
+        self.container_var["ma_setting"]["Mineral"].set("Select mineral")
+        self.container_var["ma_setting"]["Mineral Concentration"] = tk.StringVar()
+        self.container_var["ma_setting"]["Mineral Concentration"].set("100")
         self.container_var["ma_setting"]["SE Alpha"] = tk.StringVar()
         self.container_var["ma_setting"]["SE Alpha"].set("0.05")
         self.container_var["ma_setting"]["SE Threshold"] = tk.StringVar()
@@ -786,6 +790,8 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Halide"].set("Select Halide")
             self.container_var[key_setting]["Halide Concentration"] = tk.StringVar()
             self.container_var[key_setting]["Halide Concentration"].set("100")
+            self.container_var[key_setting]["Mineral"] = tk.StringVar()
+            self.container_var[key_setting]["Mineral"].set("Select mineral")
             self.container_var[key_setting]["Mineral Concentration"] = tk.StringVar()
             self.container_var[key_setting]["Mineral Concentration"].set("100")
             self.container_var[key_setting]["Host Only"] = tk.StringVar()
@@ -3662,7 +3668,6 @@ class PySILLS(tk.Frame):
             else:
                 self.container_var["SRM"][element].set(0.0)
 
-    #
     def select_mineral_is(self, var_min, fluidinclusion=False):
         self.srm_actual[var_min] = {}
 
@@ -11348,7 +11353,7 @@ class PySILLS(tk.Frame):
             text_set=self.container_var["x-y diagram"]["x"].get(), fg_active=self.bg_colors["Dark Font"],
             bg_active=self.accent_color,
             command=lambda var_x=self.container_var["x-y diagram"]["x"], var_y=self.container_var["x-y diagram"]["y"],
-                           focus=focus: self.change_xy_diagram(var_x, var_y, focus))
+                           var_focus=focus: self.change_xy_diagram(var_x, var_y, var_focus))
         opt_x["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
             activeforeground=self.bg_colors["Dark Font"],
@@ -11366,7 +11371,7 @@ class PySILLS(tk.Frame):
             text_set=self.container_var["x-y diagram"]["y"].get(), fg_active=self.bg_colors["Dark Font"],
             bg_active=self.accent_color,
             command=lambda var_x=self.container_var["x-y diagram"]["x"], var_y=self.container_var["x-y diagram"]["y"],
-                           focus=focus: self.change_xy_diagram(var_x, var_y, focus))
+                           var_focus=focus: self.change_xy_diagram(var_x, var_y, var_focus))
         opt_y["menu"].config(
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
             activeforeground=self.bg_colors["Dark Font"],
@@ -11385,8 +11390,8 @@ class PySILLS(tk.Frame):
                 text_set=self.container_var["x-y diagram"]["z"].get(), fg_active=self.bg_colors["Dark Font"],
                 bg_active=self.accent_color,
                 command=lambda var_x=self.container_var["x-y diagram"]["x"],
-                               var_y=self.container_var["x-y diagram"]["y"], focus=focus, var_z=True:
-                self.change_xy_diagram(var_x, var_y, focus, var_z))
+                               var_y=self.container_var["x-y diagram"]["y"], var_focus=focus, var_z=True:
+                self.change_xy_diagram(var_x, var_y, var_focus, var_z))
             opt_z["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                 activeforeground=self.bg_colors["Dark Font"],
@@ -11419,7 +11424,7 @@ class PySILLS(tk.Frame):
             parent=subwindow_diagram_xy, var_row_start=var_row_start, var_column_start=var_header_n + 1,
             n_rows=n_rows, n_columns=n_columns - var_header_n - 1, init=True)
 
-    def change_xy_diagram(self, var_x, var_y, focus, var_z=False, init=False):
+    def change_xy_diagram(self, var_x, var_y, var_focus, var_z=False, init=False):
         var_opt_x = self.container_var["x-y diagram"]["x"].get()
         var_opt_y = self.container_var["x-y diagram"]["y"].get()
 
@@ -11463,13 +11468,13 @@ class PySILLS(tk.Frame):
                             factor_y = r
 
                     concentration_x = round(factor_x*self.container_concentration["SMPL"]["RAW"][str_filename_short][
-                        focus][isotope_x], 4)
+                        var_focus][isotope_x], 4)
                     concentration_y = round(factor_y*self.container_concentration["SMPL"]["RAW"][str_filename_short][
-                        focus][isotope_y], 4)
+                        var_focus][isotope_y], 4)
                 else:
-                    concentration_x = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                    concentration_x = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][var_focus][
                                                 var_opt_x], 4)
-                    concentration_y = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                    concentration_y = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][var_focus][
                                                 var_opt_y], 4)
 
                 if self.oxides_xy == True:
@@ -11485,13 +11490,13 @@ class PySILLS(tk.Frame):
                     var_opt_z = self.container_var["x-y diagram"]["z"].get()
                     if self.oxides_xy == True:
                         isotope_z = self.container_oxides[var_opt_z]["Isotopes"][0]
-                        concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
-                                                isotope_z], 4)
+                        concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][
+                                                    var_focus][isotope_z], 4)
                         factor_z = 1/self.conversion_factors[var_opt_z]
                         concentration_z = round(concentration_z/factor_z, 4)
                     else:
-                        concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
-                                                var_opt_z], 4)
+                        concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][
+                                                    var_focus][var_opt_z], 4)
                     if concentration_z > 0:
                         ratio_x = "{:0.4e}".format(concentration_x/concentration_z)
                         ratio_y = "{:0.4e}".format(concentration_y/concentration_z)
@@ -12466,7 +12471,6 @@ class PySILLS(tk.Frame):
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=5,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_06,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_01e.configure(state="disabled")
             # BUTTONS
             btn_02a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
@@ -15209,6 +15213,9 @@ class PySILLS(tk.Frame):
         elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 4:
             var_text_02 = "Custom data"
             var_key = "custom"
+        elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 5:
+            var_text_02 = "Mineral selection"
+            var_key = "mineral"
 
         lbl_01 = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1,
@@ -15220,7 +15227,7 @@ class PySILLS(tk.Frame):
             n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text=var_text_02, relief=tk.FLAT, fontsize="sans 10 bold")
 
-        if self.container_var[var_setting_key]["Host Setup Selection"].get() not in [3, 4]:
+        if self.container_var[var_setting_key]["Host Setup Selection"].get() not in [3, 4, 5]:
             lbl_03 = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row + 3, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -15229,6 +15236,11 @@ class PySILLS(tk.Frame):
         if self.container_var[var_setting_key]["Host Setup Selection"].get() == 4:
             lbl_03 = SE(
                 parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
+                n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+        elif self.container_var[var_setting_key]["Host Setup Selection"].get() == 5:
+            lbl_03 = SE(
+                parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
                 n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Internal Standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -15338,8 +15350,13 @@ class PySILLS(tk.Frame):
                 var=var_entr_is_default, text_default=var_entr_is_default_text,
                 command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
                 self.ma_change_is_concentration(var_entr, var_file, state_default, event))
+        elif var_key == "mineral":
+            var_opt_default = self.container_var[var_setting_key]["Mineral"]
+            var_opt_is_default = self.container_var["IS"]["Default SMPL"]
+            list_compound = self.container_lists["Minerals"]
+            var_opt_default_text = self.container_var[var_setting_key]["Mineral"].get()
 
-        if var_key != "experiments" and var_key != "custom":
+        if var_key not in ["experiments", "custom"]:
             var_opt_is_default = self.container_var["IS"]["Default SMPL"]
             var_opt_is_list = list_possible_elements
             var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
@@ -15351,13 +15368,23 @@ class PySILLS(tk.Frame):
 
             var_entr_is_default_text = self.container_var["IS"]["Default SMPL Concentration"].get()
 
-            opt_02a = SE(
-                parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-                var_iso=var_opt_default, option_list=list_compound, text_set=var_opt_default_text,
-                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-                command=lambda var_opt=var_opt_default, var_file=None, state_default=True:
-                self.ma_change_matrix_compound(var_opt, var_file, state_default))
+            if var_key != "mineral":
+                opt_02a = SE(
+                    parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30,
+                    n_rows=1, n_columns=9, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_option_isotope(
+                    var_iso=var_opt_default, option_list=list_compound, text_set=var_opt_default_text,
+                    fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                    command=lambda var_opt=var_opt_default, var_file=None, state_default=True:
+                    self.ma_change_matrix_compound(var_opt, var_file, state_default))
+            else:
+                opt_02a = SE(
+                    parent=subwindow_ma_matrix_concentration, row_id=start_row + 1, column_id=start_column + 30,
+                    n_rows=1, n_columns=9, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_option_isotope(
+                    var_iso=var_opt_default, option_list=list_compound, text_set=var_opt_default_text,
+                    fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+
             opt_02a["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                 activeforeground=self.bg_colors["Dark Font"],
@@ -15367,13 +15394,25 @@ class PySILLS(tk.Frame):
                 activeforeground=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, highlightthickness=0)
 
-            self.opt_02b = SE(
-                parent=subwindow_ma_matrix_concentration, row_id=start_row + 4, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-                var_iso=var_opt_is_default, option_list=var_opt_is_list, text_set=var_opt_is_default_text,
-                fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-                command=lambda var_opt=var_opt_is_default, var_file=None, state_default=True:
-                self.ma_change_is_smpl(var_opt, var_file, state_default))
+            if var_key != "mineral":
+                self.opt_02b = SE(
+                    parent=subwindow_ma_matrix_concentration, row_id=start_row + 4, column_id=start_column + 30,
+                    n_rows=1, n_columns=9, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_option_isotope(
+                    var_iso=var_opt_is_default, option_list=var_opt_is_list, text_set=var_opt_is_default_text,
+                    fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                    command=lambda var_opt=var_opt_is_default, var_file=None, state_default=True:
+                    self.ma_change_is_smpl(var_opt, var_file, state_default))
+            else:
+                self.opt_02b = SE(
+                    parent=subwindow_ma_matrix_concentration, row_id=start_row + 3, column_id=start_column + 30,
+                    n_rows=1, n_columns=9, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["Light"]).create_option_isotope(
+                    var_iso=var_opt_is_default, option_list=var_opt_is_list, text_set=var_opt_is_default_text,
+                    fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
+                    command=lambda var_opt=var_opt_is_default, var_file=None, state_default=True:
+                    self.ma_change_is_smpl(var_opt, var_file, state_default))
+
             self.opt_02b["menu"].config(
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
                 activeforeground=self.bg_colors["Dark Font"],
@@ -15383,19 +15422,22 @@ class PySILLS(tk.Frame):
                 activeforeground=self.bg_colors["Dark Font"],
                 activebackground=self.accent_color, highlightthickness=0)
 
-            ## ENTRIES
-            entr_02a = SE(
-                parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
-                var=var_entr_default, text_default=var_entr_default_text,
-                command=lambda event, var_entr=var_entr_default, var_file=None, state_default=True:
-                self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
-            entr_02b = SE(
-                parent=subwindow_ma_matrix_concentration, row_id=start_row + 5, column_id=start_column + 30, n_rows=1,
-                n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
-                var=var_entr_is_default, text_default=var_entr_is_default_text,
-                command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
-                self.ma_change_is_concentration(var_entr, var_file, state_default, event))
+            if var_key != "mineral":
+                ## ENTRIES
+                entr_02a = SE(
+                    parent=subwindow_ma_matrix_concentration, row_id=start_row + 2, column_id=start_column + 30,
+                    n_rows=1, n_columns=9, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["White"]).create_simple_entry(
+                    var=var_entr_default, text_default=var_entr_default_text,
+                    command=lambda event, var_entr=var_entr_default, var_file=None, state_default=True:
+                    self.ma_change_matrix_concentration(var_entr, var_file, state_default, event))
+                entr_02b = SE(
+                    parent=subwindow_ma_matrix_concentration, row_id=start_row + 5, column_id=start_column + 30,
+                    n_rows=1, n_columns=9, fg=self.bg_colors["Dark Font"],
+                    bg=self.bg_colors["White"]).create_simple_entry(
+                    var=var_entr_is_default, text_default=var_entr_is_default_text,
+                    command=lambda event, var_entr=var_entr_is_default, var_file=None, state_default=True:
+                    self.ma_change_is_concentration(var_entr, var_file, state_default, event))
 
         ## SAMPLE FILES
         frm_smpl = SE(
@@ -15493,7 +15535,7 @@ class PySILLS(tk.Frame):
                     var_entr_is_default = self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].get()
                 else:
                     var_entr_is_default = "1000000"
-            elif var_key in ["experiments", "custom"]:  # Experimental Data Selection
+            elif var_key in ["experiments", "custom", "mineral"]:  # Experimental Data Selection
                 var_list_is = list_possible_elements
                 var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["Element"]["Concentration"]
                 if self.pysills_mode == "MA":
@@ -15519,7 +15561,7 @@ class PySILLS(tk.Frame):
                     var_entr_is_default = "1000000"
 
             var_entr_is_i.set(var_entr_is_default)
-            if var_key != "experiments" and var_key != "custom":
+            if var_key not in ["experiments", "custom", "mineral"]:
                 var_entr_i.set(var_entr_i_default)
                 if len(var_opt_i_default) > 0:
                     var_opt_comp_i.set(var_opt_i_default)
