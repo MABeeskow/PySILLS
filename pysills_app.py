@@ -315,6 +315,9 @@ class PySILLS(tk.Frame):
         self.container_var["IS STD Default"].set("0.0")
         self.container_var["IS SMPL Default"] = tk.StringVar()
         self.container_var["IS SMPL Default"].set("0.0")
+        self.container_var["x-y diagram"] = {"x": tk.StringVar(), "y": tk.StringVar()}
+        self.container_var["x-y diagram"]["x"].set("Select x")
+        self.container_var["x-y diagram"]["y"].set("Select y")
 
         self.helper_salt_composition = {}
         self.charge_balance_check = {}
@@ -11002,22 +11005,26 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Elements": self.diagram_xy(mode))
         btn_001b = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Element ratios": self.diagram_xy(mode))
         btn_001c = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxides": self.diagram_xy(mode))
         btn_001d = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxide ratios": self.diagram_xy(mode))
         btn_001e = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
@@ -11029,10 +11036,6 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
-        btn_001a.configure(state="disabled")
-        btn_001b.configure(state="disabled")
-        btn_001c.configure(state="disabled")
-        btn_001d.configure(state="disabled")
         btn_001e.configure(state="disabled")
         btn_001f.configure(state="disabled")
 
@@ -11040,22 +11043,26 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Elements", focus="INCL": self.diagram_xy(mode, focus))
         btn_002b = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Element ratios", focus="INCL": self.diagram_xy(mode, focus))
         btn_002c = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxides", focus="INCL": self.diagram_xy(mode, focus))
         btn_002d = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxide ratios", focus="INCL": self.diagram_xy(mode, focus))
         btn_002e = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
@@ -11073,16 +11080,12 @@ class PySILLS(tk.Frame):
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda init=True: self.halogen_ratios_diagram(init))
 
-        btn_002a.configure(state="disabled")
-        btn_002b.configure(state="disabled")
-        btn_002c.configure(state="disabled")
-        btn_002d.configure(state="disabled")
         btn_002e.configure(state="disabled")
         btn_002f.configure(state="disabled")
 
-    def diagram_xy(self, mode, init=False):
+    def diagram_xy(self, mode, focus="MAT", init=False):
         ## Window Settings
-        window_width = 800
+        window_width = 1000
         window_height = 600
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         row_min = 25
@@ -11117,34 +11120,169 @@ class PySILLS(tk.Frame):
 
         var_row_start = 0
         var_column_start = 0
-        var_header_n = 10
-        int_category_n = 6
+        var_header_n = 16
+        int_category_n = 8
 
         ## LABELS
-        if mode == "elements":
+        if focus == "MAT":
             lbl_01 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.accent_color).create_simple_label(
+                text="Matrix analysis", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        elif focus == "INCL":
+            lbl_01 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+                bg=self.accent_color).create_simple_label(
+                text="Inclusion analysis", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        if mode == "Elements":
+            lbl_02 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Elements", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
-        elif mode == "element ratios":
-            lbl_01 = SE(
-                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+        elif mode == "Element ratios":
+            lbl_02 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Element ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
-        elif mode == "oxides":
-            lbl_01 = SE(
-                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+        elif mode == "Oxides":
+            lbl_02 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
-        elif mode == "oxide ratios":
-            lbl_01 = SE(
-                parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+        elif mode == "Oxide ratios":
+            lbl_02 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Oxide ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        lbl_03 = SE(
+            parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        ## OPTION MENUS
+        self.container_var["x-y diagram"]["x"].set("Select x")
+        self.container_var["x-y diagram"]["y"].set("Select y")
+
+        opt_x = SE(
+            parent=subwindow_diagram_xy, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["x-y diagram"]["x"],
+            option_list=self.container_lists["Measured Isotopes"]["All"],
+            text_set=self.container_var["x-y diagram"]["x"].get(), fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color,
+            command=lambda var_x=self.container_var["x-y diagram"]["x"], var_y=self.container_var["x-y diagram"]["y"],
+                           focus=focus: self.change_xy_diagram(var_x, var_y, focus))
+        opt_x["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_x.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        opt_y = SE(
+            parent=subwindow_diagram_xy, row_id=var_row_start + 2, column_id=var_column_start + int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["x-y diagram"]["y"],
+            option_list=self.container_lists["Measured Isotopes"]["All"],
+            text_set=self.container_var["x-y diagram"]["y"].get(), fg_active=self.bg_colors["Dark Font"],
+            bg_active=self.accent_color,
+            command=lambda var_x=self.container_var["x-y diagram"]["x"], var_y=self.container_var["x-y diagram"]["y"],
+                           focus=focus: self.change_xy_diagram(var_x, var_y, focus))
+        opt_y["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_y.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        ## TREEVIEWS
+        self.tv_results_xy = SE(
+            parent=subwindow_diagram_xy, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+            n_categories=3, text_n=["File", "x", "y"], width_n=["120", "100", "100"], individual=True)
+
+        ## FRAMES
+        frm_01 = SE(
+            parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_header_n + 1, n_rows=n_rows,
+            n_columns=n_columns - var_header_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame()
+
+        ## DIAGRAMS
+        self.create_xy_diagram(
+            parent=subwindow_diagram_xy, var_row_start=var_row_start, var_column_start=var_header_n + 1,
+            n_rows=n_rows, n_columns=n_columns - var_header_n - 1, init=True)
+
+    def change_xy_diagram(self, var_x, var_y, focus, init=False):
+        var_opt_x = self.container_var["x-y diagram"]["x"].get()
+        var_opt_y = self.container_var["x-y diagram"]["y"].get()
+
+        if var_opt_x != "Select x" and var_opt_y != "Select y":
+            if len(self.tv_results_xy.get_children()) > 0:
+                for item in self.tv_results_xy.get_children():
+                    self.tv_results_xy.delete(item)
+
+            self.ax_diagram_xy.clear()
+            for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                concentration_x = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                            var_opt_x], 4)
+                concentration_y = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                            var_opt_y], 4)
+
+                entry_results = [str_filename_short, concentration_x, concentration_y]
+                self.tv_results_xy.insert("", tk.END, values=entry_results)
+
+                self.ax_diagram_xy.scatter(concentration_x, concentration_y, s=85, color=self.accent_color,
+                                           edgecolor="black", alpha=0.75)
+
+            self.ax_diagram_xy.grid()
+            self.ax_diagram_xy.set_xlabel("C("+str(var_opt_x)+") (ppm)")
+            self.ax_diagram_xy.set_ylabel("C("+str(var_opt_y)+") (ppm)")
+            self.ax_diagram_xy.set_axisbelow(True)
+
+            self.canvas_diagram_xy.draw()
+
+    def create_xy_diagram(self, parent, var_row_start, var_column_start, n_rows, n_columns, init=False):
+        self.fig_diagram_xy = Figure(figsize=(10,5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+
+        self.canvas_diagram_xy = FigureCanvasTkAgg(self.fig_diagram_xy, master=parent)
+        self.canvas_diagram_xy.get_tk_widget().grid(
+            row=var_row_start, column=var_column_start, rowspan=n_rows - 1, columnspan=n_columns,
+            sticky="nesw")
+
+        self.toolbarFrame_diagram_xy = tk.Frame(master=parent)
+        self.toolbarFrame_diagram_xy.grid(
+            row=n_rows - 1, column=var_column_start, rowspan=1, columnspan=n_columns, sticky="ew")
+
+        self.toolbar_diagram_xy = NavigationToolbar2Tk(self.canvas_diagram_xy, self.toolbarFrame_diagram_xy)
+        self.toolbar_diagram_xy.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        self.toolbar_diagram_xy._message_label.config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        self.toolbar_diagram_xy.winfo_children()[-2].config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+
+        ax = self.fig_diagram_xy.add_subplot(label=np.random.uniform())
+
+        ax.grid()
+        ax.set_xlabel("C(x) (ppm)")
+        ax.set_ylabel("C(y) (ppm)")
+        ax.set_axisbelow(True)
+
+        self.ax_diagram_xy = ax
 
     def halogen_ratios_diagram(self, init=False):
         ## Window Settings
@@ -21008,7 +21146,7 @@ class PySILLS(tk.Frame):
                     try:
                         df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     except:
-                        print("File cannot be read. (Error #FI_STD_01)")
+                        print("File (" + str(file_std) + str(")"), "cannot be read.")
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -21044,7 +21182,7 @@ class PySILLS(tk.Frame):
                     try:
                         df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     except:
-                        print("File cannot be read. (Error #FI_SMPL_01)")
+                        print("File (" + str(file_smpl) + str(")"), "cannot be read.")
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
