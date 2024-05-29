@@ -315,9 +315,10 @@ class PySILLS(tk.Frame):
         self.container_var["IS STD Default"].set("0.0")
         self.container_var["IS SMPL Default"] = tk.StringVar()
         self.container_var["IS SMPL Default"].set("0.0")
-        self.container_var["x-y diagram"] = {"x": tk.StringVar(), "y": tk.StringVar()}
+        self.container_var["x-y diagram"] = {"x": tk.StringVar(), "y": tk.StringVar(), "z": tk.StringVar()}
         self.container_var["x-y diagram"]["x"].set("Select x")
         self.container_var["x-y diagram"]["y"].set("Select y")
+        self.container_var["x-y diagram"]["z"].set("Select z")
 
         self.helper_salt_composition = {}
         self.charge_balance_check = {}
@@ -11137,6 +11138,8 @@ class PySILLS(tk.Frame):
                 bg=self.accent_color).create_simple_label(
                 text="Inclusion analysis", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
+        self.oxides_xy = False
+
         if mode == "Elements":
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
@@ -11155,28 +11158,48 @@ class PySILLS(tk.Frame):
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            self.oxides_xy = True
         elif mode == "Oxide ratios":
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Oxide ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            self.oxides_xy = True
 
-        lbl_03 = SE(
-            parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
-            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        if "ratios" in mode:
+            lbl_02 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="with respect to", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            lbl_03 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        else:
+            lbl_03 = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
+                n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## OPTION MENUS
         self.container_var["x-y diagram"]["x"].set("Select x")
         self.container_var["x-y diagram"]["y"].set("Select y")
+        if "ratios" in mode:
+            self.container_var["x-y diagram"]["z"].set("Select z")
+
+        if self.oxides_xy == False:
+            list_options = self.container_lists["Measured Isotopes"]["All"]
+        else:
+            list_options = self.container_lists["Selected Oxides"]["All"]
 
         opt_x = SE(
             parent=subwindow_diagram_xy, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.container_var["x-y diagram"]["x"],
-            option_list=self.container_lists["Measured Isotopes"]["All"],
+            var_iso=self.container_var["x-y diagram"]["x"], option_list=list_options,
             text_set=self.container_var["x-y diagram"]["x"].get(), fg_active=self.bg_colors["Dark Font"],
             bg_active=self.accent_color,
             command=lambda var_x=self.container_var["x-y diagram"]["x"], var_y=self.container_var["x-y diagram"]["y"],
@@ -11191,10 +11214,10 @@ class PySILLS(tk.Frame):
             activebackground=self.accent_color, highlightthickness=0)
 
         opt_y = SE(
-            parent=subwindow_diagram_xy, row_id=var_row_start + 2, column_id=var_column_start + int_category_n, n_rows=1,
-            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.container_var["x-y diagram"]["y"],
-            option_list=self.container_lists["Measured Isotopes"]["All"],
+            parent=subwindow_diagram_xy, row_id=var_row_start + 2, column_id=var_column_start + int_category_n,
+            n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.container_var["x-y diagram"]["y"], option_list=list_options,
             text_set=self.container_var["x-y diagram"]["y"].get(), fg_active=self.bg_colors["Dark Font"],
             bg_active=self.accent_color,
             command=lambda var_x=self.container_var["x-y diagram"]["x"], var_y=self.container_var["x-y diagram"]["y"],
@@ -11208,11 +11231,37 @@ class PySILLS(tk.Frame):
             activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color, highlightthickness=0)
 
+        if "ratios" in mode:
+            opt_z = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start + int_category_n,
+                n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=self.container_var["x-y diagram"]["z"], option_list=list_options,
+                text_set=self.container_var["x-y diagram"]["z"].get(), fg_active=self.bg_colors["Dark Font"],
+                bg_active=self.accent_color,
+                command=lambda var_x=self.container_var["x-y diagram"]["x"],
+                               var_y=self.container_var["x-y diagram"]["y"], focus=focus, var_z=True:
+                self.change_xy_diagram(var_x, var_y, focus, var_z))
+            opt_z["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_z.config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
+
         ## TREEVIEWS
-        self.tv_results_xy = SE(
-            parent=subwindow_diagram_xy, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
-            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
-            n_categories=3, text_n=["File", "x", "y"], width_n=["120", "100", "100"], individual=True)
+        if "ratios" in mode:
+            self.tv_results_xy = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 5, column_id=var_column_start, n_rows=n_rows - 6,
+                n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+                n_categories=3, text_n=["File", "x", "y"], width_n=["120", "100", "100"], individual=True)
+        else:
+            self.tv_results_xy = SE(
+                parent=subwindow_diagram_xy, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
+                n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+                n_categories=3, text_n=["File", "x", "y"], width_n=["120", "100", "100"], individual=True)
 
         ## FRAMES
         frm_01 = SE(
@@ -11225,7 +11274,7 @@ class PySILLS(tk.Frame):
             parent=subwindow_diagram_xy, var_row_start=var_row_start, var_column_start=var_header_n + 1,
             n_rows=n_rows, n_columns=n_columns - var_header_n - 1, init=True)
 
-    def change_xy_diagram(self, var_x, var_y, focus, init=False):
+    def change_xy_diagram(self, var_x, var_y, focus, var_z=False, init=False):
         var_opt_x = self.container_var["x-y diagram"]["x"].get()
         var_opt_y = self.container_var["x-y diagram"]["y"].get()
 
@@ -11241,15 +11290,43 @@ class PySILLS(tk.Frame):
                 concentration_y = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
                                             var_opt_y], 4)
 
-                entry_results = [str_filename_short, concentration_x, concentration_y]
+                if self.container_var["x-y diagram"]["z"].get() != "Select z":
+                    var_z = True
+
+                if var_z == True:
+                    var_opt_z = self.container_var["x-y diagram"]["z"].get()
+                    concentration_z = round(self.container_concentration["SMPL"]["RAW"][str_filename_short][focus][
+                                            var_opt_z], 4)
+                    if concentration_z > 0:
+                        ratio_x = "{:0.4e}".format(concentration_x/concentration_z)
+                        ratio_y = "{:0.4e}".format(concentration_y/concentration_z)
+                    else:
+                        ratio_x = np.nan
+                        ratio_y = np.nan
+
+                    entry_results = [str_filename_short, ratio_x, ratio_y]
+                else:
+                    entry_results = [str_filename_short, concentration_x, concentration_y]
+
                 self.tv_results_xy.insert("", tk.END, values=entry_results)
 
-                self.ax_diagram_xy.scatter(concentration_x, concentration_y, s=85, color=self.accent_color,
-                                           edgecolor="black", alpha=0.75)
+                if var_z == True:
+                    if np.nan not in [ratio_x, ratio_y]:
+                        self.ax_diagram_xy.scatter(ratio_x, ratio_y, s=85, color=self.accent_color,
+                                                   edgecolor="black", alpha=0.75)
+                else:
+                    self.ax_diagram_xy.scatter(concentration_x, concentration_y, s=85, color=self.accent_color,
+                                               edgecolor="black", alpha=0.75)
 
             self.ax_diagram_xy.grid()
-            self.ax_diagram_xy.set_xlabel("C("+str(var_opt_x)+") (ppm)")
-            self.ax_diagram_xy.set_ylabel("C("+str(var_opt_y)+") (ppm)")
+
+            if var_z == True:
+                self.ax_diagram_xy.set_xlabel("C("+str(var_opt_x)+")/C("+str(var_opt_z)+") (1)")
+                self.ax_diagram_xy.set_ylabel("C("+str(var_opt_y)+")/C("+str(var_opt_z)+") (1)")
+            else:
+                self.ax_diagram_xy.set_xlabel("C("+str(var_opt_x)+") (ppm)")
+                self.ax_diagram_xy.set_ylabel("C("+str(var_opt_y)+") (ppm)")
+
             self.ax_diagram_xy.set_axisbelow(True)
 
             self.canvas_diagram_xy.draw()
