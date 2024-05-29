@@ -10767,6 +10767,36 @@ class PySILLS(tk.Frame):
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Mineral classification", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_001a = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001b = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001c = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001d = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001e = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 5, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001f = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 6, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_02 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
@@ -10780,6 +10810,44 @@ class PySILLS(tk.Frame):
             text="Ti-in-Quartz", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
+        btn_001a = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Elements": self.diagram_xy(mode))
+        btn_001b = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 2, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Element ratios": self.diagram_xy(mode))
+        btn_001c = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 3, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxides": self.diagram_xy(mode))
+        btn_001d = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 4, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxide ratios": self.diagram_xy(mode))
+        btn_001e = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 5, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001f = SE(
+            parent=self.subwindow_ma_extras, row_id=var_row_start + 6, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+
+        btn_001e.configure(state="disabled")
+        btn_001f.configure(state="disabled")
+
         btn_002 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
@@ -11365,6 +11433,8 @@ class PySILLS(tk.Frame):
                 if self.oxides_xy == True:
                     isotope_x = self.container_oxides[var_opt_x]["Isotopes"][0]
                     isotope_y = self.container_oxides[var_opt_y]["Isotopes"][0]
+                    factor_x = 1
+                    factor_y = 1
 
                     if "Fe" in isotope_x:
                         r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
@@ -11372,17 +11442,12 @@ class PySILLS(tk.Frame):
                             factor_x = 1 - r
                         else:
                             factor_x = r
-                    else:
-                        factor_x = 1
-
-                    if "Mn" in isotope_x:
+                    elif "Mn" in isotope_x:
                         r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
                         if "Mn2O3" == var_opt_x:
                             factor_x = 1 - r
                         else:
                             factor_x = r
-                    else:
-                        factor_x = 1
 
                     if "Fe" in isotope_y:
                         r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
@@ -11390,17 +11455,12 @@ class PySILLS(tk.Frame):
                             factor_y = 1 - r
                         else:
                             factor_y = r
-                    else:
-                        factor_y = 1
-
-                    if "Mn" in isotope_y:
+                    elif "Mn" in isotope_y:
                         r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
                         if "Mn2O3" == var_opt_y:
                             factor_y = 1 - r
                         else:
                             factor_y = r
-                    else:
-                        factor_y = 1
 
                     concentration_x = round(factor_x*self.container_concentration["SMPL"]["RAW"][str_filename_short][
                         focus][isotope_x], 4)
