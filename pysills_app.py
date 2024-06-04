@@ -8873,7 +8873,7 @@ class PySILLS(tk.Frame):
     def checkup_internal_standard(self):
         """Check-up window to control the internal standard setup."""
         ## Window Settings
-        window_width = 900
+        window_width = 840
         window_height = 400
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         row_min = 25
@@ -8901,8 +8901,8 @@ class PySILLS(tk.Frame):
 
         var_row_start = 0
         var_column_start = 0
-        var_header_n = 16
-        int_category_n = 8
+        var_header_n = 20
+        int_category_n = 6
 
         ## LABELS
         lbl_01 = SE(
@@ -8917,18 +8917,104 @@ class PySILLS(tk.Frame):
             text="Internal standard (inclusion)", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## TREEVIEWS
-
-
-        ## OPTION MENUS
         list_is_mat = self.container_lists["Measured Isotopes"]["All"]
         list_is_incl = self.container_lists["Measured Isotopes"]["All"]
+
+        frm_mat = SE(
+            parent=subwindow_checkup_is, row_id=var_row_start + 1, column_id=var_column_start, n_rows=n_rows - 3,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_mat = ttk.Scrollbar(master=frm_mat, orient="vertical")
+        text_mat = tk.Text(
+            master=frm_mat, width=30, height=25, yscrollcommand=vsb_mat.set, bg=self.bg_colors["Very Light"])
+        vsb_mat.config(command=text_mat.yview)
+        vsb_mat.pack(side="right", fill="y")
+        text_mat.pack(side="left", fill="both", expand=True)
+
+        for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            lbl_i = tk.Label(
+                frm_mat, text=filename_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+            text_mat.window_create("end", window=lbl_i)
+            text_mat.insert("end", "\t")
+
+            if self.pysills_mode == "MA":
+                var_opt_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"]
+                var_entr_is = self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"]
+            else:
+                var_opt_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"]
+                var_entr_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Concentration"]
+
+            opt_is_i = tk.OptionMenu(
+                frm_mat, var_opt_is, *list_is_mat)
+            opt_is_i["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+            opt_is_i.config(
+                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+            text_mat.window_create("end", window=opt_is_i)
+            text_mat.insert("end", "\t")
+
+            var_opt_is_mat_i = tk.StringVar()
+            var_entr_is_mat_i = tk.StringVar()
+            var_opt_is_mat_i.set("Select isotope")
+            var_entr_is_mat_i.set("0.0")
+
+            entr_i = tk.Entry(
+                frm_mat, textvariable=var_entr_is, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"],
+                highlightthickness=0, highlightbackground=self.bg_colors["Very Light"], width=8)
+            text_mat.window_create("insert", window=entr_i)
+            text_mat.insert("end", "\n")
+
+        frm_incl = SE(
+            parent=subwindow_checkup_is, row_id=var_row_start + 1, column_id=var_header_n + 1, n_rows=n_rows - 3,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_incl = ttk.Scrollbar(master=frm_incl, orient="vertical")
+        text_incl = tk.Text(
+            master=frm_incl, width=30, height=25, yscrollcommand=vsb_incl.set, bg=self.bg_colors["Very Light"])
+        vsb_incl.config(command=text_incl.yview)
+        vsb_incl.pack(side="right", fill="y")
+        text_incl.pack(side="left", fill="both", expand=True)
+
+        if self.pysills_mode != "MA":
+            for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                filename_long = self.container_lists["SMPL"]["Long"][index]
+                lbl_i = tk.Label(
+                    frm_incl, text=filename_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+                text_incl.window_create("end", window=lbl_i)
+                text_incl.insert("end", "\t")
+
+                var_opt_is_incl_i = tk.StringVar()
+                var_entr_is_incl_i = tk.StringVar()
+                var_opt_is_incl_i.set("Select isotope")
+                var_entr_is_incl_i.set("0.0") # sex
+
+                opt_is_i = tk.OptionMenu(
+                    frm_incl, self.container_var["SMPL"][filename_long]["IS Data"]["IS"], *list_is_incl)
+                opt_is_i["menu"].config(
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                    activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
+                opt_is_i.config(
+                    bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], activebackground=self.accent_color,
+                    activeforeground=self.bg_colors["Dark Font"], highlightthickness=0)
+                text_incl.window_create("end", window=opt_is_i)
+                text_incl.insert("end", "\t")
+
+                entr_i = tk.Entry(
+                    frm_incl, textvariable=self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"],
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                    highlightbackground=self.bg_colors["Very Light"], width=8)
+                text_incl.window_create("insert", window=entr_i)
+                text_incl.insert("end", "\n")
+
+        ## OPTION MENUS
         self.var_opt_is_mat_default = tk.StringVar()
         self.var_opt_is_incl_default = tk.StringVar()
         self.var_opt_is_mat_default.set("Select isotope")
         self.var_opt_is_incl_default.set("Select isotope")
 
         opt_is_mat = SE(
-            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=int_category_n, n_rows=1,
+            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n - 2*int_category_n, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.var_opt_is_mat_default, option_list=list_is_mat, text_set=self.var_opt_is_mat_default.get(),
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
@@ -8941,34 +9027,41 @@ class PySILLS(tk.Frame):
             activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color, highlightthickness=0)
 
-        opt_is_incl = SE(
-            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n + int_category_n + 1, n_rows=1,
-            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=self.var_opt_is_incl_default, option_list=list_is_incl, text_set=self.var_opt_is_incl_default.get(),
-            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-        opt_is_incl["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-            activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        opt_is_incl.config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-            activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, highlightthickness=0)
+        if self.pysills_mode != "MA":
+            opt_is_incl = SE(
+                parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=2*var_header_n + 1 - 2*int_category_n,
+                n_rows=1, n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["Light"]).create_option_isotope(
+                var_iso=self.var_opt_is_incl_default, option_list=list_is_incl,
+                text_set=self.var_opt_is_incl_default.get(), fg_active=self.bg_colors["Dark Font"],
+                bg_active=self.accent_color)
+            opt_is_incl["menu"].config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color)
+            opt_is_incl.config(
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+                activeforeground=self.bg_colors["Dark Font"],
+                activebackground=self.accent_color, highlightthickness=0)
 
         ## ENTRIES
         self.var_entr_is_mat_default = tk.StringVar()
         self.var_entr_is_incl_default = tk.StringVar()
-        self.var_entr_is_mat_default.set("10000.0")
-        self.var_entr_is_incl_default.set("10000.0")
+        self.var_entr_is_mat_default.set("0.0")
+        self.var_entr_is_incl_default.set("0.0")
 
         entr_is_mat = SE(
-            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=2*int_category_n, n_rows=1,
-            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n - int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
             var=self.var_entr_is_mat_default, text_default=self.var_entr_is_mat_default.get())
-        entr_is_incl = SE(
-            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n + 2*int_category_n + 1, n_rows=1,
-            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
-            var=self.var_entr_is_incl_default, text_default=self.var_entr_is_incl_default.get())
+
+        if self.pysills_mode != "MA":
+            entr_is_incl = SE(
+                parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=2*var_header_n + 1 - int_category_n, n_rows=1,
+                n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+                bg=self.bg_colors["White"]).create_simple_entry(
+                var=self.var_entr_is_incl_default, text_default=self.var_entr_is_incl_default.get())
 
     def internal_standard_concentration_setup(self):
         self.checkup_internal_standard()
