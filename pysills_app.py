@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		29.05.2024
+# Date:		04.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -8870,7 +8870,108 @@ class PySILLS(tk.Frame):
                     self.temp_lines_checkup2[filetype][filename] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=key_setting)
 
+    def checkup_internal_standard(self):
+        """Check-up window to control the internal standard setup."""
+        ## Window Settings
+        window_width = 900
+        window_height = 400
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_checkup_is = tk.Toplevel(self.parent)
+        subwindow_checkup_is.title("Check-Up - Internal standard")
+        subwindow_checkup_is.geometry(var_geometry)
+        subwindow_checkup_is.resizable(False, False)
+        subwindow_checkup_is["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_checkup_is, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_checkup_is, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_checkup_is.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_checkup_is.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 16
+        int_category_n = 8
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_checkup_is, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Internal standard (sample/matrix)", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02 = SE(
+            parent=subwindow_checkup_is, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Internal standard (inclusion)", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        ## TREEVIEWS
+
+
+        ## OPTION MENUS
+        list_is_mat = self.container_lists["Measured Isotopes"]["All"]
+        list_is_incl = self.container_lists["Measured Isotopes"]["All"]
+        self.var_opt_is_mat_default = tk.StringVar()
+        self.var_opt_is_incl_default = tk.StringVar()
+        self.var_opt_is_mat_default.set("Select isotope")
+        self.var_opt_is_incl_default.set("Select isotope")
+
+        opt_is_mat = SE(
+            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.var_opt_is_mat_default, option_list=list_is_mat, text_set=self.var_opt_is_mat_default.get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_is_mat["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_is_mat.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        opt_is_incl = SE(
+            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n + int_category_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=self.var_opt_is_incl_default, option_list=list_is_incl, text_set=self.var_opt_is_incl_default.get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_is_incl["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_is_incl.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        ## ENTRIES
+        self.var_entr_is_mat_default = tk.StringVar()
+        self.var_entr_is_incl_default = tk.StringVar()
+        self.var_entr_is_mat_default.set("10000.0")
+        self.var_entr_is_incl_default.set("10000.0")
+
+        entr_is_mat = SE(
+            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=2*int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.var_entr_is_mat_default, text_default=self.var_entr_is_mat_default.get())
+        entr_is_incl = SE(
+            parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n + 2*int_category_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.var_entr_is_incl_default, text_default=self.var_entr_is_incl_default.get())
+
     def internal_standard_concentration_setup(self):
+        self.checkup_internal_standard()
         try:
             self.srm_isotopes
         except:
@@ -8906,7 +9007,7 @@ class PySILLS(tk.Frame):
             accent_bg = self.bg_colors["Dark"]
             accent_fg = self.bg_colors["Light Font"]
 
-        window_width = 420
+        window_width = 900
         window_height = 450
         row_min = 25
         n_rows = int(window_height/row_min)
