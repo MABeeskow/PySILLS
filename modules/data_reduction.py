@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.05.2024
+# Date:		05.06.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -286,15 +286,11 @@ class IntensityQuantification:
                         helper_bg_sigma.append(np.std(helper_bg, ddof=1)/np.sqrt(len(helper_bg)))
 
                     if average_type == "arithmetic mean":
-                        #result_bg = np.mean(helper_bg)
                         result_bg = np.mean(helper_bg_2)
-                        #result_bg_1sigma = np.mean(helper_bg_sigma)
                         result_bg_1sigma = np.mean(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
                         results_bg_sigma = np.std(helper_bg_2, ddof=1)
                     else:
-                        #result_bg = np.median(helper_bg)
                         result_bg = np.median(helper_bg_2)
-                        #result_bg_1sigma = np.median(helper_bg_sigma)
                         result_bg_1sigma = np.median(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
                         results_bg_sigma = np.std(helper_bg_2, ddof=1)
 
@@ -330,15 +326,11 @@ class IntensityQuantification:
                         helper_mat_sigma.append(np.std(helper_mat, ddof=1)/np.sqrt(len(helper_mat)))
 
                     if average_type == "arithmetic mean":
-                        #result_mat = np.mean(helper_mat)
                         result_mat = np.mean(helper_mat_2)
-                        #result_mat_1sigma = np.mean(helper_mat_sigma)
                         result_mat_1sigma = np.mean(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
                         results_mat_sigma = np.std(helper_mat_2, ddof=1)
                     else:
-                        #result_mat = np.median(helper_mat)
                         result_mat = np.median(helper_mat_2)
-                        #result_mat_1sigma = np.median(helper_mat_sigma)
                         result_mat_1sigma = np.median(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
                         results_mat_sigma = np.std(helper_mat_2, ddof=1)
 
@@ -374,15 +366,13 @@ class IntensityQuantification:
                         helper_incl_sigma.append(np.std(helper_incl, ddof=1)/np.sqrt(len(helper_incl)))
 
                     if average_type == "arithmetic mean":
-                        # result_incl = np.mean(helper_incl)
-                        # result_incl_1sigma = np.mean(helper_incl_sigma)
                         result_incl = np.mean(helper_incl_2)
                         result_incl_1sigma = np.mean(np.std(helper_incl_2, ddof=1)/np.sqrt(len(helper_incl_2)))
+                        results_incl_sigma = np.std(helper_incl_2, ddof=1)
                     else:
-                        # result_incl = np.median(helper_incl)
-                        # result_incl_1sigma = np.median(helper_incl_sigma)
                         result_incl = np.median(helper_incl_2)
                         result_incl_1sigma = np.median(np.std(helper_incl_2, ddof=1)/np.sqrt(len(helper_incl_2)))
+                        results_incl_sigma = np.std(helper_incl_2, ddof=1)
 
                     helper_results[isotope]["uncorrected"]["INCL"] = result_incl
                     helper_results[isotope]["uncorrected"]["1 SIGMA INCL"] = result_incl_1sigma
@@ -390,6 +380,7 @@ class IntensityQuantification:
                     helper_results[isotope]["corrected"]["1 SIGMA MIX"] = result_incl_1sigma - result_bg_1sigma
                     self.results_container["INCL"][isotope] = result_incl
                     self.results_container["1 SIGMA INCL"][isotope] = result_incl_1sigma
+                    self.results_container["INCL SIGMA"][isotope] = results_incl_sigma
                     self.results_container["N INCL"][isotope] = len(helper_incl_2)
 
             # for key, item in helper_results[isotope].items():
