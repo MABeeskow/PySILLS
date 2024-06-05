@@ -33319,6 +33319,13 @@ class PySILLS(tk.Frame):
             self.show_spike_data(mode=mode)
 
     def check_spikes_isotope(self, var_file=None):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        elif self.pysills_mode == "FI":
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
         if var_file == None:
             var_file = self.current_file_spk
         else:
@@ -33326,10 +33333,21 @@ class PySILLS(tk.Frame):
 
         helper_list = []
         df_isotopes = self.container_lists["Measured Isotopes"][var_file]
+        var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
+
         for var_isotope in df_isotopes:
+            updated_indices = []
             list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
             if len(list_indices) > 0:
-                helper_list.append(var_isotope)
+                for index in list_indices:
+                    value_raw = self.container_spikes[var_file][var_isotope]["Data RAW"][index]
+                    value_smoothed = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][index]
+                    if value_raw >= var_threshold and value_smoothed != value_raw:
+                        updated_indices.append(index)
+                        if var_isotope not in helper_list:
+                            helper_list.append(var_isotope)
+
+            self.container_spikes[var_file][var_isotope]["Indices"] = updated_indices
 
         return helper_list
 
