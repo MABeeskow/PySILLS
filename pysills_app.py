@@ -248,8 +248,8 @@ class PySILLS(tk.Frame):
         self.chemistry_oxides_sorted = {
             "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
             "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO2"],
-            "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["ClO2", "Cl2O3", "Cl2O5", "Cl2O7"], "K": ["K2O"],
-            "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
+            "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["Cl2O", "ClO2", "Cl2O3", "Cl2O5", "Cl2O7"],
+            "K": ["K2O"], "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
             "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3", "MnO2", "MnO3", "Mn2O7"],
             "Fe": ["FeO", "Fe2O3", "FeO3"], "Co": ["CoO", "Co2O3"], "Ni": ["NiO", "Ni2O3"], "Cu": ["Cu2O", "CuO"],
             "Zn": ["ZnO"], "Ga": ["Ga2O3"], "Ge": ["GeO2"], "As": ["As2O3", "As2O5"], "Se": ["SeO2", "SiO3"],
@@ -463,10 +463,15 @@ class PySILLS(tk.Frame):
             self.container_var["Oxides Quantification INCL"]["Minor"][oxide] = tk.IntVar()
             self.container_var["Oxides Quantification INCL"]["Minor"][oxide].set(0)
         for ratio in list_oxideratios:
+            if "Fe" in ratio:
+                value_default = "0.0"
+            else:
+                value_default = "1.0"
+
             self.container_var["Oxides Quantification"]["Ratios"][ratio] = tk.StringVar()
-            self.container_var["Oxides Quantification"]["Ratios"][ratio].set("0.0")
+            self.container_var["Oxides Quantification"]["Ratios"][ratio].set(value_default)
             self.container_var["Oxides Quantification INCL"]["Ratios"][ratio] = tk.StringVar()
-            self.container_var["Oxides Quantification INCL"]["Ratios"][ratio].set("0.0")
+            self.container_var["Oxides Quantification INCL"]["Ratios"][ratio].set(value_default)
 
         # Detailed Data Analysis
         self.container_var["Detailed Data Analysis"] = {
@@ -1082,6 +1087,8 @@ class PySILLS(tk.Frame):
         self.container_lists["ISOTOPES"] = []
         self.container_lists["Measured Isotopes"] = {}
         self.container_lists["Measured Isotopes"]["All"] = []
+        self.container_lists["Possible Oxides"] = {}
+        self.container_lists["Possible Oxides"]["All"] = []
         self.container_lists["Measured Elements"] = {}
         self.container_lists["Measured Elements"]["All"] = []
         self.container_lists["Acquisition Times Delta"] = {}
@@ -8870,6 +8877,755 @@ class PySILLS(tk.Frame):
                     self.temp_lines_checkup2[filetype][filename] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=key_setting)
 
+    def checkup_oxides(self):
+        """Check-up window to control the 100 wt.% oxides setup."""
+        ## Window Settings
+        window_width = 1340
+        window_height = 725
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_checkup_oxides = tk.Toplevel(self.parent)
+        subwindow_checkup_oxides.title("Check-Up - 100 wt.% oxides")
+        subwindow_checkup_oxides.geometry(var_geometry)
+        subwindow_checkup_oxides.resizable(False, False)
+        subwindow_checkup_oxides["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_checkup_oxides, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_checkup_oxides, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_checkup_oxides.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_checkup_oxides.grid_columnconfigure(i, minsize=column_min)
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 10
+        int_category_n = 8
+
+        ## FRAMES
+        frm_01 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=var_column_start, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_02 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_03 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=2*var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_04 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=3*var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_05 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=4*var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_06 = SE(
+            parent=subwindow_checkup_oxides, row_id=15, column_id=var_column_start, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_07 = SE(
+            parent=subwindow_checkup_oxides, row_id=15, column_id=var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_08 = SE(
+            parent=subwindow_checkup_oxides, row_id=15, column_id=2*var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_09 = SE(
+            parent=subwindow_checkup_oxides, row_id=15, column_id=3*var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_10 = SE(
+            parent=subwindow_checkup_oxides, row_id=15, column_id=4*var_header_n, n_rows=12,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        frm_11 = SE(
+            parent=subwindow_checkup_oxides, row_id=13, column_id=var_column_start, n_rows=1,
+            n_columns=5*var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
+            relief=tk.FLAT)
+        frm_12 = SE(
+            parent=subwindow_checkup_oxides, row_id=27, column_id=var_column_start, n_rows=1,
+            n_columns=5*var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
+            relief=tk.FLAT)
+        frm_13 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1, n_rows=3,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
+            relief=tk.FLAT)
+        frm_14 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 2, column_id=5*var_header_n + 1, n_rows=2,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
+            relief=tk.FLAT)
+        frm_15 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 5, column_id=5*var_header_n + 1, n_rows=2,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
+            relief=tk.FLAT)
+        frm_16 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 9, column_id=5*var_header_n + 1, n_rows=4,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
+            relief=tk.FLAT)
+
+        ## LABELS sex
+        lbl_01 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Alkali metals", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_02 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Alkaline earth metals", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_03 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=2*var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Transition metals", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_04 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=3*var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Other metals", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_05 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=4*var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Metalloids", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_06 = SE(
+            parent=subwindow_checkup_oxides, row_id=14, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Lanthanides", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_07 = SE(
+            parent=subwindow_checkup_oxides, row_id=14, column_id=var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Actinides", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_08 = SE(
+            parent=subwindow_checkup_oxides, row_id=14, column_id=2*var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Non-metals", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_09 = SE(
+            parent=subwindow_checkup_oxides, row_id=14, column_id=3*var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Halogens", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_10 = SE(
+            parent=subwindow_checkup_oxides, row_id=14, column_id=4*var_header_n, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Noble gases", relief=tk.FLAT, fontsize="sans 12 bold")
+        lbl_11 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Setup - Oxide ratios", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+        lbl_11a = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Matrix/Sample", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_11b = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 2, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="FeO/(FeO + Fe2O3)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_11c = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 3, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="MnO/(MnO + Mn2O3)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_11d = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 4, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Inclusion", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_11e = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 5, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="FeO/(FeO + Fe2O3)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_11f = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 6, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="MnO/(MnO + Mn2O3)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_12 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 8, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Setup - Reference element", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+        lbl_12a = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 9, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Matrix quantification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_12b = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 11, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Inclusion quantification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_13 = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 14, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Setup - Oxide selection", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+        lbl_13a = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Select all oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_13b = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Deselect all oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_13c = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 17, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Guess composition", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        ## BUTTONS
+        btn_01 = SE(
+            parent=subwindow_checkup_oxides, row_id=13, column_id=int(0.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_02 = SE(
+            parent=subwindow_checkup_oxides, row_id=13, column_id=int(1.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_03 = SE(
+            parent=subwindow_checkup_oxides, row_id=13, column_id=int(2.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_04 = SE(
+            parent=subwindow_checkup_oxides, row_id=13, column_id=int(3.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_05 = SE(
+            parent=subwindow_checkup_oxides, row_id=13, column_id=int(4.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_06 = SE(
+            parent=subwindow_checkup_oxides, row_id=27, column_id=int(0.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_07 = SE(
+            parent=subwindow_checkup_oxides, row_id=27, column_id=int(1.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_08 = SE(
+            parent=subwindow_checkup_oxides, row_id=27, column_id=int(2.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_09 = SE(
+            parent=subwindow_checkup_oxides, row_id=27, column_id=int(3.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_10 = SE(
+            parent=subwindow_checkup_oxides, row_id=27, column_id=int(4.5*var_header_n), n_rows=1,
+            n_columns=int(0.5*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_13a = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.select_all_oxides)
+        btn_13b = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.deselect_all_oxides)
+        btn_13c = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 17, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_13c.configure(state="disabled")
+
+        ## ENTRIES
+        var_entr_mat_fe = self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"]
+        var_entr_mat_mn = self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"]
+        var_entr_incl_fe = self.container_var["Oxides Quantification INCL"]["Ratios"]["Fe-Ratio"]
+        var_entr_incl_mn = self.container_var["Oxides Quantification INCL"]["Ratios"]["Mn-Ratio"]
+
+        entr_mat_fe = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 2, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_mat_fe, text_default=var_entr_mat_fe.get())
+        # entr_mat_fe.bind(
+        #     "<Return>", lambda event, var_entr=var_entr_mat_fe, mode="MAT":
+        #     self.change_default_is_value(var_entr, mode, event))
+        entr_mat_mn = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 3, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_mat_mn, text_default=var_entr_mat_mn.get())
+        # entr_mat_mn.bind(
+        #     "<Return>", lambda event, var_entr=var_entr_mat_mn, mode="MAT":
+        #     self.change_default_is_value(var_entr, mode, event))
+
+        entr_incl_fe = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 5, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_incl_fe, text_default=var_entr_incl_fe.get())
+        # entr_incl_fe.bind(
+        #     "<Return>", lambda event, var_entr=var_entr_incl_fe, mode="MAT":
+        #     self.change_default_is_value(var_entr, mode, event))
+        entr_incl_mn = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 6, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_incl_mn, text_default=var_entr_incl_mn.get())
+        # entr_incl_mn.bind(
+        #     "<Return>", lambda event, var_entr=var_entr_incl_mn, mode="MAT":
+        #     self.change_default_is_value(var_entr, mode, event))
+
+        ## TREEVIEWS
+        list_major_oxides = [
+            "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "Mn2O3", "SO3"]
+        # Alkali metals
+        vsb_01 = ttk.Scrollbar(master=frm_01, orient="vertical")
+        text_01 = tk.Text(
+            master=frm_01, width=30, height=25, yscrollcommand=vsb_01.set, bg=self.bg_colors["Very Light"])
+        vsb_01.config(command=text_01.yview)
+        vsb_01.pack(side="right", fill="y")
+        text_01.pack(side="left", fill="both", expand=True)
+        counter_01 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["Li", "Na", "K", "Rb", "Cs", "Fr"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+
+                    cb_i = tk.Checkbutton(
+                        master=frm_01, text=oxide, fg=self.bg_colors["Dark Font"],
+                        bg=self.bg_colors["Very Light"], variable=var_cb)
+                    text_01.window_create("end", window=cb_i)
+                    text_01.insert("end", "\n")
+                    counter_01 += 1
+                    if element not in self.container_lists["Possible Oxides"]:
+                        self.container_lists["Possible Oxides"][element] = []
+                    self.container_lists["Possible Oxides"]["All"].append(oxide)
+                    self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Alkaline earth metals
+        vsb_02 = ttk.Scrollbar(master=frm_02, orient="vertical")
+        text_02 = tk.Text(
+            master=frm_02, width=30, height=25, yscrollcommand=vsb_02.set, bg=self.bg_colors["Very Light"])
+        vsb_02.config(command=text_02.yview)
+        vsb_02.pack(side="right", fill="y")
+        text_02.pack(side="left", fill="both", expand=True)
+        counter_02 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["Be", "Mg", "Ca", "Sr", "Ba", "Ra"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+
+                    cb_i = tk.Checkbutton(
+                        master=frm_02, text=oxide, fg=self.bg_colors["Dark Font"],
+                        bg=self.bg_colors["Very Light"], variable=var_cb)
+                    text_02.window_create("end", window=cb_i)
+                    text_02.insert("end", "\n")
+                    counter_02 += 1
+                    if element not in self.container_lists["Possible Oxides"]:
+                        self.container_lists["Possible Oxides"][element] = []
+                    self.container_lists["Possible Oxides"]["All"].append(oxide)
+                    self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Transition metals
+        vsb_03 = ttk.Scrollbar(master=frm_03, orient="vertical")
+        text_03 = tk.Text(
+            master=frm_03, width=30, height=25, yscrollcommand=vsb_03.set, bg=self.bg_colors["Very Light"])
+        vsb_03.config(command=text_03.yview)
+        vsb_03.pack(side="right", fill="y")
+        text_03.pack(side="left", fill="both", expand=True)
+        counter_03 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Y", "Zr", "Nb", "Mo", "Tc", "Ru",
+                           "Rh", "Pd", "Ag", "Cd", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Rf", "Db",
+                           "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_03, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_03.window_create("end", window=cb_i)
+                        text_03.insert("end", "\n")
+                        counter_03 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Other metals
+        vsb_04 = ttk.Scrollbar(master=frm_04, orient="vertical")
+        text_04 = tk.Text(
+            master=frm_04, width=30, height=25, yscrollcommand=vsb_04.set, bg=self.bg_colors["Very Light"])
+        vsb_04.config(command=text_04.yview)
+        vsb_04.pack(side="right", fill="y")
+        text_04.pack(side="left", fill="both", expand=True)
+        counter_04 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["Al", "Ga", "In", "Sn", "Tl", "Pb", "Bi", "Nh", "Fl", "Mc", "Lv"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_04, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_04.window_create("end", window=cb_i)
+                        text_04.insert("end", "\n")
+                        counter_04 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Metalloids
+        vsb_05 = ttk.Scrollbar(master=frm_05, orient="vertical")
+        text_05 = tk.Text(
+            master=frm_05, width=30, height=25, yscrollcommand=vsb_05.set, bg=self.bg_colors["Very Light"])
+        vsb_05.config(command=text_05.yview)
+        vsb_05.pack(side="right", fill="y")
+        text_05.pack(side="left", fill="both", expand=True)
+        counter_05 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["B", "Si", "Ge", "As", "Sb", "Te", "Po"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_05, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_05.window_create("end", window=cb_i)
+                        text_05.insert("end", "\n")
+                        counter_05 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Lanthanides
+        vsb_06 = ttk.Scrollbar(master=frm_06, orient="vertical")
+        text_06 = tk.Text(
+            master=frm_06, width=30, height=25, yscrollcommand=vsb_06.set, bg=self.bg_colors["Very Light"])
+        vsb_06.config(command=text_06.yview)
+        vsb_06.pack(side="right", fill="y")
+        text_06.pack(side="left", fill="both", expand=True)
+        counter_06 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["La", "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Lu"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_06, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_06.window_create("end", window=cb_i)
+                        text_06.insert("end", "\n")
+                        counter_06 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Actinides
+        vsb_07 = ttk.Scrollbar(master=frm_07, orient="vertical")
+        text_07 = tk.Text(
+            master=frm_07, width=30, height=25, yscrollcommand=vsb_07.set, bg=self.bg_colors["Very Light"])
+        vsb_07.config(command=text_07.yview)
+        vsb_07.pack(side="right", fill="y")
+        text_07.pack(side="left", fill="both", expand=True)
+        counter_07 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["Ac", "Th", "Pa", "U", "Np", "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No", "Lr"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_07, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_07.window_create("end", window=cb_i)
+                        text_07.insert("end", "\n")
+                        counter_07 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Non-metals
+        vsb_08 = ttk.Scrollbar(master=frm_08, orient="vertical")
+        text_08 = tk.Text(
+            master=frm_08, width=30, height=25, yscrollcommand=vsb_08.set, bg=self.bg_colors["Very Light"])
+        vsb_08.config(command=text_08.yview)
+        vsb_08.pack(side="right", fill="y")
+        text_08.pack(side="left", fill="both", expand=True)
+        counter_08 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["H", "C", "N", "O", "P", "S", "Se"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_08, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_08.window_create("end", window=cb_i)
+                        text_08.insert("end", "\n")
+                        counter_08 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Halogens
+        vsb_09 = ttk.Scrollbar(master=frm_09, orient="vertical")
+        text_09 = tk.Text(
+            master=frm_09, width=30, height=25, yscrollcommand=vsb_09.set, bg=self.bg_colors["Very Light"])
+        vsb_09.config(command=text_09.yview)
+        vsb_09.pack(side="right", fill="y")
+        text_09.pack(side="left", fill="both", expand=True)
+        counter_09 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["F", "Cl", "Br", "I", "At", "Ts"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_09, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_09.window_create("end", window=cb_i)
+                        text_09.insert("end", "\n")
+                        counter_09 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        # Noble gases
+        vsb_10 = ttk.Scrollbar(master=frm_10, orient="vertical")
+        text_10 = tk.Text(
+            master=frm_10, width=30, height=25, yscrollcommand=vsb_10.set, bg=self.bg_colors["Very Light"])
+        vsb_10.config(command=text_10.yview)
+        vsb_10.pack(side="right", fill="y")
+        text_10.pack(side="left", fill="both", expand=True)
+        counter_10 = 0
+        for index, element in enumerate(self.container_lists["Measured Elements"]["All"]):
+            if element in ["He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og"]:
+                for oxide in self.chemistry_oxides_sorted[element]:
+                    bool_problem = False
+                    if oxide in list_major_oxides:
+                        var_cb = self.container_var["Oxides Quantification"]["Major"][oxide]
+                    else:
+                        if oxide in self.container_var["Oxides Quantification"]["Minor"]:
+                            var_cb = self.container_var["Oxides Quantification"]["Minor"][oxide]
+                        else:
+                            bool_problem = True
+
+                    if bool_problem == False:
+                        cb_i = tk.Checkbutton(
+                            master=frm_10, text=oxide, fg=self.bg_colors["Dark Font"],
+                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                        text_10.window_create("end", window=cb_i)
+                        text_10.insert("end", "\n")
+                        counter_10 += 1
+                        if element not in self.container_lists["Possible Oxides"]:
+                            self.container_lists["Possible Oxides"][element] = []
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+        if counter_01 == 0:
+            btn_01.configure(state="disabled")
+        if counter_02 == 0:
+            btn_02.configure(state="disabled")
+        if counter_03 == 0:
+            btn_03.configure(state="disabled")
+        if counter_04 == 0:
+            btn_04.configure(state="disabled")
+        if counter_05 == 0:
+            btn_05.configure(state="disabled")
+        if counter_06 == 0:
+            btn_06.configure(state="disabled")
+        if counter_07 == 0:
+            btn_07.configure(state="disabled")
+        if counter_08 == 0:
+            btn_08.configure(state="disabled")
+        if counter_09 == 0:
+            btn_09.configure(state="disabled")
+        if counter_10 == 0:
+            btn_10.configure(state="disabled")
+
+        ## OPTION MENUS
+        var_opt_mat_oxide = tk.StringVar()
+        var_opt_mat_oxide.set("Select oxide")
+        var_opt_mat_element = tk.StringVar()
+        var_opt_mat_element.set("Select element")
+        var_opt_incl_oxide = tk.StringVar()
+        var_opt_incl_oxide.set("Select oxide")
+        var_opt_incl_element = tk.StringVar()
+        var_opt_incl_element.set("Select element")
+
+        list_mat_oxides = sorted(self.container_lists["Possible Oxides"]["All"]).copy()
+        list_mat_elements = sorted(self.container_lists["Measured Elements"]["All"]).copy()
+        list_incl_oxides = sorted(self.container_lists["Possible Oxides"]["All"]).copy()
+        list_incl_elements = sorted(self.container_lists["Measured Elements"]["All"]).copy()
+
+        opt_mat_oxide = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 9, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=var_opt_mat_oxide, option_list=list_mat_oxides, text_set=var_opt_mat_oxide.get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_mat_oxide["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_mat_oxide.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        opt_mat_element = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 10, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=var_opt_mat_element, option_list=list_mat_elements, text_set=var_opt_mat_element.get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_mat_element["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_mat_element.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        opt_incl_oxide = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 11, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=var_opt_incl_oxide, option_list=list_incl_oxides, text_set=var_opt_incl_oxide.get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_incl_oxide["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_incl_oxide.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+        opt_incl_element = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 12, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_option_isotope(
+            var_iso=var_opt_incl_element, option_list=list_incl_elements, text_set=var_opt_incl_element.get(),
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+        opt_incl_element["menu"].config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color)
+        opt_incl_element.config(
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
+            activeforeground=self.bg_colors["Dark Font"],
+            activebackground=self.accent_color, highlightthickness=0)
+
+    def select_all_oxides(self):
+        for oxide, variable in self.container_var["Oxides Quantification"]["Major"].items():
+            if oxide in self.container_lists["Possible Oxides"]["All"]:
+                variable.set(1)
+        for oxide, variable in self.container_var["Oxides Quantification"]["Minor"].items():
+            if oxide in self.container_lists["Possible Oxides"]["All"]:
+                variable.set(1)
+
+    def deselect_all_oxides(self):
+        for oxide, variable in self.container_var["Oxides Quantification"]["Major"].items():
+            if oxide in self.container_lists["Possible Oxides"]["All"]:
+                variable.set(0)
+        for oxide, variable in self.container_var["Oxides Quantification"]["Minor"].items():
+            if oxide in self.container_lists["Possible Oxides"]["All"]:
+                variable.set(0)
+
     def checkup_internal_standard(self):
         """Check-up window to control the internal standard setup."""
         ## Window Settings
@@ -12160,7 +12916,7 @@ class PySILLS(tk.Frame):
             else:
                 key_element = re.search("(\D+)(\d+)", isotope)
                 element = key_element.group(1)
-                #
+
                 if element not in self.container_lists["Elements"]:
                     self.container_lists["Elements"].append(element)
                 if element not in self.container_lists["Measured Elements"]:
@@ -12664,7 +13420,7 @@ class PySILLS(tk.Frame):
             n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
             relief=tk.FLAT)
 
-        # LABELS
+        # LABELS sex
         lbl_01 = SE(
             parent=self.subwindow_oxides_composition, row_id=var_row_start, column_id=var_column_start,
             n_rows=var_row_n, n_columns=4*var_header_n + 3, fg=self.bg_colors["Light Font"],
@@ -13005,7 +13761,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
-        # OPTION MENUS
+        # OPTION MENUS sex
         list_opt04a = sorted(self.container_lists["Selected Oxides"]["All"])
         if focus == "MAT":
             var_opt_04 = self.container_var[var_setting_key]["Oxide"]
@@ -13868,16 +14624,20 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Internal Standard", relief=var_relief, fontsize="sans 10 bold")
-        lbl_10c = SE(
+        lbl_10b = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
+            n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="100 wt.% oxides", relief=var_relief, fontsize="sans 10 bold")
+        lbl_10c = SE(
+            parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Calculation Intervals", relief=var_relief, fontsize="sans 10 bold")
         lbl_10d = SE(
-            parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Acquisition Times", relief=var_relief, fontsize="sans 10 bold")
         lbl_10e = SE(
-            parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start, n_rows=var_row_n,
+            parent=var_parent, row_id=var_row_start + 6, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Imported Files", relief=var_relief, fontsize="sans 10 bold")
 
@@ -13894,20 +14654,26 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.checkup_internal_standard)  # Check-Up - Internal Standard Settings
-        btn_10c = SE(
+        btn_10b = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start + var_category_n,
+            n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.checkup_oxides)  # Check-Up - 100 wt.% oxides
+        btn_10c = SE(
+            parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_interval_settings)  # Check-Up - Calculation Interval Settings
         btn_10d = SE(
-            parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_acquisition_times)  # Check-Up - Acquisition Times
         btn_10e = SE(
-            parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start + var_category_n,
+            parent=var_parent, row_id=var_row_start + 6, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
