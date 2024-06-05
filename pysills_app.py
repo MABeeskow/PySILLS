@@ -347,7 +347,7 @@ class PySILLS(tk.Frame):
                 self.container_gui[menu][gui_category] = {}
                 self.container_gui[menu][gui_category]["General"] = []
                 self.container_gui[menu][gui_category]["Specific"] = []
-        #
+
         ## SUBWINDOWS
         self.gui_subwindows = {}
         main_categories = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions"]
@@ -355,7 +355,7 @@ class PySILLS(tk.Frame):
         gui_elements = ["Frame", "Label", "Button", "Entry", "Checkbox", "Radiobutton", "Option Menu", "Listbox",
                         "Treeview"]
         priorities = ["Permanent", "Temporary"]
-        #
+
         for main_category in main_categories:
             self.gui_subwindows[main_category] = {}
             for sub_category in sub_categories:
@@ -364,7 +364,7 @@ class PySILLS(tk.Frame):
                     self.gui_subwindows[main_category][sub_category][gui_element] = {}
                     for priority in priorities:
                         self.gui_subwindows[main_category][sub_category][gui_element][priority] = []
-        #
+
         ## Container (Variables)
         categories = ["main"]
         subcategories = ["Label", "Entry", "Radiobutton", "Checkbox"]
@@ -9227,7 +9227,7 @@ class PySILLS(tk.Frame):
         ## TREEVIEWS
         list_mat_isotopes = self.container_lists["Measured Isotopes"]["All"].copy()
         list_incl_isotopes = self.container_lists["Measured Isotopes"]["All"].copy()
-        # File setup (matrix/sample) sex
+        # File setup (matrix/sample)
         vsb_17 = ttk.Scrollbar(master=frm_17, orient="vertical")
         text_17 = tk.Text(
             master=frm_17, width=30, height=25, yscrollcommand=vsb_17.set, bg=self.bg_colors["Very Light"])
@@ -13843,7 +13843,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Import Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
-        # OPTION MENUS sex
+        # OPTION MENUS
         list_opt04a = sorted(self.container_lists["Selected Oxides"]["All"])
         if focus == "MAT":
             var_opt_04 = self.container_var[var_setting_key]["Oxide"]
@@ -17700,6 +17700,59 @@ class PySILLS(tk.Frame):
 
             self.canvas_specific_ratio.draw()
 
+    def check_results_oxide_normalization(self, var_filename):
+        sum_oxides_mat = 0
+        sum_oxides_incl = 0
+
+        file_isotopes = self.container_lists["Measured Isotopes"][var_filename]
+        for isotope in file_isotopes:
+            key = re.search("(\D+)(\d*)", isotope)
+            element = key.group(1)
+            if self.pysills_mode in ["MA", "FI"]:
+                concentration_mat_i = self.container_concentration["SMPL"]["RAW"][var_filename]["MAT"][isotope]
+                for oxide in self.container_lists["Possible Oxides"][element]:
+                    if element == "Fe":
+                        factor = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
+                        concentration_oxide_mat_i = (factor*self.conversion_factors[oxide]*concentration_mat_i*
+                                                     10**(-4))
+                    elif element == "Mn":
+                        factor = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
+                        concentration_oxide_mat_i = (factor*self.conversion_factors[oxide]*concentration_mat_i*
+                                                     10**(-4))
+                    else:
+                        concentration_oxide_mat_i = self.conversion_factors[oxide]*concentration_mat_i*10**(-4)
+
+                    sum_oxides_mat += concentration_oxide_mat_i
+            else:
+                concentration_mat_i = self.container_concentration["SMPL"]["RAW"][var_filename]["MAT"][isotope]
+                concentration_incl_i = self.container_concentration["SMPL"]["RAW"][var_filename]["INCL"][isotope]
+                for oxide in self.container_lists["Possible Oxides"][element]:
+                    if element == "Fe":
+                        factor = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Fe-Ratio"].get())
+                        concentration_oxide_mat_i = (factor*self.conversion_factors[oxide]*concentration_mat_i*
+                                                     10**(-4))
+                        concentration_oxide_incl_i = (factor*self.conversion_factors[oxide]*concentration_incl_i*
+                                                      10**(-4))
+                    elif element == "Mn":
+                        factor = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Mn-Ratio"].get())
+                        concentration_oxide_mat_i = (factor*self.conversion_factors[oxide]*concentration_mat_i*
+                                                     10**(-4))
+                        concentration_oxide_incl_i = (factor*self.conversion_factors[oxide]*concentration_incl_i*
+                                                      10**(-4))
+                    else:
+                        concentration_oxide_mat_i = self.conversion_factors[oxide]*concentration_mat_i*10**(-4)
+                        concentration_oxide_incl_i = self.conversion_factors[oxide]*concentration_incl_i*10**(-4)
+
+                    sum_oxides_mat += concentration_oxide_mat_i
+                    sum_oxides_incl += concentration_oxide_incl_i
+
+        print("")
+        print("Results - plausibility check (100 wt.% oxides calculation)")
+        print("File:", var_filename)
+        print("Sum(oxides, matrix/sample):", round(sum_oxides_mat, 4), round(sum_oxides_mat - 100, 4), "%")
+        if self.pysills_mode == "MI":
+            print("Sum(oxides, inclusion):", round(sum_oxides_incl, 4), round(sum_oxides_incl - 100, 4), "%")
+
     def ma_show_quick_results(self, var_file, var_type):
         #
         parts = var_file.split("/")
@@ -20958,6 +21011,8 @@ class PySILLS(tk.Frame):
                         if isotope == var_is:
                             self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Concentration"].set(
                                 var_result_i)
+
+        self.check_results_oxide_normalization(var_filename=filename_short)
 
     def ma_get_concentration_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                    mode="Specific"):
