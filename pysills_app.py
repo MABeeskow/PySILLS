@@ -20947,6 +20947,18 @@ class PySILLS(tk.Frame):
             var_d = np.nan
 
         largest_value = {"Isotope": None, "Value": 0, "Oxide": None}
+        value_is = {"Isotope": None, "Value": 0, "Oxide": None}
+        index = self.container_lists[filetype]["Short"].index(filename_short)
+        filename_long = self.container_lists[filetype]["Long"][index]
+
+        if self.pysills_mode == "MA":
+            var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+        else:
+            if focus == "MAT":
+                var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+            else:
+                var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+
         for oxide, oxide_container in helper_oxides.items():
             for isotope in oxide_container["Isotopes"]:
                 var_e = oxide_container["b"][isotope]*var_d
@@ -20962,8 +20974,14 @@ class PySILLS(tk.Frame):
                     largest_value["Value"] = var_concentration_i
                     largest_value["Oxide"] = oxide
 
+                if isotope == var_is:
+                    value_is["Isotope"] = isotope
+                    value_is["Value"] = var_concentration_i
+                    value_is["Oxide"] = oxide
+
         element_largest_oxide = helper_oxides[largest_value["Oxide"]]["Element"]
         max_amount_element = self.maximum_amounts[element_largest_oxide]
+
         if largest_value["Value"] > max_amount_element:
             correction_factor = max_amount_element/largest_value["Value"]
             for oxide, oxide_container in helper_oxides.items():
