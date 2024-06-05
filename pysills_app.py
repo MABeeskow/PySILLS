@@ -13428,30 +13428,8 @@ class PySILLS(tk.Frame):
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_matrix_concentration_setup)
         elif str_method == "100 wt.% Oxides":
-            str_focus = focus
-            # LABELS
-            str_lbl_01 = self.language_dict["Oxide Setup"][self.var_language]
-            str_btn_01 = self.language_dict["Composition Setup"][self.var_language]
-            str_btn_02 = self.language_dict["File-specific Setup"][self.var_language]
-
-            lbl_01 = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_column_start,
-                n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
-                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
-            # BUTTONS
-            btn_01a = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
-                column_id=var_column_start, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=lambda focus=str_focus: self.oxides_setup_composition(focus))
-            btn_01b = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
-                column_id=var_header_n + 1, n_rows=2, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_simple_button(
-                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=lambda focus=str_focus: self.oxides_setup_files(focus))
+            self.subwindow_mineral_matrix_quantification.destroy()
+            self.checkup_oxides()
 
     def oxides_setup_composition(self, focus="MAT"):
         # Window Settings
@@ -14254,12 +14232,19 @@ class PySILLS(tk.Frame):
                     self.btn_setup_100pct.grid_remove()
         elif var_opt == "100 wt.% Oxides":
             if self.bool_incl_is_100pct == False:
+                # self.btn_setup_100pct = SE(
+                #     parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
+                #     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
+                #     bg=self.bg_colors["Light"]).create_simple_button(
+                #     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                #     command=lambda focus="INCL": self.mineral_matrix_quantification(focus))
                 self.btn_setup_100pct = SE(
                     parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
                     n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
                     bg=self.bg_colors["Light"]).create_simple_button(
                     text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                    command=lambda focus="INCL": self.mineral_matrix_quantification(focus))
+                    command=self.checkup_oxides)
+
                 self.bool_incl_is_100pct = True
                 self.str_incl_is_custom_external = "100 wt.% Oxides"
             else:
@@ -23016,57 +23001,6 @@ class PySILLS(tk.Frame):
             self.container_var["SRM"]["I127"].set("Scapolite 17")
 
         self.build_srm_database()
-
-        # ## INITIALIZATION
-        # self.select_spike_elimination(
-        #     var_opt=self.container_var["Spike Elimination Method"].get(),
-        #     start_row=var_spike_elimination_setup["Row start"], mode="FI")
-        #
-        # if self.file_loaded:
-        #     self.fi_select_srm_initialization()
-        #
-        #     for filetype in ["STD", "SMPL"]:
-        #         if self.container_var["Spike Elimination"][filetype]["State"]:
-        #             if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs-Test",
-        #                                                                         "PySILLS Spike Finder"]:
-        #                 var_method = "Grubbs"
-        #                 self.spike_elimination_all(filetype=filetype, algorithm=var_method)
-        # else:
-        #     self.select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
-        #     self.select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
-        #
-        #     if self.container_var["SRM"]["default"][0].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #     if self.container_var["SRM"]["default"][1].get() != "Select SRM":
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #     if self.demo_mode:
-        #         self.container_var["SRM"]["default"][0].set("NIST 610 (GeoReM)")
-        #         self.container_var["SRM"]["default"][1].set("NIST 610 (GeoReM)")
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][0].get())
-        #         self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
-        #
-        # if self.demo_mode:
-        #     for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
-        #         self.container_var["STD"][filename_std_long]["SRM"].set("NIST 610 (GeoReM)")
-        #         if index in [3, 4, 8, 9]:
-        #             self.container_var["STD"][filename_std_long]["SRM"].set("Scapolite 17")
-        #
-        #     for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
-        #         self.container_var["SMPL"][filename_smpl_long]["IS Data"]["IS"].set("Ca43")
-        #
-        #     self.container_var["SRM"]["Cl35"].set("Scapolite 17")
-        #     self.container_var["SRM"]["Br81"].set("Scapolite 17")
-        #     self.container_var["SRM"]["I127"].set("Scapolite 17")
-        #
-        # self.build_srm_database()
-        # self.file_system_need_update = False
-        #
-        # self.select_opt_inclusion_is_quantification(
-        #     var_opt="100 wt.% Oxides", dict_geometry_info=var_quantification_method)
-        # self.select_opt_inclusion_quantification(
-        #     var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
-        #
-        # self.btn_save_project.configure(state="normal")
 
     def change_rb_inclusion_setup(self):
         if self.pysills_mode == "FI":
