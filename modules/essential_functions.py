@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		23.05.2024
+# Date:		27.05.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ class Essentials:
                 if val_poi > val_critical:
                     if value_outlier in average_dataset_new["All"]:
                         value_corrected = np.mean(average_dataset_new["SP"])
-                        data_smoothed[index_outlier] = value_corrected
+                        data_smoothed[index_outlier] = round(value_corrected, 2)
 
         return data_smoothed, outlier_indices
 
