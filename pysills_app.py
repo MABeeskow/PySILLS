@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		05.06.2024
+# Date:		06.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -150,7 +150,7 @@ class PySILLS(tk.Frame):
             "Sm2O3": 348.717, "Ta2O5": 441.895, "Tb2O3": 365.857, "Tb4O7": 747.713, "TeO3": 175.597, "ThO2": 264.038,
             "Tl2O3": 456.757, "Tm2O3": 385.857, "UO2": 270.048, "UO3": 286.047, "U3O8": 842.142, "V2O5": 181.879,
             "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222, "I2O4": 317.796, "I2O5": 333.795, "I4O9": 651.591,
-            "I2O": 269.799, "Ni2O3": 165.383}
+            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863}
 
         self.conversion_factors = {
             "SiO2": round((self.chemistry_data["Si"]/self.chemistry_data_oxides["SiO2"])**(-1), 4),
@@ -243,7 +243,9 @@ class PySILLS(tk.Frame):
             "I2O4": round((2*self.chemistry_data["I"]/self.chemistry_data_oxides["I2O4"])**(-1), 4),
             "I2O5": round((2*self.chemistry_data["I"]/self.chemistry_data_oxides["I2O5"])**(-1), 4),
             "I4O9": round((4*self.chemistry_data["I"]/self.chemistry_data_oxides["I4O9"])**(-1), 4),
-            "I2O": round((2*self.chemistry_data["I"]/self.chemistry_data_oxides["I2O"])**(-1), 4)}
+            "I2O": round((2*self.chemistry_data["I"]/self.chemistry_data_oxides["I2O"])**(-1), 4),
+            "Co2O3": round((2*self.chemistry_data["Co"]/self.chemistry_data_oxides["Co2O3"])**(-1), 4),
+            "Ni2O3": round((2*self.chemistry_data["Ni"]/self.chemistry_data_oxides["Ni2O3"])**(-1), 4)}
 
         self.chemistry_oxides_sorted = {
             "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
@@ -428,7 +430,7 @@ class PySILLS(tk.Frame):
             "SiO2", "TiO2", "Al2O3", "FeO", "Fe2O3", "MnO", "Mn2O3", "MgO", "CaO", "Na2O", "K2O", "P2O5", "SO3"]
         list_industrial_metal_oxides = [
             "CrO", "Cr2O3", "NiO", "Ni2O3", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO2", "MoO3", "V2O5", "ZrO2",
-            "Nb2O5", "HfO2", "Ta2O5"]
+            "Nb2O5", "HfO2", "Ta2O5", "Co2O3"]
         list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
         list_rareearth_metals = [
             "Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3", "Dy2O3", "Er2O3", "Yb2O3",
@@ -9335,8 +9337,11 @@ class PySILLS(tk.Frame):
                     counter_01 += 1
                     if element not in self.container_lists["Possible Oxides"]:
                         self.container_lists["Possible Oxides"][element] = []
-                    self.container_lists["Possible Oxides"]["All"].append(oxide)
-                    self.container_lists["Possible Oxides"][element].append(oxide)
+
+                    if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                    if oxide not in self.container_lists["Possible Oxides"][element]:
+                        self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Alkaline earth metals
         vsb_02 = ttk.Scrollbar(master=frm_02, orient="vertical")
@@ -9362,8 +9367,11 @@ class PySILLS(tk.Frame):
                     counter_02 += 1
                     if element not in self.container_lists["Possible Oxides"]:
                         self.container_lists["Possible Oxides"][element] = []
-                    self.container_lists["Possible Oxides"]["All"].append(oxide)
-                    self.container_lists["Possible Oxides"][element].append(oxide)
+
+                    if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                        self.container_lists["Possible Oxides"]["All"].append(oxide)
+                    if oxide not in self.container_lists["Possible Oxides"][element]:
+                        self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Transition metals
         vsb_03 = ttk.Scrollbar(master=frm_03, orient="vertical")
@@ -9396,8 +9404,11 @@ class PySILLS(tk.Frame):
                         counter_03 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Other metals
         vsb_04 = ttk.Scrollbar(master=frm_04, orient="vertical")
@@ -9428,8 +9439,11 @@ class PySILLS(tk.Frame):
                         counter_04 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Metalloids
         vsb_05 = ttk.Scrollbar(master=frm_05, orient="vertical")
@@ -9460,8 +9474,11 @@ class PySILLS(tk.Frame):
                         counter_05 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Lanthanides
         vsb_06 = ttk.Scrollbar(master=frm_06, orient="vertical")
@@ -9492,8 +9509,11 @@ class PySILLS(tk.Frame):
                         counter_06 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Actinides
         vsb_07 = ttk.Scrollbar(master=frm_07, orient="vertical")
@@ -9524,8 +9544,11 @@ class PySILLS(tk.Frame):
                         counter_07 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Non-metals
         vsb_08 = ttk.Scrollbar(master=frm_08, orient="vertical")
@@ -9556,8 +9579,11 @@ class PySILLS(tk.Frame):
                         counter_08 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Halogens
         vsb_09 = ttk.Scrollbar(master=frm_09, orient="vertical")
@@ -9588,8 +9614,11 @@ class PySILLS(tk.Frame):
                         counter_09 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         # Noble gases
         vsb_10 = ttk.Scrollbar(master=frm_10, orient="vertical")
@@ -9620,8 +9649,11 @@ class PySILLS(tk.Frame):
                         counter_10 += 1
                         if element not in self.container_lists["Possible Oxides"]:
                             self.container_lists["Possible Oxides"][element] = []
-                        self.container_lists["Possible Oxides"]["All"].append(oxide)
-                        self.container_lists["Possible Oxides"][element].append(oxide)
+
+                        if oxide not in self.container_lists["Possible Oxides"]["All"]:
+                            self.container_lists["Possible Oxides"]["All"].append(oxide)
+                        if oxide not in self.container_lists["Possible Oxides"][element]:
+                            self.container_lists["Possible Oxides"][element].append(oxide)
 
         if counter_01 == 0:
             btn_01.configure(state="disabled")
@@ -9682,7 +9714,7 @@ class PySILLS(tk.Frame):
             activeforeground=self.bg_colors["Dark Font"],
             activebackground=self.accent_color, highlightthickness=0)
 
-        if self.pysills_mode == "MA":
+        if self.pysills_mode in ["MA", "FI"]:
             opt_incl_isotope.configure(state="disabled")
 
         ## CHECKBOXES
@@ -9697,7 +9729,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_checkbox(
             var_cb=self.oxide_calculation_incl, text="Inclusion", set_sticky="nesw", own_color=True)
 
-        if self.pysills_mode == "MA":
+        if self.pysills_mode in ["MA", "FI"]:
             cb_02.configure(state="disabled")
 
     def select_reference_isotope(self, var_opt, mode="MAT"):
@@ -9715,11 +9747,13 @@ class PySILLS(tk.Frame):
         for oxide, variable in self.container_var["Oxides Quantification"]["Major"].items():
             if oxide in self.container_lists["Possible Oxides"]["All"]:
                 variable.set(1)
-                self.container_lists["Selected Oxides"]["All"].append(oxide)
+                if oxide not in self.container_lists["Selected Oxides"]["All"]:
+                    self.container_lists["Selected Oxides"]["All"].append(oxide)
         for oxide, variable in self.container_var["Oxides Quantification"]["Minor"].items():
             if oxide in self.container_lists["Possible Oxides"]["All"]:
                 variable.set(1)
-                self.container_lists["Selected Oxides"]["All"].append(oxide)
+                if oxide not in self.container_lists["Selected Oxides"]["All"]:
+                    self.container_lists["Selected Oxides"]["All"].append(oxide)
 
     def deselect_all_oxides(self):
         self.container_lists["Selected Oxides"]["All"].clear()
@@ -17722,7 +17756,8 @@ class PySILLS(tk.Frame):
                     else:
                         concentration_oxide_mat_i = self.conversion_factors[oxide]*concentration_mat_i*10**(-4)
 
-                    sum_oxides_mat += concentration_oxide_mat_i
+                    if np.isnan(concentration_oxide_mat_i) == False:
+                        sum_oxides_mat += concentration_oxide_mat_i
             else:
                 concentration_mat_i = self.container_concentration["SMPL"]["RAW"][var_filename]["MAT"][isotope]
                 concentration_incl_i = self.container_concentration["SMPL"]["RAW"][var_filename]["INCL"][isotope]
@@ -17743,8 +17778,11 @@ class PySILLS(tk.Frame):
                         concentration_oxide_mat_i = self.conversion_factors[oxide]*concentration_mat_i*10**(-4)
                         concentration_oxide_incl_i = self.conversion_factors[oxide]*concentration_incl_i*10**(-4)
 
-                    sum_oxides_mat += concentration_oxide_mat_i
-                    sum_oxides_incl += concentration_oxide_incl_i
+                    if np.isnan(concentration_oxide_mat_i) == False:
+                        sum_oxides_mat += concentration_oxide_mat_i
+
+                    if np.isnan(concentration_oxide_incl_i) == False:
+                        sum_oxides_incl += concentration_oxide_incl_i
 
         print("")
         print("Results - plausibility check (100 wt.% oxides calculation)")
@@ -20816,6 +20854,109 @@ class PySILLS(tk.Frame):
 
                     self.container_concentration[var_filetype][var_datatype][isotope] = var_result_i
 
+    def get_oxide_ratio(self, var_focus, var_element, var_oxide):
+        if var_element == "Fe":
+            if var_focus == "MAT":
+                r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
+            else:
+                r = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Fe-Ratio"].get())
+
+            if var_oxide == "FeO":
+                factor = r
+            elif var_oxide == "Fe2O3":
+                factor = 1 - r
+        elif var_element == "Mn":
+            if var_focus == "MAT":
+                r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
+            else:
+                r = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Mn-Ratio"].get())
+
+            if var_oxide == "MnO":
+                factor = r
+            elif var_oxide == "Mn2O3":
+                factor = 1 - r
+        else:
+            factor = 1
+
+        return factor
+
+    def run_total_oxides_calculation_alternative(self, var_filetype, var_datatype, var_filename_short, var_focus="MAT"):
+        """ Calculates the element concentrations based on a normalized total oxide approach.
+        Parameters
+        ----------
+        var_filetype : str
+            The file category, e.g. STD
+        var_datatype : str
+            The data category, e.g. RAW
+        var_filename_short : str
+            The file as a short version (without the complete filepath)
+        var_focus : str
+            It specifies if the quantification has to be done for the matrix or the inclusion signal.
+        Returns
+        -------
+        """
+        file_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
+        index_filename = self.container_lists["SMPL"]["Short"].index(var_filename_short)
+        var_filename_long = self.container_lists["SMPL"]["Long"][index_filename]
+
+        if self.pysills_mode == "MA":
+            var_is = self.container_var["SMPL"][var_filename_long]["IS Data"]["IS"].get()
+        else:
+            if var_focus == "MAT":
+                var_is = self.container_var["SMPL"][var_filename_long]["Matrix Setup"]["IS"]["Name"].get()
+            else:
+                var_is = self.container_var["SMPL"][var_filename_long]["IS Data"]["IS"].get()
+
+        if var_focus == "MAT":
+            total_amount_oxides = float(
+                self.container_var["Oxides Quantification"]["Total Amounts"][var_filename_short].get())
+        else:
+            total_amount_oxides = float(
+                self.container_var["Oxides Quantification INCL"]["Total Amounts"][var_filename_short].get())
+
+        helper_a = 0
+        for isotope in file_isotopes:
+            key_element = re.search("(\D+)(\d+)", isotope)
+            element = key_element.group(1)
+            if isotope == var_is:
+                element_is = element
+
+            for oxide in self.container_lists["Possible Oxides"][element]:
+                focus = var_focus
+                gamma = self.get_oxide_ratio(var_focus=focus, var_element=element, var_oxide=oxide)
+                conversion_factor_i = gamma*self.conversion_factors[oxide]
+
+                intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                    var_filename_short][var_focus][isotope]
+                intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                    var_filename_short][var_focus][var_is]
+                sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                    var_filename_short][var_focus][isotope]
+
+                if (intensity_is*sensitivity_i) > 0:
+                    helper_a += (conversion_factor_i*intensity_i)/(intensity_is*sensitivity_i)
+
+        concentration_is = (total_amount_oxides*10**4)/helper_a
+        max_amount_element = self.maximum_amounts[element_is]
+
+        if concentration_is > max_amount_element:
+            correction_factor = max_amount_element/concentration_is
+            concentration_is = correction_factor*concentration_is
+
+        for isotope in file_isotopes:
+            intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_filename_short][
+                var_focus][isotope]
+            intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_filename_short][
+                var_focus][var_is]
+            sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][var_filename_short][
+                var_focus][isotope]
+
+            if (intensity_is*sensitivity_i) > 0:
+                concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
+            else:
+                concentration_i = np.nan
+            print(isotope, concentration_i)
+
     def run_total_oxides_calculation(self, filetype, datatype, filename_short, list_isotopes, focus="MAT"):
         """ Calculates the element concentrations based on a normalized total oxide approach.
         Parameters
@@ -20831,6 +20972,8 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
+        self.run_total_oxides_calculation_alternative(
+            var_filetype=filetype, var_datatype=datatype, var_filename_short=filename_short, var_focus=focus)
         helper_oxides = {}
         helper_oxides2 = {}
         for oxide in self.container_lists["Selected Oxides"]["All"]:
@@ -20927,8 +21070,13 @@ class PySILLS(tk.Frame):
                 molar_mass_oxide = self.chemistry_data_oxides[oxide]
                 molar_mass_element = self.chemistry_data[oxide_container["Element"]]
 
-                var_b = var_a*molar_mass_oxide/molar_mass_element
-                var_c += var_b
+                if np.isnan(var_a) == False:
+                    var_b = var_a*molar_mass_oxide/molar_mass_element
+                else:
+                    var_b = 0
+
+                if np.isnan(var_b) == False:
+                    var_c += var_b
 
                 oxide_container["Intensities"][isotope] = var_intensity_i
                 oxide_container["Sensitivities"][isotope] = var_sensitivity_i
@@ -20953,11 +21101,13 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "MA":
             var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+            var_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
         else:
             if focus == "MAT":
                 var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
             else:
                 var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                var_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
 
         for oxide, oxide_container in helper_oxides.items():
             for isotope in oxide_container["Isotopes"]:
@@ -20966,18 +21116,19 @@ class PySILLS(tk.Frame):
                 oxide_container["d"][isotope] = var_d
                 oxide_container["e"][isotope] = var_e
 
-                var_concentration_i = oxide_container["a"][isotope]*var_d*10**4
-                oxide_container["Concentrations"][isotope] = var_concentration_i
+                if np.isnan(oxide_container["a"][isotope]) == False:
+                    var_concentration_i = oxide_container["a"][isotope]*var_d*10**4
+                    oxide_container["Concentrations"][isotope] = var_concentration_i
 
-                if var_concentration_i > largest_value["Value"]:
-                    largest_value["Isotope"] = isotope
-                    largest_value["Value"] = var_concentration_i
-                    largest_value["Oxide"] = oxide
+                    if var_concentration_i > largest_value["Value"]:
+                        largest_value["Isotope"] = isotope
+                        largest_value["Value"] = var_concentration_i
+                        largest_value["Oxide"] = oxide
 
-                if isotope == var_is:
-                    value_is["Isotope"] = isotope
-                    value_is["Value"] = var_concentration_i
-                    value_is["Oxide"] = oxide
+                    if isotope == var_is:
+                        value_is["Isotope"] = isotope
+                        value_is["Value"] = var_concentration_i
+                        value_is["Oxide"] = oxide
 
         element_largest_oxide = helper_oxides[largest_value["Oxide"]]["Element"]
         max_amount_element = self.maximum_amounts[element_largest_oxide]
@@ -21002,7 +21153,11 @@ class PySILLS(tk.Frame):
                 var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
                 var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
                 var_sigma = var_sigma_bg_i + var_sigma_mat_i
-                var_result_i = round(oxide_container["Concentrations"][isotope], 4)
+
+                if isotope in oxide_container["Concentrations"]:
+                    var_result_i = round(oxide_container["Concentrations"][isotope], 4)
+                else:
+                    var_result_i = np.nan
 
                 if var_intensity_i > 0:
                     var_result_sigma_i = round((var_sigma*var_result_i)/var_intensity_i, 4)
