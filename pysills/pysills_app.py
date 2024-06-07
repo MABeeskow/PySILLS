@@ -1535,12 +1535,14 @@ class PySILLS(tk.Frame):
             try:
                 pysills_logo = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Logo.png"))
             except:
-                pysills_logo = tk.PhotoImage(file=self.path_pysills + str("/pysills/documentation/images/PySILLS_Logo.png"))
+                pysills_logo = tk.PhotoImage(file=self.path_pysills + str(
+                    "/pysills/documentation/images/PySILLS_Logo.png"))
+
             pysills_logo = pysills_logo.subsample(1, 1)
             img = tk.Label(self.parent, image=pysills_logo, bg=background_color_header)
             img.image = pysills_logo
             img.grid(
-                row=start_row - 3, column=start_column, rowspan=n_rows_header, columnspan=common_n_columns + 10,
+                row=start_row - 3, column=start_column, rowspan=n_rows_header, columnspan=common_n_columns + 12,
                 sticky="nesw")
 
             ## Icon
