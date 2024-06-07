@@ -1544,7 +1544,8 @@ class PySILLS(tk.Frame):
                 sticky="nesw")
 
             ## Icon
-            pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Icon.png"))
+            #pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Icon.png"))
+            pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Logo_02.png"))
             self.parent.iconphoto(False, pysills_icon)
         except:
             pass
