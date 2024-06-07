@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/663565362.svg)](https://zenodo.org/badge/latestdoi/663565362)
 
 <a href="https://github.com/MABeeskow/PySILLS">
-  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/documentation/images/PySILLS_Logo_Header.png" width="75%">
+  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/pysills/documentation/images/PySILLS_Logo_Header.png" width="75%">
 </a>
 
 developed by Maximilian Alexander Beeskow
