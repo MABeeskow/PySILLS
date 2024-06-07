@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		06.06.2024
+# Date:		07.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -2110,10 +2110,9 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda init=True: self.fi_extras(init))
-            #btn_03.configure(state="disabled")
-            #
+
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
-        #
+
         elif var_rb.get() == 2:  # Melt Inclusions
             self.pysills_mode = "MI"
             ## Cleaning
@@ -2122,16 +2121,16 @@ class PySILLS(tk.Frame):
                     for gui_item in self.gui_elements["main"][gui_category]["Specific"]:
                         gui_item.grid_remove()
                     self.gui_elements["main"][gui_category]["Specific"].clear()
-            #
+
             ## Labels
             str_lbl_01 = self.language_dict["Melt Inclusions"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
-            #
+
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
-            #
+
             ## Buttons
             btn_01 = SE(
                 parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
@@ -2146,11 +2145,11 @@ class PySILLS(tk.Frame):
             btn_03 = SE(
                 parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-            btn_03.configure(state="disabled")
-            #
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=lambda init=True: self.mi_extras(init))
+
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
-        #
+
         elif var_rb.get() == 3:  # Report Analysis
             self.pysills_mode = "OA"
             ## Cleaning
@@ -9222,7 +9221,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_incl_mn, text_default=var_entr_incl_mn.get())
 
-        if self.pysills_mode == "MA":
+        if self.pysills_mode in ["MA", "FI"]:
             entr_incl_fe.configure(state="disabled")
             entr_incl_mn.configure(state="disabled")
 
@@ -12224,6 +12223,258 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_simple_button(
             text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda init=True: self.halogen_ratios_diagram(init))
+
+        if len(self.container_lists["Selected Oxides"]["All"]) == 0:
+            btn_002c.configure(state="disabled")
+            btn_002d.configure(state="disabled")
+
+        btn_002e.configure(state="disabled")
+        btn_002f.configure(state="disabled")
+
+    def mi_extras(self, init=False):
+        """Main window of additional analysis tools for a melt inclusion analysis project."""
+        ## Window Settings
+        window_width = 660
+        window_height = 225
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        self.subwindow_mi_extras = tk.Toplevel(self.parent)
+        self.subwindow_mi_extras.title("MELT INCLUSION ANALYSIS - Extras")
+        self.subwindow_mi_extras.geometry(var_geometry)
+        self.subwindow_mi_extras.resizable(False, False)
+        self.subwindow_mi_extras["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_mi_extras, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_mi_extras, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_mi_extras.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_mi_extras.grid_columnconfigure(i, minsize=column_min)
+
+        ## Initialization
+        if init:
+            for var_filetype in ["STD", "SMPL"]:
+                for var_file_short in self.container_lists[var_filetype]["Short"]:
+                    self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+
+                if (self.container_var["Spike Elimination"]["STD"]["State"] == False and
+                        self.container_var["Spike Elimination"]["SMPL"]["State"] == False):
+                    list_datatype = ["RAW"]
+                else:
+                    list_datatype = ["RAW", "SMOOTHED"]
+
+            var_filetype = "None"
+            var_file_short = "None"
+            var_file_long = "None"
+            var_focus = "None"
+
+            for var_datatype in list_datatype:
+                if len(self.container_spikes) > 0:
+                    # Intensity Results
+                    self.get_intensity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    self.fi_get_intensity_corrected(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_focus=var_focus, mode="All")
+                    self.fi_get_intensity_mix(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
+                    # Sensitivity Results
+                    self.get_analytical_sensitivity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, mode="All")
+                    results_is = self.determine_possible_is(filetype="ALL")
+                    IQ(dataframe=None, project_type=self.pysills_mode,
+                       results_container=self.container_intensity_ratio).get_intensity_ratio(
+                        data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
+                    self.fi_get_rsf(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    # Concentration Results
+                    self.fi_get_concentration2(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    self.fi_get_normalized_sensitivity(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    self.fi_get_concentration_ratio(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=var_focus, mode="All")
+                    self.get_lod(
+                        var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                        var_file_long=var_file_long, var_focus=None, mode="All")
+                    self.fi_get_mixed_concentration_ratio(
+                        var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long,
+                        mode="All")
+                    self.fi_get_mixing_ratio(
+                        var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long,
+                        mode="All")
+                    self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short,
+                                                    mode="All")
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 16
+        int_category_n = 12
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Matrix classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_02 = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Fluid classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001a = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001b = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001c = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001d = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001e = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 5, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_001f = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 6, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002a = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 1, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002b = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 2, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002c = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 3, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002d = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 4, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002e = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 5, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_002f = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 6, column_id=var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        # BUTTONS
+        btn_001a = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 1, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Elements": self.diagram_xy(mode))
+        btn_001b = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 2, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Element ratios": self.diagram_xy(mode))
+        btn_001c = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 3, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxides": self.diagram_xy(mode))
+        btn_001d = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 4, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxide ratios": self.diagram_xy(mode))
+        btn_001e = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 5, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_001f = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 6, column_id=int_category_n,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+
+        if len(self.container_lists["Selected Oxides"]["All"]) == 0:
+            btn_001c.configure(state="disabled")
+            btn_001d.configure(state="disabled")
+
+        btn_001e.configure(state="disabled")
+        btn_001f.configure(state="disabled")
+
+        btn_002a = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Elements", focus="INCL": self.diagram_xy(mode, focus))
+        btn_002b = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 2, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Element ratios", focus="INCL": self.diagram_xy(mode, focus))
+        btn_002c = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 3, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxides", focus="INCL": self.diagram_xy(mode, focus))
+        btn_002d = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 4, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="Oxide ratios", focus="INCL": self.diagram_xy(mode, focus))
+        btn_002e = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 5, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+        btn_002f = SE(
+            parent=self.subwindow_mi_extras, row_id=var_row_start + 6, column_id=var_header_n + int_category_n + 1,
+            n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
+            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         if len(self.container_lists["Selected Oxides"]["All"]) == 0:
             btn_002c.configure(state="disabled")
@@ -21215,32 +21466,32 @@ class PySILLS(tk.Frame):
         #     sills_mode=True)
         self.run_total_oxides_calculation_alternative2(
             var_filetype=filetype, var_datatype=datatype, var_filename_short=filename_short, var_focus=focus)
-        # helper_oxides = {}
-        # helper_oxides2 = {}
-        # for oxide in self.container_lists["Selected Oxides"]["All"]:
-        #     if oxide not in helper_oxides:
-        #         helper_oxides[oxide] = {
-        #             "Element": None, "Isotopes": [], "Intensities": {}, "Sensitivities": {}, "a": {},
-        #             "b": {}, "c": {}, "d": {}, "e": {}, "Concentrations": {}}
-        #     key_element = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
-        #     ref_element = key_element.group(1)
-        #     if helper_oxides[oxide]["Element"] == None:
-        #         helper_oxides[oxide]["Element"] = ref_element
-        #     if ref_element not in helper_oxides2:
-        #         helper_oxides2[ref_element] = []
-        #     helper_oxides2[ref_element].append(oxide)
-        #
-        # for isotope in list_isotopes:
-        #     key_element = re.search("(\D+)(\d+)", isotope)
-        #     element = key_element.group(1)
-        #     if element in helper_oxides2:
-        #         for oxide in helper_oxides2[element]:
-        #             helper_oxides[oxide]["Isotopes"].append(isotope)
-        #     else:
-        #         print("ATTENTION - The element", element,
-        #               "is not part of the list of elements for the 100 wt.% oxides calculation.")
-        #
-        # self.container_oxides = helper_oxides
+        helper_oxides = {}
+        helper_oxides2 = {}
+        for oxide in self.container_lists["Selected Oxides"]["All"]:
+            if oxide not in helper_oxides:
+                helper_oxides[oxide] = {
+                    "Element": None, "Isotopes": [], "Intensities": {}, "Sensitivities": {}, "a": {},
+                    "b": {}, "c": {}, "d": {}, "e": {}, "Concentrations": {}}
+            key_element = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+            ref_element = key_element.group(1)
+            if helper_oxides[oxide]["Element"] == None:
+                helper_oxides[oxide]["Element"] = ref_element
+            if ref_element not in helper_oxides2:
+                helper_oxides2[ref_element] = []
+            helper_oxides2[ref_element].append(oxide)
+
+        for isotope in list_isotopes:
+            key_element = re.search("(\D+)(\d+)", isotope)
+            element = key_element.group(1)
+            if element in helper_oxides2:
+                for oxide in helper_oxides2[element]:
+                    helper_oxides[oxide]["Isotopes"].append(isotope)
+            else:
+                print("ATTENTION - The element", element,
+                      "is not part of the list of elements for the 100 wt.% oxides calculation.")
+
+        self.container_oxides = helper_oxides
         # var_c = 0
         # for oxide, oxide_container in helper_oxides.items():
         #     for isotope in oxide_container["Isotopes"]:
