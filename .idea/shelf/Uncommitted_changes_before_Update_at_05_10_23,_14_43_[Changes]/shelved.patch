@@ -1,0 +1,17 @@
+Index: .idea/PySILLS_Github.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<module version=\"4\">\n  <component name=\"PyDocumentationSettings\">\n    <option name=\"format\" value=\"PLAIN\" />\n    <option name=\"myDocStringFormat\" value=\"Plain\" />\n  </component>\n</module>
+===================================================================
+diff --git a/.idea/PySILLS_Github.iml b/.idea/PySILLS_Github.iml
+--- a/.idea/PySILLS_Github.iml	
++++ b/.idea/PySILLS_Github.iml	
+@@ -4,4 +4,7 @@
+     <option name="format" value="PLAIN" />
+     <option name="myDocStringFormat" value="Plain" />
+   </component>
++  <component name="TestRunnerService">
++    <option name="PROJECT_TEST_RUNNER" value="py.test" />
++  </component>
+ </module>
+\ No newline at end of file

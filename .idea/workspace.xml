@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing and code cleaning&quot;" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Merge.Settings">
+    <option name="BRANCH" value="development" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;
+  }
+}</component>
+  <component name="GithubProjectSettings">
+    <option name="branchProtectionPatterns">
+      <list>
+        <option value="master" />
+      </list>
+    </option>
+  </component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="f4437dd1-ee14-4817-9096-f0cab60b44eb" />
+        <option name="url" value="git@github.com:MABeeskow/PySILLS.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/pysills_app.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2SFZIga7SWBJF8g6otp7W5bsGae" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.PySILLS.executor&quot;: &quot;Run&quot;,
+    &quot;Python.pysills_app.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="PySILLS" type="PythonConfigurationType" factoryName="Python">
+      <module name="PySILLS_Github" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.7 (PySILLS_Github)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pysills/pysills_app.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-48aec45f0201-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17011.127" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="" />
+      <created>1688744210159</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1688744210159</updated>
+    </task>
+    <task id="LOCAL-00098" summary="&quot;improved mass balance calculation&quot;">
+      <option name="closed" value="true" />
+      <created>1712693624944</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1712693624944</updated>
+    </task>
+    <task id="LOCAL-00099" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1712846333653</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1712846333653</updated>
+    </task>
+    <task id="LOCAL-00100" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1713003903164</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1713003903164</updated>
+    </task>
+    <task id="LOCAL-00101" summary="&quot;updated 'spike elimination'&quot;">
+      <option name="closed" value="true" />
+      <created>1713136174150</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1713136174150</updated>
+    </task>
+    <task id="LOCAL-00102" summary="&quot;performance improvements&quot;">
+      <option name="closed" value="true" />
+      <created>1713378968862</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1713378968862</updated>
+    </task>
+    <task id="LOCAL-00103" summary="&quot;performance improvements&quot;">
+      <option name="closed" value="true" />
+      <created>1713382024022</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1713382024022</updated>
+    </task>
+    <task id="LOCAL-00104" summary="&quot;performance improvements&quot;">
+      <option name="closed" value="true" />
+      <created>1713390086484</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1713390086484</updated>
+    </task>
+    <task id="LOCAL-00105" summary="&quot;performance improvements&quot;">
+      <option name="closed" value="true" />
+      <created>1713426854093</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1713426854093</updated>
+    </task>
+    <task id="LOCAL-00106" summary="&quot;bug fixing&quot;">
+      <option name="closed" value="true" />
+      <created>1714088573805</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1714088573805</updated>
+    </task>
+    <task id="LOCAL-00107" summary="&quot;bug fixing&quot;">
+      <option name="closed" value="true" />
+      <created>1714123754935</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1714123754935</updated>
+    </task>
+    <task id="LOCAL-00108" summary="&quot;bug fixing&quot;">
+      <option name="closed" value="true" />
+      <created>1714124166320</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1714124166320</updated>
+    </task>
+    <task id="LOCAL-00109" summary="&quot;bug fixing&quot;">
+      <option name="closed" value="true" />
+      <created>1714127840027</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1714127840027</updated>
+    </task>
+    <task id="LOCAL-00110" summary="&quot;bug fixing&quot;">
+      <option name="closed" value="true" />
+      <created>1714133859341</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1714133859341</updated>
+    </task>
+    <task id="LOCAL-00111" summary="&quot;bug fixing&quot;">
+      <option name="closed" value="true" />
+      <created>1716410709759</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1716410709759</updated>
+    </task>
+    <task id="LOCAL-00112" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716474133486</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1716474133486</updated>
+    </task>
+    <task id="LOCAL-00113" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716482645611</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1716482645611</updated>
+    </task>
+    <task id="LOCAL-00114" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716486529153</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1716486529153</updated>
+    </task>
+    <task id="LOCAL-00115" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716494862502</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1716494862502</updated>
+    </task>
+    <task id="LOCAL-00116" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716499933848</created>
+      <option name="number" value="00116" />
+      <option name="presentableId" value="LOCAL-00116" />
+      <option name="project" value="LOCAL" />
+      <updated>1716499933848</updated>
+    </task>
+    <task id="LOCAL-00117" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716500479612</created>
+      <option name="number" value="00117" />
+      <option name="presentableId" value="LOCAL-00117" />
+      <option name="project" value="LOCAL" />
+      <updated>1716500479612</updated>
+    </task>
+    <task id="LOCAL-00118" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716508547695</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1716508547695</updated>
+    </task>
+    <task id="LOCAL-00119" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716555275355</created>
+      <option name="number" value="00119" />
+      <option name="presentableId" value="LOCAL-00119" />
+      <option name="project" value="LOCAL" />
+      <updated>1716555275356</updated>
+    </task>
+    <task id="LOCAL-00120" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716832760279</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1716832760279</updated>
+    </task>
+    <task id="LOCAL-00121" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716832968366</created>
+      <option name="number" value="00121" />
+      <option name="presentableId" value="LOCAL-00121" />
+      <option name="project" value="LOCAL" />
+      <updated>1716832968366</updated>
+    </task>
+    <task id="LOCAL-00122" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716932953577</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1716932953578</updated>
+    </task>
+    <task id="LOCAL-00123" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716937562917</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1716937562917</updated>
+    </task>
+    <task id="LOCAL-00124" summary="&quot;added x-y plotter&quot;">
+      <option name="closed" value="true" />
+      <created>1716975567616</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1716975567617</updated>
+    </task>
+    <task id="LOCAL-00125" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716977755582</created>
+      <option name="number" value="00125" />
+      <option name="presentableId" value="LOCAL-00125" />
+      <option name="project" value="LOCAL" />
+      <updated>1716977755582</updated>
+    </task>
+    <task id="LOCAL-00126" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716981604711</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1716981604711</updated>
+    </task>
+    <task id="LOCAL-00127" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716983289554</created>
+      <option name="number" value="00127" />
+      <option name="presentableId" value="LOCAL-00127" />
+      <option name="project" value="LOCAL" />
+      <updated>1716983289554</updated>
+    </task>
+    <task id="LOCAL-00128" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716984256140</created>
+      <option name="number" value="00128" />
+      <option name="presentableId" value="LOCAL-00128" />
+      <option name="project" value="LOCAL" />
+      <updated>1716984256140</updated>
+    </task>
+    <task id="LOCAL-00129" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1716990763945</created>
+      <option name="number" value="00129" />
+      <option name="presentableId" value="LOCAL-00129" />
+      <option name="project" value="LOCAL" />
+      <updated>1716990763945</updated>
+    </task>
+    <task id="LOCAL-00130" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717521566649</created>
+      <option name="number" value="00130" />
+      <option name="presentableId" value="LOCAL-00130" />
+      <option name="project" value="LOCAL" />
+      <updated>1717521566649</updated>
+    </task>
+    <task id="LOCAL-00131" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717576186418</created>
+      <option name="number" value="00131" />
+      <option name="presentableId" value="LOCAL-00131" />
+      <option name="project" value="LOCAL" />
+      <updated>1717576186418</updated>
+    </task>
+    <task id="LOCAL-00132" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717587088846</created>
+      <option name="number" value="00132" />
+      <option name="presentableId" value="LOCAL-00132" />
+      <option name="project" value="LOCAL" />
+      <updated>1717587088846</updated>
+    </task>
+    <task id="LOCAL-00133" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717589564823</created>
+      <option name="number" value="00133" />
+      <option name="presentableId" value="LOCAL-00133" />
+      <option name="project" value="LOCAL" />
+      <updated>1717589564823</updated>
+    </task>
+    <task id="LOCAL-00134" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717601056136</created>
+      <option name="number" value="00134" />
+      <option name="presentableId" value="LOCAL-00134" />
+      <option name="project" value="LOCAL" />
+      <updated>1717601056136</updated>
+    </task>
+    <task id="LOCAL-00135" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717602419664</created>
+      <option name="number" value="00135" />
+      <option name="presentableId" value="LOCAL-00135" />
+      <option name="project" value="LOCAL" />
+      <updated>1717602419664</updated>
+    </task>
+    <task id="LOCAL-00136" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717605295538</created>
+      <option name="number" value="00136" />
+      <option name="presentableId" value="LOCAL-00136" />
+      <option name="project" value="LOCAL" />
+      <updated>1717605295538</updated>
+    </task>
+    <task id="LOCAL-00137" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717606528020</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1717606528020</updated>
+    </task>
+    <task id="LOCAL-00138" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717607787340</created>
+      <option name="number" value="00138" />
+      <option name="presentableId" value="LOCAL-00138" />
+      <option name="project" value="LOCAL" />
+      <updated>1717607787340</updated>
+    </task>
+    <task id="LOCAL-00139" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717666423630</created>
+      <option name="number" value="00139" />
+      <option name="presentableId" value="LOCAL-00139" />
+      <option name="project" value="LOCAL" />
+      <updated>1717666423630</updated>
+    </task>
+    <task id="LOCAL-00140" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717685182425</created>
+      <option name="number" value="00140" />
+      <option name="presentableId" value="LOCAL-00140" />
+      <option name="project" value="LOCAL" />
+      <updated>1717685182425</updated>
+    </task>
+    <task id="LOCAL-00141" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717743311339</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1717743311340</updated>
+    </task>
+    <task id="LOCAL-00142" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717751220156</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1717751220156</updated>
+    </task>
+    <task id="LOCAL-00143" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717751857737</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1717751857737</updated>
+    </task>
+    <task id="LOCAL-00144" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717754505503</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1717754505504</updated>
+    </task>
+    <task id="LOCAL-00145" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717757992518</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1717757992518</updated>
+    </task>
+    <task id="LOCAL-00146" summary="&quot;bug fixing and code cleaning&quot;">
+      <option name="closed" value="true" />
+      <created>1717758352509</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1717758352509</updated>
+    </task>
+    <option name="localTasksCounter" value="147" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="&quot;improved data export&quot;" />
+    <MESSAGE value="&quot;fixed some bugs for the fluid inclusion analysis&quot;" />
+    <MESSAGE value="&quot;improved code (bugfixing)&quot;" />
+    <MESSAGE value="&quot;some bugfixing&quot;" />
+    <MESSAGE value="&quot;code cleaning&quot;" />
+    <MESSAGE value="&quot;fixed some bugs&quot;" />
+    <MESSAGE value="&quot;updated 'get_intensity'&quot;" />
+    <MESSAGE value="&quot;updated 'Fluid Inclusion Analysis'&quot;" />
+    <MESSAGE value="&quot;fixed some things&quot;" />
+    <MESSAGE value="&quot;little fix&quot;" />
+    <MESSAGE value="&quot;added 'Agilent 8900' to the database and fixed a bug concerning 24h and AM/PM notation&quot;" />
+    <MESSAGE value="&quot;bugfixing&quot;" />
+    <MESSAGE value="&quot;started 'Melt Inclusion Analysis'&quot;" />
+    <MESSAGE value="&quot;bug fixing + code cleaning&quot;" />
+    <MESSAGE value="&quot;updated 'PyPitzer' (not finished)&quot;" />
+    <MESSAGE value="&quot;updated readme and references&quot;" />
+    <MESSAGE value="&quot;code cleaning + bug fixing&quot;" />
+    <MESSAGE value="&quot;updated documentation&quot;" />
+    <MESSAGE value="&quot;improved IS concentration calculation&quot;" />
+    <MESSAGE value="&quot;improved mass balance calculation&quot;" />
+    <MESSAGE value="&quot;updated 'spike elimination'&quot;" />
+    <MESSAGE value="&quot;performance improvements&quot;" />
+    <MESSAGE value="&quot;bug fixing&quot;" />
+    <MESSAGE value="&quot;added x-y plotter&quot;" />
+    <MESSAGE value="&quot;bug fixing and code cleaning&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;bug fixing and code cleaning&quot;" />
+  </component>
+</project>
