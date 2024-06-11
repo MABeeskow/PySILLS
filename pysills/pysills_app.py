@@ -982,8 +982,9 @@ class PySILLS(tk.Frame):
         self.container_var["Gas Energy"] = tk.StringVar()
         self.container_var["Gas Energy"].set("15.760")
         self.container_var["Spike Elimination Method"] = tk.StringVar()
-        self.container_var["Spike Elimination Method"].set("Grubbs-Test")
-        self.list_se_methods = ["Grubbs-Test", "Grubbs-Test (SILLS)", "PySILLS Spike Finder"]
+        self.container_var["Spike Elimination Method"].set("Grubbs test")
+        #self.list_se_methods = ["Grubbs-Test", "Grubbs-Test (SILLS)", "PySILLS Spike Finder"]
+        self.list_se_methods = ["Grubbs test", "Whisker analysis"]
         self.list_isotopes = []
         self.srm_actual = {}
         self.container_files = {}
@@ -4272,29 +4273,29 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
-            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (SILLS)":
+            if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
-            elif self.container_var["Spike Elimination Method"].get() == "PySILLS Spike Finder":
+            elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
         elif self.pysills_mode == "FI":
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
-            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (SILLS)":
+            if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
-            elif self.container_var["Spike Elimination Method"].get() == "PySILLS Spike Finder":
+            elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
         elif self.pysills_mode == "MI":
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
-            if self.container_var["Spike Elimination Method"].get() == "Grubbs-Test (SILLS)":
+            if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
                 var_method = 0
             elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
                 var_method = 1
-            elif self.container_var["Spike Elimination Method"].get() == "PySILLS Spike Finder":
+            elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
 
         if filetype == "STD":
@@ -7690,10 +7691,16 @@ class PySILLS(tk.Frame):
                 self.container_var["Spike Elimination"]["SMPL"]["State"] = bool(splitted_lines[3])
 
                 if analysis_mode == "ma":
+                    if splitted_lines[4] == "Grubbs-Test":
+                        splitted_lines[4] = "Grubbs test"
+
                     self.container_var["Spike Elimination Method"].set(splitted_lines[4])
                     self.container_var[key_setting]["SE Alpha"].set(splitted_lines[5])
                     self.container_var[key_setting]["SE Threshold"].set(int(splitted_lines[6]))
                 else:
+                    if splitted_lines[5] == "Grubbs-Test":
+                        splitted_lines[5] = "Grubbs test"
+
                     self.container_var[key_setting]["Spike Elimination Inclusion"].set(splitted_lines[4])
                     self.container_var["Spike Elimination Method"].set(splitted_lines[5])
                     self.container_var[key_setting]["SE Alpha"].set(splitted_lines[6])
@@ -13446,12 +13453,14 @@ class PySILLS(tk.Frame):
                     else:
                         if self.container_var["Spike Elimination"]["STD"]["State"]:
                             if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                "Whisker analysis"]:
                                 var_method = "Grubbs"
                                 self.spike_elimination_all(filetype="STD", algorithm=var_method)
                         if self.container_var["Spike Elimination"]["SMPL"]["State"]:
                             if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                "Whisker analysis"]:
                                 var_method = "Grubbs"
                                 self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
                 else:
@@ -21439,8 +21448,15 @@ class PySILLS(tk.Frame):
         # Determine c
         c_total = sum_c
         # Determine d
-        factor_d = total_amount_oxides/c_total
+        if c_total > 0:
+            factor_d = total_amount_oxides/c_total
+        else:
+            print("Attention! It is probably necessary to define first the set of oxides before the calculation can be "
+                  "run successfully.")
+            factor_d= np.nan
+
         # Determine e_i
+        concentration_is = None
         for isotope, b_i in helper_b.items():
             e_i = factor_d*b_i
             concentration_i = e_i*10**4
@@ -21463,41 +21479,44 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][var_filename_long]["Matrix Setup"]["IS"]["Concentration"].set(
                                 concentration_is)
 
-        for isotope in file_isotopes:
-            concentration_is = concentration_is
-            sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][var_filename_short][
-                var_focus][var_is]
-            intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                var_filename_short][var_focus][var_is]
-            intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                var_filename_short][var_focus][isotope]
-            sensitivity_i_pre = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                var_filename_short][var_focus][isotope]
-            sensitivity_i = sensitivity_i_pre/sensitivity_is
+        if concentration_is != None:
+            for isotope in file_isotopes:
+                concentration_is = concentration_is
+                sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][var_filename_short][
+                    var_focus][var_is]
+                intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                    var_filename_short][var_focus][var_is]
+                intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                    var_filename_short][var_focus][isotope]
+                sensitivity_i_pre = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                    var_filename_short][var_focus][isotope]
+                sensitivity_i = sensitivity_i_pre/sensitivity_is
 
-            concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
+                concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
 
-            self.container_concentration[var_filetype][var_datatype][var_filename_short][var_focus][
-                isotope] = concentration_i
+                self.container_concentration[var_filetype][var_datatype][var_filename_short][var_focus][
+                    isotope] = concentration_i
 
-            var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_filename_short]["BG SIGMA"][isotope]
-            key_std = var_focus + " SIGMA"
-            var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_std][isotope]
-            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_filename_short]["N BG"][isotope]
-            key_n = "N " + var_focus
-            var_n_mat = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_n][isotope]
-            var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
-            var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
-            var_sigma = var_sigma_bg_i + var_sigma_mat_i
+                var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_filename_short]["BG SIGMA"][
+                    isotope]
+                key_std = var_focus + " SIGMA"
+                var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_std][
+                    isotope]
+                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_filename_short]["N BG"][isotope]
+                key_n = "N " + var_focus
+                var_n_mat = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_n][isotope]
+                var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
+                var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
+                var_sigma = var_sigma_bg_i + var_sigma_mat_i
 
-            if intensity_i > 0:
-                var_result_sigma_i = round((var_sigma*concentration_i)/intensity_i, 4)
-            else:
-                var_result_sigma_i = 0.0
+                if intensity_i > 0:
+                    var_result_sigma_i = round((var_sigma*concentration_i)/intensity_i, 4)
+                else:
+                    var_result_sigma_i = 0.0
 
-            key_sigma = "1 SIGMA " + var_focus
-            self.container_concentration[var_filetype][var_datatype][var_filename_short][key_sigma][
-                isotope] = var_result_sigma_i
+                key_sigma = "1 SIGMA " + var_focus
+                self.container_concentration[var_filetype][var_datatype][var_filename_short][key_sigma][
+                    isotope] = var_result_sigma_i
 
     def run_total_oxides_calculation(self, filetype, datatype, filename_short, list_isotopes, focus="MAT"):
         """ Calculates the element concentrations based on a normalized total oxide approach.
@@ -23466,7 +23485,8 @@ class PySILLS(tk.Frame):
                     for filetype in ["STD", "SMPL"]:
                         if self.container_var["Spike Elimination"][filetype]["State"]:
                             if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                "Whisker analysis"]:
                                 var_method = "Grubbs"
                                 self.spike_elimination_all(filetype=filetype, algorithm=var_method)
             except:
@@ -23782,7 +23802,8 @@ class PySILLS(tk.Frame):
                     for filetype in ["STD", "SMPL"]:
                         if self.container_var["Spike Elimination"][filetype]["State"]:
                             if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                "Whisker analysis"]:
                                 var_method = "Grubbs"
                                 self.spike_elimination_all(filetype=filetype, algorithm=var_method)
             except:
@@ -24525,8 +24546,8 @@ class PySILLS(tk.Frame):
                                         var_file_short]["BG"][isotope]
                                     var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
                                         var_file_short]["INCL"][isotope]
-                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                        isotope]
+                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                        "N BG"][isotope]
                                     var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                         "N INCL"][isotope]
                                     var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
@@ -24592,14 +24613,14 @@ class PySILLS(tk.Frame):
                                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
                                         var_file_short]["INCL"][isotope]
 
-                                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][var_is]
+                                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][
+                                        var_datatype][var_file_short]["INCL"][var_is]
                                     var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
                                         var_file_short]["BG"][isotope]
                                     var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
                                         var_file_short]["INCL"][isotope]
-                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                        isotope]
+                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                        "N BG"][isotope]
                                     var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                         "N INCL"][isotope]
                                     var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
@@ -25034,8 +25055,8 @@ class PySILLS(tk.Frame):
                                         var_file_short]["BG"][isotope]
                                     var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
                                         var_file_short]["INCL"][isotope]
-                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                        isotope]
+                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                        "N BG"][isotope]
                                     var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                         "N INCL"][isotope]
                                     var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
@@ -25108,8 +25129,8 @@ class PySILLS(tk.Frame):
                                         var_file_short]["BG"][isotope]
                                     var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
                                         var_file_short]["INCL"][isotope]
-                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                        isotope]
+                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                        "N BG"][isotope]
                                     var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
                                         "N INCL"][isotope]
                                     var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
@@ -34335,7 +34356,7 @@ class PySILLS(tk.Frame):
         #
         start_row = start_row + 1 + var_row_correction
         #
-        if var_opt in ["Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder"]:
+        if var_opt in ["Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test", "Whisker analysis"]:
             ## GUI
             # Labels
             lbl_09c = SE(
@@ -34485,7 +34506,7 @@ class PySILLS(tk.Frame):
         self.lbl_03a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
-            text=self.current_original_value, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=round(self.current_original_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03b1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
@@ -34493,7 +34514,7 @@ class PySILLS(tk.Frame):
         self.lbl_03b = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
-            text=self.current_suggested_value, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=round(self.current_suggested_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03c1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
@@ -34501,7 +34522,7 @@ class PySILLS(tk.Frame):
         self.lbl_03c = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=self.bg_colors["Light Font"], bg=self.accent_color).create_simple_label(
-            text=self.current_current_value, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=round(self.current_current_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -34697,20 +34718,20 @@ class PySILLS(tk.Frame):
         value_0 = self.list_indices[0]
         current_id = self.scl_01.get()
 
-        self.current_original_value = self.container_spikes[var_file][var_isotope]["Data RAW"][value_0]
-        self.current_suggested_value = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0]
+        self.current_original_value = round(self.container_spikes[var_file][var_isotope]["Data RAW"][value_0], 2)
+        self.current_suggested_value = round(self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0], 2)
         val_corrected = self.current_suggested_value
         if value_0 in self.container_spike_values[var_file][var_isotope]["Save"]:
             value_current = self.container_spike_values[var_file][var_isotope]["Save"][value_0]
-            self.current_current_value = value_current
+            self.current_current_value = round(value_current, 2)
             if value_current == self.current_original_value:
                 self.replace_spike_value(mode="RAW")
         else:
             if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
-                self.current_current_value = val_corrected
+                self.current_current_value = round(val_corrected, 2)
             else:
-                self.current_current_value = self.container_spike_values[var_file][var_isotope]["Current"][
-                    current_id - 1]
+                self.current_current_value = round(self.container_spike_values[var_file][var_isotope]["Current"][
+                    current_id - 1], 2)
         self.lbl_03a.configure(text=self.current_original_value)
         self.lbl_03b.configure(text=self.current_suggested_value)
         self.lbl_03c.configure(text=self.current_current_value)
@@ -34733,13 +34754,13 @@ class PySILLS(tk.Frame):
         var_id_real = self.list_indices[current_id - 1]
         var_file = self.current_file_spk
         var_isotope = self.var_opt_spk_iso.get()
-        val_original = self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real]
-        val_corrected = self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real]
+        val_original = round(self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real], 2)
+        val_corrected = round(self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real], 2)
 
         if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
-            val_current = val_corrected
+            val_current = round(val_corrected, 2)
         else:
-            val_current = self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1]
+            val_current = round(self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1], 2)
 
         if var_file not in self.container_spike_values:
             self.container_spike_values[var_file] = {}
@@ -34810,13 +34831,13 @@ class PySILLS(tk.Frame):
         var_id_real = self.list_indices[current_id - 1]
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
-        val_original = self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1]
-        val_corrected = self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1]
+        val_original = round(self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1], 2)
+        val_corrected = round(self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1], 2)
 
         if mode == "RAW":
-            val_updated = val_original
+            val_updated = round(val_original, 2)
         else:
-            val_updated = val_corrected
+            val_updated = round(val_corrected, 2)
 
         self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id_real] = val_updated
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
@@ -35335,17 +35356,19 @@ class PySILLS(tk.Frame):
         if mode == "MA":
             self.container_intensity[var_filetype]["RAW"][var_file_short] = {
                 "BG": {}, "BG SIGMA": {}, "N BG": {}, "N MAT": {}, "N INCL": {}, "MAT": {}, "MAT SIGMA": {},
-                "1 SIGMA MAT": {}}
+                "1 SIGMA MAT": {}, "Parallelism BG": {}, "Parallelism MAT": {}, "Parallelism INCL": {}}
             self.container_intensity[var_filetype]["SMOOTHED"][var_file_short] = {
                 "BG": {}, "BG SIGMA": {}, "N BG": {}, "N MAT": {}, "N INCL": {},"MAT": {}, "MAT SIGMA": {},
-                "1 SIGMA MAT": {}}
+                "1 SIGMA MAT": {}, "Parallelism BG": {}, "Parallelism MAT": {}, "Parallelism INCL": {}}
         else:
             self.container_intensity[var_filetype]["RAW"][var_file_short] = {
                 "BG": {}, "BG SIGMA": {}, "N BG": {}, "N MAT": {}, "N INCL": {},"MAT": {}, "MAT SIGMA": {}, "INCL": {},
-                "1 SIGMA MAT": {}, "1 SIGMA INCL": {}, "INCL SIGMA": {}}
+                "1 SIGMA MAT": {}, "1 SIGMA INCL": {}, "INCL SIGMA": {}, "Parallelism BG": {}, "Parallelism MAT": {},
+                "Parallelism INCL": {}}
             self.container_intensity[var_filetype]["SMOOTHED"][var_file_short] = {
                 "BG": {}, "BG SIGMA": {}, "N BG": {}, "N MAT": {}, "N INCL": {},"MAT": {}, "MAT SIGMA": {}, "INCL": {},
-                "1 SIGMA MAT": {}, "1 SIGMA INCL": {}, "INCL SIGMA": {}}
+                "1 SIGMA MAT": {}, "1 SIGMA INCL": {}, "INCL SIGMA": {}, "Parallelism BG": {}, "Parallelism MAT": {},
+                "Parallelism INCL": {}}
         ## Intensity Ratio
         if mode == "MA":
             self.container_intensity_ratio[var_filetype]["RAW"][var_file_short] = {"BG": {}, "MAT": {}}
