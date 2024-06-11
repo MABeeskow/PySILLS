@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing and code cleaning&quot;" />
+    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing and code cleaning&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pysills/pysills_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/pysills_app.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -81,7 +85,6 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.7 (PySILLS_Github)" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -544,6 +547,6 @@
     <MESSAGE value="&quot;bug fixing&quot;" />
     <MESSAGE value="&quot;added x-y plotter&quot;" />
     <MESSAGE value="&quot;bug fixing and code cleaning&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;bug fixing and code cleaning&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="" />
   </component>
 </project>
