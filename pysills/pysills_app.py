@@ -21448,8 +21448,15 @@ class PySILLS(tk.Frame):
         # Determine c
         c_total = sum_c
         # Determine d
-        factor_d = total_amount_oxides/c_total
+        if c_total > 0:
+            factor_d = total_amount_oxides/c_total
+        else:
+            print("Attention! It is probably necessary to define first the set of oxides before the calculation can be "
+                  "run successfully.")
+            factor_d= np.nan
+
         # Determine e_i
+        concentration_is = None
         for isotope, b_i in helper_b.items():
             e_i = factor_d*b_i
             concentration_i = e_i*10**4
@@ -21472,41 +21479,44 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][var_filename_long]["Matrix Setup"]["IS"]["Concentration"].set(
                                 concentration_is)
 
-        for isotope in file_isotopes:
-            concentration_is = concentration_is
-            sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][var_filename_short][
-                var_focus][var_is]
-            intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                var_filename_short][var_focus][var_is]
-            intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                var_filename_short][var_focus][isotope]
-            sensitivity_i_pre = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                var_filename_short][var_focus][isotope]
-            sensitivity_i = sensitivity_i_pre/sensitivity_is
+        if concentration_is != None:
+            for isotope in file_isotopes:
+                concentration_is = concentration_is
+                sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][var_filename_short][
+                    var_focus][var_is]
+                intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                    var_filename_short][var_focus][var_is]
+                intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                    var_filename_short][var_focus][isotope]
+                sensitivity_i_pre = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                    var_filename_short][var_focus][isotope]
+                sensitivity_i = sensitivity_i_pre/sensitivity_is
 
-            concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
+                concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
 
-            self.container_concentration[var_filetype][var_datatype][var_filename_short][var_focus][
-                isotope] = concentration_i
+                self.container_concentration[var_filetype][var_datatype][var_filename_short][var_focus][
+                    isotope] = concentration_i
 
-            var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_filename_short]["BG SIGMA"][isotope]
-            key_std = var_focus + " SIGMA"
-            var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_std][isotope]
-            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_filename_short]["N BG"][isotope]
-            key_n = "N " + var_focus
-            var_n_mat = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_n][isotope]
-            var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
-            var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
-            var_sigma = var_sigma_bg_i + var_sigma_mat_i
+                var_std_bg_i = self.container_intensity[var_filetype][var_datatype][var_filename_short]["BG SIGMA"][
+                    isotope]
+                key_std = var_focus + " SIGMA"
+                var_std_mat_i = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_std][
+                    isotope]
+                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_filename_short]["N BG"][isotope]
+                key_n = "N " + var_focus
+                var_n_mat = self.container_intensity[var_filetype][var_datatype][var_filename_short][key_n][isotope]
+                var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
+                var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
+                var_sigma = var_sigma_bg_i + var_sigma_mat_i
 
-            if intensity_i > 0:
-                var_result_sigma_i = round((var_sigma*concentration_i)/intensity_i, 4)
-            else:
-                var_result_sigma_i = 0.0
+                if intensity_i > 0:
+                    var_result_sigma_i = round((var_sigma*concentration_i)/intensity_i, 4)
+                else:
+                    var_result_sigma_i = 0.0
 
-            key_sigma = "1 SIGMA " + var_focus
-            self.container_concentration[var_filetype][var_datatype][var_filename_short][key_sigma][
-                isotope] = var_result_sigma_i
+                key_sigma = "1 SIGMA " + var_focus
+                self.container_concentration[var_filetype][var_datatype][var_filename_short][key_sigma][
+                    isotope] = var_result_sigma_i
 
     def run_total_oxides_calculation(self, filetype, datatype, filename_short, list_isotopes, focus="MAT"):
         """ Calculates the element concentrations based on a normalized total oxide approach.
