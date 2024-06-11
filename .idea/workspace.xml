@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing and code cleaning&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;added rock-forming element selection to the oxides setup window&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pysills/modules/data_reduction.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/modules/data_reduction.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pysills/modules/spike_elimination.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/modules/spike_elimination.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pysills/pysills_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/pysills_app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -102,7 +103,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-48aec45f0201-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17011.127" />
+        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
       </set>
     </attachedChunks>
   </component>
@@ -114,14 +115,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1688744210159</updated>
-    </task>
-    <task id="LOCAL-00098" summary="&quot;improved mass balance calculation&quot;">
-      <option name="closed" value="true" />
-      <created>1712693624944</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1712693624944</updated>
     </task>
     <task id="LOCAL-00099" summary="&quot;bug fixing and code cleaning&quot;">
       <option name="closed" value="true" />
@@ -507,7 +500,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717758352509</updated>
     </task>
-    <option name="localTasksCounter" value="147" />
+    <task id="LOCAL-00147" summary="&quot;added rock-forming element selection to the oxides setup window&quot;">
+      <option name="closed" value="true" />
+      <created>1718093931813</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1718093931813</updated>
+    </task>
+    <option name="localTasksCounter" value="148" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
