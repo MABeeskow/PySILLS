@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		07.06.2024
+# Date:		11.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -9125,7 +9125,12 @@ class PySILLS(tk.Frame):
             parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Guess composition", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text="Rock-forming elements", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_13d = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_label(
+            text="Guess the composition", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_14 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=5*var_header_n + int(1.5*var_header_n) + 2,
             n_rows=1, n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
@@ -9142,7 +9147,7 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Inclusion", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_15 = SE(
-            parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1, n_rows=1,
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 17, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Run 100 wt.% oxides calculation for", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
@@ -9214,8 +9219,14 @@ class PySILLS(tk.Frame):
             parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1 + int_category_n,
             n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
+            text="Select", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.select_main_rockforming_elements)
+        btn_13d = SE(
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1 + int_category_n,
+            n_rows=1, n_columns=int(0.75*var_header_n), fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Light"]).create_simple_button(
             text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-        btn_13c.configure(state="disabled")
+        btn_13d.configure(state="disabled")
 
         ## ENTRIES
         var_entr_mat_fe = self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"]
@@ -9742,18 +9753,32 @@ class PySILLS(tk.Frame):
 
         ## CHECKBOXES
         cb_01 = SE(
-            parent=subwindow_checkup_oxides, row_id=var_row_start + 17, column_id=5*var_header_n + 1,
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 18, column_id=5*var_header_n + 1,
             fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=int(1.5*var_header_n),
             bg=self.bg_colors["Light"]).create_simple_checkbox(
             var_cb=self.oxide_calculation_mat, text="Matrix/Sample", set_sticky="nesw", own_color=True)
         cb_02 = SE(
-            parent=subwindow_checkup_oxides, row_id=var_row_start + 18, column_id=5*var_header_n + 1,
+            parent=subwindow_checkup_oxides, row_id=var_row_start + 19, column_id=5*var_header_n + 1,
             fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=int(1.5*var_header_n),
             bg=self.bg_colors["Light"]).create_simple_checkbox(
             var_cb=self.oxide_calculation_incl, text="Inclusion", set_sticky="nesw", own_color=True)
 
         if self.pysills_mode in ["MA", "FI"]:
             cb_02.configure(state="disabled")
+
+    def select_main_rockforming_elements(self):
+        list_oxides = ["SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "Mn2O3", "MnO", "MgO", "CaO", "Na2O", "K2O", "P2O5"]
+        self.container_lists["Selected Oxides"]["All"].clear()
+        for oxide, variable in self.container_var["Oxides Quantification"]["Major"].items():
+            if oxide in list_oxides and oxide in self.container_lists["Possible Oxides"]["All"]:
+                variable.set(1)
+                if oxide not in self.container_lists["Selected Oxides"]["All"]:
+                    self.container_lists["Selected Oxides"]["All"].append(oxide)
+        for oxide, variable in self.container_var["Oxides Quantification"]["Minor"].items():
+            if oxide in list_oxides and oxide in self.container_lists["Possible Oxides"]["All"]:
+                variable.set(1)
+                if oxide not in self.container_lists["Selected Oxides"]["All"]:
+                    self.container_lists["Selected Oxides"]["All"].append(oxide)
 
     def select_reference_isotope(self, var_opt, mode="MAT"):
         for index, filename_long in enumerate(self.container_lists["SMPL"]["Long"]):
