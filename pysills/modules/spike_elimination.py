@@ -6,7 +6,7 @@
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		23.05.2024
+# Date:		11.06.2024
 
 #-----------------------------------------------
 
@@ -133,8 +133,15 @@ class GrubbsTestSILLS:
                 mean_4 = np.mean(surrounding_4["All"])
                 std_4 = np.std(surrounding_4["All"], ddof=1)
 
-                val_poi_3 = round(abs(value - mean_3)/std_3, 3)
-                val_poi_4 = round(abs(value - mean_4)/std_4, 3)
+                if std_3 > 0:
+                    val_poi_3 = round(abs(value - mean_3)/std_3, 3)
+                else:
+                    val_poi_3 = np.nan
+
+                if std_4 > 0:
+                    val_poi_4 = round(abs(value - mean_4)/std_4, 3)
+                else:
+                    val_poi_4 = np.nan
 
                 val_crit_3 = round(self.calculate_grubbs_critical_value(size=len(surrounding_3["All"])), 3)
                 val_crit_4 = round(self.calculate_grubbs_critical_value(size=len(surrounding_4["All"])), 3)

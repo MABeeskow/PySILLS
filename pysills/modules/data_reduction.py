@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.05.2024
+# Date:		12.06.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -267,6 +267,7 @@ class IntensityQuantification:
                     helper_bg = []
                     helper_bg_2 = []
                     helper_bg_sigma = []
+                    helper_bg_parts = []
                     for index, interval in interval_bg.items():
                         start_index = interval[0]
                         end_index = interval[1] + 1
@@ -282,19 +283,33 @@ class IntensityQuantification:
                         else:
                             helper_bg.extend(dataset)
 
+                    n_dataset = len(helper_bg_2)
+                    if n_dataset % 2 == 0:
+                        n_1st_half = int(len(helper_bg_2)/2)
+                    else:
+                        n_1st_half = int(round(len(helper_bg_2)/2 + 0.5, 0))
+
+                    if average_type == "arithmetic mean":
+                        dataset_1st_half = round(np.mean(helper_bg_2[:n_1st_half]), 4)
+                        dataset_2nd_half = round(np.mean(helper_bg_2[n_1st_half:]), 4)
+                    else:
+                        dataset_1st_half = round(np.median(helper_bg_2[:n_1st_half]), 4)
+                        dataset_2nd_half = round(np.median(helper_bg_2[n_1st_half:]), 4)
+
+                    if dataset_2nd_half > 0:
+                        parallelism_factor = round(dataset_1st_half/dataset_2nd_half, 4)
+                    else:
+                        parallelism_factor = np.nan
+
                     if stack_intervals == True:
                         helper_bg_sigma.append(np.std(helper_bg, ddof=1)/np.sqrt(len(helper_bg)))
 
                     if average_type == "arithmetic mean":
-                        #result_bg = np.mean(helper_bg)
                         result_bg = np.mean(helper_bg_2)
-                        #result_bg_1sigma = np.mean(helper_bg_sigma)
                         result_bg_1sigma = np.mean(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
                         results_bg_sigma = np.std(helper_bg_2, ddof=1)
                     else:
-                        #result_bg = np.median(helper_bg)
                         result_bg = np.median(helper_bg_2)
-                        #result_bg_1sigma = np.median(helper_bg_sigma)
                         result_bg_1sigma = np.median(np.std(helper_bg_2, ddof=1)/np.sqrt(len(helper_bg_2)))
                         results_bg_sigma = np.std(helper_bg_2, ddof=1)
 
@@ -305,6 +320,7 @@ class IntensityQuantification:
                     self.results_container["BG"][isotope] = result_bg
                     self.results_container["BG SIGMA"][isotope] = results_bg_sigma
                     self.results_container["N BG"][isotope] = len(helper_bg_2)
+                    self.results_container["Parallelism BG"][isotope] = [dataset_1st_half, dataset_2nd_half]
                 elif focus == "MAT":
                     # Mineral/Matrix Signal
                     helper_mat = []
@@ -326,19 +342,33 @@ class IntensityQuantification:
                         else:
                             helper_mat.extend(dataset)
 
+                    n_dataset = len(helper_mat_2)
+                    if n_dataset % 2 == 0:
+                        n_1st_half = int(len(helper_mat_2)/2)
+                    else:
+                        n_1st_half = int(round(len(helper_mat_2)/2 + 0.5, 0))
+
+                    if average_type == "arithmetic mean":
+                        dataset_1st_half = round(np.mean(helper_mat_2[:n_1st_half]), 4)
+                        dataset_2nd_half = round(np.mean(helper_mat_2[n_1st_half:]), 4)
+                    else:
+                        dataset_1st_half = round(np.median(helper_mat_2[:n_1st_half]), 4)
+                        dataset_2nd_half = round(np.median(helper_mat_2[n_1st_half:]), 4)
+
+                    if dataset_2nd_half > 0:
+                        parallelism_factor = round(dataset_1st_half/dataset_2nd_half, 4)
+                    else:
+                        parallelism_factor = np.nan
+
                     if stack_intervals == True:
                         helper_mat_sigma.append(np.std(helper_mat, ddof=1)/np.sqrt(len(helper_mat)))
 
                     if average_type == "arithmetic mean":
-                        #result_mat = np.mean(helper_mat)
                         result_mat = np.mean(helper_mat_2)
-                        #result_mat_1sigma = np.mean(helper_mat_sigma)
                         result_mat_1sigma = np.mean(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
                         results_mat_sigma = np.std(helper_mat_2, ddof=1)
                     else:
-                        #result_mat = np.median(helper_mat)
                         result_mat = np.median(helper_mat_2)
-                        #result_mat_1sigma = np.median(helper_mat_sigma)
                         result_mat_1sigma = np.median(np.std(helper_mat_2, ddof=1)/np.sqrt(len(helper_mat_2)))
                         results_mat_sigma = np.std(helper_mat_2, ddof=1)
 
@@ -350,6 +380,7 @@ class IntensityQuantification:
                     self.results_container["1 SIGMA MAT"][isotope] = result_mat_1sigma
                     self.results_container["MAT SIGMA"][isotope] = results_mat_sigma
                     self.results_container["N MAT"][isotope] = len(helper_mat_2)
+                    self.results_container["Parallelism MAT"][isotope] = [dataset_1st_half, dataset_2nd_half]
                 elif focus == "INCL":
                     # Inclusion Signal
                     helper_incl = []
@@ -370,19 +401,35 @@ class IntensityQuantification:
                         else:
                             helper_incl.extend(dataset)
 
+                    n_dataset = len(helper_incl_2)
+                    if n_dataset % 2 == 0:
+                        n_1st_half = int(len(helper_incl_2)/2)
+                    else:
+                        n_1st_half = int(round(len(helper_incl_2)/2 + 0.5, 0))
+
+                    if average_type == "arithmetic mean":
+                        dataset_1st_half = round(np.mean(helper_incl_2[:n_1st_half]), 4)
+                        dataset_2nd_half = round(np.mean(helper_incl_2[n_1st_half:]), 4)
+                    else:
+                        dataset_1st_half = round(np.median(helper_incl_2[:n_1st_half]), 4)
+                        dataset_2nd_half = round(np.median(helper_incl_2[n_1st_half:]), 4)
+
+                    if dataset_2nd_half > 0:
+                        parallelism_factor = round(dataset_1st_half/dataset_2nd_half, 4)
+                    else:
+                        parallelism_factor = np.nan
+
                     if stack_intervals == True:
                         helper_incl_sigma.append(np.std(helper_incl, ddof=1)/np.sqrt(len(helper_incl)))
 
                     if average_type == "arithmetic mean":
-                        # result_incl = np.mean(helper_incl)
-                        # result_incl_1sigma = np.mean(helper_incl_sigma)
                         result_incl = np.mean(helper_incl_2)
                         result_incl_1sigma = np.mean(np.std(helper_incl_2, ddof=1)/np.sqrt(len(helper_incl_2)))
+                        results_incl_sigma = np.std(helper_incl_2, ddof=1)
                     else:
-                        # result_incl = np.median(helper_incl)
-                        # result_incl_1sigma = np.median(helper_incl_sigma)
                         result_incl = np.median(helper_incl_2)
                         result_incl_1sigma = np.median(np.std(helper_incl_2, ddof=1)/np.sqrt(len(helper_incl_2)))
+                        results_incl_sigma = np.std(helper_incl_2, ddof=1)
 
                     helper_results[isotope]["uncorrected"]["INCL"] = result_incl
                     helper_results[isotope]["uncorrected"]["1 SIGMA INCL"] = result_incl_1sigma
@@ -390,7 +437,9 @@ class IntensityQuantification:
                     helper_results[isotope]["corrected"]["1 SIGMA MIX"] = result_incl_1sigma - result_bg_1sigma
                     self.results_container["INCL"][isotope] = result_incl
                     self.results_container["1 SIGMA INCL"][isotope] = result_incl_1sigma
+                    self.results_container["INCL SIGMA"][isotope] = results_incl_sigma
                     self.results_container["N INCL"][isotope] = len(helper_incl_2)
+                    self.results_container["Parallelism INCL"][isotope] = [dataset_1st_half, dataset_2nd_half]
 
             # for key, item in helper_results[isotope].items():
             #     print(key, item)

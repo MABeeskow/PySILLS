@@ -6,18 +6,24 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.05.2024
+# Date:		07.06.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES
+# external
 import re, os, sys, datetime
 import tkinter as tk
 import numpy as np
 import scipy.stats as stats
-from modules import data
 import tkinter.filedialog as fd
-from modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
+# internal
+try:
+    from modules import data
+    from modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
+except:
+    from pysills.modules import data
+    from pysills.modules.spike_elimination import two_sided_test_indices, two_sided_test_outliers
 
 ## CLASSES
 class EssentialDataProcessing:
@@ -393,10 +399,9 @@ class Essentials:
         xi_opt[var_i] = [m, c]
 
 class EssentialsSRM:
-    #
     def __init__(self):
         pass
-    #
+
     def place_srm_values(self, srm_name, srm_dict):
         path = os.getcwd()
         parent = os.path.dirname(path)
@@ -409,7 +414,8 @@ class EssentialsSRM:
         except:
             path = os.getcwd()
             path = os.path.dirname(os.path.realpath(sys.argv[0]))
-            data_srm = data.general().importSRM(filename=path + str("/lib/srm/NIST_606.csv"))
+            data_srm = data.general().importSRM(filename=path + str("/pysills/lib/srm/NIST_606.csv"))
+            path += "/pysills"
         #
         if srm_name == "NIST 606":
             data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_606.csv"))   # replaces parent with path
