@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pysills/modules/data_reduction.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/modules/data_reduction.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pysills/pysills_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/pysills_app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -85,9 +84,8 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.9" />
       <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/pysills/pysills_app.py" />
@@ -115,14 +113,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1688744210159</updated>
-    </task>
-    <task id="LOCAL-00101" summary="&quot;updated 'spike elimination'&quot;">
-      <option name="closed" value="true" />
-      <created>1713136174150</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1713136174150</updated>
     </task>
     <task id="LOCAL-00102" summary="&quot;performance improvements&quot;">
       <option name="closed" value="true" />
@@ -508,7 +498,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718188454637</updated>
     </task>
-    <option name="localTasksCounter" value="150" />
+    <task id="LOCAL-00150" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718192941456</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1718192941456</updated>
+    </task>
+    <option name="localTasksCounter" value="151" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

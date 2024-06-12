@@ -1133,7 +1133,7 @@ class PySILLS(tk.Frame):
         self.maximum_amounts = {}
 
         for oxide in self.conversion_factors.keys():
-            key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+            key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
             element_cation = key.group(1)
 
             if key.group(2) != "":
@@ -2526,7 +2526,7 @@ class PySILLS(tk.Frame):
                 var_energy = self.container_var["Gas Energy"].get()
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if float(var_energy) >= float(self.ionization_energies["First"][element]) \
                         and float(var_energy) >= float(self.ionization_energies["Second"][element]):
@@ -2549,7 +2549,7 @@ class PySILLS(tk.Frame):
                 var_energy = self.container_var["Gas Energy"].get()
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if float(var_energy) >= float(self.ionization_energies["First"][element]) \
                         and float(var_energy) >= float(self.ionization_energies["Second"][element]):
@@ -2571,7 +2571,7 @@ class PySILLS(tk.Frame):
                 var_energy = self.container_var["Gas Energy"].get()
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if float(var_energy) >= float(self.ionization_energies["First"][element]) \
                         and float(var_energy) >= float(self.ionization_energies["Second"][element]):
@@ -2593,7 +2593,7 @@ class PySILLS(tk.Frame):
                 var_energy = self.container_var["Gas Energy"].get()
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if float(var_energy) >= float(self.ionization_energies["First"][element]) \
                         and float(var_energy) >= float(self.ionization_energies["Second"][element]):
@@ -2615,7 +2615,7 @@ class PySILLS(tk.Frame):
                 var_energy = self.container_var["Gas Energy"].get()
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if float(var_energy) >= float(self.ionization_energies["First"][element]) \
                         and float(var_energy) >= float(self.ionization_energies["Second"][element]):
@@ -2637,7 +2637,7 @@ class PySILLS(tk.Frame):
                 var_energy = self.container_var["Gas Energy"].get()
             #
             for isotope in self.container_lists["ISOTOPES"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if float(var_energy) >= float(self.ionization_energies["First"][element]) \
                         and float(var_energy) >= float(self.ionization_energies["Second"][element]):
@@ -2665,7 +2665,7 @@ class PySILLS(tk.Frame):
             self.container_files["STD"][parts[-1]]["IS"].set(element)
         #
         if element in self.container_lists["ISOTOPES"]:
-            key_is = re.search("(\D+)(\d+)", element)
+            key_is = re.search(r"(\D+)(\d+)", element)
             element_is = key_is.group(1)
         if mineral != None and mineral != "Select Mineral":
             if element in self.mineral_chem[mineral]:
@@ -2720,7 +2720,7 @@ class PySILLS(tk.Frame):
         self.container_var["SMPL"][file]["IS"].set(element)
         if mineral != None:
             parts = file.split("/")
-            key_i = re.search("(\D+)(\d+)", element)
+            key_i = re.search(r"(\D+)(\d+)", element)
             var_element = key_i.group(1)
             self.container_files["SMPL"][parts[-1]]["IS Concentration"].set(self.mineral_chem[mineral][var_element])
             #
@@ -2736,7 +2736,7 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][file]["IS"].set(element)
         #
         if element in self.container_lists["ISOTOPES"]:
-            key_is = re.search("(\D+)(\d+)", element)
+            key_is = re.search(r"(\D+)(\d+)", element)
             element_is = key_is.group(1)
         if mineral != None and mineral != "Select Mineral":
             if element in self.mineral_chem[mineral]:
@@ -2983,15 +2983,6 @@ class PySILLS(tk.Frame):
                     dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors_temporary[isotope],
                     linewidth=var_lw, visible=True)
                 self.temp_lines[isotope] = ln
-
-        if file_short in self.container_helper[var_filetype]:
-            if len(self.container_helper[var_filetype][file_short]["BG"]["Content"]) > 0:
-                times_bg = self.container_helper[var_filetype][file_short]["BG"]["Content"][1]["Times"]
-                box_bg = var_ax.axvspan(
-                    float(times_bg[0]), float(times_bg[1]), alpha=0.35, color=self.colors_intervals["BG"])
-            if len(self.container_helper[var_filetype][file_short]["MAT"]["Content"]) > 0:
-                times_sig = self.container_helper[var_filetype][file_short]["MAT"]["Content"][1]["Times"]
-                box_sig = var_ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=self.colors_intervals["MAT"])
 
         var_ax.grid(True)
         var_ax.set_yscale("log")
@@ -3725,7 +3716,7 @@ class PySILLS(tk.Frame):
             possible_is = []
             for element in self.container_var["mineralchemistry"]:
                 for isotope in self.container_lists["ISOTOPES"]:
-                    key = re.search("(\D+)(\d+)", isotope)
+                    key = re.search(r"(\D+)(\d+)", isotope)
                     if element == key.group(1):
                         possible_is.append(isotope)
 
@@ -3733,7 +3724,7 @@ class PySILLS(tk.Frame):
                 list_fluidchemistry = ["H", "Na", "Mg", "Ca", "K", "Cl", "F", "Br", "I", "At"]
                 for element in list_fluidchemistry:
                     for isotope in self.container_lists["ISOTOPES"]:
-                        key = re.search("(\D+)(\d+)", isotope)
+                        key = re.search(r"(\D+)(\d+)", isotope)
                         if element == key.group(1):
                             possible_is.append(isotope)
 
@@ -3777,7 +3768,7 @@ class PySILLS(tk.Frame):
             self.mineral_chem["Unknown"] = {}
             for element in self.container_var["mineralchemistry"]:
                 for isotope in self.container_lists["ISOTOPES"]:
-                    key = re.search("(\D+)(\d+)", isotope)
+                    key = re.search(r"(\D+)(\d+)", isotope)
                     if element == key.group(1):
                         self.mineral_chem["Unknown"][element] = self.srm_actual[var_min][element]
                         self.mineral_chem["Unknown"][isotope] = self.srm_actual[var_min][element]
@@ -7771,7 +7762,7 @@ class PySILLS(tk.Frame):
                     self.container_lists["Measured Elements"][key] = {}
 
                 for isotope in df_isotopes:
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     if element not in self.container_lists["Measured Elements"][key]:
                         self.container_lists["Measured Elements"][key][element] = [isotope]
@@ -10028,7 +10019,7 @@ class PySILLS(tk.Frame):
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
                 self.srm_isotopes[isotope] = {}
                 var_srm = self.container_var["SRM"][isotope].get()
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 var_element = key_element.group(1)
                 self.srm_isotopes[isotope]["SRM"] = var_srm
                 if var_element in self.srm_actual[var_srm]:
@@ -10713,7 +10704,7 @@ class PySILLS(tk.Frame):
         for index, isotope in enumerate(self.container_lists["ISOTOPES"]):
             var_srm_i = self.container_var["SRM"][isotope].get()
             #
-            key_element = re.search("(\D+)(\d+)", isotope)
+            key_element = re.search(r"(\D+)(\d+)", isotope)
             element = key_element.group(1)
             if element in self.srm_actual[var_srm_i]:
                 var_isotope_concentration = self.srm_actual[var_srm_i][element]
@@ -11992,7 +11983,7 @@ class PySILLS(tk.Frame):
             self.list_ti_isotopes = []
 
             for isotope in file_isotopes:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if element == "Ti":
                     self.list_ti_isotopes.append(isotope)
@@ -13242,7 +13233,7 @@ class PySILLS(tk.Frame):
                               "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                         self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
                             if element not in self.container_lists["Measured Elements"]["All"]:
@@ -13285,7 +13276,7 @@ class PySILLS(tk.Frame):
                               "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                         self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
                             if element not in self.container_lists["Measured Elements"]["All"]:
@@ -13308,7 +13299,7 @@ class PySILLS(tk.Frame):
                     print("There is a problem with an isotope (->", isotope, "<-) that is probably just a number. "
                           "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                 else:
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     if key_element != None:
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"]["All"]:
@@ -13321,7 +13312,7 @@ class PySILLS(tk.Frame):
                     if isotope.isdigit():
                         pass
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"][filename_short]:
                             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
@@ -13336,7 +13327,7 @@ class PySILLS(tk.Frame):
                     if isotope.isdigit():
                         pass
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"][filename_short]:
                             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
@@ -13380,7 +13371,7 @@ class PySILLS(tk.Frame):
             if isotope.isdigit():
                 pass
             else:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
 
                 if element not in self.container_lists["Elements"]:
@@ -14074,7 +14065,7 @@ class PySILLS(tk.Frame):
 
         for list_oxides in all_lists:
             for oxide in list_oxides:
-                key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
                 element_oxide = key.group(1)
                 if element_oxide in self.container_lists["Measured Elements"]["All"]:
                     if oxide not in ["PbO2", "Pr6O11", "Tb4O7"]:
@@ -15296,7 +15287,7 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=opt_srm_i)
                 text_iso.insert("end", "\t")
                 #
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
 
                 self.container_var["charge"][isotope] = {"textvar": tk.StringVar()}
@@ -16556,7 +16547,7 @@ class PySILLS(tk.Frame):
         for isotope in self.container_var["SRM"]:
             if isotope in self.container_lists["ISOTOPES"]:
                 var_srm_i = self.container_var["SRM"][isotope].get()
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if element in self.srm_actual[var_srm_i]:
                     var_isotope_concentration = self.srm_actual[var_srm_i][element]
@@ -16568,12 +16559,12 @@ class PySILLS(tk.Frame):
             list_elements = []
             list_compound = []
             for isotope in list_possible_elements:
-                key = re.search("(\D+)(\d*)", isotope)
+                key = re.search(r"(\D+)(\d*)", isotope)
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
                     list_elements.append(element_isotope)
             for oxide in list_oxides:
-                key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
                 element_oxide = key.group(1)
                 if element_oxide in list_elements:
                     if oxide not in list_compound:
@@ -16596,7 +16587,7 @@ class PySILLS(tk.Frame):
             list_elements = []
             list_compound = []
             for isotope in list_possible_elements:
-                key = re.search("(\D+)(\d*)", isotope)
+                key = re.search(r"(\D+)(\d*)", isotope)
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
                     list_elements.append(element_isotope)
@@ -16949,7 +16940,7 @@ class PySILLS(tk.Frame):
                 amount_oxide_i = 0.0
                 self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("0.0")
 
-            key_oxide = re.search("(\D+)(\d*)(\D+)(\d*)", oxide_i)
+            key_oxide = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide_i)
             name_cation = key_oxide.group(1)
             name_anion = key_oxide.group(3)
 
@@ -17073,7 +17064,7 @@ class PySILLS(tk.Frame):
             self.container_var["IS"]["Default SMPL Concentration"].set(value_default_is)
 
             if var_key == "Oxide":
-                key = re.search("(\D+)(\d*)(\D+)(\d*)", var_opt)
+                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", var_opt)
                 var_opt_element = key.group(1)
             else:
                 var_opt_element = var_opt
@@ -17100,7 +17091,7 @@ class PySILLS(tk.Frame):
 
         if mode == "oxides":
             oxide_i = self.container_var["SMPL"][filename_long]["Matrix Setup"]["Oxide"]["Name"].get()
-            key_oxide = re.search("(\D+)(\d*)(\D+)(\d*)", oxide_i)
+            key_oxide = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide_i)
             name_cation = key_oxide.group(1)
             name_anion = key_oxide.group(3)
             possible_is = self.container_lists["Measured Elements"][filename_short][name_cation]
@@ -17210,7 +17201,7 @@ class PySILLS(tk.Frame):
                     var_oxide = self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].get()
 
                     if var_oxide != "Select Oxide":
-                        key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
+                        key = re.search(r"(\D+)(\d*)(\D+)(\d*)", var_oxide)
                         list_elements = []
                         list_amounts = []
                         list_fraction = {}
@@ -18126,7 +18117,7 @@ class PySILLS(tk.Frame):
 
         file_isotopes = self.container_lists["Measured Isotopes"][var_filename]
         for isotope in file_isotopes:
-            key = re.search("(\D+)(\d*)", isotope)
+            key = re.search(r"(\D+)(\d*)", isotope)
             element = key.group(1)
             if self.pysills_mode in ["MA", "FI"]:
                 concentration_mat_i = self.container_concentration["SMPL"]["RAW"][var_filename]["MAT"][isotope]
@@ -18244,7 +18235,7 @@ class PySILLS(tk.Frame):
                     list_considered_isotopes.append(isotope)
             list_categories.extend(list_considered_isotopes)
 
-            key_element_is = re.search("(\D+)(\d+)", var_is)
+            key_element_is = re.search(r"(\D+)(\d+)", var_is)
             element_is = key_element_is.group(1)
             stop_calculation = False
             if element_is in self.srm_actual[var_srm_file]:
@@ -18610,7 +18601,7 @@ class PySILLS(tk.Frame):
         item = self.container_helper[var_type][var_file_short][var_key]["Listbox"].curselection()[0]
         value = var_lb.get(item)
         value_parts = value.split(" ")
-        key_id = re.search("(\D+)(\d+)", value_parts[0])
+        key_id = re.search(r"(\D+)(\d+)", value_parts[0])
         var_id = int(key_id.group(2))
 
         self.container_helper[var_type][var_file_short][var_key]["Indices"].remove(var_id)
@@ -20131,7 +20122,7 @@ class PySILLS(tk.Frame):
             for isotope in file_isotopes:
                 if var_filetype == "STD":
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     if element in self.srm_actual[var_srm_i]:
                         var_concentration_i = self.srm_actual[var_srm_i][element]
@@ -20234,7 +20225,7 @@ class PySILLS(tk.Frame):
                     if var_is != None:
                         break
             else:
-                key_element_is_smpl = re.search("(\D+)(\d+)", var_is_smpl)
+                key_element_is_smpl = re.search(r"(\D+)(\d+)", var_is_smpl)
                 element_is_smpl = key_element_is_smpl.group(1)
                 var_intensity_is_smpl = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
                     var_is_smpl]
@@ -20245,7 +20236,7 @@ class PySILLS(tk.Frame):
                     var_is = var_is_smpl
 
             if var_is != None:
-                key_element_is = re.search("(\D+)(\d+)", var_is)
+                key_element_is = re.search(r"(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
 
                 if element_is in self.srm_actual[srm_file]:
@@ -20253,7 +20244,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_is = var_is_smpl
 
-                key_element_is = re.search("(\D+)(\d+)", var_is)
+                key_element_is = re.search(r"(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
 
                 var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
@@ -20279,7 +20270,7 @@ class PySILLS(tk.Frame):
                             else:
                                 var_concentration_is_smpl = 0.0
 
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
 
                         if element in self.srm_actual[srm_isotope]:
@@ -20317,7 +20308,7 @@ class PySILLS(tk.Frame):
                         else:
                             var_concentration_is = 0.0
 
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element in self.srm_actual[srm_file]:
                             if var_is_host == isotope:
@@ -20347,7 +20338,7 @@ class PySILLS(tk.Frame):
                             print("The element", element_is, "is not part of the SRM", srm_file + "!")
                             var_concentration_is = 0.0
 
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
 
                         if element in self.srm_actual[srm_file]:
@@ -20433,7 +20424,7 @@ class PySILLS(tk.Frame):
                     if var_is != None:
                         break
             else:
-                key_element_is_smpl = re.search("(\D+)(\d+)", var_is_smpl)
+                key_element_is_smpl = re.search(r"(\D+)(\d+)", var_is_smpl)
                 element_is_smpl = key_element_is_smpl.group(1)
                 var_intensity_is_smpl = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
                     var_is_smpl]
@@ -20444,14 +20435,14 @@ class PySILLS(tk.Frame):
                     var_is = var_is_smpl
 
             if var_is != None:
-                key_element_is = re.search("(\D+)(\d+)", var_is)
+                key_element_is = re.search(r"(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
                 if element_is in self.srm_actual[srm_file]:
                     pass
                 else:
                     var_is = var_is_smpl
 
-                key_element_is = re.search("(\D+)(\d+)", var_is)
+                key_element_is = re.search(r"(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
 
                 var_intensity_is = self.container_intensity_corrected["STD"][var_datatype][filename_short]["MAT"][
@@ -20464,7 +20455,7 @@ class PySILLS(tk.Frame):
                     isotopes_file = self.container_lists["Measured Isotopes"][filename_short]
                 else:
                     srm_isotope = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
                     if element_is in self.srm_actual[srm_file]:
@@ -20594,7 +20585,7 @@ class PySILLS(tk.Frame):
                 else:
                     var_is = var_is_smpl
 
-                key_element_is = re.search("(\D+)(\d+)", var_is)
+                key_element_is = re.search(r"(\D+)(\d+)", var_is)
                 element_is = key_element_is.group(1)
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     "MAT"][var_is]
@@ -20613,7 +20604,7 @@ class PySILLS(tk.Frame):
                             else:
                                 var_concentration_is = 0.0
 
-                            key_element = re.search("(\D+)(\d+)", isotope)
+                            key_element = re.search(r"(\D+)(\d+)", isotope)
                             element = key_element.group(1)
                             if element in self.srm_actual[var_srm_i]:
                                 if var_is_host == isotope:
@@ -20641,7 +20632,7 @@ class PySILLS(tk.Frame):
                             else:
                                 var_concentration_is = 0.0
 
-                            key_element = re.search("(\D+)(\d+)", isotope)
+                            key_element = re.search(r"(\D+)(\d+)", isotope)
                             element = key_element.group(1)
                             if element in self.srm_actual[var_srm_file]:
                                 if var_is_host == isotope:
@@ -20669,7 +20660,7 @@ class PySILLS(tk.Frame):
                             else:
                                 var_concentration_is = 0.0
 
-                            key_element = re.search("(\D+)(\d+)", isotope)
+                            key_element = re.search(r"(\D+)(\d+)", isotope)
                             element = key_element.group(1)
                             if element in self.srm_actual[var_srm_file]:
                                 var_concentration_i = self.srm_actual[var_srm_file][element]
@@ -21000,7 +20991,7 @@ class PySILLS(tk.Frame):
                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][isotope]
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     if element in self.srm_actual[var_srm_i]:
                         var_concentration_i = self.srm_actual[var_srm_i][element]
@@ -21082,7 +21073,7 @@ class PySILLS(tk.Frame):
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
                 for isotope in file_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
                     if element in self.srm_actual[var_srm_i]:
@@ -21099,7 +21090,7 @@ class PySILLS(tk.Frame):
                 if (self.container_var["Quantification Mineral"]["Method"].get() == "Internal Standard" and
                         self.oxide_calculation_mat.get() == 0):
                     var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
-                    key_element = re.search("(\D+)(\d+)", var_is)
+                    key_element = re.search(r"(\D+)(\d+)", var_is)
                     is_element = key_element.group(1)
                     max_amount_is = self.maximum_amounts[is_element]
                     var_concentration_is = float(self.container_var[var_filetype][var_file_long]["IS Data"][
@@ -21140,7 +21131,7 @@ class PySILLS(tk.Frame):
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
                                 isotope] = var_result_sigma_i
 
-                            key_element = re.search("(\D+)(\d+)", isotope)
+                            key_element = re.search(r"(\D+)(\d+)", isotope)
                             element = key_element.group(1)
                             max_amount_i = self.maximum_amounts[element]
 
@@ -21182,7 +21173,7 @@ class PySILLS(tk.Frame):
                             self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
                                 isotope] = var_result_sigma_i
 
-                            key_element = re.search("(\D+)(\d+)", isotope)
+                            key_element = re.search(r"(\D+)(\d+)", isotope)
                             element = key_element.group(1)
                             max_amount_i = self.maximum_amounts[element]
 
@@ -21381,7 +21372,7 @@ class PySILLS(tk.Frame):
 
         helper_a = 0
         for isotope in file_isotopes:
-            key_element = re.search("(\D+)(\d+)", isotope)
+            key_element = re.search(r"(\D+)(\d+)", isotope)
             element = key_element.group(1)
             if isotope == var_is:
                 element_is = element
@@ -21470,7 +21461,7 @@ class PySILLS(tk.Frame):
             list_oxides = self.container_lists["Selected Oxides"]["All"]
 
         for oxide in list_oxides:
-            key_element = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+            key_element = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
             element = key_element.group(1)
             if element in self.container_lists["Measured Elements"]:
                 list_isotopes = self.container_lists["Measured Elements"][element]
@@ -21603,7 +21594,7 @@ class PySILLS(tk.Frame):
                 helper_oxides[oxide] = {
                     "Element": None, "Isotopes": [], "Intensities": {}, "Sensitivities": {}, "a": {},
                     "b": {}, "c": {}, "d": {}, "e": {}, "Concentrations": {}}
-            key_element = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+            key_element = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
             ref_element = key_element.group(1)
             if helper_oxides[oxide]["Element"] == None:
                 helper_oxides[oxide]["Element"] = ref_element
@@ -21612,7 +21603,7 @@ class PySILLS(tk.Frame):
             helper_oxides2[ref_element].append(oxide)
 
         for isotope in list_isotopes:
-            key_element = re.search("(\D+)(\d+)", isotope)
+            key_element = re.search(r"(\D+)(\d+)", isotope)
             element = key_element.group(1)
             if element in helper_oxides2:
                 for oxide in helper_oxides2[element]:
@@ -21625,7 +21616,7 @@ class PySILLS(tk.Frame):
         # var_c = 0
         # for oxide, oxide_container in helper_oxides.items():
         #     for isotope in oxide_container["Isotopes"]:
-        #         key_element = re.search("(\D+)(\d+)", isotope)
+        #         key_element = re.search(r"(\D+)(\d+)", isotope)
         #         element = key_element.group(1)
         #         if element not in ["F", "Cl", "Br", "I", "At", "Ts"]:
         #             var_intensity_i = self.container_intensity_corrected[filetype][datatype][filename_short][focus][isotope]
@@ -21740,7 +21731,7 @@ class PySILLS(tk.Frame):
         #
         # for oxide, oxide_container in helper_oxides.items():
         #     for isotope in oxide_container["Isotopes"]:
-        #         key_element = re.search("(\D+)(\d+)", isotope)
+        #         key_element = re.search(r"(\D+)(\d+)", isotope)
         #         element = key_element.group(1)
         #         if element not in ["F", "Cl", "Br", "I", "At", "Ts"]:
         #             var_e = oxide_container["b"][isotope]*var_d
@@ -21775,7 +21766,7 @@ class PySILLS(tk.Frame):
         #
         # for oxide, oxide_container in helper_oxides.items():
         #     for isotope in oxide_container["Isotopes"]:
-        #         key_element = re.search("(\D+)(\d+)", isotope)
+        #         key_element = re.search(r"(\D+)(\d+)", isotope)
         #         element = key_element.group(1)
         #         if element in ["F", "Cl", "Br", "I", "At", "Ts"]:
         #             var_is = value_is["Isotope"]
@@ -23325,7 +23316,7 @@ class PySILLS(tk.Frame):
                               "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                         self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
                             if element not in self.container_lists["Measured Elements"]["All"]:
@@ -23361,14 +23352,14 @@ class PySILLS(tk.Frame):
                               "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                         self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
                             if element not in self.container_lists["Measured Elements"]["All"]:
                                 self.container_lists["Measured Elements"]["All"].append(element)
 
             for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 if key_element != None:
                     element = key_element.group(1)
                     if element not in self.container_lists["Measured Elements"]["All"]:
@@ -23377,7 +23368,7 @@ class PySILLS(tk.Frame):
                     print("There is a problem with an isotope (->", isotope, "<-) that is probably just a number. "
                           "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                 else:
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     if key_element != None:
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"]["All"]:
@@ -23390,7 +23381,7 @@ class PySILLS(tk.Frame):
                     if isotope.isdigit():
                         pass
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"][filename_short]:
                             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
@@ -23405,7 +23396,7 @@ class PySILLS(tk.Frame):
                     if isotope.isdigit():
                         pass
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"][filename_short]:
                             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
@@ -23452,7 +23443,7 @@ class PySILLS(tk.Frame):
             if isotope.isdigit():
                 pass
             else:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
 
                 if element not in self.container_lists["Elements"]:
@@ -23668,7 +23659,7 @@ class PySILLS(tk.Frame):
                               "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                         self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
                             if element not in self.container_lists["Measured Elements"]["All"]:
@@ -23701,7 +23692,7 @@ class PySILLS(tk.Frame):
                               "Please check this out and correct it if possible. Otherwise, it will be ignored here.")
                         self.container_lists["Measured Isotopes"][file_parts[-1]].remove(isotope)
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         if key_element != None:
                             element = key_element.group(1)
                             if element not in self.container_lists["Measured Elements"]["All"]:
@@ -23711,7 +23702,7 @@ class PySILLS(tk.Frame):
                 if isotope.isdigit():
                     pass
                 else:
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
                     if element not in self.container_lists["Measured Elements"]["All"]:
                         self.container_lists["Measured Elements"]["All"].append(element)
@@ -23723,7 +23714,7 @@ class PySILLS(tk.Frame):
                     if isotope.isdigit():
                         pass
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"][filename_short]:
                             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
@@ -23738,7 +23729,7 @@ class PySILLS(tk.Frame):
                     if isotope.isdigit():
                         pass
                     else:
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         if element not in self.container_lists["Measured Elements"][filename_short]:
                             self.container_lists["Measured Elements"][filename_short][element] = [isotope]
@@ -23785,7 +23776,7 @@ class PySILLS(tk.Frame):
             if isotope.isdigit():
                 pass
             else:
-                key_element = re.search("(\D+)(\d+)", isotope)
+                key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
                 if element not in self.container_lists["Elements"]:
                     self.container_lists["Elements"].append(element)
@@ -24299,7 +24290,7 @@ class PySILLS(tk.Frame):
             for isotope in file_isotopes:
                 if var_filetype == "STD":
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
                     var_concentration_i = self.srm_actual[var_srm_i][element]
@@ -24413,7 +24404,7 @@ class PySILLS(tk.Frame):
                             var_file_short]["MAT"][isotope]
 
                         var_srm_i = self.container_var["SRM"][isotope].get()
-                        key_element = re.search("(\D+)(\d+)", isotope)
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
                         var_concentration_i = self.srm_actual[var_srm_i][element]
 
@@ -24488,7 +24479,7 @@ class PySILLS(tk.Frame):
             if var_filetype == "STD":
                 for isotope in file_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
                     var_result_i = self.srm_actual[var_srm_i][element]
@@ -24995,7 +24986,7 @@ class PySILLS(tk.Frame):
             if var_filetype == "STD":
                 for isotope in file_isotopes:
                     var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search("(\D+)(\d+)", isotope)
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
                     var_result_i = self.srm_actual[var_srm_i][element]
@@ -28111,7 +28102,7 @@ class PySILLS(tk.Frame):
             var_is = var_opt
             if var_is != "Select IS":
                 var_srm_is = self.container_var["SRM"][var_is].get()
-                key_element = re.search("(\D+)(\d+)", var_is)
+                key_element = re.search(r"(\D+)(\d+)", var_is)
                 element = key_element.group(1)
                 var_concentration_is = self.srm_actual[var_srm_is][element]
             for file_std in self.container_lists["STD"]["Long"]:
@@ -29683,14 +29674,9 @@ class PySILLS(tk.Frame):
                     "RAW"] = ln_raw
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
-                    #if "Uncut" in self.container_measurements["EDITED"][str_filename_short][isotope]:
                     ln_smoothed = ax.plot(
-                        self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"], label=isotope,
-                        color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                    # ln_smoothed = ax.plot(
-                    #     self.dataset_time, self.container_measurements["EDITED"][str_filename_short][isotope][
-                    #         "Uncut"], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
-                    #     visible=True)
+                        self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
                     self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
                         "SMOOTHED"] = ln_smoothed
                     self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
@@ -30027,7 +30013,7 @@ class PySILLS(tk.Frame):
 
             list_categories.extend(list_considered_isotopes)
 
-            key_element_is = re.search("(\D+)(\d+)", var_is)
+            key_element_is = re.search(r"(\D+)(\d+)", var_is)
             element_is = key_element_is.group(1)
             stop_calculation = False
             if element_is in self.srm_actual[var_srm_file]:
@@ -30557,7 +30543,7 @@ class PySILLS(tk.Frame):
         item = self.container_helper[var_type][var_file_short][var_key]["Listbox"].curselection()[0]
         value = var_lb.get(item)
         value_parts = value.split(" ")
-        key_id = re.search("(\D+)(\d+)", value_parts[0])
+        key_id = re.search(r"(\D+)(\d+)", value_parts[0])
         var_id = int(key_id.group(2))
 
         self.container_helper[var_type][var_file_short][var_key]["Indices"].remove(var_id)
@@ -30972,12 +30958,12 @@ class PySILLS(tk.Frame):
             list_elements = []
             var_list_comp = []
             for isotope in self.container_lists["ISOTOPES"]:
-                key = re.search("(\D+)(\d*)", isotope)
+                key = re.search(r"(\D+)(\d*)", isotope)
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
                     list_elements.append(element_isotope)
             for oxide in list_oxides:
-                key = re.search("(\D+)(\d*)(\D+)(\d*)", oxide)
+                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
                 element_oxide = key.group(1)
                 if element_oxide in list_elements:
                     if oxide not in var_list_comp:
@@ -31013,7 +30999,7 @@ class PySILLS(tk.Frame):
             list_elements = []
             var_list_comp = []
             for isotope in self.container_lists["ISOTOPES"]:
-                key = re.search("(\D+)(\d*)", isotope)
+                key = re.search(r"(\D+)(\d*)", isotope)
                 element_isotope = key.group(1)
                 if element_isotope not in list_elements:
                     list_elements.append(element_isotope)
@@ -31174,7 +31160,7 @@ class PySILLS(tk.Frame):
 
             self.container_var[key_setting]["IS MAT Default Concentration"].set(1000000)
             if var_key == "Oxide":
-                key = re.search("(\D+)(\d*)(\D+)(\d*)", var_opt)
+                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", var_opt)
                 var_opt_element = key.group(1)
             else:
                 var_opt_element = var_opt
@@ -31184,7 +31170,7 @@ class PySILLS(tk.Frame):
                 if isotope.isdigit():
                     pass
                 else:
-                    key_02 = re.search("(\D+)(\d+)", isotope)
+                    key_02 = re.search(r"(\D+)(\d+)", isotope)
                     element = key_02.group(1)
                     if element == var_opt_element:
                         possible_is.append(isotope)
@@ -31222,7 +31208,7 @@ class PySILLS(tk.Frame):
                 self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Name"].set(var_opt)
                 #
                 var_oxide = self.container_var["SMPL"][file_smpl]["Host Only Tracer"]["Matrix"].get()
-                key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
+                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", var_oxide)
                 list_elements = []
                 list_amounts = []
                 list_fraction = {}
@@ -31296,7 +31282,7 @@ class PySILLS(tk.Frame):
 
                 if var_key == "Oxide":
                     var_oxide = self.container_var["SMPL"][file_smpl]["Matrix Setup"][var_key]["Name"].get()
-                    key = re.search("(\D+)(\d*)(\D+)(\d*)", var_oxide)
+                    key = re.search(r"(\D+)(\d*)(\D+)(\d*)", var_oxide)
                     list_elements = []
                     list_amounts = []
                     list_fraction = {}
@@ -31379,18 +31365,18 @@ class PySILLS(tk.Frame):
         for category in ["Chlorides", "Carbonates", "Sulfates"]:
             for salt, values in self.container_var[key_setting]["Salt Correction"][category].items():
                 if category == "Chlorides":
-                    parts_salt = re.search("([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)", salt)
+                    parts_salt = re.search(r"([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)", salt)
                 elif category == "Carbonates":
-                    parts_salt = re.search("([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)"
-                                           "([A-Z]{,1}[a-z]{,1})(\d*)", salt)
+                    parts_salt = re.search(
+                        r"([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)", salt)
                 else:
                     parts_salt = re.search(
-                        "([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)", salt)
+                        r"([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)([A-Z]{,1}[a-z]{,1})(\d*)", salt)
                 if values["State"].get() == 1:
                     self.container_lists["Salt Chemistry"][salt] = {}
                     self.container_lists["Selected Salts"].append(salt)
                     for isotope in self.container_lists["ISOTOPES"]:
-                        key = re.search("(\D+)(\d+)", isotope)
+                        key = re.search(r"(\D+)(\d+)", isotope)
                         for item in parts_salt.groups():
                             if item == "":
                                 item = str(1)
@@ -31791,7 +31777,7 @@ class PySILLS(tk.Frame):
                             molar_mass_na = elements_masses["Na"]
 
                             for isotope in file_isotopes:
-                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                key_isotope = re.search(r"(\D+)(\d+)", isotope)
                                 isotope_atom = key_isotope.group(1)
 
                                 if element == isotope_atom:
@@ -31870,7 +31856,7 @@ class PySILLS(tk.Frame):
                             molar_mass_na = elements_masses["Na"]
                             salt_composition += ", " + str(salt)
                             for isotope in file_isotopes:
-                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                key_isotope = re.search(r"(\D+)(\d+)", isotope)
                                 isotope_atom = key_isotope.group(1)
 
                                 if element == isotope_atom:
@@ -31998,7 +31984,7 @@ class PySILLS(tk.Frame):
                         molar_mass_na = elements_masses["Na"]
                         salt_composition += ", " + str(salt)
                         for isotope in file_isotopes:
-                            key_isotope = re.search("(\D+)(\d+)", isotope)
+                            key_isotope = re.search(r"(\D+)(\d+)", isotope)
                             isotope_atom = key_isotope.group(1)
 
                             if element == isotope_atom:
@@ -32230,7 +32216,7 @@ class PySILLS(tk.Frame):
                             molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
                             element = self.molar_masses_compounds[salt]["Cation"]
                             for isotope in file_isotopes:
-                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                key_isotope = re.search(r"(\D+)(\d+)", isotope)
                                 isotope_atom = key_isotope.group(1)
 
                                 if element == isotope_atom:
@@ -32332,7 +32318,7 @@ class PySILLS(tk.Frame):
                             salt_composition += ", " + str(salt)
 
                             for isotope in file_isotopes:
-                                key_isotope = re.search("(\D+)(\d+)", isotope)
+                                key_isotope = re.search(r"(\D+)(\d+)", isotope)
                                 isotope_atom = key_isotope.group(1)
 
                                 if element == isotope_atom:
@@ -32456,7 +32442,7 @@ class PySILLS(tk.Frame):
                         salt_composition += ", " + str(salt)
 
                         for isotope in file_isotopes:
-                            key_isotope = re.search("(\D+)(\d+)", isotope)
+                            key_isotope = re.search(r"(\D+)(\d+)", isotope)
                             isotope_atom = key_isotope.group(1)
 
                             if element == isotope_atom:
@@ -32810,7 +32796,7 @@ class PySILLS(tk.Frame):
         text_isotopes.pack(side="left", fill="both", expand=True)
 
         for var_isotope in self.container_lists["Measured Isotopes"]["All"]:
-            key_element_i = re.search("(\D+)(\d+)", var_isotope)
+            key_element_i = re.search(r"(\D+)(\d+)", var_isotope)
             element_i = key_element_i.group(1)
             if element_i in self.container_lists["Possible Cations"] or element_i in self.container_lists[
                 "Possible Anions"]:
@@ -33005,7 +32991,7 @@ class PySILLS(tk.Frame):
                 b_na = results_pypitzer.x[0]
                 b_cl = results_pypitzer.x[1]
                 str_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"].get()
-                key_element_is = re.search("(\D+)(\d+)", str_is)
+                key_element_is = re.search(r"(\D+)(\d+)", str_is)
                 element_is = key_element_is.group(1)
                 val_molar_mass_is = self.chemistry_data[element_is]
                 val_molar_mass_cl = self.chemistry_data["Cl"]
@@ -33031,12 +33017,12 @@ class PySILLS(tk.Frame):
                 file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
 
                 str_is = self.container_var["SMPL"][file_smpl_long]["IS Data"]["IS"].get()
-                key_element_is = re.search("(\D+)(\d+)", str_is)
+                key_element_is = re.search(r"(\D+)(\d+)", str_is)
                 element_is = key_element_is.group(1)
                 val_molar_mass_is = self.chemistry_data[element_is]
 
                 for isotope in file_isotopes:
-                    key_element_i = re.search("(\D+)(\d+)", isotope)
+                    key_element_i = re.search(r"(\D+)(\d+)", isotope)
                     element_i = key_element_i.group(1)
                     val_molar_mass_i = self.chemistry_data[element_i]
                     val_concentration_ratio_i = self.container_concentration_ratio["SMPL"][var_datatype][
@@ -33127,7 +33113,7 @@ class PySILLS(tk.Frame):
         helper_ratios = {}
 
         str_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
-        key_element_is = re.search("(\D+)(\d+)", str_is)
+        key_element_is = re.search(r"(\D+)(\d+)", str_is)
         element_is = key_element_is.group(1)
         val_molar_mass_is = self.chemistry_data[element_is]
 
@@ -33139,7 +33125,7 @@ class PySILLS(tk.Frame):
                 continue
 
             for isotope in list_isotopes:
-                key_element_i = re.search("(\D+)(\d+)", isotope)
+                key_element_i = re.search(r"(\D+)(\d+)", isotope)
                 element_i = key_element_i.group(1)
 
                 if element_i in self.temp_checkbuttons_pypitzer:
