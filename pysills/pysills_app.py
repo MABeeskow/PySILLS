@@ -17664,7 +17664,7 @@ class PySILLS(tk.Frame):
         self.tv_parallelism = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 40, n_rows=9,
             n_columns=n_columns - 40, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
-            n_categories=3, text_n=["Isotope", "Background", "Sample"], width_n=["90", "100", "100"], individual=True)
+            n_categories=2, text_n=["Isotope", "Sample"], width_n=["90", "100"], individual=True)
 
         ## INITIALIZATION
 
@@ -17686,26 +17686,33 @@ class PySILLS(tk.Frame):
 
             var_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
             file_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
-            value_bg1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
-                var_is][0]
             value_mat1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                 var_is][0]
-            value_bg2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
-                var_is][1]
             value_mat2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                 var_is][1]
+            if self.pysills_mode in ["FI", "MI"]:
+                value_incl1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
+                    var_is][0]
+                value_incl2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
+                    var_is][1]
             for isotope in file_isotopes:
-                value_bg1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
-                    isotope][0]
                 value_mat1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                     isotope][0]
-                value_bg2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
-                    isotope][1]
                 value_mat2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                     isotope][1]
-                result_bg_i = round((value_bg2_i/value_bg2_is)/(value_bg1_i/value_bg1_is), 2)
+                if self.pysills_mode in ["FI", "MI"]:
+                    value_incl1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short][
+                        "Parallelism INCL"][isotope][0]
+                    value_incl2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short][
+                        "Parallelism INCL"][isotope][1]
+
                 result_mat_i = round((value_mat2_i/value_mat2_is)/(value_mat1_i/value_mat1_is), 2)
-                entry_results = [isotope, result_bg_i, result_mat_i]
+                if self.pysills_mode in ["FI", "MI"]:
+                    result_incl_i = round((value_incl2_i/value_incl2_is)/(value_incl1_i/value_incl1_is), 2)
+                    entry_results = [isotope, result_mat_i, result_incl_i]
+                else:
+                    entry_results = [isotope, result_mat_i]
+
                 self.tv_parallelism.insert("", tk.END, values=entry_results)
 
     def switch_to_another_file(self, filetype, mode):
@@ -29282,7 +29289,7 @@ class PySILLS(tk.Frame):
         self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
 
         ## Window Settings
-        window_width = 1060
+        window_width = 1360
         window_height = 800
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -29343,6 +29350,11 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_05 = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column + 53, n_rows=1,
+            n_columns=n_columns - (start_column + 53) - 6, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Parallelism", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
         btn_02a = SE(
@@ -29380,6 +29392,13 @@ class PySILLS(tk.Frame):
             command=lambda var_parent=self.subwindow_fi_checkfile, var_type=str_filetype,
                            var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
+        btn_09 = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=n_columns - 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Update", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
+            command=lambda var_filetype=str_filetype, var_filename_short=str_filename_short,
+                           var_filename_long=str_filename_long:
+            self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
         ## RADIOBUTTONS
         rb_02a = SE(
@@ -29586,6 +29605,13 @@ class PySILLS(tk.Frame):
             n_columns=13, fg=self.bg_colors["Dark Font"],
             bg=self.colors_intervals["INCL LB"]).create_simple_listbox_grid(include_scrb_x=False)
         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"] = lb_incl
+
+        ## TREEVIEWS
+        self.tv_parallelism = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 53, n_rows=9,
+            n_columns=n_columns - 53, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+            n_categories=3, text_n=["Isotope", "Matrix", "Inclusion"],
+            width_n=["90", "100", "100"], individual=True)
 
         ## INITIALIZATION
         self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short].set(0)
