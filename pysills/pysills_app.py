@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.06.2024
+# Date:		12.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -17374,7 +17374,7 @@ class PySILLS(tk.Frame):
         self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short].set(0)
 
         ## Window Settings
-        window_width = 1060
+        window_width = 1100
         window_height = 800
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -17407,7 +17407,7 @@ class PySILLS(tk.Frame):
         ## FRAMES
         frm_00 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 10,
-            n_columns=n_columns - 11, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
+            n_columns=n_columns - 14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
             relief=tk.SOLID)
 
         ## LABELS
@@ -17440,6 +17440,11 @@ class PySILLS(tk.Frame):
             n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_05 = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 40, n_rows=1,
+            n_columns=n_columns - (start_column + 40) - 6, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Parallelism", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
         btn_02a = SE(
@@ -17478,6 +17483,13 @@ class PySILLS(tk.Frame):
             command=lambda var_parent=self.subwindow_ma_checkfile, var_type=str_filetype,
                            var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
+        btn_09 = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=n_columns - 6, n_rows=1, n_columns=6,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Update", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
+            command=lambda var_filetype=str_filetype, var_filename_short=var_filename_short,
+                           var_filename_long=str_filename_long:
+            self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
         ## RADIOBUTTONS
         rb_02a = SE(
@@ -17655,9 +17667,53 @@ class PySILLS(tk.Frame):
             bg=self.colors_intervals["MAT LB"]).create_simple_listbox_grid(include_scrb_x=False)
         self.container_helper[str_filetype][var_filename_short]["MAT"]["Listbox"] = lb_mat
 
+        ## TREEVIEWS
+        self.tv_parallelism = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 40, n_rows=9,
+            n_columns=n_columns - 40, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
+            n_categories=3, text_n=["Isotope", "Background", "Sample"], width_n=["90", "100", "100"], individual=True)
+
         ## INITIALIZATION
 
         self.ma_show_time_signal_diagram(var_file=str_filename_long, var_filetype=str_filetype)
+
+        for isotope in df_isotopes:
+            entry_parallelism = [isotope, "---", "---"]
+            self.tv_parallelism.insert("", tk.END, values=entry_parallelism)
+
+    def update_parallelism_values(self, var_filetype, var_filename_short, var_filename_long):
+        if var_filetype == "SMPL":
+            self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_filename_short)
+            self.get_intensity(
+                var_filetype=var_filetype, var_datatype="RAW", var_file_short=var_filename_short, mode="Specific")
+
+            if len(self.tv_parallelism.get_children()) > 0:
+                for item in self.tv_parallelism.get_children():
+                    self.tv_parallelism.delete(item)
+
+            var_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
+            file_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
+            value_bg1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
+                var_is][0]
+            value_mat1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
+                var_is][0]
+            value_bg2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
+                var_is][1]
+            value_mat2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
+                var_is][1]
+            for isotope in file_isotopes:
+                value_bg1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
+                    isotope][0]
+                value_mat1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
+                    isotope][0]
+                value_bg2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism BG"][
+                    isotope][1]
+                value_mat2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
+                    isotope][1]
+                result_bg_i = round((value_bg2_i/value_bg2_is)/(value_bg1_i/value_bg1_is), 2)
+                result_mat_i = round((value_mat2_i/value_mat2_is)/(value_mat1_i/value_mat1_is), 2)
+                entry_results = [isotope, result_bg_i, result_mat_i]
+                self.tv_parallelism.insert("", tk.END, values=entry_results)
 
     def switch_to_another_file(self, filetype, mode):
         if filetype == "STD":

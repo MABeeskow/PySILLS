@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		11.06.2024
+# Date:		12.06.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -320,7 +320,7 @@ class IntensityQuantification:
                     self.results_container["BG"][isotope] = result_bg
                     self.results_container["BG SIGMA"][isotope] = results_bg_sigma
                     self.results_container["N BG"][isotope] = len(helper_bg_2)
-                    self.results_container["Parallelism BG"][isotope] = parallelism_factor
+                    self.results_container["Parallelism BG"][isotope] = [dataset_1st_half, dataset_2nd_half]
                 elif focus == "MAT":
                     # Mineral/Matrix Signal
                     helper_mat = []
@@ -380,7 +380,7 @@ class IntensityQuantification:
                     self.results_container["1 SIGMA MAT"][isotope] = result_mat_1sigma
                     self.results_container["MAT SIGMA"][isotope] = results_mat_sigma
                     self.results_container["N MAT"][isotope] = len(helper_mat_2)
-                    self.results_container["Parallelism MAT"][isotope] = parallelism_factor
+                    self.results_container["Parallelism MAT"][isotope] = [dataset_1st_half, dataset_2nd_half]
                 elif focus == "INCL":
                     # Inclusion Signal
                     helper_incl = []
@@ -439,7 +439,7 @@ class IntensityQuantification:
                     self.results_container["1 SIGMA INCL"][isotope] = result_incl_1sigma
                     self.results_container["INCL SIGMA"][isotope] = results_incl_sigma
                     self.results_container["N INCL"][isotope] = len(helper_incl_2)
-                    self.results_container["Parallelism INCL"][isotope] = parallelism_factor
+                    self.results_container["Parallelism INCL"][isotope] = [dataset_1st_half, dataset_2nd_half]
 
             # for key, item in helper_results[isotope].items():
             #     print(key, item)
