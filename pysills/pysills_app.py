@@ -15,6 +15,7 @@
 import os, pathlib, sys, re, datetime, csv, string, math, webbrowser, time
 import numpy as np
 import pandas as pd
+import scipy.io
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -8537,6 +8538,9 @@ class PySILLS(tk.Frame):
             parent=self.parent,
             filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
                        ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
+
+        # if "mat" in filename[0]:
+        #     mat = scipy.io.loadmat(filename[0])
 
         for i in filename:
             if i not in var_list:
