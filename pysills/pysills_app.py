@@ -1996,7 +1996,12 @@ class PySILLS(tk.Frame):
 
             df_data = self.container_measurements["Dataframe"][file_short_original]
             self.container_measurements["Dataframe"][var_file_short_copy] = df_data
-            self.container_spikes[var_file_short_copy] = {}
+
+            if file_short_original in self.container_spikes:
+                self.container_spikes[var_file_short_copy] = self.container_spikes[file_short_original].copy()
+            else:
+                self.container_spikes[var_file_short_copy] = {}
+
             self.copied_file = True
 
             try:
@@ -2083,7 +2088,12 @@ class PySILLS(tk.Frame):
 
             df_data = self.container_measurements["Dataframe"][file_short_original]
             self.container_measurements["Dataframe"][var_file_short_copy] = df_data
-            self.container_spikes[var_file_short_copy] = {}
+
+            if file_short_original in self.container_spikes:
+                self.container_spikes[var_file_short_copy] = self.container_spikes[file_short_original].copy()
+            else:
+                self.container_spikes[var_file_short_copy] = {}
+
             self.copied_file = True
 
             try:
@@ -4722,6 +4732,231 @@ class PySILLS(tk.Frame):
             if current_step >= 100:
                 self.lbl_prg_spk.configure(text="Spike detection finished!", anchor=tk.W)
                 subwindow_progressbar_spike_elimination.destroy()
+
+    def single_spike_elimination(self, var_filetype, var_filename_short, var_spike_elimination_performed=True):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        elif self.pysills_mode == "FI":
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
+        if self.pysills_mode == "MA":
+            var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
+            var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
+            if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
+                var_method = 0
+            elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+                var_method = 1
+            elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
+                var_method = 2
+        elif self.pysills_mode == "FI":
+            var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
+            var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
+            if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
+                var_method = 0
+            elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+                var_method = 1
+            elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
+                var_method = 2
+        elif self.pysills_mode == "MI":
+            var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
+            var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
+            if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
+                var_method = 0
+            elif self.container_var["Spike Elimination Method"].get() == "Grubbs-Test":
+                var_method = 1
+            elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
+                var_method = 2
+
+        list_times = {}
+        subwindow_progressbar_spike_elimination, prgbar_spk = self.create_progress_bar_spike_elimination()
+        n_files = len(self.container_lists[var_filetype]["Short"])
+        n_isotopes = len(self.container_lists["Measured Isotopes"]["All"])
+        n_steps = n_files*n_isotopes
+        stepwidth = round(100/n_steps, 2)
+        current_step = 0
+        self.update_progress(parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+        self.lbl_prg_spk.configure(text="Spike detection started!", anchor=tk.W)
+
+        list_times[var_filename_short] = []
+        index_filename = self.container_lists[var_filetype]["Short"].index(var_filename_short)
+        filename_long = self.container_lists[var_filetype]["Long"][index_filename]
+        self.lbl_prg_spk.configure(text=var_filename_short)
+        if self.container_var[var_filetype][filename_long]["Checkbox"].get() == 1:
+            isotopes_spiked_list = [*self.spikes_isotopes[var_filetype][var_filename_short]]
+            corrected_isotopes = []
+            not_corrected_isotopes = []
+            self.container_spikes[var_filename_short] = {}
+            if len(isotopes_spiked_list) == 0 and "_copy" in var_filename_short:
+                var_filename_short_original = var_filename_short.replace("_copy", "")
+                isotopes_spiked_list = [*self.spikes_isotopes[var_filetype][var_filename_short_original]]
+            if var_filename_short not in self.container_spikes["Selection"]:
+                self.container_spikes["Selection"][var_filename_short] = {}
+
+            if self.file_loaded == False:
+                if self.container_icpms["name"] != None:
+                    var_skipheader = self.container_icpms["skipheader"]
+                    var_skipfooter = self.container_icpms["skipfooter"]
+                    df_data = DE(filename_long=filename_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                else:
+                    df_data = DE(filename_long=filename_long).get_measurements(
+                        delimiter=",", skip_header=3, skip_footer=1)
+            else:
+                try:
+                    df_data = self.container_measurements["Dataframe"][var_filename_short]
+                except:
+                    if "_copy" in var_filename_short:
+                        var_filename_short_original = var_filename_short.replace("_copy", "")
+                        var_filename_short = var_filename_short_original
+                        df_data = self.container_measurements["Dataframe"][var_filename_short]
+                    else:
+                        df_data = self.container_measurements["Dataframe"][var_filename_short]
+
+            list_names = list(df_data.columns.values)
+            list_names.pop(0)
+            df_isotopes = list_names
+
+            for isotope in df_isotopes:
+                if bool(self.spikes_isotopes[var_filetype][var_filename_short]) == False and "_copy" in var_filename_short:
+                    var_filename_short_original = var_filename_short.replace("_copy", "")
+                    self.spikes_isotopes[var_filetype][var_filename_short] = self.spikes_isotopes[var_filetype][
+                        var_filename_short_original]
+                if bool(self.spikes_isotopes[var_filetype][var_filename_short]):
+                    for isotope_spiked, intervals in self.spikes_isotopes[var_filetype][var_filename_short].items():
+                        if isotope_spiked not in self.container_spikes["Selection"][var_filename_short]:
+                            self.container_spikes["Selection"][var_filename_short][isotope_spiked] = {}
+
+                        if isotope in isotopes_spiked_list:
+                            if isotope not in corrected_isotopes:
+                                corrected_isotopes.append(isotope)
+                                spike_intervals = np.array(intervals)
+                                merged_intervals = ES(variable=spike_intervals).merge_times()
+                                for interval in merged_intervals:
+                                    if (isotope not in self.container_measurements["RAW"][var_filename_short] and
+                                            "_copy" in var_filename_short):
+                                        var_filename_short_original = var_filename_short.replace("_copy", "")
+                                        dataset_raw = self.container_measurements["RAW"][var_filename_short_original][
+                                                          isotope][interval[0]:interval[1]]
+                                        self.container_measurements["RAW"][var_filename_short][
+                                            isotope] = self.container_measurements["RAW"][var_filename_short_original][
+                                            isotope]
+                                    else:
+                                        dataset_raw = self.container_measurements["RAW"][var_filename_short][isotope][
+                                                      interval[0]:interval[1]]
+
+                                    dataset_complete = self.container_measurements["RAW"][var_filename_short][isotope]
+                                    dataset_complete_all = self.container_measurements["RAW"][var_filename_short]
+
+                                    if var_spike_elimination_performed == True:
+                                        time_start = datetime.datetime.now()
+                                        if var_method == 0:
+                                            data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                start_index=interval[0],
+                                                dataset_complete=dataset_complete).determine_outlier()
+                                        elif var_method == 1:
+                                            data_smoothed, indices_outl = ES(
+                                                variable=dataset_raw).do_grubbs_test(
+                                                alpha=var_alpha, dataset_complete=dataset_complete,
+                                                threshold=var_threshold)
+                                        elif var_method == 2:
+                                            data_smoothed, indices_outl = OutlierDetection(
+                                                raw_data=dataset_raw, alpha=var_alpha, threshold=var_threshold,
+                                                isotope=isotope,
+                                                dataset_complete=dataset_complete).find_outlier()
+                                        time_end = datetime.datetime.now()
+                                        time_delta = (time_end - time_start)*1000
+                                        list_times[var_filename_short].append(time_delta.total_seconds())
+                                    else:
+                                        data_smoothed = dataset_raw
+                                        indices_outl = []
+
+                                    data_improved = data_smoothed.copy()
+                                    if self.pysills_mode in ["FI", "MI"]:
+                                        if self.container_var[key_setting][
+                                            "Spike Elimination Inclusion"].get() == 2 and var_filetype == "SMPL":
+                                            length_incl_datasets = len(
+                                                self.container_helper["SMPL"][var_filename_short]["INCL"]["Content"])
+                                            if length_incl_datasets > 0:
+                                                for key, items in self.container_helper["SMPL"][var_filename_short][
+                                                    "INCL"]["Content"].items():
+                                                    var_indices = items["Indices"]
+                                                    lower_limit = var_indices[0]
+                                                    upper_limit = var_indices[1] + 1
+                                                    data_raw = self.container_measurements["RAW"][var_filename_short][
+                                                        isotope]
+                                                    if len(indices_outl) > 0:
+                                                        for index_outl in indices_outl:
+                                                            if (index_outl >= lower_limit
+                                                                    and upper_limit >= index_outl):
+                                                                value_raw = data_raw[index_outl]
+                                                                value_smoothed = data_smoothed[index_outl]
+                                                                data_improved[index_outl] = value_raw
+                                                                value_improved = data_improved[index_outl]
+
+                                    if (isotope not in self.container_measurements["EDITED"][var_filename_short] and
+                                            "_copy" in var_filename_short):
+                                        self.container_measurements["EDITED"][var_filename_short][isotope] = {
+                                            "Uncut": None}
+                                        self.container_measurements["EDITED"][var_filename_short][isotope][
+                                            "Uncut"] = data_smoothed
+                                    else:
+                                        self.container_measurements["EDITED"][var_filename_short][isotope][
+                                            "Uncut"] = data_smoothed
+
+                                    if ("Time" not in self.container_measurements["SELECTED"][var_filename_short] and
+                                            "_copy" in var_filename_short):
+                                        self.container_measurements["SELECTED"][var_filename_short][
+                                            "Time"] = self.container_measurements["SELECTED"][
+                                            var_filename_short_original]["Time"]
+
+                                    self.container_spikes[var_filename_short][isotope] = {
+                                        "Data RAW": self.container_measurements["RAW"][var_filename_short][isotope],
+                                        "Data SMOOTHED": data_smoothed, "Data IMPROVED": data_improved,
+                                        "Indices": indices_outl,
+                                        "Times": self.container_measurements["SELECTED"][var_filename_short]["Time"]}
+
+                                for var_index in indices_outl:
+                                    self.container_spikes["Selection"][var_filename_short][isotope][
+                                        var_index] = data_smoothed[var_index]
+                            else:
+                                pass
+                        else:
+                            if isotope not in not_corrected_isotopes:
+                                not_corrected_isotopes.append(isotope)
+                                self.container_measurements["EDITED"][var_filename_short][isotope]["Uncut"] = \
+                                    self.container_measurements["RAW"][var_filename_short][isotope]
+                            else:
+                                pass
+                else:
+                    if isotope not in not_corrected_isotopes:
+                        not_corrected_isotopes.append(isotope)
+
+                        if "Uncut" not in self.container_measurements["EDITED"][var_filename_short][isotope]:
+                            self.container_measurements["EDITED"][var_filename_short][isotope]["Uncut"] = None
+
+                        if var_filename_short not in self.container_measurements["RAW"]:
+                            self.build_container_measurements(filetype=var_filetype, filename_short=var_filename_short)
+
+                        self.container_measurements["EDITED"][var_filename_short][isotope]["Uncut"] = \
+                            self.container_measurements["RAW"][var_filename_short][isotope]
+
+                        self.container_spikes[var_filename_short][isotope] = {
+                            "Data RAW": self.container_measurements["RAW"][var_filename_short][isotope],
+                            "Data SMOOTHED": self.container_measurements["RAW"][var_filename_short][isotope],
+                            "Data IMPROVED": self.container_measurements["RAW"][var_filename_short][isotope],
+                            "Indices": [],
+                            "Times": self.container_measurements["SELECTED"][var_filename_short]["Time"]}
+                    else:
+                        pass
+
+                current_step += stepwidth
+                self.update_progress(
+                    parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+                self.lbl_prg_spk.configure(
+                    text=var_filename_short + " : " + isotope + " - " + str(round(current_step, 1)) + " %", anchor=tk.W)
 
     def ma_export_calculation_report(self):
         header = ["filename", "ID"]
@@ -7980,11 +8215,17 @@ class PySILLS(tk.Frame):
                         "Indices": data_indices, "Times": data_times}
 
     def open_project(self):
+        subwindow_progressbar, prgbar = self.create_progress_bar_spike_elimination()
+        current_step = 0
+        self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+        self.lbl_prg_spk.configure(text="Opening project started!", anchor=tk.W)
+
         filename = filedialog.askopenfilename()
 
         try:
             file_loaded = open(str(filename), "r")
             loaded_lines = file_loaded.readlines()
+            n_lines = len(loaded_lines)
 
             if ",,\n" in loaded_lines:
                 loaded_lines = [sub.replace(",,\n", "") for sub in loaded_lines]
@@ -8086,90 +8327,100 @@ class PySILLS(tk.Frame):
 
             time_start = datetime.datetime.now()
 
+            current_step = 10
+            self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+            self.lbl_prg_spk.configure(text="Initialization", anchor=tk.W)
+
             if self.pysills_mode == "MA":
-                time_start0 = datetime.datetime.now()
                 self.open_project_part_01(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end0 = datetime.datetime.now()
-                time_delta0 = (time_end0 - time_start0)*1000
-                print(f"Process time (opening project - part 'Project Information'):", time_delta0.total_seconds(), "ms")
+                current_step = 20
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## STANDARD FILES
                 self.open_project_part_02(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end1 = datetime.datetime.now()
-                time_delta1 = (time_end1 - time_end0)*1000
-                print(f"Process time (opening project - part 'Standard Files'):", time_delta1.total_seconds(), "ms")
+                current_step = 30
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## SAMPLE FILES
                 self.open_project_part_03(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end2 = datetime.datetime.now()
-                time_delta2 = (time_end2 - time_end1)*1000
-                print(f"Process time (opening project - part 'Sample Files'):", time_delta2.total_seconds(), "ms")
+                current_step = 40
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## ISOTOPES
                 self.open_project_part_04(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end3 = datetime.datetime.now()
-                time_delta3 = (time_end3 - time_end2)*1000
-                print(f"Process time (opening project - part 'Isotopes'):", time_delta3.total_seconds(), "ms")
+                current_step = 50
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## SAMPLE/MATRIX SETTINGS
                 self.open_project_part_05(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end4 = datetime.datetime.now()
-                time_delta4 = (time_end4 - time_end3)*1000
-                print(f"Process time (opening project - part 'Sample Settings'):", time_delta4.total_seconds(), "ms")
+                current_step = 60
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## DWELL TIME SETTINGS
                 self.open_project_part_06(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end5 = datetime.datetime.now()
-                time_delta5 = (time_end5 - time_end4)*1000
-                print(f"Process time (opening project - part 'Dwell Time Settings'):", time_delta5.total_seconds(), "ms")
+                current_step = 70
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## INTERVAL SETTINGS
                 self.open_project_part_07(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end6 = datetime.datetime.now()
-                time_delta6 = (time_end6 - time_end5)*1000
-                print(f"Process time (opening project - part 'Interval Settings'):", time_delta6.total_seconds(), "ms")
+                current_step = 80
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## SPIKE ELIMINATION
                 self.open_project_part_08(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-
-                time_end7 = datetime.datetime.now()
-                time_delta7 = (time_end7 - time_end6)*1000
-                print(f"Process time (opening project - part 'Spike Elimination'):", time_delta7.total_seconds(), "ms")
+                current_step = 90
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
                 ## EXPERIMENTAL DATA
                 self.open_project_part_09(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
                     filename=filename)
+                current_step = 100
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
 
-                time_end8 = datetime.datetime.now()
-                time_delta8 = (time_end8 - time_end7)*1000
-                print(f"Process time (opening project - part 'Experimental Data'):", time_delta8.total_seconds(), "ms")
-                time_end = datetime.datetime.now()
-                time_delta = (time_end - time_start)*1000
-                print(f"Process time (opening project - total):", time_delta.total_seconds(), "ms")
+                if current_step >= 100:
+                    self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                    subwindow_progressbar.destroy()
             elif self.pysills_mode == "FI":
                 ## PROJECT INFORMATION
                 self.open_project_part_01(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 20
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## STANDARD FILES
                 self.open_project_part_02(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 30
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## SAMPLE FILES
                 self.open_project_part_03(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 40
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## ISOTOPES
                 self.open_project_part_04(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 50
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## INCLUSION SETTINGS
                 self.open_project_part_05(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 60
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## PYPITZER SETTINGS
                 if self.without_pypitzer == False:
                     for i in range(index_container["PYPITZER SETTINGS"] + 1,
@@ -8195,7 +8446,9 @@ class PySILLS(tk.Frame):
                                 self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(var_last_compound)
                                 self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
                                     var_melting_temperature)
-
+                current_step = 63
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
                 index = 0
                 for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
@@ -8230,7 +8483,10 @@ class PySILLS(tk.Frame):
                         self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
                     #
                     index += 1
-                #
+
+                current_step = 66
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
                 index = 0
                 if self.without_pypitzer == False:
@@ -8268,6 +8524,9 @@ class PySILLS(tk.Frame):
                     #
                     index += 1
 
+                current_step = 69
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (HALTER2002)
                 index = 0
                 if self.without_pypitzer == False:
@@ -8302,6 +8561,9 @@ class PySILLS(tk.Frame):
 
                         index += 1
 
+                current_step = 72
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (BORISOVA2021)
                 index = 0
                 if self.without_pypitzer == False:
@@ -8334,6 +8596,9 @@ class PySILLS(tk.Frame):
 
                         index += 1
 
+                current_step = 75
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## MATRIX SETTINGS
                 for i in range(index_container["MATRIX SETTINGS"] + 1,
                                index_container["DWELL TIME SETTINGS"] - 1):
@@ -8352,39 +8617,69 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(info_concentration)
 
+                current_step = 78
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## DWELL TIME SETTINGS
                 self.open_project_part_06(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 81
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## INTERVAL SETTINGS
                 self.open_project_part_07(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 84
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## SPIKE ELIMINATION
                 self.open_project_part_08(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 87
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## EXPERIMENTAL DATA
                 self.open_project_part_09(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
                     filename=filename)
+                current_step = 100
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
 
-                time_end = datetime.datetime.now()
-                time_delta = (time_end - time_start)*1000
-                print(f"Process time (opening project):", time_delta.total_seconds(), "ms")
+                if current_step >= 100:
+                    self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                    subwindow_progressbar.destroy()
             elif self.pysills_mode == "MI":
                 ## PROJECT INFORMATION
                 self.open_project_part_01(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 20
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## STANDARD FILES
                 self.open_project_part_02(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 30
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## SAMPLE FILES
                 self.open_project_part_03(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 40
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## ISOTOPES
                 self.open_project_part_04(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 50
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## INCLUSION SETTINGS
                 self.open_project_part_05(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 60
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## PYPITZER SETTINGS
                 if self.without_pypitzer == False:
                     for i in range(index_container["PYPITZER SETTINGS"] + 1,
@@ -8411,6 +8706,9 @@ class PySILLS(tk.Frame):
                                 self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
                                     var_melting_temperature)
 
+                current_step = 63
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
                 index = 0
                 for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
@@ -8445,7 +8743,10 @@ class PySILLS(tk.Frame):
                         self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
                     #
                     index += 1
-                #
+
+                current_step = 66
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
                 index = 0
                 if self.without_pypitzer == False:
@@ -8482,6 +8783,9 @@ class PySILLS(tk.Frame):
                     #
                     index += 1
 
+                current_step = 69
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (HALTER2002)
                 index = 0
                 if self.without_pypitzer == False:
@@ -8516,6 +8820,9 @@ class PySILLS(tk.Frame):
 
                         index += 1
 
+                current_step = 72
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## QUANTIFICATION SETTINGS (BORISOVA2021)
                 index = 0
                 if self.without_pypitzer == False:
@@ -8548,6 +8855,9 @@ class PySILLS(tk.Frame):
 
                         index += 1
 
+                current_step = 75
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## MATRIX SETTINGS
                 for i in range(index_container["MATRIX SETTINGS"] + 1,
                                index_container["DWELL TIME SETTINGS"] - 1):
@@ -8566,23 +8876,38 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
                     self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(info_concentration)
 
+                current_step = 78
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## DWELL TIME SETTINGS
                 self.open_project_part_06(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 81
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## INTERVAL SETTINGS
                 self.open_project_part_07(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 84
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## SPIKE ELIMINATION
                 self.open_project_part_08(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                current_step = 87
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
                 ## EXPERIMENTAL DATA
                 self.open_project_part_09(
                     key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
                     filename=filename)
+                current_step = 100
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
 
-                time_end = datetime.datetime.now()
-                time_delta = (time_end - time_start)*1000
-                print(f"Process time (opening project):", time_delta.total_seconds(), "ms")
+                if current_step >= 100:
+                    self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                    subwindow_progressbar.destroy()
 
             # Initialization
             time_start = datetime.datetime.now()
@@ -13651,6 +13976,13 @@ class PySILLS(tk.Frame):
                                     "Whisker analysis"]:
                                     var_method = "Grubbs"
                                     self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+                        else:
+                            if filename_short in list_files_std:
+                                filetype = "STD"
+                            elif filename_short in list_files_smpl:
+                                filetype = "SMPL"
+
+                            self.single_spike_elimination(var_filetype=filetype, var_filename_short=filename_short)
                 else:
                     self.container_spikes[filename_short] = {}
         else:
@@ -35401,6 +35733,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         subwindow_progressbar_spike_elimination = tk.Toplevel(self.parent)
+        subwindow_progressbar_spike_elimination.attributes("-topmost", "true")
         subwindow_progressbar_spike_elimination.title("Please wait ...")
         subwindow_progressbar_spike_elimination.geometry(var_geometry)
         subwindow_progressbar_spike_elimination.resizable(False, False)
