@@ -4290,6 +4290,14 @@ class PySILLS(tk.Frame):
                 var_method = 2
 
         if filetype == "STD":
+            subwindow_progressbar_spike_elimination, prgbar_spk = self.create_progress_bar_spike_elimination()
+            n_files = len(self.container_lists["STD"]["Short"])
+            n_isotopes = len(self.container_lists["Measured Isotopes"]["All"])
+            n_steps = n_files*n_isotopes
+            stepwidth = round(100/n_steps, 2)
+            current_step = 0
+            self.update_progress(
+                parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
             for index, file_std in enumerate(self.container_lists["STD"]["Short"]):
                 file_long = self.container_lists[filetype]["Long"][index]
                 if self.container_var[filetype][file_long]["Checkbox"].get() == 1:
@@ -4386,10 +4394,28 @@ class PySILLS(tk.Frame):
                                     "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
                             else:
                                 pass
+
+                        current_step += stepwidth
+                        self.update_progress(
+                            parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
+
+            current_step += stepwidth
+            if current_step >= 100:
+                subwindow_progressbar_spike_elimination.destroy()
         elif filetype == "SMPL":
             list_times = {}
+            subwindow_progressbar_spike_elimination, prgbar_spk = self.create_progress_bar_spike_elimination()
+            n_files = len(self.container_lists["SMPL"]["Short"])
+            n_isotopes = len(self.container_lists["Measured Isotopes"]["All"])
+            n_steps = n_files*n_isotopes
+            stepwidth = round(100/n_steps, 2)
+            current_step = 0
+            self.update_progress(
+                parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+
             for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
                 list_times[file_smpl] = []
                 filename_long = self.container_lists["SMPL"]["Long"][index]
@@ -4570,8 +4596,15 @@ class PySILLS(tk.Frame):
                             else:
                                 pass
 
+                        current_step += stepwidth
+                        self.update_progress(
+                            parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
 
             self.helper_fill_container_spike_values(mode=filetype)
+
+            current_step += stepwidth
+            if current_step >= 100:
+                subwindow_progressbar_spike_elimination.destroy()
 
     def ma_export_calculation_report(self):
         header = ["filename", "ID"]
@@ -35172,6 +35205,48 @@ class PySILLS(tk.Frame):
     def update_progress(self, parent, variable, value):
         variable["value"] = value
         parent.update()
+
+    def create_progress_bar_spike_elimination(self):
+        ## Window Settings
+        window_width = 400
+        window_height = 100
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_progressbar_spike_elimination = tk.Toplevel(self.parent)
+        subwindow_progressbar_spike_elimination.title("Please wait ...")
+        subwindow_progressbar_spike_elimination.geometry(var_geometry)
+        subwindow_progressbar_spike_elimination.resizable(False, False)
+        subwindow_progressbar_spike_elimination["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_progressbar_spike_elimination, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_progressbar_spike_elimination, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_progressbar_spike_elimination.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_progressbar_spike_elimination.grid_columnconfigure(i, minsize=column_min)
+
+        ## Progress bar
+        prgbar_spk = ttk.Progressbar(master=subwindow_progressbar_spike_elimination, maximum=100)
+        prgbar_spk.grid(row=1, column=1, rowspan=1, columnspan=16, sticky="nesw")
+
+        # ## LABELS
+        # self.helper_lbl_progress_spk = tk.StringVar()
+        # self.helper_lbl_progress_spk.set("Process has started!")
+        # self.lbl_prg_spk = SE(
+        #     parent=subwindow_progressbar_spike_elimination, row_id=2, column_id=1, n_rows=1, n_columns=16,
+        #     fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+        #     text=self.helper_lbl_progress_spk.get(), relief=tk.FLAT, fontsize="sans 10 bold")
+
+        return subwindow_progressbar_spike_elimination, prgbar_spk
 
     def create_progress_bar_window_datareduction(self, mode="complete"):
         ## Window Settings
