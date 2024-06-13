@@ -34994,8 +34994,6 @@ class PySILLS(tk.Frame):
         var_id_real = self.list_indices[current_id - 1]
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
-        val_original = round(self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1], 2)
-        val_corrected = round(self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1], 2)
 
         val_raw = round(self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real], 2)
         val_smoothed = round(self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real], 2)
@@ -35004,8 +35002,6 @@ class PySILLS(tk.Frame):
             val_updated = round(val_raw, 2)
         else:
             val_updated = round(val_smoothed, 2)
-
-
 
         self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id_real] = val_updated
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
