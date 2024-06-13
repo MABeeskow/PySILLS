@@ -417,7 +417,7 @@ class PySILLS(tk.Frame):
         self.container_var["x-y diagram"]["x"].set("Select x")
         self.container_var["x-y diagram"]["y"].set("Select y")
         self.container_var["x-y diagram"]["z"].set("Select z")
-
+        self.copied_file = False
         self.helper_salt_composition = {}
         self.charge_balance_check = {}
         self.counter_calculation_runs = 0
@@ -1994,6 +1994,11 @@ class PySILLS(tk.Frame):
             for key, item in self.container_measurements["RAW"][file_short_original].items():
                 self.container_measurements["RAW"][var_file_short_copy][key] = item
 
+            df_data = self.container_measurements["Dataframe"][file_short_original]
+            self.container_measurements["Dataframe"][var_file_short_copy] = df_data
+            self.container_spikes[var_file_short_copy] = {}
+            self.copied_file = True
+
             try:
                 if self.pysills_mode == "MA":
                     self.subwindow_ma_settings.destroy()
@@ -2014,8 +2019,90 @@ class PySILLS(tk.Frame):
         else:
             file_parts_copy = var_file_long_copy.split("/")
             var_file_short_copy = file_parts_copy[-1]
-            print(var_file_short_copy, "exists already. Please copy the file with the same root (the part before "
-                  "'_copy') and the highest number after '_copy' or add the file manually. Thanks!")
+
+            var_file_long_parts = var_file_long_copy.split(".")
+            var_file_extension = var_file_long_parts[-1]
+
+            if "_copy" in var_file_long_parts[0]:
+                if "_copy" == var_file_long_parts[0][-5:]:
+                    str_added = "_copy2"
+                    file_base = var_file_long_parts[0][:-5]
+                else:
+                    number_current = var_file_long_parts[0][-5:][-1]
+                    new_number = int(number_current) + 1
+                    str_added = "_copy" + str(new_number)
+                    file_base = var_file_long_parts[0][:-6]
+            else:
+                str_added = "_copy"
+                file_base = var_file_long_parts[0]
+
+            var_file_long_copy = file_base + str_added + "." + var_file_extension
+            file_parts_copy = var_file_long_copy.split("/")
+            var_file_short_copy = file_parts_copy[-1]
+            var_list.append(var_file_long_copy)
+            var_lb.insert(tk.END, var_file_short_copy)
+
+            self.container_lists["Measured Isotopes"][var_file_short_copy] = file_isotopes_original
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short_copy]
+
+            self.add_needed_variables_for_later_added_files(
+                filename_long=var_file_long_copy, filename_short=var_file_short_copy, filetype=filetype,
+                file_isotopes=file_isotopes)
+
+            var_skipheader = self.container_icpms["skipheader"]
+            var_skipfooter = self.container_icpms["skipfooter"]
+            var_timestamp = self.container_icpms["timestamp"]
+            var_icpms = self.container_icpms["name"]
+
+            if problem_present == False:
+                dates, times = Data(filename=var_file_long_copy).import_as_list(
+                    skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+            else:
+                try:
+                    dates, times = Data(filename=var_file_long).import_as_list(
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                        icpms=var_icpms)
+                except:
+                    dates = 0
+                    times_input = self.container_var["acquisition times"][filetype][file_short_original].get()
+                    times_input_parts = times_input.split(":")
+                    times = [[times_input_parts[0], times_input_parts[1], times_input_parts[2]]]
+
+            t_start = datetime.timedelta(hours=int(times[0][0]), minutes=int(times[0][1]), seconds=int(times[0][2]))
+
+            if var_file_short_copy not in self.container_var["acquisition times"][filetype]:
+                self.container_var["acquisition times"][filetype][var_file_short_copy] = tk.StringVar()
+                self.container_var["acquisition times"][filetype][var_file_short_copy].set(
+                    times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+
+            if var_file_short_copy not in self.container_measurements["RAW"]:
+                self.container_measurements["RAW"][var_file_short_copy] = {}
+
+            for key, item in self.container_measurements["RAW"][file_short_original].items():
+                self.container_measurements["RAW"][var_file_short_copy][key] = item
+
+            df_data = self.container_measurements["Dataframe"][file_short_original]
+            self.container_measurements["Dataframe"][var_file_short_copy] = df_data
+            self.container_spikes[var_file_short_copy] = {}
+            self.copied_file = True
+
+            try:
+                if self.pysills_mode == "MA":
+                    self.subwindow_ma_settings.destroy()
+                    self.ma_settings()
+                elif self.pysills_mode == "FI":
+                    self.subwindow_fi_settings.destroy()
+                    self.fi_settings()
+                elif self.pysills_mode == "MI":
+                    self.subwindow_mi_settings.destroy()
+                    self.mi_settings()
+            except:
+                if self.pysills_mode == "MA":
+                    self.ma_settings()
+                elif self.pysills_mode == "FI":
+                    self.fi_settings()
+                elif self.pysills_mode == "MI":
+                    self.mi_settings()
 
     def add_needed_variables_for_later_added_files(self, filename_long, filename_short, filetype, file_isotopes):
         if self.pysills_mode == "MA":
@@ -2444,12 +2531,15 @@ class PySILLS(tk.Frame):
                             df_data = DE(filename_long=filename_long).get_measurements(
                                 delimiter=",", skip_header=3, skip_footer=1)
                     else:
-                        if "_copy" in filename_short:
-                            filename_short_original = filename_short.replace("_copy", "")
-                            filename_short = filename_short_original
+                        try:
                             df_data = self.container_measurements["Dataframe"][filename_short]
-                        else:
-                            df_data = self.container_measurements["Dataframe"][filename_short]
+                        except:
+                            if "_copy" in filename_short:
+                                filename_short_original = filename_short.replace("_copy", "")
+                                filename_short = filename_short_original
+                                df_data = self.container_measurements["Dataframe"][filename_short]
+                            else:
+                                df_data = self.container_measurements["Dataframe"][filename_short]
 
                     list_names = list(df_data.columns.values)
                     list_names.pop(0)
@@ -4455,12 +4545,21 @@ class PySILLS(tk.Frame):
                             df_data = DE(filename_long=filename_long).get_measurements(
                                 delimiter=",", skip_header=3, skip_footer=1)
                     else:
-                        if "_copy" in file_smpl:
-                            filename_original = file_smpl.replace("_copy", "")
-                            #file_smpl = filename_original
-                            df_data = self.container_measurements["Dataframe"][filename_original]
-                        else:
+                        try:
                             df_data = self.container_measurements["Dataframe"][file_smpl]
+                        except:
+                            if "_copy" in file_smpl:
+                                file_smpl_original = file_smpl.replace("_copy", "")
+                                file_smpl = file_smpl_original
+                                df_data = self.container_measurements["Dataframe"][file_smpl]
+                            else:
+                                df_data = self.container_measurements["Dataframe"][file_smpl]
+                        # if "_copy" in file_smpl:
+                        #     filename_original = file_smpl.replace("_copy", "")
+                        #     #file_smpl = filename_original
+                        #     df_data = self.container_measurements["Dataframe"][filename_original]
+                        # else:
+                        #     df_data = self.container_measurements["Dataframe"][file_smpl]
 
                     list_names = list(df_data.columns.values)
                     list_names.pop(0)
@@ -13539,18 +13638,19 @@ class PySILLS(tk.Frame):
                     if len(self.container_spikes[filename_short]) > 0:
                         pass
                     else:
-                        if self.container_var["Spike Elimination"]["STD"]["State"]:
-                            if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
-                                "Whisker analysis"]:
-                                var_method = "Grubbs"
-                                self.spike_elimination_all(filetype="STD", algorithm=var_method)
-                        if self.container_var["Spike Elimination"]["SMPL"]["State"]:
-                            if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
-                                "Whisker analysis"]:
-                                var_method = "Grubbs"
-                                self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
+                        if self.copied_file == False:
+                            if self.container_var["Spike Elimination"]["STD"]["State"]:
+                                if self.container_var["Spike Elimination Method"].get() in [
+                                    "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                    "Whisker analysis"]:
+                                    var_method = "Grubbs"
+                                    self.spike_elimination_all(filetype="STD", algorithm=var_method)
+                            if self.container_var["Spike Elimination"]["SMPL"]["State"]:
+                                if self.container_var["Spike Elimination Method"].get() in [
+                                    "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                    "Whisker analysis"]:
+                                    var_method = "Grubbs"
+                                    self.spike_elimination_all(filetype="SMPL", algorithm=var_method)
                 else:
                     self.container_spikes[filename_short] = {}
         else:
@@ -23646,13 +23746,14 @@ class PySILLS(tk.Frame):
                 if len(self.container_spikes[filename_short]) > 0:
                     pass
                 else:
-                    for filetype in ["STD", "SMPL"]:
-                        if self.container_var["Spike Elimination"][filetype]["State"]:
-                            if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
-                                "Whisker analysis"]:
-                                var_method = "Grubbs"
-                                self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+                    if self.copied_file == False:
+                        for filetype in ["STD", "SMPL"]:
+                            if self.container_var["Spike Elimination"][filetype]["State"]:
+                                if self.container_var["Spike Elimination Method"].get() in [
+                                    "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                    "Whisker analysis"]:
+                                    var_method = "Grubbs"
+                                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
             except:
                 print("Problem with settings window creation. It has to be fixed one day.")
         else:
@@ -23963,13 +24064,14 @@ class PySILLS(tk.Frame):
                 if len(self.container_spikes[filename_short]) > 0:
                     pass
                 else:
-                    for filetype in ["STD", "SMPL"]:
-                        if self.container_var["Spike Elimination"][filetype]["State"]:
-                            if self.container_var["Spike Elimination Method"].get() in [
-                                "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
-                                "Whisker analysis"]:
-                                var_method = "Grubbs"
-                                self.spike_elimination_all(filetype=filetype, algorithm=var_method)
+                    if self.copied_file == False:
+                        for filetype in ["STD", "SMPL"]:
+                            if self.container_var["Spike Elimination"][filetype]["State"]:
+                                if self.container_var["Spike Elimination Method"].get() in [
+                                    "Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test",
+                                    "Whisker analysis"]:
+                                    var_method = "Grubbs"
+                                    self.spike_elimination_all(filetype=filetype, algorithm=var_method)
             except:
                 print("Problem with settings window creation. It has to be fixed one day.")
         else:
@@ -29824,13 +29926,14 @@ class PySILLS(tk.Frame):
                     "RAW"] = ln_raw
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
-                    ln_smoothed = ax.plot(
-                        self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
-                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                    self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                        "SMOOTHED"] = ln_smoothed
-                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
-                        isotope].set(1)
+                    if isotope in self.container_spikes[str_filename_short]:
+                        ln_smoothed = ax.plot(
+                            self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                            label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                        self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                            "SMOOTHED"] = ln_smoothed
+                        self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                            isotope].set(1)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
