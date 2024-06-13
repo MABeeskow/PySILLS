@@ -151,7 +151,7 @@ class PySILLS(tk.Frame):
             "Sm2O3": 348.717, "Ta2O5": 441.895, "Tb2O3": 365.857, "Tb4O7": 747.713, "TeO3": 175.597, "ThO2": 264.038,
             "Tl2O3": 456.757, "Tm2O3": 385.857, "UO2": 270.048, "UO3": 286.047, "U3O8": 842.142, "V2O5": 181.879,
             "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222, "I2O4": 317.796, "I2O5": 333.795, "I4O9": 651.591,
-            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863}
+            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863, "CrO": 67.995}
 
         self.conversion_factors = {
             "SiO2": round((self.chemistry_data["Si"]/self.chemistry_data_oxides["SiO2"])**(-1), 4),
@@ -194,6 +194,7 @@ class PySILLS(tk.Frame):
             "Ce2O3": round((2*self.chemistry_data["Ce"]/self.chemistry_data_oxides["Ce2O3"])**(-1), 4),
             "CeO2": round((self.chemistry_data["Ce"]/self.chemistry_data_oxides["CeO2"])**(-1), 4),
             "CoO": round((self.chemistry_data["Co"]/self.chemistry_data_oxides["CoO"])**(-1), 4),
+            "CrO": round((self.chemistry_data["Cr"]/self.chemistry_data_oxides["CrO"])**(-1), 4),
             "Cr2O3": round((2*self.chemistry_data["Cr"]/self.chemistry_data_oxides["Cr2O3"])**(-1), 4),
             "Dy2O3": round((2*self.chemistry_data["Dy"]/self.chemistry_data_oxides["Dy2O3"])**(-1), 4),
             "Er2O3": round((2*self.chemistry_data["Er"]/self.chemistry_data_oxides["Er2O3"])**(-1), 4),
@@ -25680,7 +25681,11 @@ class PySILLS(tk.Frame):
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "INCL"][var_mo]
 
-                var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                if (var_intensity_mix_is*var_sensitivity_i) > 0:
+                    var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                else:
+                    var_result_i = np.nan
+
                 self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
