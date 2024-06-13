@@ -15,6 +15,7 @@
 import os, pathlib, sys, re, datetime, csv, string, math, webbrowser, time
 import numpy as np
 import pandas as pd
+import scipy.io
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -150,7 +151,7 @@ class PySILLS(tk.Frame):
             "Sm2O3": 348.717, "Ta2O5": 441.895, "Tb2O3": 365.857, "Tb4O7": 747.713, "TeO3": 175.597, "ThO2": 264.038,
             "Tl2O3": 456.757, "Tm2O3": 385.857, "UO2": 270.048, "UO3": 286.047, "U3O8": 842.142, "V2O5": 181.879,
             "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222, "I2O4": 317.796, "I2O5": 333.795, "I4O9": 651.591,
-            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863}
+            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863, "CrO": 67.995}
 
         self.conversion_factors = {
             "SiO2": round((self.chemistry_data["Si"]/self.chemistry_data_oxides["SiO2"])**(-1), 4),
@@ -193,6 +194,7 @@ class PySILLS(tk.Frame):
             "Ce2O3": round((2*self.chemistry_data["Ce"]/self.chemistry_data_oxides["Ce2O3"])**(-1), 4),
             "CeO2": round((self.chemistry_data["Ce"]/self.chemistry_data_oxides["CeO2"])**(-1), 4),
             "CoO": round((self.chemistry_data["Co"]/self.chemistry_data_oxides["CoO"])**(-1), 4),
+            "CrO": round((self.chemistry_data["Cr"]/self.chemistry_data_oxides["CrO"])**(-1), 4),
             "Cr2O3": round((2*self.chemistry_data["Cr"]/self.chemistry_data_oxides["Cr2O3"])**(-1), 4),
             "Dy2O3": round((2*self.chemistry_data["Dy"]/self.chemistry_data_oxides["Dy2O3"])**(-1), 4),
             "Er2O3": round((2*self.chemistry_data["Er"]/self.chemistry_data_oxides["Er2O3"])**(-1), 4),
@@ -8537,6 +8539,9 @@ class PySILLS(tk.Frame):
             parent=self.parent,
             filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
                        ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
+
+        # if "mat" in filename[0]:
+        #     mat = scipy.io.loadmat(filename[0])
 
         for i in filename:
             if i not in var_list:
@@ -25676,7 +25681,11 @@ class PySILLS(tk.Frame):
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "INCL"][var_mo]
 
-                var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                if (var_intensity_mix_is*var_sensitivity_i) > 0:
+                    var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                else:
+                    var_result_i = np.nan
+
                 self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
@@ -34985,8 +34994,6 @@ class PySILLS(tk.Frame):
         var_id_real = self.list_indices[current_id - 1]
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
-        val_original = round(self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1], 2)
-        val_corrected = round(self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1], 2)
 
         val_raw = round(self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real], 2)
         val_smoothed = round(self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real], 2)
@@ -34995,8 +35002,6 @@ class PySILLS(tk.Frame):
             val_updated = round(val_raw, 2)
         else:
             val_updated = round(val_smoothed, 2)
-
-
 
         self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id_real] = val_updated
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
