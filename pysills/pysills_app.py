@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		12.06.2024
+# Date:		13.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -15,6 +15,7 @@
 import os, pathlib, sys, re, datetime, csv, string, math, webbrowser, time
 import numpy as np
 import pandas as pd
+import scipy.io
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -150,7 +151,7 @@ class PySILLS(tk.Frame):
             "Sm2O3": 348.717, "Ta2O5": 441.895, "Tb2O3": 365.857, "Tb4O7": 747.713, "TeO3": 175.597, "ThO2": 264.038,
             "Tl2O3": 456.757, "Tm2O3": 385.857, "UO2": 270.048, "UO3": 286.047, "U3O8": 842.142, "V2O5": 181.879,
             "Y2O3": 225.809, "Yb2O3": 394.097, "ZrO2": 123.222, "I2O4": 317.796, "I2O5": 333.795, "I4O9": 651.591,
-            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863}
+            "I2O": 269.799, "Ni2O3": 165.383, "Co2O3": 165.863, "CrO": 67.995}
 
         self.conversion_factors = {
             "SiO2": round((self.chemistry_data["Si"]/self.chemistry_data_oxides["SiO2"])**(-1), 4),
@@ -193,6 +194,7 @@ class PySILLS(tk.Frame):
             "Ce2O3": round((2*self.chemistry_data["Ce"]/self.chemistry_data_oxides["Ce2O3"])**(-1), 4),
             "CeO2": round((self.chemistry_data["Ce"]/self.chemistry_data_oxides["CeO2"])**(-1), 4),
             "CoO": round((self.chemistry_data["Co"]/self.chemistry_data_oxides["CoO"])**(-1), 4),
+            "CrO": round((self.chemistry_data["Cr"]/self.chemistry_data_oxides["CrO"])**(-1), 4),
             "Cr2O3": round((2*self.chemistry_data["Cr"]/self.chemistry_data_oxides["Cr2O3"])**(-1), 4),
             "Dy2O3": round((2*self.chemistry_data["Dy"]/self.chemistry_data_oxides["Dy2O3"])**(-1), 4),
             "Er2O3": round((2*self.chemistry_data["Er"]/self.chemistry_data_oxides["Er2O3"])**(-1), 4),
@@ -1669,7 +1671,7 @@ class PySILLS(tk.Frame):
             bg=background_color_elements).create_simple_button(
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="STD": self.project_manager(type))
-        #btn_11_std.configure(state="disabled")
+        btn_11_std.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
@@ -1694,7 +1696,7 @@ class PySILLS(tk.Frame):
             bg=background_color_elements).create_simple_button(
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="SMPL": self.project_manager(type))
-        #btn_11_smpl.configure(state="disabled")
+        btn_11_smpl.configure(state="disabled")
         SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows + 1,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -1985,6 +1987,12 @@ class PySILLS(tk.Frame):
                 self.container_var["acquisition times"][filetype][var_file_short_copy] = tk.StringVar()
                 self.container_var["acquisition times"][filetype][var_file_short_copy].set(
                     times[0][0] + ":" + times[0][1] + ":" + times[0][2])
+
+            if var_file_short_copy not in self.container_measurements["RAW"]:
+                self.container_measurements["RAW"][var_file_short_copy] = {}
+
+            for key, item in self.container_measurements["RAW"][file_short_original].items():
+                self.container_measurements["RAW"][var_file_short_copy][key] = item
 
             try:
                 if self.pysills_mode == "MA":
@@ -4290,8 +4298,18 @@ class PySILLS(tk.Frame):
                 var_method = 2
 
         if filetype == "STD":
+            subwindow_progressbar_spike_elimination, prgbar_spk = self.create_progress_bar_spike_elimination()
+            n_files = len(self.container_lists["STD"]["Short"])
+            n_isotopes = len(self.container_lists["Measured Isotopes"]["All"])
+            n_steps = n_files*n_isotopes
+            stepwidth = round(100/n_steps, 2)
+            current_step = 0
+            self.update_progress(
+                parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+            self.lbl_prg_spk.configure(text="Spike detection started!", anchor=tk.W)
             for index, file_std in enumerate(self.container_lists["STD"]["Short"]):
                 file_long = self.container_lists[filetype]["Long"][index]
+                self.lbl_prg_spk.configure(text=file_std)
                 if self.container_var[filetype][file_long]["Checkbox"].get() == 1:
                     isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_std]]
                     corrected_isotopes = []
@@ -4386,13 +4404,36 @@ class PySILLS(tk.Frame):
                                     "Times": self.container_measurements["SELECTED"][file_std]["Time"]}
                             else:
                                 pass
+
+                        current_step += stepwidth
+                        self.update_progress(
+                            parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+                        self.lbl_prg_spk.configure(
+                            text=file_std + " : " + isotope + " - " + str(round(current_step, 1)) + " %", anchor=tk.W)
+
             # Fill container_spike_values
             self.helper_fill_container_spike_values(mode=filetype)
+
+            current_step += stepwidth
+            if current_step >= 100:
+                self.lbl_prg_spk.configure(text="Spike detection finished!", anchor=tk.W)
+                subwindow_progressbar_spike_elimination.destroy()
         elif filetype == "SMPL":
             list_times = {}
+            subwindow_progressbar_spike_elimination, prgbar_spk = self.create_progress_bar_spike_elimination()
+            n_files = len(self.container_lists["SMPL"]["Short"])
+            n_isotopes = len(self.container_lists["Measured Isotopes"]["All"])
+            n_steps = n_files*n_isotopes
+            stepwidth = round(100/n_steps, 2)
+            current_step = 0
+            self.update_progress(
+                parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+            self.lbl_prg_spk.configure(text="Spike detection started!", anchor=tk.W)
+
             for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
                 list_times[file_smpl] = []
                 filename_long = self.container_lists["SMPL"]["Long"][index]
+                self.lbl_prg_spk.configure(text=file_smpl)
                 if self.container_var[filetype][filename_long]["Checkbox"].get() == 1:
                     isotopes_spiked_list = [*self.spikes_isotopes[filetype][file_smpl]]
                     corrected_isotopes = []
@@ -4570,8 +4611,18 @@ class PySILLS(tk.Frame):
                             else:
                                 pass
 
+                        current_step += stepwidth
+                        self.update_progress(
+                            parent=subwindow_progressbar_spike_elimination, variable=prgbar_spk, value=current_step)
+                        self.lbl_prg_spk.configure(
+                            text=file_smpl + " : " + isotope + " - " + str(round(current_step, 1)) + " %", anchor=tk.W)
 
             self.helper_fill_container_spike_values(mode=filetype)
+
+            current_step += stepwidth
+            if current_step >= 100:
+                self.lbl_prg_spk.configure(text="Spike detection finished!", anchor=tk.W)
+                subwindow_progressbar_spike_elimination.destroy()
 
     def ma_export_calculation_report(self):
         header = ["filename", "ID"]
@@ -8505,6 +8556,9 @@ class PySILLS(tk.Frame):
             filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
                        ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
 
+        # if "mat" in filename[0]:
+        #     mat = scipy.io.loadmat(filename[0])
+
         for i in filename:
             if i not in var_list:
                 var_list.append(i)
@@ -9378,7 +9432,9 @@ class PySILLS(tk.Frame):
 
                     cb_i = tk.Checkbutton(
                         master=frm_01, text=oxide, fg=self.bg_colors["Dark Font"],
-                        bg=self.bg_colors["Very Light"], variable=var_cb)
+                        bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                     text_01.window_create("end", window=cb_i)
                     text_01.insert("end", "\n")
                     counter_01 += 1
@@ -9408,7 +9464,9 @@ class PySILLS(tk.Frame):
 
                     cb_i = tk.Checkbutton(
                         master=frm_02, text=oxide, fg=self.bg_colors["Dark Font"],
-                        bg=self.bg_colors["Very Light"], variable=var_cb)
+                        bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                     text_02.window_create("end", window=cb_i)
                     text_02.insert("end", "\n")
                     counter_02 += 1
@@ -9445,7 +9503,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_03, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_03.window_create("end", window=cb_i)
                         text_03.insert("end", "\n")
                         counter_03 += 1
@@ -9480,7 +9540,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_04, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_04.window_create("end", window=cb_i)
                         text_04.insert("end", "\n")
                         counter_04 += 1
@@ -9515,7 +9577,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_05, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_05.window_create("end", window=cb_i)
                         text_05.insert("end", "\n")
                         counter_05 += 1
@@ -9550,7 +9614,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_06, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_06.window_create("end", window=cb_i)
                         text_06.insert("end", "\n")
                         counter_06 += 1
@@ -9585,7 +9651,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_07, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_07.window_create("end", window=cb_i)
                         text_07.insert("end", "\n")
                         counter_07 += 1
@@ -9620,7 +9688,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_08, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_08.window_create("end", window=cb_i)
                         text_08.insert("end", "\n")
                         counter_08 += 1
@@ -9655,7 +9725,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_09, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_09.window_create("end", window=cb_i)
                         text_09.insert("end", "\n")
                         counter_09 += 1
@@ -9690,7 +9762,9 @@ class PySILLS(tk.Frame):
                     if bool_problem == False:
                         cb_i = tk.Checkbutton(
                             master=frm_10, text=oxide, fg=self.bg_colors["Dark Font"],
-                            bg=self.bg_colors["Very Light"], variable=var_cb)
+                            bg=self.bg_colors["Very Light"], variable=var_cb,
+                            command=lambda var_checkbox=var_cb, key_oxide=oxide:
+                            self.select_oxide2(var_checkbox, key_oxide))
                         text_10.window_create("end", window=cb_i)
                         text_10.insert("end", "\n")
                         counter_10 += 1
@@ -9778,6 +9852,14 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode in ["MA", "FI"]:
             cb_02.configure(state="disabled")
+
+    def select_oxide2(self, var_checkbox, key_oxide):
+        if var_checkbox.get() == 1:
+            if key_oxide not in self.container_lists["Selected Oxides"]["All"]:
+                self.container_lists["Selected Oxides"]["All"].append(key_oxide)
+        else:
+            if key_oxide in self.container_lists["Selected Oxides"]["All"]:
+                self.container_lists["Selected Oxides"]["All"].remove(key_oxide)
 
     def select_main_rockforming_elements(self):
         list_oxides = ["SiO2", "TiO2", "Al2O3", "Fe2O3", "FeO", "Mn2O3", "MnO", "MgO", "CaO", "Na2O", "K2O", "P2O5"]
@@ -17484,6 +17566,9 @@ class PySILLS(tk.Frame):
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
+        if str_filetype == "STD":
+            btn_09.configure(state="disabled")
+
         ## RADIOBUTTONS
         rb_02a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=0, n_rows=1, n_columns=7,
@@ -17684,17 +17769,22 @@ class PySILLS(tk.Frame):
                 for item in self.tv_parallelism.get_children():
                     self.tv_parallelism.delete(item)
 
-            var_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
+            if self.pysills_mode == "MA":
+                var_mat_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
+            else:
+                var_mat_is = self.container_var[var_filetype][var_filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                var_incl_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
+
             file_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
             value_mat1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
-                var_is][0]
+                var_mat_is][0]
             value_mat2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
-                var_is][1]
+                var_mat_is][1]
             if self.pysills_mode in ["FI", "MI"]:
                 value_incl1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
-                    var_is][0]
+                    var_incl_is][0]
                 value_incl2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
-                    var_is][1]
+                    var_incl_is][1]
             for isotope in file_isotopes:
                 value_mat1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                     isotope][0]
@@ -17706,9 +17796,17 @@ class PySILLS(tk.Frame):
                     value_incl2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short][
                         "Parallelism INCL"][isotope][1]
 
-                result_mat_i = round((value_mat2_i/value_mat2_is)/(value_mat1_i/value_mat1_is), 2)
+                if value_mat2_is > 0 and value_mat1_is > 0 and value_mat1_i > 0:
+                    result_mat_i = round((value_mat2_i/value_mat2_is)/(value_mat1_i/value_mat1_is), 2)
+                else:
+                    result_mat_i = np.nan
+
                 if self.pysills_mode in ["FI", "MI"]:
-                    result_incl_i = round((value_incl2_i/value_incl2_is)/(value_incl1_i/value_incl1_is), 2)
+                    if value_incl2_is > 0 and value_incl1_is > 0 and value_incl1_i > 0:
+                        result_incl_i = round((value_incl2_i/value_incl2_is)/(value_incl1_i/value_incl1_is), 2)
+                    else:
+                        result_mat_i = np.nan
+
                     entry_results = [isotope, result_mat_i, result_incl_i]
                 else:
                     entry_results = [isotope, result_mat_i]
@@ -21482,24 +21580,27 @@ class PySILLS(tk.Frame):
                         sensitivity_i_pre = self.container_analytical_sensitivity[var_filetype][var_datatype][
                             var_filename_short][var_focus][isotope]
                         sensitivity_i = sensitivity_i_pre/sensitivity_is
-
                         # Determine a_i
                         a_i = intensity_i
                         # Determine b_i_pre
-                        b_i_pre = a_i/sensitivity_i
+                        if sensitivity_i > 0:
+                            b_i_pre = a_i/sensitivity_i
+                        else:
+                            b_i_pre = np.nan
                         # Determine b_i
                         focus= var_focus
                         factor = self.get_oxide_ratio(
                             var_focus=focus, var_element=element, var_oxide=oxide, sills_mode=True)
-                        b_i = factor*b_i_pre
-                        helper_b[isotope] = b_i
-                        # Determine c_i
-                        conversion_factor = self.conversion_factors[oxide]
-                        c_i = conversion_factor*b_i
-                        sum_c += c_i
-                        helper[isotope] = {
-                            "Element": element, "a": a_i, "b*": b_i_pre, "b": b_i, "c": c_i,
-                            "Sensitivity": sensitivity_i}
+                        if np.isnan(b_i_pre) == False:
+                            b_i = factor*b_i_pre
+                            helper_b[isotope] = b_i
+                            # Determine c_i
+                            conversion_factor = self.conversion_factors[oxide]
+                            c_i = conversion_factor*b_i
+                            sum_c += c_i
+                            helper[isotope] = {
+                                "Element": element, "a": a_i, "b*": b_i_pre, "b": b_i, "c": c_i,
+                                "Sensitivity": sensitivity_i}
 
         # Determine c
         c_total = sum_c
@@ -21511,7 +21612,7 @@ class PySILLS(tk.Frame):
                   "run successfully.")
             factor_d= np.nan
 
-        # Determine e_i
+        # Determine e_i sex
         concentration_is = None
         for isotope, b_i in helper_b.items():
             e_i = factor_d*b_i
@@ -21548,7 +21649,10 @@ class PySILLS(tk.Frame):
                     var_filename_short][var_focus][isotope]
                 sensitivity_i = sensitivity_i_pre/sensitivity_is
 
-                concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
+                if (intensity_is*sensitivity_i) > 0:
+                    concentration_i = (intensity_i*concentration_is)/(intensity_is*sensitivity_i)
+                else:
+                    concentration_i = np.nan
 
                 self.container_concentration[var_filetype][var_datatype][var_filename_short][var_focus][
                     isotope] = concentration_i
@@ -21618,8 +21722,8 @@ class PySILLS(tk.Frame):
                 for oxide in helper_oxides2[element]:
                     helper_oxides[oxide]["Isotopes"].append(isotope)
             else:
-                print("ATTENTION - The element", element,
-                      "is not part of the list of elements for the 100 wt.% oxides calculation.")
+                print("ATTENTION - The element", element, "is not included in the list of elements for the 100 wt.% "
+                                                          "oxides calculation.")
 
         self.container_oxides = helper_oxides
         # var_c = 0
@@ -22215,13 +22319,17 @@ class PySILLS(tk.Frame):
                         else:
                             var_sensitivity_i = 0.0
 
-                        if var_sensitivity_i > 0 and var_intensity_is > 0 and var_n_bg > 0:
-                            var_result_i = (3.29*(
-                                    var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
-                                                   var_n_mat*var_tau_i*var_sensitivity_i)*(
-                                                       var_concentration_is/var_intensity_is)
+                        if None not in [var_concentration_is, var_sensitivity_i, var_intensity_is]:
+                            if var_sensitivity_i > 0 and var_intensity_is > 0 and var_n_bg > 0:
+                                var_result_i = ((3.29*
+                                                (var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5)
+                                                + 2.71)/(var_n_mat*var_tau_i*var_sensitivity_i)*
+                                                (var_concentration_is/var_intensity_is))
+                            else:
+                                var_result_i = np.nan
                         else:
-                            var_result_i = 0.0
+                            var_result_i = np.nan
+
                         self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = var_result_i
 
@@ -24334,10 +24442,13 @@ class PySILLS(tk.Frame):
                     intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         var_focus][var_is]
 
-                    if concentration_is > 0:
-                        var_result_i = sensitivity_i*(intensity_is/concentration_is)
+                    if concentration_is != None:
+                        if concentration_is > 0:
+                            var_result_i = sensitivity_i*(intensity_is/concentration_is)
+                        else:
+                            var_result_i = np.nan
                     else:
-                        var_result_i = 0.0
+                        var_result_i = np.nan
 
                     self.container_normalized_sensitivity[var_filetype][var_datatype][var_file_short][var_focus][
                         isotope] = var_result_i
@@ -25617,7 +25728,11 @@ class PySILLS(tk.Frame):
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "INCL"][var_mo]
 
-                var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                if (var_intensity_mix_is*var_sensitivity_i) > 0:
+                    var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                else:
+                    var_result_i = np.nan
+
                 self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
@@ -29322,7 +29437,7 @@ class PySILLS(tk.Frame):
         ## FRAMES
         frm_00 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 10,
-            n_columns=n_columns - 11, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
+            n_columns=n_columns - 14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
             relief=tk.SOLID)
 
         ## LABELS
@@ -29399,6 +29514,9 @@ class PySILLS(tk.Frame):
             command=lambda var_filetype=str_filetype, var_filename_short=str_filename_short,
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
+
+        if str_filetype == "STD":
+            btn_09.configure(state="disabled")
 
         ## RADIOBUTTONS
         rb_02a = SE(
@@ -29617,6 +29735,10 @@ class PySILLS(tk.Frame):
         self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short].set(0)
         self.fi_show_time_signal_diagram(var_type=str_filetype, var_file=str_filename_long)
 
+        for isotope in file_isotopes:
+            entry_parallelism = [isotope, "---", "---"]
+            self.tv_parallelism.insert("", tk.END, values=entry_parallelism)
+
     def fi_show_time_signal_diagram(self, var_type, var_file, var_lb_state=True):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
@@ -29648,9 +29770,9 @@ class PySILLS(tk.Frame):
 
         self.fig_specific = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_specific = FigureCanvasTkAgg(self.fig_specific, master=self.subwindow_fi_checkfile)
-        self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
+        self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=54, sticky="nesw")
         self.toolbarFrame = tk.Frame(master=self.subwindow_fi_checkfile)
-        self.toolbarFrame.grid(row=20, column=14, rowspan=2, columnspan=39, sticky="w")
+        self.toolbarFrame.grid(row=20, column=14, rowspan=2, columnspan=54, sticky="w")
         self.toolbar_specific = NavigationToolbar2Tk(self.canvas_specific, self.toolbarFrame)
         self.toolbar_specific.config(background=self.bg_colors["Very Light"])
         self.toolbar_specific._message_label.config(
@@ -29918,9 +30040,9 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Ratio": ax_ratio}
 
         self.canvas_specific_ratio = FigureCanvasTkAgg(self.fig_specific_ratio, master=self.subwindow_fi_checkfile)
-        self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
+        self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=54, sticky="nesw")
         self.toolbarFrame_specific_ratio = tk.Frame(master=self.subwindow_fi_checkfile)
-        self.toolbarFrame_specific_ratio.grid(row=20, column=14, rowspan=2, columnspan=39, sticky="w")
+        self.toolbarFrame_specific_ratio.grid(row=20, column=14, rowspan=2, columnspan=54, sticky="w")
         self.toolbar_specific_ratio = NavigationToolbar2Tk(self.canvas_specific_ratio, self.toolbarFrame_specific_ratio)
         self.toolbar_specific_ratio.config(background=self.bg_colors["Very Light"])
         self.toolbar_specific_ratio._message_label.config(
@@ -30013,7 +30135,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
         frm_quick = SE(
-            parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=39,
+            parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=54,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
 
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
@@ -30068,7 +30190,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=38,
+                parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=53,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -30078,8 +30200,8 @@ class PySILLS(tk.Frame):
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
-            scb_v.grid(row=0, column=52, rowspan=18, columnspan=1, sticky="ns")
-            scb_h.grid(row=18, column=14, rowspan=1, columnspan=38, sticky="ew")
+            scb_v.grid(row=0, column=67, rowspan=18, columnspan=1, sticky="ns")
+            scb_h.grid(row=18, column=14, rowspan=1, columnspan=53, sticky="ew")
 
             if var_is != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0 and n_intervals_incl > 0:
                 ## INITIALIZATION
@@ -30245,8 +30367,13 @@ class PySILLS(tk.Frame):
 
                     # Concentration Results
                     concentration_i = self.container_concentration[var_type]["RAW"][var_file_short]["MAT"][isotope]
-                    concentration_sigma_mat_i = self.container_concentration[var_type]["RAW"][var_file_short][
-                        "1 SIGMA MAT"][isotope]
+
+                    if isotope in self.container_concentration[var_type]["RAW"][var_file_short]["1 SIGMA MAT"]:
+                        concentration_sigma_mat_i = self.container_concentration[var_type]["RAW"][var_file_short][
+                            "1 SIGMA MAT"][isotope]
+                    else:
+                        concentration_sigma_mat_i = np.nan
+
                     concentration_ratio_i = self.container_concentration_ratio[var_type]["RAW"][var_file_short]["MAT"][
                         isotope]
                     lod_i = self.container_lod[var_type]["RAW"][var_file_short]["MAT"][isotope]
@@ -30283,8 +30410,15 @@ class PySILLS(tk.Frame):
                         entries_normalized_sensitivity_incl_i.append(f"{normalized_sensitivity_incl_i:.{4}f}")
                         entries_rsf_i.append(f"{rsf_i:.{4}E}")
 
-                    entries_concentration_i.append(f"{concentration_i:.{4}f}")
-                    entries_concentration_sigma_mat_i.append(f"{concentration_sigma_mat_i:.{4}f}")
+                    if None not in [concentration_i]:
+                        entries_concentration_i.append(f"{concentration_i:.{4}f}")
+                    else:
+                        entries_concentration_i.append(np.nan)
+
+                    if None not in [concentration_sigma_mat_i]:
+                        entries_concentration_sigma_mat_i.append(f"{concentration_sigma_mat_i:.{4}f}")
+                    else:
+                        entries_concentration_sigma_mat_i.append(np.nan)
 
                     if var_type == "SMPL":
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
@@ -32196,6 +32330,8 @@ class PySILLS(tk.Frame):
         self.pypitzer_performed = False
 
         is_defined = self.check_if_is_was_defined()
+        val_max_na = round((self.chemistry_data["Na"]/(self.chemistry_data["Na"] + self.chemistry_data["Cl"]))*10**6, 4)
+        val_max_cl = round((self.chemistry_data["Cl"]/(self.chemistry_data["Na"] + self.chemistry_data["Cl"]))*10**6, 4)
 
         if condition_std == True and condition_smpl == True and is_defined == True:
             amount_fluid = (100 - float(var_entr.get()))/100
@@ -32423,6 +32559,21 @@ class PySILLS(tk.Frame):
 
                         val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
                                 var_sensitivity_is/var_sensitivity_na)), 4)
+
+                        if "Cl" in var_is_i:
+                            if val_concentration_is > val_max_cl:
+                                val_concentration_is = val_max_na
+                                self.parent.bell()
+                                print("The concentration of the internal standard,", var_is_i + ",",
+                                      "was higher than the highest possible value, assuming that the whole inclusion is "
+                                      "composed of 100 % halite.")
+                    else:
+                        if val_concentration_is > val_max_na:
+                            val_concentration_is = val_max_na
+                            self.parent.bell()
+                            print("The concentration of the internal standard,", var_na+",",
+                                  "was higher than the highest possible value, assuming that the whole inclusion is "
+                                  "composed of 100 % halite.")
 
                     helper_is.append(val_concentration_is)
 
@@ -34919,13 +35070,14 @@ class PySILLS(tk.Frame):
         var_id_real = self.list_indices[current_id - 1]
         var_file = self.current_file_spk
         var_isotope = self.current_isotope
-        val_original = round(self.container_spike_values[var_file][var_isotope]["RAW"][current_id - 1], 2)
-        val_corrected = round(self.container_spike_values[var_file][var_isotope]["SMOOTHED"][current_id - 1], 2)
+
+        val_raw = round(self.container_spikes[var_file][var_isotope]["Data RAW"][var_id_real], 2)
+        val_smoothed = round(self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][var_id_real], 2)
 
         if mode == "RAW":
-            val_updated = round(val_original, 2)
+            val_updated = round(val_raw, 2)
         else:
-            val_updated = round(val_corrected, 2)
+            val_updated = round(val_smoothed, 2)
 
         self.container_spikes[var_file][var_isotope]["Data IMPROVED"][var_id_real] = val_updated
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
@@ -35134,6 +35286,48 @@ class PySILLS(tk.Frame):
     def update_progress(self, parent, variable, value):
         variable["value"] = value
         parent.update()
+
+    def create_progress_bar_spike_elimination(self):
+        ## Window Settings
+        window_width = 400
+        window_height = 100
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_progressbar_spike_elimination = tk.Toplevel(self.parent)
+        subwindow_progressbar_spike_elimination.title("Please wait ...")
+        subwindow_progressbar_spike_elimination.geometry(var_geometry)
+        subwindow_progressbar_spike_elimination.resizable(False, False)
+        subwindow_progressbar_spike_elimination["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_progressbar_spike_elimination, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_progressbar_spike_elimination, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_progressbar_spike_elimination.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_progressbar_spike_elimination.grid_columnconfigure(i, minsize=column_min)
+
+        ## Progress bar
+        prgbar_spk = ttk.Progressbar(master=subwindow_progressbar_spike_elimination, maximum=100)
+        prgbar_spk.grid(row=1, column=1, rowspan=1, columnspan=16, sticky="nesw")
+
+        ## LABELS
+        self.helper_lbl_progress_spk = tk.StringVar()
+        self.helper_lbl_progress_spk.set("Process has started!")
+        self.lbl_prg_spk = SE(
+            parent=subwindow_progressbar_spike_elimination, row_id=2, column_id=1, n_rows=1, n_columns=16,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text=self.helper_lbl_progress_spk.get(), relief=tk.FLAT, fontsize="sans 10 bold")
+
+        return subwindow_progressbar_spike_elimination, prgbar_spk
 
     def create_progress_bar_window_datareduction(self, mode="complete"):
         ## Window Settings
