@@ -409,7 +409,7 @@ class PySILLS(tk.Frame):
         self.container_var["dwell_times"] = {}
         self.container_var["dwell_times"]["Entry"] = {}
         self.container_var["dwell_times"]["Entry"]["Default"] = tk.StringVar()
-        self.container_var["dwell_times"]["Entry"]["Default"].set("0.01")
+        self.container_var["dwell_times"]["Entry"]["Default"].set("2.0")
         self.container_var["IS STD Default"] = tk.StringVar()
         self.container_var["IS STD Default"].set("0.0")
         self.container_var["IS SMPL Default"] = tk.StringVar()
@@ -681,7 +681,7 @@ class PySILLS(tk.Frame):
         self.container_var["ma_setting"]["SE Alpha"] = tk.StringVar()
         self.container_var["ma_setting"]["SE Alpha"].set("0.05")
         self.container_var["ma_setting"]["SE Threshold"] = tk.StringVar()
-        self.container_var["ma_setting"]["SE Threshold"].set("1000")
+        self.container_var["ma_setting"]["SE Threshold"].set("5000")
         self.container_var["ma_setting"]["Host Setup Selection"] = tk.IntVar()
         self.container_var["ma_setting"]["Host Setup Selection"].set(1)
         self.container_var["ma_setting"]["Quantification Method"] = tk.IntVar()
@@ -823,7 +823,7 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["SE Alpha"] = tk.StringVar()
             self.container_var[key_setting]["SE Alpha"].set("0.05")
             self.container_var[key_setting]["SE Threshold"] = tk.StringVar()
-            self.container_var[key_setting]["SE Threshold"].set("1000")
+            self.container_var[key_setting]["SE Threshold"].set("5000")
             self.container_var[key_setting]["Inclusion Plugin"] = {
                 "Intensity BG": tk.IntVar(), "Intensity MAT": tk.IntVar(), "Intensity MIX": tk.IntVar(),
                 "Intensity INCL": tk.IntVar(), "Analytical Sensitivity": tk.IntVar(), "Concentration SRM": tk.IntVar()}
@@ -9081,10 +9081,10 @@ class PySILLS(tk.Frame):
 
         self.container_elements["dwell_times"]["Label"].extend([lbl_01, lbl_02])
 
-        if self.container_var["dwell_times"]["Entry"]["Default"].get() != "0.01":
+        if self.container_var["dwell_times"]["Entry"]["Default"].get() != "2.0":
             var_text = self.container_var["dwell_times"]["Entry"]["Default"].get()
         else:
-            var_text = "0.01"
+            var_text = "2.0"
 
         entr_dwell = SE(
             parent=window_dwell, row_id=1, column_id=7, n_rows=1, n_columns=7,
@@ -13949,6 +13949,7 @@ class PySILLS(tk.Frame):
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
         ## INITIALIZATION
+        self.calculate_threshold_spike_elimination()
         self.select_spike_elimination(
             var_opt=self.container_var["Spike Elimination Method"].get(),
             start_row=var_spike_elimination_setup["Row start"], mode="MA")
@@ -15689,7 +15690,7 @@ class PySILLS(tk.Frame):
                     self.container_var["SRM"][isotope].set("Select SRM")
                     #
                     self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
-                    self.container_var["dwell_times"]["Entry"][isotope].set("0.01")
+                    self.container_var["dwell_times"]["Entry"][isotope].set("2.0")
                     #
                     for file_std_short in self.container_lists["STD"]["Short"]:
                         self.build_checkbutton_isotope_visibility(
@@ -26811,7 +26812,11 @@ class PySILLS(tk.Frame):
                                 if str(value) == "nan":
                                     entries_container.append("undefined")
                                 else:
-                                    entries_container.append("< LoD")
+                                    if str(value_lod) == "nan" and str(value) != "nan":
+                                        entries_container.append(f"{value:.{n_digits}f}")
+                                        helper_values[isotope].append(value)
+                                    else:
+                                        entries_container.append("< LoD")
 
                         self.tv_results_files.insert("", tk.END, values=entries_container)
                     else:
@@ -33909,6 +33914,19 @@ class PySILLS(tk.Frame):
         ## INITIALIZATION
         self.fi_check_elements_checkbutton()
 
+    def calculate_threshold_spike_elimination(self):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        elif self.pysills_mode == "FI":
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
+        val_dwell_time = float(self.container_var["dwell_times"]["Entry"]["Default"].get())
+        factor = 1000/val_dwell_time
+        value = int(10*factor)
+        self.container_var[key_setting]["SE Threshold"].set(value)
+
     def guess_salt_composition(self):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
@@ -34443,12 +34461,12 @@ class PySILLS(tk.Frame):
                 text="Sample Files", relief=var_relief, fontsize="sans 10 bold")
             #
             # Entries
-            var_entr_09c_default = "0.05"
+            var_entr_09c_default = var_alpha.get()
             entr_09c = SE(
                 parent=var_parent, row_id=start_row + 3, column_id=7, n_rows=1, n_columns=11,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_alpha, text_default=var_entr_09c_default)
-            var_entr_09d_default = "1000"
+            var_entr_09d_default = var_threshold.get()
             entr_09d = SE(
                 parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
