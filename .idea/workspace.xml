@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing and code cleaning&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_10_23__14_43__Changes_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_10_23__14_43__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pysills/pysills_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/pysills_app.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +53,7 @@
     </option>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/pysills_app.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/pysills/pysills_app.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -65,18 +66,19 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.PySILLS.executor&quot;: &quot;Run&quot;,
-    &quot;Python.pysills_app.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.PySILLS.executor": "Run",
+    "Python.pysills_app.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/MAB26/PycharmProjects/PySILLS_GitHub/pysills/pysills_app.py",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="PySILLS" type="PythonConfigurationType" factoryName="Python">
-      <module name="PySILLS_Github" />
+      <module name="PySILLS_GitHub" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -102,7 +104,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-48aec45f0201-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17011.127" />
+        <option value="bundled-python-sdk-5b207ade9991-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.17890.14" />
       </set>
     </attachedChunks>
   </component>
@@ -114,70 +116,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1688744210159</updated>
-    </task>
-    <task id="LOCAL-00098" summary="&quot;improved mass balance calculation&quot;">
-      <option name="closed" value="true" />
-      <created>1712693624944</created>
-      <option name="number" value="00098" />
-      <option name="presentableId" value="LOCAL-00098" />
-      <option name="project" value="LOCAL" />
-      <updated>1712693624944</updated>
-    </task>
-    <task id="LOCAL-00099" summary="&quot;bug fixing and code cleaning&quot;">
-      <option name="closed" value="true" />
-      <created>1712846333653</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1712846333653</updated>
-    </task>
-    <task id="LOCAL-00100" summary="&quot;bug fixing and code cleaning&quot;">
-      <option name="closed" value="true" />
-      <created>1713003903164</created>
-      <option name="number" value="00100" />
-      <option name="presentableId" value="LOCAL-00100" />
-      <option name="project" value="LOCAL" />
-      <updated>1713003903164</updated>
-    </task>
-    <task id="LOCAL-00101" summary="&quot;updated 'spike elimination'&quot;">
-      <option name="closed" value="true" />
-      <created>1713136174150</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1713136174150</updated>
-    </task>
-    <task id="LOCAL-00102" summary="&quot;performance improvements&quot;">
-      <option name="closed" value="true" />
-      <created>1713378968862</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1713378968862</updated>
-    </task>
-    <task id="LOCAL-00103" summary="&quot;performance improvements&quot;">
-      <option name="closed" value="true" />
-      <created>1713382024022</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1713382024022</updated>
-    </task>
-    <task id="LOCAL-00104" summary="&quot;performance improvements&quot;">
-      <option name="closed" value="true" />
-      <created>1713390086484</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1713390086484</updated>
-    </task>
-    <task id="LOCAL-00105" summary="&quot;performance improvements&quot;">
-      <option name="closed" value="true" />
-      <created>1713426854093</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1713426854093</updated>
     </task>
     <task id="LOCAL-00106" summary="&quot;bug fixing&quot;">
       <option name="closed" value="true" />
@@ -507,7 +445,71 @@
       <option name="project" value="LOCAL" />
       <updated>1717758352509</updated>
     </task>
-    <option name="localTasksCounter" value="147" />
+    <task id="LOCAL-00147" summary="&quot;added rock-forming element selection to the oxides setup window&quot;">
+      <option name="closed" value="true" />
+      <created>1718093931813</created>
+      <option name="number" value="00147" />
+      <option name="presentableId" value="LOCAL-00147" />
+      <option name="project" value="LOCAL" />
+      <updated>1718093931813</updated>
+    </task>
+    <task id="LOCAL-00148" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718140977589</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1718140977590</updated>
+    </task>
+    <task id="LOCAL-00149" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718188454637</created>
+      <option name="number" value="00149" />
+      <option name="presentableId" value="LOCAL-00149" />
+      <option name="project" value="LOCAL" />
+      <updated>1718188454637</updated>
+    </task>
+    <task id="LOCAL-00150" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718192941456</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1718192941456</updated>
+    </task>
+    <task id="LOCAL-00151" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718197614138</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1718197614138</updated>
+    </task>
+    <task id="LOCAL-00152" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718271955726</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1718271955727</updated>
+    </task>
+    <task id="LOCAL-00153" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718274646958</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1718274646958</updated>
+    </task>
+    <task id="LOCAL-00154" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1718292818746</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1718292818746</updated>
+    </task>
+    <option name="localTasksCounter" value="155" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -522,7 +524,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="&quot;improved data export&quot;" />
     <MESSAGE value="&quot;fixed some bugs for the fluid inclusion analysis&quot;" />
     <MESSAGE value="&quot;improved code (bugfixing)&quot;" />
     <MESSAGE value="&quot;some bugfixing&quot;" />
@@ -547,6 +548,7 @@
     <MESSAGE value="&quot;bug fixing&quot;" />
     <MESSAGE value="&quot;added x-y plotter&quot;" />
     <MESSAGE value="&quot;bug fixing and code cleaning&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;" />
   </component>
 </project>
