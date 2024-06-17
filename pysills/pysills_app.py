@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		14.06.2024
+# Date:		17.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -31963,6 +31963,12 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
+        list_halogen_isotopes = []
+        for halogen in ["Cl", "Br", "I"]:
+            if halogen in self.container_lists["Measured Elements"]:
+                for isotope in self.container_lists["Measured Elements"][halogen]:
+                    list_halogen_isotopes.append(isotope)
+
         self.container_lists["Possible IS SMPL"].clear()
         self.container_lists["Selected Salts"].clear()
         for category in ["Chlorides", "Carbonates", "Sulfates"]:
@@ -31978,31 +31984,32 @@ class PySILLS(tk.Frame):
                 if values["State"].get() == 1:
                     self.container_lists["Salt Chemistry"][salt] = {}
                     self.container_lists["Selected Salts"].append(salt)
-                    for isotope in self.container_lists["ISOTOPES"]:
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
                         key = re.search(r"(\D+)(\d+)", isotope)
                         for item in parts_salt.groups():
                             if item == "":
                                 item = str(1)
-                            #
+
                             if item.isalpha():
                                 last_letter = item
                                 if item == key.group(1):
-                                    if isotope not in self.container_lists["Possible IS SMPL"]:
+                                    if (isotope not in self.container_lists["Possible IS SMPL"]
+                                            and isotope not in list_halogen_isotopes):
                                         self.container_lists["Possible IS SMPL"].append(isotope)
                             if item.isnumeric():
                                 last_number = item
                                 self.container_lists["Salt Chemistry"][salt][last_letter] = last_number
-        #
+
         self.opt_is_smpl_def["menu"].delete(0, "end")
-        #
+
         for file_smpl, gui_opt in self.container_optionmenu["SMPL"]["IS"].items():
             gui_opt["menu"].delete(0, "end")
-        #
+
         for isotope in self.container_lists["Possible IS SMPL"]:
             self.opt_is_smpl_def["menu"].add_command(
                 label=isotope, command=lambda var_isotope=isotope, var_key="SMPL":
                 self.fi_change_is_default(var_isotope, var_key))
-            #
+
             for file_smpl, gui_opt in self.container_optionmenu["SMPL"]["IS"].items():
                 gui_opt["menu"].add_command(
                     label=isotope, command=lambda var_isotope=isotope, var_file=file_smpl, var_key="SMPL":
@@ -33678,11 +33685,17 @@ class PySILLS(tk.Frame):
             command=self.guess_salt_composition)
 
         ## Option Menus
+        self.container_lists["Possible IS SMPL"] = self.container_lists["Measured Isotopes"]["All"].copy()
+        for halogen in ["Cl", "Br", "I"]:
+            if halogen in self.container_lists["Measured Elements"]:
+                for isotope in self.container_lists["Measured Elements"][halogen]:
+                    self.container_lists["Possible IS SMPL"].remove(isotope)
+
         opt_05a = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=start_column + n_header + 9,
             n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var[key_setting]["Salt Correction"]["Default IS"],
-            option_list=self.container_lists["ISOTOPES"],
+            option_list=self.container_lists["Possible IS SMPL"],
             text_set=self.container_var[key_setting]["Salt Correction"]["Default IS"].get(),
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
             command=lambda var_opt=self.container_var[key_setting]["Salt Correction"]["Default IS"],
