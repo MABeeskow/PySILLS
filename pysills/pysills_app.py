@@ -13449,6 +13449,7 @@ class PySILLS(tk.Frame):
                 master=frm_01, text=filename_short, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"],
                 variable=self.helper_halogen_ratios[filename_short],
                 command=lambda filename_short=str_filename_short: self.select_file_halogen_ratio(filename_short))
+            self.helper_halogen_ratios["Checkboxes"][filename_short] = cb_i
             text_01.window_create("end", window=cb_i)
             text_01.insert("end", "\n")
 
@@ -13494,7 +13495,7 @@ class PySILLS(tk.Frame):
         ax2.set_xscale("log")
         ax.set_yscale("log")
         ax.set_xlim(4*10**(-1), 3*10**5)
-        ax.set_ylim(8*10**(-2), 3*10**2)
+        ax.set_ylim(1*10**(-2), 3*10**2)
         ax2.set_xlim(7*10**(4), 1*10**-1)
         ax.grid()
 
@@ -13622,11 +13623,14 @@ class PySILLS(tk.Frame):
                                 filename_short]["INCL"][isotope_br]
                             val_brcl = (concentration_br/concentration_cl)*10**3
                             helper_brcl.append(val_brcl)
-
-                            sct = self.ax_halogen_ratio.scatter(
-                                val_icl, val_brcl, s=50, color=self.accent_color, edgecolor="black", zorder=2,
-                                alpha=0.75)
-                            self.helper_scatter_points[filename_short].append(sct)
+                            if 0.0 not in [val_icl, val_brcl]:
+                                sct = self.ax_halogen_ratio.scatter(
+                                    val_icl, val_brcl, s=50, color=self.accent_color, edgecolor="black", zorder=2,
+                                    alpha=0.75)
+                                self.helper_scatter_points[filename_short].append(sct)
+                            else:
+                                self.helper_halogen_ratios[filename_short].set(0)
+                                self.helper_halogen_ratios["Checkboxes"][filename_short].configure(state="disabled")
             else:
                 if "I" not in self.container_lists["Measured Elements"]:
                     elements_list = ["Cl", "Br"]
@@ -13648,11 +13652,14 @@ class PySILLS(tk.Frame):
                                 filename_short]["INCL"][isotope_br]
                             val_brcl = (concentration_br/concentration_cl)*10**3
                             helper_brcl.append(val_brcl)
-
-                            sct = self.ax_halogen_ratio.scatter(
-                                val_icl, val_brcl, s=50, color=self.accent_color, edgecolor="black", zorder=2,
-                                alpha=0.75)
-                            self.helper_scatter_points[filename_short].append(sct)
+                            if 0.0 not in [val_icl, val_brcl]:
+                                sct = self.ax_halogen_ratio.scatter(
+                                    val_icl, val_brcl, s=50, color=self.accent_color, edgecolor="black", zorder=2,
+                                    alpha=0.75)
+                                self.helper_scatter_points[filename_short].append(sct)
+                            else:
+                                self.helper_halogen_ratios[filename_short].set(0)
+                                self.helper_halogen_ratios["Checkboxes"][filename_short].configure(state="disabled")
         else:
             for sct_item in self.helper_scatter_points[filename_short]:
                 sct_item.set_visible(False)
@@ -25515,7 +25522,7 @@ class PySILLS(tk.Frame):
 
     def fi_get_concentration2(
             self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT", mode="Specific",
-            pypitzer=False):
+            pypitzer=False, var_incl_is=None):
         """ Calculates the concentration, C, based on the following two equations:
         1) Standard Files:  C_i = SRM_dataset(element)
         2) Sample Files:    C_i = (intensity_smpl_i/intensity_smpl_is)*(concentration_smpl_is/sensitivity_i)
@@ -25630,12 +25637,16 @@ class PySILLS(tk.Frame):
                             for index, isotope in enumerate(file_isotopes):
                                 if self.container_var[key_setting]["Inclusion Concentration Calculation"].get() == 0:
                                     # Simple Signals (SILLS)
-                                    var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+                                    if var_incl_is == None:
+                                        var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+                                    else:
+                                        var_is = self.container_lists["Measured Elements"][var_file_short]["Na"][0]
 
                                     if pypitzer == False:
                                         if self.pypitzer_performed == False:
                                             var_concentration_incl_is = float(
-                                                self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                                                self.container_var["SMPL"][var_file_long]["IS Data"][
+                                                    "Concentration"].get())
                                         else:
                                             var_concentration_incl_is = float(
                                                 self.container_var["SMPL"][var_file_long]["IS Data"][var_datatype][
@@ -25643,12 +25654,15 @@ class PySILLS(tk.Frame):
                                     else:
                                         var_concentration_incl_is = 10000
 
-                                    var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-                                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][var_is]
-                                    var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
+                                    if var_incl_is != None:
+                                        var_concentration_incl_is = 10000
+
+                                    var_intensity_incl_i = self.container_intensity_corrected[var_filetype][
+                                        var_datatype][var_file_short]["INCL"][isotope]
+                                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][
+                                        var_datatype][var_file_short]["INCL"][var_is]
+                                    var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][
+                                        var_datatype][var_file_short]["INCL"][isotope]
 
                                     if var_intensity_incl_is > 0 and var_sensitivity_i > 0:
                                         var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*(
@@ -28163,7 +28177,7 @@ class PySILLS(tk.Frame):
                     y_values_02.append(y_value)
                     x_all.append(x_value)
                     y_all.append(y_value)
-                    #
+
                     self.ax_sensitivity_03a2.scatter(
                         x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                     self.ax_sensitivity_03a2.plot(
@@ -32853,10 +32867,10 @@ class PySILLS(tk.Frame):
                         self.helper_salt_composition[file_smpl_short].set(salt_composition)
                         self.check_chargebalance(filename_long=file_smpl)
 
-                        # self.quantify_inclusion_based_on_molalities(
-                        #     var_filename_short=file_smpl_short, var_is_i=var_is_i,
-                        #     var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
-                        #     var_concentration_is=val_concentration_is)
+                        self.quantify_inclusion_based_on_molalities(
+                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                            var_concentration_is=val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -32973,10 +32987,10 @@ class PySILLS(tk.Frame):
 
                     self.check_chargebalance(filename_long=file_smpl)
 
-                    # self.quantify_inclusion_based_on_molalities(
-                    #     var_filename_short=file_smpl_short, var_is_i=var_is_i,
-                    #     var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
-                    #     var_concentration_is=val_concentration_is)
+                    self.quantify_inclusion_based_on_molalities(
+                        var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                        var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                        var_concentration_is=val_concentration_is)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
             self.parent.bell()
@@ -33614,11 +33628,6 @@ class PySILLS(tk.Frame):
             self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
 
     def perform_quantification_mass_charge_balance(self):
-        # Perform quantification
-        for var_filetype in ["STD", "SMPL"]:
-            for var_file_short in self.container_lists[var_filetype]["Short"]:
-                self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
-
         var_filetype = "None"
         var_file_short = "None"
         var_file_long = "None"
@@ -33626,27 +33635,10 @@ class PySILLS(tk.Frame):
 
         for var_datatype in ["RAW", "SMOOTHED"]:
             try:
-                # Intensity Results
-                self.get_intensity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_focus=var_focus, mode="All")
-                self.fi_get_intensity_corrected(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_focus=var_focus, mode="All")
-
-                # Sensitivity Results
-                self.get_analytical_sensitivity(
-                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, mode="All")
-                results_is = self.determine_possible_is(filetype="ALL")
-                IQ(dataframe=None, project_type=self.pysills_mode,
-                   results_container=self.container_intensity_ratio).get_intensity_ratio(
-                    data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
-
                 # Concentration Results
                 self.fi_get_concentration2(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-                    var_file_long=var_file_long, var_focus=var_focus, mode="All", pypitzer=False)
+                    var_file_long=var_file_long, var_focus=var_focus, mode="All", pypitzer=False, var_incl_is=True)
                 self.fi_get_concentration_ratio(
                     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                     var_file_long=var_file_long, var_focus=var_focus, mode="All")
@@ -33765,7 +33757,7 @@ class PySILLS(tk.Frame):
                         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                         var_file_long=var_file_long, mode="All")
 
-            #self.perform_quantification_mass_charge_balance()
+            self.perform_quantification_mass_charge_balance()
             self.init_fi_massbalance = True
 
         ## Labels
@@ -33779,7 +33771,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="File setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
-            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=start_column + n_header + 1,
+            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=start_column + n_header + 1,
             n_rows=1, n_columns=n_header - 8, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Very Dark"]).create_simple_label(
             text="Default settings", relief=tk.FLAT, fontsize="sans 10 bold")
@@ -33791,6 +33783,12 @@ class PySILLS(tk.Frame):
             bg=self.accent_color).create_simple_button(
             text="Guess the composition", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.guess_salt_composition)
+        btn_02a = SE(
+            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 27, n_rows=1,
+            n_columns=11, fg=self.bg_colors["Dark Font"],
+            bg=self.accent_color).create_simple_button(
+            text="Fix calculation", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.fix_mass_charge_balance_calculation)
 
         ## Option Menus
         self.container_lists["Possible IS SMPL"] = self.container_lists["Measured Isotopes"]["All"].copy()
@@ -33800,7 +33798,7 @@ class PySILLS(tk.Frame):
                     self.container_lists["Possible IS SMPL"].remove(isotope)
 
         opt_05a = SE(
-            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=start_column + n_header + 9,
+            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=start_column + n_header + 9,
             n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
             var_iso=self.container_var[key_setting]["Salt Correction"]["Default IS"],
             option_list=self.container_lists["Possible IS SMPL"],
@@ -33823,7 +33821,7 @@ class PySILLS(tk.Frame):
         ## Entries
         if mode == "mass balance":
             entr_05a = SE(
-                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 15,
+                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 15,
                 n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
                 text_default=self.container_var[key_setting]["Salt Correction"]["Default Salinity"].get(),
@@ -33831,14 +33829,14 @@ class PySILLS(tk.Frame):
                                mode="default", var_file=None:
                 self.fi_calculate_massbalance(var_entr, mode, var_file, event))
             entr_05b = SE(
-                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 21,
+                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 21,
                 n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var[key_setting]["Salt Correction"]["Default Concentration"],
                 text_default=self.container_var[key_setting]["Salt Correction"]["Default Concentration"].get(),
                 command=self.fi_set_concentration_is_massbalance)
         elif mode == "charge balance":
             entr_05a = SE(
-                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 15,
+                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 15,
                 n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
                 text_default=self.container_var[key_setting]["Salt Correction"]["Default Salinity"].get(),
@@ -33846,7 +33844,7 @@ class PySILLS(tk.Frame):
                                mode="default", var_file=None:
                 self.fi_calculate_chargebalance(var_entr, mode, var_file, event))
             entr_05b = SE(
-                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 21,
+                parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 21,
                 n_rows=1, n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=self.container_var[key_setting]["Salt Correction"]["Default Concentration"],
                 text_default=self.container_var[key_setting]["Salt Correction"]["Default Concentration"].get(),
@@ -33854,13 +33852,13 @@ class PySILLS(tk.Frame):
 
         ## CHECKBOXES
         cb_01a = SE(
-            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 27,
+            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 27,
             fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=11,
             bg=self.bg_colors["Light"]).create_simple_checkbox(
             var_cb=self.molality_based_quantification, text="Molality-based quantification", set_sticky="nesw",
             own_color=True, command=lambda var_cb=self.molality_based_quantification: self.change_checkbox(var_cb))
         cb_01a.configure(offvalue=False)
-        cb_01a.configure(state="disabled")
+        #cb_01a.configure(state="disabled")
 
         ## Tables
         list_salts = []
@@ -33962,7 +33960,7 @@ class PySILLS(tk.Frame):
 
         frm_02 = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row + 1, column_id=start_column + n_header + 1,
-            n_rows=n_rows - 3, n_columns=int(2*n_header + 5), fg=self.bg_colors["Dark Font"],
+            n_rows=n_rows - 4, n_columns=int(2*n_header + 5), fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Very Light"]).create_frame()
         vsb_02 = ttk.Scrollbar(master=frm_02, orient="vertical")
         text_02 = tk.Text(
@@ -34044,10 +34042,44 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         self.fi_check_elements_checkbutton()
-        #self.perform_quantification_mass_charge_balance()
+
+    def fix_mass_charge_balance_calculation(self):
+        for var_filetype in ["STD", "SMPL"]:
+            for index, var_file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                filename_long = self.container_lists[var_filetype]["Long"][index]
+                self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+                if var_filetype == "SMPL":
+                    var_na = self.container_lists["Measured Elements"][var_file_short]["Na"][0]
+                    self.container_var["SMPL"][filename_long]["IS Data"]["IS"].set(var_na)
+
+        self.container_var["fi_setting"]["Salt Correction"]["Default IS"].set(var_na)
+
+        var_filetype = "None"
+        var_file_short = "None"
+        var_file_long = "None"
+        var_focus = "None"
+        self.var_init_fi_datareduction = True
+
+        for var_datatype in ["RAW", "SMOOTHED"]:
+            # Intensity Results
+            self.get_intensity(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_focus=var_focus, mode="All")
+            self.fi_get_intensity_corrected(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_focus=var_focus, mode="All")
+            # Sensitivity Results
+            self.get_analytical_sensitivity(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, mode="All")
+            # Concentration Results
+            self.fi_get_concentration2(
+                var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                var_file_long=var_file_long, var_focus=var_focus, mode="All")
 
     def change_checkbox(self, var_cb):
-        print("State:", var_cb.get())
+        #print("State:", var_cb.get())
+        pass
 
     def calculate_threshold_spike_elimination(self):
         if self.pysills_mode == "MA":
