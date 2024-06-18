@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		17.06.2024
+# Date:		18.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -422,6 +422,8 @@ class PySILLS(tk.Frame):
         self.helper_salt_composition = {}
         self.charge_balance_check = {}
         self.counter_calculation_runs = 0
+        self.molality_based_quantification = tk.BooleanVar()
+        self.molality_based_quantification.set(False)
         # Quantification Method
         self.container_var["Quantification Mineral"] = {"Method": tk.StringVar()}
         self.container_var["Quantification Mineral"]["Method"].set("Internal Standard")
@@ -25004,512 +25006,512 @@ class PySILLS(tk.Frame):
                         self.container_rsf[var_filetype][var_datatype][isotope] = var_result_i
 
     #
-    def fi_get_concentration(
-            self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT", mode="Specific",
-            pypitzer=False):
-        """ Calculates the concentration, C, based on the following two equations:
-        1) Standard Files:  C_i = SRM_dataset(element)
-        2) Sample Files:    C_i = (intensity_smpl_i/intensity_smpl_is)*(concentration_smpl_is/sensitivity_i)
-
-        Parameters
-        ----------
-        var_filetype : str
-            The file category, e.g. STD
-        var_datatype : str
-            The data category, e.g. RAW
-        var_file_short : str
-            The file as a short version (without the complete filepath)
-        var_file_long : str
-            The file as the long version (with the complete filepath)
-
-        Returns
-        -------
-        """
-        if self.pysills_mode == "FI":
-            key_setting = "fi_setting"
-        elif self.pysills_mode == "MI":
-            key_setting = "mi_setting"
-
-        if mode == "Specific":
-            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            if var_filetype == "STD":
-                for isotope in file_isotopes:
-                    var_srm_i = self.container_var["SRM"][isotope].get()
-                    key_element = re.search(r"(\D+)(\d+)", isotope)
-                    element = key_element.group(1)
-
-                    var_result_i = self.srm_actual[var_srm_i][element]
-                    var_result_sigma_i = 0.0
-
-                    self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                        isotope] = var_result_i
-                    self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                        isotope] = var_result_sigma_i
-            elif var_filetype == "SMPL":
-                # Internal standard for the inclusion (e.g. Na)
-                var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
-                for index, isotope in enumerate(file_isotopes):
-                    if var_focus == "MAT":
-                        # Classical Mineral Analysis
-                        if (self.container_var["Quantification Mineral"]["Method"].get() == "Internal Standard" and
-                                self.oxide_calculation_mat.get() == 0):
-                            # Internal standard for the matrix (e.g. Si)
-                            var_host_is = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
-                            var_concentration_host_is = float(
-                                self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
-                            var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                var_file_short]["MAT"][var_host_is]
-                            var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short]["MAT"][isotope]
-                            var_sensitivity_ishost = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                var_file_short]["MAT"][var_host_is]
-
-                            if var_sensitivity_ishost > 0:
-                                var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
-                            else:
-                                var_sensitivity_host_is = 0.0
-                            if var_intensity_host_is > 0 and var_sensitivity_host_is > 0:
-                                var_result_i = (var_intensity_i/var_intensity_host_is)* \
-                                               (var_concentration_host_is/var_sensitivity_i)
-                            else:
-                                var_result_i = np.nan
-
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
-                                isotope] = var_result_i
-
-                            var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "BG"][isotope]
-                            var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "MAT"][isotope]
-                            var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                isotope]
-                            var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short]["N MAT"][
-                                isotope]
-                            var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                            var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                            var_sigma_mat_i = ((((var_intensity_mat_i*var_tau_i)/var_n_mat)**0.5/var_tau_i)**2)**0.5
-                            var_sigma = (var_sigma_bg_i**2 + var_sigma_mat_i**2)**0.5
-
-                            if (var_intensity_host_is*var_sensitivity_host_is) > 0:
-                                var_result_sigma_i = (var_concentration_host_is/(
-                                        var_intensity_host_is*var_sensitivity_host_is))*var_sigma
-                            else:
-                                var_result_sigma_i = np.nan
-
-                            self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
-                                isotope] = var_result_sigma_i
-                        else:
-                            # 100 wt.% total oxides
-                            self.run_total_oxides_calculation(
-                                filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
-                                list_isotopes=file_isotopes)
-                    else:
-                        if self.pysills_mode == "MI":
-                            if (self.container_var[key_setting]["Inclusion Setup Option"].get() == "100 wt.% Oxides" or
-                                    self.oxide_calculation_incl.get() == 1):
-                                # 100 wt.% total oxides
-                                self.run_total_oxides_calculation(
-                                    filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
-                                    list_isotopes=file_isotopes, focus="INCL")
-                        if self.pysills_mode == "FI" and self.oxide_calculation_incl.get() == 0:
-                            # Matrix-only Tracer Method
-                            if self.container_var[key_setting][
-                                "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                                if self.container_var[key_setting]["Inclusion Concentration Calculation"].get() == 0:
-                                    # Simple Signals (SILLS)
-                                    var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
-
-                                    if pypitzer == False:
-                                        if self.pypitzer_performed == False:
-                                            var_concentration_incl_is = float(
-                                                self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
-                                        else:
-                                            var_concentration_incl_is = float(
-                                                self.container_var["SMPL"][var_file_long]["IS Data"][var_datatype][
-                                                    "Concentration"].get())
-                                    else:
-                                        var_concentration_incl_is = 10000
-
-                                    var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-                                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][var_is]
-                                    var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-
-                                    if var_intensity_incl_is > 0 and var_sensitivity_i > 0:
-                                        var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*(
-                                                var_concentration_incl_is/var_sensitivity_i)
-                                    else:
-                                        var_result_i = np.nan
-
-                                    var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
-                                        var_file_short]["BG"][isotope]
-                                    var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                        "N BG"][isotope]
-                                    var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                        "N INCL"][isotope]
-                                    var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                                    var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                                    var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
-                                                         /var_tau_i)**2)**0.5
-                                    var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
-
-                                    ## Inclusion concentration
-                                    if (var_intensity_incl_is*var_sensitivity_i) > 0:
-                                        var_result_sigma_i = (var_concentration_incl_is/(
-                                                var_intensity_incl_is*var_sensitivity_i))*var_sigma
-                                    else:
-                                        var_result_sigma_i = np.nan
-                                else:
-                                    # Using x
-                                    var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-
-                                    var_intensity_mix_t = self.container_intensity_mix["SMPL"][var_datatype][
-                                        var_file_short][var_t]
-                                    var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
-                                        var_file_short][var_is]
-                                    var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-                                    var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
-                                        var_file_short]["1 SIGMA INCL"][isotope]
-                                    var_sensitivity_t = self.container_analytical_sensitivity["SMPL"][var_datatype][
-                                        var_file_short]["INCL"][var_t]
-
-                                    ## Mixed concentration ratio a
-                                    var_a = self.calculate_mixed_concentration_ratio(
-                                        intensity_mix_i=var_intensity_mix_t, intensity_mix_IS=var_intensity_mix_is,
-                                        sensitivity_IS_i=var_sensitivity_t)
-
-                                    var_concentration_host_t = self.container_concentration["SMPL"][var_datatype][
-                                        var_file_short]["MAT"][var_t]
-                                    var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
-                                        var_file_short]["MAT"][var_is]
-
-                                    if pypitzer == False:
-                                        var_concentration_incl_is = float(
-                                            self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
-                                    else:
-                                        var_concentration_incl_is = 10000
-
-                                    ## Mixing ratio x
-                                    var_x = self.calculate_mixing_ratio(
-                                        factor_a=var_a, concentration_mat_i=var_concentration_host_t,
-                                        concentration_mat_IS=var_concentration_host_is, concentraton_incl_i=0,
-                                        concentration_incl_IS=var_concentration_incl_is)
-
-                                    var_concentration_mix_is = ((1 - var_x)*var_concentration_host_is + var_x*
-                                                                var_concentration_incl_is)
-
-                                    var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
-                                        var_file_short][isotope]
-                                    var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
-                                        var_file_short][var_is]
-                                    var_intensity_host_i = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["MAT"][isotope]
-                                    var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                        var_file_short]["MAT"][var_is]
-                                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-
-                                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][
-                                        var_datatype][var_file_short]["INCL"][var_is]
-                                    var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
-                                        var_file_short]["BG"][isotope]
-                                    var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
-                                        var_file_short]["INCL"][isotope]
-                                    var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                        "N BG"][isotope]
-                                    var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                        "N INCL"][isotope]
-                                    var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                                    var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                                    var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
-                                                         /var_tau_i)**2)**0.5
-                                    var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
-
-                                    ## Inclusion concentration
-                                    if (var_x*var_sensitivity_i > 0 and var_intensity_mix_is > 0
-                                            and var_intensity_host_is > 0):
-                                        var_result_i = (1/(var_x*var_sensitivity_i))*(
-                                                (var_concentration_mix_is/var_intensity_mix_is)*var_intensity_mix_i +
-                                                (var_x - 1)*(var_concentration_host_is/var_intensity_host_is)*
-                                                var_intensity_host_i)
-                                        var_result_sigma_i = (var_concentration_incl_is/(
-                                                var_intensity_incl_is*var_sensitivity_i))*var_sigma
-                                    else:
-                                        var_result_i = np.nan
-                                        var_result_sigma_i = 0.0
-
-                                if var_result_i < 0:
-                                    var_result_i = 0.0
-
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
-                                    isotope] = var_result_sigma_i
-                            # Second Internal Standard
-                            elif self.container_var[key_setting][
-                                "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                                var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
-                                var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
-                                    "Name"].get()
-
-                                ## Mixed concentration ratio a
-                                var_intensity_mix_is1 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                    var_is1]
-                                var_intensity_mix_is2 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                    var_is2]
-                                var_sensitivity_is2 = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][var_is2]
-
-                                var_a = self.calculate_mixed_concentration_ratio(
-                                    intensity_mix_i=var_intensity_mix_is2, intensity_mix_IS=var_intensity_mix_is1,
-                                    sensitivity_IS_i=var_sensitivity_is2)
-
-                                ## Mixing ratio x
-                                var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][var_is1]
-                                var_concentration_host_is2 = self.container_concentration["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][var_is2]
-
-                                if pypitzer == False:
-                                    var_concentration_incl_is1 = float(
-                                        self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
-                                else:
-                                    var_concentration_incl_is1 = 10000
-
-                                var_concentration_incl_is2 = float(self.container_var["SMPL"][var_file_long][
-                                                                       "Second Internal Standard"]["Value"].get())
-
-                                var_x = self.calculate_mixing_ratio(
-                                    factor_a=var_a, concentration_mat_i=var_concentration_host_is2,
-                                    concentration_mat_IS=var_concentration_host_is1,
-                                    concentraton_incl_i=var_concentration_incl_is2,
-                                    concentration_incl_IS=var_concentration_incl_is1)
-
-                                ## Mixed Concentration IS1
-                                var_concentration_mix_is1 = ((1 - var_x)*var_concentration_host_is1 +
-                                                             var_x*var_concentration_incl_is1)
-
-                                ## Mixed Concentrations
-                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                    isotope]
-                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][isotope]
-
-                                var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is1)*(
-                                        var_concentration_mix_is1/var_sensitivity_i)
-                                var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][isotope]
-
-                                var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][var_is]
-                                var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
-                                    var_file_short]["BG"][isotope]
-                                var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][isotope]
-                                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                    isotope]
-                                var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                    "N INCL"][isotope]
-                                var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                                var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                                var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
-                                                     /var_tau_i)**2)**0.5
-                                var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
-
-                                ## Inclusion Concentrations
-                                if var_x > 0:
-                                    var_result_i = (var_concentration_mix_i - (1 - var_x)*var_concentration_host_i)/var_x
-                                    var_result_sigma_i = (var_concentration_incl_is1/(
-                                            var_intensity_incl_is*var_sensitivity_i))*var_sigma
-                                else:
-                                    var_result_i = np.nan
-                                    var_result_sigma_i = 0.0
-
-                                if var_result_i < 0:
-                                    var_result_i = 0.0
-
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["Second-Internal"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
-                                    isotope] = var_result_sigma_i
-                            elif self.container_var[key_setting][
-                                "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                                # Mixing ratio x
-                                if index == 0:
-                                    var_x, var_concentration_mix_is = self.estimate_x_halter2002(
-                                        datatype=var_datatype, filename_long=var_file_long, filename_short=var_file_short)
-                                var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][isotope]
-                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][isotope]
-                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                    isotope]
-                                var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                    var_is]
-                                var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is)*(
-                                        var_concentration_mix_is/var_sensitivity_i)
-
-                                if var_x > 0:
-                                    var_result_i = (var_concentration_mix_i + (var_x - 1)*var_concentration_host_i)/var_x
-                                else:
-                                    var_result_i = np.nan
-
-                                if var_result_i < 0:
-                                    var_result_i = 0.0
-
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["Halter2002"][
-                                    isotope] = var_result_i
-                            elif self.container_var[key_setting][
-                                "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
-                                var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][var_is]
-                                var_rho_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
-                                                           "rho(host)"].get())
-                                var_rho_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
-                                                           "rho(incl)"].get())
-                                var_radius_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
-                                                              "R(host)"].get())
-                                var_radius_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
-                                                              "R(incl)"].get())
-                                var_normalized_sensitivity_i = self.container_normalized_sensitivity["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][isotope]
-                                var_normalized_sensitivity_is = self.container_normalized_sensitivity["SMPL"][var_datatype][
-                                    var_file_short]["MAT"][var_is]
-                                var_intensity_incl_i = self.container_intensity_corrected["SMPL"][var_datatype][
-                                    var_file_short]["INCL"][isotope]
-                                var_intensity_incl_is = self.container_intensity_corrected["SMPL"][var_datatype][
-                                    var_file_short]["INCL"][var_is]
-
-                                if pypitzer == False:
-                                    var_concentration_incl_is = float(
-                                        self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
-                                else:
-                                    var_concentration_incl_is = 10000
-
-                                var_factor_s_i = var_normalized_sensitivity_is/var_normalized_sensitivity_i
-                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][isotope]
-                                if var_sensitivity_i > 0:
-                                    var_factor_s_i = 1/var_sensitivity_i
-                                else:
-                                    var_factor_s_i = 0.0
-                                var_factor_k_i = ((var_rho_incl_i/var_rho_host_i)*
-                                                  (var_intensity_incl_i/var_intensity_incl_is)*
-                                                  (var_concentration_incl_is/var_concentration_host_is)*
-                                                  (var_radius_incl_i**2)/(1.5*var_radius_host_i**2 - var_radius_incl_i**2))
-
-                                var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
-                                    var_file_short]["BG"][isotope]
-                                var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][isotope]
-                                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                                    isotope]
-                                var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                    "N INCL"][isotope]
-                                var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                                var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                                var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
-                                                     /var_tau_i)**2)**0.5
-                                var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
-
-                                # Inclusion Concentration
-                                if var_sensitivity_i > 0:
-                                    var_result_i = (var_concentration_host_is*(var_rho_host_i/var_rho_incl_i)*
-                                                    var_factor_s_i*var_factor_k_i*
-                                                    (1.5*var_radius_host_i**2 - var_radius_incl_i**2)/
-                                                    (var_radius_incl_i**2))
-                                    var_result_sigma_i = (var_concentration_incl_is/(
-                                            var_intensity_incl_is*var_sensitivity_i))*var_sigma
-                                else:
-                                    var_result_i = np.nan
-                                    var_result_sigma_i = 0.0
-
-                                if var_result_i < 0:
-                                    var_result_i = 0.0
-
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["Borisova2021"][
-                                    isotope] = var_result_i
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
-                                    isotope] = var_result_sigma_i
-
-                if (self.container_var[key_setting][
-                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)"
-                        and var_focus == "INCL"):
-                    var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
-                    var_concentration_incl_is = self.container_concentration[var_filetype][var_datatype][
-                        var_file_short]["INCL"][var_is]
-                    var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                        var_file_short]["INCL"][var_is]
-
-                    for index, isotope in enumerate(file_isotopes):
-                        var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
-                            var_file_short]["INCL"][isotope]
-                        var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
-                            var_file_short]["BG"][isotope]
-                        var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
-                            var_file_short]["INCL"][isotope]
-                        var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
-                            isotope]
-                        var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                            "N INCL"][isotope]
-                        var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
-                        var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
-                        var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
-                                             /var_tau_i)**2)**0.5
-                        var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
-
-                        var_result_sigma_i = (var_concentration_incl_is/(
-                                var_intensity_incl_is*var_sensitivity_i))*var_sigma
-                        self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
-                            isotope] = var_result_sigma_i
-        else:
-            for var_filetype in ["STD", "SMPL"]:
-                if var_filetype == "STD":
-                    focus_set = ["MAT"]
-                else:
-                    focus_set = ["MAT", "INCL"]
-
-                for var_focus in focus_set:
-                    if var_focus not in self.container_concentration[var_filetype][var_datatype]:
-                        self.container_concentration[var_filetype][var_datatype][var_focus] = {}
-
-                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                        helper_results = []
-
-                        for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-                            if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-                                var_file_short = self.container_lists[var_filetype]["Short"][index]
-                                file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-
-                                if isotope in file_isotopes:
-                                    self.fi_get_concentration(
-                                        var_filetype=var_filetype, var_datatype=var_datatype,
-                                        var_file_short=var_file_short, var_file_long=var_file_long, var_focus=var_focus,
-                                        pypitzer=pypitzer)
-                                    var_result_i = self.container_concentration[var_filetype][var_datatype][
-                                        var_file_short][var_focus][isotope]
-                                    helper_results.append(var_result_i)
-
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result_i = np.mean(helper_results)
-                        else:
-                            var_result_i = np.median(helper_results)
-                        self.container_concentration[var_filetype][var_datatype][var_focus][isotope] = var_result_i
+    # def fi_get_concentration(
+    #         self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT", mode="Specific",
+    #         pypitzer=False):
+    #     """ Calculates the concentration, C, based on the following two equations:
+    #     1) Standard Files:  C_i = SRM_dataset(element)
+    #     2) Sample Files:    C_i = (intensity_smpl_i/intensity_smpl_is)*(concentration_smpl_is/sensitivity_i)
+    #
+    #     Parameters
+    #     ----------
+    #     var_filetype : str
+    #         The file category, e.g. STD
+    #     var_datatype : str
+    #         The data category, e.g. RAW
+    #     var_file_short : str
+    #         The file as a short version (without the complete filepath)
+    #     var_file_long : str
+    #         The file as the long version (with the complete filepath)
+    #
+    #     Returns
+    #     -------
+    #     """
+    #     if self.pysills_mode == "FI":
+    #         key_setting = "fi_setting"
+    #     elif self.pysills_mode == "MI":
+    #         key_setting = "mi_setting"
+    #
+    #     if mode == "Specific":
+    #         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+    #         if var_filetype == "STD":
+    #             for isotope in file_isotopes:
+    #                 var_srm_i = self.container_var["SRM"][isotope].get()
+    #                 key_element = re.search(r"(\D+)(\d+)", isotope)
+    #                 element = key_element.group(1)
+    #
+    #                 var_result_i = self.srm_actual[var_srm_i][element]
+    #                 var_result_sigma_i = 0.0
+    #
+    #                 self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+    #                     isotope] = var_result_i
+    #                 self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+    #                     isotope] = var_result_sigma_i
+    #         elif var_filetype == "SMPL":
+    #             # Internal standard for the inclusion (e.g. Na)
+    #             var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+    #             for index, isotope in enumerate(file_isotopes):
+    #                 if var_focus == "MAT":
+    #                     # Classical Mineral Analysis
+    #                     if (self.container_var["Quantification Mineral"]["Method"].get() == "Internal Standard" and
+    #                             self.oxide_calculation_mat.get() == 0):
+    #                         # Internal standard for the matrix (e.g. Si)
+    #                         var_host_is = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+    #                         var_concentration_host_is = float(
+    #                             self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Concentration"].get())
+    #                         var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                             var_file_short]["MAT"][isotope]
+    #                         var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                             var_file_short]["MAT"][var_host_is]
+    #                         var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                             var_file_short]["MAT"][isotope]
+    #                         var_sensitivity_ishost = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                             var_file_short]["MAT"][var_host_is]
+    #
+    #                         if var_sensitivity_ishost > 0:
+    #                             var_sensitivity_host_is = var_sensitivity_i/var_sensitivity_ishost
+    #                         else:
+    #                             var_sensitivity_host_is = 0.0
+    #                         if var_intensity_host_is > 0 and var_sensitivity_host_is > 0:
+    #                             var_result_i = (var_intensity_i/var_intensity_host_is)* \
+    #                                            (var_concentration_host_is/var_sensitivity_i)
+    #                         else:
+    #                             var_result_i = np.nan
+    #
+    #                         self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
+    #                             isotope] = var_result_i
+    #
+    #                         var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                             "BG"][isotope]
+    #                         var_intensity_mat_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                             "MAT"][isotope]
+    #                         var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+    #                             isotope]
+    #                         var_n_mat = self.container_intensity[var_filetype][var_datatype][var_file_short]["N MAT"][
+    #                             isotope]
+    #                         var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+    #                         var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+    #                         var_sigma_mat_i = ((((var_intensity_mat_i*var_tau_i)/var_n_mat)**0.5/var_tau_i)**2)**0.5
+    #                         var_sigma = (var_sigma_bg_i**2 + var_sigma_mat_i**2)**0.5
+    #
+    #                         if (var_intensity_host_is*var_sensitivity_host_is) > 0:
+    #                             var_result_sigma_i = (var_concentration_host_is/(
+    #                                     var_intensity_host_is*var_sensitivity_host_is))*var_sigma
+    #                         else:
+    #                             var_result_sigma_i = np.nan
+    #
+    #                         self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA MAT"][
+    #                             isotope] = var_result_sigma_i
+    #                     else:
+    #                         # 100 wt.% total oxides
+    #                         self.run_total_oxides_calculation(
+    #                             filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
+    #                             list_isotopes=file_isotopes)
+    #                 else:
+    #                     if self.pysills_mode == "MI":
+    #                         if (self.container_var[key_setting]["Inclusion Setup Option"].get() == "100 wt.% Oxides" or
+    #                                 self.oxide_calculation_incl.get() == 1):
+    #                             # 100 wt.% total oxides
+    #                             self.run_total_oxides_calculation(
+    #                                 filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
+    #                                 list_isotopes=file_isotopes, focus="INCL")
+    #                     if self.pysills_mode == "FI" and self.oxide_calculation_incl.get() == 0:
+    #                         # Matrix-only Tracer Method
+    #                         if self.container_var[key_setting][
+    #                             "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
+    #                             if self.container_var[key_setting]["Inclusion Concentration Calculation"].get() == 0:
+    #                                 # Simple Signals (SILLS)
+    #                                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+    #
+    #                                 if pypitzer == False:
+    #                                     if self.pypitzer_performed == False:
+    #                                         var_concentration_incl_is = float(
+    #                                             self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+    #                                     else:
+    #                                         var_concentration_incl_is = float(
+    #                                             self.container_var["SMPL"][var_file_long]["IS Data"][var_datatype][
+    #                                                 "Concentration"].get())
+    #                                 else:
+    #                                     var_concentration_incl_is = 10000
+    #
+    #                                 var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                                     var_file_short]["INCL"][isotope]
+    #                                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                                     var_file_short]["INCL"][var_is]
+    #                                 var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                                     var_file_short]["INCL"][isotope]
+    #
+    #                                 if var_intensity_incl_is > 0 and var_sensitivity_i > 0:
+    #                                     var_result_i = (var_intensity_incl_i/var_intensity_incl_is)*(
+    #                                             var_concentration_incl_is/var_sensitivity_i)
+    #                                 else:
+    #                                     var_result_i = np.nan
+    #
+    #                                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+    #                                     var_file_short]["BG"][isotope]
+    #                                 var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+    #                                     var_file_short]["INCL"][isotope]
+    #                                 var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                                     "N BG"][isotope]
+    #                                 var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                                     "N INCL"][isotope]
+    #                                 var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+    #                                 var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+    #                                 var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+    #                                                      /var_tau_i)**2)**0.5
+    #                                 var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+    #
+    #                                 ## Inclusion concentration
+    #                                 if (var_intensity_incl_is*var_sensitivity_i) > 0:
+    #                                     var_result_sigma_i = (var_concentration_incl_is/(
+    #                                             var_intensity_incl_is*var_sensitivity_i))*var_sigma
+    #                                 else:
+    #                                     var_result_sigma_i = np.nan
+    #                             else:
+    #                                 # Using x
+    #                                 var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
+    #
+    #                                 var_intensity_mix_t = self.container_intensity_mix["SMPL"][var_datatype][
+    #                                     var_file_short][var_t]
+    #                                 var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
+    #                                     var_file_short][var_is]
+    #                                 var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                                     var_file_short]["INCL"][isotope]
+    #                                 var_intensity_sigma_i = self.container_intensity[var_filetype][var_datatype][
+    #                                     var_file_short]["1 SIGMA INCL"][isotope]
+    #                                 var_sensitivity_t = self.container_analytical_sensitivity["SMPL"][var_datatype][
+    #                                     var_file_short]["INCL"][var_t]
+    #
+    #                                 ## Mixed concentration ratio a
+    #                                 var_a = self.calculate_mixed_concentration_ratio(
+    #                                     intensity_mix_i=var_intensity_mix_t, intensity_mix_IS=var_intensity_mix_is,
+    #                                     sensitivity_IS_i=var_sensitivity_t)
+    #
+    #                                 var_concentration_host_t = self.container_concentration["SMPL"][var_datatype][
+    #                                     var_file_short]["MAT"][var_t]
+    #                                 var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
+    #                                     var_file_short]["MAT"][var_is]
+    #
+    #                                 if pypitzer == False:
+    #                                     var_concentration_incl_is = float(
+    #                                         self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+    #                                 else:
+    #                                     var_concentration_incl_is = 10000
+    #
+    #                                 ## Mixing ratio x
+    #                                 var_x = self.calculate_mixing_ratio(
+    #                                     factor_a=var_a, concentration_mat_i=var_concentration_host_t,
+    #                                     concentration_mat_IS=var_concentration_host_is, concentraton_incl_i=0,
+    #                                     concentration_incl_IS=var_concentration_incl_is)
+    #
+    #                                 var_concentration_mix_is = ((1 - var_x)*var_concentration_host_is + var_x*
+    #                                                             var_concentration_incl_is)
+    #
+    #                                 var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
+    #                                     var_file_short][isotope]
+    #                                 var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
+    #                                     var_file_short][var_is]
+    #                                 var_intensity_host_i = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                                     var_file_short]["MAT"][isotope]
+    #                                 var_intensity_host_is = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                                     var_file_short]["MAT"][var_is]
+    #                                 var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][
+    #                                     var_file_short]["INCL"][isotope]
+    #
+    #                                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][
+    #                                     var_datatype][var_file_short]["INCL"][var_is]
+    #                                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+    #                                     var_file_short]["BG"][isotope]
+    #                                 var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+    #                                     var_file_short]["INCL"][isotope]
+    #                                 var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                                     "N BG"][isotope]
+    #                                 var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                                     "N INCL"][isotope]
+    #                                 var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+    #                                 var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+    #                                 var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+    #                                                      /var_tau_i)**2)**0.5
+    #                                 var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+    #
+    #                                 ## Inclusion concentration
+    #                                 if (var_x*var_sensitivity_i > 0 and var_intensity_mix_is > 0
+    #                                         and var_intensity_host_is > 0):
+    #                                     var_result_i = (1/(var_x*var_sensitivity_i))*(
+    #                                             (var_concentration_mix_is/var_intensity_mix_is)*var_intensity_mix_i +
+    #                                             (var_x - 1)*(var_concentration_host_is/var_intensity_host_is)*
+    #                                             var_intensity_host_i)
+    #                                     var_result_sigma_i = (var_concentration_incl_is/(
+    #                                             var_intensity_incl_is*var_sensitivity_i))*var_sigma
+    #                                 else:
+    #                                     var_result_i = np.nan
+    #                                     var_result_sigma_i = 0.0
+    #
+    #                             if var_result_i < 0:
+    #                                 var_result_i = 0.0
+    #
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
+    #                                 isotope] = var_result_sigma_i
+    #                         # Second Internal Standard
+    #                         elif self.container_var[key_setting][
+    #                             "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+    #                             var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+    #                             var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
+    #                                 "Name"].get()
+    #
+    #                             ## Mixed concentration ratio a
+    #                             var_intensity_mix_is1 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+    #                                 var_is1]
+    #                             var_intensity_mix_is2 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+    #                                 var_is2]
+    #                             var_sensitivity_is2 = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][var_is2]
+    #
+    #                             var_a = self.calculate_mixed_concentration_ratio(
+    #                                 intensity_mix_i=var_intensity_mix_is2, intensity_mix_IS=var_intensity_mix_is1,
+    #                                 sensitivity_IS_i=var_sensitivity_is2)
+    #
+    #                             ## Mixing ratio x
+    #                             var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][var_is1]
+    #                             var_concentration_host_is2 = self.container_concentration["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][var_is2]
+    #
+    #                             if pypitzer == False:
+    #                                 var_concentration_incl_is1 = float(
+    #                                     self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+    #                             else:
+    #                                 var_concentration_incl_is1 = 10000
+    #
+    #                             var_concentration_incl_is2 = float(self.container_var["SMPL"][var_file_long][
+    #                                                                    "Second Internal Standard"]["Value"].get())
+    #
+    #                             var_x = self.calculate_mixing_ratio(
+    #                                 factor_a=var_a, concentration_mat_i=var_concentration_host_is2,
+    #                                 concentration_mat_IS=var_concentration_host_is1,
+    #                                 concentraton_incl_i=var_concentration_incl_is2,
+    #                                 concentration_incl_IS=var_concentration_incl_is1)
+    #
+    #                             ## Mixed Concentration IS1
+    #                             var_concentration_mix_is1 = ((1 - var_x)*var_concentration_host_is1 +
+    #                                                          var_x*var_concentration_incl_is1)
+    #
+    #                             ## Mixed Concentrations
+    #                             var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+    #                                 isotope]
+    #                             var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][isotope]
+    #
+    #                             var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is1)*(
+    #                                     var_concentration_mix_is1/var_sensitivity_i)
+    #                             var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][isotope]
+    #
+    #                             var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][var_is]
+    #                             var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+    #                                 var_file_short]["BG"][isotope]
+    #                             var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][isotope]
+    #                             var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+    #                                 isotope]
+    #                             var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                                 "N INCL"][isotope]
+    #                             var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+    #                             var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+    #                             var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+    #                                                  /var_tau_i)**2)**0.5
+    #                             var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+    #
+    #                             ## Inclusion Concentrations
+    #                             if var_x > 0:
+    #                                 var_result_i = (var_concentration_mix_i - (1 - var_x)*var_concentration_host_i)/var_x
+    #                                 var_result_sigma_i = (var_concentration_incl_is1/(
+    #                                         var_intensity_incl_is*var_sensitivity_i))*var_sigma
+    #                             else:
+    #                                 var_result_i = np.nan
+    #                                 var_result_sigma_i = 0.0
+    #
+    #                             if var_result_i < 0:
+    #                                 var_result_i = 0.0
+    #
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Second-Internal"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
+    #                                 isotope] = var_result_sigma_i
+    #                         elif self.container_var[key_setting][
+    #                             "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+    #                             # Mixing ratio x
+    #                             if index == 0:
+    #                                 var_x, var_concentration_mix_is = self.estimate_x_halter2002(
+    #                                     datatype=var_datatype, filename_long=var_file_long, filename_short=var_file_short)
+    #                             var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][isotope]
+    #                             var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][isotope]
+    #                             var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+    #                                 isotope]
+    #                             var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
+    #                                 var_is]
+    #                             var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is)*(
+    #                                     var_concentration_mix_is/var_sensitivity_i)
+    #
+    #                             if var_x > 0:
+    #                                 var_result_i = (var_concentration_mix_i + (var_x - 1)*var_concentration_host_i)/var_x
+    #                             else:
+    #                                 var_result_i = np.nan
+    #
+    #                             if var_result_i < 0:
+    #                                 var_result_i = 0.0
+    #
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Halter2002"][
+    #                                 isotope] = var_result_i
+    #                         elif self.container_var[key_setting][
+    #                             "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
+    #                             var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][var_is]
+    #                             var_rho_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+    #                                                        "rho(host)"].get())
+    #                             var_rho_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+    #                                                        "rho(incl)"].get())
+    #                             var_radius_host_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+    #                                                           "R(host)"].get())
+    #                             var_radius_incl_i = float(self.container_var["SMPL"][var_file_long]["Borisova2021"][
+    #                                                           "R(incl)"].get())
+    #                             var_normalized_sensitivity_i = self.container_normalized_sensitivity["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][isotope]
+    #                             var_normalized_sensitivity_is = self.container_normalized_sensitivity["SMPL"][var_datatype][
+    #                                 var_file_short]["MAT"][var_is]
+    #                             var_intensity_incl_i = self.container_intensity_corrected["SMPL"][var_datatype][
+    #                                 var_file_short]["INCL"][isotope]
+    #                             var_intensity_incl_is = self.container_intensity_corrected["SMPL"][var_datatype][
+    #                                 var_file_short]["INCL"][var_is]
+    #
+    #                             if pypitzer == False:
+    #                                 var_concentration_incl_is = float(
+    #                                     self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+    #                             else:
+    #                                 var_concentration_incl_is = 10000
+    #
+    #                             var_factor_s_i = var_normalized_sensitivity_is/var_normalized_sensitivity_i
+    #                             var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][isotope]
+    #                             if var_sensitivity_i > 0:
+    #                                 var_factor_s_i = 1/var_sensitivity_i
+    #                             else:
+    #                                 var_factor_s_i = 0.0
+    #                             var_factor_k_i = ((var_rho_incl_i/var_rho_host_i)*
+    #                                               (var_intensity_incl_i/var_intensity_incl_is)*
+    #                                               (var_concentration_incl_is/var_concentration_host_is)*
+    #                                               (var_radius_incl_i**2)/(1.5*var_radius_host_i**2 - var_radius_incl_i**2))
+    #
+    #                             var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+    #                                 var_file_short]["BG"][isotope]
+    #                             var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+    #                                 var_file_short]["INCL"][isotope]
+    #                             var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+    #                                 isotope]
+    #                             var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                                 "N INCL"][isotope]
+    #                             var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+    #                             var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+    #                             var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+    #                                                  /var_tau_i)**2)**0.5
+    #                             var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+    #
+    #                             # Inclusion Concentration
+    #                             if var_sensitivity_i > 0:
+    #                                 var_result_i = (var_concentration_host_is*(var_rho_host_i/var_rho_incl_i)*
+    #                                                 var_factor_s_i*var_factor_k_i*
+    #                                                 (1.5*var_radius_host_i**2 - var_radius_incl_i**2)/
+    #                                                 (var_radius_incl_i**2))
+    #                                 var_result_sigma_i = (var_concentration_incl_is/(
+    #                                         var_intensity_incl_is*var_sensitivity_i))*var_sigma
+    #                             else:
+    #                                 var_result_i = np.nan
+    #                                 var_result_sigma_i = 0.0
+    #
+    #                             if var_result_i < 0:
+    #                                 var_result_i = 0.0
+    #
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["Borisova2021"][
+    #                                 isotope] = var_result_i
+    #                             self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
+    #                                 isotope] = var_result_sigma_i
+    #
+    #             if (self.container_var[key_setting][
+    #                 "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)"
+    #                     and var_focus == "INCL"):
+    #                 var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
+    #                 var_concentration_incl_is = self.container_concentration[var_filetype][var_datatype][
+    #                     var_file_short]["INCL"][var_is]
+    #                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
+    #                     var_file_short]["INCL"][var_is]
+    #
+    #                 for index, isotope in enumerate(file_isotopes):
+    #                     var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+    #                         var_file_short]["INCL"][isotope]
+    #                     var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+    #                         var_file_short]["BG"][isotope]
+    #                     var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+    #                         var_file_short]["INCL"][isotope]
+    #                     var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+    #                         isotope]
+    #                     var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+    #                         "N INCL"][isotope]
+    #                     var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+    #                     var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+    #                     var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+    #                                          /var_tau_i)**2)**0.5
+    #                     var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+    #
+    #                     var_result_sigma_i = (var_concentration_incl_is/(
+    #                             var_intensity_incl_is*var_sensitivity_i))*var_sigma
+    #                     self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
+    #                         isotope] = var_result_sigma_i
+    #     else:
+    #         for var_filetype in ["STD", "SMPL"]:
+    #             if var_filetype == "STD":
+    #                 focus_set = ["MAT"]
+    #             else:
+    #                 focus_set = ["MAT", "INCL"]
+    #
+    #             for var_focus in focus_set:
+    #                 if var_focus not in self.container_concentration[var_filetype][var_datatype]:
+    #                     self.container_concentration[var_filetype][var_datatype][var_focus] = {}
+    #
+    #                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
+    #                     helper_results = []
+    #
+    #                     for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
+    #                         if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
+    #                             var_file_short = self.container_lists[var_filetype]["Short"][index]
+    #                             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+    #
+    #                             if isotope in file_isotopes:
+    #                                 self.fi_get_concentration(
+    #                                     var_filetype=var_filetype, var_datatype=var_datatype,
+    #                                     var_file_short=var_file_short, var_file_long=var_file_long, var_focus=var_focus,
+    #                                     pypitzer=pypitzer)
+    #                                 var_result_i = self.container_concentration[var_filetype][var_datatype][
+    #                                     var_file_short][var_focus][isotope]
+    #                                 helper_results.append(var_result_i)
+    #
+    #                     if self.container_var["General Settings"]["Desired Average"].get() == 1:
+    #                         var_result_i = np.mean(helper_results)
+    #                     else:
+    #                         var_result_i = np.median(helper_results)
+    #                     self.container_concentration[var_filetype][var_datatype][var_focus][isotope] = var_result_i
 
     def fi_get_concentration2(
             self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus="MAT", mode="Specific",
@@ -25758,8 +25760,12 @@ class PySILLS(tk.Frame):
                                     if var_result_i < 0:
                                         var_result_i = 0.0
 
-                                self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
-                                    isotope] = var_result_i
+                                if self.molality_based_quantification.get() == False:
+                                    self.container_concentration[var_filetype][var_datatype][var_file_short]["INCL"][
+                                        isotope] = var_result_i
+                                else:
+                                    var_result_i = self.container_concentration[var_filetype][var_datatype][
+                                        var_file_short]["INCL"][isotope]
                                 self.container_concentration[var_filetype][var_datatype][var_file_short]["Matrix-Only"][
                                     isotope] = var_result_i
                                 self.container_concentration[var_filetype][var_datatype][var_file_short]["1 SIGMA INCL"][
@@ -30719,9 +30725,10 @@ class PySILLS(tk.Frame):
                     var_file_long=var_file, var_focus="MAT")
 
                 if var_type == "SMPL":
-                    self.fi_get_concentration2(
-                        var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
-                        var_file_long=var_file, var_focus="INCL")
+                    if self.molality_based_quantification.get() == False:
+                        self.fi_get_concentration2(
+                            var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
+                            var_file_long=var_file, var_focus="INCL")
                     self.fi_get_normalized_sensitivity(
                         var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="INCL")
@@ -31993,8 +32000,10 @@ class PySILLS(tk.Frame):
                             if item.isalpha():
                                 last_letter = item
                                 if item == key.group(1):
-                                    if (isotope not in self.container_lists["Possible IS SMPL"]
-                                            and isotope not in list_halogen_isotopes):
+                                    # if (isotope not in self.container_lists["Possible IS SMPL"]
+                                    #         and isotope not in list_halogen_isotopes):
+                                    #     self.container_lists["Possible IS SMPL"].append(isotope)
+                                    if isotope not in self.container_lists["Possible IS SMPL"]:
                                         self.container_lists["Possible IS SMPL"].append(isotope)
                             if item.isnumeric():
                                 last_number = item
@@ -32652,7 +32661,6 @@ class PySILLS(tk.Frame):
             concentration_cl = (intensity_cl/intensity_na)*(concentration_na/sensitivity_cl)
             val_b += concentration_cl/(molar_mass_cl*charge_cl)
 
-
         for salt in self.container_lists["Selected Salts"]:
             element = self.molar_masses_compounds[salt]["Cation"]
             molar_mass_i = self.chemistry_data[element]
@@ -32791,6 +32799,7 @@ class PySILLS(tk.Frame):
                         val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
                         concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
                         concentration_na_true = val_concentration_is
+                        concentration_cl_true = val_concentration_cl
                         helper.append(val_concentration_is)
                         helper_cl.append(val_concentration_cl)
 
@@ -32843,6 +32852,11 @@ class PySILLS(tk.Frame):
 
                         self.helper_salt_composition[file_smpl_short].set(salt_composition)
                         self.check_chargebalance(filename_long=file_smpl)
+
+                        # self.quantify_inclusion_based_on_molalities(
+                        #     var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                        #     var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                        #     var_concentration_is=val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -32924,6 +32938,7 @@ class PySILLS(tk.Frame):
                     val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
                     concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
                     concentration_na_true = val_concentration_is
+                    concentration_cl_true = val_concentration_cl
                     helper.append(val_concentration_is)
                     helper_cl.append(val_concentration_cl)
 
@@ -32957,9 +32972,61 @@ class PySILLS(tk.Frame):
                         self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
 
                     self.check_chargebalance(filename_long=file_smpl)
+
+                    # self.quantify_inclusion_based_on_molalities(
+                    #     var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                    #     var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                    #     var_concentration_is=val_concentration_is)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
             self.parent.bell()
+
+    def quantify_inclusion_based_on_molalities(
+            self, var_filename_short, var_is_i, var_concentration_na, var_concentration_cl, var_concentration_is):
+        file_isotopes = self.container_lists["Measured Isotopes"][var_filename_short]
+        index_file = self.container_lists["SMPL"]["Short"].index(var_filename_short)
+        filename_long = self.container_lists["SMPL"]["Long"][index_file]
+
+        key_element_is = re.search(r"(\D+)(\d+)", var_is_i)
+        element_is = key_element_is.group(1)
+        molar_mass_is = self.chemistry_data[element_is]
+        molar_mass_na = self.chemistry_data["Na"]
+        molar_mass_cl = self.chemistry_data["Cl"]
+        molality_na = var_concentration_na/(molar_mass_na*1000)
+        concentration_is = 10000
+        # print(var_filename_short)
+        # print("IS:", var_is_i, var_concentration_is, concentration_is, var_concentration_cl)
+        for isotope in [var_is_i]:
+            key_element_i = re.search(r"(\D+)(\d+)", isotope)
+            element_i = key_element_i.group(1)
+            molar_mass_i = self.chemistry_data[element_i]
+            concentration_i = self.container_concentration["SMPL"]["RAW"][var_filename_short]["INCL"][
+                isotope]
+            concentration_ratio_is = self.container_concentration_ratio["SMPL"]["RAW"][var_filename_short][
+                "INCL"][var_is_i]
+            concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+            factor_i = (molar_mass_is/molar_mass_i)*concentration_ratio_i
+            molality_i = molality_na*factor_i
+
+            concentration_i = round(molality_i*molar_mass_i*1000, 4)
+            conversion_factor_i = concentration_i/var_concentration_is
+            self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].set(var_concentration_is)
+
+        for isotope in file_isotopes:
+            key_element_i = re.search(r"(\D+)(\d+)", isotope)
+            element_i = key_element_i.group(1)
+            molar_mass_i = self.chemistry_data[element_i]
+            concentration_i = self.container_concentration["SMPL"]["RAW"][var_filename_short]["INCL"][
+                isotope]
+            concentration_ratio_is = self.container_concentration_ratio["SMPL"]["RAW"][var_filename_short][
+                "INCL"][var_is_i]
+            concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+            factor_i = (molar_mass_is/molar_mass_i)*concentration_ratio_i
+            molality_i = molality_na*factor_i
+
+            concentration_i = round(molality_i*molar_mass_i*1000/conversion_factor_i, 4)
+            self.container_concentration["SMPL"]["RAW"][var_filename_short]["INCL"][isotope] = concentration_i
+            # print(isotope, concentration_i)
 
     def fi_set_concentration_is_massbalance(self, event):
         if self.pysills_mode == "FI":
@@ -33546,6 +33613,46 @@ class PySILLS(tk.Frame):
                 var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
             self.fi_get_concentration_mixed(var_datatype=var_datatype, var_file_short=var_file_short, mode="All")
 
+    def perform_quantification_mass_charge_balance(self):
+        # Perform quantification
+        for var_filetype in ["STD", "SMPL"]:
+            for var_file_short in self.container_lists[var_filetype]["Short"]:
+                self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
+
+        var_filetype = "None"
+        var_file_short = "None"
+        var_file_long = "None"
+        var_focus = "None"
+
+        for var_datatype in ["RAW", "SMOOTHED"]:
+            try:
+                # Intensity Results
+                self.get_intensity(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_focus=var_focus, mode="All")
+                self.fi_get_intensity_corrected(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_focus=var_focus, mode="All")
+
+                # Sensitivity Results
+                self.get_analytical_sensitivity(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, mode="All")
+                results_is = self.determine_possible_is(filetype="ALL")
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_ratio).get_intensity_ratio(
+                    data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
+
+                # Concentration Results
+                self.fi_get_concentration2(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, var_focus=var_focus, mode="All", pypitzer=False)
+                self.fi_get_concentration_ratio(
+                    var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
+                    var_file_long=var_file_long, var_focus=var_focus, mode="All")
+            except:
+                print("It is necessary to define first the calculation intervals.")
+
     def build_species_dictionary(self, filename_short, filename_long, datatype):
         dict_chemistry = self.container_lists["Measured Elements"][filename_short]
         helper_ratios = {}
@@ -33658,6 +33765,7 @@ class PySILLS(tk.Frame):
                         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                         var_file_long=var_file_long, mode="All")
 
+            #self.perform_quantification_mass_charge_balance()
             self.init_fi_massbalance = True
 
         ## Labels
@@ -33743,6 +33851,16 @@ class PySILLS(tk.Frame):
                 var=self.container_var[key_setting]["Salt Correction"]["Default Concentration"],
                 text_default=self.container_var[key_setting]["Salt Correction"]["Default Concentration"].get(),
                 command=self.fi_set_concentration_is_chargebalance)
+
+        ## CHECKBOXES
+        cb_01a = SE(
+            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 27,
+            fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=11,
+            bg=self.bg_colors["Light"]).create_simple_checkbox(
+            var_cb=self.molality_based_quantification, text="Molality-based quantification", set_sticky="nesw",
+            own_color=True, command=lambda var_cb=self.molality_based_quantification: self.change_checkbox(var_cb))
+        cb_01a.configure(offvalue=False)
+        cb_01a.configure(state="disabled")
 
         ## Tables
         list_salts = []
@@ -33926,6 +34044,10 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         self.fi_check_elements_checkbutton()
+        #self.perform_quantification_mass_charge_balance()
+
+    def change_checkbox(self, var_cb):
+        print("State:", var_cb.get())
 
     def calculate_threshold_spike_elimination(self):
         if self.pysills_mode == "MA":
