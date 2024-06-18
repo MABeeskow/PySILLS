@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		17.06.2024
+# Date:		18.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -32791,6 +32791,7 @@ class PySILLS(tk.Frame):
                         val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
                         concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
                         concentration_na_true = val_concentration_is
+                        concentration_cl_true = val_concentration_cl
                         helper.append(val_concentration_is)
                         helper_cl.append(val_concentration_cl)
 
@@ -32843,6 +32844,51 @@ class PySILLS(tk.Frame):
 
                         self.helper_salt_composition[file_smpl_short].set(salt_composition)
                         self.check_chargebalance(filename_long=file_smpl)
+
+                        # key_element_is = re.search(r"(\D+)(\d+)", var_is_i)
+                        # element_is = key_element_is.group(1)
+                        # molar_mass_is = self.chemistry_data[element_is]
+                        # molar_mass_na = self.chemistry_data["Na"]
+                        # molar_mass_cl = self.chemistry_data["Cl"]
+                        # molality_na = concentration_na_true/(molar_mass_na*1000)
+                        # molality_cl = concentration_cl_true/(molar_mass_cl*1000)
+                        # concentration_is = round(self.container_concentration["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        #     var_is_i], 4)
+                        # concentration_is = 10000
+                        # print(file_smpl_short)
+                        # print("IS:", var_is_i, val_concentration_is, concentration_is, concentration_cl_true)
+                        # for isotope in [var_is_i]:
+                        #     key_element_i = re.search(r"(\D+)(\d+)", isotope)
+                        #     element_i = key_element_i.group(1)
+                        #     molar_mass_i = self.chemistry_data[element_i]
+                        #     concentration_i = self.container_concentration["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        #         isotope]
+                        #     concentration_ratio_is = self.container_concentration_ratio["SMPL"]["RAW"][file_smpl_short][
+                        #         "INCL"][var_is_i]
+                        #     concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+                        #     factor_i = (molar_mass_is/molar_mass_i)*concentration_ratio_i
+                        #     if element_i != "Cl":
+                        #         molality_i = molality_na*factor_i
+                        #     else:
+                        #         molality_i = molality_cl
+                        #     concentration_i = round(molality_i*molar_mass_i*1000, 4)
+                        #     conversion_factor_i = concentration_i/val_concentration_is
+                        #
+                        # for isotope in file_isotopes:
+                        #     key_element_i = re.search(r"(\D+)(\d+)", isotope)
+                        #     element_i = key_element_i.group(1)
+                        #     molar_mass_i = self.chemistry_data[element_i]
+                        #     concentration_i = self.container_concentration["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        #         isotope]
+                        #     concentration_ratio_is = self.container_concentration_ratio["SMPL"]["RAW"][file_smpl_short][
+                        #         "INCL"][var_is_i]
+                        #     concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+                        #     factor_i = (molar_mass_is/molar_mass_i)*concentration_ratio_i
+                        #     molality_i = molality_na*factor_i
+                        #     concentration_i = round(molality_i*molar_mass_i*1000/conversion_factor_i, 4)
+                        #     self.container_concentration["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        #         isotope] = concentration_i
+                        #     print(isotope, concentration_i)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -33926,6 +33972,7 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         self.fi_check_elements_checkbutton()
+        #self.perform_complete_quantification(mode="PyPitzer")
 
     def calculate_threshold_spike_elimination(self):
         if self.pysills_mode == "MA":
