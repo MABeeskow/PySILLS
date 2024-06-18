@@ -32449,6 +32449,7 @@ class PySILLS(tk.Frame):
                         val_concentration_cl = round(b_cl*val_molar_mass_cl*total_ppm, 4)
                         concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
                         concentration_na_true = val_concentration_is
+                        concentration_cl_true = val_concentration_cl
                         helper.append(val_concentration_is)
                         helper_cl.append(val_concentration_cl)
 
@@ -32486,6 +32487,11 @@ class PySILLS(tk.Frame):
 
                         self.helper_salt_composition[file_smpl_short].set(salt_composition)
                         self.check_chargebalance(filename_long=file_smpl)
+
+                        self.quantify_inclusion_based_on_molalities(
+                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                            var_concentration_is=val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -32578,6 +32584,7 @@ class PySILLS(tk.Frame):
                     val_concentration_cl = round(b_cl*val_molar_mass_cl*total_ppm, 4)
                     concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
                     concentration_na_true = val_concentration_is
+                    concentration_cl_true = val_concentration_cl
                     helper.append(val_concentration_is)
                     helper_cl.append(val_concentration_cl)
 
@@ -32611,6 +32618,11 @@ class PySILLS(tk.Frame):
                     self.check_chargebalance(filename_long=file_smpl)
 
                     self.helper_salt_composition[file_smpl_short].set(salt_composition)
+
+                    self.quantify_inclusion_based_on_molalities(
+                        var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                        var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                        var_concentration_is=val_concentration_is)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
             self.parent.bell()
