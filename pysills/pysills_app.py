@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		18.06.2024
+# Date:		24.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -409,7 +409,7 @@ class PySILLS(tk.Frame):
         self.container_var["dwell_times"] = {}
         self.container_var["dwell_times"]["Entry"] = {}
         self.container_var["dwell_times"]["Entry"]["Default"] = tk.StringVar()
-        self.container_var["dwell_times"]["Entry"]["Default"].set("2.0")
+        self.container_var["dwell_times"]["Entry"]["Default"].set("0.002")
         self.container_var["IS STD Default"] = tk.StringVar()
         self.container_var["IS STD Default"].set("0.0")
         self.container_var["IS SMPL Default"] = tk.StringVar()
@@ -9051,19 +9051,19 @@ class PySILLS(tk.Frame):
         window_dwell.geometry("300x450+0+0")
         window_dwell.resizable(False, False)
         window_dwell["bg"] = self.bg_colors["Super Dark"]
-        #
+
         window_width = 300
         window_height = 450
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(window_dwell, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(window_dwell, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             window_dwell.grid_rowconfigure(i, minsize=row_min)
@@ -9083,10 +9083,10 @@ class PySILLS(tk.Frame):
 
         self.container_elements["dwell_times"]["Label"].extend([lbl_01, lbl_02])
 
-        if self.container_var["dwell_times"]["Entry"]["Default"].get() != "2.0":
+        if self.container_var["dwell_times"]["Entry"]["Default"].get() != "0.002":
             var_text = self.container_var["dwell_times"]["Entry"]["Default"].get()
         else:
-            var_text = "2.0"
+            var_text = "0.002"
 
         entr_dwell = SE(
             parent=window_dwell, row_id=1, column_id=7, n_rows=1, n_columns=7,
@@ -15699,7 +15699,7 @@ class PySILLS(tk.Frame):
                     self.container_var["SRM"][isotope].set("Select SRM")
                     #
                     self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
-                    self.container_var["dwell_times"]["Entry"][isotope].set("2.0")
+                    self.container_var["dwell_times"]["Entry"][isotope].set("0.002")
                     #
                     for file_std_short in self.container_lists["STD"]["Short"]:
                         self.build_checkbutton_isotope_visibility(
@@ -34101,9 +34101,9 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
-        val_dwell_time = float(self.container_var["dwell_times"]["Entry"]["Default"].get())
-        factor = 1000/val_dwell_time
-        value = int(10*factor)
+        val_dwell_time = float(self.container_var["dwell_times"]["Entry"]["Default"].get())     # in seconds
+        factor = 10/val_dwell_time
+        value = int(factor)
         self.container_var[key_setting]["SE Threshold"].set(value)
 
     def guess_salt_composition(self):
