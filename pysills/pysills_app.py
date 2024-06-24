@@ -9075,7 +9075,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=window_dwell, row_id=0, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Dwell Time Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Dwell Time Setup (in s)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=window_dwell, row_id=1, column_id=0, n_rows=1, n_columns=7, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Dark"]).create_simple_label(
