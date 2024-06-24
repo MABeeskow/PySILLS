@@ -535,9 +535,11 @@ class PySILLS(tk.Frame):
         self.container_var["Spike Elimination Check"]["RB Value SMPL"].set(1)
         self.container_var["Geothermometry"] = {"Titanium in Quartz": tk.IntVar()}
         self.container_var["Geothermometry"]["Titanium in Quartz"].set(0)
-        #
-        self.container_var["Spike Elimination"] = {"STD": {"State": False}, "SMPL": {"State": False}}
-        #
+
+        self.container_var["Spike Elimination"] = {
+            "STD": {"State": False}, "SMPL": {"State": False}, "Threshold": {}, "Alpha": tk.StringVar()}
+        self.container_var["Spike Elimination"]["Alpha"].set("0.05")
+
         self.container_var["Initialization"] = {"STD": False, "SMPL": False, "ISOTOPES": False}
 
         self.container_icpms = {"name": None, "skipheader": 1, "skipfooter": 0, "timestamp": 0}
@@ -690,7 +692,7 @@ class PySILLS(tk.Frame):
         self.container_var["ma_setting"]["Quantification Method"].set(1)
         self.container_var["ma_setting"]["Time-Signal Checker"] = tk.IntVar()
         self.container_var["ma_setting"]["Time-Signal Checker"].set(1)
-        #
+
         self.container_var["ma_datareduction_isotopes"]["File Type"] = tk.IntVar()  # e.g. Sample files
         self.container_var["ma_datareduction_isotopes"]["File Type"].set(1)
         self.container_var["ma_datareduction_isotopes"]["Data Type"] = tk.IntVar()  # e.g. RAW data
@@ -9108,7 +9110,7 @@ class PySILLS(tk.Frame):
         vsb_dwell.pack(side="right", fill="y")
         text_dwell.pack(side="left", fill="both", expand=True)
 
-        for var_isotope in self.container_lists["ISOTOPES"]:
+        for var_isotope in self.container_lists["Measured Isotopes"]["All"]:
             lbl_i = tk.Label(
                 frm_dwell, text=var_isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
             text_dwell.window_create("end", window=lbl_i)
@@ -9120,6 +9122,9 @@ class PySILLS(tk.Frame):
                 highlightbackground=self.bg_colors["Very Light"], width=12)
             text_dwell.window_create("insert", window=entr_i)
             text_dwell.insert("end", "\n")
+
+            if var_isotope not in self.container_var["Spike Elimination"]["Threshold"]:
+                self.container_var["Spike Elimination"]["Threshold"][var_isotope] = tk.StringVar()
 
     def change_dwell_times(self, var_isotope, mode, event):
         if mode == "Default":
@@ -34093,7 +34098,7 @@ class PySILLS(tk.Frame):
         #print("State:", var_cb.get())
         pass
 
-    def calculate_threshold_spike_elimination(self):
+    def calculate_threshold_spike_elimination(self, mode="default"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
         elif self.pysills_mode == "FI":
@@ -34101,10 +34106,14 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
-        val_dwell_time = float(self.container_var["dwell_times"]["Entry"]["Default"].get())     # in seconds
+        if mode == "default":
+            val_dwell_time = float(self.container_var["dwell_times"]["Entry"]["Default"].get())     # in seconds
+
         factor = 10/val_dwell_time
         value = int(factor)
-        self.container_var[key_setting]["SE Threshold"].set(value)
+
+        if mode == "default":
+            self.container_var[key_setting]["SE Threshold"].set(value)
 
     def guess_salt_composition(self):
         if self.pysills_mode == "FI":
