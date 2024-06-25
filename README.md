@@ -39,6 +39,8 @@ The following features extend PySILLS and do not replace already existing featur
 * Jupyter notebooks for a browser-based data reduction of LA-ICP-MS experiments
 * production of a video course on YouTube
 
+If you like this project, please consider to follow (click on the star icon above) it.
+
 ---
 
 ## ⚠️ Pre-release comment / disclaimer
