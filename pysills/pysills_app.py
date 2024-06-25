@@ -633,15 +633,115 @@ class PySILLS(tk.Frame):
         self.rb_report = tk.IntVar()
         self.rb_report.set(0)
 
+        ## LANGUAGE SUPPORT
+        self.language_dict = {
+            "Select Mode": {
+                "English": "Select Mode", "German": "Modusauswahl", "Chinese": "选择模式",
+                "Greek": "Επιλέξτε Λειτουργία",
+                "Russian": "Выбор режима", "Spanish": "Seleccionar modo", "Italian": "Selezionare la modalità"},
+            "Standard Files": {"English": "Standard Files", "German": "Standardmessungen", "Chinese": "标准文件"},
+            "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
+            "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
+            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
+            "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
+            "Add": {"English": "Add", "German": "Hinzufügen"},
+            "Copy": {"English": "Copy", "German": "Kopieren"},
+            "Delete": {"English": "Delete", "German": "Löschen"},
+            "Rename": {"English": "Rename", "German": "Umbenennen"},
+            "New Project": {"English": "New Project", "German": "Neues Projekt"},
+            "Load Project": {"English": "Open Project", "German": "Projekt laden"},
+            "Save Project": {"English": "Save Project", "German": "Projekt speichern"},
+            "General Settings": {"English": "Main Settings", "German": "Haupteinstellungen"},
+            "About": {"English": "About PySILLS", "German": "Über PySILLS"},
+            "Quit": {"English": "Quit", "German": "Beenden"},
+            "Manager": {"English": "Manager", "German": "Manager"},
+            "Setup": {"English": "Setup", "German": "Einstellungen"},
+            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
+            "Mineral Analysis": {"English": "Mineral Analysis", "German": "Minerale"},
+            "Settings": {"English": "Settings", "German": "Einstellungen"},
+            "Results": {"English": "Results", "German": "Ergebnisse"},
+            "Extras": {"English": "Extras", "German": "Extras"},
+            "Fluid Inclusions": {"English": "Fluid Inclusions", "German": "Flüssigkeitseinschlüsse"},
+            "Melt Inclusions": {"English": "Melt Inclusions", "German": "Schmelzeinschlüsse"},
+            "Development": {"English": "Development", "German": "Entwicklung"},
+            "Additional Information": {"English": "Additional Information", "German": "Weitere Informationen"},
+            "Citation": {"English": "Citing PySILLS", "German": "PySILLS zitieren"},
+            "References": {"English": "References", "German": "Quellen"},
+            "Project Information": {"English": "Project Information", "German": "Projektinformationen"},
+            "Calculation Accuracy": {"English": "Calculation Accuracy", "German": "Numerische Genauigkeit"},
+            "Sensitivity Drift": {"English": "Sensitivity Drift", "German": "Sensitivitätsverschiebung"},
+            "Limit of Detection": {"English": "Limit of Detection", "German": "Nachweisgrenze"},
+            "Offset Automatic Interval Detection": {
+                "English": "Offset Automatic Interval Detection",
+                "German": "Versatz der automatischen Intervalerkennung"},
+            "Colormap": {"English": "Colormap", "German": "Farbpalette"},
+            "Report File": {"English": "Report File", "German": "Ausgabedatei"},
+            "Plotting Setup": {"English": "Plotting Setup", "German": "Diagrammeinstellungen"},
+            "Language Selection": {"English": "Language Selection", "German": "Sprachauswahl"},
+            "Data Processing": {"English": "Data Processing", "German": "Datenverarbeitung"},
+            "MINERAL ANALYSIS - Setup": {
+                "English": "MINERAL ANALYSIS - Setup", "German": "MINERALANALYSE - Einstellungen"},
+            "Author": {"English": "Author", "German": "Autor"},
+            "Source ID": {"English": "Source ID", "German": "Proben ID"},
+            "Standard Reference Material (SRM)": {
+                "English": "Standard Reference Material (SRM)", "German": "Standard/Referenzmaterial (SRM)"},
+            "Isotopes": {"English": "Isotopes", "German": "Isotope"},
+            "Sample Settings": {"English": "Sample Settings", "German": "Probeneinstellungen"},
+            "Dwell Time Settings": {"English": "Dwell Time Settings", "German": "Haltezeiten Einstellungen"},
+            "Default Time Window (Background)": {
+                "English": "Default Time Interval (Background)", "German": "Einstellungen Zeitintervall (Untergrund)"},
+            "Default Time Window (Matrix)": {
+                "English": "Default Time Interval (Matrix)", "German": "Einstellungen Zeitintervall (Matrix)"},
+            "Default Time Window (Sample)": {
+                "English": "Default Time Interval (Sample)", "German": "Einstellungen Zeitintervall (Probe)"},
+            "Start": {"English": "Start", "German": "Start"},
+            "End": {"English": "End", "German": "Ende"},
+            "Run": {"English": "Run", "German": "Ausführen"},
+            "Spike Elimination": {"English": "Spike Elimination", "German": "Ausreißer-Test"},
+            "Calculation Method": {"English": "Calculation Method", "German": "Berechnungsmethode"},
+            "Check-Up": {"English": "Check-Up", "German": "Kontrolle"},
+            "Internal Standard": {"English": "Internal Standard", "German": "Interner Standard"},
+            "Exclude inclusion": {"English": "Exclude inclusion", "German": "Inklusion ausschließen"},
+            "Significance level": {"English": "Significance level", "German": "Signifikanzniveau"},
+            "Threshold": {"English": "Threshold", "German": "Schwellenwert"},
+            "Remove all": {"English": "Remove all", "German": "Alles entfernen"},
+            "Apply to all": {"English": "Apply to all", "German": "Auf alles anwenden"},
+            "Check": {"English": "Check", "German": "Überprüfen"},
+            "Calculation Intervals": {"English": "Calculation intervals", "German": "Zeitintervalle"},
+            "Acquisition Times": {"English": "Acquisition Times", "German": "Messzeiten (Experiment)"},
+            "Imported Files": {"English": "Imported Files", "German": "Importierte Dateien"},
+            "100 wt.% oxides": {"English": "100 wt.% oxides", "German": "100 Gew.-% Oxide"},
+            "Auto-Detection": {"English": "Auto-Detection", "German": "Auto-Erkennung"},
+            "Set start time": {"English": "Set start time", "German": "Startzeit setzen"},
+            "Set end time": {"English": "Set end time", "German": "Endzeit setzen"},
+            "Assemblage Settings": {"English": "Assemblage Settings", "German": "Assemblage Einstellungen"},
+            "Isotope Dwell Times": {"English": "Isotope Dwell Times", "German": "Haltezeiten je Isotop"},
+            "Matrix Settings": {"English": "Matrix Settings", "German": "Matrixeinstellungen"},
+            "Internal Standard Setup": {
+                "English": "Internal Standard Setup", "German": "Einstellungen interner Standard"},
+            "Oxide Calculation": {"English": "Oxide Calculation", "German": "Oxidberechnung"},
+            "Element Calculation": {"English": "Element Calculation", "German": "Elementberechnung"},
+            "Experimental Data": {"English": "Experimental Data", "German": "Experimentelle Daten"},
+            "Custom Data": {"English": "Custom Data", "German": "Manuelle Dateneingabe"},
+            "Oxide Setup": {"English": "Oxide Setup", "German": "Oxideinstellungen"},
+            "Composition Setup": {"English": "Composition Setup", "German": "Zusammensetzung\n definieren"},
+            "Mineral Calculation": {"English": "Mineral Calculation", "German": "Mineralberechnung"},
+            "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
+
+        self.var_language = self.container_var["General Settings"]["Language"].get()
+
         ## MINERAL ANALYSIS
+        str_var_01 = self.language_dict["Set start time"][self.var_language]
+        str_var_02 = self.language_dict["Set end time"][self.var_language]
+
         self.container_var["settings"] = {
             "Time BG Start": tk.StringVar(), "Time BG End": tk.StringVar(), "Time SIG Start": tk.StringVar(),
             "Time SIG End": tk.StringVar(), "Author": tk.StringVar(), "Source ID": tk.StringVar(),
             "IS Concentration": tk.StringVar(), "SE Alpha": tk.StringVar()}
-        self.container_var["settings"]["Time BG Start"].set("Set start time")
-        self.container_var["settings"]["Time BG End"].set("Set end time")
-        self.container_var["settings"]["Time SIG Start"].set("Set start time")
-        self.container_var["settings"]["Time SIG End"].set("Set end time")
+        self.container_var["settings"]["Time BG Start"].set(str_var_01)
+        self.container_var["settings"]["Time BG End"].set(str_var_02)
+        self.container_var["settings"]["Time SIG Start"].set(str_var_01)
+        self.container_var["settings"]["Time SIG End"].set(str_var_02)
         self.container_var["settings"]["Source ID"].set("RUR01")
         self.container_var["settings"]["IS Concentration"].set("0.0")
         self.container_var["settings"]["SE Alpha"].set("0.05")
@@ -660,13 +760,13 @@ class PySILLS(tk.Frame):
         self.container_var["ma_setting"]["Default IS SMPL"] = tk.StringVar()
         self.container_var["ma_setting"]["Default IS SMPL"].set("Select IS")
         self.container_var["ma_setting"]["Time BG Start"] = tk.StringVar()
-        self.container_var["ma_setting"]["Time BG Start"].set("Set start time")
+        self.container_var["ma_setting"]["Time BG Start"].set(str_var_01)
         self.container_var["ma_setting"]["Time BG End"] = tk.StringVar()
-        self.container_var["ma_setting"]["Time BG End"].set("Set end time")
+        self.container_var["ma_setting"]["Time BG End"].set(str_var_02)
         self.container_var["ma_setting"]["Time MAT Start"] = tk.StringVar()
-        self.container_var["ma_setting"]["Time MAT Start"].set("Set start time")
+        self.container_var["ma_setting"]["Time MAT Start"].set(str_var_01)
         self.container_var["ma_setting"]["Time MAT End"] = tk.StringVar()
-        self.container_var["ma_setting"]["Time MAT End"].set("Set end time")
+        self.container_var["ma_setting"]["Time MAT End"].set(str_var_02)
         self.container_var["ma_setting"]["Author"] = tk.StringVar()
         self.container_var["ma_setting"]["Source ID"] = tk.StringVar()
         self.container_var["ma_setting"]["Source ID"].set("RUR01")
@@ -742,17 +842,17 @@ class PySILLS(tk.Frame):
         keys = ["fi_setting", "mi_setting"]
         for key_setting in keys:
             self.container_var[key_setting]["Time BG Start"] = tk.StringVar()
-            self.container_var[key_setting]["Time BG Start"].set("Set start time")
+            self.container_var[key_setting]["Time BG Start"].set(str_var_01)
             self.container_var[key_setting]["Time BG End"] = tk.StringVar()
-            self.container_var[key_setting]["Time BG End"].set("Set end time")
+            self.container_var[key_setting]["Time BG End"].set(str_var_02)
             self.container_var[key_setting]["Time MAT Start"] = tk.StringVar()
-            self.container_var[key_setting]["Time MAT Start"].set("Set start time")
+            self.container_var[key_setting]["Time MAT Start"].set(str_var_01)
             self.container_var[key_setting]["Time MAT End"] = tk.StringVar()
-            self.container_var[key_setting]["Time MAT End"].set("Set end time")
+            self.container_var[key_setting]["Time MAT End"].set(str_var_02)
             self.container_var[key_setting]["Time INCL Start"] = tk.StringVar()
-            self.container_var[key_setting]["Time INCL Start"].set("Set start time")
+            self.container_var[key_setting]["Time INCL Start"].set(str_var_01)
             self.container_var[key_setting]["Time INCL End"] = tk.StringVar()
-            self.container_var[key_setting]["Time INCL End"].set("Set end time")
+            self.container_var[key_setting]["Time INCL End"].set(str_var_02)
             self.container_var[key_setting]["Author"] = tk.StringVar()
             self.container_var[key_setting]["Source ID"] = tk.StringVar()
             self.container_var[key_setting]["Source ID"].set("RUR01")
@@ -1410,72 +1510,6 @@ class PySILLS(tk.Frame):
         for i in range(0, n_columns):
             self.parent.grid_columnconfigure(i, minsize=column_min)
 
-        ## LANGUAGE SUPPORT
-        self.language_dict = {
-            "Select Mode": {
-                "English": "Select Mode", "German": "Modusauswahl", "Chinese": "选择模式",
-                "Greek": "Επιλέξτε Λειτουργία",
-                "Russian": "Выбор режима", "Spanish": "Seleccionar modo", "Italian": "Selezionare la modalità"},
-            "Standard Files": {"English": "Standard Files", "German": "Standardmessungen", "Chinese": "标准文件"},
-            "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
-            "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
-            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
-            "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
-            "Add": {"English": "Add", "German": "Hinzufügen"},
-            "Copy": {"English": "Copy", "German": "Kopieren"},
-            "Delete": {"English": "Delete", "German": "Löschen"},
-            "Rename": {"English": "Rename", "German": "Umbenennen"},
-            "New Project": {"English": "New Project", "German": "Neues Projekt"},
-            "Load Project": {"English": "Open Project", "German": "Projekt laden"},
-            "Save Project": {"English": "Save Project", "German": "Projekt speichern"},
-            "General Settings": {"English": "Main Settings", "German": "Haupteinstellungen"},
-            "About": {"English": "About PySILLS", "German": "Über PySILLS"},
-            "Quit": {"English": "Quit", "German": "Beenden"},
-            "Manager": {"English": "Manager", "German": "Manager"},
-            "Setup": {"English": "Setup", "German": "Einstellungen"},
-            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
-            "Mineral Analysis": {"English": "Mineral Analysis", "German": "Minerale"},
-            "Settings": {"English": "Settings", "German": "Einstellungen"},
-            "Results": {"English": "Results", "German": "Ergebnisse"},
-            "Extras": {"English": "Extras", "German": "Extras"},
-            "Fluid Inclusions": {"English": "Fluid Inclusions", "German": "Flüssigkeitseinschlüsse"},
-            "Melt Inclusions": {"English": "Melt Inclusions", "German": "Schmelzeinschlüsse"},
-            "Development": {"English": "Development", "German": "Entwicklung"},
-            "Additional Information": {"English": "Additional Information", "German": "Weitere Informationen"},
-            "Citation": {"English": "Citing PySILLS", "German": "PySILLS zitieren"},
-            "References": {"English": "References", "German": "Quellen"},
-            "Project Information": {"English": "Project Information", "German": "Projektinformationen"},
-            "Calculation Accuracy": {"English": "Calculation Accuracy", "German": "Numerische Genauigkeit"},
-            "Sensitivity Drift": {"English": "Sensitivity Drift", "German": "Sensitivitätsverschiebung"},
-            "Limit of Detection": {"English": "Limit of Detection", "German": "Nachweisgrenze"},
-            "Offset Automatic Interval Detection": {
-                "English": "Offset Automatic Interval Detection",
-                "German": "Versatz der automatischen Intervalerkennung"},
-            "Colormap": {"English": "Colormap", "German": "Farbpalette"},
-            "Report File": {"English": "Report File", "German": "Ausgabedatei"},
-            "Plotting Setup": {"English": "Plotting Setup", "German": "Diagrammeinstellungen"},
-            "Language Selection": {"English": "Language Selection", "German": "Sprachauswahl"},
-            "Data Processing": {"English": "Data Processing", "German": "Datenverarbeitung"},
-            "MINERAL ANALYSIS - Setup": {
-                "English": "MINERAL ANALYSIS - Setup", "German": "MINERALANALYSE - Einstellungen"},
-            "Author": {"English": "Author", "German": "Autor"},
-            "Source ID": {"English": "Source ID", "German": "Proben ID"},
-            "Standard Reference Material (SRM)": {
-                "English": "Standard Reference Material (SRM)", "German": "Standard/Referenzmaterial (SRM)"},
-            "Isotopes": {"English": "Isotopes", "German": "Isotope"},
-            "Sample Settings": {"English": "Sample Settings", "German": "Probeneinstellungen"},
-            "Matrix Settings": {"English": "Matrix Settings", "German": "Matrixeinstellungen"},
-            "Internal Standard Setup": {
-                "English": "Internal Standard Setup", "German": "Einstellungen interner Standard"},
-            "Oxide Calculation": {"English": "Oxide Calculation", "German": "Oxidberechnung"},
-            "Element Calculation": {"English": "Element Calculation", "German": "Elementberechnung"},
-            "Experimental Data": {"English": "Experimental Data", "German": "Experimentelle Daten"},
-            "Custom Data": {"English": "Custom Data", "German": "Manuelle Dateneingabe"},
-            "Oxide Setup": {"English": "Oxide Setup", "German": "Oxideinstellungen"},
-            "Composition Setup": {"English": "Composition Setup", "German": "Zusammensetzung\n definieren"},
-            "Mineral Calculation": {"English": "Mineral Calculation", "German": "Mineralberechnung"},
-            "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
-
         ################################################################################################################
         #
         ## FRAMES
@@ -1536,6 +1570,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
         self.var_language = self.container_var["General Settings"]["Language"].get()
+        self.update_variables_initial_values()
 
         ## Logo
         try:
@@ -4362,6 +4397,28 @@ class PySILLS(tk.Frame):
                         pass
             else:
                 pass
+
+    def update_variables_initial_values(self):
+        str_var_01 = self.language_dict["Set start time"][self.var_language]
+        str_var_02 = self.language_dict["Set end time"][self.var_language]
+
+        self.container_var["settings"]["Time BG Start"].set(str_var_01)
+        self.container_var["settings"]["Time BG End"].set(str_var_02)
+        self.container_var["settings"]["Time SIG Start"].set(str_var_01)
+        self.container_var["settings"]["Time SIG End"].set(str_var_02)
+        self.container_var["ma_setting"]["Time BG Start"].set(str_var_01)
+        self.container_var["ma_setting"]["Time BG End"].set(str_var_02)
+        self.container_var["ma_setting"]["Time MAT Start"].set(str_var_01)
+        self.container_var["ma_setting"]["Time MAT End"].set(str_var_02)
+
+        keys = ["fi_setting", "mi_setting"]
+        for key_setting in keys:
+            self.container_var[key_setting]["Time BG Start"].set(str_var_01)
+            self.container_var[key_setting]["Time BG End"].set(str_var_02)
+            self.container_var[key_setting]["Time MAT Start"].set(str_var_01)
+            self.container_var[key_setting]["Time MAT End"].set(str_var_02)
+            self.container_var[key_setting]["Time INCL Start"].set(str_var_01)
+            self.container_var[key_setting]["Time INCL End"].set(str_var_02)
 
     def do_spike_elimination_all_grubbs(self, filetype, spike_elimination_performed=True):
         if self.pysills_mode == "MA":
@@ -15440,6 +15497,9 @@ class PySILLS(tk.Frame):
             var_parent = self.subwindow_mi_settings
             var_setting_key = "mi_setting"
 
+        str_lbl_01 = self.language_dict["Assemblage Settings"][self.var_language]
+        str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
+
         var_row_start = var_geometry_info["Row start"]
         var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
@@ -15452,11 +15512,11 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Assemblage Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Option Menus
         if self.container_var["ID"]["Default SMPL"].get() != "Select ID":
@@ -15491,6 +15551,10 @@ class PySILLS(tk.Frame):
             var_parent = self.subwindow_mi_settings
             var_setting_key = "mi_setting"
 
+        str_lbl_01 = self.language_dict["Dwell Time Settings"][self.var_language]
+        str_lbl_02 = self.language_dict["Isotope Dwell Times"][self.var_language]
+        str_btn_01 = self.language_dict["Setup"][self.var_language]
+
         var_row_start = var_geometry_info["Row start"]
         var_column_start = var_geometry_info["Column start"]
         var_row_n = var_geometry_info["N rows"]
@@ -15503,18 +15567,18 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Dwell Time Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Isotope Dwell Times", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
         btn_06a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.create_dwell_time_window)
 
     def place_calculation_window_bg(self, var_geometry_info, var_relief=tk.FLAT):
@@ -15538,38 +15602,45 @@ class PySILLS(tk.Frame):
         var_header_n = var_column_n
         var_category_n = var_column_n - 6
 
+        str_lbl_01 = self.language_dict["Default Time Window (Background)"][self.var_language]
+        str_lbl_02 = self.language_dict["Start"][self.var_language]
+        str_lbl_03 = self.language_dict["End"][self.var_language]
+        str_lbl_04 = self.language_dict["Auto-Detection"][self.var_language]
+        str_btn_01 = self.language_dict["Run"][self.var_language]
+        str_btn_02 = self.language_dict["Remove all"][self.var_language]
+
         # Labels
         lbl_07 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Default Time Window (Background)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Start", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=var_relief, fontsize="sans 10 bold")
         lbl_07b = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="End", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=var_relief, fontsize="sans 10 bold")
         lbl_07c = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=var_relief, fontsize="sans 10 bold")
 
         # Buttons
         btn_07c = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n - 6, n_rows=1,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="BG": self.detect_signal_interval(mode))
         btn_07cd = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=1,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="BG": self.clear_all_calculation_intervals(mode))
 
         # Entries
@@ -15600,15 +15671,15 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-            str_header = "Default Time Window (Sample)"
+            str_lbl_01 = self.language_dict["Default Time Window (Sample)"][self.var_language]
         elif self.pysills_mode == "FI":
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
-            str_header = "Default Time Window (Matrix)"
+            str_lbl_01 = self.language_dict["Default Time Window (Matrix)"][self.var_language]
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
             var_setting_key = "mi_setting"
-            str_header = "Default Time Window (Matrix)"
+            str_lbl_01 = self.language_dict["Default Time Window (Matrix)"][self.var_language]
 
         var_row_start = var_geometry_info["Row start"]
         var_column_start = var_geometry_info["Column start"]
@@ -15617,40 +15688,46 @@ class PySILLS(tk.Frame):
         var_header_n = var_column_n
         var_category_n = var_column_n - 6
 
+        str_lbl_02 = self.language_dict["Start"][self.var_language]
+        str_lbl_03 = self.language_dict["End"][self.var_language]
+        str_lbl_04 = self.language_dict["Auto-Detection"][self.var_language]
+        str_btn_01 = self.language_dict["Run"][self.var_language]
+        str_btn_02 = self.language_dict["Remove all"][self.var_language]
+
         # Labels
         lbl_08 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text=str_header, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Start", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=var_relief, fontsize="sans 10 bold")
         lbl_08b = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="End", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=var_relief, fontsize="sans 10 bold")
         lbl_08c = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Auto-Detection", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=var_relief, fontsize="sans 10 bold")
 
         # Buttons
         btn_08c = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n - 6, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="MAT": self.detect_signal_interval(mode))
         btn_08cd = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_category_n, n_rows=var_row_n,
             n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Remove all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="MAT": self.clear_all_calculation_intervals(mode))
 
         # Entries
@@ -15694,16 +15771,20 @@ class PySILLS(tk.Frame):
         var_column_n = var_geometry_info["N columns"]
         var_header_n = var_column_n
 
+        str_lbl_01 = self.language_dict["Spike Elimination"][self.var_language]
+        str_lbl_02 = self.language_dict["Calculation Method"][self.var_language]
+        str_lbl_03 = self.language_dict["Exclude inclusion"][self.var_language]
+
         # Labels
         lbl_09 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Spike Elimination", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09b = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n - 9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Calculation Method", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
 
         # Option Menus
         if self.container_var["Spike Elimination Method"].get() != "Select Method":
@@ -15730,7 +15811,7 @@ class PySILLS(tk.Frame):
             cb_09b = SE(
                 parent=var_parent, row_id=var_row_start + 2, column_id=0, fg=self.bg_colors["Dark Font"], n_rows=1,
                 n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
-                var_cb=self.container_var[var_setting_key]["Check Inclusion Exclusion"], text="Exclude inclusion",
+                var_cb=self.container_var[var_setting_key]["Check Inclusion Exclusion"], text=str_lbl_03,
                 set_sticky="nesw", own_color=True, command=lambda setting_key=var_setting_key:
                 self.change_inclusion_consideration(setting_key))
             self.change_inclusion_consideration(setting_key=var_setting_key)
@@ -15762,73 +15843,82 @@ class PySILLS(tk.Frame):
         var_header_n = var_column_n
         var_category_n = var_column_n - 6
 
+        str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
+        str_lbl_02 = self.language_dict["Standard Reference Material (SRM)"][self.var_language]
+        str_lbl_03 = self.language_dict["Internal Standard"][self.var_language]
+        str_lbl_04 = self.language_dict["100 wt.% oxides"][self.var_language]
+        str_lbl_05 = self.language_dict["Calculation Intervals"][self.var_language]
+        str_lbl_06 = self.language_dict["Acquisition Times"][self.var_language]
+        str_lbl_07 = self.language_dict["Imported Files"][self.var_language]
+        str_btn_01 = self.language_dict["Check"][self.var_language]
+
         # Labels
         lbl_10 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Check-Up", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Standard Reference Material", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10b = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Internal Standard", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10b = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="100 wt.% oxides", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10c = SE(
             parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Calculation Intervals", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10d = SE(
             parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Acquisition Times", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10e = SE(
             parent=var_parent, row_id=var_row_start + 6, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text="Imported Files", relief=var_relief, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
 
         # Buttons
         btn_10a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_srm_settings)  # Check-Up - SRM Settings
         btn_10b = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.checkup_internal_standard)  # Check-Up - Internal Standard Settings
         btn_10b = SE(
             parent=var_parent, row_id=var_row_start + 3, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.checkup_oxides)  # Check-Up - 100 wt.% oxides
         btn_10c = SE(
             parent=var_parent, row_id=var_row_start + 4, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_interval_settings)  # Check-Up - Calculation Interval Settings
         btn_10d = SE(
             parent=var_parent, row_id=var_row_start + 5, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_acquisition_times)  # Check-Up - Acquisition Times
         btn_10e = SE(
             parent=var_parent, row_id=var_row_start + 6, column_id=var_column_start + var_category_n,
             n_rows=var_row_n, n_columns=var_category_n - 6, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Check Data", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.check_imported_files)
 
     def place_measured_isotopes_overview(self, var_geometry_info):
@@ -34587,10 +34677,6 @@ class PySILLS(tk.Frame):
 
     ## SPIKE ELIMINATION
     def select_spike_elimination(self, var_opt, start_row, var_relief=tk.FLAT, mode="FI"):
-        ## COLORS
-        bg_light = self.bg_colors["Very Light"]
-        bg_medium = self.bg_colors["Light"]
-        #
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
@@ -34609,29 +34695,37 @@ class PySILLS(tk.Frame):
             var_row_correction = -1
             var_alpha = self.container_var[var_setting_key]["SE Alpha"]
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
-        #
+
         start_row = start_row + 1 + var_row_correction
-        #
+
+        str_lbl_01 = self.language_dict["Significance level"][self.var_language]
+        str_lbl_02 = self.language_dict["Threshold"][self.var_language]
+        str_lbl_03 = self.language_dict["Standard Files"][self.var_language]
+        str_lbl_04 = self.language_dict["Sample Files"][self.var_language]
+        str_btn_01 = self.language_dict["Run"][self.var_language]
+        str_btn_02 = self.language_dict["Check"][self.var_language]
+        str_btn_03 = self.language_dict["Setup"][self.var_language]
+
         if var_opt in ["Grubbs-Test (SILLS)", "Grubbs-Test", "PySILLS Spike Finder", "Grubbs test", "Whisker analysis"]:
             ## GUI
             # Labels
             lbl_09c = SE(
                 parent=var_parent, row_id=start_row + 3, column_id=0, n_rows=1, n_columns=7,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-                text="Significance Level", relief=var_relief, fontsize="sans 10 bold")
+                text=str_lbl_01, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
             lbl_09d = SE(
                 parent=var_parent, row_id=start_row + 4, column_id=0, n_rows=1, n_columns=7,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-                text="Threshold", relief=var_relief, fontsize="sans 10 bold")
+                text=str_lbl_02, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
             lbl_09e = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=0, n_rows=1, n_columns=7,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-                text="Standard Files", relief=var_relief, fontsize="sans 10 bold")
+                text=str_lbl_03, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
             lbl_09f = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=0, n_rows=1, n_columns=7,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-                text="Sample Files", relief=var_relief, fontsize="sans 10 bold")
-            #
+                text=str_lbl_04, relief=var_relief, fontsize="sans 10 bold", anchor=tk.W)
+
             # Entries
             var_entr_09c_default = var_alpha.get()
             entr_09c = SE(
@@ -34648,27 +34742,27 @@ class PySILLS(tk.Frame):
             btn_09e1 = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=7, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda filetype="STD", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
             btn_09e2 = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=12, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda mode="STD": self.custom_spike_check(mode))
             btn_09f1 = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=7, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Apply to all", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda filetype="SMPL", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
             btn_09f2 = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=12, n_rows=1, n_columns=5,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda mode="SMPL": self.custom_spike_check(mode))
             btn_09d = SE(
                 parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.create_spike_elimination_threshold_window)
 
             # Frames
