@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4b93aec1-11b1-431b-ad5f-aaa0c8829e1c" name="Changes" comment="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pysills/PySILLS.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pysills/pysills_app.py" beforeDir="false" afterPath="$PROJECT_DIR$/pysills/pysills_app.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,14 +115,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1688744210159</updated>
-    </task>
-    <task id="LOCAL-00111" summary="&quot;bug fixing&quot;">
-      <option name="closed" value="true" />
-      <created>1716410709759</created>
-      <option name="number" value="00111" />
-      <option name="presentableId" value="LOCAL-00111" />
-      <option name="project" value="LOCAL" />
-      <updated>1716410709759</updated>
     </task>
     <task id="LOCAL-00112" summary="&quot;bug fixing and code cleaning&quot;">
       <option name="closed" value="true" />
@@ -509,7 +500,15 @@
       <option name="project" value="LOCAL" />
       <updated>1719263354287</updated>
     </task>
-    <option name="localTasksCounter" value="160" />
+    <task id="LOCAL-00160" summary="&quot;bug fixing, code cleaning and quality-of-life stuff&quot;">
+      <option name="closed" value="true" />
+      <created>1719307749681</created>
+      <option name="number" value="00160" />
+      <option name="presentableId" value="LOCAL-00160" />
+      <option name="project" value="LOCAL" />
+      <updated>1719307749681</updated>
+    </task>
+    <option name="localTasksCounter" value="161" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
