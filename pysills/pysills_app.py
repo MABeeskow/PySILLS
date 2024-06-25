@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		24.06.2024
+# Date:		25.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -4442,6 +4442,8 @@ class PySILLS(tk.Frame):
                                                           interval[0]:interval[1]]
                                             dataset_complete = self.container_measurements["RAW"][file_std][isotope]
                                             dataset_complete_all = self.container_measurements["RAW"][file_std]
+                                            var_threshold = int(self.container_var["Spike Elimination"]["Threshold"][
+                                                                    isotope].get())
 
                                             if spike_elimination_performed == True:
                                                 time_start = datetime.datetime.now()
@@ -4610,6 +4612,8 @@ class PySILLS(tk.Frame):
 
                                             dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
                                             dataset_complete_all = self.container_measurements["RAW"][file_smpl]
+                                            var_threshold = int(self.container_var["Spike Elimination"]["Threshold"][
+                                                                    isotope].get())
 
                                             if spike_elimination_performed == True:
                                                 time_start = datetime.datetime.now()
@@ -9135,7 +9139,145 @@ class PySILLS(tk.Frame):
             value = self.container_var["dwell_times"]["Entry"][var_isotope].get()
             self.container_var["dwell_times"]["Entry"][var_isotope].set(value)
 
-    #
+    def create_spike_elimination_threshold_window(self):
+        """Check-up window to control the spike elimination threshold setup."""
+        ## Window Settings
+        window_width = 300
+        window_height = 600
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_se_threshold = tk.Toplevel(self.parent)
+        subwindow_se_threshold.title("Spike Elimination")
+        subwindow_se_threshold.geometry(var_geometry)
+        subwindow_se_threshold.resizable(False, False)
+        subwindow_se_threshold["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_se_threshold, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_se_threshold, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_se_threshold.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_se_threshold.grid_columnconfigure(i, minsize=column_min)
+
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 14
+        int_category_n = 8
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_se_threshold, row_id=var_row_start, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Spike Elimination - Threshold Setup", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_01 = SE(
+            parent=subwindow_se_threshold, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            text="Default threshold value", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_02 = SE(
+            parent=subwindow_se_threshold, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
+            n_columns=var_header_n, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Isotope-specific threshold value", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+
+        ## ENTRIES
+        entr_01 = SE(
+            parent=subwindow_se_threshold, row_id=var_row_start + 1, column_id=int_category_n, n_rows=1,
+            n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(var=var_threshold, text_default=var_threshold.get())
+
+        ## BUTTONS
+        btn_03 = SE(
+            parent=subwindow_se_threshold, row_id=n_rows - 2, column_id=var_header_n - int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
+            text="Update values", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda mode="specific": self.calculate_threshold_spike_elimination(mode))
+
+        ## TREEVIEWS
+        frm_se_threshold = SE(
+            parent=subwindow_se_threshold, row_id=var_row_start + 3, column_id=var_column_start, n_rows=n_rows - 5,
+            n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
+        vsb_se_threshold = ttk.Scrollbar(master=frm_se_threshold, orient="vertical")
+        text_se_threshold = tk.Text(
+            master=frm_se_threshold, width=30, height=25, yscrollcommand=vsb_se_threshold.set,
+            bg=self.bg_colors["Very Light"])
+        vsb_se_threshold.config(command=text_se_threshold.yview)
+        vsb_se_threshold.pack(side="right", fill="y")
+        text_se_threshold.pack(side="left", fill="both", expand=True)
+
+        for index, var_isotope in enumerate(self.container_lists["Measured Isotopes"]["All"]):
+            if index == 0:
+                lbl_i = tk.Label(
+                    frm_se_threshold, text="Isotope" + "\t" + "Dwell time" + "\t" + "Threshold",
+                    bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+                text_se_threshold.window_create("end", window=lbl_i)
+                text_se_threshold.insert("end", "\n")
+
+                lbl_i = tk.Label(
+                    frm_se_threshold, text=var_isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+                text_se_threshold.window_create("end", window=lbl_i)
+                text_se_threshold.insert("end", "\t")
+
+                if var_isotope not in self.container_var["Spike Elimination"]["Threshold"]:
+                    self.container_var["Spike Elimination"]["Threshold"][var_isotope] = tk.StringVar()
+                    self.container_var["Spike Elimination"]["Threshold"][var_isotope].set(var_threshold.get())
+
+                entr_i = tk.Entry(
+                    frm_se_threshold, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope],
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                    highlightbackground=self.bg_colors["Very Light"], width=12)
+                text_se_threshold.window_create("insert", window=entr_i)
+                text_se_threshold.insert("end", "\t")
+
+                entr_i = tk.Entry(
+                    frm_se_threshold, textvariable=self.container_var["Spike Elimination"]["Threshold"][var_isotope],
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                    highlightbackground=self.bg_colors["Very Light"], width=12)
+                text_se_threshold.window_create("insert", window=entr_i)
+                text_se_threshold.insert("end", "\n")
+            else:
+                lbl_i = tk.Label(
+                    frm_se_threshold, text=var_isotope, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+                text_se_threshold.window_create("end", window=lbl_i)
+                text_se_threshold.insert("end", "\t")
+
+                if var_isotope not in self.container_var["Spike Elimination"]["Threshold"]:
+                    self.container_var["Spike Elimination"]["Threshold"][var_isotope] = tk.StringVar()
+                    self.container_var["Spike Elimination"]["Threshold"][var_isotope].set(var_threshold.get())
+
+                entr_i = tk.Entry(
+                    frm_se_threshold, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope],
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                    highlightbackground=self.bg_colors["Very Light"], width=12)
+                text_se_threshold.window_create("insert", window=entr_i)
+                text_se_threshold.insert("end", "\t")
+
+                entr_i = tk.Entry(
+                    frm_se_threshold, textvariable=self.container_var["Spike Elimination"]["Threshold"][var_isotope],
+                    fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
+                    highlightbackground=self.bg_colors["Very Light"], width=12)
+                text_se_threshold.window_create("insert", window=entr_i)
+                text_se_threshold.insert("end", "\n")
+
     def detect_signal_interval(self, mode="BG"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
@@ -13903,6 +14045,16 @@ class PySILLS(tk.Frame):
             self.subwindow_ma_settings.grid_columnconfigure(i, minsize=column_min)
 
         ## INITIALIZATION
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
             if isotope.isdigit():
                 pass
@@ -13916,6 +14068,10 @@ class PySILLS(tk.Frame):
                     self.container_lists["Measured Elements"][element] = []
                 if isotope not in self.container_lists["Measured Elements"][element]:
                     self.container_lists["Measured Elements"][element].append(isotope)
+
+                if isotope not in self.container_var["Spike Elimination"]["Threshold"]:
+                    self.container_var["Spike Elimination"]["Threshold"][isotope] = tk.StringVar()
+                    self.container_var["Spike Elimination"]["Threshold"][isotope].set(var_threshold.get())
 
         ## Static
         # Build section 'Project Information'
@@ -22060,7 +22216,7 @@ class PySILLS(tk.Frame):
                   "run successfully.")
             factor_d= np.nan
 
-        # Determine e_i sex
+        # Determine e_i
         concentration_is = None
         for isotope, b_i in helper_b.items():
             e_i = factor_d*b_i
@@ -22141,11 +22297,6 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        # self.run_total_oxides_calculation_alternative(
-        #     var_filetype=filetype, var_datatype=datatype, var_filename_short=filename_short, var_focus=focus)
-        # self.run_total_oxides_calculation_alternative2(
-        #     var_filetype=filetype, var_datatype=datatype, var_filename_short=filename_short, var_focus=focus,
-        #     sills_mode=True)
         self.run_total_oxides_calculation_alternative2(
             var_filetype=filetype, var_datatype=datatype, var_filename_short=filename_short, var_focus=focus)
         helper_oxides = {}
@@ -22174,225 +22325,6 @@ class PySILLS(tk.Frame):
                                                           "oxides calculation.")
 
         self.container_oxides = helper_oxides
-        # var_c = 0
-        # for oxide, oxide_container in helper_oxides.items():
-        #     for isotope in oxide_container["Isotopes"]:
-        #         key_element = re.search(r"(\D+)(\d+)", isotope)
-        #         element = key_element.group(1)
-        #         if element not in ["F", "Cl", "Br", "I", "At", "Ts"]:
-        #             var_intensity_i = self.container_intensity_corrected[filetype][datatype][filename_short][focus][isotope]
-        #             var_sensitivity_i = self.container_analytical_sensitivity[filetype][datatype][filename_short][focus][
-        #                 isotope]
-        #             if oxide == "Fe2O3":
-        #                 if focus == "MAT":
-        #                     r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
-        #                 else:
-        #                     r = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Fe-Ratio"].get())
-        #
-        #                 if r == 0:
-        #                     gamma = 0
-        #                 else:
-        #                     gamma = (1 + (2*self.chemistry_data_oxides["FeO"])/(
-        #                         self.chemistry_data_oxides["Fe2O3"])*(1 - r)/(r))**(-1)
-        #                 var_a = (var_intensity_i/var_sensitivity_i)*(1 - gamma)
-        #             elif oxide == "FeO":
-        #                 if focus == "MAT":
-        #                     r = float(self.container_var["Oxides Quantification"]["Ratios"]["Fe-Ratio"].get())
-        #                 else:
-        #                     r = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Fe-Ratio"].get())
-        #
-        #                 if r == 0:
-        #                     gamma = 0
-        #                 else:
-        #                     gamma = (1 + (2*self.chemistry_data_oxides["FeO"])/(
-        #                         self.chemistry_data_oxides["Fe2O3"])*(1 - r)/(r))**(-1)
-        #                 var_a = (var_intensity_i/var_sensitivity_i)*gamma
-        #             elif oxide == "Mn2O3":
-        #                 if focus == "MAT":
-        #                     r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
-        #                 else:
-        #                     r = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Mn-Ratio"].get())
-        #
-        #                 if r == 0:
-        #                     gamma = 0
-        #                 else:
-        #                     gamma = (1 + (2*self.chemistry_data_oxides["MnO"])/(
-        #                         self.chemistry_data_oxides["Mn2O3"])*(1 - r)/(r))**(-1)
-        #                 var_a = (var_intensity_i/var_sensitivity_i)*(1 - gamma)
-        #             elif oxide == "MnO":
-        #                 if focus == "MAT":
-        #                     r = float(self.container_var["Oxides Quantification"]["Ratios"]["Mn-Ratio"].get())
-        #                 else:
-        #                     r = float(self.container_var["Oxides Quantification INCL"]["Ratios"]["Mn-Ratio"].get())
-        #
-        #                 if r == 0:
-        #                     gamma = 0
-        #                 else:
-        #                     if r > 0 and (self.chemistry_data_oxides["Mn2O3"]) > 0:
-        #                         gamma = (1 + (2*self.chemistry_data_oxides["MnO"])/(
-        #                             self.chemistry_data_oxides["Mn2O3"])*(1 - r)/(r))**(-1)
-        #                     else:
-        #                         gamma = np.nan
-        #
-        #                 if var_sensitivity_i > 0:
-        #                     var_a = (var_intensity_i/var_sensitivity_i)*gamma
-        #                 else:
-        #                     var_a = np.nan
-        #             else:
-        #                 if var_sensitivity_i > 0:
-        #                     var_a = var_intensity_i/var_sensitivity_i
-        #                 else:
-        #                     var_a = np.nan
-        #
-        #             molar_mass_oxide = self.chemistry_data_oxides[oxide]
-        #             molar_mass_element = self.chemistry_data[oxide_container["Element"]]
-        #             conversion_factor_i = self.conversion_factors[oxide]
-        #             if element in ["F", "Cl", "Br", "I", "At", "Ts"]:
-        #                 conversion_factor_i = 1.0
-        #
-        #             if np.isnan(var_a) == False:
-        #                 var_b = var_a*molar_mass_oxide/molar_mass_element
-        #                 var_b = var_a*conversion_factor_i
-        #             else:
-        #                 var_b = 0
-        #
-        #             if np.isnan(var_b) == False:
-        #                 var_c += var_b
-        #
-        #             oxide_container["Intensities"][isotope] = var_intensity_i
-        #             oxide_container["Sensitivities"][isotope] = var_sensitivity_i
-        #             oxide_container["a"][isotope] = var_a
-        #             oxide_container["b"][isotope] = var_b
-        #
-        # if focus == "MAT":
-        #     w_total_oxides = float(self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].get())
-        # else:
-        #     w_total_oxides = float(self.container_var["Oxides Quantification INCL"]["Total Amounts"][
-        #                                filename_short].get())
-        #
-        # if var_c > 0:
-        #     var_d = w_total_oxides/var_c
-        # else:
-        #     var_d = np.nan
-        #
-        # largest_value = {"Isotope": None, "Value": 0, "Oxide": None}
-        # value_is = {"Isotope": None, "Value": 0, "Oxide": None}
-        # index = self.container_lists[filetype]["Short"].index(filename_short)
-        # filename_long = self.container_lists[filetype]["Long"][index]
-        #
-        # if self.pysills_mode == "MA":
-        #     var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
-        #     var_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
-        # else:
-        #     if focus == "MAT":
-        #         var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
-        #     else:
-        #         var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
-        #         var_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
-        #
-        # for oxide, oxide_container in helper_oxides.items():
-        #     for isotope in oxide_container["Isotopes"]:
-        #         key_element = re.search(r"(\D+)(\d+)", isotope)
-        #         element = key_element.group(1)
-        #         if element not in ["F", "Cl", "Br", "I", "At", "Ts"]:
-        #             var_e = oxide_container["b"][isotope]*var_d
-        #             oxide_container["c"][isotope] = var_c
-        #             oxide_container["d"][isotope] = var_d
-        #             oxide_container["e"][isotope] = var_e
-        #
-        #             if np.isnan(oxide_container["a"][isotope]) == False:
-        #                 var_concentration_i = oxide_container["a"][isotope]*var_d*10**4
-        #                 oxide_container["Concentrations"][isotope] = var_concentration_i
-        #
-        #                 if var_concentration_i > largest_value["Value"]:
-        #                     largest_value["Isotope"] = isotope
-        #                     largest_value["Value"] = var_concentration_i
-        #                     largest_value["Oxide"] = oxide
-        #
-        #                 if isotope == var_is:
-        #                     value_is["Isotope"] = isotope
-        #                     value_is["Value"] = var_concentration_i
-        #                     value_is["Oxide"] = oxide
-        #         else:
-        #             var_e = np.nan
-        #             oxide_container["c"][isotope] = var_c
-        #             oxide_container["d"][isotope] = var_d
-        #             oxide_container["e"][isotope] = var_e
-        #
-        #             var_concentration_i = np.nan
-        #             oxide_container["Concentrations"][isotope] = var_concentration_i
-        #
-        # element_largest_oxide = helper_oxides[largest_value["Oxide"]]["Element"]
-        # max_amount_element = self.maximum_amounts[element_largest_oxide]
-        #
-        # for oxide, oxide_container in helper_oxides.items():
-        #     for isotope in oxide_container["Isotopes"]:
-        #         key_element = re.search(r"(\D+)(\d+)", isotope)
-        #         element = key_element.group(1)
-        #         if element in ["F", "Cl", "Br", "I", "At", "Ts"]:
-        #             var_is = value_is["Isotope"]
-        #             concentration_is = value_is["Value"]
-        #             intensity_i = self.container_intensity_corrected[filetype][datatype][filename_short][focus][isotope]
-        #             intensity_is = self.container_intensity_corrected[filetype][datatype][filename_short][focus][var_is]
-        #             sensitivity_i = self.container_analytical_sensitivity[filetype][datatype][filename_short][focus][
-        #                 isotope]
-        #
-        #             concentration_i = (intensity_i/intensity_is)*(concentration_is/sensitivity_i)
-        #             oxide_container["Concentrations"][isotope] = concentration_i
-        #
-        # if largest_value["Value"] > max_amount_element:
-        #     correction_factor = max_amount_element/largest_value["Value"]
-        #     for oxide, oxide_container in helper_oxides.items():
-        #         for isotope in oxide_container["Isotopes"]:
-        #             old_value = oxide_container["Concentrations"][isotope]
-        #             new_value = correction_factor*old_value
-        #             oxide_container["Concentrations"][isotope] = new_value
-        #
-        # for oxide, oxide_container in helper_oxides.items():
-        #     for isotope in oxide_container["Isotopes"]:
-        #         var_intensity_i = self.container_intensity_corrected[filetype][datatype][filename_short][focus][isotope]
-        #         var_std_bg_i = self.container_intensity[filetype][datatype][filename_short]["BG SIGMA"][isotope]
-        #         key_std = focus + " SIGMA"
-        #         var_std_mat_i = self.container_intensity[filetype][datatype][filename_short][key_std][isotope]
-        #         var_n_bg = self.container_intensity[filetype][datatype][filename_short]["N BG"][isotope]
-        #         key_n = "N " + focus
-        #         var_n_mat = self.container_intensity[filetype][datatype][filename_short][key_n][isotope]
-        #         var_sigma_bg_i = var_std_bg_i/(var_n_bg**0.5)
-        #         var_sigma_mat_i = var_std_mat_i/(var_n_mat**0.5)
-        #         var_sigma = var_sigma_bg_i + var_sigma_mat_i
-        #
-        #         if isotope in oxide_container["Concentrations"]:
-        #             var_result_i = round(oxide_container["Concentrations"][isotope], 4)
-        #         else:
-        #             var_result_i = np.nan
-        #
-        #         if var_intensity_i > 0:
-        #             var_result_sigma_i = round((var_sigma*var_result_i)/var_intensity_i, 4)
-        #         else:
-        #             var_result_sigma_i = 0.0
-        #
-        #         #self.container_concentration[filetype][datatype][filename_short][focus][isotope] = var_result_i
-        #         key_sigma = "1 SIGMA " + focus
-        #         self.container_concentration[filetype][datatype][filename_short][key_sigma][
-        #             isotope] = var_result_sigma_i
-
-                # index = self.container_lists[filetype]["Short"].index(filename_short)
-                # filename_long = self.container_lists[filetype]["Long"][index]
-                # var_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
-                # if focus == "INCL":
-                #     if isotope == var_is:
-                #         self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].set(var_result_i)
-                # elif focus == "MAT":
-                #     if self.pysills_mode == "MA":
-                #         if isotope == var_is:
-                #             self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].set(var_result_i)
-                #     else:
-                #         var_is = self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Name"].get()
-                #         if isotope == var_is:
-                #             self.container_var["SMPL"][filename_long]["Matrix Setup"]["IS"]["Concentration"].set(
-                #                 var_result_i)
-
-        #self.check_results_oxide_normalization(var_filename=filename_short)
 
     def ma_get_concentration_ratio(self, var_filetype, var_datatype, var_file_short, var_file_long,
                                    mode="Specific"):
@@ -24004,6 +23936,16 @@ class PySILLS(tk.Frame):
             self.subwindow_fi_settings.grid_columnconfigure(i, minsize=column_min)
         #
         ## INITIALIZATION
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
             if isotope.isdigit():
                 pass
@@ -24032,6 +23974,10 @@ class PySILLS(tk.Frame):
                     self.container_lists["Measured Elements"]["Cations"][element] = {"Cl": element + "Cl4"}
                 if element in ["Nb", "Ta"]:
                     self.container_lists["Measured Elements"]["Cations"][element] = {"Cl": element + "Cl5"}
+
+                if isotope not in self.container_var["Spike Elimination"]["Threshold"]:
+                    self.container_var["Spike Elimination"]["Threshold"][isotope] = tk.StringVar()
+                    self.container_var["Spike Elimination"]["Threshold"][isotope].set(var_threshold.get())
 
         ## Static
         # Build section 'Project Information'
@@ -24338,6 +24284,16 @@ class PySILLS(tk.Frame):
             self.subwindow_mi_settings.grid_columnconfigure(i, minsize=column_min)
 
         ## INITIALIZATION
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+            var_threshold = self.container_var[var_setting_key]["SE Threshold"]
+
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
             if isotope.isdigit():
                 pass
@@ -24350,6 +24306,10 @@ class PySILLS(tk.Frame):
                     self.container_lists["Measured Elements"][element] = []
                 if isotope not in self.container_lists["Measured Elements"][element]:
                     self.container_lists["Measured Elements"][element].append(isotope)
+
+                if isotope not in self.container_var["Spike Elimination"]["Threshold"]:
+                    self.container_var["Spike Elimination"]["Threshold"][isotope] = tk.StringVar()
+                    self.container_var["Spike Elimination"]["Threshold"][isotope].set(var_threshold.get())
 
         ## Static
         # Build section 'Project Information'
@@ -34108,12 +34068,15 @@ class PySILLS(tk.Frame):
 
         if mode == "default":
             val_dwell_time = float(self.container_var["dwell_times"]["Entry"]["Default"].get())     # in seconds
-
-        factor = 10/val_dwell_time
-        value = int(factor)
-
-        if mode == "default":
+            factor = 10/val_dwell_time
+            value = int(factor)
             self.container_var[key_setting]["SE Threshold"].set(value)
+        elif mode == "specific":
+            for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                val_dwell_time = float(self.container_var["dwell_times"]["Entry"][isotope].get())   # in seconds
+                factor = 10/val_dwell_time
+                value = int(factor)
+                self.container_var["Spike Elimination"]["Threshold"][isotope].set(value)
 
     def guess_salt_composition(self):
         if self.pysills_mode == "FI":
@@ -34659,7 +34622,7 @@ class PySILLS(tk.Frame):
                 parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_threshold, text_default=var_entr_09d_default)
-            #
+
             # Buttons
             btn_09e1 = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=7, n_rows=1, n_columns=5,
@@ -34681,6 +34644,11 @@ class PySILLS(tk.Frame):
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text="Check", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda mode="SMPL": self.custom_spike_check(mode))
+            btn_09d = SE(
+                parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.create_spike_elimination_threshold_window)
 
             # Frames
             if self.container_var["Spike Elimination"]["STD"]["State"]:
