@@ -8224,722 +8224,739 @@ class PySILLS(tk.Frame):
                         "Indices": data_indices, "Times": data_times}
 
     def open_project(self):
-        subwindow_progressbar, prgbar = self.create_progress_bar_spike_elimination()
-        current_step = 0
-        self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-        self.lbl_prg_spk.configure(text="Opening project started!", anchor=tk.W)
+        if len(self.container_lists["Measured Isotopes"]["All"]) > 0:
+            print("We are sorry but it is currently necessary to restart PySILLS before another project can be opened. "
+                  "This issue will be fixed in the future.")
+            self.parent.bell()
+        else:
+            subwindow_progressbar, prgbar = self.create_progress_bar_spike_elimination()
+            current_step = 0
+            self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+            self.lbl_prg_spk.configure(text="Opening project started!", anchor=tk.W)
 
-        filename = filedialog.askopenfilename()
+            filename = filedialog.askopenfilename()
 
-        try:
-            file_loaded = open(str(filename), "r")
-            loaded_lines = file_loaded.readlines()
-            n_lines = len(loaded_lines)
+            try:
+                file_loaded = open(str(filename), "r")
+                loaded_lines = file_loaded.readlines()
+                n_lines = len(loaded_lines)
 
-            if ",,\n" in loaded_lines:
-                loaded_lines = [sub.replace(",,\n", "") for sub in loaded_lines]
-            elif ";;\n" in loaded_lines:
-                loaded_lines = [sub.replace(";;\n", "") for sub in loaded_lines]
+                if ",,\n" in loaded_lines:
+                    loaded_lines = [sub.replace(",,\n", "") for sub in loaded_lines]
+                elif ";;\n" in loaded_lines:
+                    loaded_lines = [sub.replace(";;\n", "") for sub in loaded_lines]
 
-            n_settings = 0
-            strings = ["PROJECT INFORMATION", "STANDARD FILES"]
-            index_container = {}
+                n_settings = 0
+                strings = ["PROJECT INFORMATION", "STANDARD FILES"]
+                index_container = {}
 
-            while n_settings < len(strings):
-                index_container[strings[n_settings]] = 0
-                index = 0
-                flag = 0
-                for line in open(str(filename), "r"):
-                    if strings[n_settings] in line:
-                        flag = 1
-                        break
+                while n_settings < len(strings):
+                    index_container[strings[n_settings]] = 0
+                    index = 0
+                    flag = 0
+                    for line in open(str(filename), "r"):
+                        if strings[n_settings] in line:
+                            flag = 1
+                            break
+                        else:
+                            index += 1
+                    if flag == 0:
+                        pass
                     else:
-                        index += 1
-                if flag == 0:
-                    pass
-                else:
-                    index_container[strings[n_settings]] += index
-                    n_settings += 1
+                        index_container[strings[n_settings]] += index
+                        n_settings += 1
 
-            for i in range(index_container["PROJECT INFORMATION"] + 1, index_container["STANDARD FILES"] - 1):
-                line_std = str(loaded_lines[i].strip())
-                splitted_line = line_std.split(";")
-                var_mode = splitted_line[0]
-                if var_mode == "Mineral Analysis":
-                    key_setting = "ma_setting"
-                    self.pysills_mode = "MA"
-                    self.var_rb_mode.set(0)
-                elif var_mode == "Fluid Inclusion Analysis":
-                    key_setting = "fi_setting"
-                    self.pysills_mode = "FI"
-                    self.var_rb_mode.set(1)
-                elif var_mode == "Melt Inclusion Analysis":
-                    key_setting = "mi_setting"
-                    self.pysills_mode = "MI"
-                    self.var_rb_mode.set(2)
-                break
-            self.select_experiment(var_rb=self.var_rb_mode)
+                for i in range(index_container["PROJECT INFORMATION"] + 1, index_container["STANDARD FILES"] - 1):
+                    line_std = str(loaded_lines[i].strip())
+                    splitted_line = line_std.split(";")
+                    var_mode = splitted_line[0]
+                    if var_mode == "Mineral Analysis":
+                        key_setting = "ma_setting"
+                        self.pysills_mode = "MA"
+                        self.var_rb_mode.set(0)
+                    elif var_mode == "Fluid Inclusion Analysis":
+                        key_setting = "fi_setting"
+                        self.pysills_mode = "FI"
+                        self.var_rb_mode.set(1)
+                    elif var_mode == "Melt Inclusion Analysis":
+                        key_setting = "mi_setting"
+                        self.pysills_mode = "MI"
+                        self.var_rb_mode.set(2)
+                    break
+                self.select_experiment(var_rb=self.var_rb_mode)
 
-            n_settings = 0
-            if "EXPERIMENTAL DATA\n" in loaded_lines or "EXPERIMENTAL DATA" in loaded_lines:
-                if self.pysills_mode == "MA":
-                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
-                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
-                               "END"]
+                n_settings = 0
+                if "EXPERIMENTAL DATA\n" in loaded_lines or "EXPERIMENTAL DATA" in loaded_lines:
+                    if self.pysills_mode == "MA":
+                        strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                   "SAMPLE SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
+                                   "EXPERIMENTAL DATA", "END"]
+                    else:
+                        if ("PYPITZER SETTINGS\n" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)\n"
+                                in loaded_lines and "QUANTIFICATION SETTINGS (BORISOVA2021)\n" in loaded_lines):
+                            strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                       "INCLUSION SETTINGS", "PYPITZER SETTINGS",
+                                       "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                                       "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)",
+                                       "QUANTIFICATION SETTINGS (HALTER2002)", "QUANTIFICATION SETTINGS (BORISOVA2021)",
+                                       "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS",
+                                       "SPIKE ELIMINATION", "EXPERIMENTAL DATA", "END"]
+                        else:
+                            strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                       "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                                       "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
+                                       "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
+                                       "EXPERIMENTAL DATA", "END"]
+                            self.without_pypitzer = True
                 else:
-                    if ("PYPITZER SETTINGS\n" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)\n"
-                            in loaded_lines and "QUANTIFICATION SETTINGS (BORISOVA2021)\n" in loaded_lines):
+                    if self.pysills_mode == "MA":
+                        strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                   "SAMPLE SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
+                                   "END"]
+                    else:
                         strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
                                    "INCLUSION SETTINGS", "PYPITZER SETTINGS",
                                    "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
                                    "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)",
                                    "QUANTIFICATION SETTINGS (HALTER2002)", "QUANTIFICATION SETTINGS (BORISOVA2021)",
                                    "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
-                                   "EXPERIMENTAL DATA", "END"]
-                    else:
-                        strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                                   "INCLUSION SETTINGS", "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                                   "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)", "MATRIX SETTINGS",
-                                   "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "EXPERIMENTAL DATA",
                                    "END"]
-                        self.without_pypitzer = True
-            else:
-                if self.pysills_mode == "MA":
-                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES", "SAMPLE SETTINGS",
-                               "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION", "END"]
-                else:
-                    strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
-                               "INCLUSION SETTINGS", "PYPITZER SETTINGS",
-                               "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
-                               "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)",
-                               "QUANTIFICATION SETTINGS (HALTER2002)", "QUANTIFICATION SETTINGS (BORISOVA2021)",
-                               "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS", "SPIKE ELIMINATION",
-                               "END"]
-                self.old_file = True
+                    self.old_file = True
 
-            index_container = {}
-            while n_settings < len(strings):
-                index_container[strings[n_settings]] = 0
-                index = 0
-                flag = 0
-                for line in open(str(filename), "r"):
-                    if strings[n_settings] in line:
-                        flag = 1
-                        break
+                index_container = {}
+                while n_settings < len(strings):
+                    index_container[strings[n_settings]] = 0
+                    index = 0
+                    flag = 0
+                    for line in open(str(filename), "r"):
+                        if strings[n_settings] in line:
+                            flag = 1
+                            break
+                        else:
+                            index += 1
+                    if flag == 0:
+                        pass
                     else:
-                        index += 1
-                if flag == 0:
-                    pass
-                else:
-                    index_container[strings[n_settings]] += index
-                    n_settings += 1
+                        index_container[strings[n_settings]] += index
+                        n_settings += 1
 
-            time_start = datetime.datetime.now()
+                time_start = datetime.datetime.now()
 
-            current_step = 10
-            self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-            self.lbl_prg_spk.configure(text="Initialization", anchor=tk.W)
+                current_step = 10
+                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                self.lbl_prg_spk.configure(text="Initialization", anchor=tk.W)
 
-            if self.pysills_mode == "MA":
-                self.open_project_part_01(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 20
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## STANDARD FILES
-                self.open_project_part_02(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 30
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## SAMPLE FILES
-                self.open_project_part_03(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 40
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## ISOTOPES
-                self.open_project_part_04(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 50
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## SAMPLE/MATRIX SETTINGS
-                self.open_project_part_05(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 60
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## DWELL TIME SETTINGS
-                self.open_project_part_06(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 70
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## INTERVAL SETTINGS
-                self.open_project_part_07(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 80
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## SPIKE ELIMINATION
-                self.open_project_part_08(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 90
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
-                ## EXPERIMENTAL DATA
-                self.open_project_part_09(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
-                    filename=filename)
-                current_step = 100
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
-
-                if current_step >= 100:
+                if self.pysills_mode == "MA":
+                    self.open_project_part_01(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 20
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## STANDARD FILES
+                    self.open_project_part_02(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 30
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## SAMPLE FILES
+                    self.open_project_part_03(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 40
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## ISOTOPES
+                    self.open_project_part_04(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 50
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## SAMPLE/MATRIX SETTINGS
+                    self.open_project_part_05(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 60
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## DWELL TIME SETTINGS
+                    self.open_project_part_06(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 70
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## INTERVAL SETTINGS
+                    self.open_project_part_07(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 80
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## SPIKE ELIMINATION
+                    self.open_project_part_08(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 90
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
+                    ## EXPERIMENTAL DATA
+                    self.open_project_part_09(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
+                        filename=filename)
+                    current_step = 100
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                     self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
-                    subwindow_progressbar.destroy()
-            elif self.pysills_mode == "FI":
-                ## PROJECT INFORMATION
-                self.open_project_part_01(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 20
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## STANDARD FILES
-                self.open_project_part_02(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 30
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## SAMPLE FILES
-                self.open_project_part_03(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 40
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## ISOTOPES
-                self.open_project_part_04(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 50
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## INCLUSION SETTINGS
-                self.open_project_part_05(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 60
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## PYPITZER SETTINGS
-                if self.without_pypitzer == False:
-                    for i in range(index_container["PYPITZER SETTINGS"] + 1,
-                                   index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
+
+                    if current_step >= 100:
+                        self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                        subwindow_progressbar.destroy()
+                elif self.pysills_mode == "FI":
+                    ## PROJECT INFORMATION
+                    self.open_project_part_01(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 20
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## STANDARD FILES
+                    self.open_project_part_02(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 30
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## SAMPLE FILES
+                    self.open_project_part_03(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 40
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## ISOTOPES
+                    self.open_project_part_04(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 50
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## INCLUSION SETTINGS
+                    self.open_project_part_05(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 60
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## PYPITZER SETTINGS
+                    if self.without_pypitzer == False:
+                        for i in range(index_container["PYPITZER SETTINGS"] + 1,
+                                       index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
+                            line_data = str(loaded_lines[i].strip())
+                            splitted_data = line_data.split(";")
+
+                            if splitted_data[0] == "Cations":
+                                self.container_lists["Selected Cations"].extend(splitted_data[1:])
+                            elif splitted_data[0] == "Anions":
+                                self.container_lists["Selected Anions"].extend(splitted_data[1:])
+                            elif splitted_data[0] == "Isotopes":
+                                for isotope in splitted_data[1:]:
+                                    self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
+                                    self.helper_checkbuttons["Isotopes"][isotope].set(1)
+                            elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
+                                for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                                    var_last_compound = splitted_data[1]
+                                    var_melting_temperature = splitted_data[2]
+
+                                    self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
+                                    self.container_var["SMPL"][filename_smpl_long][
+                                        "Melting temperature"] = tk.StringVar()
+                                    self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(
+                                        var_last_compound)
+                                    self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
+                                        var_melting_temperature)
+                    current_step = 63
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
+                    index = 0
+                    for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
+                                   index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] - 1):
                         line_data = str(loaded_lines[i].strip())
                         splitted_data = line_data.split(";")
-
-                        if splitted_data[0] == "Cations":
-                            self.container_lists["Selected Cations"].extend(splitted_data[1:])
-                        elif splitted_data[0] == "Anions":
-                            self.container_lists["Selected Anions"].extend(splitted_data[1:])
-                        elif splitted_data[0] == "Isotopes":
-                            for isotope in splitted_data[1:]:
-                                self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
-                                self.helper_checkbuttons["Isotopes"][isotope].set(1)
-                        elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
-                            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
-                                var_last_compound = splitted_data[1]
-                                var_melting_temperature = splitted_data[2]
-
-                                self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
-                                self.container_var["SMPL"][filename_smpl_long]["Melting temperature"] = tk.StringVar()
-                                self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(var_last_compound)
-                                self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
-                                    var_melting_temperature)
-                current_step = 63
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
-                index = 0
-                for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
-                               index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] - 1):
-                    line_data = str(loaded_lines[i].strip())
-                    splitted_data = line_data.split(";")
-                    #
-                    if index == 0:
-                        self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
-                        self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
-
-                        if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                        if len(splitted_data) == 3:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
-                                int(splitted_data[2]))
-                        else:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
-                    else:
-                        info_file = splitted_data[0]
-                        info_amount = splitted_data[1]
-                        info_matrix = splitted_data[2]
-                        info_isotope = splitted_data[3]
-                        info_concentration = splitted_data[4]
                         #
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
-                            "Amount": tk.StringVar()}
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Amount"].set(info_amount)
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Matrix"].set(info_matrix)
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Name"].set(info_isotope)
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
-                    #
-                    index += 1
+                        if index == 0:
+                            self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
+                            self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
 
-                current_step = 66
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
-                index = 0
-                if self.without_pypitzer == False:
-                    keyword = "QUANTIFICATION SETTINGS (HALTER2002)"
-                else:
-                    keyword = "MATRIX SETTINGS"
-
-                for i in range(index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] + 1,
-                               index_container[keyword] - 1):
-                    line_data = str(loaded_lines[i].strip())
-                    splitted_data = line_data.split(";")
-                    #
-                    if index == 0:
-                        self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
-                        self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
-
-                        if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                        if len(splitted_data) == 3:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
-                                int(splitted_data[2]))
+                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                            if len(splitted_data) == 3:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
+                                    int(splitted_data[2]))
+                            else:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
                         else:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
+                            info_file = splitted_data[0]
+                            info_amount = splitted_data[1]
+                            info_matrix = splitted_data[2]
+                            info_isotope = splitted_data[3]
+                            info_concentration = splitted_data[4]
+                            #
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"] = {
+                                "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
+                                "Amount": tk.StringVar()}
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Amount"].set(info_amount)
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Matrix"].set(info_matrix)
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Name"].set(info_isotope)
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
+                        #
+                        index += 1
+
+                    current_step = 66
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
+                    index = 0
+                    if self.without_pypitzer == False:
+                        keyword = "QUANTIFICATION SETTINGS (HALTER2002)"
                     else:
-                        if len(splitted_data) == 3:
+                        keyword = "MATRIX SETTINGS"
+
+                    for i in range(index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] + 1,
+                                   index_container[keyword] - 1):
+                        line_data = str(loaded_lines[i].strip())
+                        splitted_data = line_data.split(";")
+                        #
+                        if index == 0:
+                            self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
+                            self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
+
+                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                            if len(splitted_data) == 3:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
+                                    int(splitted_data[2]))
+                            else:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
+                        else:
+                            if len(splitted_data) == 3:
+                                info_file = splitted_data[0]
+                                info_isotope = splitted_data[1]
+                                info_concentration = splitted_data[2]
+
+                                self.container_var["SMPL"][info_file]["Second Internal Standard"] = {
+                                    "Name": tk.StringVar(), "Value": tk.StringVar()}
+                                self.container_var["SMPL"][info_file]["Second Internal Standard"]["Name"].set(
+                                    info_isotope)
+                                self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
+                                    info_concentration)
+                        #
+                        index += 1
+
+                    current_step = 69
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (HALTER2002)
+                    index = 0
+                    if self.without_pypitzer == False:
+                        for i in range(index_container["QUANTIFICATION SETTINGS (HALTER2002)"] + 1,
+                                       index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
+                            line_data = str(loaded_lines[i].strip())
+                            splitted_data = line_data.split(";")
+
+                            if index == 0:
+                                val_method = int(splitted_data[1])
+                                if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                    self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
+                            else:
+                                filename_short = splitted_data[0]
+                                index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
+                                filename_long = self.container_lists["SMPL"]["Long"][index_filename]
+                                val_a_i = splitted_data[1]
+                                val_b_i = splitted_data[2]
+                                val_rho_host_i = splitted_data[3]
+                                val_rho_incl_i = splitted_data[4]
+                                val_r_i = splitted_data[5]
+                                if "Halter2002" not in self.container_var["SMPL"][filename_long]:
+                                    self.container_var["SMPL"][filename_long]["Halter2002"] = {
+                                        "a": tk.StringVar(), "b": tk.StringVar(), "rho(host)": tk.StringVar(),
+                                        "rho(incl)": tk.StringVar(), "R": tk.StringVar()}
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set(val_a_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set(val_b_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set(val_rho_host_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set(val_rho_incl_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set(val_r_i)
+
+                            index += 1
+
+                    current_step = 72
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (BORISOVA2021)
+                    index = 0
+                    if self.without_pypitzer == False:
+                        for i in range(index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] + 1,
+                                       index_container["MATRIX SETTINGS"] - 1):
+                            line_data = str(loaded_lines[i].strip())
+                            splitted_data = line_data.split(";")
+
+                            if index == 0:
+                                val_method = int(splitted_data[1])
+                                if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                    self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
+                            else:
+                                filename_short = splitted_data[0]
+                                index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
+                                filename_long = self.container_lists["SMPL"]["Long"][index_filename]
+                                val_r_host_i = splitted_data[1]
+                                val_r_incl_i = splitted_data[2]
+                                val_rho_host_i = splitted_data[3]
+                                val_rho_incl_i = splitted_data[4]
+                                if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
+                                    self.container_var["SMPL"][filename_long]["Borisova2021"] = {
+                                        "R(host)": tk.StringVar(), "R(incl)": tk.StringVar(),
+                                        "rho(host)": tk.StringVar(), "rho(incl)": tk.StringVar()}
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set(val_r_host_i)
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set(val_r_incl_i)
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set(
+                                    val_rho_host_i)
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set(
+                                    val_rho_incl_i)
+
+                            index += 1
+
+                    current_step = 75
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## MATRIX SETTINGS
+                    for i in range(index_container["MATRIX SETTINGS"] + 1,
+                                   index_container["DWELL TIME SETTINGS"] - 1):
+                        line_std = str(loaded_lines[i].strip())
+                        splitted_std = line_std.split(";")
+
+                        info_file = splitted_std[0]
+                        info_isotope = splitted_std[1]
+                        info_concentration = splitted_std[2]
+
+                        if "Matrix Setup" not in self.container_var["SMPL"][info_file]:
+                            self.container_var["SMPL"][info_file]["Matrix Setup"] = {
+                                "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                                "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                                "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                        self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
+                        self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(
+                            info_concentration)
+
+                    current_step = 78
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## DWELL TIME SETTINGS
+                    self.open_project_part_06(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 81
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## INTERVAL SETTINGS
+                    self.open_project_part_07(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 84
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## SPIKE ELIMINATION
+                    self.open_project_part_08(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 87
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## EXPERIMENTAL DATA
+                    self.open_project_part_09(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
+                        filename=filename)
+                    current_step = 100
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+
+                    if current_step >= 100:
+                        self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                        subwindow_progressbar.destroy()
+                elif self.pysills_mode == "MI":
+                    ## PROJECT INFORMATION
+                    self.open_project_part_01(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 20
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## STANDARD FILES
+                    self.open_project_part_02(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 30
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## SAMPLE FILES
+                    self.open_project_part_03(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 40
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## ISOTOPES
+                    self.open_project_part_04(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 50
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## INCLUSION SETTINGS
+                    self.open_project_part_05(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 60
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## PYPITZER SETTINGS
+                    if self.without_pypitzer == False:
+                        for i in range(index_container["PYPITZER SETTINGS"] + 1,
+                                       index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
+                            line_data = str(loaded_lines[i].strip())
+                            splitted_data = line_data.split(";")
+
+                            if splitted_data[0] == "Cations":
+                                self.container_lists["Selected Cations"].extend(splitted_data[1:])
+                            elif splitted_data[0] == "Anions":
+                                self.container_lists["Selected Anions"].extend(splitted_data[1:])
+                            elif splitted_data[0] == "Isotopes":
+                                for isotope in splitted_data[1:]:
+                                    self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
+                                    self.helper_checkbuttons["Isotopes"][isotope].set(1)
+                            elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
+                                for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
+                                    var_last_compound = splitted_data[1]
+                                    var_melting_temperature = splitted_data[2]
+
+                                    self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
+                                    self.container_var["SMPL"][filename_smpl_long][
+                                        "Melting temperature"] = tk.StringVar()
+                                    self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(
+                                        var_last_compound)
+                                    self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
+                                        var_melting_temperature)
+
+                    current_step = 63
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
+                    index = 0
+                    for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
+                                   index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] - 1):
+                        line_data = str(loaded_lines[i].strip())
+                        splitted_data = line_data.split(";")
+                        #
+                        if index == 0:
+                            self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
+                            self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
+
+                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                            if len(splitted_data) == 3:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
+                                    int(splitted_data[2]))
+                            else:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
+                        else:
+                            info_file = splitted_data[0]
+                            info_amount = splitted_data[1]
+                            info_matrix = splitted_data[2]
+                            info_isotope = splitted_data[3]
+                            info_concentration = splitted_data[4]
+                            #
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"] = {
+                                "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
+                                "Amount": tk.StringVar()}
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Amount"].set(info_amount)
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Matrix"].set(info_matrix)
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Name"].set(info_isotope)
+                            self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
+                        #
+                        index += 1
+
+                    current_step = 66
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
+                    index = 0
+                    if self.without_pypitzer == False:
+                        keyword = "QUANTIFICATION SETTINGS (HALTER2002)"
+                    else:
+                        keyword = "MATRIX SETTINGS"
+
+                    for i in range(index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] + 1,
+                                   index_container[keyword] - 1):
+                        line_data = str(loaded_lines[i].strip())
+                        splitted_data = line_data.split(";")
+                        #
+                        if index == 0:
+                            self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
+                            self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
+
+                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                            if len(splitted_data) == 3:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
+                                    int(splitted_data[2]))
+                            else:
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
+                        else:
                             info_file = splitted_data[0]
                             info_isotope = splitted_data[1]
                             info_concentration = splitted_data[2]
-
+                            #
                             self.container_var["SMPL"][info_file]["Second Internal Standard"] = {
                                 "Name": tk.StringVar(), "Value": tk.StringVar()}
                             self.container_var["SMPL"][info_file]["Second Internal Standard"]["Name"].set(info_isotope)
                             self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
                                 info_concentration)
-                    #
-                    index += 1
-
-                current_step = 69
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (HALTER2002)
-                index = 0
-                if self.without_pypitzer == False:
-                    for i in range(index_container["QUANTIFICATION SETTINGS (HALTER2002)"] + 1,
-                                   index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
-                        line_data = str(loaded_lines[i].strip())
-                        splitted_data = line_data.split(";")
-
-                        if index == 0:
-                            val_method = int(splitted_data[1])
-                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
-                        else:
-                            filename_short = splitted_data[0]
-                            index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
-                            filename_long = self.container_lists["SMPL"]["Long"][index_filename]
-                            val_a_i = splitted_data[1]
-                            val_b_i = splitted_data[2]
-                            val_rho_host_i = splitted_data[3]
-                            val_rho_incl_i = splitted_data[4]
-                            val_r_i = splitted_data[5]
-                            if "Halter2002" not in self.container_var["SMPL"][filename_long]:
-                                self.container_var["SMPL"][filename_long]["Halter2002"] = {
-                                    "a": tk.StringVar(), "b": tk.StringVar(), "rho(host)": tk.StringVar(),
-                                    "rho(incl)": tk.StringVar(), "R": tk.StringVar()}
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set(val_a_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set(val_b_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set(val_rho_host_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set(val_rho_incl_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set(val_r_i)
-
+                        #
                         index += 1
 
-                current_step = 72
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (BORISOVA2021)
-                index = 0
-                if self.without_pypitzer == False:
-                    for i in range(index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] + 1,
-                                   index_container["MATRIX SETTINGS"] - 1):
-                        line_data = str(loaded_lines[i].strip())
-                        splitted_data = line_data.split(";")
+                    current_step = 69
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (HALTER2002)
+                    index = 0
+                    if self.without_pypitzer == False:
+                        for i in range(index_container["QUANTIFICATION SETTINGS (HALTER2002)"] + 1,
+                                       index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
+                            line_data = str(loaded_lines[i].strip())
+                            splitted_data = line_data.split(";")
 
-                        if index == 0:
-                            val_method = int(splitted_data[1])
-                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
-                        else:
-                            filename_short = splitted_data[0]
-                            index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
-                            filename_long = self.container_lists["SMPL"]["Long"][index_filename]
-                            val_r_host_i = splitted_data[1]
-                            val_r_incl_i = splitted_data[2]
-                            val_rho_host_i = splitted_data[3]
-                            val_rho_incl_i = splitted_data[4]
-                            if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
-                                self.container_var["SMPL"][filename_long]["Borisova2021"] = {
-                                    "R(host)": tk.StringVar(), "R(incl)": tk.StringVar(), "rho(host)": tk.StringVar(),
-                                    "rho(incl)": tk.StringVar()}
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set(val_r_host_i)
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set(val_r_incl_i)
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set(val_rho_host_i)
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set(val_rho_incl_i)
+                            if index == 0:
+                                val_method = int(splitted_data[1])
+                                if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                    self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
+                            else:
+                                filename_short = splitted_data[0]
+                                index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
+                                filename_long = self.container_lists["SMPL"]["Long"][index_filename]
+                                val_a_i = splitted_data[1]
+                                val_b_i = splitted_data[2]
+                                val_rho_host_i = splitted_data[3]
+                                val_rho_incl_i = splitted_data[4]
+                                val_r_i = splitted_data[5]
+                                if "Halter2002" not in self.container_var["SMPL"][filename_long]:
+                                    self.container_var["SMPL"][filename_long]["Halter2002"] = {
+                                        "a": tk.StringVar(), "b": tk.StringVar(), "rho(host)": tk.StringVar(),
+                                        "rho(incl)": tk.StringVar(), "R": tk.StringVar()}
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set(val_a_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set(val_b_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set(val_rho_host_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set(val_rho_incl_i)
+                                self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set(val_r_i)
 
-                        index += 1
+                            index += 1
 
-                current_step = 75
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## MATRIX SETTINGS
-                for i in range(index_container["MATRIX SETTINGS"] + 1,
-                               index_container["DWELL TIME SETTINGS"] - 1):
-                    line_std = str(loaded_lines[i].strip())
-                    splitted_std = line_std.split(";")
+                    current_step = 72
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## QUANTIFICATION SETTINGS (BORISOVA2021)
+                    index = 0
+                    if self.without_pypitzer == False:
+                        for i in range(index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] + 1,
+                                       index_container["MATRIX SETTINGS"] - 1):
+                            line_data = str(loaded_lines[i].strip())
+                            splitted_data = line_data.split(";")
 
-                    info_file = splitted_std[0]
-                    info_isotope = splitted_std[1]
-                    info_concentration = splitted_std[2]
+                            if index == 0:
+                                val_method = int(splitted_data[1])
+                                if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
+                                    self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
+                                self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
+                            else:
+                                filename_short = splitted_data[0]
+                                index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
+                                filename_long = self.container_lists["SMPL"]["Long"][index_filename]
+                                val_r_host_i = splitted_data[1]
+                                val_r_incl_i = splitted_data[2]
+                                val_rho_host_i = splitted_data[3]
+                                val_rho_incl_i = splitted_data[4]
+                                if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
+                                    self.container_var["SMPL"][filename_long]["Borisova2021"] = {
+                                        "R(host)": tk.StringVar(), "R(incl)": tk.StringVar(),
+                                        "rho(host)": tk.StringVar(), "rho(incl)": tk.StringVar()}
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set(val_r_host_i)
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set(val_r_incl_i)
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set(
+                                    val_rho_host_i)
+                                self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set(
+                                    val_rho_incl_i)
 
-                    if "Matrix Setup" not in self.container_var["SMPL"][info_file]:
-                        self.container_var["SMPL"][info_file]["Matrix Setup"] = {
-                            "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                            "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                            "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                    self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
-                    self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(info_concentration)
+                            index += 1
 
-                current_step = 78
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## DWELL TIME SETTINGS
-                self.open_project_part_06(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 81
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## INTERVAL SETTINGS
-                self.open_project_part_07(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 84
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## SPIKE ELIMINATION
-                self.open_project_part_08(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 87
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## EXPERIMENTAL DATA
-                self.open_project_part_09(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
-                    filename=filename)
-                current_step = 100
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                    current_step = 75
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## MATRIX SETTINGS
+                    for i in range(index_container["MATRIX SETTINGS"] + 1,
+                                   index_container["DWELL TIME SETTINGS"] - 1):
+                        line_std = str(loaded_lines[i].strip())
+                        splitted_std = line_std.split(";")
 
-                if current_step >= 100:
-                    self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
-                    subwindow_progressbar.destroy()
-            elif self.pysills_mode == "MI":
-                ## PROJECT INFORMATION
-                self.open_project_part_01(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 20
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## STANDARD FILES
-                self.open_project_part_02(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 30
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## SAMPLE FILES
-                self.open_project_part_03(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 40
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## ISOTOPES
-                self.open_project_part_04(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 50
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## INCLUSION SETTINGS
-                self.open_project_part_05(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 60
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## PYPITZER SETTINGS
-                if self.without_pypitzer == False:
-                    for i in range(index_container["PYPITZER SETTINGS"] + 1,
-                                   index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] - 1):
-                        line_data = str(loaded_lines[i].strip())
-                        splitted_data = line_data.split(";")
+                        info_file = splitted_std[0]
+                        info_isotope = splitted_std[1]
+                        info_concentration = splitted_std[2]
 
-                        if splitted_data[0] == "Cations":
-                            self.container_lists["Selected Cations"].extend(splitted_data[1:])
-                        elif splitted_data[0] == "Anions":
-                            self.container_lists["Selected Anions"].extend(splitted_data[1:])
-                        elif splitted_data[0] == "Isotopes":
-                            for isotope in splitted_data[1:]:
-                                self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
-                                self.helper_checkbuttons["Isotopes"][isotope].set(1)
-                        elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
-                            for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
-                                var_last_compound = splitted_data[1]
-                                var_melting_temperature = splitted_data[2]
-
-                                self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
-                                self.container_var["SMPL"][filename_smpl_long]["Melting temperature"] = tk.StringVar()
-                                self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(var_last_compound)
-                                self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
-                                    var_melting_temperature)
-
-                current_step = 63
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)
-                index = 0
-                for i in range(index_container["QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)"] + 1,
-                               index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] - 1):
-                    line_data = str(loaded_lines[i].strip())
-                    splitted_data = line_data.split(";")
-                    #
-                    if index == 0:
-                        self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
-                        self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
-
-                        if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                        if len(splitted_data) == 3:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
-                                int(splitted_data[2]))
-                        else:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
-                    else:
-                        info_file = splitted_data[0]
-                        info_amount = splitted_data[1]
-                        info_matrix = splitted_data[2]
-                        info_isotope = splitted_data[3]
-                        info_concentration = splitted_data[4]
-                        #
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
-                            "Amount": tk.StringVar()}
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Amount"].set(info_amount)
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Matrix"].set(info_matrix)
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Name"].set(info_isotope)
-                        self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
-                    #
-                    index += 1
-
-                current_step = 66
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)
-                index = 0
-                if self.without_pypitzer == False:
-                    keyword = "QUANTIFICATION SETTINGS (HALTER2002)"
-                else:
-                    keyword = "MATRIX SETTINGS"
-
-                for i in range(index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] + 1,
-                               index_container[keyword] - 1):
-                    line_data = str(loaded_lines[i].strip())
-                    splitted_data = line_data.split(";")
-                    #
-                    if index == 0:
-                        self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
-                        self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
-
-                        if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                        if len(splitted_data) == 3:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(
-                                int(splitted_data[2]))
-                        else:
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
-                    else:
-                        info_file = splitted_data[0]
-                        info_isotope = splitted_data[1]
-                        info_concentration = splitted_data[2]
-                        #
-                        self.container_var["SMPL"][info_file]["Second Internal Standard"] = {
-                            "Name": tk.StringVar(), "Value": tk.StringVar()}
-                        self.container_var["SMPL"][info_file]["Second Internal Standard"]["Name"].set(info_isotope)
-                        self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
+                        if "Matrix Setup" not in self.container_var["SMPL"][info_file]:
+                            self.container_var["SMPL"][info_file]["Matrix Setup"] = {
+                                "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                                "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                                "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                        self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
+                        self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(
                             info_concentration)
-                    #
-                    index += 1
 
-                current_step = 69
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (HALTER2002)
-                index = 0
-                if self.without_pypitzer == False:
-                    for i in range(index_container["QUANTIFICATION SETTINGS (HALTER2002)"] + 1,
-                                   index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
-                        line_data = str(loaded_lines[i].strip())
-                        splitted_data = line_data.split(";")
-
-                        if index == 0:
-                            val_method = int(splitted_data[1])
-                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
-                        else:
-                            filename_short = splitted_data[0]
-                            index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
-                            filename_long = self.container_lists["SMPL"]["Long"][index_filename]
-                            val_a_i = splitted_data[1]
-                            val_b_i = splitted_data[2]
-                            val_rho_host_i = splitted_data[3]
-                            val_rho_incl_i = splitted_data[4]
-                            val_r_i = splitted_data[5]
-                            if "Halter2002" not in self.container_var["SMPL"][filename_long]:
-                                self.container_var["SMPL"][filename_long]["Halter2002"] = {
-                                    "a": tk.StringVar(), "b": tk.StringVar(), "rho(host)": tk.StringVar(),
-                                    "rho(incl)": tk.StringVar(), "R": tk.StringVar()}
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["a"].set(val_a_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["b"].set(val_b_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set(val_rho_host_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["rho(incl)"].set(val_rho_incl_i)
-                            self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set(val_r_i)
-
-                        index += 1
-
-                current_step = 72
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## QUANTIFICATION SETTINGS (BORISOVA2021)
-                index = 0
-                if self.without_pypitzer == False:
-                    for i in range(index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] + 1,
-                                   index_container["MATRIX SETTINGS"] - 1):
-                        line_data = str(loaded_lines[i].strip())
-                        splitted_data = line_data.split(";")
-
-                        if index == 0:
-                            val_method = int(splitted_data[1])
-                            if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
-                                self.container_var[key_setting]["Inclusion Intensity Calculation"] = tk.IntVar()
-                            self.container_var[key_setting]["Inclusion Intensity Calculation"].set(val_method)
-                        else:
-                            filename_short = splitted_data[0]
-                            index_filename = self.container_lists["SMPL"]["Short"].index(filename_short)
-                            filename_long = self.container_lists["SMPL"]["Long"][index_filename]
-                            val_r_host_i = splitted_data[1]
-                            val_r_incl_i = splitted_data[2]
-                            val_rho_host_i = splitted_data[3]
-                            val_rho_incl_i = splitted_data[4]
-                            if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
-                                self.container_var["SMPL"][filename_long]["Borisova2021"] = {
-                                    "R(host)": tk.StringVar(), "R(incl)": tk.StringVar(), "rho(host)": tk.StringVar(),
-                                    "rho(incl)": tk.StringVar()}
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["R(host)"].set(val_r_host_i)
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["R(incl)"].set(val_r_incl_i)
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set(val_rho_host_i)
-                            self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set(val_rho_incl_i)
-
-                        index += 1
-
-                current_step = 75
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## MATRIX SETTINGS
-                for i in range(index_container["MATRIX SETTINGS"] + 1,
-                               index_container["DWELL TIME SETTINGS"] - 1):
-                    line_std = str(loaded_lines[i].strip())
-                    splitted_std = line_std.split(";")
-
-                    info_file = splitted_std[0]
-                    info_isotope = splitted_std[1]
-                    info_concentration = splitted_std[2]
-
-                    if "Matrix Setup" not in self.container_var["SMPL"][info_file]:
-                        self.container_var["SMPL"][info_file]["Matrix Setup"] = {
-                            "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                            "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-                            "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                    self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Name"].set(info_isotope)
-                    self.container_var["SMPL"][info_file]["Matrix Setup"]["IS"]["Concentration"].set(info_concentration)
-
-                current_step = 78
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## DWELL TIME SETTINGS
-                self.open_project_part_06(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 81
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## INTERVAL SETTINGS
-                self.open_project_part_07(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 84
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## SPIKE ELIMINATION
-                self.open_project_part_08(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
-                current_step = 87
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
-                ## EXPERIMENTAL DATA
-                self.open_project_part_09(
-                    key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
-                    filename=filename)
-                current_step = 100
-                self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
-                self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
-
-                if current_step >= 100:
+                    current_step = 78
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## DWELL TIME SETTINGS
+                    self.open_project_part_06(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 81
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## INTERVAL SETTINGS
+                    self.open_project_part_07(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 84
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## SPIKE ELIMINATION
+                    self.open_project_part_08(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                    current_step = 87
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
+                    self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
+                    ## EXPERIMENTAL DATA
+                    self.open_project_part_09(
+                        key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
+                        filename=filename)
+                    current_step = 100
+                    self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                     self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
-                    subwindow_progressbar.destroy()
 
-            # Initialization
-            time_start = datetime.datetime.now()
-            self.file_loaded = True
-            self.demo_mode = False
+                    if current_step >= 100:
+                        self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
+                        subwindow_progressbar.destroy()
 
-            if self.old_file == True and self.var_opt_icp.get() == "Select ICP-MS":
-                self.container_icpms["name"] = None
-            else:
-                self.select_icp_ms(var_opt=self.var_opt_icp)
+                # Initialization
+                time_start = datetime.datetime.now()
+                self.file_loaded = True
+                self.demo_mode = False
 
-            if self.pysills_mode == "MA":
-                self.ma_settings()
-            elif self.pysills_mode == "FI":
-                self.fi_settings()
-            elif self.pysills_mode == "MI":
-                self.mi_settings()
+                if self.old_file == True and self.var_opt_icp.get() == "Select ICP-MS":
+                    self.container_icpms["name"] = None
+                else:
+                    self.select_icp_ms(var_opt=self.var_opt_icp)
 
-            time_end = datetime.datetime.now()
-            time_delta = (time_end - time_start)*1000
-            print(f"Process time (opening project - part 'Initialization'):", time_delta.total_seconds(), "ms")
-        except FileNotFoundError:
-            print("File not found!")
+                if self.pysills_mode == "MA":
+                    self.ma_settings()
+                elif self.pysills_mode == "FI":
+                    self.fi_settings()
+                elif self.pysills_mode == "MI":
+                    self.mi_settings()
+
+                time_end = datetime.datetime.now()
+                time_delta = (time_end - time_start)*1000
+                print(f"Process time (opening project - part 'Initialization'):", time_delta.total_seconds(), "ms")
+            except FileNotFoundError:
+                print("File not found!")
 
     def convert_true_false_string(self, var_str):
         d = {"True": True, "False": False}
