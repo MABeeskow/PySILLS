@@ -5172,8 +5172,12 @@ class PySILLS(tk.Frame):
 
                         # Limit of Detection
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
-                        report_lod[var_filetype][var_datatype][file_short][isotope] = round(
-                            value_i, n_decimals_concentration)
+
+                        if value_i != None:
+                            report_lod[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_concentration)
+                        else:
+                            report_intensity[var_filetype][var_datatype][file_short][isotope] = "---"
 
                         ## Intensity Results
                         # Intensity
