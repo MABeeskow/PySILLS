@@ -1,9 +1,9 @@
-[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/) &nbsp;
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-370/) &nbsp;
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) &nbsp;
 [![DOI](https://zenodo.org/badge/663565362.svg)](https://zenodo.org/badge/latestdoi/663565362)
 
 <a href="https://github.com/MABeeskow/PySILLS">
-  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/pysills/documentation/images/PySILLS_Logo_Header.png" width="75%">
+  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/pysills/lib/images/PySILLS_Logo_Header.png" width="75%">
 </a>
 
 developed by Maximilian Alexander Beeskow
