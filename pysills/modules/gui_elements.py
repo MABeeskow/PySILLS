@@ -3,17 +3,22 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 27.03.2024
+# 26.06.2024
 # ----------------------
 #
 ## MODULES
+# external
 import tkinter as tk
 from tkinter import ttk
 import numpy as np
-from modules.essential_functions import Essentials
 import colorsys
 import matplotlib.colors
-#
+# internal
+try:
+    from pysills.modules.essential_functions import Essentials
+except:
+    from modules.essential_functions import Essentials
+
 ## CLASSES
 class SimpleElements:
     #

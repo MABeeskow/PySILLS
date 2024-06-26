@@ -61,8 +61,9 @@ the project, it is possible that further bugs occur.
 
 ## 🚀 Installation
 
-It is planned that PySILLS will be able to install via PyPi and conda, since all required dependencies will then be 
-installed automatically.
+PySILLS can be easily installed via the following command:
+
+<code>pip install PySILLS==1.0.1 </code>
 
 Alternatively, it is possible to run PySILLS by a manual installation of Python and - if not already installed - the 
 following packages:
@@ -72,6 +73,10 @@ following packages:
 * pandas
 * matplotlib
 * sympy
+* (tkinter)
+
+In some cases, it will be necessary to install tkinter manually although it should be actually already part of your 
+python version.
 
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54) &nbsp;
 ![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white) &nbsp;

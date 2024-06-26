@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		25.06.2024
+# Date:		26.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -24,20 +24,34 @@ import tkinter as tk
 from tkinter import filedialog, ttk, font
 import random as rd
 # internal
-from pypitzer.Pitzer.models import FluidPitzer
-from modules.chemistry import PeriodicSystem
-from modules.chemistry import PeriodicSystemOfElements as PSE
-from modules.data import Data
-from modules.data_reduction import DataExtraction as DE
-from modules.data_reduction import IntensityQuantification as IQ
-from modules.data_reduction import SensitivityQuantification as SQ
-from modules.data_reduction import CompositionQuantification as CQ
-from modules.essential_functions import Essentials as ES
-from modules.essential_functions import EssentialsSRM as ESRM
-from modules.fluid_inclusions import FluidInclusions
-from modules.gui_elements import SimpleElements as SE
-from modules.mineral_analysis import MineralAnalysis
-from modules.spike_elimination import GrubbsTestSILLS, OutlierDetection
+try:
+    from pysills.pypitzer.Pitzer.models import FluidPitzer
+except:
+    from pypitzer.Pitzer.models import FluidPitzer
+
+try:
+    from pysills.modules.chemistry import PeriodicSystem
+    from pysills.modules.chemistry import PeriodicSystemOfElements as PSE
+    from pysills.modules.data import Data
+    from pysills.modules.data_reduction import DataExtraction as DE
+    from pysills.modules.data_reduction import IntensityQuantification as IQ
+    from pysills.modules.data_reduction import SensitivityQuantification as SQ
+    from pysills.modules.essential_functions import Essentials as ES
+    from pysills.modules.essential_functions import EssentialsSRM as ESRM
+    from pysills.modules.gui_elements import SimpleElements as SE
+    from pysills.modules.spike_elimination import GrubbsTestSILLS, OutlierDetection
+except:
+    from modules.chemistry import PeriodicSystem
+    from modules.chemistry import PeriodicSystemOfElements as PSE
+    from modules.data import Data
+    from modules.data_reduction import DataExtraction as DE
+    from modules.data_reduction import IntensityQuantification as IQ
+    from modules.data_reduction import SensitivityQuantification as SQ
+    from modules.essential_functions import Essentials as ES
+    from modules.essential_functions import EssentialsSRM as ESRM
+    from modules.gui_elements import SimpleElements as SE
+    from modules.spike_elimination import GrubbsTestSILLS, OutlierDetection
+
 # import subprocess
 import string
 
@@ -1396,23 +1410,33 @@ class PySILLS(tk.Frame):
              ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
              ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0]
 
-        #if var_path == None:
         self.path_pysills = os.path.dirname(os.path.realpath(sys.argv[0]))
-        #else:
-        #    self.path_pysills = var_path
+        self.path_pysills_main = self.path_pysills
+
+        if "/pysills" in self.path_pysills_main:
+            self.path_pysills_main = self.path_pysills_main.replace("/pysills", "")
+        elif "/tests" in self.path_pysills_main:
+            self.path_pysills_main = self.path_pysills_main.replace("/tests", "")
+        elif "/bin" in self.path_pysills_main:
+            self.path_pysills_main = os.path.abspath(__file__)
+            self.path_pysills_main = self.path_pysills_main.replace("/pysills_app.py", "")
 
         helper_srm_library = []
 
         try:
-            helper_srm_library = os.listdir(self.path_pysills + str("/lib/srm/"))
+            helper_srm_library = os.listdir(self.path_pysills_main + str("/lib/srm/"))
         except:
             helper_srm_library = os.listdir(self.path_pysills + str("/pysills/lib/srm/"))
+
         helper_srm_library.remove("__init__.py")
+
         try:
             helper_srm_library.remove(".DS_Store")
         except:
             pass
+
         helper_srm_library.sort()
+
         for var_srm in helper_srm_library:
             var_srm_new = var_srm.replace("_", " ")
             var_srm_new = var_srm_new.replace(".csv", "")
@@ -1450,8 +1474,9 @@ class PySILLS(tk.Frame):
             self.container_lists["SRM Library"].append(var_srm_new)
 
         helper_icpms_library = []
+
         try:
-            helper_icpms_library = os.listdir(self.path_pysills + str("/lib/icpms/"))
+            helper_icpms_library = os.listdir(self.path_pysills_main + str("/lib/icpms/"))
         except:
             helper_icpms_library = os.listdir(self.path_pysills + str("/pysills/lib/icpms/"))
 
@@ -1459,11 +1484,14 @@ class PySILLS(tk.Frame):
             helper_icpms_library.remove("__init__.py")
         if ".DS_Store" in helper_icpms_library:
             helper_icpms_library.remove(".DS_Store")
+
         try:
             helper_icpms_library.remove(".DS_Store")
         except:
             pass
+
         helper_icpms_library.sort()
+
         for var_icpms in helper_icpms_library:
             var_icpms_new = var_icpms.replace("_", " ")
             var_icpms_new = var_icpms_new.replace(".csv", "")
@@ -1557,7 +1585,7 @@ class PySILLS(tk.Frame):
         project_path = project_path_prew.strip("/pysills")
 
         try:
-            file_usersettings = open(self.path_pysills + str("/user_settings.txt"), "r")
+            file_usersettings = open(self.path_pysills_main + str("/user_settings.txt"), "r")
             for index, file_data in enumerate(file_usersettings):
                 file_data_splitted = file_data.split(";")
 
@@ -1607,12 +1635,15 @@ class PySILLS(tk.Frame):
 
         ## Logo
         try:
-            #self.path_pysills = os.getcwd()
             try:
-                pysills_logo = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Logo.png"))
+                if "/pysills" in self.path_pysills_main:
+                    pysills_logo = tk.PhotoImage(file=self.path_pysills_main + str("/lib/images/PySILLS_Logo.png"))
+                else:
+                    pysills_logo = tk.PhotoImage(
+                        file=self.path_pysills_main + str("/pysills/lib/images/PySILLS_Logo.png"))
             except:
                 pysills_logo = tk.PhotoImage(file=self.path_pysills + str(
-                    "/pysills/documentation/images/PySILLS_Logo.png"))
+                    "/pysills/lib/images/PySILLS_Logo.png"))
 
             pysills_logo = pysills_logo.subsample(1, 1)
             img = tk.Label(self.parent, image=pysills_logo, bg=background_color_header)
@@ -1620,13 +1651,25 @@ class PySILLS(tk.Frame):
             img.grid(
                 row=start_row - 3, column=start_column, rowspan=n_rows_header, columnspan=common_n_columns + 12,
                 sticky="nesw")
+        except:
+            self.parent.bell()
+            print("There is a problem with the PySILLS header image.")
 
-            ## Icon
-            #pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Icon.png"))
-            pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/documentation/images/PySILLS_Logo_02.png"))
+        ## Icon
+        try:
+            try:
+                if "/pysills" in self.path_pysills_main:
+                    pysills_icon = tk.PhotoImage(file=self.path_pysills_main + str("/lib/images/PySILLS_Icon.png"))
+                else:
+                    pysills_icon = tk.PhotoImage(
+                        file=self.path_pysills_main + str("/pysills/lib/images/PySILLS_Icon.png"))
+            except:
+                pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/pysills/lib/images/PySILLS_Icon.png"))
+
             self.parent.iconphoto(False, pysills_icon)
         except:
-            pass
+            self.parent.bell()
+            print("There is a problem with the PySILLS icon.")
 
         # LABELS
         var_lbl_01 = self.language_dict["Select Mode"][self.var_language]
@@ -1960,7 +2003,7 @@ class PySILLS(tk.Frame):
 
         if var_instrument_raw != "Select ICP-MS":
             try:
-                file_long = path + str("/lib/icpms/" + var_instrument + ".csv")
+                file_long = self.path_pysills_main + str("/lib/icpms/" + var_instrument + ".csv")
                 file_content = open(file_long)
             except:
                 file_long = path + str("/pysills/lib/icpms/" + var_instrument + ".csv")
@@ -11065,22 +11108,20 @@ class PySILLS(tk.Frame):
                 else:
                     self.container_var["srm_window"]["Entry"][element].set("0.0")
 
-    #
     def create_srm_data_list(self):
         for var_srm in self.list_srm:
             self.container_lists["SRM Data"][var_srm] = {}
             ESRM().place_srm_values(srm_name=var_srm, srm_dict=self.container_lists["SRM Data"])
-        #
+
         for var_srm in self.list_srm:
             data_srm = self.container_lists["SRM Data"][var_srm]
             for element in self.list_pse:
                 if element not in self.container_lists["SRM Data"]:
                     self.container_lists["SRM Data"][element] = {}
-                #
+
                 if element in data_srm:
                     self.container_lists["SRM Data"][element][var_srm] = data_srm[element]
 
-    #
     def subwindow_general_settings(self):
         ## Window Settings
         window_width = 700
@@ -11427,7 +11468,7 @@ class PySILLS(tk.Frame):
     def confirm_general_settings(self):
         path_pysills = os.path.dirname(os.path.realpath(__file__))
         path_pysills = self.path_pysills
-        filename = os.path.join(path_pysills, "user_settings.txt")
+        filename = os.path.join(self.path_pysills_main, "user_settings.txt")
         with open(filename, "w") as file_settings:
             file_settings.write("GENERAL SETTINGS" + ";\n")
             for key, value in self.container_var["General Settings"].items():
@@ -13977,17 +14018,18 @@ class PySILLS(tk.Frame):
                 ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
 
                 try:
-                    demo_files = os.listdir(path=path + str("/demo_files/"))
+                    demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
                 except:
                     path += "/pysills"
                     demo_files = os.listdir(path=path + str("/demo_files/"))
 
                 for file in demo_files:
                     if file.startswith("demo_ma"):
-                        path_complete = os.path.join(path + str("/demo_files/"), file)
+                        path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             ma_demo_files["ALL"].append(str(path_raw.as_posix()))
+
                 ma_demo_files["ALL"].sort()
                 ma_demo_files["STD"].extend(ma_demo_files["ALL"][:3])
                 ma_demo_files["STD"].extend(ma_demo_files["ALL"][-3:])
@@ -23945,14 +23987,14 @@ class PySILLS(tk.Frame):
                 fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
 
                 try:
-                    demo_files = os.listdir(path=path + str("/demo_files/"))
+                    demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
                 except:
                     path += "/pysills"
                     demo_files = os.listdir(path=path + str("/demo_files/"))
 
                 for file in demo_files:
                     if file.startswith("demo_fi"):
-                        path_complete = os.path.join(path + str("/demo_files/"), file)
+                        path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             fi_demo_files["ALL"].append(str(path_raw.as_posix()))
@@ -24306,14 +24348,14 @@ class PySILLS(tk.Frame):
                 mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
 
                 try:
-                    demo_files = os.listdir(path=path + str("/demo_files/"))
+                    demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
                 except:
                     path += "/pysills"
                     demo_files = os.listdir(path=path + str("/demo_files/"))
 
                 for file in demo_files:
                     if file.startswith("demo_mi"):
-                        path_complete = os.path.join(path + str("/demo_files/"), file)
+                        path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             mi_demo_files["ALL"].append(str(path_raw.as_posix()))

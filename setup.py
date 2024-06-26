@@ -1,0 +1,28 @@
+from setuptools import setup, find_packages
+
+with open("README.md", "r") as f:
+    description = f.read()
+
+setup(
+    name="PySILLS",
+    version="1.0.1",
+    # packages=["lib", "lib.srm", "lib.icpms", "tests", "pysills", "pysills.modules", "pysills.plugins",
+    #           "pysills.pypitzer", "pysills.pypitzer.MCWEP", "pysills.pypitzer.Pitzer", "pysills.pypitzer.public",
+    #           "pysills.pypitzer.database", "pysills.pypitzer.uncertainty", "notebooks"],
+    packages=find_packages(),
+    url="https://github.com/MABeeskow/PySILLS",
+    license="LGPL-3.0",
+    author="Maximilian Alexander Beeskow",
+    author_email="pysills.analysis@gmail.com",
+    description="PySILLS is a Python-based, open source data reduction tool for the major, minor and trace element "
+                "analysis of minerals as well as of fluid and melt inclusions.",
+    keywords=["LA-ICP-MS", "data reduction", "minerals", "fluid inclusions", "melt inclusions", "sills", "pysills",
+              "chemical composition", "compositional analysis", "major elements", "minor elements", "trace elements"],
+    install_requires=["numpy", "scipy", "pandas", "matplotlib", "sympy"],
+    entry_points={"console_scripts": ["pysills = pysills.pysills_app:pysills"]},
+    include_package_data=True,
+    package_data={"": ["lib/srm/*.csv", "lib/icpms/*.csv", "lib/demo_files/*.csv", "lib/images/*.png",
+                       "lib/images/*.ico"]},
+    long_description=description,
+    long_description_content_type="text/markdown",
+)

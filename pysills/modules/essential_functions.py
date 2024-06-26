@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		07.06.2024
+# Date:		26.06.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -406,92 +406,102 @@ class EssentialsSRM:
         path = os.getcwd()
         parent = os.path.dirname(path)
         path = os.path.dirname(os.path.realpath(sys.argv[0]))
+        path_main = path
+
+        if "/pysills" in path_main:
+            path_main = path.replace("/pysills", "")
+        elif "/tests" in path_main:
+            path_main = path.replace("/tests", "")
+        elif "/bin" in path_main:
+            path_main = os.path.abspath(__file__)
+            path_main = path_main.replace("/modules/essential_functions.py", "")
+
         try:
             path_app = os.getcwd()
             path = os.path.dirname(path_app)
             path = os.path.dirname(os.path.realpath(sys.argv[0]))
-            data_srm = data.general().importSRM(filename=path + str("/lib/srm/NIST_606.csv"))
+            data_srm = data.general().importSRM(filename=path_main + str("/lib/srm/NIST_606.csv"))
         except:
             path = os.getcwd()
             path = os.path.dirname(os.path.realpath(sys.argv[0]))
             data_srm = data.general().importSRM(filename=path + str("/pysills/lib/srm/NIST_606.csv"))
             path += "/pysills"
-        #
+
         if srm_name == "NIST 606":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_606.csv"))   # replaces parent with path
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_606.csv"))
         elif srm_name == "NIST 610":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_610.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_610.csv"))
         elif srm_name == "NIST 610 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_610_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_610_GeoReM.csv"))
         elif srm_name == "NIST 610 (Spandler)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_610_Spandler.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_610_Spandler.csv"))
         elif srm_name == "NIST 611":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_611.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_611.csv"))
         elif srm_name == "NIST 611 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_611_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_611_GeoReM.csv"))
         elif srm_name == "NIST 612":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_612.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_612.csv"))
         elif srm_name == "NIST 612 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_612_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_612_GeoReM.csv"))
         elif srm_name == "NIST 613":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_613.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_613.csv"))
         elif srm_name == "NIST 613 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_613_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_613_GeoReM.csv"))
         elif srm_name == "NIST 614":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_614.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_614.csv"))
         elif srm_name == "NIST 614 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_614_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_614_GeoReM.csv"))
         elif srm_name == "NIST 615":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_615.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_615.csv"))
         elif srm_name == "NIST 615 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_615_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_615_GeoReM.csv"))
         elif srm_name == "NIST 616":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_616.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_616.csv"))
         elif srm_name == "NIST 616 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_616_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_616_GeoReM.csv"))
         elif srm_name == "NIST 617":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_617.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_617.csv"))
         elif srm_name == "NIST 617 (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/NIST_617_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_617_GeoReM.csv"))
         elif srm_name == "USGS BCR-2G (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/USGS_BCR2G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/USGS_BCR2G_GeoReM.csv"))
         elif srm_name == "USGS GSD-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/USGS_GSD1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/USGS_GSD1G_GeoReM.csv"))
         elif srm_name == "USGS GSE-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/USGS_GSE1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/USGS_GSE1G_GeoReM.csv"))
         elif srm_name == "B6":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/B6.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/B6.csv"))
         elif srm_name == "Durango Apatite":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/Durango_Apatite.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/Durango_Apatite.csv"))
         elif srm_name == "Scapolite 17":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/Scapolite_17.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/Scapolite_17.csv"))
         elif srm_name == "BAM-376":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/BAM_376.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/BAM_376.csv"))
         elif srm_name == "BCR-2G":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/BCR_2G.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/BCR_2G.csv"))
         elif srm_name == "BL-Q":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/BL_Q.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/BL_Q.csv"))
         elif srm_name == "Br-Glass":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/Br_Glass.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/Br_Glass.csv"))
         elif srm_name == "GSD-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/GSD_1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/GSD_1G_GeoReM.csv"))
         elif srm_name == "GSE-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/GSE_1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/GSE_1G_GeoReM.csv"))
         elif srm_name == "GSE-2G":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/GSE_2G.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/GSE_2G.csv"))
         elif srm_name == "HAL-O":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/HAL_O.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/HAL_O.csv"))
         elif srm_name == "K-Br":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/K_Br.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/K_Br.csv"))
         elif srm_name == "MACS-3":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/MACS_3.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/MACS_3.csv"))
         elif srm_name == "Po 724":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/Po_724.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/Po_724.csv"))
         elif srm_name == "STDGL-2B2":
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/STDGL_2B2.csv"))
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/STDGL_2B2.csv"))
         else:
             srm_name_new = srm_name.replace(" ", "_")
-            data_srm = data.general().importSRM(filename=path+str("/lib/srm/"+srm_name_new))
-        #
+            data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/"+srm_name_new))
+
         for item in data_srm:
             srm_dict[srm_name][item[0]] = round(item[1], 4)

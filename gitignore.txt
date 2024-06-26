@@ -20,6 +20,21 @@ modules/__pycache__/*.pyc
 notebooks/.ipynb_checkpoints/
 tests/.ipynb_checkpoints/
 
+# build
+.build
+.build/
+build/
+
+# dist
+.dist
+.dist/
+dist/
+
+# PySILLS.egg-info
+.PySILLS.egg-info
+.PySILLS.egg-info/
+PySILLS.egg-info/
+
 # idea
 .idea
 .idea/
