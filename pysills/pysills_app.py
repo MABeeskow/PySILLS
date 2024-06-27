@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.3
+# Version:	v1.0.4
 # Date:		27.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
         ## Current version
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
-        self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.3 - 27.06.2024"
+        #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
+        self.val_version = "1.0.4 - 27.06.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -14103,7 +14103,6 @@ class PySILLS(tk.Frame):
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
                         var_skipfooter = self.container_icpms["skipfooter"]
-                        print(file_std)
                         df_exmpl = DE(filename_long=file_std).get_measurements(
                             delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
                     else:
