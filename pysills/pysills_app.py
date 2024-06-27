@@ -16881,9 +16881,10 @@ class PySILLS(tk.Frame):
                     self.container_measurements["Dataframe"][filename_short] = df_i
             else:
                 if "_copy" in filename_short:
-                    filename_short_original = filename_short.replace("_copy", "")
-                    filename_short = filename_short_original
-                    df_i = self.container_measurements["Dataframe"][filename_short]
+                    key = re.search(r"(_copy\d*)", filename_short)
+                    key_copy = key.group(1)
+                    filename_short_original = filename_short.replace(key_copy, "")
+                    df_i = self.container_measurements["Dataframe"][filename_short_original]
                 else:
                     df_i = self.container_measurements["Dataframe"][filename_short]
 
