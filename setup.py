@@ -5,10 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="PySILLS",
-    version="1.0.1",
-    # packages=["lib", "lib.srm", "lib.icpms", "tests", "pysills", "pysills.modules", "pysills.plugins",
-    #           "pysills.pypitzer", "pysills.pypitzer.MCWEP", "pysills.pypitzer.Pitzer", "pysills.pypitzer.public",
-    #           "pysills.pypitzer.database", "pysills.pypitzer.uncertainty", "notebooks"],
+    version="1.0.3",
     packages=find_packages(),
     url="https://github.com/MABeeskow/PySILLS",
     license="LGPL-3.0",
