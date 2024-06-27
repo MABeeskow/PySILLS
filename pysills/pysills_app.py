@@ -1424,9 +1424,10 @@ class PySILLS(tk.Frame):
         helper_srm_library = []
 
         try:
-            helper_srm_library = os.listdir(self.path_pysills_main + str("/lib/srm/"))
+            folder_path = os.path.join(self.path_pysills_main, "lib", "srm")
+            helper_srm_library = os.listdir(folder_path)
         except:
-            helper_srm_library = os.listdir(self.path_pysills + str("/pysills/lib/srm/"))
+            helper_srm_library = os.listdir(self.path_pysills_main + str("/pysills/lib/srm/"))
 
         helper_srm_library.remove("__init__.py")
 
@@ -1476,9 +1477,10 @@ class PySILLS(tk.Frame):
         helper_icpms_library = []
 
         try:
-            helper_icpms_library = os.listdir(self.path_pysills_main + str("/lib/icpms/"))
+            folder_path = os.path.join(self.path_pysills_main, "lib", "icpms")
+            helper_icpms_library = os.listdir(folder_path)
         except:
-            helper_icpms_library = os.listdir(self.path_pysills + str("/pysills/lib/icpms/"))
+            helper_icpms_library = os.listdir(self.path_pysills_main + str("/pysills/lib/icpms/"))
 
         if "__init__.py" in helper_icpms_library:
             helper_icpms_library.remove("__init__.py")
@@ -2026,7 +2028,7 @@ class PySILLS(tk.Frame):
                 file_long = self.path_pysills_main + str("/lib/icpms/" + var_instrument + ".csv")
                 file_content = open(file_long)
             except:
-                file_long = path + str("/pysills/lib/icpms/" + var_instrument + ".csv")
+                file_long = self.path_pysills_main + str("/pysills/lib/icpms/" + var_instrument + ".csv")
                 file_content = open(file_long)
 
             for index, line in enumerate(file_content):
@@ -14042,17 +14044,19 @@ class PySILLS(tk.Frame):
                     folder_path = folder_path.replace("\\", "/")
                     demo_files = os.listdir(path=folder_path)
                 except:
-                    if r"/pysills" not in path:
-                        folder_path = os.path.join(self.path_pysills_main, "pysills", "demo_files")
+                    if "pysills" not in self.path_pysills_main:
+                        folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "demo_files")
                     else:
-                        folder_path = os.path.join(self.path_pysills_main, "demo_files")
+                        folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
 
-                    folder_path = folder_path.replace("\\", "/")
+                    if self.var_os == "win32":
+                        folder_path = folder_path.replace("\\", "/")
+
                     demo_files = os.listdir(path=folder_path)
 
                 for file in demo_files:
                     if file.startswith("demo_ma"):
-                        folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                        #folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
                         #folder_path = self.path_pysills_main + str(r"/lib/demo_files/")
                         path_complete = os.path.join(folder_path, file)
                         if "_copy" not in path_complete:
@@ -14099,6 +14103,7 @@ class PySILLS(tk.Frame):
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
                         var_skipfooter = self.container_icpms["skipfooter"]
+                        print(file_std)
                         df_exmpl = DE(filename_long=file_std).get_measurements(
                             delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
                     else:
@@ -24016,17 +24021,42 @@ class PySILLS(tk.Frame):
                 fi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
 
                 try:
-                    demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
+                    folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                    folder_path = folder_path.replace("\\", "/")
+                    demo_files = os.listdir(path=folder_path)
                 except:
-                    path += "/pysills"
-                    demo_files = os.listdir(path=path + str("/demo_files/"))
+                    if "pysills" not in self.path_pysills_main:
+                        folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "demo_files")
+                    else:
+                        folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+
+                    if self.var_os == "win32":
+                        folder_path = folder_path.replace("\\", "/")
+
+                    demo_files = os.listdir(path=folder_path)
 
                 for file in demo_files:
                     if file.startswith("demo_fi"):
-                        path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
+                        #folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                        #folder_path = self.path_pysills_main + str(r"/lib/demo_files/")
+                        path_complete = os.path.join(folder_path, file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             fi_demo_files["ALL"].append(str(path_raw.as_posix()))
+
+                # try:
+                #     demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
+                # except:
+                #     path += "/pysills"
+                #     demo_files = os.listdir(path=path + str("/demo_files/"))
+                #
+                # for file in demo_files:
+                #     if file.startswith("demo_fi"):
+                #         path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
+                #         if "_copy" not in path_complete:
+                #             path_raw = pathlib.PureWindowsPath(path_complete)
+                #             fi_demo_files["ALL"].append(str(path_raw.as_posix()))
+
                 fi_demo_files["ALL"].sort()
                 fi_demo_files["STD"].extend(fi_demo_files["ALL"][:4])
                 fi_demo_files["STD"].extend(fi_demo_files["ALL"][-4:])
@@ -24377,17 +24407,42 @@ class PySILLS(tk.Frame):
                 mi_demo_files = {"ALL": [], "STD": [], "SMPL": []}
 
                 try:
-                    demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
+                    folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                    folder_path = folder_path.replace("\\", "/")
+                    demo_files = os.listdir(path=folder_path)
                 except:
-                    path += "/pysills"
-                    demo_files = os.listdir(path=path + str("/demo_files/"))
+                    if "pysills" not in self.path_pysills_main:
+                        folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "demo_files")
+                    else:
+                        folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+
+                    if self.var_os == "win32":
+                        folder_path = folder_path.replace("\\", "/")
+
+                    demo_files = os.listdir(path=folder_path)
 
                 for file in demo_files:
                     if file.startswith("demo_mi"):
-                        path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
+                        #folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                        #folder_path = self.path_pysills_main + str(r"/lib/demo_files/")
+                        path_complete = os.path.join(folder_path, file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             mi_demo_files["ALL"].append(str(path_raw.as_posix()))
+
+                # try:
+                #     demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
+                # except:
+                #     path += "/pysills"
+                #     demo_files = os.listdir(path=path + str("/demo_files/"))
+                #
+                # for file in demo_files:
+                #     if file.startswith("demo_mi"):
+                #         path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
+                #         if "_copy" not in path_complete:
+                #             path_raw = pathlib.PureWindowsPath(path_complete)
+                #             mi_demo_files["ALL"].append(str(path_raw.as_posix()))
+
                 mi_demo_files["ALL"].sort()
                 mi_demo_files["STD"].extend(mi_demo_files["ALL"][:5])
                 mi_demo_files["STD"].extend(mi_demo_files["ALL"][-5:])

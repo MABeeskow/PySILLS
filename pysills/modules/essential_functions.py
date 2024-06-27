@@ -420,12 +420,17 @@ class EssentialsSRM:
             path_app = os.getcwd()
             path = os.path.dirname(path_app)
             path = os.path.dirname(os.path.realpath(sys.argv[0]))
-            data_srm = data.general().importSRM(filename=path_main + str("/lib/srm/NIST_606.csv"))
+            path_file = os.path.join(path_main, "lib", "srm", "NIST_606.csv")
+            data_srm = data.general().importSRM(filename=path_file)
         except:
             path = os.getcwd()
             path = os.path.dirname(os.path.realpath(sys.argv[0]))
-            data_srm = data.general().importSRM(filename=path + str("/pysills/lib/srm/NIST_606.csv"))
+            path_file = os.path.join(path_main, "pysills", "lib", "srm", "NIST_606.csv")
+            data_srm = data.general().importSRM(filename=path_file)
             path += "/pysills"
+
+        if "pyills" not in path_main:
+            path_main = os.path.join(path_main, "pysills")
 
         if srm_name == "NIST 606":
             data_srm = data.general().importSRM(filename=path_main+str("/lib/srm/NIST_606.csv"))
