@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "pre-release"
+        self.val_version = "1.0.3 - 27.06.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -310,7 +310,7 @@ class PySILLS(tk.Frame):
         self.list_alphabet = list(string.ascii_uppercase)
         #
         var_os = sys.platform
-
+        self.var_os = var_os
         # ['GTK3Agg', 'GTK3Cairo', 'MacOSX', 'nbAgg', 'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo', 'TkAgg', 'TkCairo',
         # 'WebAgg', 'WX', 'WXAgg', 'WXCairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
 
@@ -660,7 +660,7 @@ class PySILLS(tk.Frame):
             "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
             "Add": {"English": "Add", "German": "Hinzufügen"},
             "Standard file": {"English": "Standard file", "German": "Standardmessung"},
-            "Sample file": {"English": "Standard file", "German": "Probenmessung"},
+            "Sample file": {"English": "Sample file", "German": "Probenmessung"},
             "Confirm all": {"English": "Confirm all", "German": "Alles bestätigen"},
             "Measured isotopes": {"English": "Measured isotopes", "German": "Isotopenübersicht"},
             "Copy": {"English": "Copy", "German": "Kopieren"},
@@ -1632,18 +1632,28 @@ class PySILLS(tk.Frame):
         font_elements = "sans 10 bold"
         self.var_language = self.container_var["General Settings"]["Language"].get()
         self.update_variables_initial_values()
-
         ## Logo
         try:
             try:
-                if "/pysills" in self.path_pysills_main:
-                    pysills_logo = tk.PhotoImage(file=self.path_pysills_main + str("/lib/images/PySILLS_Logo.png"))
+                if self.var_os in ["darwin", "linux"]:
+                    if r"/pysills" in self.path_pysills_main:
+                        pysills_logo = tk.PhotoImage(file=self.path_pysills_main + str(r"/lib/images/PySILLS_Logo.png"))
+                    else:
+                        pysills_logo = tk.PhotoImage(
+                            file=self.path_pysills_main + str("/pysills/lib/images/PySILLS_Logo.png"))
                 else:
-                    pysills_logo = tk.PhotoImage(
-                        file=self.path_pysills_main + str("/pysills/lib/images/PySILLS_Logo.png"))
+                    if r"\pysills" in self.path_pysills_main:
+                        pysills_logo = tk.PhotoImage(file=self.path_pysills_main + str(r"\lib\images\PySILLS_Logo.png"))
+                    else:
+                        pysills_logo = tk.PhotoImage(
+                            file=self.path_pysills_main + str(r"\pysills\lib\images\PySILLS_Logo.png"))
             except:
-                pysills_logo = tk.PhotoImage(file=self.path_pysills + str(
-                    "/pysills/lib/images/PySILLS_Logo.png"))
+                if self.var_os in ["darwin", "linux"]:
+                    pysills_logo = tk.PhotoImage(file=self.path_pysills + str(
+                        r"/pysills/lib/images/PySILLS_Logo.png"))
+                else:
+                    pysills_logo = tk.PhotoImage(file=self.path_pysills + str(
+                        r"\pysills\lib/images\PySILLS_Logo.png"))
 
             pysills_logo = pysills_logo.subsample(1, 1)
             img = tk.Label(self.parent, image=pysills_logo, bg=background_color_header)
@@ -1658,13 +1668,23 @@ class PySILLS(tk.Frame):
         ## Icon
         try:
             try:
-                if "/pysills" in self.path_pysills_main:
-                    pysills_icon = tk.PhotoImage(file=self.path_pysills_main + str("/lib/images/PySILLS_Icon.png"))
+                if self.var_os in ["darwin", "linux"]:
+                    if r"/pysills" in self.path_pysills_main:
+                        pysills_icon = tk.PhotoImage(file=self.path_pysills_main + str(r"/lib/images/PySILLS_Icon.png"))
+                    else:
+                        pysills_icon = tk.PhotoImage(
+                            file=self.path_pysills_main + str(r"/pysills/lib/images/PySILLS_Icon.png"))
                 else:
-                    pysills_icon = tk.PhotoImage(
-                        file=self.path_pysills_main + str("/pysills/lib/images/PySILLS_Icon.png"))
+                    if r"\pysills" in self.path_pysills_main:
+                        pysills_icon = tk.PhotoImage(file=self.path_pysills_main + str(r"\lib\images\PySILLS_Icon.png"))
+                    else:
+                        pysills_icon = tk.PhotoImage(
+                            file=self.path_pysills_main + str(r"\pysills\lib\images\PySILLS_Icon.png"))
             except:
-                pysills_icon = tk.PhotoImage(file=self.path_pysills + str("/pysills/lib/images/PySILLS_Icon.png"))
+                if self.var_os in ["darwin", "linux"]:
+                    pysills_icon = tk.PhotoImage(file=self.path_pysills + str(r"/pysills/lib/images/PySILLS_Icon.png"))
+                else:
+                    pysills_icon = tk.PhotoImage(file=self.path_pysills + str(r"\pysills\lib\images\PySILLS_Icon.png"))
 
             self.parent.iconphoto(False, pysills_icon)
         except:
@@ -14008,7 +14028,7 @@ class PySILLS(tk.Frame):
     def ma_settings(self):
         """Main settings window of a mineral analysis project."""
         if self.file_system_need_update:
-            path = os.getcwd()
+            path2 = os.getcwd()
             path = self.path_pysills
             parent = os.path.dirname(path)
 
@@ -14018,14 +14038,23 @@ class PySILLS(tk.Frame):
                 ma_demo_files = {"ALL": [], "STD": [], "SMPL": []}
 
                 try:
-                    demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
+                    folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                    folder_path = folder_path.replace("\\", "/")
+                    demo_files = os.listdir(path=folder_path)
                 except:
-                    path += "/pysills"
-                    demo_files = os.listdir(path=path + str("/demo_files/"))
+                    if r"/pysills" not in path:
+                        folder_path = os.path.join(self.path_pysills_main, "pysills", "demo_files")
+                    else:
+                        folder_path = os.path.join(self.path_pysills_main, "demo_files")
+
+                    folder_path = folder_path.replace("\\", "/")
+                    demo_files = os.listdir(path=folder_path)
 
                 for file in demo_files:
                     if file.startswith("demo_ma"):
-                        path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
+                        folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
+                        #folder_path = self.path_pysills_main + str(r"/lib/demo_files/")
+                        path_complete = os.path.join(folder_path, file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             ma_demo_files["ALL"].append(str(path_raw.as_posix()))

@@ -63,7 +63,7 @@ the project, it is possible that further bugs occur.
 
 PySILLS can be easily installed via the following command:
 
-<code>pip install PySILLS==1.0.1 </code>
+<code>pip install PySILLS</code>
 
 Alternatively, it is possible to run PySILLS by a manual installation of Python and - if not already installed - the 
 following packages:
@@ -111,7 +111,8 @@ not appear anymore!
 [PySILLS manual](https://docs.google.com/document/d/15dqejKteG7hTiImd5IzyIQJBEtDjFNNw8B1161cvPsY/) |
 [PySILLS on ReadTheDocs](https://pysills.readthedocs.io/en/latest/) |
 [PySILLS on Blogger](https://pysills.blogspot.com/) | 
-[PySILLS on YouTube](https://www.youtube.com/@PySILLS)
+[PySILLS on YouTube](https://www.youtube.com/@PySILLS) | 
+[PySILLS on PyPi](https://pypi.org/project/PySILLS/)
 
 ![Blogger](https://img.shields.io/badge/Blogger-FF5722?style=for-the-badge&logo=blogger&logoColor=white) &nbsp;
 ![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)
@@ -315,4 +316,4 @@ https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
 ---
 
 Version: Pre-Release  
-Last updated: 25.06.2024
+Last updated: 27.06.2024
