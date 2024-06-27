@@ -264,19 +264,47 @@ class PySILLS(tk.Frame):
             "Co2O3": round((2*self.chemistry_data["Co"]/self.chemistry_data_oxides["Co2O3"])**(-1), 4),
             "Ni2O3": round((2*self.chemistry_data["Ni"]/self.chemistry_data_oxides["Ni2O3"])**(-1), 4)}
 
+        # self.chemistry_oxides_sorted = {
+        #     "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
+        #     "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO2"],
+        #     "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["Cl2O", "ClO2", "Cl2O3", "Cl2O5", "Cl2O7"],
+        #     "K": ["K2O"], "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
+        #     "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3", "MnO2", "MnO3", "Mn2O7"],
+        #     "Fe": ["FeO", "Fe2O3", "FeO3"], "Co": ["CoO", "Co2O3"], "Ni": ["NiO", "Ni2O3"], "Cu": ["Cu2O", "CuO"],
+        #     "Zn": ["ZnO"], "Ga": ["Ga2O3"], "Ge": ["GeO2"], "As": ["As2O3", "As2O5"], "Se": ["SeO2", "SiO3"],
+        #     "Br": ["Br2O", "Br2O3", "Br2O5", "Br2O7"], "Kr": ["KrO"], "Rb": ["Rb2O"], "Sr": ["SrO"], "Y": ["Y2O3"],
+        #     "Zr": ["ZrO2"], "Nb": ["Nb2O3", "Nb2O5"], "Mo": ["MoO", "Mo2O3", "MoO2", "Mo2O5", "MoO3"], "Tc": ["Tc2O7"],
+        #     "Ru": ["RuO", "Ru2O3", "RuO2", "RuO3", "RuO4"], "Rh": ["Rh2O", "RhO", "Rh2O3", "RhO2", "Rh2O5"],
+        #     "Pd": ["PdO", "PdO2"], "Ag": ["Ag2O", "AgO"], "Cd": ["CdO"], "In": ["In2O3"], "Sn": ["SnO", "SnO2"],
+        #     "Sb": ["Sb2O3", "Sb2O5"], "Te": ["TeO2", "TeO3"], "I": ["I2O", "I2O4", "I2O5", "I4O9"],
+        #     "Xe": ["XeO", "XeO2", "XeO3"], "Cs": ["Cs2O"], "Ba": ["BaO"], "La": ["La2O3"], "Ce": ["Ce2O3", "CeO2"],
+        #     "Pr": ["Pr2O3", "PrO2"], "Nd": ["Nd2O3"], "Pm": ["Pm2O3"], "Sm": ["SmO", "Sm2O3"], "Eu": ["EuO", "Eu2O3"],
+        #     "Gd": ["Gd2O3"], "Tb": ["Tb2O3", "TbO2"], "Dy": ["Dy2O3"], "Ho": ["Ho2O3"], "Er": ["Er2O3"],
+        #     "Tm": ["TmO", "Tm2O3"], "Yb": ["YbO", "Yb2O3"], "Lu": ["Lu2O3"], "Hf": ["HfO2"], "Ta": ["Ta2O5"],
+        #     "W": ["WO", "WO2O3", "WO2", "W2O5", "WO3"], "Re": ["ReO", "ReO2", "ReO3", "Re2O7"],
+        #     "Os": ["OsO", "Os2O3", "OsO2", "OsO3", "OsO4"], "Ir": ["Ir2O", "IrO", "Ir2O3", "IrO2", "IrO3"],
+        #     "Pt": ["PtO", "PtO2"], "Au": ["Au2O", "Au2O3"], "Hg": ["Hg2O", "HgO"], "Tl": ["Tl2O", "Tl2O3"],
+        #     "Pb": ["PbO", "PbO2"], "Bi": ["Bi2O3", "B2O5"], "Po": ["PoO", "PoO2", "PoO3"],
+        #     "At": ["At2O", "At2O3", "At2O5", "At2O7"], "Rn": ["RnO"], "Fr": ["Fr2O"], "Ra": ["RaO"], "Ac": ["Ac2O3"],
+        #     "Th": ["ThO2"], "Pa": ["PaO2", "Pa2O5"], "U": ["U2O3", "UO2", "U2O5", "UO3"],
+        #     "Np": ["Np2O3", "NpO2", "Np2O5", "NpO3"], "Pu": ["Pu2O3", "PuO2", "Pu2O5", "PuO3"],
+        #     "Am": ["Am2O3", "AmO2", "Am2O5", "AmO3"], "Cm": ["Cm2O3", "CmO2"], "Bk": ["Bk2O3", "BkO2"],
+        #     "Cf": ["Cf2O3", "CfO2"], "Es": ["Es2O3"], "Fm": ["Fm2O3"], "Md": ["Md2O3"], "No": ["NoO", "No2O3"],
+        #     "Lr": ["Lr2O3"]}
+
         self.chemistry_oxides_sorted = {
             "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
             "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO2"],
-            "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["Cl2O", "ClO2", "Cl2O3", "Cl2O5", "Cl2O7"],
-            "K": ["K2O"], "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
-            "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3", "MnO2", "MnO3", "Mn2O7"],
-            "Fe": ["FeO", "Fe2O3", "FeO3"], "Co": ["CoO", "Co2O3"], "Ni": ["NiO", "Ni2O3"], "Cu": ["Cu2O", "CuO"],
+            "P": ["P2O3", "P2O5"], "S": ["SO3"], "Cl": ["Cl2O"],
+            "K": ["K2O"], "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["TiO2"], "V": ["V2O5"],
+            "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3"],
+            "Fe": ["FeO", "Fe2O3"], "Co": ["Co2O3"], "Ni": ["NiO", "Ni2O3"], "Cu": ["Cu2O", "CuO"],
             "Zn": ["ZnO"], "Ga": ["Ga2O3"], "Ge": ["GeO2"], "As": ["As2O3", "As2O5"], "Se": ["SeO2", "SiO3"],
-            "Br": ["Br2O", "Br2O3", "Br2O5", "Br2O7"], "Kr": ["KrO"], "Rb": ["Rb2O"], "Sr": ["SrO"], "Y": ["Y2O3"],
+            "Br": ["Br2O"], "Kr": ["KrO"], "Rb": ["Rb2O"], "Sr": ["SrO"], "Y": ["Y2O3"],
             "Zr": ["ZrO2"], "Nb": ["Nb2O3", "Nb2O5"], "Mo": ["MoO", "Mo2O3", "MoO2", "Mo2O5", "MoO3"], "Tc": ["Tc2O7"],
             "Ru": ["RuO", "Ru2O3", "RuO2", "RuO3", "RuO4"], "Rh": ["Rh2O", "RhO", "Rh2O3", "RhO2", "Rh2O5"],
             "Pd": ["PdO", "PdO2"], "Ag": ["Ag2O", "AgO"], "Cd": ["CdO"], "In": ["In2O3"], "Sn": ["SnO", "SnO2"],
-            "Sb": ["Sb2O3", "Sb2O5"], "Te": ["TeO2", "TeO3"], "I": ["I2O", "I2O4", "I2O5", "I4O9"],
+            "Sb": ["Sb2O3", "Sb2O5"], "Te": ["TeO2", "TeO3"], "I": ["I2O"],
             "Xe": ["XeO", "XeO2", "XeO3"], "Cs": ["Cs2O"], "Ba": ["BaO"], "La": ["La2O3"], "Ce": ["Ce2O3", "CeO2"],
             "Pr": ["Pr2O3", "PrO2"], "Nd": ["Nd2O3"], "Pm": ["Pm2O3"], "Sm": ["SmO", "Sm2O3"], "Eu": ["EuO", "Eu2O3"],
             "Gd": ["Gd2O3"], "Tb": ["Tb2O3", "TbO2"], "Dy": ["Dy2O3"], "Ho": ["Ho2O3"], "Er": ["Er2O3"],
@@ -17515,7 +17543,7 @@ class PySILLS(tk.Frame):
 
         list_possible_elements = []
         for isotope in self.container_var["SRM"]:
-            if isotope in self.container_lists["ISOTOPES"]:
+            if isotope in self.container_lists["Measured Isotopes"]["All"]:
                 var_srm_i = self.container_var["SRM"][isotope].get()
                 key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
@@ -17528,17 +17556,20 @@ class PySILLS(tk.Frame):
         if var_key == "oxides":
             list_elements = []
             list_compound = []
-            for isotope in list_possible_elements:
-                key = re.search(r"(\D+)(\d*)", isotope)
-                element_isotope = key.group(1)
-                if element_isotope not in list_elements:
-                    list_elements.append(element_isotope)
-            for oxide in list_oxides:
-                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
-                element_oxide = key.group(1)
-                if element_oxide in list_elements:
-                    if oxide not in list_compound:
-                        list_compound.append(oxide)
+            list_elements = self.container_lists["Measured Elements"]["All"]
+            list_compound = list_oxides
+            var_opt_is_list = list_possible_elements
+            # for isotope in list_possible_elements:
+            #     key = re.search(r"(\D+)(\d*)", isotope)
+            #     element_isotope = key.group(1)
+            #     if element_isotope not in list_elements:
+            #         list_elements.append(element_isotope)
+            # for oxide in list_oxides:
+            #     key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
+            #     element_oxide = key.group(1)
+            #     if element_oxide in list_elements:
+            #         if oxide not in list_compound:
+            #             list_compound.append(oxide)
             var_list_is = list_oxides
             var_opt_default = self.container_var[var_setting_key]["Oxide"]
             var_entr_default = self.container_var[var_setting_key]["Oxide Concentration"]
@@ -17627,7 +17658,7 @@ class PySILLS(tk.Frame):
 
         if var_key not in ["experiments", "custom"]:
             var_opt_is_default = self.container_var["IS"]["Default SMPL"]
-            var_opt_is_list = list_possible_elements
+            var_opt_is_list = self.container_lists["Measured Isotopes"]["All"]
             var_entr_is_default = self.container_var["IS"]["Default SMPL Concentration"]
 
             if var_opt_is_default.get() != str_var_03:
