@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		26.06.2024
+# Date:		27.06.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ class Essentials:
         part = self.variable
         if part == "BG":
             if self.var_iw_bg.get() != "No Time Intervals":
-                key = re.search("(\d+\.\d+)" + " - " + "(\d+\.\d+)", self.var_iw_bg.get())
+                key = re.search(r"(\d+\.\d+)" + " - " + r"(\d+\.\d+)", self.var_iw_bg.get())
                 t_start = float(key.group(1))
                 t_end = float(key.group(2))
                 #
@@ -114,7 +114,7 @@ class Essentials:
                 #
         elif part == "MAT":
             if self.var_iw_mat.get() != "No Time Intervals":
-                key = re.search("(\d+\.\d+)" + " - " + "(\d+\.\d+)", self.var_iw_mat.get())
+                key = re.search(r"(\d+\.\d+)" + " - " + r"(\d+\.\d+)", self.var_iw_mat.get())
                 t_start = float(key.group(1))
                 t_end = float(key.group(2))
                 #
@@ -129,7 +129,7 @@ class Essentials:
                 self.entr_t_end_mat.insert(0, t_end)
         elif part == "SIG":
             if self.var_iw_sig.get() != "No Time Intervals":
-                key = re.search("(\d+\.\d+)" + " - " + "(\d+\.\d+)", self.var_iw_sig.get())
+                key = re.search(r"(\d+\.\d+)" + " - " + r"(\d+\.\d+)", self.var_iw_sig.get())
                 t_start = float(key.group(1))
                 t_end = float(key.group(2))
                 #
