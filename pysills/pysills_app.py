@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.4
-# Date:		27.06.2024
+# Version:	v1.0.5
+# Date:		28.06.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.4 - 27.06.2024"
+        self.val_version = "1.0.5 - 28.06.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -32817,10 +32817,11 @@ class PySILLS(tk.Frame):
                         self.helper_salt_composition[file_smpl_short].set(salt_composition)
                         self.check_chargebalance(filename_long=file_smpl)
 
-                        self.quantify_inclusion_based_on_molalities(
-                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
-                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
-                            var_concentration_is=val_concentration_is)
+                        if self.molality_based_quantification.get() == True:
+                            self.quantify_inclusion_based_on_molalities(
+                                var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                                var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                                var_concentration_is=val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -32948,10 +32949,11 @@ class PySILLS(tk.Frame):
 
                     self.helper_salt_composition[file_smpl_short].set(salt_composition)
 
-                    self.quantify_inclusion_based_on_molalities(
-                        var_filename_short=file_smpl_short, var_is_i=var_is_i,
-                        var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
-                        var_concentration_is=val_concentration_is)
+                    if self.molality_based_quantification.get() == True:
+                        self.quantify_inclusion_based_on_molalities(
+                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                            var_concentration_is=val_concentration_is)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
             self.parent.bell()
@@ -33013,8 +33015,17 @@ class PySILLS(tk.Frame):
             var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][filename_short][
                 "INCL"][var_na]
             sensitivity_cl = var_sensitivity_cl/var_sensitivity_na
-            concentration_cl = (intensity_cl/intensity_na)*(concentration_na/sensitivity_cl)
-            val_b += concentration_cl/(molar_mass_cl*charge_cl)
+
+            if intensity_na > 0 and sensitivity_cl > 0:
+                concentration_cl = (intensity_cl/intensity_na)*(concentration_na/sensitivity_cl)
+            else:
+                print(filename_short, "I(Na):", intensity_na, "xi(Cl):", sensitivity_cl)
+                concentration_cl = np.nan
+
+            if (molar_mass_cl*charge_cl) != 0:
+                val_b += concentration_cl/(molar_mass_cl*charge_cl)
+            else:
+                val_b += np.nan
 
         for salt in self.container_lists["Selected Salts"]:
             element = self.molar_masses_compounds[salt]["Cation"]
@@ -33031,10 +33042,23 @@ class PySILLS(tk.Frame):
                     var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][filename_short][
                         "INCL"][var_na]
                     sensitivity_i = var_sensitivity_i/var_sensitivity_na
-                    concentration_i = (intensity_i/intensity_na)*(concentration_na/sensitivity_i)
-                    val_a += concentration_i/(molar_mass_i*charge_i)
 
-        val_c = -val_a/val_b
+                    if intensity_na > 0 and sensitivity_i > 0:
+                        concentration_i = (intensity_i/intensity_na)*(concentration_na/sensitivity_i)
+                    else:
+                        print(filename_short, "I(Na):", intensity_na, "xi(" + isotope + "):", sensitivity_i)
+                        concentration_i = np.nan
+
+                    if (molar_mass_i*charge_i) != 0:
+                        val_a += concentration_i/(molar_mass_i*charge_i)
+                    else:
+                        val_a += np.nan
+
+        if val_b > 0:
+            val_c = -val_a/val_b
+        else:
+            val_c = np.nan
+
         self.charge_balance_check[filename_short].set(round(val_c, 3))
 
     def fi_calculate_massbalance(self, var_entr, mode, var_file, event):
@@ -33130,7 +33154,11 @@ class PySILLS(tk.Frame):
                                         if var_sensitivity_i != None and var_sensitivity_na != None:
                                             var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
                                             try:
-                                                var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                                if (var_intensity_na*var_sensitivity_i) > 0:
+                                                    var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                                else:
+                                                    var_conc_ratio = np.nan
+
                                                 var_salt_contribution_3 = var_conc_ratio*(
                                                         molar_mass_salt/molar_mass_element)
                                                 helper2[file_smpl_short][salt] = var_salt_contribution_3
@@ -33208,10 +33236,11 @@ class PySILLS(tk.Frame):
                         self.helper_salt_composition[file_smpl_short].set(salt_composition)
                         self.check_chargebalance(filename_long=file_smpl)
 
-                        self.quantify_inclusion_based_on_molalities(
-                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
-                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
-                            var_concentration_is=val_concentration_is)
+                        if self.molality_based_quantification.get() == True:
+                            self.quantify_inclusion_based_on_molalities(
+                                var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                                var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                                var_concentration_is=val_concentration_is)
 
                 if self.container_var["General Settings"]["Desired Average"].get() == 1:
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
@@ -33328,10 +33357,11 @@ class PySILLS(tk.Frame):
 
                     self.check_chargebalance(filename_long=file_smpl)
 
-                    self.quantify_inclusion_based_on_molalities(
-                        var_filename_short=file_smpl_short, var_is_i=var_is_i,
-                        var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
-                        var_concentration_is=val_concentration_is)
+                    if self.molality_based_quantification.get() == True:
+                        self.quantify_inclusion_based_on_molalities(
+                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                            var_concentration_is=val_concentration_is)
         else:
             print("Please set the internal standard before you start any calculation. Thank you very much!")
             self.parent.bell()
@@ -33359,7 +33389,12 @@ class PySILLS(tk.Frame):
                 isotope]
             concentration_ratio_is = self.container_concentration_ratio["SMPL"]["RAW"][var_filename_short][
                 "INCL"][var_is_i]
-            concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+
+            if concentration_ratio_is > 0:
+                concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+            else:
+                concentration_ratio_i = np.nan
+
             factor_i = (molar_mass_is/molar_mass_i)*concentration_ratio_i
             molality_i = molality_na*factor_i
 
@@ -33375,7 +33410,12 @@ class PySILLS(tk.Frame):
                 isotope]
             concentration_ratio_is = self.container_concentration_ratio["SMPL"]["RAW"][var_filename_short][
                 "INCL"][var_is_i]
-            concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+
+            if concentration_ratio_is > 0:
+                concentration_ratio_i = (concentration_i/concentration_is)/concentration_ratio_is
+            else:
+                concentration_ratio_i = np.nan
+
             factor_i = (molar_mass_is/molar_mass_i)*concentration_ratio_i
             molality_i = molality_na*factor_i
 
