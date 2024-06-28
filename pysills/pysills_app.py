@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.5 - 28.06.2024"
+        self.val_version = "1.0.6 - 28.06.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -33019,7 +33019,8 @@ class PySILLS(tk.Frame):
             if intensity_na > 0 and sensitivity_cl > 0:
                 concentration_cl = (intensity_cl/intensity_na)*(concentration_na/sensitivity_cl)
             else:
-                print(filename_short, "I(Na):", intensity_na, "xi(Cl):", sensitivity_cl)
+                print("Attention (charge balance check) -", filename_short, "I(Na):", intensity_na, "xi(Cl):",
+                      sensitivity_cl)
                 concentration_cl = np.nan
 
             if (molar_mass_cl*charge_cl) != 0:
@@ -33046,7 +33047,8 @@ class PySILLS(tk.Frame):
                     if intensity_na > 0 and sensitivity_i > 0:
                         concentration_i = (intensity_i/intensity_na)*(concentration_na/sensitivity_i)
                     else:
-                        print(filename_short, "I(Na):", intensity_na, "xi(" + isotope + "):", sensitivity_i)
+                        print("Attention (charge balance check) -", filename_short, "I(Na):",
+                              intensity_na, "xi(" + isotope + "):", sensitivity_i)
                         concentration_i = np.nan
 
                     if (molar_mass_i*charge_i) != 0:
@@ -33054,7 +33056,7 @@ class PySILLS(tk.Frame):
                     else:
                         val_a += np.nan
 
-        if val_b > 0:
+        if val_b != 0:
             val_c = -val_a/val_b
         else:
             val_c = np.nan
