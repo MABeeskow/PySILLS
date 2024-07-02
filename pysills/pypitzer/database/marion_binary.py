@@ -3,6 +3,7 @@
 # Description: This script calculates the average of a list of numbers.
 # Version: 1.0
 # Last Modified: May 7, 2023
+# Modified by Maximilian Beeskow: July 2, 2024
 
 import pandas as pd
 
@@ -265,9 +266,11 @@ species = {
 
 index = pd.MultiIndex.from_tuples([('pr1', 'pr2', 'pr3')], names=["parameter", "species1", "species2"])
 df = pd.DataFrame(columns=['a1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7'], index=index)
+
 for key, value in species.items():
+    df.sort_index(inplace=True, na_position="first")
     df.loc[key, :] = pd.Series(value)
-df.sort_index()
+#df.sort_index()
 
 marion_binary = df
 
