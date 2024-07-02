@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.9
+# Version:	v1.0.10
 # Date:		02.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.9 - 02.07.2024"
+        self.val_version = "1.0.10 - 02.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1471,40 +1471,41 @@ class PySILLS(tk.Frame):
         helper_srm_library.sort()
 
         for var_srm in helper_srm_library:
-            var_srm_new = var_srm.replace("_", " ")
-            var_srm_new = var_srm_new.replace(".csv", "")
-            if "GeoReM" in var_srm_new:
-                var_srm_new = var_srm_new.replace("GeoReM", "(GeoReM)")
-            if "Spandler" in var_srm_new:
-                var_srm_new = var_srm_new.replace("Spandler", "(Spandler)")
-            if "BAM 376" in var_srm_new:
-                var_srm_new = var_srm_new.replace("BAM 376", "BAM-376")
-            if "BCR 2G" in var_srm_new:
-                var_srm_new = var_srm_new.replace("BCR 2G", "BCR-2G")
-            if "BL Q" in var_srm_new:
-                var_srm_new = var_srm_new.replace("BL Q", "BL-Q")
-            if "Br Glass" in var_srm_new:
-                var_srm_new = var_srm_new.replace("Br Glass", "Br-Glass")
-            if " 1G" in var_srm_new:
-                var_srm_new = var_srm_new.replace(" 1G", "-1G")
-            if " 2G" in var_srm_new:
-                var_srm_new = var_srm_new.replace(" 2G", "-2G")
-            if " 2B2" in var_srm_new:
-                var_srm_new = var_srm_new.replace(" 2B2", "-2B2")
-            if "HAL O" in var_srm_new:
-                var_srm_new = var_srm_new.replace("HAL O", "HAL-O")
-            if "K Br" in var_srm_new:
-                var_srm_new = var_srm_new.replace("K Br", "K-Br")
-            if "MACS 3" in var_srm_new:
-                var_srm_new = var_srm_new.replace("MACS 3", "MACS-3")
-            if "BCR2G" in var_srm_new:
-                var_srm_new = var_srm_new.replace("BCR2G", "BCR-2G")
-            if "GSD1G" in var_srm_new:
-                var_srm_new = var_srm_new.replace("GSD1G", "GSD-1G")
-            if "GSE1G" in var_srm_new:
-                var_srm_new = var_srm_new.replace("GSE1G", "GSE-1G")
+            if ".csv" in var_srm:
+                var_srm_new = var_srm.replace("_", " ")
+                var_srm_new = var_srm_new.replace(".csv", "")
+                if "GeoReM" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("GeoReM", "(GeoReM)")
+                if "Spandler" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("Spandler", "(Spandler)")
+                if "BAM 376" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("BAM 376", "BAM-376")
+                if "BCR 2G" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("BCR 2G", "BCR-2G")
+                if "BL Q" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("BL Q", "BL-Q")
+                if "Br Glass" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("Br Glass", "Br-Glass")
+                if " 1G" in var_srm_new:
+                    var_srm_new = var_srm_new.replace(" 1G", "-1G")
+                if " 2G" in var_srm_new:
+                    var_srm_new = var_srm_new.replace(" 2G", "-2G")
+                if " 2B2" in var_srm_new:
+                    var_srm_new = var_srm_new.replace(" 2B2", "-2B2")
+                if "HAL O" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("HAL O", "HAL-O")
+                if "K Br" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("K Br", "K-Br")
+                if "MACS 3" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("MACS 3", "MACS-3")
+                if "BCR2G" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("BCR2G", "BCR-2G")
+                if "GSD1G" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("GSD1G", "GSD-1G")
+                if "GSE1G" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("GSE1G", "GSE-1G")
 
-            self.container_lists["SRM Library"].append(var_srm_new)
+                self.container_lists["SRM Library"].append(var_srm_new)
 
         helper_icpms_library = []
 
@@ -1528,9 +1529,10 @@ class PySILLS(tk.Frame):
         helper_icpms_library.sort()
 
         for var_icpms in helper_icpms_library:
-            var_icpms_new = var_icpms.replace("_", " ")
-            var_icpms_new = var_icpms_new.replace(".csv", "")
-            self.container_lists["ICPMS Library"].append(var_icpms_new)
+            if ".csv" in var_icpms:
+                var_icpms_new = var_icpms.replace("_", " ")
+                var_icpms_new = var_icpms_new.replace(".csv", "")
+                self.container_lists["ICPMS Library"].append(var_icpms_new)
 
         self.srm_window_checker = tk.IntVar()
         self.srm_window_checker.set(0)
