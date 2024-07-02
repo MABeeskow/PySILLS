@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		27.06.2024
+# Date:		02.07.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -416,6 +416,11 @@ class EssentialsSRM:
         elif "/bin" in path_main:
             path_main = os.path.abspath(__file__)
             path_main = path_main.replace("/modules/essential_functions.py", "")
+        elif "Scripts" in path_main:
+            path_main = os.path.abspath(__file__)
+            path_main = path_main.replace("modules", "")
+            path_main = path_main.replace("essential_functions.py", "")
+            path_main = path_main[:-1]
 
         try:
             path_app = os.getcwd()
