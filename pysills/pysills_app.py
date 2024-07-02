@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.7
+# Version:	v1.0.8
 # Date:		02.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.7 - 02.07.2024"
+        self.val_version = "1.0.8 - 02.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1455,7 +1455,8 @@ class PySILLS(tk.Frame):
             folder_path = os.path.join(self.path_pysills_main, "lib", "srm")
             helper_srm_library = os.listdir(folder_path)
         except:
-            helper_srm_library = os.listdir(self.path_pysills_main + str("/pysills/lib/srm/"))
+            folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
+            helper_srm_library = os.listdir(folder_path)
 
         helper_srm_library.remove("__init__.py")
 
@@ -1508,7 +1509,8 @@ class PySILLS(tk.Frame):
             folder_path = os.path.join(self.path_pysills_main, "lib", "icpms")
             helper_icpms_library = os.listdir(folder_path)
         except:
-            helper_icpms_library = os.listdir(self.path_pysills_main + str("/pysills/lib/icpms/"))
+            folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "icpms")
+            helper_icpms_library = os.listdir(folder_path)
 
         if "__init__.py" in helper_icpms_library:
             helper_icpms_library.remove("__init__.py")
