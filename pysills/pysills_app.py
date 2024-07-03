@@ -18349,12 +18349,113 @@ class PySILLS(tk.Frame):
 
     #
     ## FILE-SPECIFIC ANALYSIS ##########################################################################################
-    #
+
+    def test_show_diagram(self, filetype, filename_long):
+        index_file = self.container_lists[filetype]["Long"].index(filename_long)
+        filename_short = self.container_lists[filetype]["Short"][index_file]
+
+        ## Window Settings
+        window_width = 1100
+        window_height = 800
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_test_diagram = tk.Toplevel(self.parent)
+        subwindow_test_diagram.title("MINERAL ANALYSIS - File Analysis of " + str(filename_short))
+        subwindow_test_diagram.geometry(var_geometry)
+        subwindow_test_diagram.resizable(False, False)
+        subwindow_test_diagram["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_test_diagram, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_test_diagram, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_test_diagram.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_test_diagram.grid_columnconfigure(i, minsize=column_min)
+
+        start_row = 0
+        start_column = 0
+        diagram_width = 50
+
+        fig_test_diagram = Figure(facecolor=self.bg_colors["Very Light"])
+
+        canvas_test_diagram = FigureCanvasTkAgg(fig_test_diagram, master=subwindow_test_diagram)
+        canvas_test_diagram.get_tk_widget().grid(
+            row=start_row, column=start_column, rowspan=n_rows - 2, columnspan=diagram_width, sticky="nesw")
+
+        toolbarFrame_test_diagram = tk.Frame(master=subwindow_test_diagram)
+        toolbarFrame_test_diagram.grid(
+            row=n_rows - 2, column=start_column, rowspan=1, columnspan=diagram_width, sticky="ew")
+
+        toolbar_test_diagram = NavigationToolbar2Tk(canvas_test_diagram, toolbarFrame_test_diagram)
+        toolbar_test_diagram.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        toolbar_test_diagram._message_label.config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        toolbar_test_diagram.winfo_children()[-2].config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+
+        ax = fig_test_diagram.add_subplot(label=np.random.uniform())
+
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
+        else:
+            if filename_short not in self.container_measurements["Dataframe"] and "_copy" in filename_short:
+                str_filename_short_original = filename_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][str_filename_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][filename_short]
+        self.dataset_time = list(DE().get_times(dataframe=df_data))
+        x_max = max(self.dataset_time)
+        df_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+        icp_measurements = np.array([df_data[isotope] for isotope in df_isotopes])
+        df_isotopes = df_data.loc[:, df_data.columns != "Time [Sec]"]
+        y_max = np.amax(icp_measurements)
+
+        x_index = []
+        x_ticks = []
+        list_times = df_data["Time [Sec]"].tolist()
+
+        for index, value in enumerate(np.linspace(0, len(list_times) - 1, 10, endpoint=True)):
+            x_index.append(int(value))
+        for index in x_index:
+            x_ticks.append(round(list_times[index], 2))
+
+        y_ticks = [ isotope for isotope in df_isotopes.keys() ]
+        normalized_df = (df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min())
+        im = ax.imshow(normalized_df.transpose(), aspect="auto", interpolation="None", cmap="viridis")
+
+        ax.set_xticks(np.linspace(0, len(list_times), 10, endpoint=True), labels=x_ticks)
+        ax.set_yticks(np.arange(len(y_ticks)), labels=y_ticks)
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Measured isotopes")
+
+        cbar = fig_test_diagram.colorbar(im)
+        cbar.ax.get_yaxis().labelpad = 12
+        cbar.set_label("Normalized range of signal intensity", rotation=90)
+
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         str_filename_long = var_filename_long
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
-
+        self.test_show_diagram(filetype=var_filetype, filename_long=var_filename_long)
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
         elif str_filetype == "SMPL":
