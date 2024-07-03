@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.10
-# Date:		02.07.2024
+# Version:	v1.0.11
+# Date:		03.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@ import pandas as pd
 import scipy.io
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+from matplotlib import colors
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import tkinter as tk
@@ -73,7 +74,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.10 - 02.07.2024"
+        self.val_version = "1.0.11 - 03.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -16783,7 +16784,7 @@ class PySILLS(tk.Frame):
             self.create_container_results(var_filetype="STD", var_file_short=file_std_short, mode=self.pysills_mode)
 
             categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
-                          "TOOLBARFRAME_RATIO"]
+                          "TOOLBARFRAME_RATIO", "FIGURE SPECTRUM", "CANVAS SPECTRUM", "TOOLBARFRAME SPECTRUM"]
             self.container_diagrams["STD"][file_std_short] = {}
             self.container_listboxes["STD"][file_std_short] = {}
             self.diagrams_setup["STD"][file_std_short] = {}
@@ -17093,7 +17094,7 @@ class PySILLS(tk.Frame):
             self.container_helper[filetype][filename_short] = {}
 
         for category in ["FIGURE", "CANVAS", "TOOLBARFRAME", "RESULTS FRAME", "FIGURE RATIO", "CANVAS RATIO",
-                         "TOOLBARFRAME RATIO"]:
+                         "TOOLBARFRAME RATIO", "FIGURE SPECTRUM", "CANVAS SPECTRUM", "TOOLBARFRAME SPECTRUM"]:
             if category not in self.container_helper[filetype][filename_short]:
                 self.container_helper[filetype][filename_short][category] = None
         for category in ["AXES", "AXES RATIO"]:
@@ -17251,7 +17252,7 @@ class PySILLS(tk.Frame):
             self.create_container_results(var_filetype="SMPL", var_file_short=file_smpl_short, mode=self.pysills_mode)
 
             categories = ["FIG", "AX", "CANVAS", "TOOLBARFRAME", "FIG_RATIO", "AX_RATIO", "CANVAS_RATIO",
-                          "TOOLBARFRAME_RATIO"]
+                          "TOOLBARFRAME_RATIO", "FIGURE SPECTRUM", "CANVAS SPECTRUM", "TOOLBARFRAME SPECTRUM"]
             self.container_diagrams["SMPL"][file_smpl_short] = {}
             self.container_listboxes["SMPL"][file_smpl_short] = {}
             self.diagrams_setup["SMPL"][file_smpl_short] = {}
@@ -17441,6 +17442,10 @@ class PySILLS(tk.Frame):
                 self.container_helper[mode][var_file_short]["CANVAS RATIO"] = None
                 self.container_helper[mode][var_file_short]["TOOLBARFRAME RATIO"] = None
                 self.container_helper[mode][var_file_short]["AXES RATIO"] = {}
+                self.container_helper[mode][var_file_short]["FIGURE SPECTRUM"] = None
+                self.container_helper[mode][var_file_short]["CANVAS SPECTRUM"] = None
+                self.container_helper[mode][var_file_short]["TOOLBARFRAME SPECTRUM"] = None
+                self.container_helper[mode][var_file_short]["AXES SPECTRUM"] = {}
 
     def build_matrix_setup_variables(self):
         for var_file in self.container_lists["SMPL"]["Long"]:
@@ -18350,62 +18355,83 @@ class PySILLS(tk.Frame):
     #
     ## FILE-SPECIFIC ANALYSIS ##########################################################################################
 
-    def test_show_diagram(self, filetype, filename_long):
+    def show_boxplot_data_view(self, filetype, filename_long):
         index_file = self.container_lists[filetype]["Long"].index(filename_long)
         filename_short = self.container_lists[filetype]["Short"][index_file]
 
-        ## Window Settings
-        window_width = 1100
-        window_height = 800
-        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        ## Cleaning
+        try:
+            canvas = self.container_helper[filetype][filename_short]["CANVAS"]
+            toolbarframe = self.container_helper[filetype][filename_short]["TOOLBARFRAME"]
 
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
+            if canvas == None:
+                canvas.get_tk_widget().grid_remove()
+                toolbarframe.grid_remove()
+        except AttributeError:
+            pass
 
-        subwindow_test_diagram = tk.Toplevel(self.parent)
-        subwindow_test_diagram.title("MINERAL ANALYSIS - File Analysis of " + str(filename_short))
-        subwindow_test_diagram.geometry(var_geometry)
-        subwindow_test_diagram.resizable(False, False)
-        subwindow_test_diagram["bg"] = self.bg_colors["Super Dark"]
+        try:
+            canvas_ratio = self.container_helper[filetype][filename_short]["CANVAS RATIO"]
+            toolbarframe_ratio = self.container_helper[filetype][filename_short]["TOOLBARFRAME RATIO"]
 
-        for x in range(n_columns):
-            tk.Grid.columnconfigure(subwindow_test_diagram, x, weight=1)
-        for y in range(n_rows):
-            tk.Grid.rowconfigure(subwindow_test_diagram, y, weight=1)
+            if canvas_ratio == None:
+                canvas_ratio.get_tk_widget().grid_remove()
+                toolbarframe_ratio.grid_remove()
+        except AttributeError:
+            pass
 
-        # Rows
-        for i in range(0, n_rows):
-            subwindow_test_diagram.grid_rowconfigure(i, minsize=row_min)
-        # Columns
-        for i in range(0, n_columns):
-            subwindow_test_diagram.grid_columnconfigure(i, minsize=column_min)
+        try:
+            canvas_spectrum = self.container_helper[filetype][filename_short]["CANVAS SPECTRUM"]
+            toolbarframe_spectrum = self.container_helper[filetype][filename_short]["TOOLBARFRAME SPECTRUM"]
 
-        start_row = 0
-        start_column = 0
-        diagram_width = 50
+            if canvas_spectrum == None:
+                canvas_spectrum.get_tk_widget().grid_remove()
+                toolbarframe_spectrum.grid_remove()
+        except AttributeError:
+            pass
 
-        fig_test_diagram = Figure(facecolor=self.bg_colors["Very Light"])
+        try:
+            resultsframe = self.container_helper[filetype][filename_short]["RESULTS FRAME"]
 
-        canvas_test_diagram = FigureCanvasTkAgg(fig_test_diagram, master=subwindow_test_diagram)
-        canvas_test_diagram.get_tk_widget().grid(
-            row=start_row, column=start_column, rowspan=n_rows - 2, columnspan=diagram_width, sticky="nesw")
+            if resultsframe != None:
+                resultsframe.destroy()
+        except AttributeError:
+            pass
 
-        toolbarFrame_test_diagram = tk.Frame(master=subwindow_test_diagram)
-        toolbarFrame_test_diagram.grid(
-            row=n_rows - 2, column=start_column, rowspan=1, columnspan=diagram_width, sticky="ew")
+        self.fig_specific_spectrum = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        ax_spectrum = self.fig_specific_spectrum.add_subplot(label=np.random.uniform())
+        self.container_helper[filetype][filename_short]["AXES"] = {"Time-Ratio": ax_spectrum}
 
-        toolbar_test_diagram = NavigationToolbar2Tk(canvas_test_diagram, toolbarFrame_test_diagram)
-        toolbar_test_diagram.config(
-            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
-            highlightcolor=self.bg_colors["Dark Font"], bd=0)
-        toolbar_test_diagram._message_label.config(
+        if self.pysills_mode == "MA":
+            parent = self.subwindow_ma_checkfile
+            val_row_start = 0
+            val_column_start = 14
+            val_row_span = 20
+            val_column_span = 39
+        elif self.pysills_mode in ["FI", "MI"]:
+            parent = self.subwindow_fi_checkfile
+            val_row_start = 0
+            val_column_start = 14
+            val_row_span = 20
+            val_column_span = 54
+
+        self.canvas_specific_spectrum = FigureCanvasTkAgg(
+            self.fig_specific_spectrum, master=parent)
+        self.canvas_specific_spectrum.get_tk_widget().grid(
+            row=val_row_start, column=val_column_start, rowspan=val_row_span, columnspan=val_column_span, sticky="nesw")
+        self.toolbarFrame_specific_spectrum = tk.Frame(master=parent)
+        self.toolbarFrame_specific_spectrum.grid(
+            row=val_row_span, column=val_column_start, rowspan=2, columnspan=val_column_span, sticky="w")
+        self.toolbar_specific_spectrum = NavigationToolbar2Tk(
+            self.canvas_specific_spectrum, self.toolbarFrame_specific_spectrum)
+        self.toolbar_specific_spectrum.config(background=self.bg_colors["Very Light"])
+        self.toolbar_specific_spectrum._message_label.config(
             bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
-        toolbar_test_diagram.winfo_children()[-2].config(
-            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+        self.toolbar_specific_spectrum.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
 
-        ax = fig_test_diagram.add_subplot(label=np.random.uniform())
+        self.container_helper[filetype][filename_short]["FIGURE SPECTRUM"] = self.fig_specific_spectrum
+        self.container_helper[filetype][filename_short]["CANVAS SPECTRUM"] = self.canvas_specific_spectrum
+        self.container_helper[filetype][filename_short]["TOOLBARFRAME SPECTRUM"] = self.toolbarFrame_specific_spectrum
 
         if self.file_loaded == False:
             if self.container_icpms["name"] != None:
@@ -18422,40 +18448,203 @@ class PySILLS(tk.Frame):
                 df_data = self.container_measurements["Dataframe"][str_filename_short_original]
             else:
                 df_data = self.container_measurements["Dataframe"][filename_short]
+
         self.dataset_time = list(DE().get_times(dataframe=df_data))
-        x_max = max(self.dataset_time)
-        df_isotopes = self.container_lists["Measured Isotopes"][filename_short]
-        icp_measurements = np.array([df_data[isotope] for isotope in df_isotopes])
-        df_isotopes = df_data.loc[:, df_data.columns != "Time [Sec]"]
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+
+        if "Time [Sec]" in df_data:
+            df_isotopes = df_data.loc[:, df_data.columns != "Time [Sec]"]
+        elif "Time" in df_data:
+            df_isotopes = df_data.loc[:, df_data.columns != "Time"]
+        else:
+            df_isotopes = df_data.loc[:, df_data.columns != list(df_data.keys())[0]]
+
+        icp_measurements = np.array([[df_data[isotope] for isotope in file_isotopes]])
+        y_min = np.amin(icp_measurements)
         y_max = np.amax(icp_measurements)
 
         x_index = []
         x_ticks = []
-        list_times = df_data["Time [Sec]"].tolist()
+
+        if "Time [Sec]" in df_data:
+            list_times = df_data["Time [Sec]"].tolist()
+        else:
+            list_times = self.dataset_time.copy()
 
         for index, value in enumerate(np.linspace(0, len(list_times) - 1, 10, endpoint=True)):
             x_index.append(int(value))
         for index in x_index:
             x_ticks.append(round(list_times[index], 2))
 
-        y_ticks = [ isotope for isotope in df_isotopes.keys() ]
-        normalized_df = (df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min())
-        im = ax.imshow(normalized_df.transpose(), aspect="auto", interpolation="None", cmap="viridis")
+        y_ticks = [isotope for isotope in df_isotopes.keys()]
 
-        ax.set_xticks(np.linspace(0, len(list_times), 10, endpoint=True), labels=x_ticks)
-        ax.set_yticks(np.arange(len(y_ticks)), labels=y_ticks)
-        ax.set_xlabel("Time (s)")
-        ax.set_ylabel("Measured isotopes")
+        ax_spectrum.boxplot(
+            df_isotopes, showmeans=True, meanline=True, patch_artist=True,
+            boxprops=dict(facecolor=self.bg_colors["Very Light"]),
+            medianprops=dict(color=self.accent_color, linewidth=1.5),
+            meanprops=dict(color=self.accent_color, linewidth=1.5, linestyle="dotted"),
+            flierprops=dict(marker="o", markerfacecolor=self.accent_color, alpha=0.5))
 
-        cbar = fig_test_diagram.colorbar(im)
+        ax_spectrum.set_yscale("log")
+
+        ax_spectrum.set_xticks(np.arange(1, len(y_ticks) + 1), labels=y_ticks, rotation=30, ha="right")
+        ax_spectrum.set_xlim(0.25, len(y_ticks) + 0.75)
+        ax_spectrum.set_ylim(1, 1.67*y_max)
+        ax_spectrum.set_xlabel("Measured isotopes")
+        ax_spectrum.set_ylabel("Signal intensity (cps)")
+
+        ax_spectrum.grid(which="major", axis="both", linestyle="-")
+        ax_spectrum.grid(which="minor", axis="both", linestyle=":", alpha=0.5)
+        ax_spectrum.set_axisbelow(True)
+
+        self.canvas_specific_spectrum.draw()
+
+    def show_spectral_data_view(self, filetype, filename_long):
+        index_file = self.container_lists[filetype]["Long"].index(filename_long)
+        filename_short = self.container_lists[filetype]["Short"][index_file]
+
+        ## Cleaning
+        try:
+            canvas = self.container_helper[filetype][filename_short]["CANVAS"]
+            toolbarframe = self.container_helper[filetype][filename_short]["TOOLBARFRAME"]
+
+            if canvas == None:
+                canvas.get_tk_widget().grid_remove()
+                toolbarframe.grid_remove()
+        except AttributeError:
+            pass
+
+        try:
+            canvas_ratio = self.container_helper[filetype][filename_short]["CANVAS RATIO"]
+            toolbarframe_ratio = self.container_helper[filetype][filename_short]["TOOLBARFRAME RATIO"]
+
+            if canvas_ratio == None:
+                canvas_ratio.get_tk_widget().grid_remove()
+                toolbarframe_ratio.grid_remove()
+        except AttributeError:
+            pass
+
+        try:
+            canvas_spectrum = self.container_helper[filetype][filename_short]["CANVAS SPECTRUM"]
+            toolbarframe_spectrum = self.container_helper[filetype][filename_short]["TOOLBARFRAME SPECTRUM"]
+
+            if canvas_spectrum == None:
+                canvas_spectrum.get_tk_widget().grid_remove()
+                toolbarframe_spectrum.grid_remove()
+        except AttributeError:
+            pass
+
+        try:
+            resultsframe = self.container_helper[filetype][filename_short]["RESULTS FRAME"]
+
+            if resultsframe != None:
+                resultsframe.destroy()
+        except AttributeError:
+            pass
+
+        self.fig_specific_spectrum = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        ax_spectrum = self.fig_specific_spectrum.add_subplot(label=np.random.uniform())
+        self.container_helper[filetype][filename_short]["AXES"] = {"Time-Ratio": ax_spectrum}
+
+        if self.pysills_mode == "MA":
+            parent = self.subwindow_ma_checkfile
+            val_row_start = 0
+            val_column_start = 14
+            val_row_span = 20
+            val_column_span = 39
+        elif self.pysills_mode in ["FI", "MI"]:
+            parent = self.subwindow_fi_checkfile
+            val_row_start = 0
+            val_column_start = 14
+            val_row_span = 20
+            val_column_span = 54
+
+        self.canvas_specific_spectrum = FigureCanvasTkAgg(
+            self.fig_specific_spectrum, master=parent)
+        self.canvas_specific_spectrum.get_tk_widget().grid(
+            row=val_row_start, column=val_column_start, rowspan=val_row_span, columnspan=val_column_span, sticky="nesw")
+        self.toolbarFrame_specific_spectrum = tk.Frame(master=parent)
+        self.toolbarFrame_specific_spectrum.grid(
+            row=val_row_span, column=val_column_start, rowspan=2, columnspan=val_column_span, sticky="w")
+        self.toolbar_specific_spectrum = NavigationToolbar2Tk(
+            self.canvas_specific_spectrum, self.toolbarFrame_specific_spectrum)
+        self.toolbar_specific_spectrum.config(background=self.bg_colors["Very Light"])
+        self.toolbar_specific_spectrum._message_label.config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        self.toolbar_specific_spectrum.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
+
+        self.container_helper[filetype][filename_short]["FIGURE SPECTRUM"] = self.fig_specific_spectrum
+        self.container_helper[filetype][filename_short]["CANVAS SPECTRUM"] = self.canvas_specific_spectrum
+        self.container_helper[filetype][filename_short]["TOOLBARFRAME SPECTRUM"] = self.toolbarFrame_specific_spectrum
+
+        if self.file_loaded == False:
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=filename_long).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
+        else:
+            if filename_short not in self.container_measurements["Dataframe"] and "_copy" in filename_short:
+                str_filename_short_original = filename_short.replace("_copy", "")
+                df_data = self.container_measurements["Dataframe"][str_filename_short_original]
+            else:
+                df_data = self.container_measurements["Dataframe"][filename_short]
+
+        self.dataset_time = list(DE().get_times(dataframe=df_data))
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+
+        if "Time [Sec]" in df_data:
+            df_isotopes = df_data.loc[:, df_data.columns != "Time [Sec]"]
+        elif "Time" in df_data:
+            df_isotopes = df_data.loc[:, df_data.columns != "Time"]
+        else:
+            df_isotopes = df_data.loc[:, df_data.columns != list(df_data.keys())[0]]
+
+        icp_measurements = np.array([[df_data[isotope] for isotope in file_isotopes]])
+        y_min = np.amin(icp_measurements)
+        y_max = np.amax(icp_measurements)
+
+        x_index = []
+        x_ticks = []
+
+        if "Time [Sec]" in df_data:
+            list_times = df_data["Time [Sec]"].tolist()
+        else:
+            list_times = self.dataset_time.copy()
+
+        for index, value in enumerate(np.linspace(0, len(list_times) - 1, 10, endpoint=True)):
+            x_index.append(int(value))
+        for index in x_index:
+            x_ticks.append(round(list_times[index], 2))
+
+        y_ticks = [isotope for isotope in df_isotopes.keys()]
+
+        if self.pysills_mode == "MA":
+            normalized_df = (df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min())
+        else:
+            normalized_df = (df_isotopes - y_min)/(y_max - y_min)
+
+        im = ax_spectrum.imshow(normalized_df.transpose(), aspect="auto", interpolation="None", cmap="viridis")
+
+        ax_spectrum.set_xticks(np.linspace(0, len(list_times), 10, endpoint=True), labels=x_ticks)
+        ax_spectrum.set_yticks(np.arange(len(y_ticks)), labels=y_ticks)
+        ax_spectrum.set_xlabel("Time (s)")
+        ax_spectrum.set_ylabel("Measured isotopes")
+
+        cbar = self.fig_specific_spectrum.colorbar(im)
         cbar.ax.get_yaxis().labelpad = 12
         cbar.set_label("Normalized range of signal intensity", rotation=90)
+
+        self.canvas_specific_spectrum.draw()
 
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         str_filename_long = var_filename_long
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
-        self.test_show_diagram(filetype=var_filetype, filename_long=var_filename_long)
+
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
         elif str_filetype == "SMPL":
@@ -18608,28 +18797,43 @@ class PySILLS(tk.Frame):
             var_rb=self.container_var["ma_setting"]["Data Type Plot"][str_filetype][var_filename_short], value_rb=1,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
             relief=tk.FLAT)
-        #
+
         rb_03a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=0,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Signal Plot", sticky="nesw",
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time series view", sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_filetype=str_filetype, var_lb_state=False:
             self.ma_show_time_signal_diagram(var_file, var_filetype, var_lb_state))
         rb_03b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Ratio Plot", sticky="nesw",
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time ratios view", sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_time_ratio_diagram(var_file, var_type))
         rb_03c = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Spectral data view", sticky="nesw",
+            relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.show_spectral_data_view(filetype, filename_long))
+        rb_03d = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=7, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=4,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Box plot data view", sticky="nesw",
+            relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.show_boxplot_data_view(filetype, filename_long))
+        rb_03e = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=2,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick Results", sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_quick_results(var_file, var_type))
+
         rb_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
             n_columns=13, fg=self.bg_colors["Light Font"], bg=self.colors_intervals["BG"]).create_radiobutton(
@@ -18896,6 +19100,16 @@ class PySILLS(tk.Frame):
             pass
 
         try:
+            canvas_spectrum = self.container_helper[str_filetype][str_filename_short]["CANVAS SPECTRUM"]
+            toolbarframe_spectrum = self.container_helper[str_filetype][str_filename_short]["TOOLBARFRAME SPECTRUM"]
+
+            if canvas_spectrum == None:
+                canvas_spectrum.get_tk_widget().grid_remove()
+                toolbarframe_spectrum.grid_remove()
+        except AttributeError:
+            pass
+
+        try:
             resultsframe = self.container_helper[str_filetype][str_filename_short]["RESULTS FRAME"]
 
             if resultsframe != None:
@@ -19154,6 +19368,16 @@ class PySILLS(tk.Frame):
             if canvas == None:
                 canvas.get_tk_widget().grid_remove()
                 toolbarframe.grid_remove()
+        except AttributeError:
+            pass
+
+        try:
+            canvas_spectrum = self.container_helper[var_type][var_file_short]["CANVAS SPECTRUM"]
+            toolbarframe_spectrum = self.container_helper[var_type][var_file_short]["TOOLBARFRAME SPECTRUM"]
+
+            if canvas_spectrum == None:
+                canvas_spectrum.get_tk_widget().grid_remove()
+                toolbarframe_spectrum.grid_remove()
         except AttributeError:
             pass
 
@@ -30430,20 +30654,34 @@ class PySILLS(tk.Frame):
             relief=tk.FLAT)
 
         rb_03a = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=0,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Signal Plot", sticky="nesw",
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time series view", sticky="nesw",
             relief=tk.FLAT, command=lambda var_type=str_filetype, var_file=str_filename_long, var_lb_state=False:
             self.fi_show_time_signal_diagram(var_type, var_file, var_lb_state))
         rb_03b = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time-Ratio Plot", sticky="nesw",
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Time ratios view", sticky="nesw",
             relief=tk.FLAT, command=lambda var_type=str_filetype, var_file=str_filename_long:
             self.fi_show_time_ratio_diagram(var_type, var_file))
         rb_03c = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=3,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Spectral data view", sticky="nesw",
+            relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.show_spectral_data_view(filetype, filename_long))
+        rb_03d = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 20, column_id=7, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=4,
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Box plot data view", sticky="nesw",
+            relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.show_boxplot_data_view(filetype, filename_long))
+        rb_03e = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=2,
