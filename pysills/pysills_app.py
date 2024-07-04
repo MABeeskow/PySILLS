@@ -18649,6 +18649,153 @@ class PySILLS(tk.Frame):
 
         self.canvas_specific_spectrum.draw()
 
+    def stepwise_analysis_file_specific(self, filetype, filename_long):
+        index_file = self.container_lists[filetype]["Long"].index(filename_long)
+        filename_short = self.container_lists[filetype]["Short"][index_file]
+
+        var_rb_02 = tk.IntVar()
+        var_rb_02.set(0)
+        var_rb_03 = tk.IntVar()
+        var_rb_03.set(0)
+        var_rb_04 = tk.IntVar()
+        var_rb_04.set(0)
+
+        if self.pysills_mode == "MA":
+            str_title = "MINERAL ANALYSIS - " + str(filename_short)
+            str_matrix = "Sample"
+        elif self.pysills_mode == "FI":
+            str_title = "FLUID INCLUSION ANALYSIS - " + str(filename_short)
+            str_matrix = "Matrix"
+        elif self.pysills_mode == "MELT":
+            str_title = "MELT INCLUSION ANALYSIS - " + str(filename_short)
+            str_matrix = "Matrix"
+
+        ## Window Settings
+        window_width = 1100
+        window_height = 800
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        row_min = 25
+        n_rows = int(window_height/row_min)
+        column_min = 20
+        n_columns = int(window_width/column_min)
+
+        subwindow_stepwise_analysis = tk.Toplevel(self.parent)
+        subwindow_stepwise_analysis.title(str_title)
+        subwindow_stepwise_analysis.geometry(var_geometry)
+        subwindow_stepwise_analysis.resizable(False, False)
+        subwindow_stepwise_analysis["bg"] = self.bg_colors["Super Dark"]
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_stepwise_analysis, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_stepwise_analysis, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_stepwise_analysis.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_stepwise_analysis.grid_columnconfigure(i, minsize=column_min)
+
+        start_row = 0
+        start_column = 0
+        n_navigation = 12
+
+        ## FRAMES
+        frm_00 = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row, column_id=start_column, n_rows=n_rows,
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_frame(
+            relief=tk.FLAT)
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"],
+            bg=self.accent_color).create_simple_label(
+            text="Stepwise analysis", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02 = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 1, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Focus selection", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_03 = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 5, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Parameter selection", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_04 = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 9, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Very Dark"]).create_simple_label(
+            text="Visualization ", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        ## RADIOBUTTONS
+        rb_02a = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 2, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_02, value_rb=0, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Background", sticky="nesw", relief=tk.FLAT)
+        rb_02b = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 3, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_02, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text=str_matrix, sticky="nesw", relief=tk.FLAT)
+        rb_02c = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 4, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_02, value_rb=2, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Inclusion", sticky="nesw", relief=tk.FLAT)
+        rb_03a = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 6, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_03, value_rb=0, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Intensity (corrected)", sticky="nesw", relief=tk.FLAT)
+        rb_03b = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 7, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_03, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Analytical sensitivity", sticky="nesw", relief=tk.FLAT)
+        rb_03c = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 8, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_03, value_rb=2, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Concentration", sticky="nesw", relief=tk.FLAT)
+        rb_04a = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 10, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_04, value_rb=0, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Table", sticky="nesw", relief=tk.FLAT)
+        rb_04b = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 11, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_04, value_rb=1, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Histogram", sticky="nesw", relief=tk.FLAT)
+        rb_04c = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 12, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_04, value_rb=2, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Time series", sticky="nesw", relief=tk.FLAT)
+        rb_04d = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 13, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_04, value_rb=3, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Box plot", sticky="nesw", relief=tk.FLAT)
+        rb_04e = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 14, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_04, value_rb=4, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Scatter plot", sticky="nesw", relief=tk.FLAT)
+        rb_04f = SE(
+            parent=subwindow_stepwise_analysis, row_id=start_row + 15, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+            var_rb=var_rb_04, value_rb=5, color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
+            text="Correlation heatmap", sticky="nesw", relief=tk.FLAT)
+
+        ## INITIALIZATION
+        if self.pysills_mode == "MA":
+            rb_02c.configure(state="disabled")
+
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         str_filename_long = var_filename_long
         str_filetype = var_filetype
@@ -18758,6 +18905,12 @@ class PySILLS(tk.Frame):
             text="Hide All", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
                 var_type, var_file_short))
+        btn_03 = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Stepwise analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
+            command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
@@ -18836,10 +18989,10 @@ class PySILLS(tk.Frame):
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_boxplot_data_view(filetype, filename_long))
         rb_03e = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=2,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick Results", sticky="nesw",
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick analysis", sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_quick_results(var_file, var_type))
 
@@ -30666,13 +30819,17 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Show All", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_show_all_lines(
-                var_type, var_file_short, ))
+                var_type, var_file_short))
         btn_02b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_hide_all_lines(
                 var_type, var_file_short))
+        btn_03 = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Stepwise analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"])
         btn_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
@@ -30750,10 +30907,10 @@ class PySILLS(tk.Frame):
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_boxplot_data_view(filetype, filename_long))
         rb_03e = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=2,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick Analysis", sticky="nesw",
+            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="Quick analysis", sticky="nesw",
             relief=tk.FLAT, command=lambda var_type=str_filetype, var_file=str_filename_long:
             self.fi_show_quick_results(var_type, var_file))
 
