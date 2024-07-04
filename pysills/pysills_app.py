@@ -463,6 +463,13 @@ class PySILLS(tk.Frame):
         self.container_var["x-y diagram"]["z"].set("Select z")
         self.container_var["a(TiO2,Rt)"] = tk.StringVar()
         self.container_var["a(TiO2,Rt)"].set("1.0")
+        self.container_var["stepwise focus"] = tk.IntVar()
+        self.container_var["stepwise focus"].set(1)
+        self.container_var["stepwise parameter"] = tk.IntVar()
+        self.container_var["stepwise parameter"].set(0)
+        self.container_var["stepwise visualization"] = tk.IntVar()
+        self.container_var["stepwise visualization"].set(0)
+
         self.copied_file = False
         self.helper_salt_composition = {}
         self.charge_balance_check = {}
@@ -18669,12 +18676,9 @@ class PySILLS(tk.Frame):
         index_file = self.container_lists[filetype]["Long"].index(filename_long)
         filename_short = self.container_lists[filetype]["Short"][index_file]
 
-        var_rb_02 = tk.IntVar()
-        var_rb_02.set(0)
-        var_rb_03 = tk.IntVar()
-        var_rb_03.set(0)
-        var_rb_04 = tk.IntVar()
-        var_rb_04.set(0)
+        var_rb_02 = self.container_var["stepwise focus"]
+        var_rb_03 = self.container_var["stepwise parameter"]
+        var_rb_04 = self.container_var["stepwise visualization"]
 
         if self.pysills_mode == "MA":
             str_title = "MINERAL ANALYSIS - " + str(filename_short)
@@ -18961,6 +18965,8 @@ class PySILLS(tk.Frame):
 
         if str_filetype == "STD":
             btn_09.configure(state="disabled")
+
+        btn_03.configure(state="disabled")
 
         ## RADIOBUTTONS
         rb_02a = SE(
@@ -30845,7 +30851,9 @@ class PySILLS(tk.Frame):
         btn_03 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Stepwise analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"])
+            text="Stepwise analysis", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
+            command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
@@ -30879,6 +30887,8 @@ class PySILLS(tk.Frame):
 
         if str_filetype == "STD":
             btn_09.configure(state="disabled")
+
+        btn_03.configure(state="disabled")
 
         ## RADIOBUTTONS
         rb_02a = SE(
