@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.11
-# Date:		03.07.2024
+# Date:		04.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.11 - 03.07.2024"
+        self.val_version = "1.0.11 - 04.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -18480,14 +18480,14 @@ class PySILLS(tk.Frame):
 
         ax_spectrum.boxplot(
             df_isotopes, showmeans=True, meanline=True, patch_artist=True,
-            boxprops=dict(facecolor=self.bg_colors["Very Light"]),
-            medianprops=dict(color=self.accent_color, linewidth=1.5),
-            meanprops=dict(color=self.accent_color, linewidth=1.5, linestyle="dotted"),
+            boxprops=dict(facecolor=self.bg_colors["Light"]),
+            medianprops=dict(color=self.bg_colors["Very Dark"], linewidth=1.5),
+            meanprops=dict(color=self.bg_colors["Very Dark"], linewidth=1.5, linestyle="dotted"),
             flierprops=dict(marker="o", markerfacecolor=self.accent_color, alpha=0.5))
 
         ax_spectrum.set_yscale("log")
 
-        ax_spectrum.set_xticks(np.arange(1, len(y_ticks) + 1), labels=y_ticks, rotation=30, ha="right")
+        ax_spectrum.set_xticks(np.arange(1, len(y_ticks) + 1), labels=y_ticks, rotation=45, ha="right")
         ax_spectrum.set_xlim(0.25, len(y_ticks) + 0.75)
         ax_spectrum.set_ylim(1, 1.67*y_max)
         ax_spectrum.set_xlabel("Measured isotopes")
@@ -18623,9 +18623,18 @@ class PySILLS(tk.Frame):
         y_ticks = [isotope for isotope in df_isotopes.keys()]
 
         if self.pysills_mode == "MA":
-            normalized_df = (df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min())
+            normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
         else:
-            normalized_df = (df_isotopes - y_min)/(y_max - y_min)
+            normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
+            # val_mean = df_isotopes.mean()
+            # val_max = df_isotopes.max()
+            # ratio_mean_max = val_mean/val_max
+            # #print(ratio_mean_max, type(ratio_mean_max), "c", list(ratio_mean_max)[0])
+            # if list(ratio_mean_max)[0] < 0.15:
+            #     df_isotopes_log10 = np.log10(df_isotopes)
+            #     normalized_df = 2*(df_isotopes_log10 - df_isotopes_log10.mean())/(df_isotopes_log10.std()) - 1
+            # else:
+            #     normalized_df = 2*(df_isotopes - df_isotopes.mean())/(df_isotopes.std()) - 1
 
         im = ax_spectrum.imshow(normalized_df.transpose(), aspect="auto", interpolation="None", cmap="viridis")
 
@@ -23678,7 +23687,7 @@ class PySILLS(tk.Frame):
 
         ## Window Settings
         window_width = 900
-        window_height = 600
+        window_height = 800
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         row_min = 25
@@ -23905,6 +23914,23 @@ class PySILLS(tk.Frame):
             entries_i = [isotope, 0.000]
             self.tv_results_detailed.insert("", tk.END, values=entries_i)
 
+        self.fig_detailed_analysis = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        self.ax_detailed_analysis = self.fig_detailed_analysis.add_subplot(label=np.random.uniform())
+
+        self.canvas_detailed_analysis = FigureCanvasTkAgg(
+            self.fig_detailed_analysis, master=self.subwindow_detailed_data_analysis)
+        self.canvas_detailed_analysis.get_tk_widget().grid(
+            row=0, column=23, rowspan=n_rows - 2, columnspan=n_columns - 23, sticky="nesw")
+        self.toolbarFrame_detailed_analysis = tk.Frame(master=self.subwindow_detailed_data_analysis)
+        self.toolbarFrame_detailed_analysis.grid(
+            row=n_rows - 2, column=23, rowspan=2, columnspan=n_columns - 23, sticky="w")
+        self.toolbar_detailed_analysis = NavigationToolbar2Tk(
+            self.canvas_detailed_analysis, self.toolbarFrame_detailed_analysis)
+        self.toolbar_detailed_analysis.config(background=self.bg_colors["Very Light"])
+        self.toolbar_detailed_analysis._message_label.config(
+            bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        self.toolbar_detailed_analysis.winfo_children()[-2].config(background=self.bg_colors["Very Light"])
+
     def detailed_analysis_select_file(self, var_opt):
         self.container_var["Detailed Data Analysis"]["Datatype"].set(0)
         self.container_var["Detailed Data Analysis"]["Focus"].set(1)
@@ -23988,6 +24014,7 @@ class PySILLS(tk.Frame):
         if type(var_opt) != str:
             var_opt = var_opt.get()
 
+        helper_values = {}
         # Algorithm
         if var_opt in ["Measured Intensity", "Intensity", "Intensity Ratio", "Intensity Noise", "\u03C3 Intensity"]:
             self.container_var["Detailed Data Analysis"]["Sensitivity Results"].set("Select Parameter")
@@ -24000,18 +24027,24 @@ class PySILLS(tk.Frame):
                         isotope]
                     entries_i = [isotope, round(value_i, 4)]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Intensity":
                 for isotope in file_isotopes:
                     value_i = self.container_intensity_corrected[str_filetype][str_datatype][str_filename_short][
                         str_focus][isotope]
                     entries_i = [isotope, round(value_i, 4)]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Intensity Ratio":
                 for isotope in file_isotopes:
                     value_i = self.container_intensity_ratio[str_filetype][str_datatype][str_filename_short][
                         str_focus][isotope]
                     entries_i = [isotope, f"{value_i:.{4}E}"]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Intensity Noise":
                 pass
             elif var_opt == "\u03C3 Intensity":
@@ -24035,17 +24068,23 @@ class PySILLS(tk.Frame):
                         entries_i = [isotope, "undefined"]
 
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Normalized Sensitivity":
                 for isotope in file_isotopes:
                     value_i = self.container_normalized_sensitivity[str_filetype][str_datatype][str_filename_short][
                         str_focus][isotope]
                     entries_i = [isotope, round(value_i, 4)]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Relative Sensitivity Factor":
                 for isotope in file_isotopes:
                     value_i = self.container_rsf[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
                     entries_i = [isotope, f"{value_i:.{4}E}"]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
         elif var_opt in ["Concentration", "Concentration Ratio", "Concentration Noise", "Limit of Detection",
                          "\u03C3 Concentration"]:
             self.container_var["Detailed Data Analysis"]["Intensity Results"].set("Select Parameter")
@@ -24062,12 +24101,16 @@ class PySILLS(tk.Frame):
                     else:
                         entries_i = [isotope, str(round(value_i, 4)) + " < LoD"]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Concentration Ratio":
                 for isotope in file_isotopes:
                     value_i = self.container_concentration_ratio[str_filetype][str_datatype][str_filename_short][
                         str_focus][isotope]
                     entries_i = [isotope, f"{value_i:.{4}E}"]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "Concentration Noise":
                 pass
             elif var_opt == "Limit of Detection":
@@ -24075,8 +24118,33 @@ class PySILLS(tk.Frame):
                     value_i = self.container_lod[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
                     entries_i = [isotope, round(value_i, 4)]
                     self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                    if isotope not in helper_values:
+                        helper_values[isotope] = value_i
             elif var_opt == "\u03C3 Concentration":
                 pass
+
+        self.create_detailed_analysis_diagram(values=helper_values)
+
+    def create_detailed_analysis_diagram(self, values):
+        self.ax_detailed_analysis.cla()
+
+        for index, (isotope, value) in enumerate(values.items()):
+            value_i = value
+            # self.ax_detailed_analysis.scatter(
+            #     value_i, index, marker="o", color=self.accent_color, edgecolor="black", s=75, alpha=0.75)
+            self.ax_detailed_analysis.scatter(
+                value_i, index, marker="o", color=self.isotope_colors[isotope], edgecolor="black", s=75, alpha=0.75)
+
+        self.ax_detailed_analysis.invert_yaxis()
+        self.ax_detailed_analysis.set_xscale("log")
+        self.ax_detailed_analysis.grid(which="major", linestyle="-", linewidth=1)
+        self.ax_detailed_analysis.minorticks_on()
+        self.ax_detailed_analysis.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+        self.ax_detailed_analysis.set_axisbelow(True)
+
+        self.ax_detailed_analysis.set_yticks(np.arange(len(list(values.keys()))), labels=list(values.keys()))
+
+        self.canvas_detailed_analysis.draw()
 
     def about_pysills(self):
         ## Window Settings
