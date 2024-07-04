@@ -18476,7 +18476,7 @@ class PySILLS(tk.Frame):
         for index in x_index:
             x_ticks.append(round(list_times[index], 2))
 
-        y_ticks = [isotope for isotope in df_isotopes.keys()]
+        y_ticks = file_isotopes
 
         ax_spectrum.boxplot(
             df_isotopes, showmeans=True, meanline=True, patch_artist=True,
@@ -18620,7 +18620,7 @@ class PySILLS(tk.Frame):
         for index in x_index:
             x_ticks.append(round(list_times[index], 2))
 
-        y_ticks = [isotope for isotope in df_isotopes.keys()]
+        y_ticks = file_isotopes
 
         if self.pysills_mode == "MA":
             normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
