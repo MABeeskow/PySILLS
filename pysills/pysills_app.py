@@ -461,6 +461,8 @@ class PySILLS(tk.Frame):
         self.container_var["x-y diagram"]["x"].set("Select x")
         self.container_var["x-y diagram"]["y"].set("Select y")
         self.container_var["x-y diagram"]["z"].set("Select z")
+        self.container_var["a(TiO2,Rt)"] = tk.StringVar()
+        self.container_var["a(TiO2,Rt)"].set("1.0")
         self.copied_file = False
         self.helper_salt_composition = {}
         self.charge_balance_check = {}
@@ -12859,6 +12861,11 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Additional Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_02a = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 7, column_id=var_column_start,
+            n_rows=1, n_columns=9, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="Activity of TiO2 in Rt", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         lbl_03 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start,
@@ -12885,6 +12892,13 @@ class PySILLS(tk.Frame):
             var_rb=self.container_var["Geothermometry"]["Titanium in Quartz"], value_rb=0,
             color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="TitaniQ - after Wark (2006)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
+        ## ENTRIES
+        entr_02a = SE(
+            parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 7, column_id=var_column_start + 9,
+            n_rows=1, n_columns=3, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["a(TiO2,Rt)"], text_default=self.container_var["a(TiO2,Rt)"].get())
 
         ## TREEVIEW
         self.tv_results_ti_in_qz = SE(
@@ -12920,6 +12934,8 @@ class PySILLS(tk.Frame):
             for item in self.tv_results_ti_in_qz.get_children():
                 self.tv_results_ti_in_qz.delete(item)
 
+        a_TiO2_Rt = float(self.container_var["a(TiO2,Rt)"].get())
+
         for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             entry_results = [str_filename_short, "-", "-"]
             self.tv_results_ti_in_qz.insert("", tk.END, values=entry_results)
@@ -12927,7 +12943,7 @@ class PySILLS(tk.Frame):
                 for isotope_ti in self.list_ti_isotopes:
                     val_concentration_ti = round(self.container_concentration["SMPL"][datatype][str_filename_short][
                                                      "MAT"][isotope_ti], 4)
-                    val_temperature_i_celsius = -3765/(np.log(val_concentration_ti) - 5.69) - 273.15
+                    val_temperature_i_celsius = -3765/(np.log(val_concentration_ti/a_TiO2_Rt) - 5.69) - 273.15
                     val_temperature_i_kelvin = val_temperature_i_celsius + 273.15
                     entry_results = [isotope_ti, datatype, round(val_concentration_ti, 4),
                                      round(val_temperature_i_celsius, 2), round(val_temperature_i_kelvin, 2)]
