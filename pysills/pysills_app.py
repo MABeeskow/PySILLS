@@ -346,7 +346,7 @@ class PySILLS(tk.Frame):
         if var_os == "linux":
             self.defaultFont = font.nametofont("TkDefaultFont")
             default_font = font.nametofont("TkDefaultFont")
-            default_font.configure(family="Ubuntu", size=10, weight=font.BOLD)
+            default_font.configure(family="Ubuntu", size=10, weight=font.NORMAL)
             self.parent.option_add("*Font", default_font)
             mpl.use("TkAgg")
         elif var_os == "darwin":
@@ -18439,7 +18439,7 @@ class PySILLS(tk.Frame):
             val_row_start = 0
             val_column_start = 14
             val_row_span = 20
-            val_column_span = 39
+            val_column_span = 46
         elif self.pysills_mode in ["FI", "MI"]:
             parent = self.subwindow_fi_checkfile
             val_row_start = 0
@@ -18583,7 +18583,7 @@ class PySILLS(tk.Frame):
             val_row_start = 0
             val_column_start = 14
             val_row_span = 20
-            val_column_span = 39
+            val_column_span = 46
         elif self.pysills_mode in ["FI", "MI"]:
             parent = self.subwindow_fi_checkfile
             val_row_start = 0
@@ -18849,7 +18849,7 @@ class PySILLS(tk.Frame):
         self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short].set(0)
 
         ## Window Settings
-        window_width = 1100
+        window_width = 1200
         window_height = 800
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -18875,45 +18875,47 @@ class PySILLS(tk.Frame):
         # Columns
         for i in range(0, n_columns):
             self.subwindow_ma_checkfile.grid_columnconfigure(i, minsize=column_min)
-        #
+
         start_row = 0
         start_column = 0
+        n_navigation = 14
+        half_navigation = int(n_navigation/2)
 
         ## FRAMES
         frm_00 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 10,
-            n_columns=n_columns - 14, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(
+            parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column + n_navigation,
+            n_rows=n_rows - 10, n_columns=n_columns - n_navigation, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_frame(
             relief=tk.SOLID)
 
         ## LABELS
         lbl_01 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column, n_rows=1, n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column, n_rows=1,
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 15, column_id=start_column, n_rows=1,
-            n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 18, column_id=start_column, n_rows=1,
-            n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Anaylsis Mode", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column, n_rows=1,
-            n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=n_navigation, fg=self.bg_colors["Light Font"],
+            bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Interval Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column, n_rows=1,
-            n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            n_columns=half_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="Start", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column, n_rows=1,
-            n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
+            n_columns=half_navigation, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
             text="End", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 40, n_rows=1,
@@ -18923,13 +18925,13 @@ class PySILLS(tk.Frame):
 
         ## BUTTONS
         btn_02a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Show All", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_show_all_lines(
                 var_type, var_file_short, ))
         btn_02b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.bg_colors["Dark"], fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
@@ -18978,19 +18980,6 @@ class PySILLS(tk.Frame):
         btn_03.configure(state="disabled")
 
         ## RADIOBUTTONS
-        rb_02a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=0, n_rows=1, n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Data Type Plot"][str_filetype][var_filename_short], value_rb=0,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="RAW", sticky="nesw",
-            relief=tk.FLAT)
-        rb_02b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=0, n_rows=1, n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var["ma_setting"]["Data Type Plot"][str_filetype][var_filename_short], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
-            relief=tk.FLAT)
-
         rb_03a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
@@ -19312,9 +19301,9 @@ class PySILLS(tk.Frame):
 
         self.fig_specific = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
         self.canvas_specific = FigureCanvasTkAgg(self.fig_specific, master=self.subwindow_ma_checkfile)
-        self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
+        self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=46, sticky="nesw")
         self.toolbarFrame_specific = tk.Frame(master=self.subwindow_ma_checkfile)
-        self.toolbarFrame_specific.grid(row=20, column=14, rowspan=2, columnspan=39, sticky="ew")
+        self.toolbarFrame_specific.grid(row=20, column=14, rowspan=2, columnspan=46, sticky="ew")
         self.toolbar_specific = NavigationToolbar2Tk(self.canvas_specific, self.toolbarFrame_specific)
         self.toolbar_specific.config(
             bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
@@ -19598,9 +19587,9 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Ratio": ax_ratio}
 
         self.canvas_specific_ratio = FigureCanvasTkAgg(self.fig_specific_ratio, master=self.subwindow_ma_checkfile)
-        self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=39, sticky="nesw")
+        self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=46, sticky="nesw")
         self.toolbarFrame_specific_ratio = tk.Frame(master=self.subwindow_ma_checkfile)
-        self.toolbarFrame_specific_ratio.grid(row=20, column=14, rowspan=2, columnspan=39, sticky="w")
+        self.toolbarFrame_specific_ratio.grid(row=20, column=14, rowspan=2, columnspan=46, sticky="w")
         self.toolbar_specific_ratio = NavigationToolbar2Tk(self.canvas_specific_ratio, self.toolbarFrame_specific_ratio)
         self.toolbar_specific_ratio.config(background=self.bg_colors["Very Light"])
         self.toolbar_specific_ratio._message_label.config(
@@ -19734,25 +19723,24 @@ class PySILLS(tk.Frame):
         print("Number of calculation runs:", self.counter_calculation_runs)
 
     def ma_show_quick_results(self, var_file, var_type):
-        #
         parts = var_file.split("/")
         var_file_short = parts[-1]
-        #
+
         ## Cleaning
         try:
             canvas = self.container_helper[var_type][var_file_short]["CANVAS"]
             toolbarframe = self.container_helper[var_type][var_file_short]["TOOLBARFRAME"]
-            #
+
             if canvas == None:
                 canvas.get_tk_widget().grid_remove()
                 toolbarframe.grid_remove()
         except AttributeError:
             pass
-        #
+
         try:
             canvas_ratio = self.container_helper[var_type][var_file_short]["CANVAS RATIO"]
             toolbarframe_ratio = self.container_helper[var_type][var_file_short]["TOOLBARFRAME RATIO"]
-            #
+
             if canvas_ratio == None:
                 canvas_ratio.get_tk_widget().grid_remove()
                 toolbarframe_ratio.grid_remove()
@@ -19764,7 +19752,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
         frm_quick = SE(
-            parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=39,
+            parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=46,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame(relief=tk.FLAT)
 
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
@@ -19810,7 +19798,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=38,
+                parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=45,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -19820,8 +19808,8 @@ class PySILLS(tk.Frame):
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
-            scb_v.grid(row=0, column=52, rowspan=18, columnspan=1, sticky="ns")
-            scb_h.grid(row=18, column=14, rowspan=1, columnspan=38, sticky="ew")
+            scb_v.grid(row=0, column=59, rowspan=18, columnspan=1, sticky="ns")
+            scb_h.grid(row=18, column=14, rowspan=1, columnspan=45, sticky="ew")
 
             if var_is != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0 and n_intervals_incl > 0:
                 ## INITIALIZATION
@@ -19998,38 +19986,34 @@ class PySILLS(tk.Frame):
                 self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
 
     def ma_show_all_lines(self, var_type, var_file_short):
-        if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
-            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            for isotope in file_isotopes:
-                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
-                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "RAW"][0].set_visible(True)
-                    self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(1)
-        elif self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 1:
-            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            for isotope in file_isotopes:
-                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        for isotope in file_isotopes:
+            if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+                self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                    "RAW"][0].set_visible(True)
+                self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(1)
+                try:
                     self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                         "SMOOTHED"][0].set_visible(True)
                     self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
+                except:
+                    print(var_file_short, isotope, "- There are no smoothed line curves.")
 
         self.canvas_specific.draw()
 
     def ma_hide_all_lines(self, var_type, var_file_short):
-        if self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 0:
-            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            for isotope in file_isotopes:
-                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
-                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "RAW"][0].set_visible(False)
-                    self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(0)
-        elif self.container_var["ma_setting"]["Data Type Plot"][var_type][var_file_short].get() == 1:
-            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            for isotope in file_isotopes:
-                if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        for isotope in file_isotopes:
+            if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
+                self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                    "RAW"][0].set_visible(False)
+                self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(0)
+                try:
                     self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                         "SMOOTHED"][0].set_visible(False)
                     self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
+                except:
+                    print(var_file_short, isotope, "- There are no smoothed line curves.")
 
         self.canvas_specific.draw()
 
@@ -30846,13 +30830,13 @@ class PySILLS(tk.Frame):
 
         ## BUTTONS
         btn_02a = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Show All", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_show_all_lines(
                 var_type, var_file_short))
         btn_02b = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Hide All", bg_active=self.accent_color, fg_active=self.bg_colors["Light Font"],
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_hide_all_lines(
@@ -30900,18 +30884,18 @@ class PySILLS(tk.Frame):
         btn_03.configure(state="disabled")
 
         ## RADIOBUTTONS
-        rb_02a = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=0, n_rows=1, n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Data Type Plot"][str_filetype][str_filename_short], value_rb=0,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="RAW", sticky="nesw",
-            relief=tk.FLAT)
-        rb_02b = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=0, n_rows=1, n_columns=7,
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Data Type Plot"][str_filetype][str_filename_short], value_rb=1,
-            color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
-            relief=tk.FLAT)
+        # rb_02a = SE(
+        #     parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=0, n_rows=1, n_columns=7,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+        #     var_rb=self.container_var[key_setting]["Data Type Plot"][str_filetype][str_filename_short], value_rb=0,
+        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="RAW", sticky="nesw",
+        #     relief=tk.FLAT)
+        # rb_02b = SE(
+        #     parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=0, n_rows=1, n_columns=7,
+        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
+        #     var_rb=self.container_var[key_setting]["Data Type Plot"][str_filetype][str_filename_short], value_rb=1,
+        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SMOOTHED", sticky="nesw",
+        #     relief=tk.FLAT)
 
         rb_03a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
@@ -31874,81 +31858,62 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
-        if self.container_var[key_setting]["Data Type Plot"][var_type][var_file_short].get() == 0:
-            for isotope in self.container_lists["ISOTOPES"]:
-                if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
-                    self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "RAW"][0].set_visible(True)
-                    #
-                elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
-                    try:
-                        self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
-                            "RAW"][0].set_visible(True)
-                    except AttributeError:
-                        pass
-                #
-                self.container_var[key_setting]["Display RAW"][var_type][var_file_short][isotope].set(1)
-        elif self.container_var[key_setting]["Data Type Plot"][var_type][var_file_short].get() == 1:
-            for isotope in self.container_lists["ISOTOPES"]:
-                if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
+        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        for isotope in file_isotopes:
+            if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
+                self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                    "RAW"][0].set_visible(True)
+                try:
                     self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
                         "SMOOTHED"][0].set_visible(True)
-                elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
-                    try:
-                        self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
-                            "SMOOTHED"][0].set_visible(True)
-                    except AttributeError:
-                        pass
-                #
-                self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
-        #
+                    self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
+                except:
+                    print(var_file_short, isotope, "- There are no smoothed line curves.")
+            elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
+                try:
+                    self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
+                        "RAW"][0].set_visible(True)
+                except AttributeError:
+                    pass
+
+            self.container_var[key_setting]["Display RAW"][var_type][var_file_short][isotope].set(1)
+
         if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
             self.canvas_specific.draw()
         elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
             self.canvas_specific_ratio.draw()
 
-    #
     def fi_hide_all_lines(self, var_type, var_file_short):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
-        if self.container_var[key_setting]["Data Type Plot"][var_type][var_file_short].get() == 0:
-            for isotope in self.container_lists["ISOTOPES"]:
-                if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
-                    self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "RAW"][0].set_visible(False)
-                    #
-                elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
-                    try:
-                        self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
-                            "RAW"][0].set_visible(False)
-                    except AttributeError:
-                        pass
-                #
-                self.container_var[key_setting]["Display RAW"][var_type][var_file_short][isotope].set(0)
-        elif self.container_var[key_setting]["Data Type Plot"][var_type][var_file_short].get() == 1:
-            for isotope in self.container_lists["ISOTOPES"]:
-                if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
+        file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        for isotope in file_isotopes:
+            if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
+                self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                    "RAW"][0].set_visible(False)
+                try:
                     self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
                         "SMOOTHED"][0].set_visible(False)
-                    #
-                elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
-                    try:
-                        self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
-                            "SMOOTHED"][0].set_visible(False)
-                    except AttributeError:
-                        pass
-                #
-                self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
-        #
+                    self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
+                except:
+                    print(var_file_short, isotope, "- There are no smoothed line curves.")
+            elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
+                try:
+                    self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
+                        "RAW"][0].set_visible(False)
+                except AttributeError:
+                    pass
+
+            self.container_var[key_setting]["Display RAW"][var_type][var_file_short][isotope].set(0)
+
         if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
             self.canvas_specific.draw()
         elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
             self.canvas_specific_ratio.draw()
 
-    #
     def fi_change_line_visibility(self, var_type, var_file_short, var_datatype, var_isotope):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
