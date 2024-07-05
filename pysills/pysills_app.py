@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.11
-# Date:		04.07.2024
+# Version:	v1.0.12
+# Date:		05.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.11 - 04.07.2024"
+        self.val_version = "1.0.12 - 05.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -469,6 +469,8 @@ class PySILLS(tk.Frame):
         self.container_var["stepwise parameter"].set(0)
         self.container_var["stepwise visualization"] = tk.IntVar()
         self.container_var["stepwise visualization"].set(0)
+        self.container_var["check INCL"] = tk.BooleanVar()
+        self.container_var["check INCL"].set(False)
 
         self.copied_file = False
         self.helper_salt_composition = {}
@@ -771,6 +773,7 @@ class PySILLS(tk.Frame):
             "Check-Up": {"English": "Check-Up", "German": "Kontrolle"},
             "Internal Standard": {"English": "Internal Standard", "German": "Interner Standard"},
             "Exclude inclusion": {"English": "Exclude inclusion", "German": "Inklusion ausschließen"},
+            "Check inclusion": {"English": "Check only inclusion", "German": "Nur Inklusion überprüfen"},
             "Quantification Method": {"English": "Quantification Method", "German": "Quantifizierungsmethode"},
             "Inclusion Settings": {"English": "Inclusion Settings", "German": "Einstellungen - Flüssigkeitseinschluss"},
             "Significance level": {"English": "Significance level", "German": "Signifikanzniveau"},
@@ -15986,6 +15989,7 @@ class PySILLS(tk.Frame):
         str_lbl_01 = self.language_dict["Spike Elimination"][self.var_language]
         str_lbl_02 = self.language_dict["Calculation Method"][self.var_language]
         str_lbl_03 = self.language_dict["Exclude inclusion"][self.var_language]
+        str_lbl_04 = self.language_dict["Check inclusion"][self.var_language]
 
         # Labels
         lbl_09 = SE(
@@ -16022,11 +16026,16 @@ class PySILLS(tk.Frame):
             # Checkboxes
             cb_09b = SE(
                 parent=var_parent, row_id=var_row_start + 2, column_id=0, fg=self.bg_colors["Dark Font"], n_rows=1,
-                n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
+                n_columns=int(var_header_n/2), bg=self.bg_colors["Light"]).create_simple_checkbox(
                 var_cb=self.container_var[var_setting_key]["Check Inclusion Exclusion"], text=str_lbl_03,
                 set_sticky="nesw", own_color=True, command=lambda setting_key=var_setting_key:
                 self.change_inclusion_consideration(setting_key))
             self.change_inclusion_consideration(setting_key=var_setting_key)
+            cb_09c = SE(
+                parent=var_parent, row_id=var_row_start + 2, column_id=int(var_header_n/2),
+                fg=self.bg_colors["Dark Font"], n_rows=1, n_columns=int(var_header_n/2),
+                bg=self.bg_colors["Light"]).create_simple_checkbox(
+                var_cb=self.container_var["check INCL"], text=str_lbl_04, set_sticky="nesw", own_color=True)
 
     def change_inclusion_consideration(self, setting_key):
         if self.container_var[setting_key]["Check Inclusion Exclusion"].get() == True:
@@ -35682,6 +35691,8 @@ class PySILLS(tk.Frame):
             self.frm_spk_smpl.config(highlightbackground="black", bd=1)
 
     def custom_spike_check(self, mode="SMPL"):
+        str_filetype = mode
+
         ## Window Settings
         window_width = 900
         window_height = 600
@@ -35865,8 +35876,17 @@ class PySILLS(tk.Frame):
             var_file = var_file
 
         helper_list = []
+        helper_list_incl = []
+        limits_incl = {}
         df_isotopes = self.container_lists["Measured Isotopes"][var_file]
         var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
+
+        if var_file in self.container_lists["SMPL"]["Short"]:
+            str_filetype = "SMPL"
+            for id, dataset in self.container_helper["SMPL"][var_file]["INCL"]["Content"].items():
+                limits_incl[id] = dataset["Indices"]
+        else:
+            str_filetype = "STD"
 
         for var_isotope in df_isotopes:
             updated_indices = []
@@ -35881,8 +35901,23 @@ class PySILLS(tk.Frame):
                             helper_list.append(var_isotope)
 
             self.container_spikes[var_file][var_isotope]["Indices"] = updated_indices
+            if "Indices INCL" not in self.container_spikes[var_file][var_isotope]["Indices"] and len(limits_incl) > 0:
+                self.container_spikes[var_file][var_isotope]["Indices INCL"] = []
 
-        return helper_list
+            for id, limits in limits_incl.items():
+                for index in updated_indices:
+                    if index >= limits[0] and limits[1] >= index:
+                        self.container_spikes[var_file][var_isotope]["Indices INCL"].append(index)
+                        if var_isotope not in helper_list_incl:
+                            helper_list_incl.append(var_isotope)
+
+        if str_filetype == "SMPL":
+            if self.container_var["check INCL"].get() == False:
+                return helper_list
+            elif self.container_var["check INCL"].get() == True:
+                return helper_list_incl
+        else:
+            return helper_list
 
     def helper_spike_values(self, var_file_short, var_isotope, var_value_raw, var_value_smoothed, mode=None):
         if var_file_short not in self.container_spike_values:
@@ -35966,7 +36001,20 @@ class PySILLS(tk.Frame):
     def show_spike_data(self, mode=None):
         var_isotope = self.var_opt_spk_iso.get()
         var_file = self.current_file_spk
-        self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
+
+        if var_file in self.container_lists["SMPL"]["Short"]:
+            str_filetype = "SMPL"
+        else:
+            str_filetype = "STD"
+
+        if str_filetype == "SMPL":
+            if self.container_var["check INCL"].get() == False:
+                self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
+            elif self.container_var["check INCL"].get() == True:
+                self.list_indices = self.container_spikes[var_file][var_isotope]["Indices INCL"]
+        else:
+            self.list_indices = self.container_spikes[var_file][var_isotope]["Indices"]
+
         if len(self.list_indices) < 16:
             n_ticks = 1
         else:
@@ -35976,6 +36024,7 @@ class PySILLS(tk.Frame):
                 n_ticks = 5
             else:
                 n_ticks = 8
+
         self.scl_01.configure(to=len(self.list_indices), tickinterval=n_ticks)
         self.current_nspikes = len(self.list_indices)
         self.lbl_04a2.configure(text=self.current_nspikes)
