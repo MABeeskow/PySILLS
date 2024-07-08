@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		12.06.2024
+# Date:		08.07.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ class DataExtraction:
 
         dataframe = pd.read_csv(
             self.filename_long, sep=self.delimiter, header=self.skip_header, skipfooter=self.skip_footer,
-            engine="python")
+            engine="python", encoding="latin1")
         dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
         if len(dataframe_blank) > 0:
             first_blank_index = dataframe_blank.index[0]
