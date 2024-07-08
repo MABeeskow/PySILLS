@@ -6,7 +6,7 @@
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
 # Version:	pre-release
-# Date:		02.07.2024
+# Date:		09.07.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -442,7 +442,7 @@ class EssentialsSRM:
              ["NIST 616 (GeoReM)"], ["NIST 617"], ["NIST 617 (GeoReM)"], ["USGS BCR-2G (GeoReM)"],
              ["USGS GSD-1G (GeoReM)"], ["USGS GSE-1G (GeoReM)"], ["B6"], ["Durango Apatite"], ["Scapolite 17"],
              ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
-             ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0])
+             ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"], ["OU-6 (GeoReM)"]])[:, 0])
 
         if "pysills" not in path_main:
             path_main = os.path.join(path_main, "pysills")
@@ -554,6 +554,9 @@ class EssentialsSRM:
             data_srm = data.general().importSRM(filename=path_file)
         elif srm_name == "STDGL-2B2":
             path_file = os.path.join(path_main, "lib", "srm", "STDGL_2B2.csv")
+            data_srm = data.general().importSRM(filename=path_file)
+        elif srm_name == "OU-6 (GeoReM)":
+            path_file = os.path.join(path_main, "lib", "srm", "OU_6_GeoReM.csv")
             data_srm = data.general().importSRM(filename=path_file)
         else:
             srm_name_new = srm_name.replace(" ", "_")

@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.13
-# Date:		08.07.2024
+# Date:		09.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.13 - 08.07.2024"
+        self.val_version = "1.0.13 - 09.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1449,7 +1449,7 @@ class PySILLS(tk.Frame):
              ["NIST 616 (GeoReM)"], ["NIST 617"], ["NIST 617 (GeoReM)"], ["USGS BCR-2G (GeoReM)"],
              ["USGS GSD-1G (GeoReM)"], ["USGS GSE-1G (GeoReM)"], ["B6"], ["Durango Apatite"], ["Scapolite 17"],
              ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
-             ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"]])[:, 0]
+             ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"], ["OU-6 (GeoReM)"]])[:, 0]
 
         self.path_pysills = os.path.dirname(os.path.realpath(sys.argv[0]))
         self.path_pysills_main = self.path_pysills
@@ -1467,12 +1467,15 @@ class PySILLS(tk.Frame):
 
         helper_srm_library = []
 
-        try:
-            folder_path = os.path.join(self.path_pysills_main, "lib", "srm")
-            helper_srm_library = os.listdir(folder_path)
-        except:
-            folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
-            helper_srm_library = os.listdir(folder_path)
+        # try:
+        #     folder_path = os.path.join(self.path_pysills_main, "lib", "srm")
+        #     helper_srm_library = os.listdir(folder_path)
+        # except:
+        #     folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
+        #     helper_srm_library = os.listdir(folder_path)
+
+        folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
+        helper_srm_library = os.listdir(folder_path)
 
         helper_srm_library.remove("__init__.py")
 
@@ -1517,6 +1520,8 @@ class PySILLS(tk.Frame):
                     var_srm_new = var_srm_new.replace("GSD1G", "GSD-1G")
                 if "GSE1G" in var_srm_new:
                     var_srm_new = var_srm_new.replace("GSE1G", "GSE-1G")
+                if "OU 6" in var_srm_new:
+                    var_srm_new = var_srm_new.replace("OU 6", "OU-6")
 
                 self.container_lists["SRM Library"].append(var_srm_new)
 
@@ -3349,7 +3354,6 @@ class PySILLS(tk.Frame):
         self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short]["Canvas"].draw()
 
     def place_srm_values(self, var_srm, header_col, default=False):
-        #
         lbl_srm_03 = SE(parent=self.parent, row_id=0, column_id=header_col, n_rows=1, n_columns=42, fg=self.green_light,
                         bg=self.green_dark).create_simple_label(text=str(var_srm) + " - Element Concentrations (ppm)",
                                                                 relief=tk.GROOVE, fontsize="sans 10 bold")
