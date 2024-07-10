@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="latin-1") as f:
     description = f.read()
 
 setup(
     name="PySILLS",
-    version="1.0.13",
+    version="1.0.15",
     packages=find_packages(),
     url="https://github.com/MABeeskow/PySILLS",
     license="LGPL-3.0",

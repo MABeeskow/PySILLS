@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 27.09.2023
+# 10.07.2024
 # ----------------------
 #
 ## MODULES
@@ -158,7 +158,14 @@ class general:
         self.delimiter = delimiter
         self.skipHeader = skipHeader
         self.skipFooter = skipFooter
-        #
+
+        if "(" in self.filename:
+            self.filename = self.filename.replace("(", "")
+        if ")" in self.filename:
+            self.filename = self.filename.replace(")", "")
+        if "-" in self.filename:
+            self.filename = self.filename.replace("-", "_")
+
         inputData = np.genfromtxt(self.filename, delimiter=self.delimiter, dtype=str, skip_header=self.skipHeader,
                                   skip_footer=self.skipFooter)
         nLines = len(inputData)

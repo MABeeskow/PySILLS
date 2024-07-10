@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.13
-# Date:		09.07.2024
+# Version:	v1.0.14
+# Date:		10.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
         # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
         # self.val_version = val_version.decode("utf-8")
         #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.13 - 09.07.2024"
+        self.val_version = "1.0.15 - 10.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1473,6 +1473,9 @@ class PySILLS(tk.Frame):
         # except:
         #     folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
         #     helper_srm_library = os.listdir(folder_path)
+
+        if "pysills" in self.path_pysills_main:
+            self.path_pysills_main = self.path_pysills_main.replace("pysills", "")
 
         folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
         helper_srm_library = os.listdir(folder_path)
