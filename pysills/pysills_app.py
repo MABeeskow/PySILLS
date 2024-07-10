@@ -71,10 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        # val_version = subprocess.check_output(['git', 'log', '-n', '1', '--pretty=tformat:%h']).strip()
-        # self.val_version = val_version.decode("utf-8")
-        #self.val_version = ''.join(rd.choice(string.ascii_letters) for i in range(8))
-        self.val_version = "1.0.15 - 10.07.2024"
+        self.val_version = "1.0.16 - 10.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"

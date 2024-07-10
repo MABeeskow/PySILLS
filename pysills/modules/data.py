@@ -165,6 +165,8 @@ class general:
             self.filename = self.filename.replace(")", "")
         if "-" in self.filename:
             self.filename = self.filename.replace("-", "_")
+        if "site_packages" in self.filename:
+            self.filename = self.filename.replace("site_packages", "site-packages")
 
         inputData = np.genfromtxt(self.filename, delimiter=self.delimiter, dtype=str, skip_header=self.skipHeader,
                                   skip_footer=self.skipFooter)
