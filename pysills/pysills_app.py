@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.16
-# Date:		11.07.2024
+# Version:	v1.0.17
+# Date:		16.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.val_version = "1.0.16 - 10.07.2024"
+        self.val_version = "1.0.17 - 16.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -20945,18 +20945,31 @@ class PySILLS(tk.Frame):
                                         file_short][var_focus][var_is_file]
                                     value = value/value_is
 
+                                if var_filetype == "STD" and value != 1.0:
+                                    if var_srm_i != var_srm_file and value != 0.0:
+                                        value = 0.0
+
                                 n_digits = self.ma_determine_ndigits(var_value=value)
                                 entries_category.append(f"{value:.{n_digits}f}")
-                                helper_values[isotope].append(value)
+
+                                if var_srm_i == var_srm_file or value != 0.0:
+                                        helper_values[isotope].append(value)
                             else:
                                 value_is = self.container_analytical_sensitivity["STD"][var_datatype][file_short][
                                     "MAT"][isotope]
                                 if value_is == 1:
                                     value = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                         file_short][var_focus][isotope]
+
+                                    if var_filetype == "STD" and value != 1.0:
+                                        if var_srm_i != var_srm_file and value != 0.0:
+                                            value = 0.0
+
                                     n_digits = self.ma_determine_ndigits(var_value=value)
                                     entries_category.append(f"{value:.{n_digits}f}")
-                                    helper_values[isotope].append(value)
+
+                                    if var_srm_i == var_srm_file or value != 0.0:
+                                        helper_values[isotope].append(value)
                                 else:
                                     entries_category.append("---")
 
@@ -27992,8 +28005,14 @@ class PySILLS(tk.Frame):
                         entries_container = [var_file]
                         str_is = None
                         for isotope in file_isotopes:
+                            var_srm_i = self.container_var["SRM"][isotope].get()
                             value = self.container_analytical_sensitivity[var_filetype][var_datatype][var_file][
                                 var_focus][isotope]
+
+                            if var_filetype == "STD" and value != 1.0:
+                                if var_srm_i != var_srm_file and value != 0.0:
+                                    value = 0.0
+
                             if var_filetype == "SMPL":
                                 y_value = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file]["INCL"][
                                     isotope]
@@ -28019,6 +28038,10 @@ class PySILLS(tk.Frame):
                                             str_is = isotope_2
                                             break
 
+                                if var_filetype == "STD" and value != 1.0:
+                                    if var_srm_i != var_srm_file and value != 0.0:
+                                        value = 0.0
+
                                 value_s_i = self.container_normalized_sensitivity[var_filetype][var_datatype][var_file][
                                     var_focus][isotope]
                                 value_s_is = self.container_normalized_sensitivity[var_filetype][var_datatype][
@@ -28026,7 +28049,9 @@ class PySILLS(tk.Frame):
                                 value = value_s_i/value_s_is
                                 n_digits = self.ma_determine_ndigits(var_value=value)
                                 entries_container.append(f"{value:.{n_digits}f}")
-                            helper_values[isotope].append(value)
+
+                            if var_srm_i == var_srm_file or value != 0.0:
+                                helper_values[isotope].append(value)
 
                         self.tv_results_files.insert("", tk.END, values=entries_container)
                     else:
