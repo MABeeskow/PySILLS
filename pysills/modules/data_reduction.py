@@ -5,8 +5,8 @@
 
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
-# Version:	pre-release
-# Date:		08.07.2024
+# Version:	v1.0.18
+# Date:		17.07.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -627,8 +627,13 @@ class IntensityQuantification:
 
                         self.results_container[filename_short][focus][isotope] = result_i
             elif filename_short in dict_is["SMPL"]:
-                isotope_is = dict_is["SMPL"][filename_short]
+                #isotope_is = dict_is["SMPL"][filename_short]
                 for focus in list_focus:
+                    if focus in dict_is["SMPL"][filename_short]:
+                        isotope_is = dict_is["SMPL"][filename_short][focus]
+                    else:
+                        isotope_is = dict_is["SMPL"][filename_short]
+
                     value_is = data_container[filename_short][focus][isotope_is]
                     for isotope, value in data_container[filename_short][focus].items():
                         if value_is > 0:

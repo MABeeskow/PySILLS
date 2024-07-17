@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.17
-# Date:		16.07.2024
+# Version:	v1.0.18
+# Date:		17.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.val_version = "1.0.17 - 16.07.2024"
+        self.val_version = "1.0.18 - 17.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -21047,7 +21047,7 @@ class PySILLS(tk.Frame):
             self.tv_results_files.insert("", tk.END, values=helper_separator)
             self.ma_calculate_statistics_table(var_data=helper_values, ratio=True)
 
-    def determine_possible_is(self, filetype="SMPL"):
+    def determine_possible_is(self, filetype="SMPL", consider_matrix=False):
         """ Collect the file-specific information about the internal standard (IS).
         -------
         Parameters
@@ -21069,14 +21069,29 @@ class PySILLS(tk.Frame):
         elif filetype == "SMPL":
             for index, filename_long in enumerate(self.container_lists[filetype]["Long"]):
                 filename_short = self.container_lists[filetype]["Short"][index]
-                isotope_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
-                helper_is[filetype][filename_short] = isotope_is
+                if consider_matrix == True:
+                    isotope_incl_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+                    isotope_mat_is = self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                    helper_is[filetype][filename_short] = {"MAT": isotope_mat_is, "INCL": isotope_incl_is}
+                else:
+                    isotope_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+                    helper_is[filetype][filename_short] = isotope_is
         elif filetype == "ALL":
             for filetype_key in ["STD", "SMPL"]:
                 for index, filename_long in enumerate(self.container_lists[filetype_key]["Long"]):
                     filename_short = self.container_lists[filetype_key]["Short"][index]
-                    isotope_is = self.container_var[filetype_key][filename_long]["IS Data"]["IS"].get()
-                    helper_is[filetype_key][filename_short] = isotope_is
+                    if filetype_key == "STD":
+                        isotope_is = self.container_var[filetype_key][filename_long]["IS Data"]["IS"].get()
+                        helper_is[filetype_key][filename_short] = isotope_is
+                    else:
+                        if consider_matrix == True:
+                            isotope_incl_is = self.container_var[filetype_key][filename_long]["IS Data"]["IS"].get()
+                            isotope_mat_is = self.container_var[filetype_key][filename_long]["Matrix Setup"]["IS"][
+                                "Name"].get()
+                            helper_is[filetype_key][filename_short] = {"MAT": isotope_mat_is, "INCL": isotope_incl_is}
+                        else:
+                            isotope_is = self.container_var[filetype_key][filename_long]["IS Data"]["IS"].get()
+                            helper_is[filetype_key][filename_short] = isotope_is
 
         return helper_is
 
@@ -25711,14 +25726,20 @@ class PySILLS(tk.Frame):
                         var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
                     break
             else:
-                var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                if var_focus == "INCL":
+                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                else:
+                    var_is = self.container_var[var_filetype][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
             if var_focus in ["MAT", "INCL"]:
                 var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                     var_focus][var_is]
             else:
                 var_intensity_is = self.container_intensity[var_filetype][var_datatype][var_file_short][
                     var_focus][var_is]
+
             for isotope in file_isotopes:
                 if var_focus in ["MAT", "INCL"]:
                     var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
@@ -25734,7 +25755,6 @@ class PySILLS(tk.Frame):
 
                 self.container_intensity_ratio[var_filetype][var_datatype][var_file_short][var_focus][
                     isotope] = var_result
-
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for var_focus in ["BG", "MAT", "INCL"]:
@@ -31651,10 +31671,11 @@ class PySILLS(tk.Frame):
                 self.fi_get_intensity_ratio(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
+
                 # Sensitivity analysis
                 self.get_analytical_sensitivity(
                     var_filetype=var_type, var_datatype="RAW", var_file_short=var_file_short, var_file_long=var_file)
-                results_is = self.determine_possible_is(filetype="ALL")
+                results_is = self.determine_possible_is(filetype="ALL", consider_matrix=True)
 
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_ratio[var_type]["RAW"]).get_intensity_ratio(
