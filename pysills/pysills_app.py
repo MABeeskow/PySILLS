@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.18
+# Version:	v1.0.19
 # Date:		17.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.val_version = "1.0.18 - 17.07.2024"
+        self.val_version = "1.0.19 - 17.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1527,12 +1527,16 @@ class PySILLS(tk.Frame):
 
         helper_icpms_library = []
 
-        try:
-            folder_path = os.path.join(self.path_pysills_main, "lib", "icpms")
-            helper_icpms_library = os.listdir(folder_path)
-        except:
+        if "site-packages" in self.path_pysills_main:
             folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "icpms")
             helper_icpms_library = os.listdir(folder_path)
+        else:
+            try:
+                folder_path = os.path.join(self.path_pysills_main, "lib", "icpms")
+                helper_icpms_library = os.listdir(folder_path)
+            except:
+                folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "icpms")
+                helper_icpms_library = os.listdir(folder_path)
 
         if "__init__.py" in helper_icpms_library:
             helper_icpms_library.remove("__init__.py")
