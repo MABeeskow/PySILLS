@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 10.07.2024
+# 18.07.2024
 # ----------------------
 #
 ## MODULES
@@ -43,7 +43,7 @@ class Data:
         if timestamp != None and icpms != None:
             line_time = imported_data[timestamp]
             if icpms == "Finnigan MAT ELEMENT":
-                key_time = re.search("(\w+)\,\s+(\w+)\s+(\d+)\,\s+(\d+)\s+(\d+)\:(\d+)\:(\d+)", line_time)
+                key_time = re.search(r"(\w+)\,\s+(\w+)\s+(\d+)\,\s+(\d+)\s+(\d+)\:(\d+)\:(\d+)", line_time)
                 dict_months = {
                     "January": "01", "February": "02", "March": "03", "April": "04", "May": "05", "June": "06",
                     "July": "07", "August": "08", "September": "09", "October": "10", "November": "11",
@@ -66,7 +66,7 @@ class Data:
                     line_time_end = imported_data[-2]
 
                 key_start = re.search(
-                    "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( AM)?( PM)?( using Batch )(\w+)",
+                    r"Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( AM)?( PM)?( using Batch )(\w+)",
                     line_time_start)
                 date_start = ["01", "01", "2000"]
                 date_end = ["31", "12", "2000"]
@@ -77,7 +77,7 @@ class Data:
                     date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
                     time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
 
-                key_end = re.search("\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
+                key_end = re.search(r"\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
                 if key_end:
                     date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
                     time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]
@@ -91,12 +91,12 @@ class Data:
                 line_time_end = imported_data[-2]
 
             key_start = re.search(
-                "Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)", line_time_start)
+                r"Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)", line_time_start)
             if key_start:
                 date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
                 time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
 
-            key_end = re.search("\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
+            key_end = re.search(r"\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
             if key_end:
                 date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
                 time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]

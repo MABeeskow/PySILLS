@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.19
-# Date:		17.07.2024
+# Version:	v1.0.20
+# Date:		18.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.val_version = "1.0.19 - 17.07.2024"
+        self.val_version = "1.0.20 - 18.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -552,8 +552,9 @@ class PySILLS(tk.Frame):
             "Accuracy Concentration": tk.IntVar(), "Sensitivity Drift": tk.IntVar(), "LOD Selection": tk.IntVar(),
             "Desired Average": tk.IntVar(), "Interval Processing": tk.IntVar(), "BG Offset Start": tk.IntVar(),
             "BG Offset End": tk.IntVar(), "MAT Offset Start": tk.IntVar(), "MAT Offset End": tk.IntVar(),
-            "Calculation Accuracy": tk.IntVar()}
+            "Calculation Accuracy": tk.IntVar(), "Color scheme": tk.StringVar()}
         self.container_var["General Settings"]["Language"].set("English")
+        self.container_var["General Settings"]["Color scheme"].set("Dark scheme")
         self.container_var["General Settings"]["Default Author"].set("J. Doe")
         self.container_var["General Settings"]["Default SRM"].set("Select SRM")
         self.container_var["General Settings"]["Colormap"].set("turbo")
@@ -695,6 +696,7 @@ class PySILLS(tk.Frame):
             "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
             "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
             "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
+            "Project": {"English": "Project", "German": "Projekt"},
             "Add": {"English": "Add", "German": "Hinzufügen"},
             "Standard file": {"English": "Standard file", "German": "Standardmessung"},
             "Sample file": {"English": "Sample file", "German": "Probenmessung"},
@@ -1597,10 +1599,10 @@ class PySILLS(tk.Frame):
                              "Monazite-Eu", "Monazite-Gd", "Monazite-Th", "Barite", "Ilvaite"]
         self.mineral_list.sort()
         self.container_lists["Minerals"] = self.mineral_list
-        #
+
         self.calculate_mineral_chemistry()
         self.create_srm_data_list()
-        #
+
         window_width = var_window_width
         window_height = var_window_height
         row_min = 25
@@ -1610,19 +1612,19 @@ class PySILLS(tk.Frame):
         column_min = int(var_window_width/90)
         n_columns = int(window_width/column_min)
         row_min = 25
-        self.n_rows = 38
+        self.n_rows = 33
         window_height = int(row_min*self.n_rows)
         column_min = 20
-        self.n_columns = 22
+        self.n_columns = 21
         window_width = int(column_min*self.n_columns)
         var_geometry = str(window_width) + "x" + str(window_height) + "+0+0"
         self.parent.geometry(var_geometry)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.parent, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.parent, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.parent.grid_rowconfigure(i, minsize=row_min)
@@ -1631,9 +1633,9 @@ class PySILLS(tk.Frame):
             self.parent.grid_columnconfigure(i, minsize=column_min)
 
         ################################################################################################################
-        #
+
         ## FRAMES
-        #
+
         frame_01 = tk.Frame(self.parent, bg=self.bg_colors["Super Dark"], borderwidth=0, highlightthickness=0)
         frame_01.grid(row=0, column=0, rowspan=42, columnspan=22, sticky="nesw")
         frame_02 = tk.Frame(self.parent, bg=self.red_dark, borderwidth=0, highlightthickness=0)
@@ -1750,47 +1752,40 @@ class PySILLS(tk.Frame):
             self.parent.bell()
             print("There is a problem with the PySILLS icon.")
 
+        # FRAMES
+        frm_01 = SE(
+            parent=self.parent, row_id=start_row + 2, column_id=start_column + 11, n_rows=n_rows_header + 4,
+            n_columns=common_n_columns, fg=font_color_light, bg=background_color_elements).create_frame(relief=tk.FLAT)
+
         # LABELS
+        var_lbl_00 = self.language_dict["Project"][self.var_language]
         var_lbl_01 = self.language_dict["Select Mode"][self.var_language]
         var_lbl_02 = self.language_dict["Standard Files"][self.var_language]
         var_lbl_03 = self.language_dict["Sample Files"][self.var_language]
-        var_lbl_04 = self.language_dict["ICP-MS File Setup"][self.var_language]
-        var_lbl_04b = self.language_dict["Select ICP-MS"][self.var_language]
         var_lbl_04c = self.language_dict["Define ICP-MS"][self.var_language]
 
-        lbl_01 = SE(
+        lbl_00 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="PySILLS", relief=tk.FLAT, fontsize=font_header)
+            text=var_lbl_00, relief=tk.FLAT, fontsize=font_header)
         lbl_01 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column + 11, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
             text=var_lbl_01, relief=tk.FLAT, fontsize=font_header)
         lbl_02 = SE(
-            parent=self.parent, row_id=start_row + 18, column_id=start_column, n_rows=n_rows_header,
+            parent=self.parent, row_id=start_row + 13, column_id=start_column, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
             text=var_lbl_02, relief=tk.FLAT, fontsize=font_header)
         lbl_03 = SE(
-            parent=self.parent, row_id=start_row + 18, column_id=start_column + 11, n_rows=n_rows_header,
+            parent=self.parent, row_id=start_row + 13, column_id=start_column + 11, n_rows=n_rows_header,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
             text=var_lbl_03, relief=tk.FLAT, fontsize=font_header)
-        lbl_04 = SE(
-            parent=self.parent, row_id=start_row + 14, column_id=start_column, n_rows=n_rows_header,
-            n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=var_lbl_04, relief=tk.FLAT, fontsize=font_header)
-        lbl_04b = SE(
-            parent=self.parent, row_id=start_row + 16, column_id=start_column, n_rows=common_n_rows,
-            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=var_lbl_04b, relief=tk.FLAT, fontsize=font_elements)
         lbl_04c = SE(
-            parent=self.parent, row_id=start_row + 16, column_id=start_column + common_n_columns + 1,
-            n_rows=common_n_rows,
-            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            parent=self.parent, row_id=start_row + 11, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
             text=var_lbl_04c, relief=tk.FLAT, fontsize=font_elements)
-        #now = datetime.datetime.now()
-        #now = now.strftime("%Y/%m/%d-%H%M")
         lbl_version = SE(
-            parent=self.parent, row_id=self.n_rows - 1, column_id=start_column, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 29, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
             text="Version: " + self.val_version, relief=tk.FLAT, fontsize="sans 8")
         lbl_dev = SE(
@@ -1801,10 +1796,10 @@ class PySILLS(tk.Frame):
 
         # LISTBOXES
         self.lb_std = SE(
-            parent=self.parent, row_id=start_row + 22, column_id=start_column, n_rows=self.n_rows - 26,
+            parent=self.parent, row_id=start_row + 17, column_id=start_column, n_rows=12,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
         self.lb_smpl = SE(
-            parent=self.parent, row_id=start_row + 22, column_id=start_column + 11, n_rows=self.n_rows - 26,
+            parent=self.parent, row_id=start_row + 17, column_id=start_column + 11, n_rows=12,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
 
         self.container_listbox_files["STD"] = self.lb_std
@@ -1843,85 +1838,85 @@ class PySILLS(tk.Frame):
         var_btn_11 = self.language_dict["Manager"][self.var_language]
 
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=start_column, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 15, column_id=start_column, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="STD":
             self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=start_row + 21, column_id=start_column, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 16, column_id=start_column, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="STD":
             self.copy_file(filetype))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=n_columns_button + 2, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 15, column_id=n_columns_button + 2, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_03, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_std, var_list=self.list_std: self.delete_csv(var_lb, var_list))
         btn_11_std = SE(
-            parent=self.parent, row_id=start_row + 21, column_id=n_columns_button + 2, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 16, column_id=n_columns_button + 2, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="STD": self.project_manager(type))
         btn_11_std.configure(state="disabled")
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=11, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 15, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="SMPL":
             self.open_csv(datatype))
         SE(
-            parent=self.parent, row_id=start_row + 21, column_id=11, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 16, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="SMPL":
             self.copy_file(filetype))
         SE(
-            parent=self.parent, row_id=start_row + 20, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 15, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_03, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda var_lb=self.lb_smpl, var_list=self.list_smpl: self.delete_csv(var_lb, var_list))
         btn_11_smpl = SE(
-            parent=self.parent, row_id=start_row + 21, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 16, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="SMPL": self.project_manager(type))
         btn_11_smpl.configure(state="disabled")
+
         SE(
-            parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows + 1,
+            parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_04, bg_active=accent_color, fg_active=font_color_dark, command=self.restart_pysills)
         SE(
-            parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=common_n_rows + 1,
+            parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_05, bg_active=accent_color, fg_active=font_color_dark, command=self.open_project)
         self.btn_save_project = SE(
-            parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=common_n_rows + 1,
+            parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_06, bg_active=accent_color, fg_active=font_color_dark, command=self.save_project)
         self.btn_save_project.configure(state="disabled")
         SE(
-            parent=self.parent, row_id=start_row + 8, column_id=start_column, n_rows=common_n_rows + 1,
+            parent=self.parent, row_id=start_row + 5, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_07, bg_active=accent_color, fg_active=font_color_dark,
             command=self.subwindow_general_settings)
         btn_about = SE(
-            parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows + 1,
+            parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_08, bg_active=accent_color, fg_active=font_color_dark, command=self.about_pysills)
         SE(
-            parent=self.parent, row_id=start_row + 12, column_id=start_column, n_rows=common_n_rows + 1,
+            parent=self.parent, row_id=start_row + 7, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_09, bg_active=accent_color, fg_active=font_color_dark, command=self.close_pysills)
         btn_icp = SE(
-            parent=self.parent, row_id=start_row + 17, column_id=start_column + common_n_columns + 1,
-            n_rows=common_n_rows, n_columns=common_n_columns, fg=font_color_dark,
-            bg=background_color_elements).create_simple_button(
+            parent=self.parent, row_id=start_row + 12, column_id=start_column, n_rows=common_n_rows,
+            n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_10, bg_active=accent_color, fg_active=font_color_dark, command=self.define_icp_ms_import_setup)
 
         # OPTION MENUS
@@ -1929,7 +1924,7 @@ class PySILLS(tk.Frame):
         str_opt_icpms = self.language_dict["Select ICP-MS"][self.var_language]
         self.var_opt_icp.set(str_opt_icpms)
         opt_icp = SE(
-            parent=self.parent, row_id=start_row + 17, column_id=start_column, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
             var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
             var_list=self.container_lists["ICPMS Library"], fg_active=font_color_dark, bg_active=accent_color,
@@ -2355,7 +2350,7 @@ class PySILLS(tk.Frame):
         self.container_var["Plotting"][self.pysills_mode]["Time-Ratio"] = {"Canvas": None, "Toolbar": None}
 
     def select_experiment(self, var_rb):
-        start_row = 9
+        start_row = 11
         start_column = 11
 
         str_btn_01 = self.language_dict["Settings"][self.var_language]
@@ -2370,29 +2365,29 @@ class PySILLS(tk.Frame):
                     for gui_item in self.gui_elements["main"][gui_category]["Specific"]:
                         gui_item.grid_remove()
                     self.gui_elements["main"][gui_category]["Specific"].clear()
-            #
+
             ## Labels
             str_lbl_01 = self.language_dict["Mineral Analysis"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
-            #
+
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
-            #
+
             ## Buttons
             btn_01 = SE(
-                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_settings)
             btn_02 = SE(
-                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03 = SE(
-                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_extras)
@@ -2407,7 +2402,7 @@ class PySILLS(tk.Frame):
                     for gui_item in self.gui_elements["main"][gui_category]["Specific"]:
                         gui_item.grid_remove()
                     self.gui_elements["main"][gui_category]["Specific"].clear()
-            #
+
             ## Labels
             str_lbl_01 = self.language_dict["Fluid Inclusions"][self.var_language]
             if self.var_language == "German":
@@ -2416,22 +2411,22 @@ class PySILLS(tk.Frame):
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
-            #
+
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
-            #
+
             ## Buttons
             btn_01 = SE(
-                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_settings)
             btn_02 = SE(
-                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_datareduction_files)
             btn_03 = SE(
-                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda init=True: self.fi_extras(init))
@@ -2458,17 +2453,17 @@ class PySILLS(tk.Frame):
 
             ## Buttons
             btn_01 = SE(
-                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.mi_settings)
             btn_02 = SE(
-                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_datareduction_files)
             btn_03 = SE(
-                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=lambda init=True: self.mi_extras(init))
@@ -2483,31 +2478,31 @@ class PySILLS(tk.Frame):
                     for gui_item in self.gui_elements["main"][gui_category]["Specific"]:
                         gui_item.grid_remove()
                     self.gui_elements["main"][gui_category]["Specific"].clear()
-            #
+
             ## Labels
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text="Report Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
-            #
+
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
-            #
+
             ## Buttons
             btn_01 = SE(
-                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_02 = SE(
-                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
             btn_03 = SE(
-                parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=10,
+                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=10,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
                 text=str_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.ma_datareduction_files)
             btn_03.configure(state="disabled")
-            #
+
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
 
     def build_srm_database(self):
@@ -11246,6 +11241,8 @@ class PySILLS(tk.Frame):
         str_lbl_10 = self.language_dict["Data Processing"][self.var_language]
         str_lbl_11 = "Dwell times"
         str_lbl_12 = "Default value"
+        str_lbl_13 = "Starter file"
+        str_lbl_14 = "PySILLS color scheme"
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -11255,14 +11252,14 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=5, column_id=start_column, n_rows=2, n_columns=10,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="Standard Reference\n Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_04 = SE(
-        #     parent=subwindow_generalsettings, row_id=8, column_id=start_column, n_rows=2, n_columns=9,
-        #     fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-        #     text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_05 = SE(
-        #     parent=subwindow_generalsettings, row_id=0, column_id=start_column + 10, n_rows=2, n_columns=16,
-        #     fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-        #     text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_13 = SE(
+            parent=subwindow_generalsettings, row_id=0, column_id=25, n_rows=1, n_columns=9,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text=str_lbl_13, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_14 = SE(
+            parent=subwindow_generalsettings, row_id=2, column_id=25, n_rows=1, n_columns=9,
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text=str_lbl_14, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=11, n_rows=1, n_columns=13,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
@@ -11397,6 +11394,7 @@ class PySILLS(tk.Frame):
             "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
             "cividis", "brg"]
         list_languages = ["English", "German", "Spanish", "Italian", "French", "Chinese", "Greek", "Russian"]
+        list_colorschemes = ["Dark scheme"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
@@ -11437,7 +11435,7 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Language"],
             var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
             fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
-        # opt_language["menu"].entryconfig("German", state="disable")
+        opt_language["menu"].entryconfig("German", state="disable")
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
         opt_language["menu"].entryconfig("French", state="disable")
@@ -11445,35 +11443,17 @@ class PySILLS(tk.Frame):
         opt_language["menu"].entryconfig("Greek", state="disable")
         opt_language["menu"].entryconfig("Russian", state="disable")
 
+        opt_colorscheme = SE(
+            parent=subwindow_generalsettings, row_id=3, column_id=25, n_rows=1, n_columns=9,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["Color scheme"],
+            var_default=self.container_var["General Settings"]["Color scheme"].get(), var_list=list_colorschemes,
+            fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color)
+
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
             [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
 
         ## Radiobuttons
-        # rb_04a = SE(
-        #     parent=subwindow_generalsettings, row_id=10, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-        #     var_rb=self.container_var["General Settings"]["Calculation Accuracy"], value_rb=0,
-        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="SILLS",
-        #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        # rb_04b = SE(
-        #     parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=9,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-        #     var_rb=self.container_var["General Settings"]["Calculation Accuracy"], value_rb=1,
-        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="PySILLS",
-        #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        # rb_05a = SE(
-        #     parent=subwindow_generalsettings, row_id=3, column_id=start_column + 10, n_rows=1, n_columns=16,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-        #     var_rb=self.container_var["General Settings"]["Sensitivity Drift"], value_rb=0,
-        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="seconds",
-        #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        # rb_05b = SE(
-        #     parent=subwindow_generalsettings, row_id=4, column_id=start_column + 10, n_rows=1, n_columns=16,
-        #     fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
-        #     var_rb=self.container_var["General Settings"]["Sensitivity Drift"], value_rb=1,
-        #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text="decimal numbers", sticky="nesw",
-        #     relief=tk.FLAT, font="sans 10 bold")
-        #
         rb_06a = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=11, n_rows=1, n_columns=13,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
@@ -11523,6 +11503,10 @@ class PySILLS(tk.Frame):
             fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
             text="Save Settings", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.confirm_general_settings)
+        btn_13 = SE(
+            parent=subwindow_generalsettings, row_id=1, column_id=25, n_rows=1, n_columns=9,
+            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+            text="Create starter file", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
 
