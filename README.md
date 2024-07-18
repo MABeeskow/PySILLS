@@ -113,7 +113,7 @@ not appear anymore!
 [PySILLS manual (installation)](https://docs.google.com/document/d/18nw22PvVRpJvcUNXSThIvXpVhTG6ePhRhZph0nDWVaY/)\
 [PySILLS manual (mineral analysis)](https://docs.google.com/document/d/1u5CkBJiXBnhqsdh7ooiEncuexeBWgP6WDg5X2Am6bOA/)\
 [PySILLS manual (fluid inclusion analysis)](https://docs.google.com/document/d/1GeK4aQaiP3D1Na_-7ZUZiBLfzr0wK2mq2888VtTlZIY/)\
-[PySILLS manual (melt inclusion analysis)](https://docs.google.com/document/d/15PcfBwTK-dGnMUEiuOhYsKcNpWurOAWnUiKUSeNjtN8/)\
+[PySILLS manual (melt inclusion analysis)](https://docs.google.com/document/d/15PcfBwTK-dGnMUEiuOhYsKcNpWurOAWnUiKUSeNjtN8/)
 
 [PySILLS on ReadTheDocs](https://pysills.readthedocs.io/en/latest/)\
 [PySILLS on Blogger](https://pysills.blogspot.com/)\
