@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.20
+# Version:	v1.0.21
 # Date:		18.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.val_version = "1.0.20 - 18.07.2024"
+        self.str_version_number = "1.0.21"
+        self.val_version = self.str_version_number + " - 18.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -11506,7 +11507,8 @@ class PySILLS(tk.Frame):
         btn_13 = SE(
             parent=subwindow_generalsettings, row_id=1, column_id=25, n_rows=1, n_columns=9,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Create starter file", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Create starter file", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=self.create_starter_file)
 
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
 
@@ -36498,6 +36500,52 @@ class PySILLS(tk.Frame):
             # Calculate concentration ratios
             # Calculate limit of detection values
             pass
+
+    def create_starter_file(self):
+        str_path_to_python = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_pysills_icon = os.path.join(self.path_pysills_main, "pysills", "lib", "images", "PySILLS_Icon.png")
+
+        if self.var_os == "linux":
+            filename = os.path.join(self.path_pysills_main, "pysills_app.desktop")
+        elif self.var_os == "darwin":
+            filename = os.path.join(self.path_pysills_main, "pysills_app.sh")
+        else:
+            filename = os.path.join(self.path_pysills_main, "pysills_app.bat")
+
+        list_paths = sys.path
+        for path in list_paths:
+            if "site-packages" in path:
+                key_path = path
+                path_parts = key_path.split("/")
+                raw_path = "/"
+                for part in path_parts:
+                    if part == "lib":
+                        break
+                    else:
+                        raw_path = os.path.join(raw_path, part)
+                str_path_to_python = os.path.join(raw_path, "bin", "python")
+
+        with open(filename, "w") as file_content:
+            if self.var_os == "linux":
+                file_content.write("#!/usr/bin/python3" + "\n")
+                file_content.write("[Desktop Entry]" + "\n")
+                file_content.write("Name=PySILLS" + "\n")
+                file_content.write("Version=" + str(self.str_version_number) + "\n")
+                file_content.write("Exec=" + str(str_path_to_python) + " " + str(str_path_to_pysills_app) + "\n")
+                file_content.write("Icon=" + str(str_path_to_pysills_icon) + "\n")
+                file_content.write("Path=" + str(self.path_pysills_main) + "\n")
+                file_content.write("Terminal=true" + "\n")
+                file_content.write("Type=Application" + "\n")
+                file_content.write("Categories=Utility;Application;")
+
+            elif self.var_os == "darwin":
+                file_content.write("#!/bin/bash" + "\n")
+                file_content.write("echo Running Script" + "\n")
+                file_content.write(str(str_path_to_python) + " " + str(str_path_to_pysills_app) + "\n")
+                file_content.write("echo Script ended")
+            else:
+                file_content.write(str(str_path_to_python) + " " + str(str_path_to_pysills_app))
 
     def extract_filename_information(self, variable):
         """Extracts the long and short filename and also its file ending."""

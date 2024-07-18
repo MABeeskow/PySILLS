@@ -10,6 +10,10 @@ tests/*.csv
 outputs/*.csv
 user_settings.txt
 PySILLS_exported_results.csv
+*.sh
+*.bat
+*.desktop
+*.command
 
 __pycache__/
 thesis/
