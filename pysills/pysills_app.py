@@ -796,17 +796,17 @@ class PySILLS(tk.Frame):
             "Inclusion Settings": {"English": "Inclusion Settings", "German": "Einstellungen - Einschlüsse"},
             "Internal Standard Setup": {
                 "English": "Internal Standard Setup", "German": "Einstellungen interner Standard"},
-            "Oxide Calculation": {"English": "Oxide Calculation", "German": "Oxidberechnung"},
+            "Oxide stoichiometry": {"English": "Oxide stoichiometry", "German": "Oxide Stöchiometrie"},
             "Default settings": {"English": "Default settings", "German": "Voreinstellungen"},
             "Select IS": {"English": "Select IS", "German": "IS auswählen"},
             "Select mineral": {"English": "Select mineral", "German": "Mineral auswählen"},
             "Element Calculation": {"English": "Element Calculation", "German": "Elementberechnung"},
             "Experimental Data": {"English": "Experimental Data", "German": "Experimentelle Daten"},
-            "Custom Data": {"English": "Custom Data", "German": "Manuelle Dateneingabe"},
+            "Custom data": {"English": "Custom data", "German": "Manuelle Dateneingabe"},
             "Oxide Setup": {"English": "Oxide Setup", "German": "Oxideinstellungen"},
             "Import data": {"English": "Import data", "German": "Daten importieren"},
             "Composition Setup": {"English": "Composition Setup", "German": "Zusammensetzung\n definieren"},
-            "Mineral Calculation": {"English": "Mineral Calculation", "German": "Mineralberechnung"},
+            "Mineral stoichiometry": {"English": "Mineral stoichiometry", "German": "Minerale Stöchiometrie"},
             "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
 
         # str_lbl_01 = self.language_dict["Sample Files"][self.var_language]
@@ -14709,11 +14709,11 @@ class PySILLS(tk.Frame):
         if str_method == "Internal Standard":
             # LABELS
             str_lbl_01 = self.language_dict["Internal Standard Setup"][self.var_language]
-            str_lbl_02 = self.language_dict["Oxide Calculation"][self.var_language]
+            str_lbl_02 = self.language_dict["Oxide stoichiometry"][self.var_language]
             str_lbl_03 = self.language_dict["Element Calculation"][self.var_language]
             str_lbl_04 = self.language_dict["Experimental Data"][self.var_language]
-            str_lbl_05 = self.language_dict["Custom Data"][self.var_language]
-            str_lbl_06 = self.language_dict["Mineral Calculation"][self.var_language]
+            str_lbl_05 = self.language_dict["Custom data"][self.var_language]
+            str_lbl_06 = self.language_dict["Mineral stoichiometry"][self.var_language]
             str_btn_01 = self.language_dict["Setup"][self.var_language]
 
             lbl_01 = SE(
@@ -14721,6 +14721,7 @@ class PySILLS(tk.Frame):
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["Super Dark"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+
             # RADIOBUTTONS
             rb_01a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
@@ -14729,34 +14730,35 @@ class PySILLS(tk.Frame):
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=1,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_02,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_01b = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 2,
-                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_03,
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-            rb_01c = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 4,
-                column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-                bg=self.bg_colors["Light"]).create_radiobutton(
-                var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
-                color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_04,
-                sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            # rb_01b = SE(
+            #     parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 2,
+            #     column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+            #     bg=self.bg_colors["Light"]).create_radiobutton(
+            #     var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=2,
+            #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_03,
+            #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            # rb_01c = SE(
+            #     parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 4,
+            #     column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
+            #     bg=self.bg_colors["Light"]).create_radiobutton(
+            #     var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=3,
+            #     color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_04,
+            #     sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01d = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 5,
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 3,
                 column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=4,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_05,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
             rb_01e = SE(
-                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 3,
+                parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 2,
                 column_id=var_column_start, n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Light"]).create_radiobutton(
                 var_rb=self.container_var[var_setting_key]["Host Setup Selection"], value_rb=5,
                 color_bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"], text=str_lbl_06,
                 sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+
             # BUTTONS
             btn_02a = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start + 1,
@@ -18627,9 +18629,9 @@ class PySILLS(tk.Frame):
         else:
             df_isotopes = df_data.loc[:, df_data.columns != list(df_data.keys())[0]]
 
-        icp_measurements = np.array([[df_data[isotope] for isotope in file_isotopes]])
-        y_min = np.amin(icp_measurements)
-        y_max = np.amax(icp_measurements)
+        if self.container_var["Spike Elimination"][filetype]["State"] == True:
+            for isotope in file_isotopes:
+                df_isotopes[isotope] = self.container_spikes[filename_short][isotope]["Data IMPROVED"]
 
         x_index = []
         x_ticks = []
@@ -18650,15 +18652,6 @@ class PySILLS(tk.Frame):
             normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
         else:
             normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
-            # val_mean = df_isotopes.mean()
-            # val_max = df_isotopes.max()
-            # ratio_mean_max = val_mean/val_max
-            # #print(ratio_mean_max, type(ratio_mean_max), "c", list(ratio_mean_max)[0])
-            # if list(ratio_mean_max)[0] < 0.15:
-            #     df_isotopes_log10 = np.log10(df_isotopes)
-            #     normalized_df = 2*(df_isotopes_log10 - df_isotopes_log10.mean())/(df_isotopes_log10.std()) - 1
-            # else:
-            #     normalized_df = 2*(df_isotopes - df_isotopes.mean())/(df_isotopes.std()) - 1
 
         im = ax_spectrum.imshow(normalized_df.transpose(), aspect="auto", interpolation="None", cmap="viridis")
 
