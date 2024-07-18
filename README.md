@@ -43,7 +43,7 @@ If you like this project, please consider to follow (click on the star icon abov
 
 ---
 
-## ⚠️ Pre-release comment / disclaimer
+## ⚠️ Disclaimer
 
 I am aware of the fact that there are still some bugs and some of them can also cause a crash of the program. But, those
 bugs are the reason why I have decided to publish this pre-release version, because, as a developer, I see everywhere 
@@ -60,6 +60,8 @@ necessary to add them manually, to save the project again and to restart it fina
 the project, it is possible that further bugs occur.
 
 ## 🚀 Installation
+
+A detailed manual about the installation of PySILLS can be found [here](https://docs.google.com/document/d/18nw22PvVRpJvcUNXSThIvXpVhTG6ePhRhZph0nDWVaY/edit?usp=sharing).
 
 PySILLS can be easily installed via the following command:
 
@@ -108,10 +110,14 @@ not appear anymore!
 
 ## 💻 Resources
 
-[PySILLS manual](https://docs.google.com/document/d/15dqejKteG7hTiImd5IzyIQJBEtDjFNNw8B1161cvPsY/) |
-[PySILLS on ReadTheDocs](https://pysills.readthedocs.io/en/latest/) |
-[PySILLS on Blogger](https://pysills.blogspot.com/) | 
-[PySILLS on YouTube](https://www.youtube.com/@PySILLS) | 
+[PySILLS manual (installation)](https://docs.google.com/document/d/18nw22PvVRpJvcUNXSThIvXpVhTG6ePhRhZph0nDWVaY/)\
+[PySILLS manual (mineral analysis)](https://docs.google.com/document/d/1u5CkBJiXBnhqsdh7ooiEncuexeBWgP6WDg5X2Am6bOA/)\
+[PySILLS manual (fluid inclusion analysis)](https://docs.google.com/document/d/1GeK4aQaiP3D1Na_-7ZUZiBLfzr0wK2mq2888VtTlZIY/)\
+[PySILLS manual (melt inclusion analysis)](https://docs.google.com/document/d/15PcfBwTK-dGnMUEiuOhYsKcNpWurOAWnUiKUSeNjtN8/)\
+
+[PySILLS on ReadTheDocs](https://pysills.readthedocs.io/en/latest/)\
+[PySILLS on Blogger](https://pysills.blogspot.com/)\
+[PySILLS on YouTube](https://www.youtube.com/@PySILLS)\
 [PySILLS on PyPi](https://pypi.org/project/PySILLS/)
 
 ![Blogger](https://img.shields.io/badge/Blogger-FF5722?style=for-the-badge&logo=blogger&logoColor=white) &nbsp;
