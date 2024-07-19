@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.21
+# Version:	v1.0.22
 # Date:		19.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.21"
+        self.str_version_number = "1.0.22"
         self.val_version = self.str_version_number + " - 19.07.2024"
 
         ## Colors
@@ -24331,7 +24331,7 @@ class PySILLS(tk.Frame):
 
     def about_pysills(self):
         ## Window Settings
-        window_width = 620
+        window_width = 640
         window_height = 550
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -24374,29 +24374,29 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 10, n_rows=1,
+            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Maximilian A. Beeskow", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Maximilian A. Beeskow", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01b = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 10, n_rows=1,
+            parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Thomas Wagner", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Thomas Wagner", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01c = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 10, n_rows=1,
+            parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Tobias Fusswinkel", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Tobias Fusswinkel", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 20, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 20, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 20, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         lbl_02 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column, n_rows=1,
@@ -24418,11 +24418,35 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="PySILLS on Blogger", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_02e = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (installation)", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True,
+            anchor=tk.W)
+        lbl_02f = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 6, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (mineral analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True,
+            anchor=tk.W)
+        lbl_02g = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 7, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (fluid inclusion analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline",
+            link=True, anchor=tk.W)
+        lbl_02h = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (melt inclusion analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline",
+            link=True, anchor=tk.W)
 
         lbl_02a.bind("<Button-1>", self.callback_github)
         lbl_02b.bind("<Button-1>", self.callback_readthedocs)
         lbl_02c.bind("<Button-1>", self.callback_youtube)
-        lbl_02d.bind("<Button-1>", self.callback_readthedocs)
+        lbl_02d.bind("<Button-1>", self.callback_blogger)
+        lbl_02e.bind("<Button-1>", self.callback_installation)
+        lbl_02f.bind("<Button-1>", self.callback_manual_ma)
+        lbl_02g.bind("<Button-1>", self.callback_manual_fi)
+        lbl_02h.bind("<Button-1>", self.callback_manual_mi)
 
         lbl_03 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column, n_rows=1,
@@ -24509,6 +24533,18 @@ class PySILLS(tk.Frame):
 
     def callback_blogger(self, event):
         webbrowser.open_new(r"https://pysills.blogspot.com/")
+
+    def callback_installation(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/18nw22PvVRpJvcUNXSThIvXpVhTG6ePhRhZph0nDWVaY/")
+
+    def callback_manual_ma(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/1u5CkBJiXBnhqsdh7ooiEncuexeBWgP6WDg5X2Am6bOA/")
+
+    def callback_manual_fi(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/1GeK4aQaiP3D1Na_-7ZUZiBLfzr0wK2mq2888VtTlZIY/")
+
+    def callback_manual_mi(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/15PcfBwTK-dGnMUEiuOhYsKcNpWurOAWnUiKUSeNjtN8/")
 
     def callback_sills(self, event):
         webbrowser.open_new(r"https://mineralsystems.ethz.ch/software/sills.html")
