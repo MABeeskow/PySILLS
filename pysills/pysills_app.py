@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.21
-# Date:		18.07.2024
+# Date:		19.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.21"
-        self.val_version = self.str_version_number + " - 18.07.2024"
+        self.val_version = self.str_version_number + " - 19.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -36517,14 +36517,25 @@ class PySILLS(tk.Frame):
         for path in list_paths:
             if "site-packages" in path:
                 key_path = path
-                path_parts = key_path.split("/")
-                raw_path = "/"
+                if self.var_os == "win32":
+                    path_parts = key_path.split("\\")
+                    raw_path = "C:\\"
+                else:
+                    path_parts = key_path.split("/")
+                    raw_path = "/"
+
                 for part in path_parts:
-                    if part == "lib":
+                    if part in ["lib", "Lib"]:
                         break
                     else:
                         raw_path = os.path.join(raw_path, part)
-                str_path_to_python = os.path.join(raw_path, "bin", "python")
+
+                if self.var_os == "win32":
+                    str_path_to_python = os.path.join(raw_path, "Scripts", "python.exe")
+                else:
+                    str_path_to_python = os.path.join(raw_path, "bin", "python")
+
+                break
 
         with open(filename, "w") as file_content:
             if self.var_os == "linux":
