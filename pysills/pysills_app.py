@@ -36524,6 +36524,12 @@ class PySILLS(tk.Frame):
                     path_parts = key_path.split("/")
                     raw_path = "/"
 
+                str_python_name = "python"
+
+                for part in path_parts:
+                    if "python" in part:
+                        str_python_name = part
+
                 for part in path_parts:
                     if part in ["lib", "Lib"]:
                         break
@@ -36532,6 +36538,8 @@ class PySILLS(tk.Frame):
 
                 if self.var_os == "win32":
                     str_path_to_python = os.path.join(raw_path, "Scripts", "python.exe")
+                elif self.var_os == "linux":
+                    str_path_to_python = os.path.join("usr", "bin", str_python_name)
                 else:
                     str_path_to_python = os.path.join(raw_path, "bin", "python")
 
