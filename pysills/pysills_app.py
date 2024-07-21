@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.21
-# Date:		19.07.2024
+# Version:	v1.0.22
+# Date:		22.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.21"
-        self.val_version = self.str_version_number + " - 19.07.2024"
+        self.str_version_number = "1.0.22"
+        self.val_version = self.str_version_number + " - 22.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -24546,35 +24546,35 @@ class PySILLS(tk.Frame):
         window_width = 260
         window_height = 225
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         subwindow_report_setup = tk.Toplevel(self.parent)
         subwindow_report_setup.title("Calculation Report - Setup")
         subwindow_report_setup.geometry(var_geometry)
         subwindow_report_setup.resizable(False, False)
         subwindow_report_setup["bg"] = self.bg_colors["Super Dark"]
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_report_setup, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_report_setup, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_report_setup.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             subwindow_report_setup.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ################################################################################################################
-        #
+
         start_row = 0
         start_column = 0
-        #
+
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_report_setup, row_id=start_row, column_id=start_column, n_rows=1,
@@ -24616,11 +24616,14 @@ class PySILLS(tk.Frame):
                 text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_export_calculation_report)
         elif self.pysills_mode == "MI":
-            pass
+            btn_06a = SE(
+                parent=subwindow_report_setup, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=12,
+                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
+                text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+                command=self.fi_export_calculation_report)
         elif self.pysills_mode == "OA":
             pass
 
-    #
     ########################################################################################################################
     # FLUID INCLUSION ANALYSIS #############################################################################################
     ########################################################################################################################
