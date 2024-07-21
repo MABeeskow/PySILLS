@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.22
-# Date:		22.07.2024
+# Date:		19.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.22"
-        self.val_version = self.str_version_number + " - 22.07.2024"
+        self.val_version = self.str_version_number + " - 19.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -24331,7 +24331,7 @@ class PySILLS(tk.Frame):
 
     def about_pysills(self):
         ## Window Settings
-        window_width = 620
+        window_width = 640
         window_height = 550
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
@@ -24374,29 +24374,29 @@ class PySILLS(tk.Frame):
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 10, n_rows=1,
+            parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Maximilian A. Beeskow", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Maximilian A. Beeskow", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01b = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 10, n_rows=1,
+            parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Thomas Wagner", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Thomas Wagner", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01c = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 10, n_rows=1,
+            parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="Tobias Fusswinkel", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Tobias Fusswinkel", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 20, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 20, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 20, n_rows=1,
             n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
-            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         lbl_02 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column, n_rows=1,
@@ -24418,11 +24418,35 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 11, n_rows=1,
             n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
             text="PySILLS on Blogger", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
+        lbl_02e = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (installation)", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True,
+            anchor=tk.W)
+        lbl_02f = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 6, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (mineral analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True,
+            anchor=tk.W)
+        lbl_02g = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 7, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (fluid inclusion analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline",
+            link=True, anchor=tk.W)
+        lbl_02h = SE(
+            parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 20, n_rows=1,
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            text="PySILLS manual (melt inclusion analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline",
+            link=True, anchor=tk.W)
 
         lbl_02a.bind("<Button-1>", self.callback_github)
         lbl_02b.bind("<Button-1>", self.callback_readthedocs)
         lbl_02c.bind("<Button-1>", self.callback_youtube)
-        lbl_02d.bind("<Button-1>", self.callback_readthedocs)
+        lbl_02d.bind("<Button-1>", self.callback_blogger)
+        lbl_02e.bind("<Button-1>", self.callback_installation)
+        lbl_02f.bind("<Button-1>", self.callback_manual_ma)
+        lbl_02g.bind("<Button-1>", self.callback_manual_fi)
+        lbl_02h.bind("<Button-1>", self.callback_manual_mi)
 
         lbl_03 = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column, n_rows=1,
@@ -24510,6 +24534,18 @@ class PySILLS(tk.Frame):
     def callback_blogger(self, event):
         webbrowser.open_new(r"https://pysills.blogspot.com/")
 
+    def callback_installation(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/18nw22PvVRpJvcUNXSThIvXpVhTG6ePhRhZph0nDWVaY/")
+
+    def callback_manual_ma(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/1u5CkBJiXBnhqsdh7ooiEncuexeBWgP6WDg5X2Am6bOA/")
+
+    def callback_manual_fi(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/1GeK4aQaiP3D1Na_-7ZUZiBLfzr0wK2mq2888VtTlZIY/")
+
+    def callback_manual_mi(self, event):
+        webbrowser.open_new(r"https://docs.google.com/document/d/15PcfBwTK-dGnMUEiuOhYsKcNpWurOAWnUiKUSeNjtN8/")
+
     def callback_sills(self, event):
         webbrowser.open_new(r"https://mineralsystems.ethz.ch/software/sills.html")
 
@@ -24546,35 +24582,35 @@ class PySILLS(tk.Frame):
         window_width = 260
         window_height = 225
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-
+        #
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-
+        #
         subwindow_report_setup = tk.Toplevel(self.parent)
         subwindow_report_setup.title("Calculation Report - Setup")
         subwindow_report_setup.geometry(var_geometry)
         subwindow_report_setup.resizable(False, False)
         subwindow_report_setup["bg"] = self.bg_colors["Super Dark"]
-
+        #
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_report_setup, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_report_setup, y, weight=1)
-
+        #
         # Rows
         for i in range(0, n_rows):
             subwindow_report_setup.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             subwindow_report_setup.grid_columnconfigure(i, minsize=column_min)
-
+        #
         ################################################################################################################
-
+        #
         start_row = 0
         start_column = 0
-
+        #
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_report_setup, row_id=start_row, column_id=start_column, n_rows=1,
@@ -24616,14 +24652,11 @@ class PySILLS(tk.Frame):
                 text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
                 command=self.fi_export_calculation_report)
         elif self.pysills_mode == "MI":
-            btn_06a = SE(
-                parent=subwindow_report_setup, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=12,
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-                text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-                command=self.fi_export_calculation_report)
+            pass
         elif self.pysills_mode == "OA":
             pass
 
+    #
     ########################################################################################################################
     # FLUID INCLUSION ANALYSIS #############################################################################################
     ########################################################################################################################
@@ -36527,6 +36560,12 @@ class PySILLS(tk.Frame):
                     path_parts = key_path.split("/")
                     raw_path = "/"
 
+                str_python_name = "python"
+
+                for part in path_parts:
+                    if "python" in part:
+                        str_python_name = part
+
                 for part in path_parts:
                     if part in ["lib", "Lib"]:
                         break
@@ -36535,6 +36574,8 @@ class PySILLS(tk.Frame):
 
                 if self.var_os == "win32":
                     str_path_to_python = os.path.join(raw_path, "Scripts", "python.exe")
+                elif self.var_os == "linux":
+                    str_path_to_python = os.path.join("usr", "bin", str_python_name)
                 else:
                     str_path_to_python = os.path.join(raw_path, "bin", "python")
 
