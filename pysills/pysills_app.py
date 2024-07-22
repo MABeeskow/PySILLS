@@ -100,10 +100,25 @@ class PySILLS(tk.Frame):
         self.slate_grey_light = "#E2E4EA"
         slategrey_dict = {"Dark": self.slate_grey_dark, "Medium": self.slate_grey_medium,
                           "Light": self.slate_grey_light}
-        #
-        self.bg_colors = {"Super Dark": "#2C2C2C", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090",
-                          "Light": "#BABABA", "Very Light": "#E3E3E3", "Dark Font": "#292929", "Light Font": "#F7F7F7",
-                          "White": "#FFFFFF", "Black": "#000000"}
+
+        self.bg_colors = {
+            "BG Window": "#2C2C2C", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090", "Light": "#BABABA",
+            "Very Light": "#E3E3E3", "Dark Font": "#292929", "Light Font": "#F7F7F7", "White": "#FFFFFF",
+            "Black": "#000000"}
+
+        self.standard_dark = {
+            "BG Window": "#E3E3E3", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090", "Button": "#BABABA",
+            "Very Light": "#E3E3E3", "Dark Font": "#292929", "Light Font": "#F7F7F7", "White": "#FFFFFF",
+            "Black": "#000000"}
+        self.standard_light = {
+            "BG Window": "#E3E3E3", "Very Dark": "#BABABA", "Dark": "#909090", "Medium": "#676767", "Light": "#BABABA",
+            "Very Light": "#E3E3E3", "Dark Font": "#F7F7F7", "Light Font": "#292929", "White": "#FFFFFF",
+            "Black": "#000000"}
+        self.green_dark = {
+            "BG Window": "#323A25", "Very Dark": "#505D3C", "Dark": "#606F49", "Medium": "#676767", "Light": "#CDD5BF",
+            "Very Light": "#FAFBF9", "Dark Font": "#282E1E", "Light Font": "#F9FAF7", "White": "#FFFFFF",
+            "Black": "#000000"}
+
         self.accent_color = "#E76F51"
         self.colors_ma = {"Very Dark": "#2F3E46", "Dark": "#354F52", "Medium": "#52796F", "Light": "#84A98C",
                           "Very Light": "#CAD2C5", "Dark Font": "#182320", "Light Font": "#F2F6F5"}
@@ -113,9 +128,7 @@ class PySILLS(tk.Frame):
                           "Very Light": "#a9d6e5", "Dark Font": "#0D242E", "Light Font": "#EEF7FA"}
         self.colors_intervals = {"BG": "#7F4F24", "SIG": "#414833", "MAT": "#414833", "INCL": "#F4D35E",
                                  "BG LB": "#D9A578", "SIG LB": "#A4AF8E", "MAT LB": "#A4AF8E", "INCL LB": "#F9E9AE"}
-        #
-        self.font_dark = "#000000"
-        self.font_light = "#FFFFFF"
+
         self.sign_red = "#E84258"
         self.sign_yellow = "#FFDE00"
         self.sign_green = "#B0D8A4"
@@ -1637,7 +1650,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
 
-        frame_01 = tk.Frame(self.parent, bg=self.bg_colors["Super Dark"], borderwidth=0, highlightthickness=0)
+        frame_01 = tk.Frame(self.parent, bg=self.bg_colors["BG Window"], borderwidth=0, highlightthickness=0)
         frame_01.grid(row=0, column=0, rowspan=42, columnspan=22, sticky="nesw")
         frame_02 = tk.Frame(self.parent, bg=self.red_dark, borderwidth=0, highlightthickness=0)
         frame_02.grid(row=2, column=0, rowspan=1, columnspan=22, sticky="nesw")
@@ -1686,7 +1699,7 @@ class PySILLS(tk.Frame):
         n_columns_button = 3
         font_color_dark = self.bg_colors["Dark Font"]
         font_color_light = self.bg_colors["Light Font"]
-        background_color_header = self.bg_colors["Super Dark"]
+        background_color_header = self.bg_colors["BG Window"]
         background_color_elements = self.bg_colors["Light"]
         background_color_listbox = self.bg_colors["Very Light"]
         accent_color = self.accent_color
@@ -1951,7 +1964,7 @@ class PySILLS(tk.Frame):
         self.subwindow_icpms_setup.title("ICP-MS File Setup")
         self.subwindow_icpms_setup.geometry(var_geometry)
         self.subwindow_icpms_setup.resizable(False, False)
-        self.subwindow_icpms_setup["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_icpms_setup["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_icpms_setup, x, weight=1)
@@ -1974,7 +1987,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="ICP-MS File Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
@@ -2371,7 +2384,7 @@ class PySILLS(tk.Frame):
             str_lbl_01 = self.language_dict["Mineral Analysis"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
@@ -2410,7 +2423,7 @@ class PySILLS(tk.Frame):
                 str_lbl_01 = "Flüssigkeits-\neinschlüsse"
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
@@ -2447,7 +2460,7 @@ class PySILLS(tk.Frame):
             str_lbl_01 = self.language_dict["Melt Inclusions"][self.var_language]
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
@@ -2483,7 +2496,7 @@ class PySILLS(tk.Frame):
             ## Labels
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
-                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Report Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
@@ -3197,11 +3210,11 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_quickplotter, row_id=row_start, column_id=column_start, n_rows=1, n_columns=40,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Time-Signal Diagram", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_quickplotter, row_id=row_start, column_id=column_start + 40, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
 
         if self.file_loaded == False:
@@ -9313,7 +9326,7 @@ class PySILLS(tk.Frame):
         window_dwell.title(str_title)
         window_dwell.geometry("300x450+0+0")
         window_dwell.resizable(False, False)
-        window_dwell["bg"] = self.bg_colors["Super Dark"]
+        window_dwell["bg"] = self.bg_colors["BG Window"]
 
         window_width = 300
         window_height = 450
@@ -9337,7 +9350,7 @@ class PySILLS(tk.Frame):
         ## Labels
         lbl_01 = SE(
             parent=window_dwell, row_id=0, column_id=0, n_rows=1, n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=window_dwell, row_id=1, column_id=0, n_rows=1, n_columns=7, fg=self.bg_colors["Light Font"],
@@ -9411,7 +9424,7 @@ class PySILLS(tk.Frame):
         subwindow_se_threshold.title("Spike Elimination")
         subwindow_se_threshold.geometry(var_geometry)
         subwindow_se_threshold.resizable(False, False)
-        subwindow_se_threshold["bg"] = self.bg_colors["Super Dark"]
+        subwindow_se_threshold["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_se_threshold, x, weight=1)
@@ -9444,7 +9457,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_se_threshold, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Spike Elimination - Threshold Setup", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01 = SE(
             parent=subwindow_se_threshold, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
@@ -9453,7 +9466,7 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=subwindow_se_threshold, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Isotope-specific threshold value", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## ENTRIES
@@ -9820,7 +9833,7 @@ class PySILLS(tk.Frame):
         subwindow_checkup_oxides.title("Check-Up - 100 wt.% oxides")
         subwindow_checkup_oxides.geometry(var_geometry)
         subwindow_checkup_oxides.resizable(False, False)
-        subwindow_checkup_oxides["bg"] = self.bg_colors["Super Dark"]
+        subwindow_checkup_oxides["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_checkup_oxides, x, weight=1)
@@ -9907,62 +9920,62 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Alkali metals", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_02 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Alkaline earth metals", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_03 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=2*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Transition metals", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_04 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=3*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Other metals", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_05 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=4*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Metalloids", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_06 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Lanthanides", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_07 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Actinides", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_08 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=2*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Non-metals", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_09 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=3*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Halogens", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_10 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=4*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Noble gases", relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_11 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Setup - Oxide ratios", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_11a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Matrix/Sample", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_11b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 2, column_id=5*var_header_n + 1, n_rows=1,
@@ -9977,7 +9990,7 @@ class PySILLS(tk.Frame):
         lbl_11d = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 4, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_11e = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 5, column_id=5*var_header_n + 1, n_rows=1,
@@ -9992,7 +10005,7 @@ class PySILLS(tk.Frame):
         lbl_12 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 8, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Setup - Reference element", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_12a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 9, column_id=5*var_header_n + 1, n_rows=1,
@@ -10007,7 +10020,7 @@ class PySILLS(tk.Frame):
         lbl_13 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 12, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Setup - Oxide selection", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_13a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 13, column_id=5*var_header_n + 1, n_rows=1,
@@ -10032,22 +10045,22 @@ class PySILLS(tk.Frame):
         lbl_14 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=5*var_header_n + int(1.5*var_header_n) + 2,
             n_rows=1, n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Setup - Files", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_14a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 1,
             column_id=5*var_header_n + int(1.5*var_header_n) + 2, n_rows=1, n_columns=int_category_n,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Matrix/Sample", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_14b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 14,
             column_id=5*var_header_n + int(1.5*var_header_n) + 2, n_rows=1, n_columns=int_category_n,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_15 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 17, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Run 100 wt.% oxides calculation for", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
 
         ## BUTTONS
@@ -10753,7 +10766,7 @@ class PySILLS(tk.Frame):
         subwindow_checkup_is.title("Check-Up - Internal standard")
         subwindow_checkup_is.geometry(var_geometry)
         subwindow_checkup_is.resizable(False, False)
-        subwindow_checkup_is["bg"] = self.bg_colors["Super Dark"]
+        subwindow_checkup_is["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_checkup_is, x, weight=1)
@@ -10776,12 +10789,12 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_checkup_is, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Internal standard (sample/matrix)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_checkup_is, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Internal standard (inclusion)", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## TREEVIEWS
@@ -11206,7 +11219,7 @@ class PySILLS(tk.Frame):
         subwindow_generalsettings.title("General Settings")
         subwindow_generalsettings.geometry(var_geometry)
         subwindow_generalsettings.resizable(False, False)
-        subwindow_generalsettings["bg"] = self.bg_colors["Super Dark"]
+        subwindow_generalsettings["bg"] = self.bg_colors["BG Window"]
 
         row_min = 25
         n_rows = int(window_height/row_min)
@@ -11247,51 +11260,51 @@ class PySILLS(tk.Frame):
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_generalsettings, row_id=5, column_id=start_column, n_rows=2, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Standard Reference\n Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_13 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=25, n_rows=1, n_columns=9,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_13, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_14 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=25, n_rows=1, n_columns=9,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_14, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=11, n_rows=1, n_columns=13,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07 = SE(
             parent=subwindow_generalsettings, row_id=5, column_id=11, n_rows=2, n_columns=13,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08 = SE(
             parent=subwindow_generalsettings, row_id=9, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09 = SE(
             parent=subwindow_generalsettings, row_id=18, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_10 = SE(
             parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=13, column_id=start_column, n_rows=1, n_columns=10,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_10, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=9, column_id=11, n_rows=1, n_columns=13,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_11, relief=tk.FLAT, fontsize="sans 10 bold")
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
@@ -12648,7 +12661,7 @@ class PySILLS(tk.Frame):
         self.subwindow_ma_extras.title("MINERAL ANALYSIS - Extras")
         self.subwindow_ma_extras.geometry(var_geometry)
         self.subwindow_ma_extras.resizable(False, False)
-        self.subwindow_ma_extras["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_ma_extras["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_ma_extras, x, weight=1)
@@ -12725,7 +12738,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Mineral classification", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001a = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
@@ -12760,7 +12773,7 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Geothermometry", relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_002 = SE(
@@ -12834,7 +12847,7 @@ class PySILLS(tk.Frame):
         self.subwindow_geothermometry_ti_in_qz.title("Geothermometry - Titanium-in-Quartz")
         self.subwindow_geothermometry_ti_in_qz.geometry(var_geometry)
         self.subwindow_geothermometry_ti_in_qz.resizable(False, False)
-        self.subwindow_geothermometry_ti_in_qz["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_geothermometry_ti_in_qz["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_geothermometry_ti_in_qz, x, weight=1)
@@ -12857,24 +12870,24 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Titanium-in-Quartz Thermometry", relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_02 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 6, column_id=var_column_start,
             n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Additional Settings", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 7, column_id=var_column_start,
             n_rows=1, n_columns=9, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Activity of TiO2 in Rt", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         lbl_03 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start,
             column_id=var_column_start + var_header_n + 1, n_rows=1, n_columns=var_header_n + 14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Results", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
@@ -12968,7 +12981,7 @@ class PySILLS(tk.Frame):
         self.subwindow_fi_extras.title("FLUID INCLUSION ANALYSIS - Extras")
         self.subwindow_fi_extras.geometry(var_geometry)
         self.subwindow_fi_extras.resizable(False, False)
-        self.subwindow_fi_extras["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_fi_extras["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_extras, x, weight=1)
@@ -13052,12 +13065,12 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Matrix classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_02 = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Fluid classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001a = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
@@ -13231,7 +13244,7 @@ class PySILLS(tk.Frame):
         self.subwindow_mi_extras.title("MELT INCLUSION ANALYSIS - Extras")
         self.subwindow_mi_extras.geometry(var_geometry)
         self.subwindow_mi_extras.resizable(False, False)
-        self.subwindow_mi_extras["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_mi_extras["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_mi_extras, x, weight=1)
@@ -13315,12 +13328,12 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_mi_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Matrix classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_02 = SE(
             parent=self.subwindow_mi_extras, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Fluid classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001a = SE(
             parent=self.subwindow_mi_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
@@ -13489,7 +13502,7 @@ class PySILLS(tk.Frame):
 
         subwindow_diagram_xy.geometry(var_geometry)
         subwindow_diagram_xy.resizable(False, False)
-        subwindow_diagram_xy["bg"] = self.bg_colors["Super Dark"]
+        subwindow_diagram_xy["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_diagram_xy, x, weight=1)
@@ -13528,26 +13541,26 @@ class PySILLS(tk.Frame):
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Elements", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         elif mode == "Element ratios":
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Element ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         elif mode == "Oxides":
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
             self.oxides_xy = True
         elif mode == "Oxide ratios":
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Oxide ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
             self.oxides_xy = True
 
@@ -13555,18 +13568,18 @@ class PySILLS(tk.Frame):
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="with respect to", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
             lbl_03 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         else:
             lbl_03 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## OPTION MENUS
@@ -13809,7 +13822,7 @@ class PySILLS(tk.Frame):
         subwindow_halogen_ratios.title("FLUID INCLUSION ANALYSIS - Extras")
         subwindow_halogen_ratios.geometry(var_geometry)
         subwindow_halogen_ratios.resizable(False, False)
-        subwindow_halogen_ratios["bg"] = self.bg_colors["Super Dark"]
+        subwindow_halogen_ratios["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_halogen_ratios, x, weight=1)
@@ -13834,7 +13847,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_halogen_ratios, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="File manager", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## TABLES
@@ -14309,7 +14322,7 @@ class PySILLS(tk.Frame):
         self.subwindow_ma_settings.title(str_title_window)
         self.subwindow_ma_settings.geometry(var_geometry)
         self.subwindow_ma_settings.resizable(False, False)
-        self.subwindow_ma_settings["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_ma_settings["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_ma_settings, x, weight=1)
@@ -14474,7 +14487,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -14529,7 +14542,7 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -14624,7 +14637,7 @@ class PySILLS(tk.Frame):
         lbl_03 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
@@ -14684,7 +14697,7 @@ class PySILLS(tk.Frame):
         self.subwindow_mineral_matrix_quantification.title(str_title_window)
         self.subwindow_mineral_matrix_quantification.geometry(var_geometry)
         self.subwindow_mineral_matrix_quantification.resizable(False, False)
-        self.subwindow_mineral_matrix_quantification["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_mineral_matrix_quantification["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_mineral_matrix_quantification, x, weight=1)
@@ -14721,7 +14734,7 @@ class PySILLS(tk.Frame):
             lbl_01 = SE(
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
             # RADIOBUTTONS
@@ -14801,7 +14814,7 @@ class PySILLS(tk.Frame):
         self.subwindow_oxides_composition.title(str_title_window)
         self.subwindow_oxides_composition.geometry(var_geometry)
         self.subwindow_oxides_composition.resizable(False, False)
-        self.subwindow_oxides_composition["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_oxides_composition["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_oxides_composition, x, weight=1)
@@ -14848,7 +14861,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_oxides_composition, row_id=var_row_start, column_id=var_column_start,
             n_rows=var_row_n, n_columns=4*var_header_n + 3, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Select all present elements and their oxides", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_column_start,
@@ -15106,7 +15119,7 @@ class PySILLS(tk.Frame):
         self.subwindow_oxides_files.title(str_title_window)
         self.subwindow_oxides_files.geometry(var_geometry)
         self.subwindow_oxides_files.resizable(False, False)
-        self.subwindow_oxides_files["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_oxides_files["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_oxides_files, x, weight=1)
@@ -15135,27 +15148,27 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=var_column_start,
             n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="File-specific Settings", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Default total amount of oxides", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 2, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Import data from file", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 7, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Select Reference Element", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=3*var_header_n + 1,
             n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Default amount of reference oxide", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # ENTRIES
@@ -15397,12 +15410,12 @@ class PySILLS(tk.Frame):
             lbl_04 = SE(
                 parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_05 = SE(
                 parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-                bg=self.bg_colors["Super Dark"]).create_simple_label(
+                bg=self.bg_colors["BG Window"]).create_simple_label(
                 text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
 
             # Option Menu
@@ -15722,7 +15735,7 @@ class PySILLS(tk.Frame):
         lbl_05 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -15777,7 +15790,7 @@ class PySILLS(tk.Frame):
         lbl_06 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -15824,7 +15837,7 @@ class PySILLS(tk.Frame):
         lbl_07 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -15909,7 +15922,7 @@ class PySILLS(tk.Frame):
         lbl_08 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_08a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -15991,7 +16004,7 @@ class PySILLS(tk.Frame):
         lbl_09 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09b = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -16073,7 +16086,7 @@ class PySILLS(tk.Frame):
         lbl_10 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_10a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -16165,7 +16178,7 @@ class PySILLS(tk.Frame):
         lbl_iso = SE(
             parent=var_parent, row_id=var_row_start - 1, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         frm_iso = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
@@ -16374,7 +16387,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Treeviews
@@ -16481,7 +16494,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Frames
@@ -16716,7 +16729,7 @@ class PySILLS(tk.Frame):
         # Labels
         lbl_header = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=1, n_columns=var_header_n,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
@@ -17181,7 +17194,7 @@ class PySILLS(tk.Frame):
         # Labels
         lbl_header = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=1, n_columns=var_header_n,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
@@ -17527,7 +17540,7 @@ class PySILLS(tk.Frame):
         subwindow_ma_matrix_concentration.title(var_window_header)
         subwindow_ma_matrix_concentration.geometry(var_geometry)
         subwindow_ma_matrix_concentration.resizable(False, False)
-        subwindow_ma_matrix_concentration["bg"] = self.bg_colors["Super Dark"]
+        subwindow_ma_matrix_concentration["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_ma_matrix_concentration, x, weight=1)
@@ -17574,11 +17587,11 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=19,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_ma_matrix_concentration, row_id=start_row, column_id=start_column + 30, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
 
         list_possible_elements = []
@@ -18700,7 +18713,7 @@ class PySILLS(tk.Frame):
         subwindow_stepwise_analysis.title(str_title)
         subwindow_stepwise_analysis.geometry(var_geometry)
         subwindow_stepwise_analysis.resizable(False, False)
-        subwindow_stepwise_analysis["bg"] = self.bg_colors["Super Dark"]
+        subwindow_stepwise_analysis["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_stepwise_analysis, x, weight=1)
@@ -18849,7 +18862,7 @@ class PySILLS(tk.Frame):
         self.subwindow_ma_checkfile.title("MINERAL ANALYSIS - File Analysis of " + str(var_filename_short))
         self.subwindow_ma_checkfile.geometry(var_geometry)
         self.subwindow_ma_checkfile.resizable(False, False)
-        self.subwindow_ma_checkfile["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_ma_checkfile["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_ma_checkfile, x, weight=1)
@@ -18879,22 +18892,22 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 18, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Anaylsis Mode", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Interval Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column, n_rows=1,
@@ -18907,7 +18920,7 @@ class PySILLS(tk.Frame):
         lbl_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 40, n_rows=1,
             n_columns=n_columns - (start_column + 40) - 6, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Parallelism", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
@@ -19020,10 +19033,10 @@ class PySILLS(tk.Frame):
             relief=tk.FLAT)
         rb_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
-            n_columns=26, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_radiobutton(
+            n_columns=26, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=3,
-            color_bg=self.bg_colors["Super Dark"], fg=self.bg_colors["Light Font"], text="No Selection",
+            color_bg=self.bg_colors["BG Window"], fg=self.bg_colors["Light Font"], text="No Selection",
             sticky="nesw", relief=tk.FLAT)
 
         ## CHECKBOXES
@@ -23633,7 +23646,7 @@ class PySILLS(tk.Frame):
         self.subwindow_ma_datareduction_files.title("MINERAL ANALYSIS - Data Reduction")
         self.subwindow_ma_datareduction_files.geometry(var_geometry)
         self.subwindow_ma_datareduction_files.resizable(False, False)
-        self.subwindow_ma_datareduction_files["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_ma_datareduction_files["bg"] = self.bg_colors["BG Window"]
         #
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_ma_datareduction_files, x, weight=1)
@@ -23655,24 +23668,24 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="File Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 3, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Data Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 6, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Assemblage Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 8, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Focus Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 10, column_id=start_column,
             n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
@@ -23882,7 +23895,7 @@ class PySILLS(tk.Frame):
         self.subwindow_detailed_data_analysis.title(str_title_window)
         self.subwindow_detailed_data_analysis.geometry(var_geometry)
         self.subwindow_detailed_data_analysis.resizable(False, False)
-        self.subwindow_detailed_data_analysis["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_detailed_data_analysis["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_detailed_data_analysis, x, weight=1)
@@ -23904,27 +23917,27 @@ class PySILLS(tk.Frame):
         # LABELS
         lbl_01 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Filename", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 3, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Experimental Data", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 6, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Experimental Focus", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 11, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Intensity Results", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 13, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Sensitivity Results", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 15, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Composition Results", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # RADIOBUTTONS
@@ -24344,7 +24357,7 @@ class PySILLS(tk.Frame):
         self.subwindow_about_pysills.title("PySILLS - About")
         self.subwindow_about_pysills.geometry(var_geometry)
         self.subwindow_about_pysills.resizable(False, False)
-        self.subwindow_about_pysills["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_about_pysills["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_about_pysills, x, weight=1)
@@ -24375,27 +24388,27 @@ class PySILLS(tk.Frame):
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Maximilian A. Beeskow", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Thomas Wagner", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01c = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Tobias Fusswinkel", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row, column_id=start_column + 20, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 2, column_id=start_column + 20, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 3, column_id=start_column + 20, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="RWTH Aachen University", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         lbl_02 = SE(
@@ -24404,38 +24417,38 @@ class PySILLS(tk.Frame):
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS on GitHub", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_02b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 6, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS on ReadTheDocs", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_02c = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 7, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS on YouTube", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_02d = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 11, n_rows=1,
-            n_columns=10, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS on Blogger", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_02e = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 5, column_id=start_column + 20, n_rows=1,
-            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS manual (installation)", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True,
             anchor=tk.W)
         lbl_02f = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 6, column_id=start_column + 20, n_rows=1,
-            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS manual (mineral analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline", link=True,
             anchor=tk.W)
         lbl_02g = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 7, column_id=start_column + 20, n_rows=1,
-            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS manual (fluid inclusion analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline",
             link=True, anchor=tk.W)
         lbl_02h = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 8, column_id=start_column + 20, n_rows=1,
-            n_columns=11, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=11, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="PySILLS manual (melt inclusion analysis)", relief=tk.FLAT, fontsize="sans 10 bold underline",
             link=True, anchor=tk.W)
 
@@ -24454,17 +24467,17 @@ class PySILLS(tk.Frame):
             text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="If you use PySILLS for your work, please cite the following", relief=tk.FLAT,
             fontsize="sans 10 bold", anchor=tk.W)
         lbl_03b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 11, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="journal article:", relief=tk.FLAT,
             fontsize="sans 10 bold", anchor=tk.W)
         lbl_03cb = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 12, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Placeholder Journal Article", relief=tk.FLAT,
             fontsize="sans 10 bold", anchor=tk.W)
 
@@ -24474,42 +24487,42 @@ class PySILLS(tk.Frame):
             text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="SILLS Equation Summary", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 15, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Guillong et al. (2008)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04c = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 16, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Heinrich et al. (2003)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04d = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 17, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Longerich et al. (1996)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04e = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 18, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Pettke et al. (2012)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04f = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 19, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Halter et al. (2002)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04g = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 20, column_id=start_column + 11, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Borisova et al. (2021)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
         lbl_04h = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 14, column_id=start_column + 21, n_rows=1,
-            n_columns=9, fg=self.accent_color, bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=9, fg=self.accent_color, bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Liu et al. (2024)", relief=tk.FLAT,
             fontsize="sans 10 bold underline", link=True, anchor=tk.W)
 
@@ -24592,7 +24605,7 @@ class PySILLS(tk.Frame):
         subwindow_report_setup.title("Calculation Report - Setup")
         subwindow_report_setup.geometry(var_geometry)
         subwindow_report_setup.resizable(False, False)
-        subwindow_report_setup["bg"] = self.bg_colors["Super Dark"]
+        subwindow_report_setup["bg"] = self.bg_colors["BG Window"]
         #
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_report_setup, x, weight=1)
@@ -24614,7 +24627,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_report_setup, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=12, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=12, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Calculation Report Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_report_setup, row_id=start_row + 2, column_id=start_column, n_rows=1,
@@ -24879,7 +24892,7 @@ class PySILLS(tk.Frame):
         self.subwindow_fi_settings.title("FLUID INCLUSION ANALYSIS - Setup")
         self.subwindow_fi_settings.geometry(var_geometry)
         self.subwindow_fi_settings.resizable(False, False)
-        self.subwindow_fi_settings["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_fi_settings["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_settings, x, weight=1)
@@ -25252,7 +25265,7 @@ class PySILLS(tk.Frame):
         self.subwindow_mi_settings.title("MELT INCLUSION ANALYSIS - Setup")
         self.subwindow_mi_settings.geometry(var_geometry)
         self.subwindow_mi_settings.resizable(False, False)
-        self.subwindow_mi_settings["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_mi_settings["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_mi_settings, x, weight=1)
@@ -28207,28 +28220,28 @@ class PySILLS(tk.Frame):
         frm_00 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row, column_id=start_column,
             n_rows=n_rows, n_columns=11, fg=self.bg_colors["Very Light"],
-            bg=self.bg_colors["Super Dark"]).create_frame(relief=tk.FLAT)
+            bg=self.bg_colors["BG Window"]).create_frame(relief=tk.FLAT)
 
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="File Type", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 3, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Data Type", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 6, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Focus", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 9, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Primary Isotope", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 11, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Secondary Isotope", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
@@ -29342,7 +29355,7 @@ class PySILLS(tk.Frame):
         self.subwindow_fi_datareduction_files.title("FLUID INCLUSION ANALYSIS - Data Reduction (Files)")
         self.subwindow_fi_datareduction_files.geometry(var_geometry)
         self.subwindow_fi_datareduction_files.resizable(False, False)
-        self.subwindow_fi_datareduction_files["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_fi_datareduction_files["bg"] = self.bg_colors["BG Window"]
         #
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_datareduction_files, x, weight=1)
@@ -29364,24 +29377,24 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="File Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 3, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Data Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 6, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Assemblage Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 8, column_id=start_column, n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Focus Selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 11, column_id=start_column,
             n_rows=1,
-            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
@@ -29728,7 +29741,7 @@ class PySILLS(tk.Frame):
             "Quantification Setup - Geometric Approach (Halter et al. 2002)")
         self.subwindow_quantification_setup_halter2002.geometry(var_geometry)
         self.subwindow_quantification_setup_halter2002.resizable(False, False)
-        self.subwindow_quantification_setup_halter2002["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_quantification_setup_halter2002["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_quantification_setup_halter2002, x, weight=1)
@@ -29748,7 +29761,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Default Settings", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_002 = SE(
@@ -29789,12 +29802,12 @@ class PySILLS(tk.Frame):
         lbl_005 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 10, column_id=start_column,
             n_rows=1, n_columns=33, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_006 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_006a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column + 19,
@@ -30110,7 +30123,7 @@ class PySILLS(tk.Frame):
             "Quantification Setup - Geometric Approach (Borisova et al. 2021)")
         self.subwindow_quantification_setup_borisova2021.geometry(var_geometry)
         self.subwindow_quantification_setup_borisova2021.resizable(False, False)
-        self.subwindow_quantification_setup_borisova2021["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_quantification_setup_borisova2021["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_quantification_setup_borisova2021, x, weight=1)
@@ -30130,7 +30143,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=18, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Default Settings", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_002 = SE(
@@ -30162,12 +30175,12 @@ class PySILLS(tk.Frame):
         lbl_005 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column,
             n_rows=1, n_columns=18, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_006 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_006a = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 19,
@@ -30360,7 +30373,7 @@ class PySILLS(tk.Frame):
         self.subwindow_fi_setup_matrixonlytracer.title("Fluid Inclusion Analysis - Matrix-only Tracer Setup")
         self.subwindow_fi_setup_matrixonlytracer.geometry(var_geometry)
         self.subwindow_fi_setup_matrixonlytracer.resizable(False, False)
-        self.subwindow_fi_setup_matrixonlytracer["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_fi_setup_matrixonlytracer["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_setup_matrixonlytracer, x, weight=1)
@@ -30383,7 +30396,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=25, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=25, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Default Settings - Matrix-Only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column, n_rows=1,
@@ -30403,16 +30416,16 @@ class PySILLS(tk.Frame):
             text="Concentration (ppm)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column, n_rows=1,
-            n_columns=25, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=25, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column + 26, n_rows=1,
-            n_columns=14, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=14, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion Concentration Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## ENTRIES
@@ -30604,7 +30617,7 @@ class PySILLS(tk.Frame):
             "FI - Quantification Setup")
         self.subwindow_fi_setup_secondinternalstandard.geometry(var_geometry)
         self.subwindow_fi_setup_secondinternalstandard.resizable(False, False)
-        self.subwindow_fi_setup_secondinternalstandard["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_fi_setup_secondinternalstandard["bg"] = self.bg_colors["BG Window"]
         #
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_setup_secondinternalstandard, x, weight=1)
@@ -30624,7 +30637,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row, column_id=start_column, n_rows=1,
-            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            n_columns=20, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Default Settings - Second Internal Standard", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01a = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 1, column_id=start_column,
@@ -30637,12 +30650,12 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 3, column_id=start_column,
             n_rows=1, n_columns=20, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row, column_id=start_column + 21,
             n_rows=1, n_columns=14, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## OPTION MENUES
@@ -30842,7 +30855,7 @@ class PySILLS(tk.Frame):
         self.subwindow_fi_checkfile.title(str_title + str(str_filename_short))
         self.subwindow_fi_checkfile.geometry(var_geometry)
         self.subwindow_fi_checkfile.resizable(False, False)
-        self.subwindow_fi_checkfile["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_fi_checkfile["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_checkfile, x, weight=1)
@@ -30868,19 +30881,19 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column, n_rows=1, n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 15, column_id=start_column, n_rows=1, n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 18, column_id=start_column, n_rows=1, n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Anaylsis Mode", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column, n_rows=1, n_columns=14,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Interval Setup", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column, n_rows=1, n_columns=7,
@@ -30893,7 +30906,7 @@ class PySILLS(tk.Frame):
         lbl_05 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column + 53, n_rows=1,
             n_columns=n_columns - (start_column + 53) - 6, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Parallelism", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
@@ -31023,7 +31036,7 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
             n_columns=39, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Calculation Interval"][str_filetype][str_filename_short],
-            value_rb=3, color_bg=self.bg_colors["Super Dark"], fg=self.bg_colors["Light Font"], text="No Selection",
+            value_rb=3, color_bg=self.bg_colors["BG Window"], fg=self.bg_colors["Light Font"], text="No Selection",
             sticky="nesw", relief=tk.FLAT)
 
         ## CHECKBOXES
@@ -35169,7 +35182,7 @@ class PySILLS(tk.Frame):
         subwindow_fi_inclusion_plugin.title(str_title)
         subwindow_fi_inclusion_plugin.geometry(var_geometry)
         subwindow_fi_inclusion_plugin.resizable(False, False)
-        subwindow_fi_inclusion_plugin["bg"] = self.bg_colors["Super Dark"]
+        subwindow_fi_inclusion_plugin["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_fi_inclusion_plugin, x, weight=1)
@@ -35192,20 +35205,20 @@ class PySILLS(tk.Frame):
         if self.str_incl_is_custom_external == "External":
             lbl_01 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
-                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="LA-ICP-MS Data Export", relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 11, n_rows=1,
-                n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
         else:
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 22, n_rows=1,
-                n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                n_columns=10, fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Default Settings", relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
-                fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
                 text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
 
         if self.str_incl_is_custom_external == "External":
@@ -35746,7 +35759,7 @@ class PySILLS(tk.Frame):
             self.subwindow_spike_check.title("MELT INCLUSION ANALYSIS -  Spike Check")
         self.subwindow_spike_check.geometry(var_geometry)
         self.subwindow_spike_check.resizable(False, False)
-        self.subwindow_spike_check["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_spike_check["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_spike_check, x, weight=1)
@@ -35781,7 +35794,7 @@ class PySILLS(tk.Frame):
         ## LABELS
         lbl_01 = SE(
             parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="File selection", relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_01a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 1, column_id=start_column, n_rows=1, n_columns=12,
@@ -35789,11 +35802,11 @@ class PySILLS(tk.Frame):
             text=self.current_file_spk, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Isotope selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 9, column_id=start_column, n_rows=1, n_columns=12,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Spike correction", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03a1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column, n_rows=1, n_columns=6,
@@ -35821,7 +35834,7 @@ class PySILLS(tk.Frame):
             text=round(self.current_current_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Spike selection", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=6,
@@ -35833,7 +35846,7 @@ class PySILLS(tk.Frame):
             text=self.current_nspikes, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 13, column_id=start_column, n_rows=1, n_columns=12,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Value selection", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
@@ -36245,7 +36258,7 @@ class PySILLS(tk.Frame):
             data_x, data_y_valid, color=self.accent_color, label="Improved data", linewidth=2)
 
         # self.ax_spikes.plot(
-        #     data_x, data_y_raw, color=self.bg_colors["Super Dark"], label="Original data", linewidth=2)
+        #     data_x, data_y_raw, color=self.bg_colors["BG Window"], label="Original data", linewidth=2)
         # self.ax_spikes.plot(data_x, data_y_smoothed, color=self.accent_color, label="Smoothed data", linewidth=2)
         self.ax_spikes.axvline(
             x=data_x[var_id_real], color=self.bg_colors["Medium"], label="Current spike", linewidth=2,
@@ -36298,7 +36311,7 @@ class PySILLS(tk.Frame):
         self.subwindow_popup.title("Attention")
         self.subwindow_popup.geometry(var_geometry)
         self.subwindow_popup.resizable(False, False)
-        self.subwindow_popup["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_popup["bg"] = self.bg_colors["BG Window"]
         self.subwindow_popup.attributes("-topmost", "true")
         self.subwindow_popup.bell()
 
@@ -36323,7 +36336,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_popup, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text="Did you miss something?", relief=tk.FLAT, fontsize="sans 10 bold")
 
         scrll = tk.Scrollbar(self.subwindow_popup)
@@ -36415,7 +36428,7 @@ class PySILLS(tk.Frame):
         subwindow_progressbar_spike_elimination.title("Please wait ...")
         subwindow_progressbar_spike_elimination.geometry(var_geometry)
         subwindow_progressbar_spike_elimination.resizable(False, False)
-        subwindow_progressbar_spike_elimination["bg"] = self.bg_colors["Super Dark"]
+        subwindow_progressbar_spike_elimination["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_progressbar_spike_elimination, x, weight=1)
@@ -36438,7 +36451,7 @@ class PySILLS(tk.Frame):
         self.helper_lbl_progress_spk.set("Process has started!")
         self.lbl_prg_spk = SE(
             parent=subwindow_progressbar_spike_elimination, row_id=2, column_id=1, n_rows=1, n_columns=16,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=self.helper_lbl_progress_spk.get(), relief=tk.FLAT, fontsize="sans 10 bold")
 
         return subwindow_progressbar_spike_elimination, prgbar_spk
@@ -36457,7 +36470,7 @@ class PySILLS(tk.Frame):
         self.subwindow_progressbar_datareduction.title("Please wait ...")
         self.subwindow_progressbar_datareduction.geometry(var_geometry)
         self.subwindow_progressbar_datareduction.resizable(False, False)
-        self.subwindow_progressbar_datareduction["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_progressbar_datareduction["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_progressbar_datareduction, x, weight=1)
@@ -36480,7 +36493,7 @@ class PySILLS(tk.Frame):
         self.helper_lbl_progress.set("Process has started!")
         self.lbl_prg = SE(
             parent=self.subwindow_progressbar_datareduction, row_id=2, column_id=1, n_rows=1, n_columns=16,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Super Dark"]).create_simple_label(
+            fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
             text=self.helper_lbl_progress.get(), relief=tk.FLAT, fontsize="sans 10 bold")
 
 
@@ -36697,7 +36710,7 @@ class PySILLS(tk.Frame):
         self.subwindow_manager.title("PySILLS - Project manager")
         self.subwindow_manager.geometry(var_geometry)
         self.subwindow_manager.resizable(False, False)
-        self.subwindow_manager["bg"] = self.bg_colors["Super Dark"]
+        self.subwindow_manager["bg"] = self.bg_colors["BG Window"]
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_manager, x, weight=1)
@@ -36725,7 +36738,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=self.subwindow_manager, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-            bg=self.bg_colors["Super Dark"]).create_simple_label(
+            bg=self.bg_colors["BG Window"]).create_simple_label(
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## LISTBOXES
