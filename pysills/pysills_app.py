@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.25
+# Version:	v1.0.26
 # Date:		23.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -684,14 +684,33 @@ class PySILLS(tk.Frame):
             "Standard Files": {"English": "Standard Files", "German": "Standardmessungen", "Chinese": "标准文件"},
             "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
             "ICP-MS file setup": {"English": "ICP-MS file setup", "German": "ICP-MS Dateikonfiguration"},
-            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
             "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
             "Project": {"English": "Project", "German": "Projekt"},
             "Add": {"English": "Add", "German": "Hinzufügen"},
+            "Isotope": {"English": "Isotope", "German": "Isotop"},
+            "Interval setup": {"English": "Interval setup", "German": "Zeintfenster Einstellungen"},
+            "Remove interval": {"English": "Remove interval", "German": "Zeitfenster entfernen"},
+            "Update": {"English": "Update", "German": "Aktualisieren"},
+            "Parallelism": {"English": "Parallelism", "German": "Parallelität"},
+            "No selection": {"English": "No selection", "German": "Keine Auswahl"},
+            "Background interval": {"English": "Background interval", "German": "Zeitfenster Untergrund"},
+            "Sample interval": {"English": "Sample interval", "German": "Zeitfenster Probe"},
+            "Matrix interval": {"English": "Matrix interval", "German": "Zeitfenster Matrix"},
+            "Inclusion interval": {"English": "Inclusion interval", "German": "Zeitfenster Einschluss"},
             "Standard file": {"English": "Standard file", "German": "Standardmessung"},
             "Sample file": {"English": "Sample file", "German": "Probenmessung"},
             "Confirm all": {"English": "Confirm all", "German": "Alles bestätigen"},
             "Measured isotopes": {"English": "Measured isotopes", "German": "Isotopenübersicht"},
+            "Display options": {"English": "Display options", "German": "Anzeigeoptionen"},
+            "Analysis mode": {"English": "Analysis mode", "German": "Analysemodus"},
+            "Show all": {"English": "Show all", "German": "Alles anzeigen"},
+            "Hide all": {"English": "Hide all", "German": "Alles ausblenden"},
+            "Time series view": {"English": "Time series view", "German": "Zeitreihe Messung"},
+            "Time ratios view": {"English": "Time ratios view", "German": "Zeitreihe Verhältnisse"},
+            "Spectral data view": {"English": "Spectral data view", "German": "Datenspektrum"},
+            "Box plot data view": {"English": "Box plot data view", "German": "Kastengrafik"},
+            "Quick analysis": {"English": "Quick analysis", "German": "Schnellanalyse"},
+            "Stepwise analysis": {"English": "Stepwise analysis", "German": "Schrittweise Analyse"},
             "Copy": {"English": "Copy", "German": "Kopieren"},
             "Delete": {"English": "Delete", "German": "Löschen"},
             "Rename": {"English": "Rename", "German": "Umbenennen"},
@@ -706,7 +725,7 @@ class PySILLS(tk.Frame):
             "Quit": {"English": "Quit", "German": "Beenden"},
             "Manager": {"English": "Manager", "German": "Manager"},
             "Setup": {"English": "Setup", "German": "Einstellungen"},
-            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
+            "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS auswählen"},
             "Mineral Analysis": {"English": "Mineral Analysis", "German": "Minerale"},
             "Settings": {"English": "Settings", "German": "Einstellungen"},
             "Results": {"English": "Results", "German": "Ergebnisse"},
@@ -751,12 +770,19 @@ class PySILLS(tk.Frame):
                 "German": "Kontrolle - Standard/Referenzmaterial (SRM)"},
             "SRM values": {"English": "SRM values", "German": "SRM Werte"},
             "Name": {"English": "Name", "German": "Name"},
+            "Category": {"English": "Category", "German": "Kategorie"},
+            "ID": {"English": "ID", "German": "ID"},
             "SRM": {"English": "SRM", "German": "SRM"},
             "Concentration (ppm)": {"English": "Concentration (ppm)", "German": "Konzentration (ppm)"},
             "Element": {"English": "Element", "German": "Element"},
             "Start": {"English": "Start", "German": "Start"},
             "End": {"English": "End", "German": "Ende"},
             "Run": {"English": "Run", "German": "Ausführen"},
+            "N(isotopes)": {"English": "N(isotopes)", "German": "N(Isotope)"},
+            "t(start)": {"English": "t(start)", "German": "t(Start)"},
+            "t(end)": {"English": "t(end)", "German": "t(Ende)"},
+            "t(day)": {"English": "t(day)", "German": "t(Tag)"},
+            "date": {"English": "date", "German": "Datum"},
             "Spike Elimination": {"English": "Spike Elimination", "German": "Einstellungen - Ausreißer"},
             "Calculation Method": {"English": "Calculation Method", "German": "Berechnungsmethode"},
             "Check-Up": {"English": "Check-Up", "German": "Kontrolle"},
@@ -764,16 +790,15 @@ class PySILLS(tk.Frame):
             "Exclude inclusion": {"English": "Exclude inclusion", "German": "Inklusion ausschließen"},
             "Check inclusion": {"English": "Check only inclusion", "German": "Nur Inklusion überprüfen"},
             "Quantification Method": {"English": "Quantification Method", "German": "Quantifizierungsmethode"},
-            "Inclusion Settings": {"English": "Inclusion Settings", "German": "Einstellungen - Flüssigkeitseinschluss"},
             "Significance level": {"English": "Significance level", "German": "Signifikanzniveau"},
             "Threshold": {"English": "Threshold", "German": "Schwellenwert"},
             "Remove all": {"English": "Remove all", "German": "Alles entfernen"},
             "Apply to all": {"English": "Apply to all", "German": "Auf alles anwenden"},
             "Check": {"English": "Check", "German": "Überprüfen"},
             "Calculation Intervals": {"English": "Calculation intervals", "German": "Zeitintervalle"},
-            "Acquisition Times": {"English": "Acquisition Times", "German": "Messzeiten (Experiment)"},
+            "Acquisition Times": {"English": "Acquisition Times", "German": "Messzeiten"},
+            "Acquisition Time": {"English": "Acquisition time", "German": "Messzeit"},
             "Imported Files": {"English": "Imported Files", "German": "Importierte Dateien"},
-            "Name": {"English": "Name", "German": "Name"},
             "Line of time stamp": {"English": "Line of time stamp", "German": "Zeitstempel in Zeile"},
             "Skip header": {"English": "Skip header", "German": "Überspringe ... Kopfzeilen"},
             "Skip footer": {"English": "Skip footer", "German": "Überspringe ... Fußzeilen"},
@@ -785,9 +810,33 @@ class PySILLS(tk.Frame):
             "Select oxide": {"English": "Select oxide", "German": "Oxid auswählen"},
             "Select isotope": {"English": "Select isotope", "German": "Isotop auswählen"},
             "Select element": {"English": "Select element", "German": "Element auswählen"},
+            "Select all": {"English": "Select all", "German": "Alles auswählen"},
+            "Select": {"English": "Select", "German": "Auswählen"},
+            "Alkali metals": {"English": "Alkali metals", "German": "Alkalimetalle"},
+            "Alkaline earth metals": {"English": "Alkaline earth metals", "German": "Erdalkalimetalle"},
+            "Transition metals": {"English": "Transition metals", "German": "Übergangsmetalle"},
+            "Other metals": {"English": "Other metals", "German": "Andere Metalle"},
+            "Metalloids": {"English": "Metalloids", "German": "Halbmetalle"},
+            "Lanthanides": {"English": "Lanthanides", "German": "Lanthanoide"},
+            "Actinides": {"English": "Actinides", "German": "Actinoide"},
+            "Non-metals": {"English": "Non-metals", "German": "Nichtmetalle"},
+            "Halogens": {"English": "Halogens", "German": "Halogene"},
+            "Noble gases": {"English": "Noble gases", "German": "Edelgase"},
+            "Select all oxides": {"English": "Select all oxides", "German": "Alle Oxide auswählen"},
+            "Deselect all oxides": {"English": "Deselect all oxides", "German": "Alle Oxide abwählen"},
+            "Rock-forming elements": {"English": "Rock-forming elements", "German": "Gesteinsbildende Elemente"},
+            "Guess the composition": {"English": "Guess the composition", "German": "Zusammensetzung schätzen"},
+            "Setup - Oxide ratios": {"English": "Setup - Oxide ratios", "German": "Einstellungen - Oxidverhältnisse"},
+            "Setup - Reference element": {
+                "English": "Setup - Reference element", "German": "Einstellungen - Referenzelement"},
+            "Setup - Oxide selection": {"English": "Setup - Oxide selection", "German": "Einstellungen - Oxidauswahl"},
+            "Run 100 wt.% oxides calculation for": {
+                "English": "Run 100 wt.% oxides calculation for", "German": "Berechnung 100 Gew.% Oxide ausführen für"},
+            "Setup - Files": {"English": "Setup - Files", "German": "Einstellungen - Dateien"},
+            "Mineral quantification": {"English": "Mineral quantification", "German": "Mineralquantifizierung"},
+            "Inclusion quantification": {"English": "Inclusion quantification", "German": "Einschlussquantifizierung"},
             "Assemblage Settings": {"English": "Assemblage Settings", "German": "Einstellungen - Assemblage"},
             "Isotope Dwell Times": {"English": "Isotope Dwell Times", "German": "Haltezeiten je Isotop"},
-            "Matrix Settings": {"English": "Matrix Settings", "German": "Einstellungen - Matrix"},
             "Inclusion Settings": {"English": "Inclusion Settings", "German": "Einstellungen - Einschlüsse"},
             "Internal Standard Setup": {
                 "English": "Internal Standard Setup", "German": "Einstellungen interner Standard"},
@@ -811,7 +860,27 @@ class PySILLS(tk.Frame):
             "Stack all intervals into one": {
                 "English": "Stack all intervals into one", "German": "Alle Intervalle stappeln"},
             "File type": {"English": "File type", "German": "Dateiendung"},
+            "Original data": {"English": "Original data", "German": "Originaldaten"},
+            "Smoothed data": {"English": "Smoothed data", "German": "Korrigierte Daten"},
+            "Current data": {"English": "Current data", "German": "Aktuelle Daten"},
+            "Current outlier": {"English": "Current outlier", "German": "Aktueller Ausreißer"},
+            "Isotope selection": {"English": "Isotope selection", "German": "Isotopauswahl"},
+            "Outlier selection": {"English": "Outlier selection", "German": "Ausreißerauswahl"},
+            "Outlier correction": {"English": "Outlier correction", "German": "Ausreißerkorrektur"},
+            "Number of outliers": {"English": "Number of outliers", "German": "Anzahl Ausreißer"},
+            "File selection": {"English": "File selection", "German": "Dateiauswahl"},
+            "Original value": {"English": "Original value", "German": "Originalwert"},
+            "Smoothed value": {"English": "Smoothed value", "German": "Korrekturwert"},
+            "Current value": {"English": "Current value", "German": "Aktueller Wert"},
+            "Value selection": {"English": "Value selection", "German": "Wert auswählen"},
+            "Outlier check": {"English": "Outlier check", "German": "Ausreißerüberprüfung"},
+            "Signal intensity": {"English": "Signal intensity", "German": "Signalintensität"},
+            "Experiment time": {"English": "Experiment time", "German": "Experimentzeit"},
             "Delimiter": {"English": "Delimiter", "German": "Trennzeichen"},
+            "Sample": {"English": "Sample", "German": "Probe"},
+            "Matrix": {"English": "Matrix", "German": "Matrix"},
+            "Inclusion": {"English": "Inclusion", "German": "Einschluss"},
+            "Internal standard": {"English": "Internal standard", "German": "Interner Standard"},
             "Background": {"English": "Background", "German": "Untergrund"},
             "Main signal": {"English": "Main signal", "German": "Hauptsignal"},
             "Line width": {"English": "Line width", "German": "Linienbreite"},
@@ -2099,19 +2168,24 @@ class PySILLS(tk.Frame):
             var=self.container_var["ICP-MS Info"]["skipfooter"], text_default=current_val_skipfooter)
 
         # BUTTONS
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_02 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
             column_id=var_column_start + (var_header_n - int_category_n), n_rows=1,
-            n_columns=(var_header_n - int_category_n), fg=font_color_light,
+            n_columns=(var_header_n - int_category_n), fg=font_color_accent,
             bg=accent_color).create_simple_button(
-            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_accent,
             command=self.confirm_icpms_settings)
         btn_002 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
             column_id=var_column_start, n_rows=1,
-            n_columns=(var_header_n - int_category_n), fg=font_color_light,
+            n_columns=(var_header_n - int_category_n), fg=font_color_accent,
             bg=accent_color).create_simple_button(
-            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_accent,
             command=self.save_icpms_settings)
 
     def confirm_icpms_settings(self):
@@ -4762,8 +4836,14 @@ class PySILLS(tk.Frame):
                                                           interval[0]:interval[1]]
                                             dataset_complete = self.container_measurements["RAW"][file_std][isotope]
                                             dataset_complete_all = self.container_measurements["RAW"][file_std]
-                                            var_threshold = int(self.container_var["Spike Elimination"]["Threshold"][
-                                                                    isotope].get())
+                                            var_threshold = int(float(
+                                                self.container_var["Spike Elimination"]["Threshold"][isotope].get()))
+
+                                            if var_threshold < 0:
+                                                var_threshold = abs(var_threshold)
+
+                                            self.container_var["Spike Elimination"]["Threshold"][isotope].set(
+                                                var_threshold)
 
                                             if spike_elimination_performed == True:
                                                 time_start = datetime.datetime.now()
@@ -4932,8 +5012,14 @@ class PySILLS(tk.Frame):
 
                                             dataset_complete = self.container_measurements["RAW"][file_smpl][isotope]
                                             dataset_complete_all = self.container_measurements["RAW"][file_smpl]
-                                            var_threshold = int(self.container_var["Spike Elimination"]["Threshold"][
-                                                                    isotope].get())
+                                            var_threshold = int(float(
+                                                self.container_var["Spike Elimination"]["Threshold"][isotope].get()))
+
+                                            if var_threshold < 0:
+                                                var_threshold = abs(var_threshold)
+
+                                            self.container_var["Spike Elimination"]["Threshold"][isotope].set(
+                                                var_threshold)
 
                                             if spike_elimination_performed == True:
                                                 time_start = datetime.datetime.now()
@@ -9566,12 +9652,18 @@ class PySILLS(tk.Frame):
             parent=subwindow_se_threshold, row_id=var_row_start + 1, column_id=int_category_n, n_rows=1,
             n_columns=var_header_n - int_category_n, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_simple_entry(var=var_threshold, text_default=var_threshold.get())
+        entr_01.bind( "<Return>", lambda event, variable=var_threshold: self.update_threshold_value(variable, event))
 
         ## BUTTONS
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_03 = SE(
             parent=subwindow_se_threshold, row_id=n_rows - 2, column_id=var_header_n - int_category_n, n_rows=1,
-            n_columns=int_category_n, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Update values", bg_active=accent_color, fg_active=font_color_light,
+            n_columns=int_category_n, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text="Update values", bg_active=accent_color, fg_active=font_color_accent,
             command=lambda mode="specific": self.calculate_threshold_spike_elimination(mode))
 
         ## TREEVIEWS
@@ -9606,14 +9698,14 @@ class PySILLS(tk.Frame):
                 entr_i = tk.Entry(
                     frm_se_threshold, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope],
                     fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0,
-                    highlightbackground=background_color_light, width=12)
+                    highlightbackground=background_color_light, width=8)
                 text_se_threshold.window_create("insert", window=entr_i)
                 text_se_threshold.insert("end", "\t")
 
                 entr_i = tk.Entry(
                     frm_se_threshold, textvariable=self.container_var["Spike Elimination"]["Threshold"][var_isotope],
                     fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0,
-                    highlightbackground=background_color_light, width=12)
+                    highlightbackground=background_color_light, width=8)
                 text_se_threshold.window_create("insert", window=entr_i)
                 text_se_threshold.insert("end", "\n")
             else:
@@ -9629,16 +9721,29 @@ class PySILLS(tk.Frame):
                 entr_i = tk.Entry(
                     frm_se_threshold, textvariable=self.container_var["dwell_times"]["Entry"][var_isotope],
                     fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0,
-                    highlightbackground=background_color_light, width=12)
+                    highlightbackground=background_color_light, width=8)
                 text_se_threshold.window_create("insert", window=entr_i)
                 text_se_threshold.insert("end", "\t")
 
                 entr_i = tk.Entry(
                     frm_se_threshold, textvariable=self.container_var["Spike Elimination"]["Threshold"][var_isotope],
                     fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0,
-                    highlightbackground=background_color_light, width=12)
+                    highlightbackground=background_color_light, width=8)
                 text_se_threshold.window_create("insert", window=entr_i)
                 text_se_threshold.insert("end", "\n")
+
+    def update_threshold_value(self, variable, event):
+        val_threshold_default = int(variable.get())
+
+        if val_threshold_default < 0:
+            val_threshold_default = abs(val_threshold_default)
+
+        variable.set(val_threshold_default)
+
+        for isotope in self.container_lists["Measured Isotopes"]["All"]:
+            self.container_var["Spike Elimination"]["Threshold"][isotope].set(val_threshold_default)
+            val_dwell_time = 10/val_threshold_default
+            self.container_var["dwell_times"]["Entry"][isotope].set(val_dwell_time)
 
     def detect_signal_interval(self, mode="BG"):
         if self.pysills_mode == "MA":
@@ -10019,66 +10124,95 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_frame(relief=tk.FLAT)
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Select isotope"][self.var_language]
+        str_lbl_02 = self.language_dict["Sample"][self.var_language]
+        str_lbl_03 = self.language_dict["Matrix"][self.var_language]
+        str_lbl_04 = self.language_dict["Inclusion"][self.var_language]
+        str_lbl_05 = self.language_dict["Select all"][self.var_language]
+        str_lbl_06 = self.language_dict["Run"][self.var_language]
+        str_lbl_07 = self.language_dict["Select"][self.var_language]
+        str_lbl_08 = self.language_dict["Setup - Oxide ratios"][self.var_language]
+        str_lbl_09 = self.language_dict["Setup - Reference element"][self.var_language]
+        str_lbl_10 = self.language_dict["Setup - Oxide selection"][self.var_language]
+        str_lbl_11 = self.language_dict["Run 100 wt.% oxides calculation for"][self.var_language]
+        str_lbl_12 = self.language_dict["Mineral quantification"][self.var_language]
+        str_lbl_13 = self.language_dict["Inclusion quantification"][self.var_language]
+        str_lbl_14 = self.language_dict["Select all oxides"][self.var_language]
+        str_lbl_15 = self.language_dict["Deselect all oxides"][self.var_language]
+        str_lbl_16 = self.language_dict["Rock-forming elements"][self.var_language]
+        str_lbl_17 = self.language_dict["Guess the composition"][self.var_language]
+        str_lbl_18 = self.language_dict["Setup - Files"][self.var_language]
+        str_lbl_19 = self.language_dict["Alkali metals"][self.var_language]
+        str_lbl_20 = self.language_dict["Alkaline earth metals"][self.var_language]
+        str_lbl_21 = self.language_dict["Transition metals"][self.var_language]
+        str_lbl_22 = self.language_dict["Other metals"][self.var_language]
+        str_lbl_23 = self.language_dict["Metalloids"][self.var_language]
+        str_lbl_24 = self.language_dict["Lanthanides"][self.var_language]
+        str_lbl_25 = self.language_dict["Actinides"][self.var_language]
+        str_lbl_26 = self.language_dict["Non-metals"][self.var_language]
+        str_lbl_27 = self.language_dict["Halogens"][self.var_language]
+        str_lbl_28 = self.language_dict["Noble gases"][self.var_language]
+
         lbl_01 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Alkali metals", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_19, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_02 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Alkaline earth metals", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_20, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_03 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=2*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Transition metals", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_21, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_04 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=3*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Other metals", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_22, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_05 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=4*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Metalloids", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_23, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_06 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Lanthanides", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_24, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_07 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Actinides", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_25, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_08 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=2*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Non-metals", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_26, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_09 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=3*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Halogens", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_27, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_10 = SE(
             parent=subwindow_checkup_oxides, row_id=14, column_id=4*var_header_n, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Noble gases", relief=tk.FLAT, fontsize="sans 12 bold")
+            text=str_lbl_28, relief=tk.FLAT, fontsize="sans 12 bold")
         lbl_11 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Setup - Oxide ratios", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+            text=str_lbl_08, relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_11a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 1, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Matrix/Sample", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_02 + "/"+ str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_11b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 2, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
@@ -10093,7 +10227,7 @@ class PySILLS(tk.Frame):
             parent=subwindow_checkup_oxides, row_id=var_row_start + 4, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Inclusion", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_11e = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 5, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
@@ -10108,137 +10242,137 @@ class PySILLS(tk.Frame):
             parent=subwindow_checkup_oxides, row_id=var_row_start + 8, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Setup - Reference element", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+            text=str_lbl_09, relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_12a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 9, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
             bg=background_color_elements).create_simple_label(
-            text="Matrix quantification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_12, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_12b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 10, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
             bg=background_color_elements).create_simple_label(
-            text="Inclusion quantification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_13, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_13 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 12, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Setup - Oxide selection", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+            text=str_lbl_10, relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_13a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 13, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
             bg=background_color_elements).create_simple_label(
-            text="Select all oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_14, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_13b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 14, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
             bg=background_color_elements).create_simple_label(
-            text="Deselect all oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_15, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_13c = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
             bg=background_color_elements).create_simple_label(
-            text="Rock-forming elements", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_16, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_13d = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark,
             bg=background_color_elements).create_simple_label(
-            text="Guess the composition", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_17, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_14 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start, column_id=5*var_header_n + int(1.5*var_header_n) + 2,
             n_rows=1, n_columns=int(1.5*var_header_n), fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Setup - Files", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+            text=str_lbl_18, relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
         lbl_14a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 1,
             column_id=5*var_header_n + int(1.5*var_header_n) + 2, n_rows=1, n_columns=int_category_n,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Matrix/Sample", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_02 + "/"+ str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_14b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 14,
             column_id=5*var_header_n + int(1.5*var_header_n) + 2, n_rows=1, n_columns=int_category_n,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Inclusion", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_15 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 17, column_id=5*var_header_n + 1, n_rows=1,
             n_columns=int(1.5*var_header_n), fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Run 100 wt.% oxides calculation for", relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
+            text=str_lbl_11, relief=tk.FLAT, fontsize="sans 12 bold", anchor=tk.W)
 
         ## BUTTONS
         btn_01 = SE(
             parent=subwindow_checkup_oxides, row_id=13, column_id=int(0.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_02 = SE(
             parent=subwindow_checkup_oxides, row_id=13, column_id=int(1.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_03 = SE(
             parent=subwindow_checkup_oxides, row_id=13, column_id=int(2.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_04 = SE(
             parent=subwindow_checkup_oxides, row_id=13, column_id=int(3.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_05 = SE(
             parent=subwindow_checkup_oxides, row_id=13, column_id=int(4.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_06 = SE(
             parent=subwindow_checkup_oxides, row_id=27, column_id=int(0.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_07 = SE(
             parent=subwindow_checkup_oxides, row_id=27, column_id=int(1.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_08 = SE(
             parent=subwindow_checkup_oxides, row_id=27, column_id=int(2.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_09 = SE(
             parent=subwindow_checkup_oxides, row_id=27, column_id=int(3.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_10 = SE(
             parent=subwindow_checkup_oxides, row_id=27, column_id=int(4.5*var_header_n), n_rows=1,
             n_columns=int(0.5*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select all", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light)
         btn_13a = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 13, column_id=5*var_header_n + 1 + int_category_n,
             n_rows=1, n_columns=int(0.75*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Run", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=self.select_all_oxides)
         btn_13b = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 14, column_id=5*var_header_n + 1 + int_category_n,
             n_rows=1, n_columns=int(0.75*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Run", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=self.deselect_all_oxides)
         btn_13c = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 15, column_id=5*var_header_n + 1 + int_category_n,
             n_rows=1, n_columns=int(0.75*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Select", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
             command=self.select_main_rockforming_elements)
         btn_13d = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 16, column_id=5*var_header_n + 1 + int_category_n,
             n_rows=1, n_columns=int(0.75*var_header_n), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Run", bg_active=accent_color, fg_active=font_color_light)
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light)
         btn_13d.configure(state="disabled")
 
         ## ENTRIES
@@ -10745,9 +10879,9 @@ class PySILLS(tk.Frame):
 
         ## OPTION MENUS
         var_opt_mat_isotope = tk.StringVar()
-        var_opt_mat_isotope.set("Select isotope")
+        var_opt_mat_isotope.set(str_lbl_01)
         var_opt_incl_isotope = tk.StringVar()
-        var_opt_incl_isotope.set("Select isotope")
+        var_opt_incl_isotope.set(str_lbl_01)
 
         opt_mat_isotope = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 9, column_id=5*var_header_n + 1 + int_category_n,
@@ -10789,12 +10923,12 @@ class PySILLS(tk.Frame):
             parent=subwindow_checkup_oxides, row_id=var_row_start + 18, column_id=5*var_header_n + 1,
             fg=font_color_dark, n_rows=1, n_columns=int(1.5*var_header_n),
             bg=background_color_elements).create_simple_checkbox(
-            var_cb=self.oxide_calculation_mat, text="Matrix/Sample", set_sticky="nesw", own_color=True)
+            var_cb=self.oxide_calculation_mat, text=str_lbl_02 + "/"+ str_lbl_03, set_sticky="nesw", own_color=True)
         cb_02 = SE(
             parent=subwindow_checkup_oxides, row_id=var_row_start + 19, column_id=5*var_header_n + 1,
             fg=font_color_dark, n_rows=1, n_columns=int(1.5*var_header_n),
             bg=background_color_elements).create_simple_checkbox(
-            var_cb=self.oxide_calculation_incl, text="Inclusion", set_sticky="nesw", own_color=True)
+            var_cb=self.oxide_calculation_incl, text=str_lbl_04, set_sticky="nesw", own_color=True)
 
         if self.pysills_mode in ["MA", "FI"]:
             cb_02.configure(state="disabled")
@@ -10865,6 +10999,9 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
+        str_lbl_02 = self.language_dict["Internal standard"][self.var_language]
+
         ## Window Settings
         window_width = 840
         window_height = 400
@@ -10875,7 +11012,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         subwindow_checkup_is = tk.Toplevel(self.parent)
-        subwindow_checkup_is.title("Check-Up - Internal standard")
+        subwindow_checkup_is.title(str_lbl_01 + " - " + str_lbl_02)
         subwindow_checkup_is.geometry(var_geometry)
         subwindow_checkup_is.resizable(False, False)
         subwindow_checkup_is["bg"] = background_color_dark
@@ -10898,16 +11035,21 @@ class PySILLS(tk.Frame):
         int_category_n = 6
 
         ## LABELS
+        str_lbl_03 = self.language_dict["Sample"][self.var_language]
+        str_lbl_04 = self.language_dict["Matrix"][self.var_language]
+        str_lbl_05 = self.language_dict["Inclusion"][self.var_language]
+        str_lbl_06 = self.language_dict["Select isotope"][self.var_language]
+
         lbl_01 = SE(
             parent=subwindow_checkup_is, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Internal standard (sample/matrix)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02 + " (" + str_lbl_03 + "/" + str_lbl_04 + ")", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_checkup_is, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
             n_columns=var_header_n, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Internal standard (inclusion)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02 + " (" + str_lbl_05 + ")", relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## TREEVIEWS
         list_is_mat = self.container_lists["Measured Isotopes"]["All"]
@@ -10979,7 +11121,7 @@ class PySILLS(tk.Frame):
 
                 var_opt_is_incl_i = tk.StringVar()
                 var_entr_is_incl_i = tk.StringVar()
-                var_opt_is_incl_i.set("Select isotope")
+                var_opt_is_incl_i.set(str_lbl_06)
                 var_entr_is_incl_i.set("0.0")
 
                 opt_is_i = tk.OptionMenu(
@@ -11003,8 +11145,8 @@ class PySILLS(tk.Frame):
         ## OPTION MENUS
         self.var_opt_is_mat_default = tk.StringVar()
         self.var_opt_is_incl_default = tk.StringVar()
-        self.var_opt_is_mat_default.set("Select isotope")
-        self.var_opt_is_incl_default.set("Select isotope")
+        self.var_opt_is_mat_default.set(str_lbl_06)
+        self.var_opt_is_incl_default.set(str_lbl_06)
 
         opt_is_mat = SE(
             parent=subwindow_checkup_is, row_id=n_rows - 2, column_id=var_header_n - 2*int_category_n, n_rows=1,
@@ -11844,177 +11986,172 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
+        str_lbl_02 = self.language_dict["Calculation Intervals"][self.var_language]
+
         ## Window Settings
         window_width = 1080
         window_height = 825
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         subwindow_intervals = tk.Toplevel(self.parent)
-        subwindow_intervals.title("Check-Up - Calculation Intervals")
+        subwindow_intervals.title(str_lbl_01 + " - " + str_lbl_02)
         subwindow_intervals.geometry(var_geometry)
         subwindow_intervals.resizable(False, False)
         subwindow_intervals["bg"] = background_color_dark
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_intervals, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_intervals, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_intervals.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             subwindow_intervals.grid_columnconfigure(i, minsize=column_min)
-        #
+
+        str_lbl_03 = self.language_dict["Name"][self.var_language]
+        str_lbl_04 = self.language_dict["Category"][self.var_language]
+        str_lbl_05 = self.language_dict["ID"][self.var_language]
+        str_lbl_06 = self.language_dict["Start"][self.var_language]
+        str_lbl_07 = self.language_dict["End"][self.var_language]
+
         if self.pysills_mode == "MA":
-            accent_bg = self.colors_ma["Dark"]
-            accent_fg = self.colors_ma["Light Font"]
-            accent_btn_bg = self.colors_ma["Medium"]
-            accent_btn_fg = self.colors_ma["Dark Font"]
-            var_categories = ["Filename", "Category", "ID", "Start", "End"]
+            var_categories = [str_lbl_03, str_lbl_04, str_lbl_05, str_lbl_06, str_lbl_07]
             var_widths = ["160", "90", "90", "90", "90"]
         elif self.pysills_mode == "FI":
-            accent_bg = accent_color
-            accent_fg = font_color_light
-            accent_btn_bg = self.colors_fi["Medium"]
-            accent_btn_fg = self.colors_fi["Dark Font"]
-            var_categories = ["Filename", "Category", "ID", "Start", "End"]
+            var_categories = [str_lbl_03, str_lbl_04, str_lbl_05, str_lbl_06, str_lbl_07]
             var_widths = ["160", "90", "90", "90", "90"]
         elif self.pysills_mode == "MI":
-            accent_bg = self.colors_mi["Dark"]
-            accent_fg = self.colors_mi["Light Font"]
-            accent_btn_bg = self.colors_mi["Medium"]
-            accent_btn_fg = self.colors_mi["Dark Font"]
-            var_categories = ["Name", "BG(start)", "BG(end)", "MAT(start)", "MAT(end)", "INCL(start)", "INCL(end)"]
-            var_widths = ["120", "67", "67", "67", "67", "67", "67"]
-        elif self.pysills_mode == "OA":
-            accent_bg = self.bg_colors["Dark"]
-            accent_fg = font_color_light
-            accent_btn_bg = self.bg_colors["Medium"]
-            accent_btn_fg = font_color_dark
-        #
+            var_categories = [str_lbl_03, str_lbl_04, str_lbl_05, str_lbl_06, str_lbl_07]
+            var_widths = ["160", "90", "90", "90", "90"]
+
         ################################################################################################################
-        #
+
         start_column = 0
         start_row = 0
-        #
+
         ## FRAMES
         frm_00 = SE(
             parent=subwindow_intervals, row_id=start_row, column_id=start_column + 26,
             n_rows=n_rows, n_columns=n_columns - 26, fg=font_color_dark,
             bg=background_color_light).create_frame(relief=tk.FLAT)
-        #
+
         ## FIGURES
         fig_checkup_std = Figure(figsize=(10, 5), tight_layout=True, facecolor=background_color_light)
         fig_checkup_smpl = Figure(figsize=(10, 5), tight_layout=True, facecolor=background_color_light)
-        #
+
         canvas_std = FigureCanvasTkAgg(fig_checkup_std, master=subwindow_intervals)
         canvas_std.get_tk_widget().grid(
             row=start_row + 1, column=start_column + 26, rowspan=15, columnspan=27, sticky="nesw")
         canvas_smpl = FigureCanvasTkAgg(fig_checkup_smpl, master=subwindow_intervals)
         canvas_smpl.get_tk_widget().grid(
             row=start_row + 17, column=start_column + 26, rowspan=15, columnspan=27, sticky="nesw")
-        #
+
         self.container_checkup["STD"].append(canvas_std)
         self.container_checkup["SMPL"].append(canvas_smpl)
         self.temp_figure_checkup = {"STD": fig_checkup_std, "SMPL": fig_checkup_smpl}
         self.temp_canvas_checkup = {"STD": canvas_std, "SMPL": canvas_smpl}
         self.temp_axes_checkup = {"STD": {}, "SMPL": {}}
         self.temp_lines_checkup = {"STD": {}, "SMPL": {}}
-        #
+
         ## LABELS
+        str_lbl_03 = self.language_dict["Standard Files"][self.var_language]
+        str_lbl_04 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_05 = self.language_dict["Before"][self.var_language]
+        str_lbl_06 = self.language_dict["Next"][self.var_language]
+        str_lbl_07 = self.language_dict["Setup"][self.var_language]
+
         lbl_std = SE(
             parent=subwindow_intervals, row_id=start_row, column_id=start_column, n_rows=1, n_columns=26,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Standard Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_smpl = SE(
             parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=26,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
+
         ## BUTTONS
         btn_std_01 = SE(
             parent=subwindow_intervals, row_id=start_row, column_id=start_column + 26, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Previous Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="STD", mode="Back", var_fig=fig_checkup_std:
             self.change_graph_checkup(filetype, mode, var_fig))
         btn_std_02 = SE(
             parent=subwindow_intervals, row_id=start_row, column_id=start_column + 32, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="STD", var_fig=fig_checkup_std: self.change_graph_checkup(filetype, var_fig))
-        #
+
         if self.pysills_mode == "MA":
             btn_std_03 = SE(
                 parent=subwindow_intervals, row_id=start_row, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Setup", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_filename_long=self.ma_current_file_std, var_filetype="STD", checkup_mode=True:
                 self.ma_check_specific_file(var_filename_long, var_filetype, checkup_mode))
-            #
         elif self.pysills_mode == "FI":
             btn_std_03 = SE(
                 parent=subwindow_intervals, row_id=start_row, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Setup", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_file=self.fi_current_file_std, var_type="STD", checkup_mode=True:
                 self.fi_check_specific_file(var_file, var_type, checkup_mode))
-            #
         elif self.pysills_mode == "MI":
             btn_std_03 = SE(
                 parent=subwindow_intervals, row_id=start_row, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Setup", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_file=self.mi_current_file_std, var_type="STD", checkup_mode=True:
                 self.mi_check_specific_file(var_file, var_type, checkup_mode))
-        #
+
         btn_smpl_01 = SE(
             parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 26, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Previous Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="SMPL", mode="Back", var_fig=fig_checkup_smpl:
             self.change_graph_checkup(filetype, mode, var_fig))
         btn_smpl_02 = SE(
             parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 32, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="SMPL", var_fig=fig_checkup_smpl: self.change_graph_checkup(filetype, var_fig))
         if self.pysills_mode == "MA":
             btn_smpl_03 = SE(
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Setup", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_filename_long=self.ma_current_file_smpl, var_filetype="SMPL", checkup_mode=True:
                 self.ma_check_specific_file(var_filename_long, var_filetype, checkup_mode))
         elif self.pysills_mode == "FI":
             btn_smpl_03 = SE(
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Setup", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_file=self.fi_current_file_smpl, var_type="SMPL", checkup_mode=True:
                 self.fi_check_specific_file(var_file, var_type, checkup_mode))
         elif self.pysills_mode == "MI":
             btn_smpl_03 = SE(
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Setup", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_file=self.mi_current_file_smpl, var_type="SMPL", checkup_mode=True:
                 self.mi_check_specific_file(var_file, var_type, checkup_mode))
-        #
+
         ## TREEVIEW
-        #
         tv_std = SE(
             parent=subwindow_intervals, row_id=start_row + 1, column_id=start_column, n_rows=15, n_columns=26,
             fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(var_categories), text_n=var_categories, width_n=var_widths, individual=True)
-        #
+
         if self.pysills_mode == "MA":
             for file_std in self.container_lists["STD"]["Short"]:
                 for category in ["BG", "MAT"]:
@@ -12024,20 +12161,18 @@ class PySILLS(tk.Frame):
                                 times = var_content["Times"]
                             else:
                                 times = var_content["Times"]
-                            #
+
                             entry_std = [file_std, category, var_id, times[0], times[1]]
                             tv_std.insert("", tk.END, values=entry_std)
-                        #
                     else:
                         var_id = 0
                         times = ["undefined", "undefined"]
-                        #
+
                         entry_std = [file_std, category, var_id, times[0], times[1]]
                         tv_std.insert("", tk.END, values=entry_std)
-                        #
+
                 self.temp_axes_checkup["STD"][file_std] = fig_checkup_std.add_subplot(label=file_std)
                 self.temp_lines_checkup["STD"][file_std] = 0
-            #
         else:
             for file_std in self.container_lists["STD"]["Short"]:
                 for category in ["BG", "MAT"]:
@@ -12047,25 +12182,24 @@ class PySILLS(tk.Frame):
                                 times = var_content["Times"]
                             else:
                                 times = var_content["Times"]
-                            #
+
                             entry_std = [file_std, category, var_id, times[0], times[1]]
                             tv_std.insert("", tk.END, values=entry_std)
-                        #
                     else:
                         var_id = 0
                         times = ["undefined", "undefined"]
-                        #
+
                         entry_std = [file_std, category, var_id, times[0], times[1]]
                         tv_std.insert("", tk.END, values=entry_std)
-                        #
+
                 self.temp_axes_checkup["STD"][file_std] = fig_checkup_std.add_subplot(label=file_std)
                 self.temp_lines_checkup["STD"][file_std] = 0
-        #
+
         tv_smpl = SE(
             parent=subwindow_intervals, row_id=start_row + 17, column_id=start_column, n_rows=15, n_columns=26,
             fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(var_categories), text_n=var_categories, width_n=var_widths, individual=True)
-        #
+
         if self.pysills_mode == "MA":
             for file_smpl in self.container_lists["SMPL"]["Short"]:
                 for category in ["BG", "MAT"]:
@@ -12076,20 +12210,18 @@ class PySILLS(tk.Frame):
                                 times = var_content["Times"]
                             else:
                                 times = var_content["Times"]
-                            #
+
                             entry_smpl = [file_smpl, category, var_id, times[0], times[1]]
                             tv_smpl.insert("", tk.END, values=entry_smpl)
-                        #
                     else:
                         var_id = 0
                         times = ["undefined", "undefined"]
-                        #
+
                         entry_smpl = [file_smpl, category, var_id, times[0], times[1]]
                         tv_smpl.insert("", tk.END, values=entry_smpl)
-                        #
+
                 self.temp_axes_checkup["SMPL"][file_smpl] = fig_checkup_smpl.add_subplot(label=file_smpl)
                 self.temp_lines_checkup["SMPL"][file_smpl] = 0
-            #
         else:
             for file_smpl in self.container_lists["SMPL"]["Short"]:
                 for category in ["BG", "MAT", "INCL"]:
@@ -12100,20 +12232,19 @@ class PySILLS(tk.Frame):
                                 times = var_content["Times"]
                             else:
                                 times = var_content["Times"]
-                            #
+
                             entry_smpl = [file_smpl, category, var_id, times[0], times[1]]
                             tv_smpl.insert("", tk.END, values=entry_smpl)
-                        #
                     else:
                         var_id = 0
                         times = ["undefined", "undefined"]
-                        #
+
                         entry_smpl = [file_smpl, category, var_id, times[0], times[1]]
                         tv_smpl.insert("", tk.END, values=entry_smpl)
-                        #
+
                 self.temp_axes_checkup["SMPL"][file_smpl] = fig_checkup_smpl.add_subplot(label=file_smpl)
                 self.temp_lines_checkup["SMPL"][file_smpl] = 0
-        #
+
         ## INITIALIZATION
         self.change_graph_checkup(filetype="STD", initialization=True, var_fig=fig_checkup_std)
         self.change_graph_checkup(filetype="SMPL", initialization=True, var_fig=fig_checkup_smpl)
@@ -12129,13 +12260,16 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
+        str_lbl_02 = self.language_dict["Acquisition Times"][self.var_language]
+
         ## Window Settings
         window_width = 520
         window_height = 825
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_aquisition_times = tk.Toplevel(self.parent)
-        subwindow_aquisition_times.title("Check-Up - Acquisition  Times")
+        subwindow_aquisition_times.title(str_lbl_01 + " - " + str_lbl_02)
         subwindow_aquisition_times.geometry(var_geometry)
         subwindow_aquisition_times.resizable(False, False)
         subwindow_aquisition_times["bg"] = background_color_dark
@@ -12161,14 +12295,17 @@ class PySILLS(tk.Frame):
         start_row = 0
 
         ## LABELS
+        str_lbl_03 = self.language_dict["Standard Files"][self.var_language]
+        str_lbl_04 = self.language_dict["Sample Files"][self.var_language]
+
         lbl_std = SE(
             parent=subwindow_aquisition_times, row_id=start_row, column_id=start_column, n_rows=1, n_columns=16,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Standard Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_smpl = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=16,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## ENTRY
         self.var_entr_std_time = tk.StringVar()
@@ -12190,10 +12327,13 @@ class PySILLS(tk.Frame):
             command=lambda event, filetype="SMPL": self.change_value_acquisition(filetype, event))
 
         ## TREEVIEWS
+        str_lbl_05 = self.language_dict["Name"][self.var_language]
+        str_lbl_06 = self.language_dict["Acquisition Time"][self.var_language]
+
         self.tv_std = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 1, column_id=start_column, n_rows=14, n_columns=15,
             fg=font_color_dark, bg=background_color_light).create_treeview(
-            n_categories=2, text_n=["Filename", "Acquisition Time"],
+            n_categories=2, text_n=[str_lbl_05, str_lbl_06],
             width_n=["150", "150"], individual=True)
 
         scb_v = ttk.Scrollbar(subwindow_aquisition_times, orient="vertical")
@@ -12255,7 +12395,7 @@ class PySILLS(tk.Frame):
         self.tv_smpl = SE(
             parent=subwindow_aquisition_times, row_id=start_row + 17, column_id=start_column, n_rows=14, n_columns=15,
             fg=font_color_dark, bg=background_color_light).create_treeview(
-            n_categories=2, text_n=["Filename", "Acquisition Time"],
+            n_categories=2, text_n=[str_lbl_05, str_lbl_06],
             width_n=["150", "150"], individual=True)
 
         scb_v = ttk.Scrollbar(subwindow_aquisition_times, orient="vertical")
@@ -12410,13 +12550,16 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
+        str_lbl_02 = self.language_dict["Imported Files"][self.var_language]
+
         ## Window Settings
         window_width = 1080
         window_height = 825
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
         #
         subwindow_imported_files = tk.Toplevel(self.parent)
-        subwindow_imported_files.title("Check-Up - Imported Files")
+        subwindow_imported_files.title(str_lbl_01 + " - " + str_lbl_02)
         subwindow_imported_files.geometry(var_geometry)
         subwindow_imported_files.resizable(False, False)
         subwindow_imported_files["bg"] = background_color_dark
@@ -12450,64 +12593,77 @@ class PySILLS(tk.Frame):
             bg=background_color_light).create_frame(relief=tk.FLAT)
 
         ## LABELS
+        str_lbl_03 = self.language_dict["Standard Files"][self.var_language]
+        str_lbl_04 = self.language_dict["Sample Files"][self.var_language]
+
         lbl_std = SE(
             parent=subwindow_imported_files, row_id=start_row, column_id=start_column, n_rows=1, n_columns=26,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Standard Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_smpl = SE(
             parent=subwindow_imported_files, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=26,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
+
         ## FIGURES
         fig_checkup_std = Figure(figsize=(10, 5), tight_layout=True, facecolor=background_color_light)
         fig_checkup_smpl = Figure(figsize=(10, 5), tight_layout=True, facecolor=background_color_light)
-        #
+
         canvas_std = FigureCanvasTkAgg(fig_checkup_std, master=subwindow_imported_files)
         canvas_std.get_tk_widget().grid(
             row=start_row + 1, column=start_column + 26, rowspan=15, columnspan=28, sticky="nesw")
         canvas_smpl = FigureCanvasTkAgg(fig_checkup_smpl, master=subwindow_imported_files)
         canvas_smpl.get_tk_widget().grid(
             row=start_row + 17, column=start_column + 26, rowspan=15, columnspan=28, sticky="nesw")
-        #
+
         self.container_checkup["STD"].append(canvas_std)
         self.container_checkup["SMPL"].append(canvas_smpl)
         self.temp_figure_checkup = {"STD": fig_checkup_std, "SMPL": fig_checkup_smpl}
         self.temp_canvas_checkup = {"STD": canvas_std, "SMPL": canvas_smpl}
         self.temp_axes_checkup = {"STD": {}, "SMPL": {}}
         self.temp_lines_checkup = {"STD": {}, "SMPL": {}}
-        #
+
         ## BUTTONS
+        str_lbl_05 = self.language_dict["Before"][self.var_language]
+        str_lbl_06 = self.language_dict["Next"][self.var_language]
+
         btn_std_01 = SE(
             parent=subwindow_imported_files, row_id=start_row, column_id=start_column + 26, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Previous Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="STD", mode="Back", var_fig=fig_checkup_std:
             self.change_graph_checkup(filetype, mode, var_fig))
         btn_std_02 = SE(
             parent=subwindow_imported_files, row_id=start_row, column_id=start_column + 32, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="STD", var_fig=fig_checkup_std: self.change_graph_checkup(filetype, var_fig))
         btn_smpl_01 = SE(
             parent=subwindow_imported_files, row_id=start_row + 16, column_id=start_column + 26, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Previous Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="SMPL", mode="Back", var_fig=fig_checkup_smpl:
             self.change_graph_checkup(filetype, mode, var_fig))
         btn_smpl_02 = SE(
             parent=subwindow_imported_files, row_id=start_row + 16, column_id=start_column + 32, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next Graph", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype="SMPL", var_fig=fig_checkup_smpl: self.change_graph_checkup(filetype, var_fig))
-        #
+
         ## TREEVIEW
+        str_lbl_07 = self.language_dict["Name"][self.var_language]
+        str_lbl_08 = self.language_dict["N(isotopes)"][self.var_language]
+        str_lbl_09 = self.language_dict["t(start)"][self.var_language]
+        str_lbl_10 = self.language_dict["t(end)"][self.var_language]
+        str_lbl_11 = self.language_dict["t(day)"][self.var_language]
+        str_lbl_12 = self.language_dict["date"][self.var_language]
+
         tv_std = SE(
             parent=subwindow_imported_files, row_id=start_row + 1, column_id=start_column, n_rows=15, n_columns=26,
             fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
-            n_categories=6, text_n=["Name", "N Isotopes", "t(start)", "t(end)", "t(day)", "date"],
+            n_categories=6, text_n=[str_lbl_07, str_lbl_08, str_lbl_09, str_lbl_10, str_lbl_11, str_lbl_12],
             width_n=["120", "80", "80", "80", "80", "80"], individual=True)
-        #
+
         for index, var_file in enumerate(self.container_lists["STD"]["Long"]):
             parts = var_file.split("/")
             file_std = parts[-1]
@@ -12554,7 +12710,7 @@ class PySILLS(tk.Frame):
         tv_smpl = SE(
             parent=subwindow_imported_files, row_id=start_row + 17, column_id=start_column, n_rows=15, n_columns=26,
             fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
-            n_categories=6, text_n=["Name", "N Isotopes", "t(start)", "t(end)", "t(day)", "date"],
+            n_categories=6, text_n=[str_lbl_07, str_lbl_08, str_lbl_09, str_lbl_10, str_lbl_11, str_lbl_12],
             width_n=["120", "80", "80", "80", "80", "80"], individual=True)
 
         for index, var_file in enumerate(self.container_lists["SMPL"]["Long"]):
@@ -16999,11 +17155,17 @@ class PySILLS(tk.Frame):
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_confirm = SE(
             parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_column_start + var_header_n - 6,
-            n_rows=1, n_columns=6, fg=font_color_light, bg=accent_color).create_simple_button(
-            text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+            n_rows=1, n_columns=6, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
+
         # Frames
         frm_files = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -17474,10 +17636,15 @@ class PySILLS(tk.Frame):
             text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # Buttons
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_confirm = SE(
             parent=var_parent, row_id=var_row_start + var_row_n + 1, column_id=var_column_start + var_header_n - 6,
-            n_rows=1, n_columns=6, fg=font_color_light, bg=accent_color).create_simple_button(
-            text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+            n_rows=1, n_columns=6, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
 
         # Frames
@@ -19133,6 +19300,8 @@ class PySILLS(tk.Frame):
         self.helper_intervals = {"BG": [], "MAT": []}
         self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short].set(0)
 
+        str_title = self.language_dict["Mineral Analysis"][self.var_language]
+
         ## Window Settings
         window_width = 1200
         window_height = 800
@@ -19144,7 +19313,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_ma_checkfile = tk.Toplevel(self.parent)
-        self.subwindow_ma_checkfile.title("MINERAL ANALYSIS - File Analysis of " + str(var_filename_short))
+        self.subwindow_ma_checkfile.title(str_title + " - " + str(var_filename_short))
         self.subwindow_ma_checkfile.geometry(var_geometry)
         self.subwindow_ma_checkfile.resizable(False, False)
         self.subwindow_ma_checkfile["bg"] = background_color_dark
@@ -19174,86 +19343,121 @@ class PySILLS(tk.Frame):
             relief=tk.SOLID)
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Measured isotopes"][self.var_language]
+        str_lbl_02 = self.language_dict["Display options"][self.var_language]
+        str_lbl_03 = self.language_dict["Analysis mode"][self.var_language]
+        str_lbl_04 = self.language_dict["Before"][self.var_language]
+        str_lbl_05 = self.language_dict["Next"][self.var_language]
+        str_lbl_06 = self.language_dict["Start"][self.var_language]
+        str_lbl_07 = self.language_dict["End"][self.var_language]
+        str_lbl_08 = self.language_dict["Show all"][self.var_language]
+        str_lbl_09 = self.language_dict["Hide all"][self.var_language]
+        str_lbl_10 = self.language_dict["Time series view"][self.var_language]
+        str_lbl_11 = self.language_dict["Time ratios view"][self.var_language]
+        str_lbl_12 = self.language_dict["Spectral data view"][self.var_language]
+        str_lbl_13 = self.language_dict["Box plot data view"][self.var_language]
+        str_lbl_14 = self.language_dict["Quick analysis"][self.var_language]
+        str_lbl_15 = self.language_dict["Stepwise analysis"][self.var_language]
+        str_lbl_16 = self.language_dict["Set start time"][self.var_language]
+        str_lbl_17 = self.language_dict["Set end time"][self.var_language]
+        str_lbl_18 = self.language_dict["Interval setup"][self.var_language]
+        str_lbl_19 = self.language_dict["Remove interval"][self.var_language]
+        str_lbl_20 = self.language_dict["Confirm all"][self.var_language]
+        str_lbl_21 = self.language_dict["Update"][self.var_language]
+        str_lbl_22 = self.language_dict["Parallelism"][self.var_language]
+        str_lbl_23 = self.language_dict["No selection"][self.var_language]
+        str_lbl_24 = self.language_dict["Background interval"][self.var_language]
+        str_lbl_25 = self.language_dict["Sample interval"][self.var_language]
+        str_lbl_26 = self.language_dict["Isotope"][self.var_language]
+        str_lbl_27 = self.language_dict["Sample"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 18, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Anaylsis Mode", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Interval Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_18, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column, n_rows=1,
             n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Start", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column, n_rows=1,
             n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="End", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 40, n_rows=1,
             n_columns=n_columns - (start_column + 40) - 6, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Parallelism", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_22, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
         btn_02a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Show All", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_08, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_show_all_lines(
                 var_type, var_file_short, ))
         btn_02b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Hide All", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_09, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
                 var_type, var_file_short))
         btn_03 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Stepwise analysis", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_15, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Remove Interval", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_19, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_remove_interval(var_type, var_file_short))
         btn_05a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Previous file", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_04, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="back": self.switch_to_another_file(filetype, mode))
         btn_05b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=7, n_rows=2, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next file", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
+
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_08 = SE(
             parent=self.subwindow_ma_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
-            fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Confirm and Close", bg_active=accent_color, fg_active=font_color_light,
+            fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_lbl_20, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_parent=self.subwindow_ma_checkfile, var_type=str_filetype,
                            var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
+
         btn_09 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=n_columns - 6, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Update", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_21, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_filetype=str_filetype, var_filename_short=filename_short,
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
@@ -19268,35 +19472,35 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Time series view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_10, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_filetype=str_filetype, var_lb_state=False:
             self.ma_show_time_signal_diagram(var_file, var_filetype, var_lb_state))
         rb_03b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Time ratios view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_11, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_time_ratio_diagram(var_file, var_type))
         rb_03c = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark, text="Spectral data view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_12, sticky="nesw",
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_spectral_data_view(filetype, filename_long))
         rb_03d = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=4,
-            color_bg=background_color_elements, fg=font_color_dark, text="Box plot data view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_13, sticky="nesw",
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_boxplot_data_view(filetype, filename_long))
         rb_03e = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Quick analysis", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_14, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_quick_results(var_file, var_type))
 
@@ -19305,14 +19509,14 @@ class PySILLS(tk.Frame):
             n_columns=13, fg=font_color_light, bg=self.colors_intervals["BG"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=0,
-            color_bg=self.colors_intervals["BG"], fg=font_color_light, text="Background Interval",
+            color_bg=self.colors_intervals["BG"], fg=font_color_light, text=str_lbl_24,
             sticky="nesw", relief=tk.FLAT)
         rb_06 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 27, n_rows=1,
             n_columns=13, fg=font_color_light, bg=self.colors_intervals["MAT"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=1,
-            color_bg=self.colors_intervals["MAT"], fg=font_color_light, text="Sample Interval",
+            color_bg=self.colors_intervals["MAT"], fg=font_color_light, text=str_lbl_25,
             sticky="nesw",
             relief=tk.FLAT)
         rb_08 = SE(
@@ -19320,7 +19524,7 @@ class PySILLS(tk.Frame):
             n_columns=26, fg=font_color_light, bg=background_color_dark).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=3,
-            color_bg=background_color_dark, fg=font_color_light, text="No Selection",
+            color_bg=background_color_dark, fg=font_color_light, text=str_lbl_23,
             sticky="nesw", relief=tk.FLAT)
 
         ## CHECKBOXES
@@ -19357,9 +19561,9 @@ class PySILLS(tk.Frame):
 
         ## ENTRIES
         var_entr_start = tk.StringVar()
-        var_entr_start.set("Set start value")
+        var_entr_start.set(str_lbl_16)
         var_entr_end = tk.StringVar()
-        var_entr_end.set("Set end value")
+        var_entr_end.set(str_lbl_17)
         self.helper_time_entries = {"Start": var_entr_start, "End": var_entr_end}
 
         entr_04a = SE(
@@ -19445,7 +19649,7 @@ class PySILLS(tk.Frame):
         self.tv_parallelism = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 40, n_rows=9,
             n_columns=n_columns - 40, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
-            n_categories=2, text_n=["Isotope", "Sample"], width_n=["90", "100"], individual=True)
+            n_categories=2, text_n=[str_lbl_26, str_lbl_27], width_n=["90", "100"], individual=True)
 
         ## INITIALIZATION
 
@@ -19821,8 +20025,12 @@ class PySILLS(tk.Frame):
         ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         ax.set_axisbelow(True)
         ax.set_title(str_filename_short, fontsize=9)
-        ax.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
-        ax.set_ylabel("Signal Intensity $I$ (cps)", labelpad=0.5, fontsize=8)
+
+        str_lbl_01 = self.language_dict["Experiment time"][self.var_language]
+        str_lbl_02 = self.language_dict["Signal intensity"][self.var_language]
+
+        ax.set_xlabel(str_lbl_01 + " $t$ (s)", labelpad=0.5, fontsize=8)
+        ax.set_ylabel(str_lbl_02 + " $I$ (cps)", labelpad=0.5, fontsize=8)
         ax.xaxis.set_tick_params(labelsize=8)
         ax.yaxis.set_tick_params(labelsize=8)
         #
@@ -31373,10 +31581,16 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text="Next file", bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
+
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
-            fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Confirm and Update \nData", bg_active=accent_color, fg_active=font_color_light,
+            fg=font_color_accent, bg=accent_color).create_simple_button(
+            text="Confirm and Update \nData", bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_parent=self.subwindow_fi_checkfile, var_type=str_filetype,
                            var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
@@ -36211,12 +36425,20 @@ class PySILLS(tk.Frame):
         font_elements = "sans 10 bold"
 
         str_filetype = mode
+        if self.pysills_mode == "MA":
+            str_focus = self.language_dict["Mineral Analysis"][self.var_language]
+        elif self.pysills_mode == "FI":
+            str_focus = self.language_dict["Fluid Inclusions"][self.var_language]
+        elif self.pysills_mode == "MI":
+            str_focus = self.language_dict["Melt Inclusions"][self.var_language]
+
+        str_title = self.language_dict["Outlier check"][self.var_language]
 
         ## Window Settings
         window_width = 900
         window_height = 600
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
@@ -36224,7 +36446,7 @@ class PySILLS(tk.Frame):
 
         self.subwindow_spike_check = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
-            self.subwindow_spike_check.title("MINERAL ANALYSIS -  Spike Check")
+            self.subwindow_spike_check.title(str_focus + " - " + str_title)
         elif self.pysills_mode == "FI":
             self.subwindow_spike_check.title("FLUID INCLUSION ANALYSIS -  Spike Check")
         elif self.pysills_mode == "MI":
@@ -36264,10 +36486,22 @@ class PySILLS(tk.Frame):
             bg=background_color_light).create_frame(relief=tk.FLAT)
 
         ## LABELS
+        str_lbl_01 = self.language_dict["File selection"][self.var_language]
+        str_lbl_02 = self.language_dict["Before"][self.var_language]
+        str_lbl_03 = self.language_dict["Next"][self.var_language]
+        str_lbl_04 = self.language_dict["Isotope selection"][self.var_language]
+        str_lbl_05 = self.language_dict["Outlier correction"][self.var_language]
+        str_lbl_06 = self.language_dict["Original value"][self.var_language]
+        str_lbl_07 = self.language_dict["Smoothed value"][self.var_language]
+        str_lbl_08 = self.language_dict["Current value"][self.var_language]
+        str_lbl_09 = self.language_dict["Outlier selection"][self.var_language]
+        str_lbl_10 = self.language_dict["Number of outliers"][self.var_language]
+        str_lbl_11 = self.language_dict["Value selection"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_spike_check, row_id=start_row, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="File selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_01a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 1, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -36275,15 +36509,15 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Isotope selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 9, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Spike correction", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03a1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Original value", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03a = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
@@ -36291,7 +36525,7 @@ class PySILLS(tk.Frame):
         lbl_03b1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Smoothed value", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03b = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
@@ -36299,7 +36533,7 @@ class PySILLS(tk.Frame):
         lbl_03c1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Current value", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03c = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
@@ -36307,11 +36541,11 @@ class PySILLS(tk.Frame):
         lbl_04 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Spike selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a1 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Number of spikes", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_10, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_04a2 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
@@ -36319,29 +36553,29 @@ class PySILLS(tk.Frame):
         lbl_05 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 13, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Value selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_11, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
         btn_01 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Before", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_02, bg_active=accent_color, fg_active=font_color_light,
             command=lambda mode="Before": self.change_file_spk(mode))
         btn_02 = SE(
             parent=self.subwindow_spike_check, row_id=start_row + 2, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_03, bg_active=accent_color, fg_active=font_color_light,
             command=lambda mode="Next": self.change_file_spk(mode))
         if len(list_spk_isotopes) > 0:
             btn_05a1 = SE(
                 parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Original value", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda mode="RAW": self.replace_spike_value(mode))
             btn_05a2 = SE(
                 parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column + 6, n_rows=1,
                 n_columns=6, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Smoothed value", bg_active=accent_color, fg_active=font_color_light,
+                text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda mode="SMOOTHED": self.replace_spike_value(mode))
 
         ## SCALES
@@ -36733,41 +36967,52 @@ class PySILLS(tk.Frame):
         y_min = min(data_y_raw)
         y_max = max(data_y_raw)
 
+        str_lbl_01 = self.language_dict["Original data"][self.var_language]
+        str_lbl_02 = self.language_dict["Smoothed data"][self.var_language]
+        str_lbl_03 = self.language_dict["Current data"][self.var_language]
+        str_lbl_04 = self.language_dict["Current outlier"][self.var_language]
+
         self.ax_spikes.scatter(
-            data_x, data_y_raw, color=color_original, label="Original data")
+            data_x, data_y_raw, color=color_original, label=str_lbl_01)
         self.ax_spikes.plot(
             data_x, data_y_raw, color=color_original, linewidth=2, alpha=0.75)
-        self.ax_spikes.scatter(data_x, data_y_smoothed, color=color_smoothed, label="Smoothed data")
+        self.ax_spikes.scatter(data_x, data_y_smoothed, color=color_smoothed, label=str_lbl_02)
         self.ax_spikes.plot(
             data_x, data_y_smoothed, color=color_smoothed, linewidth=2, alpha=0.75)
         self.ax_spikes.plot(
-            data_x, data_y_valid, color=self.accent_color, label="Improved data", linewidth=2)
+            data_x, data_y_valid, color=self.accent_color, label=str_lbl_03, linewidth=2)
         self.ax_spikes.axvline(
-            x=data_x[var_id_real], color=color_position, label="Current spike", linewidth=2,
+            x=data_x[var_id_real], color=color_position, label=str_lbl_04, linewidth=2,
             linestyle="dotted")
 
         self.ax_spikes.grid(True)
         self.ax_spikes.set_yscale("log")
         self.ax_spikes.set_xlim(left=0, right=x_max)
         self.ax_spikes.set_xticks(np.arange(0, x_max, 20))
+
         if abs(0.1*y_min) > 0:
             y_min_log = abs(0.1*y_min)
         else:
             y_min_log = 1*10**(1)
+
         self.ax_spikes.set_ylim(bottom=y_min_log, top=1.5*y_max)
         self.ax_spikes.grid(which="major", linestyle="-", linewidth=1)
         self.ax_spikes.minorticks_on()
         self.ax_spikes.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         self.ax_spikes.set_axisbelow(True)
         self.ax_spikes.set_title(var_file, fontsize=9)
-        self.ax_spikes.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
-        self.ax_spikes.set_ylabel("Signal Intensity Ratio $I$ (cps/cps)", labelpad=0.5, fontsize=8)
+
+        str_lbl_05 = self.language_dict["Experiment time"][self.var_language]
+        str_lbl_06 = self.language_dict["Signal intensity"][self.var_language]
+
+        self.ax_spikes.set_xlabel(str_lbl_05 + " $t$ (s)", labelpad=0.5, fontsize=8)
+        self.ax_spikes.set_ylabel(str_lbl_06 + " $I$ (cps)", labelpad=0.5, fontsize=8)
         self.ax_spikes.xaxis.set_tick_params(labelsize=8)
         self.ax_spikes.yaxis.set_tick_params(labelsize=8)
 
-        self.leg_spikes = self.fig_spikes.legend(loc="upper left", fontsize="x-small", bbox_to_anchor=(0.075, 0.925))
+        self.leg_spikes = self.fig_spikes.legend(loc="upper left", fontsize="x-small", bbox_to_anchor=(0.095, 0.925))
         self.leg_spikes.set_in_layout(False)
-        self.fig_spikes.tight_layout()
+        #self.fig_spikes.tight_layout()
 
         self.canvas_spikes.draw()
 
