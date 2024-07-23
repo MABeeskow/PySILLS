@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.23
-# Date:		22.07.2024
+# Version:	v1.0.24
+# Date:		23.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.23"
-        self.val_version = self.str_version_number + " - 22.07.2024"
+        self.str_version_number = "1.0.24"
+        self.val_version = self.str_version_number + " - 23.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -280,34 +280,6 @@ class PySILLS(tk.Frame):
             "Co2O3": round((2*self.chemistry_data["Co"]/self.chemistry_data_oxides["Co2O3"])**(-1), 4),
             "Ni2O3": round((2*self.chemistry_data["Ni"]/self.chemistry_data_oxides["Ni2O3"])**(-1), 4)}
 
-        # self.chemistry_oxides_sorted = {
-        #     "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
-        #     "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO2"],
-        #     "P": ["P2O3", "P2O5"], "S": ["SO", "SO2", "SO3"], "Cl": ["Cl2O", "ClO2", "Cl2O3", "Cl2O5", "Cl2O7"],
-        #     "K": ["K2O"], "Ca": ["CaO"], "Sc": ["Sc2O3"], "Ti": ["Ti2O3", "TiO2"], "V": ["VO", "V2O3", "VO2", "V2O5"],
-        #     "Cr": ["CrO", "Cr2O3", "CrO3"], "Mn": ["MnO", "Mn2O3", "MnO2", "MnO3", "Mn2O7"],
-        #     "Fe": ["FeO", "Fe2O3", "FeO3"], "Co": ["CoO", "Co2O3"], "Ni": ["NiO", "Ni2O3"], "Cu": ["Cu2O", "CuO"],
-        #     "Zn": ["ZnO"], "Ga": ["Ga2O3"], "Ge": ["GeO2"], "As": ["As2O3", "As2O5"], "Se": ["SeO2", "SiO3"],
-        #     "Br": ["Br2O", "Br2O3", "Br2O5", "Br2O7"], "Kr": ["KrO"], "Rb": ["Rb2O"], "Sr": ["SrO"], "Y": ["Y2O3"],
-        #     "Zr": ["ZrO2"], "Nb": ["Nb2O3", "Nb2O5"], "Mo": ["MoO", "Mo2O3", "MoO2", "Mo2O5", "MoO3"], "Tc": ["Tc2O7"],
-        #     "Ru": ["RuO", "Ru2O3", "RuO2", "RuO3", "RuO4"], "Rh": ["Rh2O", "RhO", "Rh2O3", "RhO2", "Rh2O5"],
-        #     "Pd": ["PdO", "PdO2"], "Ag": ["Ag2O", "AgO"], "Cd": ["CdO"], "In": ["In2O3"], "Sn": ["SnO", "SnO2"],
-        #     "Sb": ["Sb2O3", "Sb2O5"], "Te": ["TeO2", "TeO3"], "I": ["I2O", "I2O4", "I2O5", "I4O9"],
-        #     "Xe": ["XeO", "XeO2", "XeO3"], "Cs": ["Cs2O"], "Ba": ["BaO"], "La": ["La2O3"], "Ce": ["Ce2O3", "CeO2"],
-        #     "Pr": ["Pr2O3", "PrO2"], "Nd": ["Nd2O3"], "Pm": ["Pm2O3"], "Sm": ["SmO", "Sm2O3"], "Eu": ["EuO", "Eu2O3"],
-        #     "Gd": ["Gd2O3"], "Tb": ["Tb2O3", "TbO2"], "Dy": ["Dy2O3"], "Ho": ["Ho2O3"], "Er": ["Er2O3"],
-        #     "Tm": ["TmO", "Tm2O3"], "Yb": ["YbO", "Yb2O3"], "Lu": ["Lu2O3"], "Hf": ["HfO2"], "Ta": ["Ta2O5"],
-        #     "W": ["WO", "WO2O3", "WO2", "W2O5", "WO3"], "Re": ["ReO", "ReO2", "ReO3", "Re2O7"],
-        #     "Os": ["OsO", "Os2O3", "OsO2", "OsO3", "OsO4"], "Ir": ["Ir2O", "IrO", "Ir2O3", "IrO2", "IrO3"],
-        #     "Pt": ["PtO", "PtO2"], "Au": ["Au2O", "Au2O3"], "Hg": ["Hg2O", "HgO"], "Tl": ["Tl2O", "Tl2O3"],
-        #     "Pb": ["PbO", "PbO2"], "Bi": ["Bi2O3", "B2O5"], "Po": ["PoO", "PoO2", "PoO3"],
-        #     "At": ["At2O", "At2O3", "At2O5", "At2O7"], "Rn": ["RnO"], "Fr": ["Fr2O"], "Ra": ["RaO"], "Ac": ["Ac2O3"],
-        #     "Th": ["ThO2"], "Pa": ["PaO2", "Pa2O5"], "U": ["U2O3", "UO2", "U2O5", "UO3"],
-        #     "Np": ["Np2O3", "NpO2", "Np2O5", "NpO3"], "Pu": ["Pu2O3", "PuO2", "Pu2O5", "PuO3"],
-        #     "Am": ["Am2O3", "AmO2", "Am2O5", "AmO3"], "Cm": ["Cm2O3", "CmO2"], "Bk": ["Bk2O3", "BkO2"],
-        #     "Cf": ["Cf2O3", "CfO2"], "Es": ["Es2O3"], "Fm": ["Fm2O3"], "Md": ["Md2O3"], "No": ["NoO", "No2O3"],
-        #     "Lr": ["Lr2O3"]}
-
         self.chemistry_oxides_sorted = {
             "H": ["H2O"], "Li": ["Li2O"], "Be": ["BeO"], "B": ["B2O3"], "C": ["CO", "CO2"],
             "N": ["NO", "N2O3", "NO2", "N2O5"], "Na": ["Na2O"], "Mg": ["MgO"], "Al": ["Al2O3"], "Si": ["SiO2"],
@@ -349,7 +321,7 @@ class PySILLS(tk.Frame):
         var_geometry += "+0+0"
         self.parent.geometry(var_geometry)
         self.parent.resizable(True, True)
-        self.parent["bg"] = "#2C2C2C" #self.bg_colors["BG Window"]
+        #self.parent["bg"] = self.bg_colors["BG Window"]
         #
         self.list_alphabet = list(string.ascii_uppercase)
         #
@@ -1679,6 +1651,45 @@ class PySILLS(tk.Frame):
         except:
             print("There is no user_settings file!")
 
+        str_color_scheme = self.container_var["General Settings"]["Color scheme"].get()
+        if str_color_scheme == "Dark scheme":
+            self.bg_colors = {
+                "BG Window": "#2C2C2C", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090",
+                "Light": "#BABABA", "Very Light": "#E3E3E3", "Dark Font": "#292929", "Light Font": "#F7F7F7",
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#E76F51"}
+        elif str_color_scheme == "Light scheme":
+            self.bg_colors = {
+                "BG Window": "#F8F9FA", "Very Dark": "#91A1B1", "Dark": "#BAC4CE", "Medium": "#CFD6DD",
+                "Light": "#E4E8EC", "Very Light": "#FEFEFE", "Dark Font": "#2C2C2C", "Light Font": "#2C2C2C",
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#E76F51"}
+        elif str_color_scheme == "Boho theme 1":
+            self.bg_colors = {
+                "BG Window": "#72574f", "Very Dark": "#a3573a", "Dark": "#e5af9e", "Medium": "#e7b7a7",
+                "Light": "#f2d7ce", "Very Light": "#f9efeb", "Dark Font": "#2d231f", "Light Font": "#f9efeb",
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#B15C4D"}
+        elif str_color_scheme == "Boho theme 2":
+            self.bg_colors = {
+                "BG Window": "#463F3A", "Very Dark": "#a3573a", "Dark": "#e5af9e", "Medium": "#e7b7a7",
+                "Light": "#BCB8B1", "Very Light": "#F4F3EE", "Dark Font": "#463F3A", "Light Font": "#F4F3EE",
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#E0AFA0"}
+        elif str_color_scheme == "Synthwave theme":
+            self.bg_colors = {
+                "BG Window": "#1C1C3E", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090",
+                "Light": "#72419C", "Very Light": "#D3FCFF", "Dark Font": "#1C1C3E", "Light Font": "#F7F7F7",
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#FF49DB"}
+        elif str_color_scheme == "Gunmetal theme":
+            self.bg_colors = {
+                "BG Window": "#223843", "Light": "#B5BEC7", "Very Light": "#EFF1F3", "Dark Font": "#223843",
+                "Light Font": "#EFF1F3", "White": "#FFFFFF", "Black": "#000000", "Accent": "#D77A61"}
+        elif str_color_scheme == "Dark Jungle":
+            self.bg_colors = {
+                "BG Window": "#242C1D", "Light": "#C5D0B9", "Very Light": "#F0F3EE", "Dark Font": "#242C1D",
+                "Light Font": "#F0F3EE", "White": "#FFFFFF", "Black": "#000000", "Accent": "#582F0E"}
+        elif str_color_scheme == "Noble Room":
+            self.bg_colors = {
+                "BG Window": "#4B3F32", "Light": "#C3B5A5", "Very Light": "#E1DAD2", "Dark Font": "#4B3F32",
+                "Light Font": "#E1DAD2", "White": "#FFFFFF", "Black": "#000000", "Accent": "#22333B"}
+
         ## GUI
         self.pysills_mode = None
         self.demo_mode = True
@@ -1712,11 +1723,7 @@ class PySILLS(tk.Frame):
         font_elements = "sans 10 bold"
         self.var_language = self.container_var["General Settings"]["Language"].get()
         self.update_variables_initial_values()
-
-        # FRAMES
-        frm_00 = SE(
-            parent=self.parent, row_id=start_row - 3, column_id=start_column, n_rows=n_rows_header,
-            n_columns=common_n_columns + 11, fg=font_color_light, bg="#2C2C2C").create_frame(relief=tk.FLAT)
+        self.parent["bg"] = self.bg_colors["BG Window"]
 
         ## Logo
         try:
@@ -1778,6 +1785,10 @@ class PySILLS(tk.Frame):
             print("There is a problem with the PySILLS icon.")
 
         # FRAMES
+        frm_00 = SE(
+            parent=self.parent, row_id=start_row, column_id=start_column, n_rows=self.n_rows - 3,
+            n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_frame(
+            relief=tk.FLAT)
         frm_01 = SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column + 11, n_rows=n_rows_header + 4,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_elements).create_frame(relief=tk.FLAT)
@@ -11475,7 +11486,9 @@ class PySILLS(tk.Frame):
             "seismic", "coolwarm", "Spectral", "copper", "hot", "cool", "viridis", "plasma", "inferno", "magma",
             "cividis", "brg"]
         list_languages = ["English", "German", "Spanish", "Italian", "French", "Chinese", "Greek", "Russian"]
-        list_colorschemes = ["Dark scheme"]
+        list_colorschemes = [
+            "Dark scheme", "Light scheme", "Boho theme 1", "Boho theme 2", "Synthwave theme", "Gunmetal theme",
+            "Dark Jungle", "Noble Room"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
