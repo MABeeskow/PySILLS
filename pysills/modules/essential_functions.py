@@ -426,6 +426,12 @@ class EssentialsSRM:
             path_main = path_main.replace("essential_functions.py", "")
             path_main = path_main[:-1]
 
+        if "local_packages" in path_main:
+            path_main = path_main.replace("local_packages", "local-packages")
+
+        if "site_packages" in path_main:
+            path_main = path_main.replace("site_packages", "site-packages")
+
         list_srm = list(np.array(
             [["NIST 606"], ["NIST 610"], ["NIST 610 (GeoReM)"], ["NIST 610 (Spandler)"], ["NIST 611"],
              ["NIST 611 (GeoReM)"], ["NIST 612"], ["NIST 612 (GeoReM)"], ["NIST 613"], ["NIST 613 (GeoReM)"],

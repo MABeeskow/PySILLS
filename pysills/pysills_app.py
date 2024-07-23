@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.24
+# Version:	v1.0.25
 # Date:		23.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.24"
+        self.str_version_number = "1.0.25"
         self.val_version = self.str_version_number + " - 23.07.2024"
 
         ## Colors
@@ -683,7 +683,7 @@ class PySILLS(tk.Frame):
                 "Russian": "Выбор режима", "Spanish": "Seleccionar modo", "Italian": "Selezionare la modalità"},
             "Standard Files": {"English": "Standard Files", "German": "Standardmessungen", "Chinese": "标准文件"},
             "Sample Files": {"English": "Sample Files", "German": "Probenmessungen", "Chinese": "样本文件"},
-            "ICP-MS File Setup": {"English": "ICP-MS File Setup", "German": "ICP-MS Dateikonfiguration"},
+            "ICP-MS file setup": {"English": "ICP-MS file setup", "German": "ICP-MS Dateikonfiguration"},
             "Select ICP-MS": {"English": "Select ICP-MS", "German": "ICP-MS Auswahl"},
             "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
             "Project": {"English": "Project", "German": "Projekt"},
@@ -773,6 +773,11 @@ class PySILLS(tk.Frame):
             "Calculation Intervals": {"English": "Calculation intervals", "German": "Zeitintervalle"},
             "Acquisition Times": {"English": "Acquisition Times", "German": "Messzeiten (Experiment)"},
             "Imported Files": {"English": "Imported Files", "German": "Importierte Dateien"},
+            "Name": {"English": "Name", "German": "Name"},
+            "Line of time stamp": {"English": "Line of time stamp", "German": "Zeitstempel in Zeile"},
+            "Skip header": {"English": "Skip header", "German": "Überspringe ... Kopfzeilen"},
+            "Skip footer": {"English": "Skip footer", "German": "Überspringe ... Fußzeilen"},
+            "Save ICP-MS setup": {"English": "Save ICP-MS setup", "German": "ICP-MS Daten speichern"},
             "100 wt.% oxides": {"English": "100 wt.% oxides", "German": "100 Gew.-% Oxide"},
             "Auto-Detection": {"English": "Auto-Detection", "German": "Auto-Erkennung"},
             "Set start time": {"English": "Set start time", "German": "Startzeit setzen"},
@@ -799,6 +804,7 @@ class PySILLS(tk.Frame):
             "Dwell times": {"English": "Dwell times", "German": "Haltezeiten"},
             "Default author": {"English": "Default author", "German": "Voreinstellung (Name)"},
             "Default SRM": {"English": "Default SRM", "German": "Voreinstellung (SRM)"},
+            "Median": {"English": "Median", "German": "Median"},
             "Arithmetic mean": {"English": "Arithmetic mean", "German": "Arithmetisches Mittel"},
             "Average of every interval": {
                 "English": "Average of every interval", "German": "Durchschnitt pro Interval"},
@@ -808,6 +814,7 @@ class PySILLS(tk.Frame):
             "Delimiter": {"English": "Delimiter", "German": "Trennzeichen"},
             "Background": {"English": "Background", "German": "Untergrund"},
             "Main signal": {"English": "Main signal", "German": "Hauptsignal"},
+            "Line width": {"English": "Line width", "German": "Linienbreite"},
             "Save settings": {"English": "Save settings", "German": "Einstellungen speichern"},
             "Create launcher": {"English": "Create launcher", "German": "Startdatei erstellen"},
             "Calculation formula from ...": {
@@ -2000,6 +2007,9 @@ class PySILLS(tk.Frame):
         accent_color = self.bg_colors["Accent"]
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
+
+        str_title = self.language_dict["ICP-MS file setup"][self.var_language]
+
         ## Window Settings
         window_width = 340
         window_height = 200
@@ -2010,7 +2020,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_icpms_setup = tk.Toplevel(self.parent)
-        self.subwindow_icpms_setup.title("ICP-MS File Setup")
+        self.subwindow_icpms_setup.title(str_title)
         self.subwindow_icpms_setup.geometry(var_geometry)
         self.subwindow_icpms_setup.resizable(False, False)
         self.subwindow_icpms_setup["bg"] = background_color_header
@@ -2033,26 +2043,33 @@ class PySILLS(tk.Frame):
         int_category_n = 8
 
         # LABELS
+        str_lbl_01 = self.language_dict["Name"][self.var_language]
+        str_lbl_02 = self.language_dict["Line of time stamp"][self.var_language]
+        str_lbl_03 = self.language_dict["Skip header"][self.var_language]
+        str_lbl_04 = self.language_dict["Skip footer"][self.var_language]
+        str_lbl_05 = self.language_dict["Save settings"][self.var_language]
+        str_lbl_06 = self.language_dict["Save ICP-MS setup"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="ICP-MS File Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_title, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Name", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Line of Timestamp", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Skip Header", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Skip Footer", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # ENTRIES
         current_val_name = self.container_var["ICP-MS Info"]["name"].get()
@@ -2087,14 +2104,14 @@ class PySILLS(tk.Frame):
             column_id=var_column_start + (var_header_n - int_category_n), n_rows=1,
             n_columns=(var_header_n - int_category_n), fg=font_color_light,
             bg=accent_color).create_simple_button(
-            text="Confirm Settings", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=self.confirm_icpms_settings)
         btn_002 = SE(
             parent=self.subwindow_icpms_setup, row_id=var_row_start + 6,
             column_id=var_column_start, n_rows=1,
             n_columns=(var_header_n - int_category_n), fg=font_color_light,
             bg=accent_color).create_simple_button(
-            text="Save ICP-MS Setup", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
             command=self.save_icpms_settings)
 
     def confirm_icpms_settings(self):
@@ -11315,13 +11332,15 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        var_title = self.language_dict["General Settings"][self.var_language]
+
         ## Window Settings
         window_width = 700
         window_height = 550
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_generalsettings = tk.Toplevel(self.parent)
-        subwindow_generalsettings.title("General Settings")
+        subwindow_generalsettings.title(var_title)
         subwindow_generalsettings.geometry(var_geometry)
         subwindow_generalsettings.resizable(False, False)
         subwindow_generalsettings["bg"] = background_color_dark
@@ -11365,6 +11384,17 @@ class PySILLS(tk.Frame):
         str_lbl_15 = self.language_dict["Default author"][self.var_language]
         str_lbl_16 = self.language_dict["Default SRM"][self.var_language]
         str_lbl_17 = self.language_dict["Calculation formula from ..."][self.var_language]
+        str_lbl_18 = self.language_dict["Background"][self.var_language]
+        str_lbl_19 = self.language_dict["Main signal"][self.var_language]
+        str_lbl_20 = self.language_dict["File type"][self.var_language]
+        str_lbl_21 = self.language_dict["Delimiter"][self.var_language]
+        str_lbl_22 = self.language_dict["Line width"][self.var_language]
+        str_lbl_23 = self.language_dict["Save settings"][self.var_language]
+        str_lbl_24 = self.language_dict["Create launcher"][self.var_language]
+        str_lbl_25 = self.language_dict["Arithmetic mean"][self.var_language]
+        str_lbl_26 = self.language_dict["Average of every interval"][self.var_language]
+        str_lbl_27 = self.language_dict["Stack all intervals into one"][self.var_language]
+        str_lbl_28 = self.language_dict["Median"][self.var_language]
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -11437,23 +11467,23 @@ class PySILLS(tk.Frame):
         lbl_07a = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=11, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Background", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_18, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_07b = SE(
             parent=subwindow_generalsettings, row_id=8, column_id=11, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Main signal", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_19, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09a = SE(
             parent=subwindow_generalsettings, row_id=19, column_id=start_column, n_rows=1, n_columns=5,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="File type", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_20, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_09b = SE(
             parent=subwindow_generalsettings, row_id=20, column_id=start_column, n_rows=1, n_columns=5,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Delimiter", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_21, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_10a = SE(
             parent=subwindow_generalsettings, row_id=12, column_id=start_column, n_rows=1, n_columns=5,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Line width", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_22, relief=tk.FLAT, fontsize="sans 10 bold")
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01a, lbl_02a, lbl_06a, lbl_07a, lbl_07b, lbl_09a, lbl_09b, lbl_10a])
@@ -11587,26 +11617,26 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=14, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Arithmetic Mean",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_25,
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_06b = SE(
             parent=subwindow_generalsettings, row_id=15, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Median",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_28,
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
         rb_07a = SE(
             parent=subwindow_generalsettings, row_id=16, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Interval Processing"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Average of every interval",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_26,
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_07b = SE(
             parent=subwindow_generalsettings, row_id=17, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Interval Processing"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Stack all intervals into one",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_27,
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_07a.configure(state="disabled")
         rb_07b.configure(state="disabled")
@@ -11622,12 +11652,12 @@ class PySILLS(tk.Frame):
         btn_01 = SE(
             parent=subwindow_generalsettings, row_id=19, column_id=25, n_rows=2, n_columns=9,
             fg=font_color_accent, bg=accent_color).create_simple_button(
-            text="Save Settings", bg_active=accent_color, fg_active=font_color_accent,
+            text=str_lbl_23, bg_active=accent_color, fg_active=font_color_accent,
             command=self.confirm_general_settings)
         btn_13 = SE(
             parent=subwindow_generalsettings, row_id=1, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Create starter file", bg_active=accent_color, fg_active=font_color_accent,
+            text=str_lbl_24, bg_active=accent_color, fg_active=font_color_accent,
             command=self.create_starter_file)
 
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
@@ -24657,6 +24687,8 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        var_title = self.language_dict["About"][self.var_language]
+
         ## Window Settings
         window_width = 640
         window_height = 550
@@ -24668,7 +24700,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_about_pysills = tk.Toplevel(self.parent)
-        self.subwindow_about_pysills.title("PySILLS - About")
+        self.subwindow_about_pysills.title(var_title)
         self.subwindow_about_pysills.geometry(var_geometry)
         self.subwindow_about_pysills.resizable(False, False)
         self.subwindow_about_pysills["bg"] = background_color_dark
