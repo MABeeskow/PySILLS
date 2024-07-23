@@ -795,6 +795,25 @@ class PySILLS(tk.Frame):
             "Custom data": {"English": "Custom data", "German": "Manuelle Dateneingabe"},
             "Oxide Setup": {"English": "Oxide Setup", "German": "Oxideinstellungen"},
             "Import data": {"English": "Import data", "German": "Daten importieren"},
+            "Application launcher": {"English": "Application launcher", "German": "Startdatei"},
+            "Dwell times": {"English": "Dwell times", "German": "Haltezeiten"},
+            "Default author": {"English": "Default author", "German": "Voreinstellung (Name)"},
+            "Default SRM": {"English": "Default SRM", "German": "Voreinstellung (SRM)"},
+            "Arithmetic mean": {"English": "Arithmetic mean", "German": "Arithmetisches Mittel"},
+            "Average of every interval": {
+                "English": "Average of every interval", "German": "Durchschnitt pro Interval"},
+            "Stack all intervals into one": {
+                "English": "Stack all intervals into one", "German": "Alle Intervalle stappeln"},
+            "File type": {"English": "File type", "German": "Dateiendung"},
+            "Delimiter": {"English": "Delimiter", "German": "Trennzeichen"},
+            "Background": {"English": "Background", "German": "Untergrund"},
+            "Main signal": {"English": "Main signal", "German": "Hauptsignal"},
+            "Save settings": {"English": "Save settings", "German": "Einstellungen speichern"},
+            "Create launcher": {"English": "Create launcher", "German": "Startdatei erstellen"},
+            "Calculation formula from ...": {
+                "English": "Calculation formula from ...", "German": "Berechnung basierend auf ..."},
+            "PySILLS color scheme": {"English": "PySILLS color scheme", "German": "PySILLS Farbschema"},
+            "Default value": {"English": "Default value", "German": "Voreinstellung"},
             "Composition Setup": {"English": "Composition Setup", "German": "Zusammensetzung\n definieren"},
             "Mineral stoichiometry": {"English": "Mineral stoichiometry", "German": "Minerale Stöchiometrie"},
             "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
@@ -11339,10 +11358,13 @@ class PySILLS(tk.Frame):
         str_lbl_08 = self.language_dict["Plotting Setup"][self.var_language]
         str_lbl_09 = self.language_dict["Language Selection"][self.var_language]
         str_lbl_10 = self.language_dict["Data Processing"][self.var_language]
-        str_lbl_11 = "Dwell times"
-        str_lbl_12 = "Default value"
-        str_lbl_13 = "Starter file"
-        str_lbl_14 = "PySILLS color scheme"
+        str_lbl_11 = self.language_dict["Dwell times"][self.var_language]
+        str_lbl_12 = self.language_dict["Default value"][self.var_language]
+        str_lbl_13 = self.language_dict["Application launcher"][self.var_language]
+        str_lbl_14 = self.language_dict["PySILLS color scheme"][self.var_language]
+        str_lbl_15 = self.language_dict["Default author"][self.var_language]
+        str_lbl_16 = self.language_dict["Default SRM"][self.var_language]
+        str_lbl_17 = self.language_dict["Calculation formula from ..."][self.var_language]
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -11403,15 +11425,15 @@ class PySILLS(tk.Frame):
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=3, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Default Author", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_15, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Default SRM", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_16, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06a = SE(
             parent=subwindow_generalsettings, row_id=1, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Calculation formula from ...", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_17, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_07a = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=11, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -11529,7 +11551,7 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Language"],
             var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
             fg_active=font_color_light, bg_active=accent_color)
-        opt_language["menu"].entryconfig("German", state="disable")
+        # opt_language["menu"].entryconfig("German", state="disable")
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
         opt_language["menu"].entryconfig("French", state="disable")
@@ -11590,17 +11612,22 @@ class PySILLS(tk.Frame):
         rb_07b.configure(state="disabled")
         self.gui_elements["general_settings"]["Radiobutton"]["General"].extend(
             [rb_06a, rb_06b])
-        #
+
         ## Buttons
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_01 = SE(
             parent=subwindow_generalsettings, row_id=19, column_id=25, n_rows=2, n_columns=9,
-            fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Save Settings", bg_active=accent_color, fg_active=font_color_light,
+            fg=font_color_accent, bg=accent_color).create_simple_button(
+            text="Save Settings", bg_active=accent_color, fg_active=font_color_accent,
             command=self.confirm_general_settings)
         btn_13 = SE(
             parent=subwindow_generalsettings, row_id=1, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Create starter file", bg_active=accent_color, fg_active=font_color_light,
+            text="Create starter file", bg_active=accent_color, fg_active=font_color_accent,
             command=self.create_starter_file)
 
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])

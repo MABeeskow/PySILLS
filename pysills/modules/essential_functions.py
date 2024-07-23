@@ -5,8 +5,7 @@
 
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
-# Version:	pre-release
-# Date:		09.07.2024
+# Date:		23.07.2024
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -421,19 +420,11 @@ class EssentialsSRM:
             path_main = path_main.replace("modules", "")
             path_main = path_main.replace("essential_functions.py", "")
             path_main = path_main[:-1]
-
-        # try:
-        #     path_app = os.getcwd()
-        #     path = os.path.dirname(path_app)
-        #     path = os.path.dirname(os.path.realpath(sys.argv[0]))
-        #     path_file = os.path.join(path_main, "lib", "srm", "NIST_606.csv")
-        #     data_srm = data.general().importSRM(filename=path_file)
-        # except:
-        #     path = os.getcwd()
-        #     path = os.path.dirname(os.path.realpath(sys.argv[0]))
-        #     path_file = os.path.join(path_main, "pysills", "lib", "srm", "NIST_606.csv")
-        #     data_srm = data.general().importSRM(filename=path_file)
-        #     path += "/pysills"
+        elif "site-packages" in path_main:
+            path_main = os.path.abspath(__file__)
+            path_main = path_main.replace("modules", "")
+            path_main = path_main.replace("essential_functions.py", "")
+            path_main = path_main[:-1]
 
         list_srm = list(np.array(
             [["NIST 606"], ["NIST 610"], ["NIST 610 (GeoReM)"], ["NIST 610 (Spandler)"], ["NIST 611"],
