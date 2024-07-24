@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.26
-# Date:		23.07.2024
+# Version:	v1.0.27
+# Date:		24.07.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.25"
-        self.val_version = self.str_version_number + " - 23.07.2024"
+        self.str_version_number = "1.0.27"
+        self.val_version = self.str_version_number + " - 24.07.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -688,6 +688,7 @@ class PySILLS(tk.Frame):
             "Project": {"English": "Project", "German": "Projekt"},
             "Add": {"English": "Add", "German": "Hinzufügen"},
             "Isotope": {"English": "Isotope", "German": "Isotop"},
+            "Set salinity": {"English": "Set salinity", "German": "Salinität eingeben"},
             "Interval setup": {"English": "Interval setup", "German": "Zeintfenster Einstellungen"},
             "Remove interval": {"English": "Remove interval", "German": "Zeitfenster entfernen"},
             "Update": {"English": "Update", "German": "Aktualisieren"},
@@ -700,7 +701,7 @@ class PySILLS(tk.Frame):
             "Standard file": {"English": "Standard file", "German": "Standardmessung"},
             "Sample file": {"English": "Sample file", "German": "Probenmessung"},
             "Confirm all": {"English": "Confirm all", "German": "Alles bestätigen"},
-            "Measured isotopes": {"English": "Measured isotopes", "German": "Isotopenübersicht"},
+            "Measured isotopes": {"English": "Measured isotopes", "German": "Gemessene Isotope"},
             "Display options": {"English": "Display options", "German": "Anzeigeoptionen"},
             "Analysis mode": {"English": "Analysis mode", "German": "Analysemodus"},
             "Show all": {"English": "Show all", "German": "Alles anzeigen"},
@@ -730,7 +731,13 @@ class PySILLS(tk.Frame):
             "Settings": {"English": "Settings", "German": "Einstellungen"},
             "Results": {"English": "Results", "German": "Ergebnisse"},
             "Extras": {"English": "Extras", "German": "Extras"},
+            "Mass balance": {"English": "Mass balance", "German": "Massenbilanz"},
+            "Charge balance": {"English": "Charge balance", "German": "Ladungsbilanz"},
             "Fluid Inclusions": {"English": "Fluid Inclusions", "German": "Flüssigkeitseinschlüsse"},
+            "Geometric approach": {"English": "Geometric approach", "German": "Geometrischer Ansatz"},
+            "External quantification support": {
+                "English": "External quantification", "German": "Externe Quantifizierung"},
+            "Custom data": {"English": "Custom data", "German": "Manuelle Daten"},
             "Melt Inclusions": {"English": "Melt Inclusions", "German": "Schmelzeinschlüsse"},
             "Development": {"English": "Development", "German": "Entwicklung"},
             "Additional Information": {"English": "Additional Information", "German": "Weitere Informationen"},
@@ -752,6 +759,7 @@ class PySILLS(tk.Frame):
             "MINERAL ANALYSIS - Setup": {
                 "English": "MINERAL ANALYSIS - Setup", "German": "MINERALANALYSE - Einstellungen"},
             "Author": {"English": "Author", "German": "Autor"},
+            "Select last solid": {"English": "Select last solid", "German": "Letzten Festkörper auswählen"},
             "Source ID": {"English": "Source ID", "German": "Proben ID"},
             "Standard Reference Material (SRM)": {
                 "English": "Standard Reference Material (SRM)", "German": "Standard/Referenzmaterial (SRM)"},
@@ -771,6 +779,11 @@ class PySILLS(tk.Frame):
             "SRM values": {"English": "SRM values", "German": "SRM Werte"},
             "Name": {"English": "Name", "German": "Name"},
             "Category": {"English": "Category", "German": "Kategorie"},
+            "Primary isotope": {"English": "Isotope Nr. 1", "German": "Isotop Nr. 1"},
+            "Secondary isotope": {"English": "Isotope Nr. 2", "German": "Isotop Nr. 2"},
+            "Intensity results": {"English": "Results - Intensity", "German": "Ergebnisse - Intensität"},
+            "Sensitivity results": {"English": "Results - Sensitivity", "German": "Ergebnisse - Sensitivität"},
+            "Composition results": {"English": "Results - Composition", "German": "Ergebnisse - Zusammensetzung"},
             "ID": {"English": "ID", "German": "ID"},
             "SRM": {"English": "SRM", "German": "SRM"},
             "Concentration (ppm)": {"English": "Concentration (ppm)", "German": "Konzentration (ppm)"},
@@ -825,6 +838,9 @@ class PySILLS(tk.Frame):
             "Select all oxides": {"English": "Select all oxides", "German": "Alle Oxide auswählen"},
             "Deselect all oxides": {"English": "Deselect all oxides", "German": "Alle Oxide abwählen"},
             "Rock-forming elements": {"English": "Rock-forming elements", "German": "Gesteinsbildende Elemente"},
+            "Fix quantification": {"English": "Fix quantification", "German": "Quantifizierung reparieren"},
+            "Molality-based quantification": {
+                "English": "Molality-based quantification", "German": "Quantifizierung gemäß Molalität"},
             "Guess the composition": {"English": "Guess the composition", "German": "Zusammensetzung schätzen"},
             "Setup - Oxide ratios": {"English": "Setup - Oxide ratios", "German": "Einstellungen - Oxidverhältnisse"},
             "Setup - Reference element": {
@@ -835,18 +851,27 @@ class PySILLS(tk.Frame):
             "Setup - Files": {"English": "Setup - Files", "German": "Einstellungen - Dateien"},
             "Mineral quantification": {"English": "Mineral quantification", "German": "Mineralquantifizierung"},
             "Inclusion quantification": {"English": "Inclusion quantification", "German": "Einschlussquantifizierung"},
-            "Assemblage Settings": {"English": "Assemblage Settings", "German": "Einstellungen - Assemblage"},
+            "Assemblage Settings": {"English": "Assemblage settings", "German": "Einstellungen - Assemblage"},
             "Isotope Dwell Times": {"English": "Isotope Dwell Times", "German": "Haltezeiten je Isotop"},
             "Inclusion Settings": {"English": "Inclusion Settings", "German": "Einstellungen - Einschlüsse"},
             "Internal Standard Setup": {
                 "English": "Internal Standard Setup", "German": "Einstellungen interner Standard"},
             "Oxide stoichiometry": {"English": "Oxide stoichiometry", "German": "Oxide Stöchiometrie"},
             "Default settings": {"English": "Default settings", "German": "Voreinstellungen"},
+            "Composition": {"English": "Composition", "German": "Zusammensetzung"},
+            "Cations": {"English": "Cations", "German": "Kationen"},
+            "Anions": {"English": "Anions", "German": "Anionen"},
+            "Melting temperature of the last solid": {
+                "English": "Melting temperature of the last solid",
+                "German": "Schmelztemperatur des letzten Festkörpers"},
+            "Melting temperature": {"English": "Melting temperature", "German": "Schmelztemperatur"},
+            "Last solid": {"English": "Last solid", "German": "Letzter Festkörper"},
             "Select IS": {"English": "Select IS", "German": "IS auswählen"},
             "Select mineral": {"English": "Select mineral", "German": "Mineral auswählen"},
             "Element Calculation": {"English": "Element Calculation", "German": "Elementberechnung"},
             "Experimental Data": {"English": "Experimental Data", "German": "Experimentelle Daten"},
-            "Custom data": {"English": "Custom data", "German": "Manuelle Dateneingabe"},
+            "Import external data": {"English": "Import external data", "German": "Externe Daten importieren"},
+            "LA-ICP-MS data export": {"English": "LA-ICP-MS data export", "German": "LA-ICP-MS Daten exportieren"},
             "Oxide Setup": {"English": "Oxide Setup", "German": "Oxideinstellungen"},
             "Import data": {"English": "Import data", "German": "Daten importieren"},
             "Application launcher": {"English": "Application launcher", "German": "Startdatei"},
@@ -854,12 +879,22 @@ class PySILLS(tk.Frame):
             "Default author": {"English": "Default author", "German": "Voreinstellung (Name)"},
             "Default SRM": {"English": "Default SRM", "German": "Voreinstellung (SRM)"},
             "Median": {"English": "Median", "German": "Median"},
+            "Standard deviation": {"English": "Standard deviation", "German": "Standardabweichung"},
+            "Charge": {"English": "Charge", "German": "Ladung"},
+            "charged": {"English": "charged", "German": "geladen"},
             "Arithmetic mean": {"English": "Arithmetic mean", "German": "Arithmetisches Mittel"},
             "Average of every interval": {
                 "English": "Average of every interval", "German": "Durchschnitt pro Interval"},
             "Stack all intervals into one": {
                 "English": "Stack all intervals into one", "German": "Alle Intervalle stappeln"},
             "File type": {"English": "File type", "German": "Dateiendung"},
+            "Data type": {"English": "Data type", "German": "Datentyp"},
+            "Data selection": {"English": "Data selection", "German": "Datenauswahl"},
+            "Assemblage": {"English": "Assemblage", "German": "Assemblage"},
+            "Value": {"English": "Value", "German": "Wert"},
+            "Select standard file": {"English": "Select standard file", "German": "Standardmessung auswählen"},
+            "Select sample file": {"English": "Select sample file", "German": "Probenmessung auswählen"},
+            "Select parameter": {"English": "Select parameter", "German": "Parameter auswählen"},
             "Original data": {"English": "Original data", "German": "Originaldaten"},
             "Smoothed data": {"English": "Smoothed data", "German": "Korrigierte Daten"},
             "Current data": {"English": "Current data", "German": "Aktuelle Daten"},
@@ -878,9 +913,53 @@ class PySILLS(tk.Frame):
             "Experiment time": {"English": "Experiment time", "German": "Experimentzeit"},
             "Delimiter": {"English": "Delimiter", "German": "Trennzeichen"},
             "Sample": {"English": "Sample", "German": "Probe"},
+            "of": {"English": "of", "German": "von"},
+            "with": {"English": "with", "German": "mit"},
+            "without": {"English": "without", "German": "ohne"},
+            "Densities": {"English": "Densities", "German": "Dichten"},
+            "Dimensions": {"English": "Dimensions", "German": "Abmessungen"},
+            "Inclusion intensity": {"English": "Inclusion intensity", "German": "Einschlussintensität"},
+            "Inclusion dimensions": {"English": "Inclusion dimensions", "German": "Einschlussgröße"},
+            "Inclusion concentration": {"English": "Inclusion concentration", "German": "Einschlusskonzentration"},
+            "Length of": {"English": "Length of", "German": "Länge der"},
+            "semi-axis": {"English": "semi-axis", "German": "Halbachse"},
+            "Ablation radius": {"English": "Ablation radius", "German": "Ablationsradius"},
+            "Inclusion radius": {"English": "Inclusion radius", "German": "Einschlussradius"},
+            "Inclusion density": {"English": "Inclusion density", "German": "Einschlussdichte"},
+            "Matrix density": {"English": "Matrix density", "German": "Matrixdichte"},
+            "elements": {"English": "elements", "German": "Elemente"},
+            "element ratios": {"English": "element ratios", "German": "Elementverhältnisse"},
+            "oxides": {"English": "oxides", "German": "Oxide"},
+            "oxide ratios": {"English": "oxide ratios", "German": "Oxidverhältnisse"},
+            "with respect to": {"English": "with respect to", "German": "bezogen auf"},
+            "x-y diagram": {"English": "X-Y diagram", "German": "X-Y-Diagramm"},
+            "Ternary diagram": {"English": "Ternary diagram", "German": "Dreiecksdiagramm"},
+            "Geothermometry": {"English": "Geothermometry", "German": "Geothermometrie"},
             "Matrix": {"English": "Matrix", "German": "Matrix"},
             "Inclusion": {"English": "Inclusion", "German": "Einschluss"},
+            "Additional Settings": {"English": "Additional settings", "German": "Weitere Einstellungen"},
+            "Select x": {"English": "Select x", "German": "x auswählen"},
+            "Select y": {"English": "Select y", "German": "y auswählen"},
+            "Select z": {"English": "Select z", "German": "z auswählen"},
+            "Mixed signal": {"English": "Mixed signal", "German": "Gemischtes Signal"},
+            "Concentration": {"English": "Concentration", "German": "Concentration"},
+            "Concentration ratio": {"English": "Concentration ratio", "German": "Konzentrationsverhältnis"},
+            "Limit of detection": {"English": "Limit of detection", "German": "Nachweisgrenze"},
+            "Mixed intensity": {"English": "Mixed intensity", "German": "Gemischte Intensität"},
+            "Mixed concentration": {"English": "Mixed concentration", "German": "Gemischte Konzentration"},
+            "Mixing ratio": {"English": "Mixing ratio", "German": "Mischungsverhältnis"},
+            "Intensity": {"English": "Intensity", "German": "Intensität"},
+            "Intensity ratio": {"English": "Intensity ratio", "German": "Intensitätsverhältnis"},
+            "Analytical sensitivity": {"English": "Analytical sensitivity", "German": "Analytische Sensitivität"},
+            "Normalized sensitivity": {"English": "Normalized sensitivity", "German": "Normalisierte Sensitivität"},
+            "Relative sensitivity factor": {
+                "English": "Relative sensitivity factor", "German": "Relativer Sensitivitätsfaktor"},
+            "Export results": {"English": "Export results", "German": "Ergebnisse exportieren"},
+            "Further data analysis": {"English": "Further data analysis", "German": "Weitere Datenanalyse"},
+            "Sensitivity drift": {"English": "Sensitivity drift", "German": "Sensitivitätsverschiebung"},
             "Internal standard": {"English": "Internal standard", "German": "Interner Standard"},
+            "Sorting by": {"English": "Sorting by", "German": "Sortierung nach"},
+            "All in one file": {"English": "All in one file", "German": "Alles in eine Datei"},
             "Background": {"English": "Background", "German": "Untergrund"},
             "Main signal": {"English": "Main signal", "German": "Hauptsignal"},
             "Line width": {"English": "Line width", "German": "Linienbreite"},
@@ -1112,14 +1191,16 @@ class PySILLS(tk.Frame):
             #
             for key, item in self.container_var[key_setting]["Inclusion Plugin"].items():
                 item.set(1)
-            #
+
+            str_opt_01 = self.language_dict["Set salinity"][self.var_language]
+
             self.molar_masses_compounds = {}
             self.container_var[key_setting]["Salt Correction"] = {
                 "Chlorides": {}, "Carbonates": {}, "Sulfates": {}, "Salinity": tk.StringVar(),
                 "Default Salinity": tk.StringVar(), "Default Concentration": tk.StringVar(),
                 "Default IS": tk.StringVar(), "Salinity SMPL": {}}
             self.container_var[key_setting]["Salt Correction"]["Salinity"].set("0.0")
-            self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set("Set Salinity (in %)")
+            self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set(str_opt_01 + " (%)")
             self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set("0.0")
             self.container_var[key_setting]["Salt Correction"]["Default IS"].set(str_var_03)
             salt_chlorides = ["NaCl", "KCl", "CaCl2", "MgCl2", "LiCl", "FeCl2"]
@@ -12944,12 +13025,15 @@ class PySILLS(tk.Frame):
         #
         self.container_var["acquisition times"][filetype][var_file].set(new_time)
 
-    ########################################################################################################################
-    ### EXTRAS #############################################################################################################
-    ########################################################################################################################
+    ####################################################################################################################
+    ### EXTRAS #########################################################################################################
+    ####################################################################################################################
     def ma_extras(self):
         """Main window of additional analysis tools for a mineral analysis project."""
-        ## Window Settings
+        str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
+        str_title_02 = self.language_dict["Extras"][self.var_language]
+
+        ## Window Settings sex
         window_width = 500
         window_height = 400
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
@@ -12959,7 +13043,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_ma_extras = tk.Toplevel(self.parent)
-        self.subwindow_ma_extras.title("MINERAL ANALYSIS - Extras")
+        self.subwindow_ma_extras.title(str_title_01 + " - " + str_title_02)
         self.subwindow_ma_extras.geometry(var_geometry)
         self.subwindow_ma_extras.resizable(False, False)
         self.subwindow_ma_extras["bg"] = self.bg_colors["BG Window"]
@@ -13036,46 +13120,56 @@ class PySILLS(tk.Frame):
                 var_file_long=var_file_long, mode="All")
 
         # LABELS
+        str_lbl_01 = self.language_dict["Mineral Analysis"][self.var_language]
+        str_lbl_02 = self.language_dict["Further data analysis"][self.var_language]
+        str_lbl_03 = self.language_dict["x-y diagram"][self.var_language]
+        str_lbl_04 = self.language_dict["Ternary diagram"][self.var_language]
+        str_lbl_05 = self.language_dict["Geothermometry"][self.var_language]
+        str_lbl_06 = self.language_dict["elements"][self.var_language]
+        str_lbl_07 = self.language_dict["element ratios"][self.var_language]
+        str_lbl_08 = self.language_dict["oxides"][self.var_language]
+        str_lbl_09 = self.language_dict["oxide ratios"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Mineral classification", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01 + " - " + str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_001a = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_06 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_07 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001c = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_08 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001d = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_09 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001e = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 5, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04 + " (" + str_lbl_06 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001f = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 6, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04 + " (" + str_lbl_08 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_02 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start, column_id=var_header_n, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Geothermometry", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_002 = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_header_n, n_rows=1,
@@ -13084,40 +13178,42 @@ class PySILLS(tk.Frame):
             text="Ti-in-Quartz", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
+        str_btn_01 = self.language_dict["Setup"][self.var_language]
+
         btn_001a = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Elements": self.diagram_xy(mode))
         btn_001b = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 2, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Element ratios": self.diagram_xy(mode))
         btn_001c = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 3, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Oxides": self.diagram_xy(mode))
         btn_001d = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 4, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Oxide ratios": self.diagram_xy(mode))
         btn_001e = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 5, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_001f = SE(
             parent=self.subwindow_ma_extras, row_id=var_row_start + 6, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         if len(self.container_lists["Selected Oxides"]["All"]) == 0:
             btn_001c.configure(state="disabled")
@@ -13130,11 +13226,13 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.geothermometry_titanium_in_quartz)
 
     def geothermometry_titanium_in_quartz(self):
         """Window for the Titanium-in-Quartz thermometry."""
+        str_title_01 = self.language_dict["Geothermometry"][self.var_language]
+
         ## Window Settings
         window_width = 800
         window_height = 400
@@ -13145,7 +13243,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_geothermometry_ti_in_qz = tk.Toplevel(self.parent)
-        self.subwindow_geothermometry_ti_in_qz.title("Geothermometry - Titanium-in-Quartz")
+        self.subwindow_geothermometry_ti_in_qz.title(str_title_01 + " - Titanium-in-Quartz")
         self.subwindow_geothermometry_ti_in_qz.geometry(var_geometry)
         self.subwindow_geothermometry_ti_in_qz.resizable(False, False)
         self.subwindow_geothermometry_ti_in_qz["bg"] = self.bg_colors["BG Window"]
@@ -13168,17 +13266,21 @@ class PySILLS(tk.Frame):
         int_category_n = 12
 
         # LABELS
+        str_lbl_01 = self.language_dict["Geothermometry"][self.var_language]
+        str_lbl_02 = self.language_dict["Additional Settings"][self.var_language]
+        str_lbl_03 = self.language_dict["Results"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Titanium-in-Quartz Thermometry", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Titanium-in-Quartz " + str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
 
         lbl_02 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 6, column_id=var_column_start,
             n_rows=1, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Additional Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02a = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 7, column_id=var_column_start,
             n_rows=1, n_columns=9, fg=self.bg_colors["Light Font"],
@@ -13189,18 +13291,21 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start,
             column_id=var_column_start + var_header_n + 1, n_rows=1, n_columns=var_header_n + 14,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Results", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # BUTTONS
+        str_btn_01 = self.language_dict["Run"][self.var_language]
+        str_btn_02 = self.language_dict["Export results"][self.var_language]
+
         btn_03 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 5, column_id=var_row_start, n_rows=1,
             n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-            text="Run", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=self.run_geothermometer_titanium_in_quartz)
         btn_03 = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 5, column_id=6, n_rows=1,
             n_columns=6, fg=self.bg_colors["Dark Font"], bg=self.accent_color).create_simple_button(
-            text="Export Results", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         # RADIOBUTTONS
         rb_001 = SE(
@@ -13219,11 +13324,14 @@ class PySILLS(tk.Frame):
             var=self.container_var["a(TiO2,Rt)"], text_default=self.container_var["a(TiO2,Rt)"].get())
 
         ## TREEVIEW
+        str_tv_01 = self.language_dict["Name"][self.var_language]
+        str_tv_02 = self.language_dict["Category"][self.var_language]
+
         self.tv_results_ti_in_qz = SE(
             parent=self.subwindow_geothermometry_ti_in_qz, row_id=var_row_start + 1,
             column_id=var_column_start + var_header_n + 1, n_rows=14, n_columns=var_header_n + 14,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
-            n_categories=5, text_n=["Filename", "Data Type", "C(ppm)", "T(°C)", "T(K)"],
+            n_categories=5, text_n=[str_tv_01, str_tv_02, "C(ppm)", "T(°C)", "T(K)"],
             width_n=["150", "100", "90", "90", "90"], individual=True)
 
         for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
@@ -13269,7 +13377,14 @@ class PySILLS(tk.Frame):
 
     def fi_extras(self, init=False):
         """Main window of additional analysis tools for a fluid inclusion analysis project."""
-        ## Window Settings
+        str_title_02 = self.language_dict["Extras"][self.var_language]
+
+        if self.pysills_mode == "FI":
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+        elif self.pysills_mode == "MI":
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+
+        ## Window Settings sex
         window_width = 660
         window_height = 225
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
@@ -13279,7 +13394,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_fi_extras = tk.Toplevel(self.parent)
-        self.subwindow_fi_extras.title("FLUID INCLUSION ANALYSIS - Extras")
+        self.subwindow_fi_extras.title(str_title_01 + " - " + str_title_02)
         self.subwindow_fi_extras.geometry(var_geometry)
         self.subwindow_fi_extras.resizable(False, False)
         self.subwindow_fi_extras["bg"] = self.bg_colors["BG Window"]
@@ -13363,76 +13478,86 @@ class PySILLS(tk.Frame):
         int_category_n = 12
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Matrix"][self.var_language]
+        str_lbl_01b = self.language_dict["Inclusion"][self.var_language]
+        str_lbl_02 = self.language_dict["Further data analysis"][self.var_language]
+        str_lbl_03 = self.language_dict["x-y diagram"][self.var_language]
+        str_lbl_04 = self.language_dict["Ternary diagram"][self.var_language]
+        str_lbl_06 = self.language_dict["elements"][self.var_language]
+        str_lbl_07 = self.language_dict["element ratios"][self.var_language]
+        str_lbl_08 = self.language_dict["oxides"][self.var_language]
+        str_lbl_09 = self.language_dict["oxide ratios"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Matrix classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_01 + " - " + str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_02 = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start, column_id=var_header_n + 1, n_rows=1,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Fluid classification", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_01b + " - " + str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001a = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_06 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001b = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_07 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001c = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_08 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001d = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_09 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001e = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04 + " (" + str_lbl_06 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_001f = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04 + " (" + str_lbl_08 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002a = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_06 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002b = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (element ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_07 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002c = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_08 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002d = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="x-y diagram (oxide ratios)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_03 + " (" + str_lbl_09 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002e = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Ternary diagram (elements)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04 + " (" + str_lbl_06 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002f = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_label(
-            text="Ternary diagram (oxides)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_04 + " (" + str_lbl_08 + ")", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_002g = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 7, column_id=var_header_n + 1, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Dark Font"],
@@ -13440,40 +13565,42 @@ class PySILLS(tk.Frame):
             text="Halogen ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         # BUTTONS
+        str_btn_01 = self.language_dict["Setup"][self.var_language]
+
         btn_001a = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Elements": self.diagram_xy(mode))
         btn_001b = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Element ratios": self.diagram_xy(mode))
         btn_001c = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Oxides": self.diagram_xy(mode))
         btn_001d = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Oxide ratios": self.diagram_xy(mode))
         btn_001e = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_001f = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=int_category_n,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
 
         if len(self.container_lists["Selected Oxides"]["All"]) == 0:
             btn_001c.configure(state="disabled")
@@ -13486,41 +13613,41 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_extras, row_id=var_row_start + 1, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Elements", focus="INCL": self.diagram_xy(mode, focus))
         btn_002b = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 2, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Element ratios", focus="INCL": self.diagram_xy(mode, focus))
         btn_002c = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 3, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Oxides", focus="INCL": self.diagram_xy(mode, focus))
         btn_002d = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 4, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda mode="Oxide ratios", focus="INCL": self.diagram_xy(mode, focus))
         btn_002e = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 5, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_002f = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 6, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
         btn_002g = SE(
             parent=self.subwindow_fi_extras, row_id=var_row_start + 7, column_id=var_header_n + int_category_n + 1,
             n_rows=1, n_columns=var_header_n - int_category_n, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Setup", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda init=True: self.halogen_ratios_diagram(init))
 
         if len(self.container_lists["Selected Oxides"]["All"]) == 0:
@@ -13783,6 +13910,8 @@ class PySILLS(tk.Frame):
         btn_002f.configure(state="disabled")
 
     def diagram_xy(self, mode, focus="MAT", init=False):
+        str_title_02 = self.language_dict["Extras"][self.var_language]
+
         ## Window Settings
         window_width = 1000
         window_height = 600
@@ -13795,11 +13924,14 @@ class PySILLS(tk.Frame):
         subwindow_diagram_xy = tk.Toplevel(self.parent)
 
         if self.pysills_mode == "MA":
-            subwindow_diagram_xy.title("MINERAL ANALYSIS - Extras")
+            str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
+            subwindow_diagram_xy.title(str_title_01 + " - " + str_title_02)
         elif self.pysills_mode == "FI":
-            subwindow_diagram_xy.title("FLUID INCLUSION ANALYSIS - Extras")
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+            subwindow_diagram_xy.title(str_title_01 + " - " + str_title_02)
         elif self.pysills_mode == "MI":
-            subwindow_diagram_xy.title("MELT INCLUSION ANALYSIS - Extras")
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+            subwindow_diagram_xy.title(str_title_01 + " - " + str_title_02)
 
         subwindow_diagram_xy.geometry(var_geometry)
         subwindow_diagram_xy.resizable(False, False)
@@ -13824,69 +13956,90 @@ class PySILLS(tk.Frame):
 
         ## LABELS
         if focus == "MAT":
+            str_lbl_01a = self.language_dict["Sample"][self.var_language]
+            str_lbl_01b = self.language_dict["Matrix"][self.var_language]
+
             lbl_01 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.accent_color).create_simple_label(
-                text="Matrix analysis", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_01a + "/" + str_lbl_01b, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         elif focus == "INCL":
+            str_lbl_01a = self.language_dict["Inclusion"][self.var_language]
+
             lbl_01 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
                 bg=self.accent_color).create_simple_label(
-                text="Inclusion analysis", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_01a, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         self.oxides_xy = False
 
         if mode == "Elements":
+            str_lbl_02 = self.language_dict["elements"][self.var_language].capitalize()
+
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Elements", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         elif mode == "Element ratios":
+            str_lbl_02 = self.language_dict["element ratios"][self.var_language].capitalize()
+
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Element ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         elif mode == "Oxides":
+            str_lbl_02 = self.language_dict["oxides"][self.var_language].capitalize()
+
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Oxides", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
             self.oxides_xy = True
         elif mode == "Oxide ratios":
+            str_lbl_02 = self.language_dict["oxide ratios"][self.var_language].capitalize()
+
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Oxide ratios", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
             self.oxides_xy = True
 
+        str_lbl_03 = self.language_dict["Results"][self.var_language]
+
         if "ratios" in mode:
+            str_lbl_04 = self.language_dict["with respect to"][self.var_language]
+
             lbl_02 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="with respect to", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
             lbl_03 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 4, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         else:
             lbl_03 = SE(
                 parent=subwindow_diagram_xy, row_id=var_row_start + 3, column_id=var_column_start, n_rows=1,
                 n_columns=var_header_n, fg=self.bg_colors["Light Font"],
                 bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Results", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+                text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## OPTION MENUS
-        self.container_var["x-y diagram"]["x"].set("Select x")
-        self.container_var["x-y diagram"]["y"].set("Select y")
-        self.container_var["x-y diagram"]["z"].set("Select z")
+        str_opt_01 = self.language_dict["Select x"][self.var_language]
+        str_opt_02 = self.language_dict["Select y"][self.var_language]
+        str_opt_03 = self.language_dict["Select z"][self.var_language]
+
+        self.container_var["x-y diagram"]["x"].set(str_opt_01)
+        self.container_var["x-y diagram"]["y"].set(str_opt_02)
+        self.container_var["x-y diagram"]["z"].set(str_opt_03)
 
         if self.oxides_xy == False:
             list_options = self.container_lists["Measured Isotopes"]["All"]
@@ -13976,7 +14129,11 @@ class PySILLS(tk.Frame):
         var_opt_x = self.container_var["x-y diagram"]["x"].get()
         var_opt_y = self.container_var["x-y diagram"]["y"].get()
 
-        if var_opt_x != "Select x" and var_opt_y != "Select y":
+        str_opt_01 = self.language_dict["Select x"][self.var_language]
+        str_opt_02 = self.language_dict["Select y"][self.var_language]
+        str_opt_03 = self.language_dict["Select z"][self.var_language]
+
+        if var_opt_x != str_opt_01 and var_opt_y != str_opt_02:
             if len(self.tv_results_xy.get_children()) > 0:
                 for item in self.tv_results_xy.get_children():
                     self.tv_results_xy.delete(item)
@@ -14031,7 +14188,7 @@ class PySILLS(tk.Frame):
                     concentration_x = round(concentration_x/factor_x, 4)
                     concentration_y = round(concentration_y/factor_y, 4)
 
-                if self.container_var["x-y diagram"]["z"].get() != "Select z":
+                if self.container_var["x-y diagram"]["z"].get() != str_opt_03:
                     var_z = True
 
                 if var_z == True:
@@ -17472,7 +17629,7 @@ class PySILLS(tk.Frame):
                     "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
                     "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
                     "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-                self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].set(str_var_01)
+                self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].set(str_var_04)
                 self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Concentration"].set("1000000")
                 self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Name"].set(str_var_02)
                 self.container_var[filetype][filename_long]["Matrix Setup"]["Oxide"]["Concentration"].set("100.0")
@@ -17505,8 +17662,7 @@ class PySILLS(tk.Frame):
                 if "Second Internal Standard" not in self.container_var["SMPL"][filename_long]:
                     self.container_var["SMPL"][filename_long]["Second Internal Standard"] = {
                         "Name": tk.StringVar(), "Value": tk.StringVar()}
-                    self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Name"].set(
-                        "Select Isotope")
+                    self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Name"].set(str_var_04)
                     self.container_var["SMPL"][filename_long]["Second Internal Standard"]["Value"].set("0")
                 # Geometric Approach (Halter et al. 2002)
                 if "Halter2002" not in self.container_var["SMPL"][filename_long]:
@@ -17519,6 +17675,7 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][filename_long]["Halter2002"]["rho(host)"].set("2700.0")
                     self.container_var["SMPL"][filename_long]["Halter2002"]["R"].set("75.0")
                     self.container_var["SMPL"][filename_long]["Halter2002"]["Name"].set(str_var_04)
+                    self.container_var["Halter2002"]["Name"].set(str_var_04)
                 # Geometric Approach (Borisova et al. 2021)
                 if "Borisova2021" not in self.container_var["SMPL"][filename_long]:
                     self.container_var["SMPL"][filename_long]["Borisova2021"] = {
@@ -17529,21 +17686,24 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(incl)"].set("1200.0")
                     self.container_var["SMPL"][filename_long]["Borisova2021"]["rho(host)"].set("2700.0")
                     self.container_var["SMPL"][filename_long]["Borisova2021"]["Name"].set(str_var_04)
+                    self.container_var["Borisova2021"]["Name"].set(str_var_04)
                 # Melting temperatures
                 if "Melting temperature" not in self.container_var["SMPL"][filename_long]:
                     self.container_var["SMPL"][filename_long]["Melting temperature"] = tk.StringVar()
                     self.container_var["SMPL"][filename_long]["Melting temperature"].set("25.0")
                 # Last compound
+                str_opt_01 = self.language_dict["Select last solid"][self.var_language]
                 if "Last compound" not in self.container_var["SMPL"][filename_long]:
                     self.container_var["SMPL"][filename_long]["Last compound"] = tk.StringVar()
-                    self.container_var["SMPL"][filename_long]["Last compound"].set("Select last solid")
+                    self.container_var["SMPL"][filename_long]["Last compound"].set(str_opt_01)
                 # Salinity
+                str_opt_01 = self.language_dict["Set salinity"][self.var_language]
                 if filename_short not in self.container_var[var_setting_key]["Salt Correction"][
                     "Salinity SMPL"]:
                     self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
                         filename_short] = tk.StringVar()
                     self.container_var[var_setting_key]["Salt Correction"]["Salinity SMPL"][
-                        filename_short].set("Set salinity")
+                        filename_short].set(str_opt_01)
 
         if filename_short not in self.spikes_isotopes[filetype]:
             self.spikes_isotopes[filetype][filename_short] = {}
@@ -18973,8 +19133,12 @@ class PySILLS(tk.Frame):
         ax_spectrum.set_xticks(np.arange(1, len(y_ticks) + 1), labels=y_ticks, rotation=45, ha="right")
         ax_spectrum.set_xlim(0.25, len(y_ticks) + 0.75)
         ax_spectrum.set_ylim(1, 1.67*y_max)
-        ax_spectrum.set_xlabel("Measured isotopes")
-        ax_spectrum.set_ylabel("Signal intensity (cps)")
+
+        str_ax_01 = self.language_dict["Measured isotopes"][self.var_language]
+        str_ax_02 = self.language_dict["Signal intensity"][self.var_language]
+
+        ax_spectrum.set_xlabel(str_ax_01, labelpad=0.5, fontsize=8)
+        ax_spectrum.set_ylabel(str_ax_02 + " $I$ (cps)", labelpad=0.5, fontsize=8)
 
         ax_spectrum.grid(which="major", axis="both", linestyle="-")
         ax_spectrum.grid(which="minor", axis="both", linestyle=":", alpha=0.5)
@@ -19114,8 +19278,12 @@ class PySILLS(tk.Frame):
 
         ax_spectrum.set_xticks(np.linspace(0, len(list_times), 10, endpoint=True), labels=x_ticks)
         ax_spectrum.set_yticks(np.arange(len(y_ticks)), labels=y_ticks)
-        ax_spectrum.set_xlabel("Time (s)")
-        ax_spectrum.set_ylabel("Measured isotopes")
+
+        str_ax_01 = self.language_dict["Experiment time"][self.var_language]
+        str_ax_02 = self.language_dict["Measured isotopes"][self.var_language]
+
+        ax_spectrum.set_xlabel(str_ax_01 + " $t$ (s)", labelpad=0.5, fontsize=8)
+        ax_spectrum.set_ylabel(str_ax_02, labelpad=0.5, fontsize=8)
 
         cbar = self.fig_specific_spectrum.colorbar(im)
         cbar.ax.get_yaxis().labelpad = 12
@@ -19335,6 +19503,22 @@ class PySILLS(tk.Frame):
         n_navigation = 14
         half_navigation = int(n_navigation/2)
 
+        if var_filetype == "STD":
+            var_srm_file = self.container_var["STD"][var_filename_long]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][var_filename_short]:
+                    var_is_i = self.container_lists["Measured Elements"][var_filename_short][element][0]
+                    self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].set(var_is_i)
+                break
+        else:
+            if self.pysills_mode == "MA":
+                var_mat_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
+                var_is_i = var_mat_is
+            else:
+                var_mat_is = self.container_var[var_filetype][var_filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                var_incl_is = self.container_var[var_filetype][var_filename_long]["IS Data"]["IS"].get()
+                var_is_i = var_incl_is
+
         ## FRAMES
         frm_00 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column + n_navigation,
@@ -19462,7 +19646,7 @@ class PySILLS(tk.Frame):
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
-        if str_filetype == "STD":
+        if str_filetype == "STD" or "IS" in var_mat_is:
             btn_09.configure(state="disabled")
 
         btn_03.configure(state="disabled")
@@ -19503,6 +19687,10 @@ class PySILLS(tk.Frame):
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_14, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_quick_results(var_file, var_type))
+
+        if "IS" in var_is_i:
+            rb_03b.configure(state="disabled")
+            rb_03e.configure(state="disabled")
 
         rb_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
@@ -20088,9 +20276,11 @@ class PySILLS(tk.Frame):
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][var_file_short]:
                     var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                    self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_is)
                 break
         else:
             var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
 
@@ -20286,7 +20476,9 @@ class PySILLS(tk.Frame):
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][var_file_short]:
                     var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                    self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_is)
                 break
+
             list_considered_isotopes = []
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
             for isotope in file_isotopes:
@@ -21630,9 +21822,14 @@ class PySILLS(tk.Frame):
         return n_digits
 
     def ma_calculate_statistics_table(self, var_data, ratio=False):
-        entries_mean = ["Arithmetic Mean"]
-        entries_std = ["Standard Deviation"]
-        entries_chrg = ["Charge"]
+        str_tv_01 = self.language_dict["Arithmetic mean"][self.var_language]
+        str_tv_02 = self.language_dict["Standard deviation"][self.var_language]
+        str_tv_03 = self.language_dict["Charge"][self.var_language]
+
+        entries_mean = [str_tv_01]
+        entries_std = [str_tv_02]
+        entries_chrg = [str_tv_03]
+
         for isotope in self.container_lists["Measured Isotopes"]["All"]:
             if self.container_var["General Settings"]["Desired Average"].get() == 1:
                 if len(var_data[isotope]) > 0:
@@ -21748,6 +21945,8 @@ class PySILLS(tk.Frame):
                 interval_incl=condensed_intervals_incl, data_key=str_datakey, average_type=str_averagetype,
                 stack_intervals=bool_intervalstack)
 
+            str_var_01 = self.language_dict["Select isotope"][self.var_language]
+
             if self.pysills_mode == "FI":
                 mode_id = self.container_var[key_setting]["Inclusion Intensity Calculation"].get()
                 if var_filetype == "SMPL":
@@ -21757,7 +21956,7 @@ class PySILLS(tk.Frame):
                     if self.container_var[key_setting][
                         "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                        if var_t == "Select Isotope":
+                        if var_t == str_var_01:
                             var_t = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
                             self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].set(var_t)
                     elif self.container_var[key_setting][
@@ -21770,7 +21969,7 @@ class PySILLS(tk.Frame):
                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                         var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                    if var_t != "Select Isotope":
+                    if var_t != str_var_01:
                         IQ(dataframe=None, project_type=self.pysills_mode,
                            results_container=self.container_intensity_corrected[var_filetype][var_datatype][
                                var_file_short]).get_intensity_corrected(
@@ -21793,7 +21992,7 @@ class PySILLS(tk.Frame):
                     if self.container_var[key_setting][
                         "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].get()
-                        if var_t == "Select Isotope":
+                        if var_t == str_var_01:
                             var_t = self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
                             self.container_var["SMPL"][var_file_long]["Host Only Tracer"]["Name"].set(var_t)
                     elif self.container_var["mi_setting"][
@@ -21806,7 +22005,7 @@ class PySILLS(tk.Frame):
                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                         var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                    if var_t != "Select Isotope":
+                    if var_t != str_var_01:
                         IQ(dataframe=None, project_type=self.pysills_mode,
                            results_container=self.container_intensity_corrected[var_filetype][var_datatype][
                                var_file_short]).get_intensity_corrected(
@@ -24164,143 +24363,166 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
+        str_title_02 = self.language_dict["Results"][self.var_language]
+
         ## Window Settings
         window_width = 1260
         window_height = 625
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_ma_datareduction_files = tk.Toplevel(self.parent)
-        self.subwindow_ma_datareduction_files.title("MINERAL ANALYSIS - Data Reduction")
+        self.subwindow_ma_datareduction_files.title(str_title_01 + " - " + str_title_02)
         self.subwindow_ma_datareduction_files.geometry(var_geometry)
         self.subwindow_ma_datareduction_files.resizable(False, False)
         self.subwindow_ma_datareduction_files["bg"] = background_color_dark
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_ma_datareduction_files, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_ma_datareduction_files, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_ma_datareduction_files.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_ma_datareduction_files.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ################################################################################################################
-        #
+
         start_row = 0
         start_column = 0
-        #
+
         ## LABELS
+        str_lbl_01 = self.language_dict["File selection"][self.var_language]
+        str_lbl_02 = self.language_dict["Data selection"][self.var_language]
+        str_lbl_03 = self.language_dict["Assemblage"][self.var_language]
+        str_lbl_04 = self.language_dict["Category"][self.var_language]
+        str_lbl_05 = self.language_dict["Results"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="File Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Data Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 6, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Assemblage Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 8, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Focus Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 10, column_id=start_column,
             n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
+        str_rb_01 = self.language_dict["Standard Files"][self.var_language]
+        str_rb_02 = self.language_dict["Sample Files"][self.var_language]
+        str_rb_03 = self.language_dict["Original data"][self.var_language]
+        str_rb_04 = self.language_dict["Smoothed data"][self.var_language]
+        str_rb_05 = self.language_dict["Sample"][self.var_language]
+        str_rb_06 = self.language_dict["Concentration"][self.var_language]
+        str_rb_07 = self.language_dict["Concentration ratio"][self.var_language]
+        str_rb_08 = self.language_dict["Limit of detection"][self.var_language]
+        str_rb_09 = self.language_dict["Intensity"][self.var_language]
+        str_rb_10 = self.language_dict["Intensity ratio"][self.var_language]
+        str_rb_11 = self.language_dict["Analytical sensitivity"][self.var_language]
+        str_rb_12 = self.language_dict["Normalized sensitivity"][self.var_language]
+        str_rb_13 = self.language_dict["Relative sensitivity factor"][self.var_language]
+
         rb_01a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["File Type"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Standard Files", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_01, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_01b = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["File Type"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Sample Files", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_02, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
-        #
+
         rb_02a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Data Type"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="RAW Data", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_03, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_02b = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Data Type"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SMOOTHED Data", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_04, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
-        #
+
         rb_04a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Focus"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Mineral/Glass", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_05, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
-        #
+
         rb_05a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 11, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Concentration", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_06, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         self.rb_conc_ratio = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Concentration Ratio", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_07, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         self.rb_lod = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 13, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Limit of Detection", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_08, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05d = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 14, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark, text="Intensity", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_09, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         self.rb_int_ratio = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=4,
-            color_bg=background_color_elements, fg=font_color_dark, text="Intensity Ratio", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_10, sticky="nesw",
             relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05f = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 16, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=5,
-            color_bg=background_color_elements, fg=font_color_dark, text="Analytical Sensitivity",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_11,
             sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
         rb_05g = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 17, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=6,
-            color_bg=background_color_elements, fg=font_color_dark, text="Normalized Sensitivity",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_12,
             sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
         self.rb_rsf = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 18, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_datareduction_files"]["Result Category"], value_rb=7,
-            color_bg=background_color_elements, fg=font_color_dark, text="Relative Sensitivity Factor",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_13,
             sticky="nesw", relief=tk.FLAT, command=self.ma_datareduction_tables)
 
         ## OPTION MENUS
@@ -24332,11 +24554,19 @@ class PySILLS(tk.Frame):
                 activebackground=accent_color, highlightthickness=0)
 
         ## BUTTONS
+        str_btn_01 = self.language_dict["Export results"][self.var_language]
+        str_btn_02 = self.language_dict["Further data analysis"][self.var_language]
+        str_btn_03 = self.language_dict["Sensitivity drift"][self.var_language]
+
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_06a = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 20, column_id=start_column, n_rows=2,
-            n_columns=10, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Export Results", bg_active=accent_color, fg_active=font_color_light,
-            command=self.calculation_report_setup)
+            n_columns=10, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent, command=self.calculation_report_setup)
 
         self.var_rb_01 = tk.IntVar()
         self.var_rb_01.set(1)
@@ -24348,12 +24578,12 @@ class PySILLS(tk.Frame):
         btn_07c = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 23, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Sensitivity Drift", bg_active=accent_color, fg_active=font_color_light,
+            text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
             command=self.show_diagrams_sensitivity)
         btn_07d = SE(
             parent=self.subwindow_ma_datareduction_files, row_id=start_row + 22, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Detailed Data Analysis", bg_active=accent_color, fg_active=font_color_light,
+            text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
             command=self.detailed_data_analysis)
 
         ## FRAMES
@@ -24363,7 +24593,9 @@ class PySILLS(tk.Frame):
             bg=background_color_light).create_frame(relief=tk.FLAT)
 
         ## TREEVIEWS
-        list_categories = ["Files"]
+        str_tv_01 = self.language_dict["Name"][self.var_language]
+
+        list_categories = [str_tv_01]
         list_categories.extend(self.container_lists["Measured Isotopes"]["All"])
         list_width = list(75*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
@@ -24416,12 +24648,17 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_title_02 = self.language_dict["Further data analysis"][self.var_language]
+
         if self.pysills_mode == "MA":
-            str_title_window = "MINERAL ANALYSIS - Detailed Data Analysis"
+            str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
+            str_title_window = str_title_01 + " - " + str_title_02
         elif self.pysills_mode == "FI":
-            str_title_window = "FLUID INCLUSION ANALYSIS - Detailed Data Analysis"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+            str_title_window = str_title_01 + " - " + str_title_02
         elif self.pysills_mode == "MI":
-            str_title_window = "MELT INCLUSION ANALYSIS - Detailed Data Analysis"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+            str_title_window = str_title_01 + " - " + str_title_02
 
         ## Window Settings
         window_width = 900
@@ -24457,44 +24694,59 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         # LABELS
+        str_lbl_01 = self.language_dict["File selection"][self.var_language]
+        str_lbl_02 = self.language_dict["Data selection"][self.var_language]
+        str_lbl_03 = self.language_dict["Category"][self.var_language]
+        str_lbl_04 = self.language_dict["Intensity results"][self.var_language]
+        str_lbl_05 = self.language_dict["Sensitivity results"][self.var_language]
+        str_lbl_06 = self.language_dict["Composition results"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Filename", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Experimental Data", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 6, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Experimental Focus", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 11, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Intensity Results", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 13, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Sensitivity Results", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_06 = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Composition Results", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
 
         # RADIOBUTTONS
+        str_rb_01 = self.language_dict["Original data"][self.var_language]
+        str_rb_02 = self.language_dict["Smoothed data"][self.var_language]
+        str_rb_03 = self.language_dict["Background"][self.var_language]
+        str_rb_04 = self.language_dict["Sample"][self.var_language]
+        str_rb_05 = self.language_dict["Matrix"][self.var_language]
+        str_rb_06 = self.language_dict["Inclusion"][self.var_language]
+        str_rb_07 = self.language_dict["Mixed signal"][self.var_language]
+
         rb_02a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Datatype"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Original Data", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_01, sticky="nesw",
             relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Datatype"]:
             self.detailed_analysis_change_datatype(var_rb))
         rb_02b = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Datatype"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Smoothed Data", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_02, sticky="nesw",
             relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Datatype"]:
             self.detailed_analysis_change_datatype(var_rb))
 
@@ -24502,34 +24754,38 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 7, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Background", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_03, sticky="nesw",
             relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
             self.detailed_analysis_change_focus(var_rb))
         rb_03b = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 8, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Mineral / Matrix", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_04 + "/" + str_rb_05, sticky="nesw",
             relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
             self.detailed_analysis_change_focus(var_rb))
         rb_03c = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Inclusion", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_06, sticky="nesw",
             relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
             self.detailed_analysis_change_focus(var_rb))
         rb_03d = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 10, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["Detailed Data Analysis"]["Focus"], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark, text="Mixed Signal", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_07, sticky="nesw",
             relief=tk.FLAT, command=lambda var_rb=self.container_var["Detailed Data Analysis"]["Focus"]:
             self.detailed_analysis_change_focus(var_rb))
 
         # OPTION MENUS
+        str_opt_01 = self.language_dict["Select standard file"][self.var_language]
+        str_opt_02 = self.language_dict["Select sample file"][self.var_language]
+        str_opt_03 = self.language_dict["Select parameter"][self.var_language]
+
         list_files_std = self.container_lists["STD"]["Short"]
-        str_default_std = "Select Standard File"
+        str_default_std = str_opt_01
 
         opt_01a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 1, column_id=start_column, n_rows=1,
@@ -24546,7 +24802,7 @@ class PySILLS(tk.Frame):
             activebackground=accent_color, highlightthickness=0)
 
         list_files_smpl = self.container_lists["SMPL"]["Short"]
-        str_default_smpl = "Select Sample File"
+        str_default_smpl = str_opt_02
         opt_01b = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
@@ -24563,7 +24819,7 @@ class PySILLS(tk.Frame):
 
         list_intensity_parameter = ["Measured Intensity", "Intensity", "Intensity Ratio", "Intensity Noise",
                                     "\u03C3 Intensity"]
-        str_default_intensity = "Select Parameter"
+        str_default_intensity = str_opt_03
         opt_04a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
@@ -24580,7 +24836,7 @@ class PySILLS(tk.Frame):
             activebackground=accent_color, highlightthickness=0)
 
         list_sensitivity_parameter = ["Analytical Sensitivity", "Normalized Sensitivity", "Relative Sensitivity Factor"]
-        str_default_sensitivity = "Select Parameter"
+        str_default_sensitivity = str_opt_03
         opt_05a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 14, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
@@ -24598,7 +24854,7 @@ class PySILLS(tk.Frame):
 
         list_concentration_parameter = ["Concentration", "Concentration Ratio", "Concentration Noise",
                                         "Limit of Detection", "\u03C3 Concentration"]
-        str_default_concentration = "Select Parameter"
+        str_default_concentration = str_opt_03
         opt_05a = SE(
             parent=self.subwindow_detailed_data_analysis, row_id=start_row + 16, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
@@ -24621,7 +24877,10 @@ class PySILLS(tk.Frame):
             bg=background_color_light).create_frame(relief=tk.FLAT)
 
         # TREEVIEW
-        list_categories = ["Isotope", "Value"]
+        str_tv_01 = self.language_dict["Name"][self.var_language]
+        str_tv_02 = self.language_dict["Value"][self.var_language]
+
+        list_categories = [str_tv_01, str_tv_02]
         list_width = list(130*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
         list_width[0] = 90
@@ -25155,6 +25414,9 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_title_01 = self.language_dict["Setup"][self.var_language]
+        str_title_02 = self.language_dict["Export results"][self.var_language]
+
         ## Window Settings
         window_width = 260
         window_height = 225
@@ -25166,7 +25428,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         subwindow_report_setup = tk.Toplevel(self.parent)
-        subwindow_report_setup.title("Calculation Report - Setup")
+        subwindow_report_setup.title(str_title_01 + " - " + str_title_02)
         subwindow_report_setup.geometry(var_geometry)
         subwindow_report_setup.resizable(False, False)
         subwindow_report_setup["bg"] = background_color_dark
@@ -25189,50 +25451,58 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Sorting by"][self.var_language]
+        str_lbl_02 = self.language_dict["All in one file"][self.var_language]
+
         lbl_01 = SE(
             parent=subwindow_report_setup, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=12, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Calculation Report Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_title_01 + " - " + str_title_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_report_setup, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=12, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Results sorted by ...", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## RADIOBUTTONS
         rb_01a = SE(
             parent=subwindow_report_setup, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=12, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.rb_report, value_rb=0, color_bg=background_color_elements, fg=font_color_dark,
-            text="All results in one file", sticky="nesw", relief=tk.FLAT)
+            text=str_lbl_02, sticky="nesw", relief=tk.FLAT)
         rb_01b = SE(
             parent=subwindow_report_setup, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=12, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.rb_report, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
-            text="file type (STD / SMPL)", sticky="nesw", relief=tk.FLAT)
+            text="STD / SMPL", sticky="nesw", relief=tk.FLAT)
         rb_01c = SE(
             parent=subwindow_report_setup, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=12, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.rb_report, value_rb=2, color_bg=background_color_elements, fg=font_color_dark,
-            text="data type (RAW / SMOOTHED)", sticky="nesw", relief=tk.FLAT)
+            text="RAW / SMOOTHED", sticky="nesw", relief=tk.FLAT)
 
         ## BUTTONS
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         if self.pysills_mode == "MA":
             btn_06a = SE(
                 parent=subwindow_report_setup, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=12,
-                fg=font_color_light, bg=accent_color).create_simple_button(
-                text="Export Results", bg_active=accent_color, fg_active=font_color_light,
+                fg=font_color_accent, bg=accent_color).create_simple_button(
+                text=str_title_02, bg_active=accent_color, fg_active=font_color_accent,
                 command=self.ma_export_calculation_report)
         elif self.pysills_mode == "FI":
             btn_06a = SE(
                 parent=subwindow_report_setup, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=12,
-                fg=font_color_light, bg=accent_color).create_simple_button(
-                text="Export Results", bg_active=accent_color, fg_active=font_color_light,
+                fg=font_color_accent, bg=accent_color).create_simple_button(
+                text=str_title_02, bg_active=accent_color, fg_active=font_color_accent,
                 command=self.fi_export_calculation_report)
         elif self.pysills_mode == "MI":
             btn_06a = SE(
                 parent=subwindow_report_setup, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=12,
-                fg=font_color_light, bg=accent_color).create_simple_button(
-                text="Export Results", bg_active=accent_color, fg_active=font_color_light,
+                fg=font_color_accent, bg=accent_color).create_simple_button(
+                text=str_title_02, bg_active=accent_color, fg_active=font_color_accent,
                 command=self.fi_export_calculation_report)
         elif self.pysills_mode == "OA":
             pass
@@ -28755,6 +29025,8 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_title_02 = self.language_dict["Sensitivity drift"][self.var_language]
+
         ## Window Settings
         window_width = 1400
         window_height = 800
@@ -28767,11 +29039,15 @@ class PySILLS(tk.Frame):
 
         self.subwindow_fi_graphical_sensitivity = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
-            self.subwindow_fi_graphical_sensitivity.title("MINERAL ANALYSIS - Sensitivity Results")
+            str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
+            self.subwindow_fi_graphical_sensitivity.title(str_title_01 + " - " + str_title_02)
         elif self.pysills_mode == "FI":
-            self.subwindow_fi_graphical_sensitivity.title("FLUID INCLUSION ANALYSIS - Sensitivity Results")
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+            self.subwindow_fi_graphical_sensitivity.title(str_title_01 + " - " + str_title_02)
         elif self.pysills_mode == "MI":
-            self.subwindow_fi_graphical_sensitivity.title("MELT INCLUSION ANALYSIS - Sensitivity Results")
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+            self.subwindow_fi_graphical_sensitivity.title(str_title_01 + " - " + str_title_02)
+
         self.subwindow_fi_graphical_sensitivity.geometry(var_geometry)
         self.subwindow_fi_graphical_sensitivity.resizable(False, False)
         self.subwindow_fi_graphical_sensitivity["bg"] = background_color_light
@@ -28800,28 +29076,42 @@ class PySILLS(tk.Frame):
             bg=background_color_dark).create_frame(relief=tk.FLAT)
 
         ## LABELS
+        str_lbl_01 = self.language_dict["File selection"][self.var_language]
+        str_lbl_02 = self.language_dict["Data selection"][self.var_language]
+        str_lbl_03 = self.language_dict["Category"][self.var_language]
+        str_lbl_04 = self.language_dict["Primary isotope"][self.var_language]
+        str_lbl_05 = self.language_dict["Secondary isotope"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="File Type", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Data Type", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 6, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Focus", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Primary Isotope", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 11, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Secondary Isotope", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
+        str_rb_01 = self.language_dict["Standard Files"][self.var_language]
+        str_rb_02 = self.language_dict["Sample Files"][self.var_language]
+        str_rb_03 = self.language_dict["Original data"][self.var_language]
+        str_rb_04 = self.language_dict["Smoothed data"][self.var_language]
+        str_rb_05 = self.language_dict["Sample"][self.var_language]
+        str_rb_06 = self.language_dict["Matrix"][self.var_language]
+        str_rb_07 = self.language_dict["Inclusion"][self.var_language]
+
         self.var_opt_iso_04 = tk.StringVar()
         self.var_opt_iso_04.set(self.container_lists["ISOTOPES"][0])
         self.var_opt_iso_05 = tk.StringVar()
@@ -28831,34 +29121,35 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_01, value_rb=0, color_bg=background_color_elements, fg=font_color_dark,
-            text="Standard Files", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+            text=str_rb_01, sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
         rb_01b = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_01, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
-            text="Sample Files", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+            text=str_rb_02, sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
 
         rb_02a = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_02, value_rb=0, color_bg=background_color_elements, fg=font_color_dark,
-            text="RAW Data", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+            text=str_rb_03, sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
         rb_02b = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_02, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
-            text="SMOOTHED Data", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+            text=str_rb_04, sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
 
         rb_03a = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 7, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_03, value_rb=0, color_bg=background_color_elements, fg=font_color_dark,
-            text="Matrix (MAT)", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+            text=str_rb_05 + "/" + str_rb_06, sticky="nesw", relief=tk.FLAT,
+            command=self.fi_change_sensitivity_drift_diagram)
         self.rb_03b = SE(
             parent=self.subwindow_fi_graphical_sensitivity, row_id=start_row + 8, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_03, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
-            text="Inclusion (INCL)", sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
+            text=str_rb_07, sticky="nesw", relief=tk.FLAT, command=self.fi_change_sensitivity_drift_diagram)
 
         ## OPTION MENUS
         opt_04a = SE(
@@ -29124,10 +29415,16 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a.minorticks_on()
         self.ax_sensitivity_03a.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         self.ax_sensitivity_03a.set_axisbelow(True)
-        self.ax_sensitivity_03a.set_title("Analytical Sensitivity Drift", fontsize=9)
-        self.ax_sensitivity_03a.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
+
+        str_ax_01 = self.language_dict["Sensitivity drift"][self.var_language]
+        str_ax_02 = self.language_dict["Experiment time"][self.var_language]
+        str_ax_03 = self.language_dict["Analytical sensitivity"][self.var_language]
+        str_ax_04 = self.language_dict["of"][self.var_language]
+
+        self.ax_sensitivity_03a.set_title(str_ax_01, fontsize=9)
+        self.ax_sensitivity_03a.set_xlabel(str_ax_02 + " $t$ (s)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a.set_ylabel(
-            "Analytical Sensitivity $\\xi$ of " + str(var_iso_01) + " (1)", labelpad=0.5, fontsize=8)
+            str_ax_03 + " $\\xi$ " + str_ax_04 + " " + str(var_iso_01) + " (1)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a.yaxis.set_tick_params(labelsize=8)
 
@@ -29561,10 +29858,17 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a.minorticks_on()
         self.ax_sensitivity_03a.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         self.ax_sensitivity_03a.set_axisbelow(True)
-        self.ax_sensitivity_03a.set_title("Analytical Sensitivity Drift", fontsize=9)
-        self.ax_sensitivity_03a.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
+
+        str_ax_01 = self.language_dict["Sensitivity drift"][self.var_language]
+        str_ax_02 = self.language_dict["Experiment time"][self.var_language]
+        str_ax_03 = self.language_dict["Analytical sensitivity"][self.var_language]
+        str_ax_04 = self.language_dict["of"][self.var_language]
+
+        self.ax_sensitivity_03a.set_title(str_ax_01, fontsize=9)
+        self.ax_sensitivity_03a.set_xlabel(str_ax_02 + " $t$ (s)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a.set_ylabel(
-            "Analytical Sensitivity $\\xi$ of " + str(var_iso_01) + " (1)", labelpad=0.5, fontsize=8)
+            str_ax_03 + " $\\xi$ " + str_ax_04 + " " + str(var_iso_01) + " (1)", labelpad=0.5, fontsize=8)
+
         self.ax_sensitivity_03a.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a.yaxis.set_tick_params(labelsize=8)
 
@@ -29661,7 +29965,7 @@ class PySILLS(tk.Frame):
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                         self.ax_sensitivity_03a2.plot(
                             x_values_02, y_values_02, color=self.accent_color, linewidth=var_lw, linestyle="--")
-        #
+
         self.ax_sensitivity_03a2.grid(True)
         self.ax_sensitivity_03a2.set_xlim(left=0, right=1.1*max(x_all))
         self.ax_sensitivity_03a2.set_ylim(bottom=0, top=1.1*max(y_all))
@@ -29669,14 +29973,19 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a2.minorticks_on()
         self.ax_sensitivity_03a2.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         self.ax_sensitivity_03a2.set_axisbelow(True)
-        self.ax_sensitivity_03a2.set_title("Analytical Sensitivity", fontsize=9)
+
+        str_ax_01 = self.language_dict["Analytical sensitivity"][self.var_language]
+        str_ax_02 = self.language_dict["Normalized sensitivity"][self.var_language]
+        str_ax_03 = self.language_dict["of"][self.var_language]
+
+        self.ax_sensitivity_03a2.set_title(str_ax_01, fontsize=9)
         self.ax_sensitivity_03a2.set_xlabel(
-            "Normalized Sensitivity $S$ of " + str(var_iso_01) + " (cps/ppm)", labelpad=0.5, fontsize=8)
+            str_ax_02 + " $S$ " + str_ax_03 + " " + str(var_iso_01) + " (cps/ppm)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a2.set_ylabel(
-            "Normalized Sensitivity $S$ of " + str(var_iso_02) + " (cps/ppm)", labelpad=0.5, fontsize=8)
+            str_ax_02 + " $S$ " + str_ax_03 + " " + str(var_iso_02) + " (cps/ppm)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a2.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a2.yaxis.set_tick_params(labelsize=8)
-        #
+
         self.canvas_sensitivity_03a2.draw()
 
         if self.pysills_mode == "MA":
@@ -29759,7 +30068,7 @@ class PySILLS(tk.Frame):
                             x=x_value, y=y_value, color=dot_color, edgecolor="black", s=80, marker="o")
                         self.ax_sensitivity_03a2.plot(
                             x_values_02, y_values_02, color=self.accent_color, linewidth=var_lw, linestyle="--")
-        #
+
         self.ax_sensitivity_03a2.grid(True)
         self.ax_sensitivity_03a2.set_xlim(left=0, right=1.1*max(x_all))
         self.ax_sensitivity_03a2.set_ylim(bottom=0, top=1.1*max(y_all))
@@ -29767,14 +30076,20 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a2.minorticks_on()
         self.ax_sensitivity_03a2.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         self.ax_sensitivity_03a2.set_axisbelow(True)
-        self.ax_sensitivity_03a2.set_title("Analytical Sensitivity", fontsize=9)
+
+        str_ax_01 = self.language_dict["Analytical sensitivity"][self.var_language]
+        str_ax_02 = self.language_dict["Normalized sensitivity"][self.var_language]
+        str_ax_03 = self.language_dict["of"][self.var_language]
+
+        self.ax_sensitivity_03a2.set_title(str_ax_01, fontsize=9)
         self.ax_sensitivity_03a2.set_xlabel(
-            "Normalized Sensitivity $S$ of " + str(var_iso_01) + " (cps/ppm)", labelpad=0.5, fontsize=8)
+            str_ax_02 + " $S$ " + str_ax_03 + " " + str(var_iso_01) + " (cps/ppm)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a2.set_ylabel(
-            "Normalized Sensitivity $S$ of " + str(var_iso_02) + " (cps/ppm)", labelpad=0.5, fontsize=8)
+            str_ax_02 + " $S$ " + str_ax_03 + " " + str(var_iso_02) + " (cps/ppm)", labelpad=0.5, fontsize=8)
+
         self.ax_sensitivity_03a2.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a2.yaxis.set_tick_params(labelsize=8)
-        #
+
         self.canvas_sensitivity_03a2.draw()
 
         if self.pysills_mode == "MA":
@@ -29899,11 +30214,15 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a3.minorticks_on()
         self.ax_sensitivity_03a3.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         self.ax_sensitivity_03a3.set_axisbelow(True)
-        self.ax_sensitivity_03a3.set_title("% drift in analytical sensitivity", fontsize=9)
+
+        str_ax_01 = self.language_dict["Sensitivity drift"][self.var_language]
+        str_ax_02 = self.language_dict["Isotope"][self.var_language]
+
+        self.ax_sensitivity_03a3.set_title(str_ax_01 + " (%)", fontsize=9)
         self.ax_sensitivity_03a3.set_xlabel(
-            "Isotope", labelpad=0.5, fontsize=8)
+            str_ax_02, labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a3.set_ylabel(
-            "% change in analytical sensitivity", labelpad=0.5, fontsize=8)
+            str_ax_01 + " (%)", labelpad=0.5, fontsize=8)
         self.ax_sensitivity_03a3.xaxis.set_tick_params(labelsize=8)
         self.ax_sensitivity_03a3.yaxis.set_tick_params(labelsize=8)
 
@@ -29925,170 +30244,197 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+
+        str_title_02 = self.language_dict["Results"][self.var_language]
 
         ## Window Settings
         window_width = 1260
         window_height = 725
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_fi_datareduction_files = tk.Toplevel(self.parent)
-        self.subwindow_fi_datareduction_files.title("FLUID INCLUSION ANALYSIS - Data Reduction (Files)")
+        self.subwindow_fi_datareduction_files.title(str_title_01 + " - " + str_title_02)
         self.subwindow_fi_datareduction_files.geometry(var_geometry)
         self.subwindow_fi_datareduction_files.resizable(False, False)
         self.subwindow_fi_datareduction_files["bg"] = background_color_dark
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_datareduction_files, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_fi_datareduction_files, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_fi_datareduction_files.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_fi_datareduction_files.grid_columnconfigure(i, minsize=column_min)
-        #
+
         ################################################################################################################
-        #
+
         start_row = 0
         start_column = 0
-        #
+
         ## LABELS
+        str_lbl_01 = self.language_dict["File selection"][self.var_language]
+        str_lbl_02 = self.language_dict["Data selection"][self.var_language]
+        str_lbl_03 = self.language_dict["Assemblage"][self.var_language]
+        str_lbl_04 = self.language_dict["Category"][self.var_language]
+        str_lbl_05 = self.language_dict["Results"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="File Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Data Type Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 6, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Assemblage Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 8, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Focus Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 11, column_id=start_column,
             n_rows=1,
             n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Result Selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## RADIOBUTTONS
+        str_rb_01 = self.language_dict["Standard Files"][self.var_language]
+        str_rb_02 = self.language_dict["Sample Files"][self.var_language]
+        str_rb_03 = self.language_dict["Original data"][self.var_language]
+        str_rb_04 = self.language_dict["Smoothed data"][self.var_language]
+        str_rb_05 = self.language_dict["Matrix"][self.var_language]
+        str_rb_14 = self.language_dict["Inclusion"][self.var_language]
+        str_rb_06 = self.language_dict["Concentration"][self.var_language]
+        str_rb_07 = self.language_dict["Concentration ratio"][self.var_language]
+        str_rb_08 = self.language_dict["Limit of detection"][self.var_language]
+        str_rb_09 = self.language_dict["Intensity"][self.var_language]
+        str_rb_10 = self.language_dict["Mixed intensity"][self.var_language]
+        str_rb_11 = self.language_dict["Analytical sensitivity"][self.var_language]
+        str_rb_12 = self.language_dict["Normalized sensitivity"][self.var_language]
+        str_rb_13 = self.language_dict["Relative sensitivity factor"][self.var_language]
+        str_rb_15 = self.language_dict["Mixing ratio"][self.var_language]
+        str_rb_16 = self.language_dict["Mixed concentration"][self.var_language]
+
         self.rb_01a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["File Type"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Standard Files", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_01, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_01b = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["File Type"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Sample Files", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_02, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
-        #
+
         rb_02a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 4, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Data Type"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="RAW Data", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_03, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_02b = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 5, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Data Type"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SMOOTHED Data", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_04, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
-        #
+
         rb_04a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 9, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Focus"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Matrix", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_05, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
         self.rb_04b = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 10, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Focus"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Inclusion", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_14, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
-        #
+
         self.rb_05a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Concentration",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_06,
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_05b = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 13, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Concentration Ratio",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_07,
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_05c = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 14, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Limit of Detection", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_08, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
         self.rb_05d = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark, text="Mixing Ratio a",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_15 + " a",
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         self.rb_05e = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 16, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=4,
-            color_bg=background_color_elements, fg=font_color_dark, text="Mixing Ratio x",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_15 + " x",
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         self.rb_05f = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 17, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=5,
-            color_bg=background_color_elements, fg=font_color_dark, text="Mixed Concentration",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_16,
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_05g = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 18, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=6,
-            color_bg=background_color_elements, fg=font_color_dark, text="Intensity", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_09, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
         self.rb_05h = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 19, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=7,
-            color_bg=background_color_elements, fg=font_color_dark, text="Intensity Mix", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_10, sticky="nesw",
             relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_05f = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 20, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=8,
-            color_bg=background_color_elements, fg=font_color_dark, text="Analytical Sensitivity",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_11,
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_05g = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 21, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=9,
-            color_bg=background_color_elements, fg=font_color_dark, text="Normalized Sensitivity",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_12,
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         rb_05h = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 22, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["fi_datareduction_files"]["Result Category"], value_rb=10,
-            color_bg=background_color_elements, fg=font_color_dark, text="Relative Sensitivity Factor",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_13,
             sticky="nesw", relief=tk.FLAT, command=self.fi_datareduction_tables)
         #
         ## OPTION MENUS
@@ -30118,10 +30464,19 @@ class PySILLS(tk.Frame):
             activeforeground=font_color_light, highlightthickness=0)
 
         ## BUTTONS
+        str_btn_01 = self.language_dict["Export results"][self.var_language]
+        str_btn_02 = self.language_dict["Further data analysis"][self.var_language]
+        str_btn_03 = self.language_dict["Sensitivity drift"][self.var_language]
+
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_06a = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 24, column_id=start_column, n_rows=2,
-            n_columns=10, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Export Results", bg_active=accent_color, fg_active=font_color_light,
+            n_columns=10, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=self.calculation_report_setup)
 
         self.var_rb_01 = tk.IntVar()
@@ -30134,12 +30489,12 @@ class PySILLS(tk.Frame):
         btn_07c = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 27, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Sensitivity Drift", bg_active=accent_color, fg_active=font_color_light,
+            text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
             command=self.show_diagrams_sensitivity)
         btn_07c = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=start_row + 26, column_id=start_column, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Detailed Data Analysis", bg_active=accent_color, fg_active=font_color_light,
+            text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
             command=self.detailed_data_analysis)
 
         ## FRAMES
@@ -30147,9 +30502,11 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_datareduction_files, row_id=start_row, column_id=start_column + 11,
             n_rows=n_rows, n_columns=n_columns - 11, fg=background_color_light,
             bg=background_color_light).create_frame(relief=tk.FLAT)
-        #
+
         ## TREEVIEW
-        list_categories = ["Files"]
+        str_tv_01 = self.language_dict["Name"][self.var_language]
+
+        list_categories = [str_tv_01]
         list_categories.extend(self.container_lists["Measured Isotopes"]["All"])
         list_width = list(75*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
@@ -30320,8 +30677,12 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+
+        str_title_02 = self.language_dict["Geometric approach"][self.var_language]
 
         ## Window Settings
         window_width = 680
@@ -30335,7 +30696,7 @@ class PySILLS(tk.Frame):
 
         self.subwindow_quantification_setup_halter2002 = tk.Toplevel(self.parent)
         self.subwindow_quantification_setup_halter2002.title(
-            "Quantification Setup - Geometric Approach (Halter et al. 2002)")
+            str_title_01 + " - " + str_title_02 + " (Halter et al. 2002)")
         self.subwindow_quantification_setup_halter2002.geometry(var_geometry)
         self.subwindow_quantification_setup_halter2002.resizable(False, False)
         self.subwindow_quantification_setup_halter2002["bg"] = background_color_dark
@@ -30356,60 +30717,70 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Default settings"][self.var_language]
+        str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_03 = self.language_dict["Setup"][self.var_language]
+        str_lbl_04 = self.language_dict["Inclusion intensity"][self.var_language]
+        str_lbl_05 = self.language_dict["Inclusion dimensions"][self.var_language]
+        str_lbl_06 = self.language_dict["Densities"][self.var_language]
+        str_lbl_07 = self.language_dict["Matrix density"][self.var_language]
+        str_lbl_08 = self.language_dict["Inclusion density"][self.var_language]
+        str_lbl_09 = self.language_dict["Ablation radius"][self.var_language]
+        str_lbl_10 = self.language_dict["Length of"][self.var_language]
+        str_lbl_11 = self.language_dict["semi-axis"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=18, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Default Settings", relief=tk.FLAT,
-            fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_002 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Inclusion Dimensions (\u03bcm)", relief=tk.FLAT,
+            text=str_lbl_05 + " (\u03bcm)", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_002a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Length of semi-axis a", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_10 + " " + str_lbl_11 + " a", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_002b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Length of semi-axis b", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_10 + " " + str_lbl_11 + " b", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_003 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 4, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Sample Densities (g/cm3)", relief=tk.FLAT,
+            text=str_lbl_06 + " (g/cm3)", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_003a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 5, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Host Density", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_003b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 6, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Inclusion Density", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_004 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 7, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Laser Setup (\u03bcm)", relief=tk.FLAT,
+            text="Laser (\u03bcm)", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_004a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 8, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Ablation Radius / Pit Size", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_005 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 10, column_id=start_column,
             n_rows=1, n_columns=33, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_006 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=14, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_03 + " - " + str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_006a = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column + 19,
             n_rows=1, n_columns=8, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix-only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # OPTION MENUS
         list_isotopes_all = self.container_lists["Measured Isotopes"]["All"]
@@ -30427,13 +30798,23 @@ class PySILLS(tk.Frame):
             activeforeground=font_color_light, highlightthickness=0)
 
         ## BUTTONS
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
+        str_btn_01 = self.language_dict["Confirm all"][self.var_language]
+
         btn_001 = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 9, column_id=start_column + 10,
-            n_rows=1, n_columns=8, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Apply to all", bg_active=accent_color, fg_active=font_color_light,
+            n_rows=1, n_columns=8, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=self.change_values_halter2002_all)
 
         # RADIOBUTTONS
+        str_rb_01 = self.language_dict["without"][self.var_language]
+        str_rb_02 = self.language_dict["with"][self.var_language]
+
         rb_01b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
@@ -30444,13 +30825,13 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (without R)",
+            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_01 + " R)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_01b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 4, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (with R)",
+            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_02 + " R)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
         rb_01b = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 5, column_id=start_column + 19,
@@ -30497,6 +30878,12 @@ class PySILLS(tk.Frame):
             self.change_values_halter2002(entr, mode, event))
 
         ## TREEVIEWS
+        str_tv_01 = self.language_dict["Name"][self.var_language]
+        str_tv_02 = self.language_dict["semi-axis"][self.var_language].capitalize()
+        str_tv_03 = self.language_dict["Matrix density"][self.var_language]
+        str_tv_04 = self.language_dict["Inclusion density"][self.var_language]
+        str_tv_05 = self.language_dict["Ablation radius"][self.var_language]
+
         frm_smpl = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 11, column_id=start_column,
             n_rows=12, n_columns=33, fg=font_color_dark,
@@ -30508,25 +30895,25 @@ class PySILLS(tk.Frame):
         vsb_smpl.pack(side="right", fill="y")
         text_smpl.pack(side="left", fill="both", expand=True)
 
-        lbl_file = tk.Label(frm_smpl, text="Filename", bg=background_color_light, fg=font_color_dark)
+        lbl_file = tk.Label(frm_smpl, text=str_tv_01, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_file)
         text_smpl.insert("end", "\t")
-        lbl_a = tk.Label(frm_smpl, text="Semi-Axis a", bg=background_color_light, fg=font_color_dark)
+        lbl_a = tk.Label(frm_smpl, text=str_tv_02 + " a", bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_a)
         text_smpl.insert("end", "\t")
-        lbl_b = tk.Label(frm_smpl, text="Semi-Axis b", bg=background_color_light, fg=font_color_dark)
+        lbl_b = tk.Label(frm_smpl, text=str_tv_02 + " b", bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_b)
         text_smpl.insert("end", "\t")
         lbl_rhohost = tk.Label(
-            frm_smpl, text="Host Density", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_03, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_rhohost)
         text_smpl.insert("end", "\t")
         lbl_rhoincl = tk.Label(
-            frm_smpl, text="Inclusion Density", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_04, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_rhoincl)
         text_smpl.insert("end", "\t")
         lbl_ablationradius = tk.Label(
-            frm_smpl, text="Ablation Radius", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_05, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_ablationradius)
         text_smpl.insert("end", "\n")
 
@@ -30712,8 +31099,12 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+
+        str_title_02 = self.language_dict["Geometric approach"][self.var_language]
 
         ## Window Settings
         window_width = 680
@@ -30727,7 +31118,7 @@ class PySILLS(tk.Frame):
 
         self.subwindow_quantification_setup_borisova2021 = tk.Toplevel(self.parent)
         self.subwindow_quantification_setup_borisova2021.title(
-            "Quantification Setup - Geometric Approach (Borisova et al. 2021)")
+            str_title_01 + " - " + str_title_02 + " (Borisova et al. 2021)")
         self.subwindow_quantification_setup_borisova2021.geometry(var_geometry)
         self.subwindow_quantification_setup_borisova2021.resizable(False, False)
         self.subwindow_quantification_setup_borisova2021["bg"] = background_color_dark
@@ -30748,15 +31139,24 @@ class PySILLS(tk.Frame):
         start_column = 0
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Default settings"][self.var_language]
+        str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_03 = self.language_dict["Setup"][self.var_language]
+        str_lbl_04 = self.language_dict["Inclusion intensity"][self.var_language]
+        str_lbl_05 = self.language_dict["Dimensions"][self.var_language]
+        str_lbl_06 = self.language_dict["Densities"][self.var_language]
+        str_lbl_07 = self.language_dict["Matrix density"][self.var_language]
+        str_lbl_08 = self.language_dict["Inclusion density"][self.var_language]
+        str_lbl_09 = self.language_dict["Ablation radius"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=18, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Default Settings", relief=tk.FLAT,
-            fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_002 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Sample Dimensions (\u03bcm)", relief=tk.FLAT,
+            text=str_lbl_05 + " (\u03bcm)", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_002a = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column,
@@ -30765,34 +31165,33 @@ class PySILLS(tk.Frame):
         lbl_002b = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Ablation Radius / Pit Size", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_003 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 4, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Sample Densities (g/cm3)", relief=tk.FLAT,
+            text=str_lbl_06 + " (g/cm3)", relief=tk.FLAT,
             fontsize="sans 10 bold")
         lbl_003a = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 5, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Host Density", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_003b = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 6, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Inclusion Density", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_005 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column,
-            n_rows=1, n_columns=18, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=18, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_006 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column + 19,
             n_rows=1, n_columns=14, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03 + " - " + str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_006a = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 19,
             n_rows=1, n_columns=8, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix-only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold")
 
         # OPTION MENUS
         list_isotopes_all = self.container_lists["Measured Isotopes"]["All"]
@@ -30810,10 +31209,17 @@ class PySILLS(tk.Frame):
             activeforeground=font_color_light, highlightthickness=0)
 
         ## BUTTONS
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
+        str_btn_01 = self.language_dict["Confirm all"][self.var_language]
+
         btn_001 = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 7, column_id=start_column + 10,
-            n_rows=1, n_columns=8, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Apply to all", bg_active=accent_color, fg_active=font_color_light,
+            n_rows=1, n_columns=8, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=self.change_values_borisova2021_all)
 
         # RADIOBUTTONS
@@ -30873,6 +31279,12 @@ class PySILLS(tk.Frame):
             self.change_values_borisova2021(entr, mode, event))
 
         ## TREEVIEWS
+        str_tv_01 = self.language_dict["Name"][self.var_language]
+        str_tv_02 = self.language_dict["Inclusion radius"][self.var_language].capitalize()
+        str_tv_03 = self.language_dict["Matrix density"][self.var_language]
+        str_tv_04 = self.language_dict["Inclusion density"][self.var_language]
+        str_tv_05 = self.language_dict["Ablation radius"][self.var_language]
+
         frm_smpl = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 9, column_id=start_column,
             n_rows=12, n_columns=33, fg=font_color_dark,
@@ -30884,23 +31296,23 @@ class PySILLS(tk.Frame):
         vsb_smpl.pack(side="right", fill="y")
         text_smpl.pack(side="left", fill="both", expand=True)
 
-        lbl_file = tk.Label(frm_smpl, text="Filename", bg=background_color_light, fg=font_color_dark)
+        lbl_file = tk.Label(frm_smpl, text=str_tv_01, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_file)
         text_smpl.insert("end", "\t")
         lbl_a = tk.Label(
-            frm_smpl, text="Inclusion Radius ", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_02, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_a)
         text_smpl.insert("end", "\t")
         lbl_b = tk.Label(
-            frm_smpl, text="Ablation Radius", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_05, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_b)
         text_smpl.insert("end", "\t")
         lbl_rhohost = tk.Label(
-            frm_smpl, text="Host Density", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_03, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_rhohost)
         text_smpl.insert("end", "\t")
         lbl_rhoincl = tk.Label(
-            frm_smpl, text="Inclusion Density", bg=background_color_light, fg=font_color_dark)
+            frm_smpl, text=str_tv_04, bg=background_color_light, fg=font_color_dark)
         text_smpl.window_create("end", window=lbl_rhoincl)
         text_smpl.insert("end", "\n")
 
@@ -30973,8 +31385,10 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
 
         ## Window Settings
         window_width = 820
@@ -30987,7 +31401,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_fi_setup_matrixonlytracer = tk.Toplevel(self.parent)
-        self.subwindow_fi_setup_matrixonlytracer.title("Fluid Inclusion Analysis - Matrix-only Tracer Setup")
+        self.subwindow_fi_setup_matrixonlytracer.title(str_title_01 + " - Matrix-only tracer")
         self.subwindow_fi_setup_matrixonlytracer.geometry(var_geometry)
         self.subwindow_fi_setup_matrixonlytracer.resizable(False, False)
         self.subwindow_fi_setup_matrixonlytracer["bg"] = background_color_dark
@@ -31011,122 +31425,103 @@ class PySILLS(tk.Frame):
         list_oxides = sorted(self.container_lists["Oxides"])
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Default settings"][self.var_language]
+        str_lbl_02 = self.language_dict["Concentration"][self.var_language]
+        str_lbl_03 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_04 = self.language_dict["Setup"][self.var_language]
+        str_lbl_05 = self.language_dict["Inclusion intensity"][self.var_language]
+        str_lbl_06 = self.language_dict["Inclusion concentration"][self.var_language]
+        str_lbl_07 = self.language_dict["Matrix"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=25, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Default Settings - Matrix-Only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_01a = SE(
+            text=str_lbl_01 + " - Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_01c = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix Amount", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_01b = SE(
+            text="Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_01d = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column, n_rows=1,
             n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_01c = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 3, column_id=start_column, n_rows=1,
-            n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix-Only Tracer", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_01d = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column, n_rows=1,
-            n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Concentration (ppm)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02 + " (" + str_lbl_07 + ")" + " (ppm)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01 = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column, n_rows=1,
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 3, column_id=start_column, n_rows=1,
             n_columns=25, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row, column_id=start_column + 26, n_rows=1,
             n_columns=14, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04 + " - " + str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 5, column_id=start_column + 26,
-            n_rows=1, n_columns=14, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="Inclusion Concentration Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=14, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_04 + " - " + str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## ENTRIES
-        entr_01a = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column + 13,
-            n_rows=1, n_columns=12, fg=font_color_dark,
-            bg=self.bg_colors["White"]).create_simple_entry(
-            var=self.container_var[key_setting]["Matrix Amount Default"],
-            text_default=self.container_var[key_setting]["Matrix Amount Default"].get(),
-            command=lambda var_entr=self.container_var[key_setting]["Matrix Amount Default"]:
-            self.fi_change_default_matrix_amount(var_entr))
         entr_01d = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column + 13,
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column + 13,
             n_rows=1, n_columns=12, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var[key_setting]["Matrix-Only Concentration Default"],
             text_default=self.container_var[key_setting]["Matrix-Only Concentration Default"].get(),
-            command=lambda var_entr=self.container_var[key_setting]["Matrix-Only Concentration Default"]:
-            self.fi_change_default_matrixonly_is_concentration(var_entr))
+            command=lambda event, variable=self.container_var[key_setting]["Matrix-Only Concentration Default"]:
+            self.change_matrix_only_concentration(variable, event))
+        entr_01d.bind(
+            "<Return>", lambda event, variable=self.container_var[key_setting]["Matrix-Only Concentration Default"]:
+            self.change_matrix_only_concentration(variable, event))
 
         # RADIOBUTTONS
+        str_rb_01 = self.language_dict["without"][self.var_language]
+        str_rb_02 = self.language_dict["with"][self.var_language]
+
         rb_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=0,
             color_bg=background_color_elements, fg=font_color_dark, text="Heinrich et al. (2003)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (without R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_01 + " R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 3, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (with R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_02 + " R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark,
-            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text="Theory (simple intensity composition)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 6, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Concentration Calculation"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark,
-            text="without x", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_01 + " x", sticky="nesw",
+            relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 7, column_id=start_column + 26,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Concentration Calculation"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark,
-            text="with x", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text=str_rb_02 + " x", sticky="nesw",
+            relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
 
         ## OPTION MENUES
-        var_text_01b = self.container_var[key_setting]["Oxide"].get()
-        opt_01b = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 2, column_id=start_column + 13,
-            n_rows=1, n_columns=12, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=self.container_var[key_setting]["Oxide"], option_list=list_oxides,
-            text_set=var_text_01b, fg_active=font_color_light, bg_active=accent_color,
-            command=lambda var_opt=self.container_var[key_setting]["Oxide"], var_file=None, state_default=True,
-                           matrix_only=True:
-            self.fi_change_matrix_compound(var_opt, var_file, state_default, matrix_only))
-        opt_01b["menu"].config(
-            fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
-            activebackground=accent_color)
-        opt_01b.config(
-            bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-            activeforeground=font_color_light, highlightthickness=0)
-
         var_text_01c = self.container_var[key_setting]["Host Only"].get()
         self.opt_01c = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 3, column_id=start_column + 13,
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 1, column_id=start_column + 13,
             n_rows=1, n_columns=12, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
             var_iso=self.container_var[key_setting]["Host Only"],
             option_list=self.container_lists["Measured Isotopes"]["All"], text_set=var_text_01c,
             fg_active=font_color_light, bg_active=accent_color,
-            command=lambda var_opt=self.container_var[key_setting]["Host Only"], var_file=None, state_default=True:
-            self.change_matrix_only_tracer(var_opt, var_file, state_default))
+            command=lambda var_opt=self.container_var[key_setting]["Host Only"]:
+            self.change_matrix_only_tracer(var_opt))
         self.opt_01c["menu"].config(
             fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
             activebackground=accent_color)
@@ -31136,8 +31531,8 @@ class PySILLS(tk.Frame):
 
         ## TREEVIEWS
         frm_smpl = SE(
-            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 6, column_id=start_column,
-            n_rows=n_rows - 7, n_columns=25, fg=font_color_dark,
+            parent=self.subwindow_fi_setup_matrixonlytracer, row_id=start_row + 4, column_id=start_column,
+            n_rows=n_rows - 5, n_columns=25, fg=font_color_dark,
             bg=background_color_light).create_frame()
         vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
@@ -31162,30 +31557,6 @@ class PySILLS(tk.Frame):
                     self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Name"].get()):
                 self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Concentration"].set(
                     self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].get())
-
-            entr_1_i = tk.Entry(
-                frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
-            entr_1_i.bind(
-                "<Return>", lambda event, var_file=file_smpl_long: self.change_specific_matrix_amount(var_file, event))
-            text_smpl.window_create("insert", window=entr_1_i)
-            text_smpl.insert("end", "\t")
-
-            if self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Name"].get() != "Select Oxide":
-                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Matrix"].set(
-                    self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["Oxide"]["Name"].get())
-
-            opt_1_i = tk.OptionMenu(
-                frm_smpl, self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Matrix"],
-                *np.sort(list_oxides))
-            opt_1_i["menu"].config(
-                fg=font_color_dark, bg=background_color_elements,
-                activeforeground=font_color_light, activebackground=accent_color)
-            opt_1_i.config(
-                bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0)
-            text_smpl.window_create("end", window=opt_1_i)
-            text_smpl.insert("end", "\t")
 
             if self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Name"].get() != "Select Isotope":
                 self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Name"].set(
@@ -31226,64 +31597,75 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
 
         ## Window Settings
         window_width = 720
         window_height = 375
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         row_min = 25
         n_rows = int(window_height/row_min)
         column_min = 20
         n_columns = int(window_width/column_min)
-        #
+
         self.subwindow_fi_setup_secondinternalstandard = tk.Toplevel(self.parent)
-        self.subwindow_fi_setup_secondinternalstandard.title(
-            "FI - Quantification Setup")
+        self.subwindow_fi_setup_secondinternalstandard.title(str_title_01 + " - Second internal standard")
         self.subwindow_fi_setup_secondinternalstandard.geometry(var_geometry)
         self.subwindow_fi_setup_secondinternalstandard.resizable(False, False)
         self.subwindow_fi_setup_secondinternalstandard["bg"] = background_color_dark
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(self.subwindow_fi_setup_secondinternalstandard, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(self.subwindow_fi_setup_secondinternalstandard, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             self.subwindow_fi_setup_secondinternalstandard.grid_rowconfigure(i, minsize=row_min)
         # Columns
         for i in range(0, n_columns):
             self.subwindow_fi_setup_secondinternalstandard.grid_columnconfigure(i, minsize=column_min)
-        #
+
         start_row = 0
         start_column = 0
-        #
+
         ## LABELS
+        str_lbl_01 = self.language_dict["Default settings"][self.var_language]
+        str_lbl_02 = self.language_dict["Concentration"][self.var_language]
+        str_lbl_03 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_04 = self.language_dict["Setup"][self.var_language]
+        str_lbl_05 = self.language_dict["Inclusion intensity"][self.var_language]
+        str_lbl_06 = self.language_dict["Inclusion concentration"][self.var_language]
+        str_lbl_07 = self.language_dict["Matrix"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=20, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Default Settings - Second Internal Standard", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01 + " - Second internal standard", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01a = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 1, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Second Internal Standard", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Second internal standard", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 2, column_id=start_column,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Concentration (ppm)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02 + " (" + str_lbl_07 + ") (ppm)", relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_02 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 3, column_id=start_column,
-            n_rows=1, n_columns=20, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=20, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
         lbl_01 = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row, column_id=start_column + 21,
-            n_rows=1, n_columns=14, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="Inclusion Intensity Calculation", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=14, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_04 + " - " + str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+        lbl_01 = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 5, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_04 + " - " + str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
 
         ## OPTION MENUES
         var_text = self.container_var[key_setting]["2nd Internal"].get()
@@ -31302,30 +31684,46 @@ class PySILLS(tk.Frame):
             activeforeground=font_color_light, highlightthickness=0)
 
         # RADIOBUTTONS
+        str_rb_01 = self.language_dict["without"][self.var_language]
+        str_rb_02 = self.language_dict["with"][self.var_language]
+
         rb_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 1, column_id=start_column + 21,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=0,
             color_bg=background_color_elements, fg=font_color_dark, text="Heinrich et al. (2003)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 2, column_id=start_column + 21,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (without R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_01 + " R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 3, column_id=start_column + 21,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (with R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_02 + " R)",
+            sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
         rb_01b = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 4, column_id=start_column + 21,
             n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=3,
             color_bg=background_color_elements, fg=font_color_dark,
-            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold",
+            anchor=tk.W)
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 6, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.container_var[key_setting]["Inclusion Concentration Calculation"], value_rb=0,
+            color_bg=background_color_elements, fg=font_color_dark,
+            text=str_rb_01 + " x", sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
+        rb_01b = SE(
+            parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 7, column_id=start_column + 21,
+            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.container_var[key_setting]["Inclusion Concentration Calculation"], value_rb=1,
+            color_bg=background_color_elements, fg=font_color_dark,
+            text=str_rb_02 + " x", sticky="nesw", relief=tk.FLAT, font="sans 10 bold", anchor=tk.W)
 
         ## ENTRIES
         entr_01b = SE(
@@ -31336,7 +31734,7 @@ class PySILLS(tk.Frame):
             text_default=self.container_var[key_setting]["2nd Internal Concentration Default"].get(),
             command=lambda var_entr=self.container_var[key_setting]["2nd Internal Concentration Default"]:
             self.fi_change_default_2nd_is_concentration(var_entr))
-        #
+
         ## TREEVIEWS
         frm_smpl = SE(
             parent=self.subwindow_fi_setup_secondinternalstandard, row_id=start_row + 4, column_id=start_column,
@@ -31347,13 +31745,13 @@ class PySILLS(tk.Frame):
         vsb_smpl.config(command=text_smpl.yview)
         vsb_smpl.pack(side="right", fill="y")
         text_smpl.pack(side="left", fill="both", expand=True)
-        #
+
         for index, file_smpl in enumerate(self.container_lists["SMPL"]["Short"]):
             file_smpl_long = self.container_lists["SMPL"]["Long"][index]
             lbl_i = tk.Label(frm_smpl, text=file_smpl, bg=background_color_light, fg=font_color_dark)
             text_smpl.window_create("end", window=lbl_i)
             text_smpl.insert("end", "\t")
-            #
+
             opt_i = tk.OptionMenu(
                 frm_smpl, self.container_var["SMPL"][file_smpl_long]["Second Internal Standard"]["Name"],
                 *np.sort(self.container_lists["ISOTOPES"]))
@@ -31365,7 +31763,7 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, highlightthickness=0)
             text_smpl.window_create("end", window=opt_i)
             text_smpl.insert("end", "\t")
-            #
+
             entr_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Second Internal Standard"]["Value"],
                 width=15, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
@@ -31454,10 +31852,8 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
-            str_title = "FLUID INCLUSION ANALYSIS - File Analysis of "
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
-            str_title = "MELT INCLUSION ANALYSIS - File Analysis of "
 
         str_filename_long = var_file
         str_filetype = var_type
@@ -31478,6 +31874,8 @@ class PySILLS(tk.Frame):
         str_filename_short = parts[-1]
         self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
 
+        str_title = self.language_dict["Mineral Analysis"][self.var_language]
+
         ## Window Settings
         window_width = 1360
         window_height = 800
@@ -31489,7 +31887,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         self.subwindow_fi_checkfile = tk.Toplevel(self.parent)
-        self.subwindow_fi_checkfile.title(str_title + str(str_filename_short))
+        self.subwindow_fi_checkfile.title(str_title + " - " + str(str_filename_short))
         self.subwindow_fi_checkfile.geometry(var_geometry)
         self.subwindow_fi_checkfile.resizable(False, False)
         self.subwindow_fi_checkfile["bg"] = background_color_dark
@@ -31509,6 +31907,22 @@ class PySILLS(tk.Frame):
         start_row = 0
         start_column = 0
 
+        if str_filetype == "STD":
+            var_srm_file = self.container_var["STD"][str_filename_long]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][str_filename_short]:
+                    var_is_i = self.container_lists["Measured Elements"][str_filename_short][element][0]
+                    self.container_var[str_filetype][str_filename_long]["IS Data"]["IS"].set(var_is_i)
+                break
+        else:
+            if self.pysills_mode == "MA":
+                var_mat_is = self.container_var[str_filetype][str_filename_long]["IS Data"]["IS"].get()
+                var_is_i = var_mat_is
+            else:
+                var_mat_is = self.container_var[str_filetype][str_filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                var_incl_is = self.container_var[str_filetype][str_filename_long]["IS Data"]["IS"].get()
+                var_is_i = var_incl_is
+
         ## FRAMES
         frm_00 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column + 14, n_rows=n_rows - 10,
@@ -31516,70 +31930,97 @@ class PySILLS(tk.Frame):
             relief=tk.SOLID)
 
         ## LABELS
+        str_lbl_01 = self.language_dict["Measured isotopes"][self.var_language]
+        str_lbl_02 = self.language_dict["Display options"][self.var_language]
+        str_lbl_03 = self.language_dict["Analysis mode"][self.var_language]
+        str_lbl_04 = self.language_dict["Before"][self.var_language]
+        str_lbl_05 = self.language_dict["Next"][self.var_language]
+        str_lbl_06 = self.language_dict["Start"][self.var_language]
+        str_lbl_07 = self.language_dict["End"][self.var_language]
+        str_lbl_08 = self.language_dict["Show all"][self.var_language]
+        str_lbl_09 = self.language_dict["Hide all"][self.var_language]
+        str_lbl_10 = self.language_dict["Time series view"][self.var_language]
+        str_lbl_11 = self.language_dict["Time ratios view"][self.var_language]
+        str_lbl_12 = self.language_dict["Spectral data view"][self.var_language]
+        str_lbl_13 = self.language_dict["Box plot data view"][self.var_language]
+        str_lbl_14 = self.language_dict["Quick analysis"][self.var_language]
+        str_lbl_15 = self.language_dict["Stepwise analysis"][self.var_language]
+        str_lbl_16 = self.language_dict["Set start time"][self.var_language]
+        str_lbl_17 = self.language_dict["Set end time"][self.var_language]
+        str_lbl_18 = self.language_dict["Interval setup"][self.var_language]
+        str_lbl_19 = self.language_dict["Remove interval"][self.var_language]
+        str_lbl_20 = self.language_dict["Confirm all"][self.var_language]
+        str_lbl_21 = self.language_dict["Update"][self.var_language]
+        str_lbl_22 = self.language_dict["Parallelism"][self.var_language]
+        str_lbl_23 = self.language_dict["No selection"][self.var_language]
+        str_lbl_24 = self.language_dict["Background interval"][self.var_language]
+        str_lbl_25 = self.language_dict["Matrix interval"][self.var_language]
+        str_lbl_28 = self.language_dict["Inclusion interval"][self.var_language]
+
         lbl_01 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column, n_rows=1, n_columns=14,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Measured Isotopes", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 15, column_id=start_column, n_rows=1, n_columns=14,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Display Options", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 18, column_id=start_column, n_rows=1, n_columns=14,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Anaylsis Mode", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column, n_rows=1, n_columns=14,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Interval Setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_18, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Start", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 24, column_id=start_column, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="End", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column + 53, n_rows=1,
             n_columns=n_columns - (start_column + 53) - 6, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text="Parallelism", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_22, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
         btn_02a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Show All", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_08, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_show_all_lines(
                 var_type, var_file_short))
         btn_02b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Hide All", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_09, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_hide_all_lines(
                 var_type, var_file_short))
         btn_03 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Stepwise analysis", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_15, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Remove Interval", bg_active=accent_color, fg_active=font_color_light,
+            text=str_lbl_19, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_remove_interval(var_type, var_file_short))
         btn_05a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Previous file", bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
+            text=str_lbl_04, bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="back": self.switch_to_another_file(filetype, mode))
         btn_05b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 28, column_id=7, n_rows=2, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Next file", bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
+            text=str_lbl_05, bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
 
         if self.var_os == "darwin":
@@ -31590,19 +32031,19 @@ class PySILLS(tk.Frame):
         btn_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
             fg=font_color_accent, bg=accent_color).create_simple_button(
-            text="Confirm and Update \nData", bg_active=accent_color, fg_active=font_color_accent,
+            text=str_lbl_20, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_parent=self.subwindow_fi_checkfile, var_type=str_filetype,
                            var_file_long=str_filename_long:
             self.confirm_specific_file_setup(var_parent, var_type, var_file_long))
         btn_09 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=n_columns - 6, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text="Update", bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
+            text=str_lbl_21, bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
             command=lambda var_filetype=str_filetype, var_filename_short=str_filename_short,
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
-        if str_filetype == "STD":
+        if str_filetype == "STD" or "IS" in var_mat_is:
             btn_09.configure(state="disabled")
 
         btn_03.configure(state="disabled")
@@ -31611,61 +32052,65 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Time series view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_10, sticky="nesw",
             relief=tk.FLAT, command=lambda var_type=str_filetype, var_file=str_filename_long, var_lb_state=False:
             self.fi_show_time_signal_diagram(var_type, var_file, var_lb_state))
         rb_03b = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="Time ratios view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_11, sticky="nesw",
             relief=tk.FLAT, command=lambda var_type=str_filetype, var_file=str_filename_long:
             self.fi_show_time_ratio_diagram(var_type, var_file))
         rb_03c = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark, text="Spectral data view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_12, sticky="nesw",
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_spectral_data_view(filetype, filename_long))
         rb_03d = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 20, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=4,
-            color_bg=background_color_elements, fg=font_color_dark, text="Box plot data view", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_13, sticky="nesw",
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_boxplot_data_view(filetype, filename_long))
         rb_03e = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[key_setting]["Analyse Mode Plot"][str_filetype][str_filename_short], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="Quick analysis", sticky="nesw",
+            color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_14, sticky="nesw",
             relief=tk.FLAT, command=lambda var_type=str_filetype, var_file=str_filename_long:
             self.fi_show_quick_results(var_type, var_file))
+
+        if "IS" in var_is_i:
+            rb_03b.configure(state="disabled")
+            rb_03e.configure(state="disabled")
 
         rb_05 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
             n_columns=13, fg=font_color_light, bg=self.colors_intervals["BG"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Calculation Interval"][str_filetype][str_filename_short],
             value_rb=0, color_bg=self.colors_intervals["BG"], fg=font_color_light,
-            text="Background Interval", sticky="nesw", relief=tk.FLAT)
+            text=str_lbl_24, sticky="nesw", relief=tk.FLAT)
         rb_06 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 27, n_rows=1,
             n_columns=13, fg=font_color_light, bg=self.colors_intervals["MAT"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Calculation Interval"][str_filetype][str_filename_short],
-            value_rb=1, color_bg=self.colors_intervals["MAT"], fg=font_color_light, text="Matrix Interval",
+            value_rb=1, color_bg=self.colors_intervals["MAT"], fg=font_color_light, text=str_lbl_25,
             sticky="nesw", relief=tk.FLAT)
         rb_07 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 40, n_rows=1,
             n_columns=13, fg=font_color_dark, bg=self.colors_intervals["INCL"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Calculation Interval"][str_filetype][str_filename_short],
             value_rb=2, color_bg=self.colors_intervals["INCL"], fg=font_color_dark,
-            text="Inclusion Interval", sticky="nesw", relief=tk.FLAT)
+            text=str_lbl_28, sticky="nesw", relief=tk.FLAT)
         rb_08 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
             n_columns=39, fg=font_color_light, bg=self.bg_colors["Dark"]).create_radiobutton(
             var_rb=self.container_var[key_setting]["Calculation Interval"][str_filetype][str_filename_short],
-            value_rb=3, color_bg=background_color_dark, fg=font_color_light, text="No Selection",
+            value_rb=3, color_bg=background_color_dark, fg=font_color_light, text=str_lbl_23,
             sticky="nesw", relief=tk.FLAT)
 
         ## CHECKBOXES
@@ -31712,9 +32157,9 @@ class PySILLS(tk.Frame):
 
         ## ENTRIES
         var_entr_start = tk.StringVar()
-        var_entr_start.set("Set start value")
+        var_entr_start.set(str_lbl_16)
         var_entr_end = tk.StringVar()
-        var_entr_end.set("Set end value")
+        var_entr_end.set(str_lbl_17)
         self.helper_time_entries = {"Start": var_entr_start, "End": var_entr_end}
 
         entr_04a = SE(
@@ -31814,10 +32259,14 @@ class PySILLS(tk.Frame):
         self.container_helper[str_filetype][str_filename_short]["INCL"]["Listbox"] = lb_incl
 
         ## TREEVIEWS
+        str_tv_01 = self.language_dict["Isotope"][self.var_language]
+        str_tv_02 = self.language_dict["Matrix"][self.var_language]
+        str_tv_03 = self.language_dict["Inclusion"][self.var_language]
+
         self.tv_parallelism = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=start_column + 53, n_rows=9,
             n_columns=n_columns - 53, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
-            n_categories=3, text_n=["Isotope", "Matrix", "Inclusion"],
+            n_categories=3, text_n=[str_tv_01, str_tv_02, str_tv_03],
             width_n=["90", "100", "100"], individual=True)
 
         ## INITIALIZATION
@@ -32077,8 +32526,12 @@ class PySILLS(tk.Frame):
         ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
         ax.set_axisbelow(True)
         ax.set_title(str_filename_short, fontsize=9)
-        ax.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
-        ax.set_ylabel("Signal Intensity $I$ (cps)", labelpad=0.5, fontsize=8)
+
+        str_ax_01 = self.language_dict["Experiment time"][self.var_language]
+        str_ax_02 = self.language_dict["Signal intensity"][self.var_language]
+
+        ax.set_xlabel(str_ax_01 + " $t$ (s)", labelpad=0.5, fontsize=8)
+        ax.set_ylabel(str_ax_02 + " $I$ (cps)", labelpad=0.5, fontsize=8)
         ax.xaxis.set_tick_params(labelsize=8)
         ax.yaxis.set_tick_params(labelsize=8)
 
@@ -32123,14 +32576,16 @@ class PySILLS(tk.Frame):
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][var_file_short]:
                     var_key_isotope = self.container_lists["Measured Elements"][var_file_short][element][0]
+                    self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_key_isotope)
                 break
         else:
-            if self.container_var[key_setting][
-                "Quantification Method Option"].get() == "Matrix-only Tracer (SILLS)":
-                var_key_isotope = self.container_var["SMPL"][var_file]["Host Only Tracer"]["Name"].get()
-            elif self.container_var[key_setting][
-                "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
-                var_key_isotope = self.container_var["SMPL"][var_file]["Second Internal Standard"]["Name"].get()
+            if self.pysills_mode == "MA":
+                var_mat_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+                var_key_isotope = var_mat_is
+            else:
+                var_mat_is = self.container_var[var_type][var_file]["Matrix Setup"]["IS"]["Name"].get()
+                var_incl_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+                var_key_isotope = var_incl_is
 
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
@@ -32171,7 +32626,10 @@ class PySILLS(tk.Frame):
 
         self.dataset_time = list(DE().get_times(dataframe=df_data))
         x_max = max(self.dataset_time)
-        if var_key_isotope != "Select Isotope":
+
+        str_key_isotope = self.language_dict["Select isotope"][self.var_language]
+
+        if var_key_isotope != str_key_isotope:
             icp_measurements = np.array(
                 [[df_data[isotope]/df_data[var_key_isotope] for isotope in file_isotopes]])
             y_max = np.amax(icp_measurements)
@@ -32198,8 +32656,12 @@ class PySILLS(tk.Frame):
             ax_ratio.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
             ax_ratio.set_axisbelow(True)
             ax_ratio.set_title(var_file_short, fontsize=9)
-            ax_ratio.set_xlabel("Experiment Time $t$ (s)", labelpad=0.5, fontsize=8)
-            ax_ratio.set_ylabel("Signal Intensity Ratio $I$ (cps/cps)", labelpad=0.5, fontsize=8)
+
+            str_ax_01 = self.language_dict["Experiment time"][self.var_language]
+            str_ax_02 = self.language_dict["Intensity ratio"][self.var_language]
+
+            ax_ratio.set_xlabel(str_ax_01 + " $t$ (s)", labelpad=0.5, fontsize=8)
+            ax_ratio.set_ylabel(str_ax_02 + " $I$/$I_{IS}$ (cps/cps)", labelpad=0.5, fontsize=8)
             ax_ratio.xaxis.set_tick_params(labelsize=8)
             ax_ratio.yaxis.set_tick_params(labelsize=8)
 
@@ -32249,6 +32711,7 @@ class PySILLS(tk.Frame):
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][var_file_short]:
                     var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                    self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_is)
                 break
             list_considered_isotopes = []
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -33146,245 +33609,6 @@ class PySILLS(tk.Frame):
                         elif key == "End":
                             item.set("Set end value")
 
-    ## MATRIX SETTINGS
-    #
-    def fi_matrix_concentration_setup(self):
-        if self.pysills_mode == "FI":
-            key_setting = "fi_setting"
-        elif self.pysills_mode == "MI":
-            key_setting = "mi_setting"
-
-        ## Window Settings
-        window_width = 700
-        window_height = 450
-        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
-        #
-        subwindow_fi_matrix_concentration = tk.Toplevel(self.parent)
-        subwindow_fi_matrix_concentration.title("FLUID INCLUSION ANALYSIS - Matrix Concentration Setup")
-        subwindow_fi_matrix_concentration.geometry(var_geometry)
-        subwindow_fi_matrix_concentration.resizable(False, False)
-        subwindow_fi_matrix_concentration["bg"] = self.bg_colors["Very Dark"]
-        #
-        for x in range(n_columns):
-            tk.Grid.columnconfigure(subwindow_fi_matrix_concentration, x, weight=1)
-        for y in range(n_rows):
-            tk.Grid.rowconfigure(subwindow_fi_matrix_concentration, y, weight=1)
-        #
-        # Rows
-        for i in range(0, n_rows):
-            subwindow_fi_matrix_concentration.grid_rowconfigure(i, minsize=row_min)
-        # Columns
-        for i in range(0, n_columns):
-            subwindow_fi_matrix_concentration.grid_columnconfigure(i, minsize=column_min)
-        #
-        start_row = 0
-        start_column = 0
-
-        ## INITIAL VALUES
-        list_oxides = sorted(self.container_lists["Oxides"])
-
-        ## LABELS
-        lbl_01 = SE(
-            parent=subwindow_fi_matrix_concentration, row_id=start_row, column_id=start_column, n_rows=1, n_columns=24,
-            fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Sample Files", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_02 = SE(
-            parent=subwindow_fi_matrix_concentration, row_id=start_row, column_id=start_column + 25, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Light Font"], bg=self.bg_colors["Very Dark"]).create_simple_label(
-            text="Default Settings", relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        ## OPTION MENUS
-        if self.container_var[key_setting]["Host Setup Selection"].get() == 1:
-            list_elements = []
-            var_list_comp = []
-            for isotope in self.container_lists["ISOTOPES"]:
-                key = re.search(r"(\D+)(\d*)", isotope)
-                element_isotope = key.group(1)
-                if element_isotope not in list_elements:
-                    list_elements.append(element_isotope)
-            for oxide in list_oxides:
-                key = re.search(r"(\D+)(\d*)(\D+)(\d*)", oxide)
-                element_oxide = key.group(1)
-                if element_oxide in list_elements:
-                    if oxide not in var_list_comp:
-                        var_list_comp.append(oxide)
-
-            var_list_is = self.container_lists["ISOTOPES"]
-            var_opt_default_comp = self.container_var[key_setting]["Oxide"]
-            var_opt_default_is = self.container_var[key_setting]["IS MAT Default"]
-            var_entr_default = self.container_var[key_setting]["Oxide Concentration"]
-            var_entr_default_is = self.container_var[key_setting]["IS MAT Default Concentration"]
-            #
-            if self.container_var[key_setting]["Oxide"].get() != "Select Oxide":
-                var_opt_default_text = self.container_var[key_setting]["Oxide"].get()
-            else:
-                var_opt_default_text = "Select Oxide"
-            #
-            if self.container_var[key_setting]["Oxide Concentration"].get() != "0.0":
-                var_entr_default_text = self.container_var[key_setting]["Oxide Concentration"].get()
-            else:
-                var_entr_default_text = "0.0"
-            #
-            if self.container_var[key_setting]["IS MAT Default"].get() != "Select IS":
-                var_opt_default_is_text = self.container_var[key_setting]["IS MAT Default"].get()
-            else:
-                var_opt_default_is_text = "Select IS"
-            #
-            if self.container_var[key_setting]["IS MAT Default Concentration"].get() != "1000000":
-                var_entr_default_is_text = self.container_var[key_setting]["IS MAT Default Concentration"].get()
-            else:
-                var_entr_default_is_text = "1000000"
-            #
-        elif self.container_var[key_setting]["Host Setup Selection"].get() == 2:
-            list_elements = []
-            var_list_comp = []
-            for isotope in self.container_lists["ISOTOPES"]:
-                key = re.search(r"(\D+)(\d*)", isotope)
-                element_isotope = key.group(1)
-                if element_isotope not in list_elements:
-                    list_elements.append(element_isotope)
-            for element in self.container_lists["Elements"]:
-                if element in list_elements:
-                    if element not in var_list_comp:
-                        var_list_comp.append(element)
-            # var_list_comp = self.container_lists["Elements"]
-            var_list_is = self.container_lists["ISOTOPES"]
-            var_opt_default_comp = self.container_var[key_setting]["Element"]
-            var_opt_default_is = self.container_var[key_setting]["IS MAT Default"]
-            var_entr_default = self.container_var[key_setting]["Element Concentration"]
-            var_entr_default_is = self.container_var[key_setting]["IS MAT Default Concentration"]
-            #
-            if self.container_var[key_setting]["Element"].get() != "Select Element":
-                var_opt_default_text = self.container_var[key_setting]["Element"].get()
-            else:
-                var_opt_default_text = "Select Element"
-            #
-            if self.container_var[key_setting]["Element Concentration"].get() != "1000000":
-                var_entr_default_text = self.container_var[key_setting]["Element Concentration"].get()
-            else:
-                var_entr_default_text = "1000000"
-            #
-            if self.container_var[key_setting]["IS MAT Default"].get() != "Select IS":
-                var_opt_default_is_text = self.container_var[key_setting]["IS MAT Default"].get()
-            else:
-                var_opt_default_is_text = "Select IS"
-            #
-            if self.container_var[key_setting]["IS MAT Default Concentration"].get() != "1000000":
-                var_entr_default_is_text = self.container_var[key_setting]["IS MAT Default Concentration"].get()
-            else:
-                var_entr_default_is_text = "1000000"
-        #
-        opt_02a = SE(
-            parent=subwindow_fi_matrix_concentration, row_id=start_row + 1, column_id=start_column + 25, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=var_opt_default_comp, option_list=var_list_comp, text_set=var_opt_default_text,
-            fg_active=self.bg_colors["Light Font"], bg_active=self.accent_color,
-            command=lambda var_opt=var_opt_default_comp, var_file=None, state_default=True:
-            self.fi_change_matrix_compound(var_opt, var_file, state_default))
-        opt_02a["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        opt_02a.config(
-            bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, highlightthickness=0)
-        #
-        self.opt_02b = SE(
-            parent=subwindow_fi_matrix_concentration, row_id=start_row + 2, column_id=start_column + 25, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_option_isotope(
-            var_iso=var_opt_default_is, option_list=var_list_is, text_set=var_opt_default_is_text,
-            fg_active=self.bg_colors["Light Font"], bg_active=self.accent_color,
-            command=lambda var_opt=var_opt_default_is, var_file=None, state_default=True:
-            self.fi_change_matrix_compound(var_opt, var_file, state_default))
-        self.opt_02b["menu"].config(
-            fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color)
-        self.opt_02b.config(
-            bg=self.bg_colors["Light"], fg=self.bg_colors["Very Dark"], activeforeground=self.bg_colors["Dark Font"],
-            activebackground=self.accent_color, highlightthickness=0)
-        #
-        ## ENTRIES
-        entr_02b = SE(
-            parent=subwindow_fi_matrix_concentration, row_id=start_row + 3, column_id=start_column + 25, n_rows=1,
-            n_columns=9, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_entry(
-            var=var_entr_default_is, text_default=var_entr_default_is_text,
-            command=lambda event, var_entr=var_entr_default_is, var_file=None, state_default=True:
-            self.fi_change_matrix_concentration(var_entr, var_file, state_default, event))
-        #
-        ## SAMPLE FILES
-        frm_smpl = SE(
-            parent=subwindow_fi_matrix_concentration, row_id=start_row + 1, column_id=start_column, n_rows=16,
-            n_columns=24, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-        vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
-        text_smpl = tk.Text(
-            master=frm_smpl, width=30, height=25, yscrollcommand=vsb_smpl.set, bg=self.bg_colors["Very Light"])
-        vsb_smpl.config(command=text_smpl.yview)
-        vsb_smpl.pack(side="right", fill="y")
-        text_smpl.pack(side="left", fill="both", expand=True)
-        #
-        for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-            file_smpl = self.container_lists["SMPL"]["Long"][index]
-            lbl_i = tk.Label(frm_smpl, text=file_smpl_short, bg=self.bg_colors["Very Light"],
-                             fg=self.bg_colors["Dark Font"])
-            text_smpl.window_create("end", window=lbl_i)
-            text_smpl.insert("end", "\t")
-
-            if self.container_var[key_setting]["Host Setup Selection"].get() == 1:  # Oxide Selection
-                var_list_is = self.container_lists["ISOTOPES"]
-                var_opt_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"]
-                var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"]
-                if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].get() != "Select IS":
-                    var_opt_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].get()
-                else:
-                    var_opt_i_default = "Select IS"
-                if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].get() != "1000000":
-                    var_entr_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"][
-                        "Concentration"].get()
-                else:
-                    var_entr_i_default = "1000000"
-            elif self.container_var[key_setting]["Host Setup Selection"].get() == 2:  # Element Selection
-                var_list_is = self.container_lists["ISOTOPES"]
-                var_opt_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"]
-                var_entr_i = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"]
-                if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].get() != "Select IS":
-                    var_opt_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Name"].get()
-                else:
-                    var_opt_i_default = "Select IS"
-                if self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"]["Concentration"].get() != "1000000":
-                    var_entr_i_default = self.container_var["SMPL"][file_smpl]["Matrix Setup"]["IS"][
-                        "Concentration"].get()
-                else:
-                    var_entr_i_default = "1000000"
-            #
-            var_opt_i.set(var_opt_i_default)
-            #
-            opt_is_i = tk.OptionMenu(
-                frm_smpl, var_opt_i, *var_list_is,
-                command=lambda var_opt=var_opt_i, var_file=file_smpl, state_default=False:
-                self.fi_change_matrix_is(var_opt, var_file, state_default))
-            opt_is_i["menu"].config(
-                fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-            opt_is_i.config(
-                bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-                activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
-            text_smpl.window_create("end", window=opt_is_i)
-            text_smpl.insert("end", " \t")
-            #
-            var_entr_i.set(var_entr_i_default)
-            #
-            entr_i = tk.Entry(frm_smpl, textvariable=var_entr_i)
-            entr_i.bind(
-                "<Return>", lambda event, var_entr=var_entr_i, var_file=file_smpl, state_default=False:
-                self.fi_change_matrix_concentration(var_entr, var_file, state_default, event))
-            text_smpl.window_create("insert", window=entr_i)
-            text_smpl.insert("end", "\n")
-        #
-
     def fi_change_matrix_compound(self, var_opt, var_file=None, state_default=False, matrix_only=False):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
@@ -33440,7 +33664,15 @@ class PySILLS(tk.Frame):
         else:
             self.container_var["SMPL"][var_file]["Matrix Setup"][var_key]["Name"].set(var_opt)
 
-    def change_matrix_only_tracer(self, var_opt, var_file, state_default):
+    def change_matrix_only_concentration(self, variable, event):
+        for filename_long in self.container_lists["SMPL"]["Long"]:
+            self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Value"].set(round(float(variable.get()), 4))
+
+    def change_matrix_only_tracer(self, var_opt):
+        for filename_long in self.container_lists["SMPL"]["Long"]:
+            self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Name"].set(var_opt)
+
+    def change_matrix_only_tracer2(self, var_opt, var_file, state_default):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -34763,6 +34995,8 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
 
+        str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+
         ## Window Settings
         window_width = 1200
         window_height = 500
@@ -34774,7 +35008,7 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         subwindow_fi_inclusion_pypitzer = tk.Toplevel(self.parent)
-        subwindow_fi_inclusion_pypitzer.title("FLUID INCLUSION ANALYSIS - PyPitzer")
+        subwindow_fi_inclusion_pypitzer.title(str_title_01 + " - PyPitzer")
         subwindow_fi_inclusion_pypitzer.geometry(var_geometry)
         subwindow_fi_inclusion_pypitzer.resizable(False, False)
         subwindow_fi_inclusion_pypitzer["bg"] = background_color_dark
@@ -34799,56 +35033,68 @@ class PySILLS(tk.Frame):
         start_row = 0
         start_column = 0
 
-        str_btn_01 = self.language_dict["Import data"][self.var_language]
-
         ## LABELS
+        str_lbl_01 = self.language_dict["Composition"][self.var_language]
+        str_lbl_02 = self.language_dict["Cations"][self.var_language]
+        str_lbl_03 = self.language_dict["Anions"][self.var_language]
+        str_lbl_04 = self.language_dict["Default settings"][self.var_language]
+        str_lbl_05 = self.language_dict["Internal standard"][self.var_language]
+        str_lbl_06 = self.language_dict["Melting temperature of the last solid"][self.var_language]
+        str_lbl_07 = self.language_dict["Last solid"][self.var_language]
+        str_lbl_08 = self.language_dict["Melting temperature"][self.var_language]
+
         lbl_00a = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column, n_rows=1, n_columns=7,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Fluid composition", relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_00a = SE(
-            parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 8, n_rows=1, n_columns=7,
-            fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Isotope selection", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_01 = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column, n_rows=1,
             n_columns=7, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Cations", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 12, column_id=start_column, n_rows=1,
             n_columns=7, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Anions", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 16, n_rows=1,
             n_columns=24, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Melting temperature of the last solid (in °C)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06 + "(°C)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 16, n_rows=1,
             n_columns=12, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Last solid (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 2, column_id=start_column + 16, n_rows=1,
             n_columns=12, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Melting temperature (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_08 + "(°C)", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row, column_id=start_column + 41, n_rows=1,
             n_columns=18, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Internal standard concentration", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_00b = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 41, n_rows=1,
             n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Internal standard (default)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## BUTTONS
+        str_btn_01 = self.language_dict["Import data"][self.var_language]
+        str_btn_02 = self.language_dict["Run"][self.var_language]
+
         btn_00c = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 3, column_id=start_column + 34, n_rows=1,
             n_columns=6, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_light)
         btn_00c.configure(state="disabled")
+
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_00d = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=n_rows - 2, column_id=start_column + 51, n_rows=1,
-            n_columns=8, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Run calculation", bg_active=accent_color, fg_active=font_color_light,
+            n_columns=8, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_02, bg_active=accent_color, fg_active=font_color_accent,
             command=self.run_pypitzer)
 
         ## OPTION MENUS
@@ -34864,6 +35110,9 @@ class PySILLS(tk.Frame):
             "KCl*MgCl2*6H2O", "CaMg2Cl6*12H2O", "Na2SO4*10H2O", "Na2SO4", "MgSO4*6H2O", "MgSO4*7H2O", "K2SO4",
             "K2Mg(SO4)2*6H2O", "LiCl", "LiCl*H2O", "LiCl*2H2O", "LiCl*3H2O", "LiCl*5H2O", "FeCl2*4H2O", "FeCl2*6H2O",
             "FeSO4*H2O", "FeSO4*7H2O"]
+
+        str_opt_01 = self.language_dict["Select last solid"][self.var_language]
+        self.container_var[key_setting]["Last solid"].set(str_opt_01)
 
         opt_last_solid_default = SE(
             parent=subwindow_fi_inclusion_pypitzer, row_id=start_row + 1, column_id=start_column + 28, n_rows=1,
@@ -35011,7 +35260,7 @@ class PySILLS(tk.Frame):
                         if element_i not in self.helper_checkbuttons["Isotopes"]:
                             self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=0)
                             if (element_i in self.container_lists["Selected Cations"] or
-                                    element_i in self.container_lists["Selected Anions"]):
+                                    element_i in self.container_lists["Selected Anions"]) and element_i != "S":
                                 self.helper_checkbuttons["Isotopes"][var_isotope] = tk.IntVar(value=1)
                     else:
                         if element_i not in self.helper_checkbuttons["Isotopes"]:
@@ -35384,6 +35633,8 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
+        str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+
         ## Window Settings
         window_width = 1100
         window_height = 600
@@ -35397,9 +35648,11 @@ class PySILLS(tk.Frame):
         subwindow_fi_inclusion_massbalance_new = tk.Toplevel(self.parent)
 
         if mode == "mass balance":
-            subwindow_fi_inclusion_massbalance_new.title("FLUID INCLUSION ANALYSIS - Mass balance")
+            str_title_02 = self.language_dict["Mass balance"][self.var_language]
+            subwindow_fi_inclusion_massbalance_new.title(str_title_01 + " - " + str_title_02)
         else:
-            subwindow_fi_inclusion_massbalance_new.title("FLUID INCLUSION ANALYSIS - Charge balance")
+            str_title_02 = self.language_dict["Charge balance"][self.var_language]
+            subwindow_fi_inclusion_massbalance_new.title(str_title_01 + " - " + str_title_02)
 
         subwindow_fi_inclusion_massbalance_new.geometry(var_geometry)
         subwindow_fi_inclusion_massbalance_new.resizable(False, False)
@@ -35458,33 +35711,43 @@ class PySILLS(tk.Frame):
             self.init_fi_massbalance = True
 
         ## Labels
+        str_lbl_01 = self.language_dict["Composition"][self.var_language]
+        str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_03 = self.language_dict["Default settings"][self.var_language]
+
         lbl_01 = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=n_header, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Composition: H2O + ...", relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01 + " - H2O + ...", relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row, column_id=start_column + n_header + 1,
-            n_rows=1, n_columns=int(2*n_header), fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="File setup", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=int(2*n_header), fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_02 = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=start_column + n_header + 1,
-            n_rows=1, n_columns=n_header - 8, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text="Default settings", relief=tk.FLAT, fontsize="sans 10 bold")
+            n_rows=1, n_columns=n_header - 8, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
 
         ## Buttons
+        str_btn_01 = self.language_dict["Guess the composition"][self.var_language]
+        str_btn_02 = self.language_dict["Fix quantification"][self.var_language]
+
         btn_01a = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header - 10, n_rows=1,
             n_columns=n_header - (n_header - 10), fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
-            text="Guess the composition", bg_active=accent_color, fg_active=font_color_light,
+            text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
             command=self.guess_salt_composition)
+
+        if self.var_os == "darwin":
+            font_color_accent = font_color_dark
+        else:
+            font_color_accent = font_color_light
+
         btn_02a = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 27, n_rows=1,
-            n_columns=11, fg=font_color_light,
-            bg=accent_color).create_simple_button(
-            text="Fix calculation", bg_active=accent_color, fg_active=font_color_light,
+            n_columns=11, fg=font_color_accent, bg=accent_color).create_simple_button(
+            text=str_btn_02, bg_active=accent_color, fg_active=font_color_accent,
             command=self.fix_mass_charge_balance_calculation)
 
         ## Option Menus
@@ -35516,6 +35779,9 @@ class PySILLS(tk.Frame):
         self.opt_is_smpl_def = opt_05a
 
         ## Entries
+        str_opt_01 = self.language_dict["Set salinity"][self.var_language]
+        self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set(str_opt_01 + " (%)")
+
         if mode == "mass balance":
             entr_05a = SE(
                 parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 15,
@@ -35548,11 +35814,13 @@ class PySILLS(tk.Frame):
                 command=self.fi_set_concentration_is_chargebalance)
 
         ## CHECKBOXES
+        str_cb_01 = self.language_dict["Molality-based quantification"][self.var_language]
+
         cb_01a = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 27,
             fg=font_color_dark, n_rows=1, n_columns=11,
             bg=background_color_elements).create_simple_checkbox(
-            var_cb=self.molality_based_quantification, text="Molality-based quantification", set_sticky="nesw",
+            var_cb=self.molality_based_quantification, text=str_cb_01, set_sticky="nesw",
             own_color=True, command=lambda var_cb=self.molality_based_quantification: self.change_checkbox(var_cb))
         cb_01a.configure(offvalue=False)
         #cb_01a.configure(state="disabled")
@@ -35823,8 +36091,10 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
+            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
+            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
 
         ## Window Settings
         window_width = 660
@@ -35837,15 +36107,17 @@ class PySILLS(tk.Frame):
         n_columns = int(window_width/column_min)
 
         if self.bool_incl_is_custom:
+            str_title_02 = self.language_dict["Custom data"][self.var_language]
             if self.pysills_mode == "FI":
-                str_title = "FLUID INCLUSION ANALYSIS - Custom Data Setup"
+                str_title = str_title_01 + " - " + str_title_02
             elif self.pysills_mode == "MI":
-                str_title = "MELT INCLUSION ANALYSIS - Custom Data Setup"
+                str_title = str_title_01 + " - " + str_title_02
         else:
+            str_title_02 = self.language_dict["External quantification support"][self.var_language]
             if self.pysills_mode == "FI":
-                str_title = "FLUID INCLUSION ANALYSIS - Plugin-based Inclusion Setup"
+                str_title = str_title_01 + " - " + str_title_02
             elif self.pysills_mode == "MI":
-                str_title = "MELT INCLUSION ANALYSIS - Plugin-based Inclusion Setup"
+                str_title = str_title_01 + " - " + str_title_02
 
         subwindow_fi_inclusion_plugin = tk.Toplevel(self.parent)
         subwindow_fi_inclusion_plugin.title(str_title)
@@ -35868,10 +36140,13 @@ class PySILLS(tk.Frame):
         start_row = 0
         start_column = 0
 
-        str_btn_01 = self.language_dict["Import data"][self.var_language]
+        str_btn_02 = self.language_dict["Import data"][self.var_language]
 
         ## LABELS
         if self.str_incl_is_custom_external == "External":
+            str_lbl_01 = self.language_dict["LA-ICP-MS data export"][self.var_language]
+            str_lbl_02 = self.language_dict["Import external data"][self.var_language]
+
             lbl_01 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
                 fg=font_color_light, bg=background_color_dark).create_simple_label(
@@ -35879,19 +36154,30 @@ class PySILLS(tk.Frame):
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 11, n_rows=1,
                 n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-                text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
+                text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
         else:
+            str_lbl_01 = self.language_dict["Default settings"][self.var_language]
+            str_lbl_02 = self.language_dict["Import external data"][self.var_language]
+
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column + 22, n_rows=1,
                 n_columns=10, fg=font_color_light, bg=background_color_dark).create_simple_label(
-                text="Default Settings", relief=tk.FLAT, fontsize="sans 10 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
             lbl_02 = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row, column_id=start_column, n_rows=1, n_columns=10,
                 fg=font_color_light, bg=background_color_dark).create_simple_label(
-                text="Import Plugin Data", relief=tk.FLAT, fontsize="sans 10 bold")
+                text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
 
         if self.str_incl_is_custom_external == "External":
             ## CHECKBOXES
+            str_cb_01 = self.language_dict["Intensity"][self.var_language]
+            str_cb_02 = self.language_dict["Background"][self.var_language]
+            str_cb_03 = self.language_dict["Matrix"][self.var_language]
+            str_cb_04 = self.language_dict["Mixed signal"][self.var_language]
+            str_cb_05 = self.language_dict["Inclusion"][self.var_language]
+            str_cb_06 = self.language_dict["Analytical sensitivity"][self.var_language]
+            str_cb_07 = self.language_dict["Concentration"][self.var_language]
+
             var_cb_01a = self.container_var[key_setting]["Inclusion Plugin"]["Intensity BG"]
             var_cb_01b = self.container_var[key_setting]["Inclusion Plugin"]["Intensity MAT"]
             var_cb_01c = self.container_var[key_setting]["Inclusion Plugin"]["Intensity MIX"]
@@ -35903,32 +36189,32 @@ class PySILLS(tk.Frame):
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column,
                 fg=font_color_dark, n_rows=1, n_columns=10,
                 bg=background_color_elements).create_simple_checkbox(
-                var_cb=var_cb_01a, text="Intensity (Background)", set_sticky="nesw", own_color=True)
+                var_cb=var_cb_01a, text=str_cb_01 + " (" + str_cb_02 + ")", set_sticky="nesw", own_color=True)
             cb_01b = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 2, column_id=start_column,
                 fg=font_color_dark, n_rows=1, n_columns=10,
                 bg=background_color_elements).create_simple_checkbox(
-                var_cb=var_cb_01b, text="Intensity (Matrix)", set_sticky="nesw", own_color=True)
+                var_cb=var_cb_01b, text=str_cb_01 + " (" + str_cb_03 + ")", set_sticky="nesw", own_color=True)
             cb_01c = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 3, column_id=start_column,
                 fg=font_color_dark, n_rows=1, n_columns=10,
                 bg=background_color_elements).create_simple_checkbox(
-                var_cb=var_cb_01c, text="Intensity (Mix)", set_sticky="nesw", own_color=True)
+                var_cb=var_cb_01c, text=str_cb_01 + " (" + str_cb_04 + ")", set_sticky="nesw", own_color=True)
             cb_01d = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 4, column_id=start_column,
                 fg=font_color_dark, n_rows=1, n_columns=10,
                 bg=background_color_elements).create_simple_checkbox(
-                var_cb=var_cb_01d, text="Intensity (Inclusion)", set_sticky="nesw", own_color=True)
+                var_cb=var_cb_01d, text=str_cb_01 + " (" + str_cb_05 + ")", set_sticky="nesw", own_color=True)
             cb_01e = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 5, column_id=start_column,
                 fg=font_color_dark, n_rows=1, n_columns=10,
                 bg=background_color_elements).create_simple_checkbox(
-                var_cb=var_cb_01e, text="Analytical Sensitivity", set_sticky="nesw", own_color=True)
+                var_cb=var_cb_01e, text=str_cb_06, set_sticky="nesw", own_color=True)
             cb_01f = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 6, column_id=start_column,
                 fg=font_color_dark, n_rows=1, n_columns=10,
                 bg=background_color_elements).create_simple_checkbox(
-                var_cb=var_cb_01f, text="Concentration (SRM)", set_sticky="nesw", own_color=True)
+                var_cb=var_cb_01f, text=str_cb_07 + " (SRM)", set_sticky="nesw", own_color=True)
 
             cb_01a.configure(font="sans 10")
             cb_01b.configure(font="sans 10")
@@ -35938,22 +36224,24 @@ class PySILLS(tk.Frame):
             cb_01f.configure(font="sans 10")
 
             ## BUTTONS
+            str_btn_01 = self.language_dict["Export results"][self.var_language]
+
             btn_01h = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 7, column_id=start_column, n_rows=1,
                 n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text="Export Data", bg_active=accent_color, fg_active=font_color_light,
+                text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
                 command=self.export_data_for_external_calculations)
             btn_02a = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column + 11, n_rows=1,
                 n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+                text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
         else:
             ## BUTTONS
             btn_02a = SE(
                 parent=subwindow_fi_inclusion_plugin, row_id=start_row + 1, column_id=start_column, n_rows=1,
                 n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-                text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+                text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda parent=subwindow_fi_inclusion_plugin, mode="FI": self.import_is_data(parent, mode))
 
             # OPTION MENU
@@ -36588,12 +36876,15 @@ class PySILLS(tk.Frame):
             self.scl_01.grid(row=start_row + 7, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
 
         ## OPTION MENUS
+        str_opt_01 = self.language_dict["Select isotope"][self.var_language]
         self.var_opt_spk_iso = tk.StringVar()
-        self.var_opt_spk_iso.set("Select isotope")
+        self.var_opt_spk_iso.set(str_opt_01)
+
         if len(list_spk_isotopes) > 0:
             self.current_isotope = list_spk_isotopes[0]
         else:
             self.current_isotope = "No isotope"
+
         var_opt_is_default = self.current_isotope
 
         if len(list_spk_isotopes) > 0:
