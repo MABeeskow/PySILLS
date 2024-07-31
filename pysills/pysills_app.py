@@ -542,7 +542,8 @@ class PySILLS(tk.Frame):
             "Accuracy Concentration": tk.IntVar(), "Sensitivity Drift": tk.IntVar(), "LOD Selection": tk.IntVar(),
             "Desired Average": tk.IntVar(), "Interval Processing": tk.IntVar(), "BG Offset Start": tk.IntVar(),
             "BG Offset End": tk.IntVar(), "MAT Offset Start": tk.IntVar(), "MAT Offset End": tk.IntVar(),
-            "Calculation Accuracy": tk.IntVar(), "Color scheme": tk.StringVar()}
+            "Calculation Accuracy": tk.IntVar(), "Color scheme": tk.StringVar(), "Screen resolution": tk.StringVar()}
+        self.container_var["General Settings"]["Screen resolution"].set("1920x1080")
         self.container_var["General Settings"]["Language"].set("English")
         self.container_var["General Settings"]["Color scheme"].set("Dark scheme")
         self.container_var["General Settings"]["Default Author"].set("J. Doe")
@@ -882,6 +883,7 @@ class PySILLS(tk.Frame):
             "Standard deviation": {"English": "Standard deviation", "German": "Standardabweichung"},
             "Charge": {"English": "Charge", "German": "Ladung"},
             "charged": {"English": "charged", "German": "geladen"},
+            "Screen resolution": {"English": "Screen resolution", "German": "Bildschirmauflösung"},
             "Arithmetic mean": {"English": "Arithmetic mean", "German": "Arithmetisches Mittel"},
             "Average of every interval": {
                 "English": "Average of every interval", "German": "Durchschnitt pro Interval"},
@@ -1769,45 +1771,6 @@ class PySILLS(tk.Frame):
         self.calculate_mineral_chemistry()
         self.create_srm_data_list()
 
-        window_width = var_window_width
-        window_height = var_window_height
-        row_min = 25
-        row_min = int(var_window_height/40)
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        column_min = int(var_window_width/90)
-        n_columns = int(window_width/column_min)
-        row_min = 25
-        self.n_rows = 33
-        window_height = int(row_min*self.n_rows)
-        column_min = 20
-        self.n_columns = 21
-        window_width = int(column_min*self.n_columns)
-        var_geometry = str(window_width) + "x" + str(window_height) + "+0+0"
-        self.parent.geometry(var_geometry)
-
-        for x in range(n_columns):
-            tk.Grid.columnconfigure(self.parent, x, weight=1)
-        for y in range(n_rows):
-            tk.Grid.rowconfigure(self.parent, y, weight=1)
-
-        # Rows
-        for i in range(0, n_rows):
-            self.parent.grid_rowconfigure(i, minsize=row_min)
-        # Columns
-        for i in range(0, n_columns):
-            self.parent.grid_columnconfigure(i, minsize=column_min)
-
-        ################################################################################################################
-
-        ## FRAMES
-
-        frame_01 = tk.Frame(self.parent, bg=self.bg_colors["BG Window"], borderwidth=0, highlightthickness=0,
-                            relief=tk.FLAT)
-        frame_01.grid(row=3, column=0, rowspan=42, columnspan=22, sticky="nesw")
-        frame_02 = tk.Frame(self.parent, bg=self.red_dark, borderwidth=0, highlightthickness=0)
-        frame_02.grid(row=2, column=0, rowspan=1, columnspan=22, sticky="nesw")
-        #
         ## USER SETTINGS
         project_path_prew = self.path_pysills[:]
         project_path = project_path_prew.strip("/pysills")
@@ -1826,6 +1789,77 @@ class PySILLS(tk.Frame):
                     self.container_var["dwell_times"]["Entry"]["Default"].set(file_data_splitted[1])
         except:
             print("There is no user_settings file!")
+
+        # Screen resolution
+        str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+        if str_screen_resolution == "1920x1080":
+            self.row_height = 24
+            self.column_width = 21
+            self.font_settings = {
+                "Header": "sans 15 bold", "Elements": "sans 12 bold", "Small": "sans 9 bold"}
+        elif str_screen_resolution == "1280x720":
+            self.row_height = 16
+            self.column_width = 14
+            self.font_settings = {
+                "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 6 bold"}
+
+        self.window_dimensions = {
+            "Main window": [33, 21], "MA main settings": [38, 65], "FI main settings": [40, 67],
+            "MI main settings": [40, 63], "ICP-MS setup": [8, 17], "Quick plot": [28, 50],
+            "Spike elimination threshold": [24, 15], "Check-up oxides": [29, 83], "Check-up IS": [16, 42],
+            "General settings": [22, 35], "Check-up SRM": [23, 32], "Check-up intervals": [32, 54],
+            "Check-up acquisition times": [33, 26], "Check-up files": [32, 50]}
+
+        row_min = self.row_height
+        self.n_rows = 33
+        window_height = int(row_min*self.n_rows)
+        column_min = self.column_width
+
+        self.n_columns = 21
+        window_width = int(column_min*self.n_columns)
+        var_geometry = str(window_width) + "x" + str(window_height) + "+0+0"
+        self.parent.geometry(var_geometry)
+
+        for x in range(self.n_columns):
+            tk.Grid.columnconfigure(self.parent, x, weight=1)
+        for y in range(self.n_rows):
+            tk.Grid.rowconfigure(self.parent, y, weight=1)
+
+        # Rows
+        for i in range(0, self.n_rows):
+            self.parent.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, self.n_columns):
+            self.parent.grid_columnconfigure(i, minsize=column_min)
+
+        ################################################################################################################
+
+        ## FRAMES
+
+        frame_01 = tk.Frame(self.parent, bg=self.bg_colors["BG Window"], borderwidth=0, highlightthickness=0,
+                            relief=tk.FLAT)
+        frame_01.grid(row=3, column=0, rowspan=42, columnspan=22, sticky="nesw")
+        frame_02 = tk.Frame(self.parent, bg=self.red_dark, borderwidth=0, highlightthickness=0)
+        frame_02.grid(row=2, column=0, rowspan=1, columnspan=22, sticky="nesw")
+        #
+        # ## USER SETTINGS
+        # project_path_prew = self.path_pysills[:]
+        # project_path = project_path_prew.strip("/pysills")
+        #
+        # try:
+        #     file_usersettings = open(self.path_pysills_main + str("/user_settings.txt"), "r")
+        #     for index, file_data in enumerate(file_usersettings):
+        #         file_data_splitted = file_data.split(";")
+        #
+        #         try:
+        #             self.container_var["General Settings"][file_data_splitted[0]].set(file_data_splitted[1])
+        #         except:
+        #             pass
+        #
+        #         if "Dwell Times" in file_data_splitted:
+        #             self.container_var["dwell_times"]["Entry"]["Default"].set(file_data_splitted[1])
+        # except:
+        #     print("There is no user_settings file!")
 
         str_color_scheme = self.container_var["General Settings"]["Color scheme"].get()
         if str_color_scheme == "Dark scheme":
@@ -1895,8 +1929,9 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_listbox = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_small = self.font_settings["Small"]
         self.var_language = self.container_var["General Settings"]["Language"].get()
         self.update_variables_initial_values()
         self.parent["bg"] = self.bg_colors["BG Window"]
@@ -1999,12 +2034,12 @@ class PySILLS(tk.Frame):
         lbl_version = SE(
             parent=self.parent, row_id=start_row + 29, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Version: " + self.val_version, relief=tk.FLAT, fontsize="sans 8")
+            text="Version: " + self.val_version, relief=tk.FLAT, fontsize=font_small)
         lbl_dev = SE(
             parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
             text="Major, minor and trace element analysis of minerals, fluid and melt inclusions", relief=tk.FLAT,
-            fontsize="sans 8", sticky="news")
+            fontsize=font_small, sticky="news")
 
         # LISTBOXES
         self.lb_std = SE(
@@ -2049,19 +2084,19 @@ class PySILLS(tk.Frame):
         var_btn_10 = self.language_dict["Setup"][self.var_language]
         var_btn_11 = self.language_dict["Manager"][self.var_language]
 
-        SE(
+        btn_01 = SE(
             parent=self.parent, row_id=start_row + 15, column_id=start_column, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="STD":
             self.open_csv(datatype))
-        SE(
+        btn_02 = SE(
             parent=self.parent, row_id=start_row + 16, column_id=start_column, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="STD":
             self.copy_file(filetype))
-        SE(
+        btn_03 = SE(
             parent=self.parent, row_id=start_row + 15, column_id=n_columns_button + 2, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
@@ -2074,19 +2109,19 @@ class PySILLS(tk.Frame):
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="STD": self.project_manager(type))
         btn_11_std.configure(state="disabled")
-        SE(
+        btn_04 = SE(
             parent=self.parent, row_id=start_row + 15, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_01, bg_active=accent_color, fg_active=font_color_dark, command=lambda datatype="SMPL":
             self.open_csv(datatype))
-        SE(
+        btn_05 = SE(
             parent=self.parent, row_id=start_row + 16, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
             text=var_btn_02, bg_active=accent_color, fg_active=font_color_dark, command=lambda filetype="SMPL":
             self.copy_file(filetype))
-        SE(
+        btn_06 = SE(
             parent=self.parent, row_id=start_row + 15, column_id=5*n_columns_button + 1, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
             bg=background_color_elements).create_simple_button(
@@ -2100,11 +2135,11 @@ class PySILLS(tk.Frame):
             command=lambda type="SMPL": self.project_manager(type))
         btn_11_smpl.configure(state="disabled")
 
-        SE(
+        btn_07 = SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_04, bg_active=accent_color, fg_active=font_color_dark, command=self.restart_pysills)
-        SE(
+        btn_08 = SE(
             parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_05, bg_active=accent_color, fg_active=font_color_dark, command=self.open_project)
@@ -2113,7 +2148,7 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_06, bg_active=accent_color, fg_active=font_color_dark, command=self.save_project)
         self.btn_save_project.configure(state="disabled")
-        SE(
+        btn_09 = SE(
             parent=self.parent, row_id=start_row + 5, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_07, bg_active=accent_color, fg_active=font_color_dark,
@@ -2122,7 +2157,7 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 6, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_08, bg_active=accent_color, fg_active=font_color_dark, command=self.about_pysills)
-        SE(
+        btn_10 = SE(
             parent=self.parent, row_id=start_row + 7, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_09, bg_active=accent_color, fg_active=font_color_dark, command=self.close_pysills)
@@ -2130,6 +2165,22 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 12, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=var_btn_10, bg_active=accent_color, fg_active=font_color_dark, command=self.define_icp_ms_import_setup)
+
+        btn_01.configure(font=font_elements)
+        btn_02.configure(font=font_elements)
+        btn_03.configure(font=font_elements)
+        btn_04.configure(font=font_elements)
+        btn_05.configure(font=font_elements)
+        btn_06.configure(font=font_elements)
+        btn_07.configure(font=font_elements)
+        btn_08.configure(font=font_elements)
+        btn_09.configure(font=font_elements)
+        btn_10.configure(font=font_elements)
+        btn_11_std.configure(font=font_elements)
+        btn_11_smpl.configure(font=font_elements)
+        self.btn_save_project.configure(font=font_elements)
+        btn_about.configure(font=font_elements)
+        btn_icp.configure(font=font_elements)
 
         # OPTION MENUS
         self.var_opt_icp = tk.StringVar()
@@ -2161,13 +2212,15 @@ class PySILLS(tk.Frame):
         str_title = self.language_dict["ICP-MS file setup"][self.var_language]
 
         ## Window Settings
-        window_width = 340
-        window_height = 200
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["ICP-MS setup"][0]
+        n_columns = self.window_dimensions["ICP-MS setup"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         self.subwindow_icpms_setup = tk.Toplevel(self.parent)
         self.subwindow_icpms_setup.title(str_title)
@@ -2590,8 +2643,9 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_listbox = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_small = self.font_settings["Small"]
 
         start_row = 11
         start_column = 11
@@ -2614,7 +2668,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=font_color_light, bg=background_color_header).create_simple_label(
-                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
 
@@ -2653,7 +2707,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
-                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
 
@@ -2690,7 +2744,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
-                text=str_lbl_01, relief=tk.FLAT, fontsize="sans 14 bold")
+                text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
 
@@ -2726,7 +2780,7 @@ class PySILLS(tk.Frame):
             lb_01 = SE(
                 parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
                 fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
-                text="Report Analysis", relief=tk.FLAT, fontsize="sans 14 bold")
+                text="Report Analysis", relief=tk.FLAT, fontsize=font_header)
 
             self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
 
@@ -2747,6 +2801,10 @@ class PySILLS(tk.Frame):
             btn_03.configure(state="disabled")
 
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
+
+        btn_01.configure(font=font_elements)
+        btn_02.configure(font=font_elements)
+        btn_03.configure(font=font_elements)
 
     def build_srm_database(self):
         for key, item in self.container_var["SRM"].items():
@@ -3404,8 +3462,14 @@ class PySILLS(tk.Frame):
         file_isotopes = self.container_lists["Measured Isotopes"][file_short]
 
         ## Window Settings
-        window_width = 1000
-        window_height = 700
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Quick plot"][0]
+        n_columns = self.window_dimensions["Quick plot"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_quickplotter = tk.Toplevel(self.parent)
@@ -3413,11 +3477,6 @@ class PySILLS(tk.Frame):
         subwindow_quickplotter.geometry(var_geometry)
         subwindow_quickplotter.resizable(False, False)
         subwindow_quickplotter["bg"] = self.bg_colors["Very Light"]
-
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_quickplotter, x, weight=1)
@@ -9672,13 +9731,15 @@ class PySILLS(tk.Frame):
         font_elements = "sans 10 bold"
 
         ## Window Settings
-        window_width = 300
-        window_height = 600
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Spike elimination threshold"][0]
+        n_columns = self.window_dimensions["Spike elimination threshold"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         subwindow_se_threshold = tk.Toplevel(self.parent)
         subwindow_se_threshold.title("Spike Elimination")
@@ -10109,13 +10170,15 @@ class PySILLS(tk.Frame):
         font_elements = "sans 10 bold"
 
         ## Window Settings
-        window_width = 1660
-        window_height = 725
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Check-up oxides"][0]
+        n_columns = self.window_dimensions["Check-up oxides"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         subwindow_checkup_oxides = tk.Toplevel(self.parent)
         subwindow_checkup_oxides.title("Check-Up - 100 wt.% oxides")
@@ -11084,13 +11147,15 @@ class PySILLS(tk.Frame):
         str_lbl_02 = self.language_dict["Internal standard"][self.var_language]
 
         ## Window Settings
-        window_width = 840
-        window_height = 400
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Check-up IS"][0]
+        n_columns = self.window_dimensions["Check-up IS"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         subwindow_checkup_is = tk.Toplevel(self.parent)
         subwindow_checkup_is.title(str_lbl_01 + " - " + str_lbl_02)
@@ -11373,139 +11438,136 @@ class PySILLS(tk.Frame):
                 self.container_files["SMPL"][file_short]["IS"].set(var_is)
                 self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
 
-            #self.container_var["SMPL"][var_file]["IS"].set(var_is)
-
-    def srm_window(self):
-        ## Window Settings
-        window_width = 860
-        window_height = 625
-        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
-        window_srm = tk.Toplevel(self.parent)
-        window_srm.title("SRM and Mineral Composition Data")
-        window_srm.geometry(var_geometry)
-        window_srm.resizable(False, False)
-        window_srm["bg"] = self.green_light
-        #
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
-        #
-        for x in range(n_columns):
-            tk.Grid.columnconfigure(window_srm, x, weight=1)
-        for y in range(n_rows):
-            tk.Grid.rowconfigure(window_srm, y, weight=1)
-        #
-        # Rows
-        for i in range(0, n_rows):
-            window_srm.grid_rowconfigure(i, minsize=row_min)
-        # Columns
-        for i in range(0, n_columns):
-            window_srm.grid_columnconfigure(i, minsize=column_min)
-        #
-        ###########################################################
-        #
-        ## Frames
-        frm_01 = SE(
-            parent=window_srm, row_id=0, column_id=0, n_rows=n_rows, n_columns=9,
-            fg=self.green_light, bg=self.green_dark).create_frame(relief=tk.FLAT)
-        #
-        ## Labels
-        lbl_01 = SE(
-            parent=window_srm, row_id=0, column_id=0, n_rows=1, n_columns=9, fg=self.green_light,
-            bg=self.green_dark).create_simple_label(
-            text="Select SRM", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_02 = SE(
-            parent=window_srm, row_id=2, column_id=0, n_rows=1, n_columns=9, fg=self.green_light,
-            bg=self.green_dark).create_simple_label(
-            text="Select Mineral", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_03 = SE(
-            parent=window_srm, row_id=0, column_id=10, n_rows=1, n_columns=32, fg=self.green_light,
-            bg=self.green_dark).create_simple_label(
-            text="Periodic Table of the Elements", relief=tk.GROOVE, fontsize="sans 10 bold")
-        lbl_04 = SE(
-            parent=window_srm, row_id=n_rows - 4, column_id=0, n_rows=4, n_columns=9, fg=self.green_dark,
-            bg=self.red_dark).create_simple_label(
-            text="CAUTION!\n The mineral composition\n data reflects only the\n ideal composition of\n pure endmembers",
-            relief=tk.GROOVE, fontsize="sans 10 bold")
-        #
-        ## Option Menues
-        list_srm = np.sort(self.list_srm)
-        opt_srm = SE(
-            parent=window_srm, row_id=1, column_id=0, n_rows=1, n_columns=9, fg=self.green_dark,
-            bg=self.green_medium).create_simple_optionmenu(
-            var_opt=self.container_var["srm_window"]["Option Menu"]["SRM"], var_default="Select SRM",
-            var_list=list_srm, fg_active=self.green_dark, bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["srm_window"]["Option Menu"]["SRM"]:
-            self.change_option_srm_window(var_opt))
-        #
-        list_minerals = np.sort(self.mineral_list)
-        opt_mineral = SE(
-            parent=window_srm, row_id=3, column_id=0, n_rows=1, n_columns=9, fg=self.green_dark,
-            bg=self.green_medium).create_simple_optionmenu(
-            var_opt=self.container_var["srm_window"]["Option Menu"]["Mineral"], var_default="Select Mineral",
-            var_list=list_minerals, fg_active=self.green_dark, bg_active=self.red_dark,
-            command=lambda var_opt=self.container_var["srm_window"]["Option Menu"]["Mineral"]:
-            self.change_option_srm_window(var_opt))
-        #
-        ## Labels and Entries
-        start_column_pse = 10
-        for index, element in enumerate(self.list_pse):
-            if 0 <= index < 23:
-                lbl_i = SE(
-                    parent=window_srm, row_id=index + 1, column_id=start_column_pse, n_rows=1, n_columns=3,
-                    fg=self.green_light, bg=self.green_medium).create_simple_label(
-                    text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-                #
-                if element not in self.container_var["srm_window"]["Entry"]:
-                    self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-                #
-                entr_i = SE(
-                    parent=window_srm, row_id=index + 1, column_id=start_column_pse + 3, n_rows=1, n_columns=5,
-                    fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                    var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-            elif 23 <= index < 46:
-                lbl_i = SE(
-                    parent=window_srm, row_id=index + 1 - 23, column_id=start_column_pse + 8, n_rows=1, n_columns=3,
-                    fg=self.green_light, bg=self.green_medium).create_simple_label(
-                    text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-                #
-                if element not in self.container_var["srm_window"]["Entry"]:
-                    self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-                #
-                entr_i = SE(
-                    parent=window_srm, row_id=index + 1 - 23, column_id=start_column_pse + 11, n_rows=1, n_columns=5,
-                    fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                    var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-            elif 46 <= index < 69:
-                lbl_i = SE(
-                    parent=window_srm, row_id=index + 1 - 46, column_id=start_column_pse + 16, n_rows=1, n_columns=3,
-                    fg=self.green_light, bg=self.green_medium).create_simple_label(
-                    text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-                #
-                if element not in self.container_var["srm_window"]["Entry"]:
-                    self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-                #
-                entr_i = SE(
-                    parent=window_srm, row_id=index + 1 - 46, column_id=start_column_pse + 19, n_rows=1, n_columns=5,
-                    fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                    var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-            elif 69 <= index < 92:
-                lbl_i = SE(
-                    parent=window_srm, row_id=index + 1 - 69, column_id=start_column_pse + 24, n_rows=1, n_columns=3,
-                    fg=self.green_light, bg=self.green_medium).create_simple_label(
-                    text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-                #
-                if element not in self.container_var["srm_window"]["Entry"]:
-                    self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-                #
-                entr_i = SE(
-                    parent=window_srm, row_id=index + 1 - 69, column_id=start_column_pse + 27, n_rows=1, n_columns=5,
-                    fg=self.green_light, bg=self.green_dark).create_simple_entry(
-                    var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-
+    # def srm_window(self):
+    #     ## Window Settings
+    #     window_width = 860
+    #     window_height = 625
+    #     var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
     #
+    #     window_srm = tk.Toplevel(self.parent)
+    #     window_srm.title("SRM and Mineral Composition Data")
+    #     window_srm.geometry(var_geometry)
+    #     window_srm.resizable(False, False)
+    #     window_srm["bg"] = self.green_light
+    #
+    #     row_min = 25
+    #     n_rows = int(window_height/row_min)
+    #     column_min = 20
+    #     n_columns = int(window_width/column_min)
+    #
+    #     for x in range(n_columns):
+    #         tk.Grid.columnconfigure(window_srm, x, weight=1)
+    #     for y in range(n_rows):
+    #         tk.Grid.rowconfigure(window_srm, y, weight=1)
+    #
+    #     # Rows
+    #     for i in range(0, n_rows):
+    #         window_srm.grid_rowconfigure(i, minsize=row_min)
+    #     # Columns
+    #     for i in range(0, n_columns):
+    #         window_srm.grid_columnconfigure(i, minsize=column_min)
+    #
+    #     ###########################################################
+    #
+    #     ## Frames
+    #     frm_01 = SE(
+    #         parent=window_srm, row_id=0, column_id=0, n_rows=n_rows, n_columns=9,
+    #         fg=self.green_light, bg=self.green_dark).create_frame(relief=tk.FLAT)
+    #
+    #     ## Labels
+    #     lbl_01 = SE(
+    #         parent=window_srm, row_id=0, column_id=0, n_rows=1, n_columns=9, fg=self.green_light,
+    #         bg=self.green_dark).create_simple_label(
+    #         text="Select SRM", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #     lbl_02 = SE(
+    #         parent=window_srm, row_id=2, column_id=0, n_rows=1, n_columns=9, fg=self.green_light,
+    #         bg=self.green_dark).create_simple_label(
+    #         text="Select Mineral", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #     lbl_03 = SE(
+    #         parent=window_srm, row_id=0, column_id=10, n_rows=1, n_columns=32, fg=self.green_light,
+    #         bg=self.green_dark).create_simple_label(
+    #         text="Periodic Table of the Elements", relief=tk.GROOVE, fontsize="sans 10 bold")
+    #     lbl_04 = SE(
+    #         parent=window_srm, row_id=n_rows - 4, column_id=0, n_rows=4, n_columns=9, fg=self.green_dark,
+    #         bg=self.red_dark).create_simple_label(
+    #         text="CAUTION!\n The mineral composition\n data reflects only the\n ideal composition of\n pure endmembers",
+    #         relief=tk.GROOVE, fontsize="sans 10 bold")
+    #
+    #     ## Option Menues
+    #     list_srm = np.sort(self.list_srm)
+    #     opt_srm = SE(
+    #         parent=window_srm, row_id=1, column_id=0, n_rows=1, n_columns=9, fg=self.green_dark,
+    #         bg=self.green_medium).create_simple_optionmenu(
+    #         var_opt=self.container_var["srm_window"]["Option Menu"]["SRM"], var_default="Select SRM",
+    #         var_list=list_srm, fg_active=self.green_dark, bg_active=self.red_dark,
+    #         command=lambda var_opt=self.container_var["srm_window"]["Option Menu"]["SRM"]:
+    #         self.change_option_srm_window(var_opt))
+    #
+    #     list_minerals = np.sort(self.mineral_list)
+    #     opt_mineral = SE(
+    #         parent=window_srm, row_id=3, column_id=0, n_rows=1, n_columns=9, fg=self.green_dark,
+    #         bg=self.green_medium).create_simple_optionmenu(
+    #         var_opt=self.container_var["srm_window"]["Option Menu"]["Mineral"], var_default="Select Mineral",
+    #         var_list=list_minerals, fg_active=self.green_dark, bg_active=self.red_dark,
+    #         command=lambda var_opt=self.container_var["srm_window"]["Option Menu"]["Mineral"]:
+    #         self.change_option_srm_window(var_opt))
+    #
+    #     ## Labels and Entries
+    #     start_column_pse = 10
+    #     for index, element in enumerate(self.list_pse):
+    #         if 0 <= index < 23:
+    #             lbl_i = SE(
+    #                 parent=window_srm, row_id=index + 1, column_id=start_column_pse, n_rows=1, n_columns=3,
+    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
+    #
+    #             if element not in self.container_var["srm_window"]["Entry"]:
+    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
+    #
+    #             entr_i = SE(
+    #                 parent=window_srm, row_id=index + 1, column_id=start_column_pse + 3, n_rows=1, n_columns=5,
+    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
+    #         elif 23 <= index < 46:
+    #             lbl_i = SE(
+    #                 parent=window_srm, row_id=index + 1 - 23, column_id=start_column_pse + 8, n_rows=1, n_columns=3,
+    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
+    #
+    #             if element not in self.container_var["srm_window"]["Entry"]:
+    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
+    #
+    #             entr_i = SE(
+    #                 parent=window_srm, row_id=index + 1 - 23, column_id=start_column_pse + 11, n_rows=1, n_columns=5,
+    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
+    #         elif 46 <= index < 69:
+    #             lbl_i = SE(
+    #                 parent=window_srm, row_id=index + 1 - 46, column_id=start_column_pse + 16, n_rows=1, n_columns=3,
+    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
+    #
+    #             if element not in self.container_var["srm_window"]["Entry"]:
+    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
+    #
+    #             entr_i = SE(
+    #                 parent=window_srm, row_id=index + 1 - 46, column_id=start_column_pse + 19, n_rows=1, n_columns=5,
+    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
+    #         elif 69 <= index < 92:
+    #             lbl_i = SE(
+    #                 parent=window_srm, row_id=index + 1 - 69, column_id=start_column_pse + 24, n_rows=1, n_columns=3,
+    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
+    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
+    #
+    #             if element not in self.container_var["srm_window"]["Entry"]:
+    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
+    #
+    #             entr_i = SE(
+    #                 parent=window_srm, row_id=index + 1 - 69, column_id=start_column_pse + 27, n_rows=1, n_columns=5,
+    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
+    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
+
     def change_option_srm_window(self, var_opt):
         self.srm_values = {}
         self.srm_values[var_opt] = {}
@@ -11558,8 +11620,14 @@ class PySILLS(tk.Frame):
         var_title = self.language_dict["General Settings"][self.var_language]
 
         ## Window Settings
-        window_width = 700
-        window_height = 550
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["General settings"][0]
+        n_columns = self.window_dimensions["General settings"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_generalsettings = tk.Toplevel(self.parent)
@@ -11567,11 +11635,6 @@ class PySILLS(tk.Frame):
         subwindow_generalsettings.geometry(var_geometry)
         subwindow_generalsettings.resizable(False, False)
         subwindow_generalsettings["bg"] = background_color_dark
-
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_generalsettings, x, weight=1)
@@ -11618,6 +11681,7 @@ class PySILLS(tk.Frame):
         str_lbl_26 = self.language_dict["Average of every interval"][self.var_language]
         str_lbl_27 = self.language_dict["Stack all intervals into one"][self.var_language]
         str_lbl_28 = self.language_dict["Median"][self.var_language]
+        str_lbl_29 = self.language_dict["Screen resolution"][self.var_language]
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -11667,6 +11731,10 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=9, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_11, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_15 = SE(
+            parent=subwindow_generalsettings, row_id=4, column_id=25, n_rows=1, n_columns=9,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_29, relief=tk.FLAT, fontsize="sans 10 bold")
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01, lbl_02, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
@@ -11764,6 +11832,7 @@ class PySILLS(tk.Frame):
         list_colorschemes = [
             "Dark scheme", "Light scheme", "Boho theme 1", "Boho theme 2", "Synthwave theme", "Gunmetal theme",
             "Dark Jungle", "Noble Room"]
+        list_screenresolutions = ["1920x1080", "1280x720"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
@@ -11818,6 +11887,12 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Color scheme"],
             var_default=self.container_var["General Settings"]["Color scheme"].get(), var_list=list_colorschemes,
             fg_active=font_color_light, bg_active=accent_color)
+        opt_screenresolution = SE(
+            parent=subwindow_generalsettings, row_id=5, column_id=25, n_rows=1, n_columns=9,
+            fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["Screen resolution"],
+            var_default=self.container_var["General Settings"]["Screen resolution"].get(),
+            var_list=list_screenresolutions, fg_active=font_color_light, bg_active=accent_color)
 
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
             [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
@@ -11935,8 +12010,14 @@ class PySILLS(tk.Frame):
         str_lbl_07 = self.language_dict["Element"][self.var_language]
 
         ## Window Settings
-        window_width = 640
-        window_height = 575
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Check-up SRM"][0]
+        n_columns = self.window_dimensions["Check-up SRM"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_srm_checkup = tk.Toplevel(self.parent)
@@ -11944,11 +12025,6 @@ class PySILLS(tk.Frame):
         subwindow_srm_checkup.geometry(var_geometry)
         subwindow_srm_checkup.resizable(False, False)
         subwindow_srm_checkup["bg"] = background_color_dark
-
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_srm_checkup, x, weight=1)
@@ -12071,8 +12147,14 @@ class PySILLS(tk.Frame):
         str_lbl_02 = self.language_dict["Calculation Intervals"][self.var_language]
 
         ## Window Settings
-        window_width = 1080
-        window_height = 825
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Check-up intervals"][0]
+        n_columns = self.window_dimensions["Check-up intervals"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_intervals = tk.Toplevel(self.parent)
@@ -12080,11 +12162,6 @@ class PySILLS(tk.Frame):
         subwindow_intervals.geometry(var_geometry)
         subwindow_intervals.resizable(False, False)
         subwindow_intervals["bg"] = background_color_dark
-
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_intervals, x, weight=1)
@@ -12345,8 +12422,14 @@ class PySILLS(tk.Frame):
         str_lbl_02 = self.language_dict["Acquisition Times"][self.var_language]
 
         ## Window Settings
-        window_width = 520
-        window_height = 825
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Check-up acquisition times"][0]
+        n_columns = self.window_dimensions["Check-up acquisition times"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         subwindow_aquisition_times = tk.Toplevel(self.parent)
@@ -12354,11 +12437,6 @@ class PySILLS(tk.Frame):
         subwindow_aquisition_times.geometry(var_geometry)
         subwindow_aquisition_times.resizable(False, False)
         subwindow_aquisition_times["bg"] = background_color_dark
-
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
 
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_aquisition_times, x, weight=1)
@@ -12635,26 +12713,27 @@ class PySILLS(tk.Frame):
         str_lbl_02 = self.language_dict["Imported Files"][self.var_language]
 
         ## Window Settings
-        window_width = 1080
-        window_height = 825
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Check-up files"][0]
+        n_columns = self.window_dimensions["Check-up files"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
+
         subwindow_imported_files = tk.Toplevel(self.parent)
         subwindow_imported_files.title(str_lbl_01 + " - " + str_lbl_02)
         subwindow_imported_files.geometry(var_geometry)
         subwindow_imported_files.resizable(False, False)
         subwindow_imported_files["bg"] = background_color_dark
-        #
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
-        #
+
         for x in range(n_columns):
             tk.Grid.columnconfigure(subwindow_imported_files, x, weight=1)
         for y in range(n_rows):
             tk.Grid.rowconfigure(subwindow_imported_files, y, weight=1)
-        #
+
         # Rows
         for i in range(0, n_rows):
             subwindow_imported_files.grid_rowconfigure(i, minsize=row_min)
@@ -14766,14 +14845,15 @@ class PySILLS(tk.Frame):
             self.define_isotope_colors()
 
         ## Window Settings
-        window_width = 1300
-        window_height = 950
-        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["MA main settings"][0]
+        n_columns = self.window_dimensions["MA main settings"][1]
 
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         str_title_window = self.language_dict["MINERAL ANALYSIS - Setup"][self.var_language]
         self.subwindow_ma_settings = tk.Toplevel(self.parent)
@@ -14937,6 +15017,9 @@ class PySILLS(tk.Frame):
         var_header_n = var_column_n
         var_category_n = var_column_n - 6
 
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+
         # Labels
         str_lbl_01 = self.language_dict["Project Information"][self.var_language]
         str_lbl_02 = self.language_dict["Author"][self.var_language]
@@ -14946,15 +15029,15 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
         lbl_01a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
         lbl_01a = SE(
             parent=var_parent, row_id=var_row_start + 2, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
-            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
 
         # Entries
         self.container_var[var_setting_key]["Author"].set(
@@ -25537,25 +25620,10 @@ class PySILLS(tk.Frame):
 
                 for file in demo_files:
                     if file.startswith("demo_fi"):
-                        #folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
-                        #folder_path = self.path_pysills_main + str(r"/lib/demo_files/")
                         path_complete = os.path.join(folder_path, file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             fi_demo_files["ALL"].append(str(path_raw.as_posix()))
-
-                # try:
-                #     demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
-                # except:
-                #     path += "/pysills"
-                #     demo_files = os.listdir(path=path + str("/demo_files/"))
-                #
-                # for file in demo_files:
-                #     if file.startswith("demo_fi"):
-                #         path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
-                #         if "_copy" not in path_complete:
-                #             path_raw = pathlib.PureWindowsPath(path_complete)
-                #             fi_demo_files["ALL"].append(str(path_raw.as_posix()))
 
                 fi_demo_files["ALL"].sort()
                 fi_demo_files["STD"].extend(fi_demo_files["ALL"][:4])
@@ -25716,14 +25784,15 @@ class PySILLS(tk.Frame):
             self.define_isotope_colors()
 
         ## Window Settings
-        window_width = 1340
-        window_height = 1000
-        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["FI main settings"][0]
+        n_columns = self.window_dimensions["FI main settings"][1]
 
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         self.subwindow_fi_settings = tk.Toplevel(self.parent)
         self.subwindow_fi_settings.title("FLUID INCLUSION ANALYSIS - Setup")
@@ -25923,25 +25992,10 @@ class PySILLS(tk.Frame):
 
                 for file in demo_files:
                     if file.startswith("demo_mi"):
-                        #folder_path = os.path.join(self.path_pysills_main, "lib", "demo_files")
-                        #folder_path = self.path_pysills_main + str(r"/lib/demo_files/")
                         path_complete = os.path.join(folder_path, file)
                         if "_copy" not in path_complete:
                             path_raw = pathlib.PureWindowsPath(path_complete)
                             mi_demo_files["ALL"].append(str(path_raw.as_posix()))
-
-                # try:
-                #     demo_files = os.listdir(path=self.path_pysills_main + str("/lib/demo_files/"))
-                # except:
-                #     path += "/pysills"
-                #     demo_files = os.listdir(path=path + str("/demo_files/"))
-                #
-                # for file in demo_files:
-                #     if file.startswith("demo_mi"):
-                #         path_complete = os.path.join(self.path_pysills_main + str("/lib/demo_files/"), file)
-                #         if "_copy" not in path_complete:
-                #             path_raw = pathlib.PureWindowsPath(path_complete)
-                #             mi_demo_files["ALL"].append(str(path_raw.as_posix()))
 
                 mi_demo_files["ALL"].sort()
                 mi_demo_files["STD"].extend(mi_demo_files["ALL"][:5])
@@ -26089,14 +26143,15 @@ class PySILLS(tk.Frame):
             self.define_isotope_colors()
 
         ## Window Settings
-        window_width = 1260
-        window_height = 1000
-        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["MI main settings"][0]
+        n_columns = self.window_dimensions["MI main settings"][1]
 
-        row_min = 25
-        n_rows = int(window_height/row_min)
-        column_min = 20
-        n_columns = int(window_width/column_min)
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         self.subwindow_mi_settings = tk.Toplevel(self.parent)
         self.subwindow_mi_settings.title("MELT INCLUSION ANALYSIS - Setup")
