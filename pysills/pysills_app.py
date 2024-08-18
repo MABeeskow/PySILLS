@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.27
-# Date:		24.07.2024
+# Version:	v1.0.28
+# Date:		18.08.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.27"
-        self.val_version = self.str_version_number + " - 24.07.2024"
+        self.str_version_number = "1.0.28"
+        self.val_version = self.str_version_number + " - 18.08.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -23621,39 +23621,6 @@ class PySILLS(tk.Frame):
                         filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
                         list_isotopes=file_isotopes)
         else:
-            # for var_filetype in ["STD", "SMPL"]:
-            #     for isotope in self.container_lists["Measured Isotopes"]["All"]:
-            #         helper_results = []
-            #         for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
-            #             if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
-            #                 var_file_short = self.container_lists[var_filetype]["Short"][index]
-            #                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
-            #                 if isotope in file_isotopes:
-            #                     if var_filetype == "SMPL":
-            #                         var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
-            #                         var_id_selected = self.container_var["ID"]["Results Files"].get()
-            #                         if var_id == var_id_selected or self.var_init_ma_datareduction == True:
-            #                             self.ma_get_concentration(
-            #                                 var_filetype=var_filetype, var_datatype=var_datatype,
-            #                                 var_file_short=var_file_short, var_file_long=var_file_long)
-            #                             var_result_i = self.container_concentration[var_filetype][var_datatype][
-            #                                 var_file_short]["MAT"][isotope]
-            #                             helper_results.append(var_result_i)
-            #                     else:
-            #                         self.ma_get_concentration(
-            #                             var_filetype=var_filetype, var_datatype=var_datatype,
-            #                             var_file_short=var_file_short, var_file_long=var_file_long)
-            #                         var_result_i = self.container_concentration[var_filetype][var_datatype][
-            #                             var_file_short]["MAT"][isotope]
-            #                         helper_results.append(var_result_i)
-            #
-            #         if self.container_var["General Settings"]["Desired Average"].get() == 1:
-            #             var_result_i = np.mean(helper_results)
-            #         else:
-            #             var_result_i = np.median(helper_results)
-            #
-            #         self.container_concentration[var_filetype][var_datatype][isotope] = var_result_i
-
             for var_filetype in ["STD", "SMPL"]:
                 for index, var_file_long in enumerate(self.container_lists[var_filetype]["Long"]):
                     if self.container_var[var_filetype][var_file_long]["Checkbox"].get() == 1:
@@ -23661,6 +23628,7 @@ class PySILLS(tk.Frame):
                         if var_filetype == "SMPL":
                             var_id = self.container_var[var_filetype][var_file_long]["ID"].get()
                             var_id_selected = self.container_var["ID"]["Results Files"].get()
+
                             if var_id == var_id_selected or self.var_init_ma_datareduction == True:
                                 self.ma_get_concentration(
                                     var_filetype=var_filetype, var_datatype=var_datatype,
@@ -24672,6 +24640,7 @@ class PySILLS(tk.Frame):
                 fg=font_color_dark, bg=background_color_elements,
                 activeforeground=font_color_light,
                 activebackground=accent_color, highlightthickness=0)
+            self.container_var["ID"]["Results Files"].set(list_id_found[0])
 
         ## BUTTONS
         str_btn_01 = self.language_dict["Export results"][self.var_language]
@@ -30545,20 +30514,22 @@ class PySILLS(tk.Frame):
             var_id_i = self.container_var["SMPL"][var_file_long]["ID"].get()
             if var_id_i not in list_id_found:
                 list_id_found.append(var_id_i)
-        #
-        opt_03a = SE(
-            parent=self.subwindow_fi_datareduction_files, row_id=start_row + 7, column_id=start_column, n_rows=1,
-            n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=self.container_var["ID"]["Results Files"], option_list=list_id_found, text_set=var_text,
-            fg_active=font_color_light, bg_active=accent_color,
-            command=lambda var_opt=self.container_var["ID"]["Results Files"], mode="FI":
-            self.change_id_results(var_opt, mode))
-        opt_03a["menu"].config(
-            fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
-            activebackground=accent_color)
-        opt_03a.config(
-            bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-            activeforeground=font_color_light, highlightthickness=0)
+
+        if len(list_id_found) > 0:
+            opt_03a = SE(
+                parent=self.subwindow_fi_datareduction_files, row_id=start_row + 7, column_id=start_column, n_rows=1,
+                n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+                var_iso=self.container_var["ID"]["Results Files"], option_list=list_id_found, text_set=var_text,
+                fg_active=font_color_light, bg_active=accent_color,
+                command=lambda var_opt=self.container_var["ID"]["Results Files"], mode="FI":
+                self.change_id_results(var_opt, mode))
+            opt_03a["menu"].config(
+                fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
+                activebackground=accent_color)
+            opt_03a.config(
+                bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
+                activeforeground=font_color_light, highlightthickness=0)
+            self.container_var["ID"]["Results Files"].set(list_id_found[0])
 
         ## BUTTONS
         str_btn_01 = self.language_dict["Export results"][self.var_language]
