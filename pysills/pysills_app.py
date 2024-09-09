@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.28
-# Date:		18.08.2024
+# Version:	v1.0.29
+# Date:		09.09.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -320,11 +320,10 @@ class PySILLS(tk.Frame):
         var_geometry += str(var_window_height)
         var_geometry += "+0+0"
         self.parent.geometry(var_geometry)
-        self.parent.resizable(True, True)
-        #self.parent["bg"] = self.bg_colors["BG Window"]
-        #
+        self.parent.resizable(False, False)
+
         self.list_alphabet = list(string.ascii_uppercase)
-        #
+
         var_os = sys.platform
         self.var_os = var_os
         # ['GTK3Agg', 'GTK3Cairo', 'MacOSX', 'nbAgg', 'Qt4Agg', 'Qt4Cairo', 'Qt5Agg', 'Qt5Cairo', 'TkAgg', 'TkCairo',
@@ -343,10 +342,8 @@ class PySILLS(tk.Frame):
             mpl.use("MacOSX")
         else:
             self.defaultFont = font.nametofont("TkDefaultFont")
-            # default_font = font.nametofont("TkDefaultFont")
-            # self.parent.option_add("*Font", default_font)
             mpl.use("TkAgg")
-        #
+
         ## Data Container
         self.container_elements = {}
         self.gui_elements = {}
@@ -373,7 +370,7 @@ class PySILLS(tk.Frame):
             self.container_elements[menu]["Treeview"] = []
             self.container_gui[menu] = {}
             self.window_created[menu] = False
-            #
+
             self.gui_elements[menu] = {}
             for gui_category in gui_categories:
                 self.gui_elements[menu][gui_category] = {}
@@ -640,20 +637,20 @@ class PySILLS(tk.Frame):
 
         self.old_file = False
         self.without_pypitzer = False
-        #
+
         self.counter_fast_track_std = 0
         self.counter_fast_track_smpl = 0
-        #
+
         self.container_spikes = {}
-        #
+
         self.autodetection_bg = False
         self.autodetection_sig = False
-        #
+
         self.init_fi_massbalance = False
         self.init_fi_chargebalance = False
-        #
+
         self.container_checkup = {"STD": [], "SMPL": [], "Counter STD": 0, "Counter SMPL": 0}
-        #
+
         ## ALL
         self.container_intensity = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_intensity_mix = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
@@ -671,7 +668,7 @@ class PySILLS(tk.Frame):
         self.container_lod = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_mixed_concentration_ratio = {"SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_mixing_ratio = {"SMPL": {"RAW": {}, "SMOOTHED": {}}}
-        #
+
         self.container_signs = {"STD": {}, "SMPL": {}}
         self.rb_report = tk.IntVar()
         self.rb_report.set(0)
@@ -975,8 +972,6 @@ class PySILLS(tk.Frame):
             "Mineral stoichiometry": {"English": "Mineral stoichiometry", "German": "Minerale Stöchiometrie"},
             "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
 
-        # str_lbl_01 = self.language_dict["Sample Files"][self.var_language]
-
         self.var_language = self.container_var["General Settings"]["Language"].get()
 
         ## MINERAL ANALYSIS
@@ -1056,7 +1051,7 @@ class PySILLS(tk.Frame):
         self.container_var["ma_datareduction_isotopes"]["Result Category"].set(0)
         self.container_var["ma_datareduction_isotopes"]["Display Option"] = tk.IntVar()  # e.g. Table mode
         self.container_var["ma_datareduction_isotopes"]["Display Option"].set(0)
-        #
+
         self.container_var["ma_datareduction_files"]["File Type"] = tk.IntVar()  # e.g. Sample files
         self.container_var["ma_datareduction_files"]["File Type"].set(1)
         self.container_var["ma_datareduction_files"]["Data Type"] = tk.IntVar()  # e.g. RAW data
@@ -1067,14 +1062,14 @@ class PySILLS(tk.Frame):
         self.container_var["ma_datareduction_files"]["Result Category"].set(0)
         self.container_var["ma_datareduction_files"]["Display Option"] = tk.IntVar()  # e.g. Table mode
         self.container_var["ma_datareduction_files"]["Display Option"].set(0)
-        #
+
         self.container_var["ma_datareduction"] = {}
         self.container_var["ma_dataexploration"] = {}
         self.container_var["ma_datareduction"]["Option ID"] = tk.StringVar()
         self.container_var["ma_datareduction"]["Option ID"].set("Select Assemblage")
         self.container_var["ma_datareduction"]["Option IS"] = tk.StringVar()
         self.container_var["ma_datareduction"]["Option Drift"] = tk.StringVar()
-        #
+
         self.container_var["ma_dataexploration"]["Exploration Mode"] = tk.IntVar()
         self.container_var["ma_dataexploration"]["Exploration Mode"].set(0)
         self.container_var["ma_dataexploration"]["STD File"] = tk.StringVar()
@@ -1083,14 +1078,14 @@ class PySILLS(tk.Frame):
         self.container_var["ma_dataexploration"]["SMPL File"].set("Select File")
         self.container_var["ma_dataexploration"]["Isotope"] = tk.StringVar()
         self.container_var["ma_dataexploration"]["Isotope"].set("Select Isotope")
-        #
+
         self.var_mode_ma = False
         self.var_init_ma_setting = False
         self.var_init_ma_datareduction = False
         self.var_init_fi_datareduction = False
         self.var_init_mi_datareduction = False
         self.var_init_ma_dataexploration = False
-        #
+
         ## FLUID/MELT INCLUSION ANALYSIS
         keys = ["fi_setting", "mi_setting"]
         for key_setting in keys:
@@ -1190,7 +1185,7 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Inclusion Intensity Calculation"].set(0)
             self.container_var[key_setting]["Inclusion Concentration Calculation"] = tk.IntVar()
             self.container_var[key_setting]["Inclusion Concentration Calculation"].set(0)
-            #
+
             for key, item in self.container_var[key_setting]["Inclusion Plugin"].items():
                 item.set(1)
 
@@ -1285,11 +1280,11 @@ class PySILLS(tk.Frame):
         self.container_var["fi_datareduction_files"]["Isotope 2 Right Plot"].set("Select Isotope")
         self.container_var["fi_datareduction_files"]["Sensitivity Diagrams"] = {
             "Left": {"FIG": None, "CANVAS": None, "AX": None}, "Right": {"FIG": None, "CANVAS": None, "AX": None}}
-        #
+
         self.container_var["fi_datareduction"] = {}
         self.container_var["fi_dataexploration"] = {}
         self.var_mode_fi = False
-        #
+
         self.container_var["mi_setting"]["Time BG Start"] = tk.StringVar()
         self.container_var["mi_setting"]["Time BG Start"].set("Set start time")
         self.container_var["mi_setting"]["Time BG End"] = tk.StringVar()
@@ -1309,10 +1304,12 @@ class PySILLS(tk.Frame):
         self.container_var["mi_dataexploration"] = {}
         self.container_var["ma_datareduction"]["Radiobutton"] = [
             tk.IntVar(), tk.IntVar(), tk.IntVar(), tk.IntVar(), tk.IntVar()]
+
         for var_rb in self.container_var["ma_datareduction"]["Radiobutton"]:
             var_rb.set(0)
+
         self.var_mode_mi = False
-        #
+
         self.container_var["mineralchemistry"] = []
         self.container_var["plotting"] = {}
         self.container_var["IS"] = {}
@@ -1323,21 +1320,19 @@ class PySILLS(tk.Frame):
         self.container_var["IS"]["Default SMPL Concentration"] = tk.StringVar()
         self.container_var["IS"]["Default SMPL Concentration"].set("1000000")
         self.container_var["ID"] = {}
-        # self.container_var["ID"]["Default STD"] = tk.StringVar()
-        # self.container_var["ID"]["Default STD"].set("A")
         self.container_var["ID"]["Default SMPL"] = tk.StringVar()
         self.container_var["ID"]["Default SMPL"].set("A")
         self.container_var["ID"]["Results Isotopes"] = tk.StringVar()
         self.container_var["ID"]["Results Isotopes"].set("A")
         self.container_var["ID"]["Results Files"] = tk.StringVar()
         self.container_var["ID"]["Results Files"].set("A")
-        #self.container_var["STD"] = {}
-        #self.container_var["SMPL"] = {}
+
         for type in ["STD", "SMPL"]:
             if type not in self.container_var:
                 self.container_var[type] = {}
                 self.container_var[type]["Project manager"] = tk.IntVar()
                 self.container_var[type]["Project manager"].set(0)
+
         self.container_var["LASER"] = tk.StringVar()
         self.container_var["LASER"].set("Argon")
         self.container_var["charge"] = {}
@@ -1345,7 +1340,6 @@ class PySILLS(tk.Frame):
         self.container_var["Gas Energy"].set("15.760")
         self.container_var["Spike Elimination Method"] = tk.StringVar()
         self.container_var["Spike Elimination Method"].set("Grubbs test")
-        #self.list_se_methods = ["Grubbs-Test", "Grubbs-Test (SILLS)", "PySILLS Spike Finder"]
         self.list_se_methods = ["Grubbs test", "Whisker analysis"]
         self.list_isotopes = []
         self.srm_actual = {}
@@ -1359,14 +1353,15 @@ class PySILLS(tk.Frame):
         self.container_optionmenu["ISOTOPES"] = {}
         self.container_measurements = {}
         categories_01 = ["RAW", "SELECTED", "EDITED"]
+
         for category_01 in categories_01:
             self.container_measurements[category_01] = {}
-        #
+
         self.mineral_chem = {}
         self.time_ratio_data = {}
-        #
+
         self.last_rb_setup = {}
-        #
+
         self.container_helper = {}
         self.container_helper["STD"] = {}
         self.container_helper["SMPL"] = {}
@@ -1403,12 +1398,13 @@ class PySILLS(tk.Frame):
         self.container_helper["Default SIG"] = {}
         self.container_helper["Default SIG"]["Times"] = [0, 0]
         self.container_helper["Default SIG"]["Positions"] = [0, 0]
-        #
+
         self.container_lists = {}
-        #
+
         self.container_lists["Colors PySILLS"] = {}
         categories = ["Dark", "Medium", "Light", "Sign"]
         subcategories = ["Green", "Red", "Blue", "Yellow", "Brown", "Slate Grey"]
+
         for category in categories:
             self.container_lists["Colors PySILLS"][category] = {}
             for subcategory in subcategories:
@@ -1481,9 +1477,6 @@ class PySILLS(tk.Frame):
         self.temp_checkbuttons_pypitzer = {}
 
         self.container_lists["Oxides"] = []
-        #self.container_lists["Oxides"] = [
-        #    "SiO2", "TiO2", "Al2O3", "Fe2O3", "Fe3O4", "FeO", "MgO", "MnO", "CaO", "BaO", "Na2O", "K2O", "P2O5",
-        #    "Cr2O3", "ZrO2"]
         self.container_lists["Sulfides"] = [
             "FeS2", "ZnS" "PbS", "Ag2S", "Na2S", "MoS2", "CdS", "SeS2", "BaS", "BeS", "CoS", "Cu2S", "CuS", "FeS",
             "Fe2S3", "Hg2S", "HgS", "MnS", "NiS", "Tl2S", "SnS", "SnS2"]
@@ -1571,29 +1564,31 @@ class PySILLS(tk.Frame):
         self.container_results["SMPL"]["SMOOTHED"] = {}
         self.xi_std_time = {}
         self.xi_regr = None
-        #
+
         self.demo_view = False
-        #
+
         self.fast_track_std = False
         self.fast_track_smpl = False
-        #
+
         self.file_loaded = False
-        #
+
         self.spikes_isotopes = {}
-        #
+
         self.diagrams_setup = {}
         categories_01 = ["STD", "SMPL"]
+
         for category_01 in categories_01:
             self.diagrams_setup[category_01] = {}
-        #
+
         self.container_diagrams = {}
         self.container_listboxes = {}
         categories_01 = ["STD", "SMPL"]
+
         for category_01 in categories_01:
             self.container_diagrams[category_01] = {}
             self.container_listboxes[category_01] = {}
             self.spikes_isotopes[category_01] = {}
-        #
+
         # Calculation Report
         self.container_report = {}
         categories_01 = ["Total STD", "Total SMPL"]
@@ -1608,7 +1603,7 @@ class PySILLS(tk.Frame):
                 self.container_report[category_01]["Error"][category_02] = {}
                 self.container_report[category_01]["Mean"][category_02]["filename"] = category_01
                 self.container_report[category_01]["Error"][category_02]["filename"] = category_01
-        #
+
         self.list_srm = np.array(
             [["NIST 606"], ["NIST 610"], ["NIST 610 (GeoReM)"], ["NIST 610 (Spandler)"], ["NIST 611"],
              ["NIST 611 (GeoReM)"], ["NIST 612"], ["NIST 612 (GeoReM)"], ["NIST 613"], ["NIST 613 (GeoReM)"],
@@ -1633,13 +1628,6 @@ class PySILLS(tk.Frame):
             self.path_pysills_main = self.path_pysills_main.replace("pysills_app.py", "")
 
         helper_srm_library = []
-
-        # try:
-        #     folder_path = os.path.join(self.path_pysills_main, "lib", "srm")
-        #     helper_srm_library = os.listdir(folder_path)
-        # except:
-        #     folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
-        #     helper_srm_library = os.listdir(folder_path)
 
         if "pysills" in self.path_pysills_main:
             self.path_pysills_main = self.path_pysills_main.replace("pysills", "")
@@ -1733,6 +1721,7 @@ class PySILLS(tk.Frame):
         self.ionization_energies = {}
         self.ionization_energies["First"] = {}
         self.ionization_energies["Second"] = {}
+
         for element in self.list_pse:
             data_element = PeriodicSystem(name=element).get_data()
             if len(data_element) == 13:
@@ -1741,11 +1730,12 @@ class PySILLS(tk.Frame):
             elif len(data_element) == 12:
                 self.ionization_energies["First"][element] = data_element[-1]
                 self.ionization_energies["Second"][element] = 0.0
-        #
+
         self.container_settings = {}
         categories_01 = ["MA", "FI", "MI"]  # MA=Mineral Analysis, FI=Fluid Inclusions, MI=Melt Inclusions
         categories_02 = ["Start BG", "End BG", "Start SIG", "End SIG", "Start MAT", "End MAT", "Start INCL", "End INCL"]
         categories_03 = ["Deviation", "Threshold", "Author", "Source ID"]
+
         for category_01 in categories_01:
             self.container_settings[category_01] = {}
             for category_02 in categories_02:
@@ -1757,7 +1747,7 @@ class PySILLS(tk.Frame):
                     self.container_settings[category_01][category_02] = tk.StringVar()
             for category_03 in categories_03:
                 self.container_settings[category_01][category_03] = tk.StringVar()
-        #
+
         self.mineral_list = ["Quartz", "Calcite", "Fluorite", "Apatite-Cl", "Apatite-F", "Apatite-OH", "Forsterite",
                              "Fayalite", "Tephroite", "Albite", "Anorthite", "Orthoclase", "Microcline", "Zircon",
                              "Enargite", "Pyrite", "Chalcopyrite", "Bornite", "Arsenopyrite", "Sphalerite", "Galena",
@@ -1851,26 +1841,8 @@ class PySILLS(tk.Frame):
         frame_01.grid(row=3, column=0, rowspan=42, columnspan=22, sticky="nesw")
         frame_02 = tk.Frame(self.parent, bg=self.red_dark, borderwidth=0, highlightthickness=0)
         frame_02.grid(row=2, column=0, rowspan=1, columnspan=22, sticky="nesw")
-        #
-        # ## USER SETTINGS
-        # project_path_prew = self.path_pysills[:]
-        # project_path = project_path_prew.strip("/pysills")
-        #
-        # try:
-        #     file_usersettings = open(self.path_pysills_main + str("/user_settings.txt"), "r")
-        #     for index, file_data in enumerate(file_usersettings):
-        #         file_data_splitted = file_data.split(";")
-        #
-        #         try:
-        #             self.container_var["General Settings"][file_data_splitted[0]].set(file_data_splitted[1])
-        #         except:
-        #             pass
-        #
-        #         if "Dwell Times" in file_data_splitted:
-        #             self.container_var["dwell_times"]["Entry"]["Default"].set(file_data_splitted[1])
-        # except:
-        #     print("There is no user_settings file!")
 
+        # ## USER SETTINGS
         str_color_scheme = self.container_var["General Settings"]["Color scheme"].get()
         if str_color_scheme == "Dark scheme":
             self.bg_colors = {
@@ -2467,7 +2439,8 @@ class PySILLS(tk.Frame):
             else:
                 try:
                     dates, times = Data(filename=var_file_long).import_as_list(
-                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp, icpms=var_icpms)
+                        skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
+                        icpms=var_icpms)
                 except:
                     dates = 0
                     times_input = self.container_var["acquisition times"][filetype][file_short_original].get()
