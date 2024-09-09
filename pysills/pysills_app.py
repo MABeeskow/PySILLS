@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.28"
-        self.val_version = self.str_version_number + " - 18.08.2024"
+        self.str_version_number = "1.0.29"
+        self.val_version = self.str_version_number + " - 09.09.2024"
 
         ## Colors
         self.green_dark = "#282D28"

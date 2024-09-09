@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 23.07.2024
+# 09.09.2024
 # ----------------------
 #
 ## MODULES
@@ -153,7 +153,6 @@ class general:
         return data
     #
     def importSRM(self, filename, delimiter=";", skipHeader=0, skipFooter=0):
-        #
         self.filename = filename
         self.delimiter = delimiter
         self.skipHeader = skipHeader
@@ -165,6 +164,9 @@ class general:
             self.filename = self.filename.replace(")", "")
         if "-" in self.filename:
             self.filename = self.filename.replace("-", "_")
+
+        if "venv_" in self.filename:
+            self.filename = self.filename.replace("venv_", "venv-")
         if "site_packages" in self.filename:
             self.filename = self.filename.replace("site_packages", "site-packages")
         if "local_packages" in self.filename:
@@ -175,12 +177,12 @@ class general:
         nLines = len(inputData)
         nRows = len(inputData[0])
         data = []
-        #
+
         for i in range(0, nLines):
             data.append([inputData[i][0], float(inputData[i][1])])
-        #
+
         return data
-#
+
 class Segmentation:
     #
     def __init__(self, input_data):
