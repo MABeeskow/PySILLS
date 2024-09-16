@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.30
-# Date:		09.09.2024
+# Version:	v1.0.31
+# Date:		16.09.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.30"
-        self.val_version = self.str_version_number + " - 09.09.2024"
+        self.str_version_number = "1.0.31"
+        self.val_version = self.str_version_number + " - 16.09.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -837,6 +837,7 @@ class PySILLS(tk.Frame):
             "Deselect all oxides": {"English": "Deselect all oxides", "German": "Alle Oxide abwählen"},
             "Rock-forming elements": {"English": "Rock-forming elements", "German": "Gesteinsbildende Elemente"},
             "Fix quantification": {"English": "Fix quantification", "German": "Quantifizierung reparieren"},
+            "Calculate again": {"English": "Calculate again", "German": "Berechnung wiederholen"},
             "Molality-based quantification": {
                 "English": "Molality-based quantification", "German": "Quantifizierung gemäß Molalität"},
             "Guess the composition": {"English": "Guess the composition", "German": "Zusammensetzung schätzen"},
@@ -16481,7 +16482,7 @@ class PySILLS(tk.Frame):
             n_columns=var_category_n - 6, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var[var_setting_key]["Time BG Start"], text_default=var_entr_07a_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG Start"], var_key="Start",
+            command=lambda event, var_entr=self.container_var[var_setting_key]["Time BG Start"], var_key="Start",
                            mode="default", var_interval="BG":
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
         entr_07b = SE(
@@ -16489,7 +16490,7 @@ class PySILLS(tk.Frame):
             n_columns=var_category_n - 6, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var[var_setting_key]["Time BG End"], text_default=var_entr_07b_default,
-            command=lambda event, var_entr=self.container_var["ma_setting"]["Time BG End"], var_key="End",
+            command=lambda event, var_entr=self.container_var[var_setting_key]["Time BG End"], var_key="End",
                            mode="default", var_interval="BG":
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
 
@@ -20984,43 +20985,67 @@ class PySILLS(tk.Frame):
                     list_filetypes = ["STD", "SMPL"]
             else:
                 list_filetypes = ["STD", "SMPL"]
+
             for var_type in list_filetypes:
                 for var_file in self.container_lists[var_type]["Long"]:
-                    if self.container_icpms["name"] != None:
-                        var_skipheader = self.container_icpms["skipheader"]
-                        var_skipfooter = self.container_icpms["skipfooter"]
-                        df_data = DE(filename_long=var_file).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    parts = var_file.split("/")
+                    str_filename_short = parts[-1]
+
+                    if self.file_loaded == False:
+                        if self.container_icpms["name"] != None:
+                            var_skipheader = self.container_icpms["skipheader"]
+                            var_skipfooter = self.container_icpms["skipfooter"]
+                            df_data = DE(filename_long=var_file).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        else:
+                            df_data = DE(filename_long=var_file).get_measurements(
+                                delimiter=",", skip_header=3, skip_footer=1)
                     else:
-                        df_data = DE(filename_long=var_file).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
+                        if str_filename_short not in self.container_measurements[
+                            "Dataframe"] and "_copy" in str_filename_short:
+                            str_filename_short_original = str_filename_short.replace("_copy", "")
+                            df_data = self.container_measurements["Dataframe"][str_filename_short_original]
+                        else:
+                            df_data = self.container_measurements["Dataframe"][str_filename_short]
+
                     dataset_time = list(DE().get_times(dataframe=df_data))
                     var_file_short = var_file.split("/")[-1]
 
-                    if 1 not in self.container_helper[var_type][var_file_short][var_interval]["Content"]:
-                        self.container_helper[var_type][var_file_short][var_interval]["Content"][1] = {
+                    list_indices = list(self.container_helper[var_type][var_file_short][var_interval]["Content"].keys())
+                    if var_key == "Start":
+                        if len(list_indices) == 0:
+                            val_index = 1
+                        elif len(list_indices) == 1:
+                            val_index = list_indices[0] + 1
+                        else:
+                            val_index = list_indices[-1] + 1
+                    else:
+                        val_index = list_indices[-1]
+
+                    if val_index not in self.container_helper[var_type][var_file_short][var_interval]["Content"]:
+                        self.container_helper[var_type][var_file_short][var_interval]["Content"][val_index] = {
                             "Times": [None, None], "Indices": [None, None], "Object": None}
                         self.container_helper[var_type][var_file_short][var_interval]["ID"] += 1
-                        self.container_helper[var_type][var_file_short][var_interval]["Indices"].append(1)
+                        self.container_helper[var_type][var_file_short][var_interval]["Indices"].append(val_index)
 
                     x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
                     if var_key == "Start":
                         var_entr.set("Start value set!")
                         var_time = x_nearest
                         var_index = dataset_time.index(var_time)
-                        #
-                        self.container_helper[var_type][var_file_short][var_interval]["Content"][1]["Times"][
+
+                        self.container_helper[var_type][var_file_short][var_interval]["Content"][val_index]["Times"][
                             0] = var_time
-                        self.container_helper[var_type][var_file_short][var_interval]["Content"][1]["Indices"][
+                        self.container_helper[var_type][var_file_short][var_interval]["Content"][val_index]["Indices"][
                             0] = var_index
                     elif var_key == "End":
                         var_entr.set("End value set!")
                         var_time = x_nearest
                         var_index = dataset_time.index(var_time)
 
-                        self.container_helper[var_type][var_file_short][var_interval]["Content"][1]["Times"][
+                        self.container_helper[var_type][var_file_short][var_interval]["Content"][val_index]["Times"][
                             1] = var_time
-                        self.container_helper[var_type][var_file_short][var_interval]["Content"][1]["Indices"][
+                        self.container_helper[var_type][var_file_short][var_interval]["Content"][val_index]["Indices"][
                             1] = var_index
                         if self.pysills_mode == "MA":
                             self.temp_lines_checkup2[var_type][var_file_short] = 0
@@ -26695,7 +26720,11 @@ class PySILLS(tk.Frame):
                     key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
-                    var_concentration_i = self.srm_actual[var_srm_i][element]
+                    if element in self.srm_actual[var_srm_i]:
+                        var_concentration_i = self.srm_actual[var_srm_i][element]
+                    else:
+                        var_concentration_i = 0.0
+
                     var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         "MAT"][isotope]
 
@@ -26811,7 +26840,11 @@ class PySILLS(tk.Frame):
                         var_srm_i = self.container_var["SRM"][isotope].get()
                         key_element = re.search(r"(\D+)(\d+)", isotope)
                         element = key_element.group(1)
-                        var_concentration_i = self.srm_actual[var_srm_i][element]
+
+                        if element in self.srm_actual[var_srm_i]:
+                            var_concentration_i = self.srm_actual[var_srm_i][element]
+                        else:
+                            var_concentration_i = 0
 
                         var_intensity_i = self.container_intensity_corrected["STD"][var_datatype]["MAT"][isotope]
 
@@ -27394,7 +27427,11 @@ class PySILLS(tk.Frame):
                     key_element = re.search(r"(\D+)(\d+)", isotope)
                     element = key_element.group(1)
 
-                    var_result_i = self.srm_actual[var_srm_i][element]
+                    if element in self.srm_actual[var_srm_i]:
+                        var_result_i = self.srm_actual[var_srm_i][element]
+                    else:
+                        var_result_i = 0.0
+
                     var_result_sigma_i = 0.0
 
                     self.container_concentration[var_filetype][var_datatype][var_file_short]["MAT"][
@@ -34647,17 +34684,30 @@ class PySILLS(tk.Frame):
         val_max_cl = round((self.chemistry_data["Cl"]/(self.chemistry_data["Na"] + self.chemistry_data["Cl"]))*10**6, 4)
 
         if condition_std == True and condition_smpl == True and is_defined == True:
-            amount_fluid = (100 - float(var_entr.get()))/100
-            amount_nacl_equiv = float(var_entr.get())/100
-            total_ppm = 10**6
+            if mode != "recalculate":
+                amount_fluid = (100 - float(var_entr.get()))/100
+                amount_nacl_equiv = float(var_entr.get())/100
+                total_ppm = 10**6
 
-            # Calculate fluid data
-            self.calculate_fluid_data()
-            # Calculate chloride data
-            self.calculate_chloride_data()
-            # Prepare NaCl equivalents  calculation
-            self.prepare_nacl_equivalents(
-                amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+                # Calculate fluid data
+                self.calculate_fluid_data()
+                # Calculate chloride data
+                self.calculate_chloride_data()
+                # Prepare NaCl equivalents  calculation
+                self.prepare_nacl_equivalents(
+                    amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+            else:
+                amount_fluid = (100 - 5)/100
+                amount_nacl_equiv = 5/100
+                total_ppm = 10**6
+
+                # Calculate fluid data
+                self.calculate_fluid_data()
+                # Calculate chloride data
+                self.calculate_chloride_data()
+                # Prepare NaCl equivalents  calculation
+                self.prepare_nacl_equivalents(
+                    amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
 
             if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
                 elements_masses = self.chemistry_data
@@ -34668,7 +34718,7 @@ class PySILLS(tk.Frame):
             val_molar_mass_cl = elements_masses["Cl"]
             val_molar_mass_nacl = val_molar_mass_na + val_molar_mass_cl
 
-            if mode == "default":
+            if mode in ["default", "recalculate"]:
                 helper = []
                 helper_is = []
                 helper_cl = []
@@ -34677,6 +34727,22 @@ class PySILLS(tk.Frame):
                 molar_mass_nacl = self.molar_masses_compounds["NaCl"]["Total"]
                 for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
                     file_smpl = self.container_lists["SMPL"]["Long"][index]
+
+                    if mode == "recalculate":
+                        amount_fluid = (100 - float(self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
+                                                        file_smpl_short].get()))/100
+                        amount_nacl_equiv = float(self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
+                                                      file_smpl_short].get())/100
+                        total_ppm = 10**6
+
+                        # Calculate fluid data
+                        self.calculate_fluid_data()
+                        # Calculate chloride data
+                        self.calculate_chloride_data()
+                        # Prepare NaCl equivalents  calculation
+                        self.prepare_nacl_equivalents(
+                            amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+
                     if self.container_var["SMPL"][file_smpl]["Checkbox"].get() == 1:
                         salt_composition = "NaCl"
                         helper2[file_smpl_short] = {}
@@ -34798,8 +34864,10 @@ class PySILLS(tk.Frame):
 
                         helper_is.append(val_concentration_is)
 
-                        self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
-                            var_entr.get())
+                        if mode != "recalculate":
+                            self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+                                var_entr.get())
+
                         self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
                         self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
                         if file_smpl_short in self.container_files["SMPL"]:
@@ -35779,6 +35847,7 @@ class PySILLS(tk.Frame):
         ## Buttons
         str_btn_01 = self.language_dict["Guess the composition"][self.var_language]
         str_btn_02 = self.language_dict["Fix quantification"][self.var_language]
+        str_btn_03 = self.language_dict["Calculate again"][self.var_language]
 
         btn_01a = SE(
             parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header - 10, n_rows=1,
@@ -35786,6 +35855,14 @@ class PySILLS(tk.Frame):
             bg=background_color_elements).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
             command=self.guess_salt_composition)
+
+        btn_01b = SE(
+            parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 15, n_rows=1,
+            n_columns=6, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda event="", var_entr=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
+                           mode="recalculate", var_file=None:
+            self.fi_calculate_massbalance(var_entr, mode, var_file, event))
 
         if self.var_os == "darwin":
             font_color_accent = font_color_dark
