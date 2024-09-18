@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.31
-# Date:		16.09.2024
+# Version:	v1.0.32
+# Date:		18.09.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.31"
-        self.val_version = self.str_version_number + " - 16.09.2024"
+        self.str_version_number = "1.0.32"
+        self.val_version = self.str_version_number + " - 18.09.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -704,6 +704,8 @@ class PySILLS(tk.Frame):
             "Analysis mode": {"English": "Analysis mode", "German": "Analysemodus"},
             "Show all": {"English": "Show all", "German": "Alles anzeigen"},
             "Hide all": {"English": "Hide all", "German": "Alles ausblenden"},
+            "Show only RAW": {"English": "Show only RAW", "German": "RAW anzeigen"},
+            "Hide only RAW": {"English": "Hide only RAW", "German": "RAW ausblenden"},
             "Time series view": {"English": "Time series view", "German": "Zeitreihe Messung"},
             "Time ratios view": {"English": "Time ratios view", "German": "Zeitreihe Verhältnisse"},
             "Spectral data view": {"English": "Spectral data view", "German": "Datenspektrum"},
@@ -19629,6 +19631,8 @@ class PySILLS(tk.Frame):
         str_lbl_07 = self.language_dict["End"][self.var_language]
         str_lbl_08 = self.language_dict["Show all"][self.var_language]
         str_lbl_09 = self.language_dict["Hide all"][self.var_language]
+        str_lbl_08a = self.language_dict["Show only RAW"][self.var_language]
+        str_lbl_09a = self.language_dict["Hide only RAW"][self.var_language]
         str_lbl_10 = self.language_dict["Time series view"][self.var_language]
         str_lbl_11 = self.language_dict["Time ratios view"][self.var_language]
         str_lbl_12 = self.language_dict["Spectral data view"][self.var_language]
@@ -19695,6 +19699,18 @@ class PySILLS(tk.Frame):
             text=str_lbl_09, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
                 var_type, var_file_short))
+        btn_02c = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=start_column, n_rows=1, n_columns=7,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_08a, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_type=str_filetype, var_file_short=var_filename_short, key="RAW": self.ma_show_all_lines(
+                var_type, var_file_short, key))
+        btn_02d = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_09a, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_type=str_filetype, var_file_short=var_filename_short, key="RAW": self.ma_hide_all_lines(
+                var_type, var_file_short, key))
         btn_03 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -20792,35 +20808,37 @@ class PySILLS(tk.Frame):
 
                 self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
 
-    def ma_show_all_lines(self, var_type, var_file_short):
+    def ma_show_all_lines(self, var_type, var_file_short, key="ALL"):
         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
         for isotope in file_isotopes:
             if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "RAW"][0].set_visible(True)
                 self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(1)
-                try:
-                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "SMOOTHED"][0].set_visible(True)
-                    self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
-                except:
-                    print(var_file_short, isotope, "- There are no smoothed line curves.")
+                if key == "ALL":
+                    try:
+                        self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                            "SMOOTHED"][0].set_visible(True)
+                        self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
+                    except:
+                        print(var_file_short, isotope, "- There are no smoothed line curves.")
 
         self.canvas_specific.draw()
 
-    def ma_hide_all_lines(self, var_type, var_file_short):
+    def ma_hide_all_lines(self, var_type, var_file_short, key="ALL"):
         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
         for isotope in file_isotopes:
             if isotope in self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short]:
                 self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "RAW"][0].set_visible(False)
                 self.container_var["ma_setting"]["Display RAW"][var_type][var_file_short][isotope].set(0)
-                try:
-                    self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "SMOOTHED"][0].set_visible(False)
-                    self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
-                except:
-                    print(var_file_short, isotope, "- There are no smoothed line curves.")
+                if key == "ALL":
+                    try:
+                        self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                            "SMOOTHED"][0].set_visible(False)
+                        self.container_var["ma_setting"]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
+                    except:
+                        print(var_file_short, isotope, "- There are no smoothed line curves.")
 
         self.canvas_specific.draw()
 
@@ -32022,6 +32040,8 @@ class PySILLS(tk.Frame):
         str_lbl_07 = self.language_dict["End"][self.var_language]
         str_lbl_08 = self.language_dict["Show all"][self.var_language]
         str_lbl_09 = self.language_dict["Hide all"][self.var_language]
+        str_lbl_08a = self.language_dict["Show only RAW"][self.var_language]
+        str_lbl_09a = self.language_dict["Hide only RAW"][self.var_language]
         str_lbl_10 = self.language_dict["Time series view"][self.var_language]
         str_lbl_11 = self.language_dict["Time ratios view"][self.var_language]
         str_lbl_12 = self.language_dict["Spectral data view"][self.var_language]
@@ -32083,6 +32103,18 @@ class PySILLS(tk.Frame):
             text=str_lbl_09, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=str_filename_short: self.fi_hide_all_lines(
                 var_type, var_file_short))
+        btn_02c = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=start_column, n_rows=1, n_columns=7,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_08a, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_type=str_filetype, var_file_short=str_filename_short, key="RAW": self.fi_show_all_lines(
+                var_type, var_file_short, key))
+        btn_02d = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_09a, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_type=str_filetype, var_file_short=str_filename_short, key="RAW": self.fi_hide_all_lines(
+                var_type, var_file_short, key))
         btn_03 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -33119,7 +33151,7 @@ class PySILLS(tk.Frame):
                     self.tv_results_quick.insert("", tk.END, values=entries_a_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_x_i)
 
-    def fi_show_all_lines(self, var_type, var_file_short):
+    def fi_show_all_lines(self, var_type, var_file_short, key="ALL"):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -33130,12 +33162,13 @@ class PySILLS(tk.Frame):
             if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
                 self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "RAW"][0].set_visible(True)
-                try:
-                    self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "SMOOTHED"][0].set_visible(True)
-                    self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
-                except:
-                    print(var_file_short, isotope, "- There are no smoothed line curves.")
+                if key == "ALL":
+                    try:
+                        self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                            "SMOOTHED"][0].set_visible(True)
+                        self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(1)
+                    except:
+                        print(var_file_short, isotope, "- There are no smoothed line curves.")
             elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
                 try:
                     self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
@@ -33150,7 +33183,7 @@ class PySILLS(tk.Frame):
         elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
             self.canvas_specific_ratio.draw()
 
-    def fi_hide_all_lines(self, var_type, var_file_short):
+    def fi_hide_all_lines(self, var_type, var_file_short, key="ALL"):
         if self.pysills_mode == "FI":
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -33161,12 +33194,13 @@ class PySILLS(tk.Frame):
             if self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 0:
                 self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
                     "RAW"][0].set_visible(False)
-                try:
-                    self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
-                        "SMOOTHED"][0].set_visible(False)
-                    self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
-                except:
-                    print(var_file_short, isotope, "- There are no smoothed line curves.")
+                if key == "ALL":
+                    try:
+                        self.container_var[key_setting]["Time-Signal Lines"][var_type][var_file_short][isotope][
+                            "SMOOTHED"][0].set_visible(False)
+                        self.container_var[key_setting]["Display SMOOTHED"][var_type][var_file_short][isotope].set(0)
+                    except:
+                        print(var_file_short, isotope, "- There are no smoothed line curves.")
             elif self.container_var[key_setting]["Analyse Mode Plot"][var_type][var_file_short].get() == 1:
                 try:
                     self.container_var[key_setting]["Time-Ratio Lines"][var_type][var_file_short][isotope][
