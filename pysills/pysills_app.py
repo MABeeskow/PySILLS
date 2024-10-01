@@ -15,6 +15,7 @@
 import os, pathlib, sys, re, datetime, csv, string, math, webbrowser, time
 import numpy as np
 import pandas as pd
+pd.options.mode.chained_assignment = None
 import scipy.io
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -987,6 +988,10 @@ class PySILLS(tk.Frame):
             "Default value": {"English": "Default value", "German": "Voreinstellung"},
             "Composition Setup": {"English": "Composition Setup", "German": "Zusammensetzung\n definieren"},
             "Mineral stoichiometry": {"English": "Mineral stoichiometry", "German": "Minerale Stöchiometrie"},
+            "PySILLS subtitle": {
+                "English": "Major, minor and trace element analysis of minerals, fluid and melt inclusions",
+                "German":
+                    "Haupt-, Neben- und Spurenelementanalysie von Mineralen, Flüssigkeits- und Schmelzeinschlüssen"},
             "File-specific Setup": {"English": "File-specific Setup", "German": "Datei-spezifische\n Einstellungen"}}
 
         self.var_language = self.container_var["General Settings"]["Language"].get()
@@ -2012,6 +2017,7 @@ class PySILLS(tk.Frame):
         var_lbl_02 = self.language_dict["Standard Files"][self.var_language]
         var_lbl_03 = self.language_dict["Sample Files"][self.var_language]
         var_lbl_04c = self.language_dict["Define ICP-MS"][self.var_language]
+        var_lbl_dev = self.language_dict["PySILLS subtitle"][self.var_language]
 
         lbl_00 = SE(
             parent=self.parent, row_id=start_row, column_id=start_column, n_rows=n_rows_header,
@@ -2040,8 +2046,7 @@ class PySILLS(tk.Frame):
         lbl_dev = SE(
             parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
-            text="Major, minor and trace element analysis of minerals, fluid and melt inclusions", relief=tk.FLAT,
-            fontsize=font_small, sticky="news")
+            text=var_lbl_dev, relief=tk.FLAT, fontsize=font_small, sticky="news")
 
         # LISTBOXES
         self.lb_std = SE(
@@ -15383,270 +15388,6 @@ class PySILLS(tk.Frame):
             self.subwindow_mineral_matrix_quantification.destroy()
             self.checkup_oxides()
 
-    # def oxides_setup_composition(self, focus="MAT"):
-    #     # Window Settings
-    #     row_min = self.row_height
-    #     column_min = self.column_width
-    #     n_rows = self.window_dimensions["Oxide quantification"][0]
-    #     n_columns = self.window_dimensions["Oxide quantification"][1]
-    #
-    #     window_width = int(n_columns*self.column_width)
-    #     window_height = int(n_rows*self.row_height)
-    #
-    #     var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-    #
-    #     if self.pysills_mode == "MA":
-    #         str_title_window = "Sample Quantification"
-    #         str_title_window = self.language_dict["Sample Settings"][self.var_language]
-    #         var_setting_key = "ma_setting"
-    #     elif self.pysills_mode == "FI":
-    #         str_title_window = "Matrix Quantification"
-    #         var_setting_key = "fi_setting"
-    #     elif self.pysills_mode == "MI":
-    #         if focus == "MAT":
-    #             str_title_window = "Matrix Quantification"
-    #         else:
-    #             str_title_window = "Inclusion Quantification"
-    #         var_setting_key = "mi_setting"
-    #
-    #     self.subwindow_oxides_composition = tk.Toplevel(self.parent)
-    #     self.subwindow_oxides_composition.title(str_title_window)
-    #     self.subwindow_oxides_composition.geometry(var_geometry)
-    #     self.subwindow_oxides_composition.resizable(False, False)
-    #     self.subwindow_oxides_composition["bg"] = self.bg_colors["BG Window"]
-    #
-    #     for x in range(n_columns):
-    #         tk.Grid.columnconfigure(self.subwindow_oxides_composition, x, weight=1)
-    #     for y in range(n_rows):
-    #         tk.Grid.rowconfigure(self.subwindow_oxides_composition, y, weight=1)
-    #
-    #     # Rows
-    #     for i in range(0, n_rows):
-    #         self.subwindow_oxides_composition.grid_rowconfigure(i, minsize=row_min)
-    #     # Columns
-    #     for i in range(0, n_columns):
-    #         self.subwindow_oxides_composition.grid_columnconfigure(i, minsize=column_min)
-    #
-    #     var_row_start = 0
-    #     var_column_start = 1
-    #     var_row_n = 1
-    #     var_header_n = 8
-    #
-    #     str_focus = focus
-    #
-    #     # FRAMES
-    #     frm_01 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_column_start, n_rows=19,
-    #         n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
-    #         relief=tk.FLAT)
-    #     frm_02 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_header_n + 2, n_rows=19,
-    #         n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
-    #         relief=tk.FLAT)
-    #     frm_03 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=2*var_header_n + 3, n_rows=19,
-    #         n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
-    #         relief=tk.FLAT)
-    #     frm_04 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=3*var_header_n + 4, n_rows=19,
-    #         n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
-    #         relief=tk.FLAT)
-    #     frm_04 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=4*var_header_n + 5, n_rows=19,
-    #         n_columns=var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_frame(
-    #         relief=tk.FLAT)
-    #
-    #     # LABELS
-    #     lbl_01 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start, column_id=var_column_start,
-    #         n_rows=var_row_n, n_columns=4*var_header_n + 3, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["BG Window"]).create_simple_label(
-    #         text="Select all present elements and their oxides", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_02 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_column_start,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["Dark"]).create_simple_label(
-    #         text="Rock-forming Elements", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_03 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=var_header_n + 2,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["Dark"]).create_simple_label(
-    #         text="Industrial Metals", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_04 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=2*var_header_n + 3,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["Dark"]).create_simple_label(
-    #         text="Precious Metals", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_05 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=3*var_header_n + 4,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["Dark"]).create_simple_label(
-    #         text="Rare-Earth Elements", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_07 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=4*var_header_n + 5,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["Dark"]).create_simple_label(
-    #         text="Other Elements", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_06 = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 1, column_id=5*var_header_n + 6,
-    #         n_rows=var_row_n, n_columns=2*var_header_n - 2, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["Dark"]).create_simple_label(
-    #         text="Define the oxide ratios", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_06a = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 2, column_id=5*var_header_n + 6,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["Light"]).create_simple_label(
-    #         text="FeO/(FeO + Fe2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_06b = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 3, column_id=5*var_header_n + 6,
-    #         n_rows=var_row_n, n_columns=var_header_n, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["Light"]).create_simple_label(
-    #         text="MnO/(MnO + Mn2O3)", relief=tk.FLAT, fontsize="sans 10 bold")
-    #
-    #     # BUTTONS
-    #     btn_01a = SE(
-    #         parent=self.subwindow_oxides_composition, row_id=var_row_start + 18, column_id=5*var_header_n + 6, n_rows=2,
-    #         n_columns=2*var_header_n - 2, fg=self.bg_colors["Dark Font"],
-    #         bg=self.accent_color).create_simple_button(
-    #         text="Guess the composition", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-    #         command=self.guess_composition)
-    #
-    #     # CHECKBOXES
-    #     self.container_checkboxes = {}
-    #     ## Major Oxides
-    #     list_major_oxides = [
-    #         "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "Mn2O3", "SO3"]
-    #     list_major_oxides = sorted(list_major_oxides)
-    #     for index, oxide in enumerate(list_major_oxides):
-    #         if focus == "MAT":
-    #             var_cb_002a = self.container_var["Oxides Quantification"]["Major"][oxide]
-    #         else:
-    #             var_cb_002a = self.container_var["Oxides Quantification INCL"]["Major"][oxide]
-    #
-    #         cb_002a = SE(
-    #             parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #             column_id=var_column_start, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
-    #             n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
-    #             var_cb=var_cb_002a, text=oxide, set_sticky="nesw", own_color=True,
-    #             command=lambda var_oxide=oxide, var_key="Major", focus=str_focus:
-    #             self.select_oxide(var_oxide, var_key, focus))
-    #         self.container_checkboxes[oxide] = cb_002a
-    #
-    #         if oxide in self.container_lists["Selected Oxides"]["All"]:
-    #             cb_002a.select()
-    #
-    #     ## Industrial Metals
-    #     list_industrial_metals = ["Cr2O3", "NiO", "ZnO", "CuO", "PbO", "PbO2", "SnO2", "WO3", "MoO3", "V2O5", "ZrO2",
-    #         "Nb2O5", "HfO2", "Ta2O5"]
-    #     list_industrial_metals = sorted(list_industrial_metals)
-    #     for index, oxide in enumerate(list_industrial_metals):
-    #         if focus == "MAT":
-    #             var_cb_003a = self.container_var["Oxides Quantification"]["Minor"][oxide]
-    #         else:
-    #             var_cb_003a = self.container_var["Oxides Quantification INCL"]["Minor"][oxide]
-    #
-    #         cb_003a = SE(
-    #             parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #             column_id=var_header_n + 2, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
-    #             n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
-    #             var_cb=var_cb_003a, text=oxide, set_sticky="nesw", own_color=True,
-    #             command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
-    #             self.select_oxide(var_oxide, var_key, focus))
-    #         self.container_checkboxes[oxide] = cb_003a
-    #
-    #         if oxide in self.container_lists["Selected Oxides"]["All"]:
-    #             cb_003a.select()
-    #
-    #     ## Precious Metals
-    #     list_precious_metals = ["AgO", "PdO", "PtO", "Au2O", "OsO", "RuO", "IrO", "RhO"]
-    #     list_precious_metals = sorted(list_precious_metals)
-    #     for index, oxide in enumerate(list_precious_metals):
-    #         if focus == "MAT":
-    #             var_cb_004a = self.container_var["Oxides Quantification"]["Minor"][oxide]
-    #         else:
-    #             var_cb_004a = self.container_var["Oxides Quantification INCL"]["Minor"][oxide]
-    #
-    #         cb_004a = SE(
-    #             parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #             column_id=2*var_header_n + 3, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
-    #             n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
-    #             var_cb=var_cb_004a, text=oxide, set_sticky="nesw", own_color=True,
-    #             command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
-    #             self.select_oxide(var_oxide, var_key, focus))
-    #         self.container_checkboxes[oxide] = cb_004a
-    #
-    #         if oxide in self.container_lists["Selected Oxides"]["All"]:
-    #             cb_004a.select()
-    #
-    #     ## Rare Earth Metals
-    #     list_rareearth_metals = ["Ce2O3", "Nd2O3", "La2O3", "Y2O3", "Sc2O3", "Pr2O3", "Pr6O11", "Sm2O3", "Gd2O3",
-    #                              "Dy2O3", "Er2O3", "Yb2O3", "Eu2O3", "Ho2O3", "Tb2O3", "Tb4O7", "Lu2O3", "Tm2O3"]
-    #     list_rareearth_metals = sorted(list_rareearth_metals)
-    #     for index, oxide in enumerate(list_rareearth_metals):
-    #         if focus == "MAT":
-    #             var_cb_005a = self.container_var["Oxides Quantification"]["Minor"][oxide]
-    #         else:
-    #             var_cb_005a = self.container_var["Oxides Quantification INCL"]["Minor"][oxide]
-    #
-    #         cb_005a = SE(
-    #             parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #             column_id=3*var_header_n + 4, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
-    #             n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
-    #             var_cb=var_cb_005a, text=oxide, set_sticky="nesw", own_color=True,
-    #             command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
-    #             self.select_oxide(var_oxide, var_key, focus))
-    #         self.container_checkboxes[oxide] = cb_005a
-    #
-    #         if oxide in self.container_lists["Selected Oxides"]["All"]:
-    #             cb_005a.select()
-    #
-    #     ## Other Elements
-    #     list_other_elements = [
-    #         "Li2O", "Ga2O3", "B2O3", "BeO", "GeO2", "As2O3", "Sb2O3", "BaO", "SrO", "Cl2O", "Br2O", "I2O", "Rb2O",
-    #         "Cs2O", "Fr2O", ]
-    #     list_other_elements = sorted(list_other_elements)
-    #     for index, oxide in enumerate(list_other_elements):
-    #         if focus == "MAT":
-    #             var_cb_006a = self.container_var["Oxides Quantification"]["Minor"][oxide]
-    #         else:
-    #             var_cb_006a = self.container_var["Oxides Quantification INCL"]["Minor"][oxide]
-    #
-    #         cb_006a = SE(
-    #             parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #             column_id=4*var_header_n + 5, fg=self.bg_colors["Dark Font"], n_rows=var_row_n,
-    #             n_columns=var_header_n, bg=self.bg_colors["Light"]).create_simple_checkbox(
-    #             var_cb=var_cb_006a, text=oxide, set_sticky="nesw", own_color=True,
-    #             command=lambda var_oxide=oxide, var_key="Minor", focus=str_focus:
-    #             self.select_oxide(var_oxide, var_key, focus))
-    #         self.container_checkboxes[oxide] = cb_006a
-    #
-    #         if oxide in self.container_lists["Selected Oxides"]["All"]:
-    #             cb_006a.select()
-    #
-    #     # ENTRIES
-    #     list_oxideratios = ["Fe-Ratio", "Mn-Ratio"]
-    #     for index, ratio in enumerate(list_oxideratios):
-    #         if ratio in ["Mn-Ratio"]:
-    #             if focus == "MAT":
-    #                 self.container_var["Oxides Quantification"]["Ratios"][ratio].set("1.0")
-    #             else:
-    #                 self.container_var["Oxides Quantification INCL"]["Ratios"][ratio].set("1.0")
-    #
-    #         if focus == "MAT":
-    #             entr_002 = SE(
-    #                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #                 column_id=6*var_header_n + 6, n_rows=var_row_n, n_columns=var_header_n - 2,
-    #                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
-    #                 var=self.container_var["Oxides Quantification"]["Ratios"][ratio],
-    #                 text_default=self.container_var["Oxides Quantification"]["Ratios"][ratio].get())
-    #         else:
-    #             entr_002 = SE(
-    #                 parent=self.subwindow_oxides_composition, row_id=var_row_start + 2 + index,
-    #                 column_id=6*var_header_n + 6, n_rows=var_row_n, n_columns=var_header_n - 2,
-    #                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
-    #                 var=self.container_var["Oxides Quantification INCL"]["Ratios"][ratio],
-    #                 text_default=self.container_var["Oxides Quantification INCL"]["Ratios"][ratio].get())
-
     def guess_composition(self):
         list_major_oxides = [
             "SiO2", "Al2O3", "FeO", "Fe2O3", "CaO", "Na2O", "MgO", "K2O", "TiO2", "P2O5", "MnO", "Mn2O3", "SO3"]
@@ -15686,274 +15427,6 @@ class PySILLS(tk.Frame):
         if state_cb == 0:
             if var_oxide in self.container_lists["Selected Oxides"]["All"]:
                 self.container_lists["Selected Oxides"]["All"].remove(var_oxide)
-
-    # def oxides_setup_files(self, focus="MAT"):
-    #     """ Definition of the file-specific settings that are necessary for a 100 wt.-% calculation.
-    #     Parameters:  -
-    #     """
-    #     # Window Settings
-    #     window_width = 760
-    #     window_height = 425
-    #     var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-    #
-    #     row_min = 25
-    #     n_rows = int(window_height/row_min)
-    #     column_min = 20
-    #     n_columns = int(window_width/column_min)
-    #
-    #     if self.pysills_mode == "MA":
-    #         str_title_window = "Sample Quantification"
-    #         var_setting_key = "ma_setting"
-    #     elif self.pysills_mode == "FI":
-    #         str_title_window = "Matrix Quantification"
-    #         var_setting_key = "fi_setting"
-    #     elif self.pysills_mode == "MI":
-    #         if focus == "MAT":
-    #             str_title_window = "Matrix Quantification"
-    #         else:
-    #             str_title_window = "Inclusion Quantification"
-    #         var_setting_key = "mi_setting"
-    #
-    #     self.subwindow_oxides_files = tk.Toplevel(self.parent)
-    #     self.subwindow_oxides_files.title(str_title_window)
-    #     self.subwindow_oxides_files.geometry(var_geometry)
-    #     self.subwindow_oxides_files.resizable(False, False)
-    #     self.subwindow_oxides_files["bg"] = self.bg_colors["BG Window"]
-    #
-    #     for x in range(n_columns):
-    #         tk.Grid.columnconfigure(self.subwindow_oxides_files, x, weight=1)
-    #     for y in range(n_rows):
-    #         tk.Grid.rowconfigure(self.subwindow_oxides_files, y, weight=1)
-    #
-    #     # Rows
-    #     for i in range(0, n_rows):
-    #         self.subwindow_oxides_files.grid_rowconfigure(i, minsize=row_min)
-    #     # Columns
-    #     for i in range(0, n_columns):
-    #         self.subwindow_oxides_files.grid_columnconfigure(i, minsize=column_min)
-    #
-    #     var_row_start = 0
-    #     var_column_start = 0
-    #     var_row_n = 1
-    #     var_header_n = 8
-    #
-    #     str_focus = focus
-    #
-    #     str_btn_01 = self.language_dict["Import data"][self.var_language]
-    #
-    #     # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    #
-    #     # LABELS
-    #     lbl_01 = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=var_column_start,
-    #         n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["BG Window"]).create_simple_label(
-    #         text="File-specific Settings", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_02 = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["BG Window"]).create_simple_label(
-    #         text="Default total amount of oxides", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_03 = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 2, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["BG Window"]).create_simple_label(
-    #         text="Import data from file", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_04 = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 7, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["BG Window"]).create_simple_label(
-    #         text="Select Reference Element", relief=tk.FLAT, fontsize="sans 10 bold")
-    #     lbl_04 = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 5, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Light Font"],
-    #         bg=self.bg_colors["BG Window"]).create_simple_label(
-    #         text="Default amount of reference oxide", relief=tk.FLAT, fontsize="sans 10 bold")
-    #
-    #     # ENTRIES
-    #     var_entr_default = tk.StringVar()
-    #     var_entr_default.set("100.0")
-    #     entr_02a = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["White"]).create_simple_entry(
-    #         var=var_entr_default, text_default=var_entr_default.get())
-    #     entr_02a.bind(
-    #         "<Return>", lambda event, var_entr=var_entr_default, focus=str_focus:
-    #         self.change_total_oxides_amount(var_entr, focus, event))
-    #
-    #     var_entr_03_default = tk.StringVar()
-    #     var_entr_03_default.set("100.0")
-    #     entr_03a = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 6, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["White"]).create_simple_entry(
-    #         var=var_entr_03_default, text_default=var_entr_03_default.get())
-    #     entr_03a.bind(
-    #         "<Return>", lambda event, var_entr=var_entr_03_default: self.change_reference_oxide_amount(var_entr, event))
-    #
-    #     # BUTTONS
-    #     btn_03a = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 3, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["Light"]).create_simple_button(
-    #         text=str_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
-    #
-    #     # OPTION MENUS
-    #     list_opt04a = sorted(self.container_lists["Selected Oxides"]["All"])
-    #     if focus == "MAT":
-    #         var_opt_04 = self.container_var[var_setting_key]["Oxide"]
-    #     elif focus == "INCL":
-    #         var_opt_04 = self.container_var[var_setting_key]["Oxide Inclusion"]
-    #
-    #     opt_04a = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 8, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["Light"]).create_option_isotope(
-    #         var_iso=var_opt_04, option_list=list_opt04a, text_set=var_opt_04.get(),
-    #         fg_active=self.bg_colors["Dark Font"], bg_active=self.accent_color,
-    #         command=lambda var_opt=var_opt_04, var_file=None, state_default=True:
-    #         self.ma_change_matrix_compound(var_opt, var_file, state_default))
-    #     opt_04a["menu"].config(
-    #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-    #         activebackground=self.accent_color)
-    #     opt_04a.config(
-    #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-    #         activebackground=self.accent_color, highlightthickness=0)
-    #
-    #     self.opt_02b = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 9, column_id=3*var_header_n + 1,
-    #         n_rows=var_row_n, n_columns=var_header_n + 4, fg=self.bg_colors["Dark Font"],
-    #         bg=self.bg_colors["Light"]).create_option_isotope(
-    #         var_iso=self.container_var["IS"]["Default SMPL"],
-    #         option_list=self.container_lists["Measured Isotopes"]["All"],
-    #         text_set=self.container_var["IS"]["Default SMPL"].get(), fg_active=self.bg_colors["Dark Font"],
-    #         bg_active=self.accent_color, command=lambda var_opt=self.container_var["IS"]["Default SMPL"]:
-    #         self.select_reference_element(var_opt))
-    #     self.opt_02b["menu"].config(
-    #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-    #         activebackground=self.accent_color)
-    #     self.opt_02b.config(
-    #         fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"], activeforeground=self.bg_colors["Dark Font"],
-    #         activebackground=self.accent_color, highlightthickness=0)
-    #
-    #     ## TREEVIEWS
-    #     frm_tv = SE(
-    #         parent=self.subwindow_oxides_files, row_id=var_row_start + 1, column_id=var_column_start, n_rows=15,
-    #         n_columns=3*var_header_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Very Light"]).create_frame()
-    #     vsb_tv = ttk.Scrollbar(master=frm_tv, orient="vertical")
-    #     text_tv = tk.Text(
-    #         master=frm_tv, width=30, height=25, yscrollcommand=vsb_tv.set, bg=self.bg_colors["Very Light"])
-    #     vsb_tv.config(command=text_tv.yview)
-    #     vsb_tv.pack(side="right", fill="y")
-    #     text_tv.pack(side="left", fill="both", expand=True)
-    #
-    #     lbl_i = tk.Label(
-    #         frm_tv, text="Filename", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-    #     text_tv.window_create("end", window=lbl_i)
-    #     text_tv.insert("end", "\t")
-    #     lbl_i = tk.Label(
-    #         frm_tv, text="Reference Oxide", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-    #     text_tv.window_create("end", window=lbl_i)
-    #     text_tv.insert("end", "\t")
-    #     lbl_i = tk.Label(
-    #         frm_tv, text="Reference Isotope", bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-    #     text_tv.window_create("end", window=lbl_i)
-    #     text_tv.insert("end", "\t")
-    #     lbl_i = tk.Label(
-    #         frm_tv, text="Total amount of oxides (wt.%)", bg=self.bg_colors["Very Light"],
-    #         fg=self.bg_colors["Dark Font"])
-    #     text_tv.window_create("end", window=lbl_i)
-    #     text_tv.insert("end", "\t")
-    #     lbl_i = tk.Label(
-    #         frm_tv, text="Reference oxide amount (wt.%)", bg=self.bg_colors["Very Light"],
-    #         fg=self.bg_colors["Dark Font"])
-    #     text_tv.window_create("end", window=lbl_i)
-    #     text_tv.insert("end", "\n")
-    #
-    #     for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
-    #         filename_long = self.container_lists["SMPL"]["Long"][index]
-    #         if focus == "INCL":
-    #             if "Inclusion Setup" not in self.container_var["SMPL"][filename_long]:
-    #                 self.container_var["SMPL"][filename_long]["Inclusion Setup"] = {
-    #                     "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-    #                     "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
-    #                     "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
-    #
-    #         if focus == "MAT":
-    #             key_setup = "Matrix Setup"
-    #         elif focus == "INCL":
-    #             key_setup = "Inclusion Setup"
-    #
-    #         if len(self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Concentration"].get()) == 0:
-    #             self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Concentration"].set("100.0")
-    #         lbl_i = tk.Label(
-    #             frm_tv, text=filename_short, bg=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
-    #         text_tv.window_create("end", window=lbl_i)
-    #         text_tv.insert("end", "\t")
-    #
-    #         list_opt_oxide_i = sorted(self.container_lists["Selected Oxides"]["All"])
-    #         opt_oxide_i = tk.OptionMenu(
-    #             frm_tv, self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Name"],
-    #             *list_opt_oxide_i,
-    #             command=lambda var_opt=self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Name"],
-    #                            var_file=filename_long, state_default=False:
-    #             self.ma_change_matrix_compound(var_opt, var_file, state_default))
-    #         opt_oxide_i["menu"].config(
-    #             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-    #             activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-    #         opt_oxide_i.config(
-    #             bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-    #             activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
-    #         text_tv.window_create("end", window=opt_oxide_i)
-    #         text_tv.insert("end", " \t")
-    #
-    #         if self.pysills_mode == "MA":
-    #             var_opt_is_i = self.container_var["SMPL"][filename_long]["IS Data"]["IS"]
-    #         else:
-    #             var_opt_is_i = self.container_var["SMPL"][filename_long][key_setup]["IS"]["Name"]
-    #
-    #         opt_ref_i = tk.OptionMenu(
-    #             frm_tv, var_opt_is_i, *self.container_lists["Measured Isotopes"]["All"],
-    #             command=lambda var_opt=var_opt_is_i, var_file=filename_long, state_default=False:
-    #             self.ma_change_matrix_compound(var_opt, var_file, state_default))
-    #         opt_ref_i["menu"].config(
-    #             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"],
-    #             activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color)
-    #         opt_ref_i.config(
-    #             bg=self.bg_colors["Light"], fg=self.bg_colors["Dark Font"],
-    #             activeforeground=self.bg_colors["Dark Font"], activebackground=self.accent_color, highlightthickness=0)
-    #         text_tv.window_create("end", window=opt_ref_i)
-    #         text_tv.insert("end", " \t")
-    #
-    #         if focus == "MAT":
-    #             if filename_short not in self.container_var["Oxides Quantification"]["Total Amounts"]:
-    #                 self.container_var["Oxides Quantification"]["Total Amounts"][filename_short] = tk.StringVar()
-    #                 self.container_var["Oxides Quantification"]["Total Amounts"][filename_short].set("100.0")
-    #
-    #             entr_i = tk.Entry(
-    #                 frm_tv, textvariable=self.container_var["Oxides Quantification"]["Total Amounts"][filename_short],
-    #                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
-    #                 highlightbackground=self.bg_colors["Very Light"])
-    #         else:
-    #             if filename_short not in self.container_var["Oxides Quantification INCL"]["Total Amounts"]:
-    #                 self.container_var["Oxides Quantification INCL"]["Total Amounts"][filename_short] = tk.StringVar()
-    #                 self.container_var["Oxides Quantification INCL"]["Total Amounts"][filename_short].set("100.0")
-    #
-    #             entr_i = tk.Entry(
-    #                 frm_tv, textvariable=self.container_var["Oxides Quantification INCL"]["Total Amounts"][
-    #                     filename_short], fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"],
-    #                 highlightthickness=0, highlightbackground=self.bg_colors["Very Light"])
-    #
-    #         text_tv.window_create("insert", window=entr_i)
-    #         text_tv.insert("end", "\t")
-    #
-    #         entr_i = tk.Entry(
-    #             frm_tv, textvariable=self.container_var["SMPL"][filename_long][key_setup]["Oxide"]["Concentration"],
-    #             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"], highlightthickness=0,
-    #             highlightbackground=self.bg_colors["Very Light"])
-    #         text_tv.window_create("insert", window=entr_i)
-    #         text_tv.insert("end", "\n")
 
     def change_reference_oxide_amount(self, var_entr, event):
         for filename_long in self.container_lists["SMPL"]["Long"]:
@@ -19441,9 +18914,13 @@ class PySILLS(tk.Frame):
         y_ticks = file_isotopes
 
         if self.pysills_mode == "MA":
-            normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
+            df_isotopes_edited = df_isotopes.copy()
+            normalized_df = np.log(df_isotopes_edited.replace(0, 1))
+            normalized_df = (normalized_df - normalized_df.min())/(normalized_df.max() - normalized_df.min())
         else:
-            normalized_df = 2*(df_isotopes - df_isotopes.min())/(df_isotopes.max() - df_isotopes.min()) - 1
+            df_isotopes_edited = df_isotopes.copy()
+            normalized_df = np.log(df_isotopes_edited.replace(0, 1))
+            normalized_df = (normalized_df - normalized_df.min())/(normalized_df.max() - normalized_df.min())
 
         im = ax_spectrum.imshow(normalized_df.transpose(), aspect="auto", interpolation="None", cmap="viridis")
 
@@ -37905,48 +37382,20 @@ class PySILLS(tk.Frame):
             pass
 
     def create_starter_file(self):
-        str_path_to_python = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
-        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_python = self.container_var["Python path"].get()
+        str_path_to_pysills_folder = os.path.join(self.path_pysills_main, "pysills")
+        str_path_to_pysills_app = self.container_var["PySILLS path"].get()
         str_path_to_pysills_icon = os.path.join(self.path_pysills_main, "pysills", "lib", "images", "PySILLS_Icon.png")
 
         if self.var_os == "linux":
-            filename = os.path.join(self.path_pysills_main, "pysills_app.desktop")
+            filename = os.path.join(str_path_to_pysills_folder, "pysills_app.desktop")
         elif self.var_os == "darwin":
-            filename = os.path.join(self.path_pysills_main, "pysills_app.sh")
+            filename = os.path.join(str_path_to_pysills_folder, "pysills_app.sh")
         else:
-            filename = os.path.join(self.path_pysills_main, "pysills_app.bat")
+            filename = os.path.join(str_path_to_pysills_folder, "pysills_app.bat")
 
-        list_paths = sys.path
-        for path in list_paths:
-            if "site-packages" in path:
-                key_path = path
-                if self.var_os == "win32":
-                    path_parts = key_path.split("\\")
-                    raw_path = "C:\\"
-                else:
-                    path_parts = key_path.split("/")
-                    raw_path = "/"
-
-                str_python_name = "python"
-
-                for part in path_parts:
-                    if "python" in part:
-                        str_python_name = part
-
-                for part in path_parts:
-                    if part in ["lib", "Lib"]:
-                        break
-                    else:
-                        raw_path = os.path.join(raw_path, part)
-
-                if self.var_os == "win32":
-                    str_path_to_python = os.path.join(raw_path, "Scripts", "python.exe")
-                elif self.var_os == "linux":
-                    str_path_to_python = os.path.join("usr", "bin", str_python_name)
-                else:
-                    str_path_to_python = os.path.join(raw_path, "bin", "python")
-
-                break
+        if os.path.exists(filename):
+            os.remove(filename)
 
         with open(filename, "w") as file_content:
             if self.var_os == "linux":
@@ -37968,9 +37417,6 @@ class PySILLS(tk.Frame):
                 file_content.write("echo Script ended")
             else:
                 file_content.write(str(str_path_to_python) + " " + str(str_path_to_pysills_app))
-
-        self.container_var["Python path"].set(str_path_to_python)
-        self.container_var["PySILLS path"].set(str_path_to_pysills_app)
 
     def get_current_path_pysills_folder(self):
         str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
