@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.32
-# Date:		18.09.2024
+# Version:	v1.0.33
+# Date:		01.10.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -71,8 +71,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.32"
-        self.val_version = self.str_version_number + " - 18.09.2024"
+        self.str_version_number = "1.0.33"
+        self.val_version = self.str_version_number + " - 01.10.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -823,6 +823,7 @@ class PySILLS(tk.Frame):
             "Select oxide": {"English": "Select oxide", "German": "Oxid auswählen"},
             "Select isotope": {"English": "Select isotope", "German": "Isotop auswählen"},
             "Select element": {"English": "Select element", "German": "Element auswählen"},
+            "Select file": {"English": "Select file", "German": "Datei auswählen"},
             "Select all": {"English": "Select all", "German": "Alles auswählen"},
             "Select": {"English": "Select", "German": "Auswählen"},
             "Alkali metals": {"English": "Alkali metals", "German": "Alkalimetalle"},
@@ -13104,7 +13105,7 @@ class PySILLS(tk.Frame):
         str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
         str_title_02 = self.language_dict["Extras"][self.var_language]
 
-        ## Window Settings sex
+        ## Window Settings
         row_min = self.row_height
         column_min = self.column_width
         n_rows = self.window_dimensions["MA Extras"][0]
@@ -13459,7 +13460,7 @@ class PySILLS(tk.Frame):
         elif self.pysills_mode == "MI":
             str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
 
-        ## Window Settings sex
+        ## Window Settings
         row_min = self.row_height
         column_min = self.column_width
         n_rows = self.window_dimensions["FI Extras"][0]
@@ -36967,47 +36968,47 @@ class PySILLS(tk.Frame):
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 9, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03a1 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03a = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 10, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
             text=round(self.current_original_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03b1 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 13, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03b = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 11, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 13, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
             text=round(self.current_suggested_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_03c1 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_03c = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 12, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
             text=round(self.current_current_value, 2), relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_04a1 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 7, column_id=start_column, n_rows=1, n_columns=6,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=str_lbl_10, relief=tk.FLAT, fontsize="sans 10 bold")
         self.lbl_04a2 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 6, column_id=start_column + 6, n_rows=1, n_columns=6,
+            parent=self.subwindow_spike_check, row_id=start_row + 7, column_id=start_column + 6, n_rows=1, n_columns=6,
             fg=font_color_light, bg=accent_color).create_simple_label(
             text=self.current_nspikes, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_05 = SE(
-            parent=self.subwindow_spike_check, row_id=start_row + 13, column_id=start_column, n_rows=1, n_columns=12,
+            parent=self.subwindow_spike_check, row_id=start_row + 15, column_id=start_column, n_rows=1, n_columns=12,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_11, relief=tk.FLAT, fontsize="sans 10 bold")
 
@@ -37022,14 +37023,32 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_03, bg_active=accent_color, fg_active=font_color_light,
             command=lambda mode="Next": self.change_file_spk(mode))
+
+        str_opt_01 = self.language_dict["Select isotope"][self.var_language]
+        self.var_opt_spk_iso = tk.StringVar()
+        self.var_opt_spk_iso.set(str_opt_01)
+
+        btn_03 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column, n_rows=1, n_columns=6,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_02, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_opt_iso=self.var_opt_spk_iso, mode="Before", list_isotopes=list_spk_isotopes:
+            self.change_spk_isotope(var_opt_iso, mode, list_isotopes))
+        btn_04 = SE(
+            parent=self.subwindow_spike_check, row_id=start_row + 5, column_id=start_column + 6, n_rows=1, n_columns=6,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_03, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_opt_iso=self.var_opt_spk_iso, mode="Next", list_isotopes=list_spk_isotopes:
+            self.change_spk_isotope(var_opt_iso, mode, list_isotopes))
+
         if len(list_spk_isotopes) > 0:
             btn_05a1 = SE(
-                parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column, n_rows=1, n_columns=6,
+                parent=self.subwindow_spike_check, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
                 text=str_lbl_06, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda mode="RAW": self.replace_spike_value(mode))
             btn_05a2 = SE(
-                parent=self.subwindow_spike_check, row_id=start_row + 14, column_id=start_column + 6, n_rows=1,
+                parent=self.subwindow_spike_check, row_id=start_row + 16, column_id=start_column + 6, n_rows=1,
                 n_columns=6, fg=font_color_dark, bg=background_color_elements).create_simple_button(
                 text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda mode="SMOOTHED": self.replace_spike_value(mode))
@@ -37041,12 +37060,34 @@ class PySILLS(tk.Frame):
                 background=background_color_elements, foreground=font_color_dark,
                 activebackground=accent_color, troughcolor=background_color_elements, highlightthickness=0,
                 command=self.change_spk_id)
-            self.scl_01.grid(row=start_row + 7, column=start_column, rowspan=2, columnspan=12, sticky="nesw")
+            self.scl_01.grid(row=start_row + 8, column=start_column, rowspan=3, columnspan=12, sticky="nesw")
 
         ## OPTION MENUS
-        str_opt_01 = self.language_dict["Select isotope"][self.var_language]
-        self.var_opt_spk_iso = tk.StringVar()
-        self.var_opt_spk_iso.set(str_opt_01)
+        str_opt_02 = self.language_dict["Select file"][self.var_language]
+        self.var_opt_spk_file = tk.StringVar()
+        self.var_opt_spk_file.set(str_opt_01)
+
+        if len(var_list_files) > 0:
+            self.current_file_spk = var_list_files[0]
+        else:
+            self.current_file_spk = "No file"
+
+        var_opt_spk_file_default = self.current_file_spk
+
+        if len(var_list_files) > 0:
+            self.opt_spke_file = SE(
+                parent=self.subwindow_spike_check, row_id=start_row + 1, column_id=start_column, n_rows=1, n_columns=12,
+                fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+                var_iso=self.var_opt_spk_file, option_list=var_list_files, text_set=var_opt_spk_file_default,
+                fg_active=font_color_light, bg_active=accent_color,
+                command=lambda mode="Option", var_opt=self.var_opt_spk_file: self.change_file_spk(mode, var_opt))
+            self.opt_spke_file["menu"].config(
+                fg=font_color_dark, bg=background_color_elements,
+                activeforeground=font_color_light,
+                activebackground=accent_color)
+            self.opt_spke_file.config(
+                bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
+                activeforeground=font_color_light, highlightthickness=0)
 
         if len(list_spk_isotopes) > 0:
             self.current_isotope = list_spk_isotopes[0]
@@ -37270,12 +37311,40 @@ class PySILLS(tk.Frame):
             var_value_smoothed=self.current_suggested_value, mode=mode)
         self.show_spike_diagram()
 
-    def change_spk_isotope(self, var_opt_iso):
-        var_isotope = var_opt_iso
-        self.var_opt_spk_iso.set(var_isotope)
-        self.current_isotope = var_isotope
-        self.scl_01.set(1)
+    def change_spk_isotope(self, var_opt_iso, mode=None, list_isotopes=None):
+        if mode == None:
+            var_isotope = var_opt_iso
+            self.var_opt_spk_iso.set(var_isotope)
+            self.current_isotope = var_isotope
+        else:
+            if mode == "Before":
+                var_isotope = var_opt_iso.get()
+                self.var_opt_spk_iso.set(var_isotope)
+                isotope_id = list_isotopes.index(var_isotope)
 
+                if isotope_id > 0:
+                    isotope_id -= 1
+                elif isotope_id == 0:
+                    isotope_id = len(list_isotopes) - 1
+
+                var_isotope = list_isotopes[isotope_id]
+                self.var_opt_spk_iso.set(var_isotope)
+                self.current_isotope = var_isotope
+            elif mode == "Next":
+                var_isotope = var_opt_iso.get()
+                self.var_opt_spk_iso.set(var_isotope)
+                isotope_id = list_isotopes.index(var_isotope)
+
+                if isotope_id < len(list_isotopes) - 1:
+                    isotope_id += 1
+                elif isotope_id == len(list_isotopes) - 1:
+                    isotope_id = 0
+
+                var_isotope = list_isotopes[isotope_id]
+                self.var_opt_spk_iso.set(var_isotope)
+                self.current_isotope = var_isotope
+
+        self.scl_01.set(1)
         self.show_spike_data()
 
     def change_spk_id(self, mode=None):
@@ -37309,7 +37378,7 @@ class PySILLS(tk.Frame):
 
         self.show_spike_diagram()
 
-    def change_file_spk(self, mode):
+    def change_file_spk(self, mode, var_opt=None):
         if mode == "Next":
             if self.current_file_spk in self.container_lists["STD"]["Short"]:
                 var_filetype = "STD"
@@ -37323,6 +37392,7 @@ class PySILLS(tk.Frame):
 
             self.current_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
             self.lbl_01a.configure(text=self.current_file_spk)
+            self.var_opt_spk_file.set(self.current_file_spk)
         elif mode == "Before":
             if self.current_file_spk in self.container_lists["STD"]["Short"]:
                 var_filetype = "STD"
@@ -37336,6 +37406,19 @@ class PySILLS(tk.Frame):
 
             self.current_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
             self.lbl_01a.configure(text=self.current_file_spk)
+            self.var_opt_spk_file.set(self.current_file_spk)
+        elif mode not in ["Next", "Before"]:
+            var_opt = self.var_opt_spk_file.get()
+            if self.current_file_spk in self.container_lists["STD"]["Short"]:
+                var_filetype = "STD"
+            else:
+                var_filetype = "SMPL"
+
+            var_opt_id = self.container_lists[var_filetype]["Short"].index(var_opt)
+            self.current_file_id = var_opt_id
+            self.current_file_spk = self.container_lists[var_filetype]["Short"][self.current_file_id]
+            self.lbl_01a.configure(text=self.current_file_spk)
+            self.var_opt_spk_file.set(self.current_file_spk)
 
         possible_spk_isotopes = self.check_spikes_isotope()
         if len(possible_spk_isotopes) > 0:
