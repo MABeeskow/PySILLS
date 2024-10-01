@@ -335,14 +335,19 @@ class PySILLS(tk.Frame):
             default_font.configure(family="Ubuntu", size=10, weight=font.NORMAL)
             self.parent.option_add("*Font", default_font)
             mpl.use("TkAgg")
+            self.fontsize_normal = 10
         elif var_os == "darwin":
             self.defaultFont = font.nametofont("TkDefaultFont")
             default_font = font.nametofont("TkDefaultFont")
             self.parent.option_add("*Font", default_font)
             mpl.use("MacOSX")
+            self.fontsize_normal = 10
         else:
             self.defaultFont = font.nametofont("TkDefaultFont")
+            default_font = font.nametofont("TkDefaultFont")
+            self.parent.option_add("*Font", default_font)
             mpl.use("TkAgg")
+            self.fontsize_normal = 10
 
         ## Data Container
         self.container_elements = {}
@@ -455,6 +460,12 @@ class PySILLS(tk.Frame):
         self.container_var["stepwise visualization"].set(0)
         self.container_var["check INCL"] = tk.BooleanVar()
         self.container_var["check INCL"].set(False)
+        self.container_var["Python path"] = tk.StringVar()
+        self.container_var["Python path"].set("Set python path")
+        self.container_var["PySILLS path"] = tk.StringVar()
+        self.container_var["PySILLS path"].set("Set PySILLS path")
+        self.container_var["PySILLS script"] = tk.StringVar()
+        self.container_var["PySILLS script"].set("Set PySILLS path")
 
         self.copied_file = False
         self.helper_salt_composition = {}
@@ -721,6 +732,8 @@ class PySILLS(tk.Frame):
             "Save Project": {"English": "Save Project", "German": "Projekt speichern"},
             "General Settings": {"English": "Main Settings", "German": "Haupteinstellungen"},
             "About": {"English": "About PySILLS", "German": "Über PySILLS"},
+            "Python path": {"English": "Python path", "German": "Python Pfad"},
+            "PySILLS path": {"English": "PySILLS path", "German": "PySILLS Pfad"},
             "Before": {"English": "Before", "German": "Zurück"},
             "Next": {"English": "Next", "German": "Weiter"},
             "Quit": {"English": "Quit", "German": "Beenden"},
@@ -762,7 +775,7 @@ class PySILLS(tk.Frame):
             "Select last solid": {"English": "Select last solid", "German": "Letzten Festkörper auswählen"},
             "Source ID": {"English": "Source ID", "German": "Proben ID"},
             "Standard Reference Material (SRM)": {
-                "English": "Standard Reference Material (SRM)", "German": "Standard/Referenzmaterial (SRM)"},
+                "English": "Standard Reference Material", "German": "Standard/Referenzmaterial"},
             "Isotopes": {"English": "Isotopes", "German": "Isotope"},
             "Dwell times (in s)": {"English": "Dwell times (in s)", "German": "Haltezeiten (in s)"},
             "Sample Settings": {"English": "Sample Settings", "German": "Probeneinstellungen"},
@@ -1790,12 +1803,14 @@ class PySILLS(tk.Frame):
             self.row_height = 24
             self.column_width = 21
             self.font_settings = {
-                "Header": "sans 15 bold", "Elements": "sans 12 bold", "Small": "sans 9 bold", "Options": "sans 12"}
+                "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
+                "Table": "sans 10"}
         elif str_screen_resolution == "1280x720":
             self.row_height = 16
             self.column_width = 14
             self.font_settings = {
-                "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 6 bold", "Options": "sans 8"}
+                "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
+                "Table": "sans 8"}
 
         self.window_dimensions = {
             "Main window": [33, 21], "MA main settings": [38, 65], "FI main settings": [40, 67],
@@ -2179,7 +2194,7 @@ class PySILLS(tk.Frame):
             var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
             var_list=self.container_lists["ICPMS Library"], fg_active=font_color_light, bg_active=accent_color,
             command=lambda var_opt=self.var_opt_icp: self.select_icp_ms(var_opt))
-        opt_icp.configure=font=font_option
+        opt_icp.configure(font=font_option)
 
     def close_pysills(self):
         self.parent.quit()
@@ -11675,6 +11690,8 @@ class PySILLS(tk.Frame):
         str_lbl_27 = self.language_dict["Stack all intervals into one"][self.var_language]
         str_lbl_28 = self.language_dict["Median"][self.var_language]
         str_lbl_29 = self.language_dict["Screen resolution"][self.var_language]
+        str_lbl_30 = self.language_dict["Python path"][self.var_language]
+        str_lbl_31 = self.language_dict["PySILLS path"][self.var_language]
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -11728,6 +11745,14 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=4, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_29, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_30 = SE(
+            parent=subwindow_generalsettings, row_id=11, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_30, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_31 = SE(
+            parent=subwindow_generalsettings, row_id=13, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_31, relief=tk.FLAT, fontsize="sans 10 bold")
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01, lbl_02, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
@@ -11810,6 +11835,19 @@ class PySILLS(tk.Frame):
             text_default=self.container_var["General Settings"]["Line width"].get(),
             command=lambda event, var_entr=self.container_var["General Settings"]["Line width"]:
             self.check_lw_value(var_entr, event))
+        entr_30 = SE(
+            parent=subwindow_generalsettings, row_id=12, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["Python path"], text_default=self.container_var["Python path"].get(), command=None)
+        entr_31 = SE(
+            parent=subwindow_generalsettings, row_id=14, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["PySILLS path"], text_default=self.container_var["PySILLS path"].get(), command=None)
+        entr_32 = SE(
+            parent=subwindow_generalsettings, row_id=15, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.container_var["PySILLS script"], text_default=self.container_var["PySILLS script"].get(),
+            command=None)
 
         self.gui_elements["general_settings"]["Entry"]["General"].extend(
             [entr_01a, entr_07a, entr_07b, entr_07c, entr_07d, entr_10a])
@@ -11954,6 +11992,11 @@ class PySILLS(tk.Frame):
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
 
         self.check_lw_value(var_entr=self.container_var["General Settings"]["Line width"], event="")
+
+        # INITIALIZATION
+        self.get_current_path_python()
+        self.get_current_path_pysills_folder()
+        self.get_current_path_pysills_script()
 
     def check_lw_value(self, var_entr, event):
         if float(var_entr.get()) < 0:
@@ -15024,6 +15067,8 @@ class PySILLS(tk.Frame):
 
         font_header = self.font_settings["Header"]
         font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         # Labels
         str_lbl_01 = self.language_dict["Project Information"][self.var_language]
@@ -15034,7 +15079,7 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_01a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_label(
@@ -15058,6 +15103,8 @@ class PySILLS(tk.Frame):
             parent=var_parent, row_id=var_row_start + 2, column_id=var_category_n, n_rows=1, n_columns=6,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var[var_setting_key]["Source ID"], text_default=var_entr_01b_default)
+        entr_01a.configure(font=font_option)
+        entr_01b.configure(font=font_option)
 
     def place_standard_reference_material(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Standard Reference Material'
@@ -15095,7 +15142,7 @@ class PySILLS(tk.Frame):
         lbl_02 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_02a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n - 4, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -15194,7 +15241,7 @@ class PySILLS(tk.Frame):
         lbl_03 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
 
         # Buttons
         btn_03a = SE(
@@ -15299,7 +15346,7 @@ class PySILLS(tk.Frame):
                 parent=self.subwindow_mineral_matrix_quantification, row_id=var_row_start, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=2*var_header_n + 1, fg=font_color_light,
                 bg=background_color_dark).create_simple_label(
-                text=str_lbl_01, relief=tk.FLAT, fontsize=font_element)
+                text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
             # RADIOBUTTONS
             rb_01a = SE(
@@ -15974,11 +16021,11 @@ class PySILLS(tk.Frame):
                 parent=var_parent, row_id=var_row_start + int_row_start_quantification, column_id=var_column_start,
                 n_rows=var_row_n, n_columns=var_header_n, fg=font_color_light,
                 bg=background_color_dark).create_simple_label(
-                text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+                text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
             lbl_05 = SE(
                 parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
                 n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-                text=str_lbl_02, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+                text=str_lbl_02, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
 
             # Option Menu
             str_default_inclusion_setup = self.container_var[key_setting]["Inclusion Setup Option"].get()
@@ -16324,7 +16371,7 @@ class PySILLS(tk.Frame):
         lbl_05 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_05a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -16388,7 +16435,7 @@ class PySILLS(tk.Frame):
         lbl_06 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_06a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -16413,8 +16460,9 @@ class PySILLS(tk.Frame):
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
         font_header = self.font_settings["Header"]
-        font_element = self.font_settings["Elements"] # "sans 10 bold"
+        font_element = self.font_settings["Elements"]
         font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -16444,7 +16492,7 @@ class PySILLS(tk.Frame):
         lbl_07 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_07a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -16496,6 +16544,8 @@ class PySILLS(tk.Frame):
             command=lambda event, var_entr=self.container_var[var_setting_key]["Time BG End"], var_key="End",
                            mode="default", var_interval="BG":
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
+        entr_07a.configure(font=font_option)
+        entr_07b.configure(font=font_option)
 
     def place_calculation_window_smpl(self, var_geometry_info, var_relief=tk.FLAT):
         """Creates and places the necessary tkinter widgets for the section: 'Calculation Window (Sample) Setup'
@@ -16508,8 +16558,9 @@ class PySILLS(tk.Frame):
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
         font_header = self.font_settings["Header"]
-        font_element = self.font_settings["Elements"] # "sans 10 bold"
+        font_element = self.font_settings["Elements"]
         font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -16541,7 +16592,7 @@ class PySILLS(tk.Frame):
         lbl_08 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_08a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=font_color_dark,
@@ -16595,6 +16646,8 @@ class PySILLS(tk.Frame):
             command=lambda event, var_entr=self.container_var[var_setting_key]["Time MAT End"], var_key="End",
                            mode="default", var_interval="MAT":
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
+        entr_08a.configure(font=font_option)
+        entr_08b.configure(font=font_option)
 
     def place_spike_elimination_setup(self, var_geometry_info, var_relief=tk.FLAT):
         """Creates and places the necessary tkinter widgets for the section: 'Spike Elimination Setup'
@@ -16635,7 +16688,7 @@ class PySILLS(tk.Frame):
         lbl_09 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_09b = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n - 9, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -16675,6 +16728,8 @@ class PySILLS(tk.Frame):
                 fg=font_color_dark, n_rows=1, n_columns=int(var_header_n/2),
                 bg=background_color_elements).create_simple_checkbox(
                 var_cb=self.container_var["check INCL"], text=str_lbl_04, set_sticky="nesw", own_color=True)
+            cb_09b.configure(font=font_option)
+            cb_09c.configure(font=font_option)
 
     def change_inclusion_consideration(self, setting_key):
         if self.container_var[setting_key]["Check Inclusion Exclusion"].get() == True:
@@ -16724,7 +16779,7 @@ class PySILLS(tk.Frame):
         lbl_10 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_10a = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_category_n, fg=font_color_dark, bg=background_color_elements).create_simple_label(
@@ -16800,8 +16855,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -16826,7 +16883,7 @@ class PySILLS(tk.Frame):
         lbl_iso = SE(
             parent=var_parent, row_id=var_row_start - 1, column_id=var_column_start, n_rows=1,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
         frm_iso = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_dark, bg=background_color_light).create_frame()
@@ -16849,10 +16906,10 @@ class PySILLS(tk.Frame):
                 if isotope not in self.container_var["SRM"]:
                     self.container_var["SRM"][isotope] = tk.StringVar()
                     self.container_var["SRM"][isotope].set("Select SRM")
-                    #
+
                     self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
                     self.container_var["dwell_times"]["Entry"][isotope].set("0.002")
-                    #
+
                     for file_std_short in self.container_lists["STD"]["Short"]:
                         self.build_checkbutton_isotope_visibility(
                             var_mode=var_setting_key, var_filetype="STD", var_filename_short=file_std_short,
@@ -16874,7 +16931,7 @@ class PySILLS(tk.Frame):
                         self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][
                             isotope] = {
                             "RAW": None, "SMOOTHED": None}
-                    #
+
                     for file_smpl_short in self.container_lists["SMPL"]["Short"]:
                         self.build_checkbutton_isotope_visibility(
                             var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
@@ -16897,7 +16954,7 @@ class PySILLS(tk.Frame):
                         self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short][
                             isotope] = {
                             "RAW": None, "SMOOTHED": None}
-                #
+
                 if self.file_loaded:
                     for file_std_short in self.container_lists["STD"]["Short"]:
                         self.build_checkbutton_isotope_visibility(
@@ -16920,7 +16977,7 @@ class PySILLS(tk.Frame):
                         self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short][
                             isotope] = {
                             "RAW": None, "SMOOTHED": None}
-                    #
+
                     for file_smpl_short in self.container_lists["SMPL"]["Short"]:
                         self.build_checkbutton_isotope_visibility(
                             var_mode=var_setting_key, var_filetype="SMPL", var_filename_short=file_smpl_short,
@@ -16948,7 +17005,7 @@ class PySILLS(tk.Frame):
                                  highlightbackground="black", bd=1)
                 text_iso.window_create("end", window=frm_i)
                 text_iso.insert("end", "")
-                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark)
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_table)
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
@@ -16961,10 +17018,10 @@ class PySILLS(tk.Frame):
                     activeforeground=font_color_light, activebackground=accent_color)
                 opt_srm_i.config(
                     bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                    activeforeground=font_color_light, highlightthickness=0)
+                    activeforeground=font_color_light, highlightthickness=0, font=font_table)
                 text_iso.window_create("end", window=opt_srm_i)
                 text_iso.insert("end", "\t")
-                #
+
                 key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
 
@@ -16982,11 +17039,11 @@ class PySILLS(tk.Frame):
                 else:
                     self.container_var["charge"][isotope]["textvar"].set("1+ charged")
                     charge_fg = font_color_dark
-                #
+
                 lbl_i = tk.Label(
                     frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
                     textvariable=self.container_var["charge"][isotope]["textvar"], bg=background_color_light,
-                    fg=charge_fg)
+                    fg=charge_fg, font=font_table)
                 self.container_var["charge"][isotope]["labelvar"] = lbl_i
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\n")
@@ -17017,8 +17074,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -17045,7 +17104,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
         # Treeviews
         frm_02 = SE(
@@ -17065,34 +17124,34 @@ class PySILLS(tk.Frame):
             self.get_acquisition_times(var_filetype="SMPL")
 
         lbl_i = tk.Label(
-            frm_02, text=str_lbl_02, bg=background_color_light, fg=font_color_dark)
+            frm_02, text=str_lbl_02, bg=background_color_light, fg=font_color_dark, font=font_table)
         text_02.window_create("end", window=lbl_i)
         text_02.insert("end", "\n")
         for var_file_short in self.container_lists["STD"]["Short"]:
             lbl_i = tk.Label(
-                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark)
+                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark, font=font_table)
             text_02.window_create("end", window=lbl_i)
             text_02.insert("end", "\t")
 
             entr_i = tk.Entry(
                 frm_02, textvariable=self.container_var["acquisition times"]["STD"][var_file_short],
-                fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0, width=12)
+                fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0, width=12, font=font_table)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
         lbl_i = tk.Label(
-            frm_02, text=str_lbl_03, bg=background_color_light, fg=font_color_dark)
+            frm_02, text=str_lbl_03, bg=background_color_light, fg=font_color_dark, font=font_table)
         text_02.window_create("end", window=lbl_i)
         text_02.insert("end", "\n")
         for var_file_short in self.container_lists["SMPL"]["Short"]:
             lbl_i = tk.Label(
-                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark)
+                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark, font=font_table)
             text_02.window_create("end", window=lbl_i)
             text_02.insert("end", "\t")
 
             entr_i = tk.Entry(
                 frm_02, textvariable=self.container_var["acquisition times"]["SMPL"][var_file_short],
-                fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0, width=12)
+                fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0, width=12, font=font_table)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
@@ -17129,8 +17188,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -17161,7 +17222,7 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=var_row_n,
             n_columns=var_header_n, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
         # Frames
         frm_02 = SE(
@@ -17175,7 +17236,7 @@ class PySILLS(tk.Frame):
             n_columns=int(var_header_n/2), fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[var_mode_setting]["Time-Signal Checker"], value_rb=1,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_02, sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_mode_setting:
+            relief=tk.FLAT, font=font_element, command=lambda var_setting_key=var_mode_setting:
             self.change_filetype_time_signal_diagram_checker(var_setting_key))
         rb_02 = SE(
             parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start + int(var_header_n/2),
@@ -17183,7 +17244,7 @@ class PySILLS(tk.Frame):
             bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var[var_mode_setting]["Time-Signal Checker"], value_rb=2,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_03, sticky="nesw",
-            relief=tk.FLAT, font="sans 10 bold", command=lambda var_setting_key=var_mode_setting:
+            relief=tk.FLAT, font=font_element, command=lambda var_setting_key=var_mode_setting:
             self.change_filetype_time_signal_diagram_checker(var_setting_key))
 
         if len(self.container_lists["STD"]["Short"]) == 0:
@@ -17207,6 +17268,8 @@ class PySILLS(tk.Frame):
             text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_mode="Next", var_setting_key=var_mode_setting:
             self.change_file_time_signal_diagram_checker(var_mode, var_setting_key))
+        btn_01.configure(font=font_element)
+        btn_02.configure(font=font_element)
 
         ## Initialization
         self.current_file_id_checker = 0
@@ -17378,8 +17441,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_listbox = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -17405,7 +17470,7 @@ class PySILLS(tk.Frame):
         lbl_header = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=1, n_columns=var_header_n,
             fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
         # Buttons
         if self.var_os == "darwin":
@@ -17418,6 +17483,7 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=6, fg=font_color_accent, bg=accent_color).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_filetype="STD": self.confirm_all_files_2(var_filetype))
+        btn_confirm.configure(font=font_element)
 
         # Frames
         frm_files = SE(
@@ -17441,7 +17507,8 @@ class PySILLS(tk.Frame):
 
                 for isotope in df_isotopes:
                     if isotope.isdigit():
-                        print(isotope, "in file", file_std_short,"is missing its element. Let's hope it will get it back.")
+                        print(isotope, "in file", file_std_short,
+                              "is missing its element. Let's hope it will get it back.")
                     else:
                         if isotope not in self.container_lists["Measured Isotopes"]["All"]:
                             self.container_lists["Measured Isotopes"]["All"].append(isotope)
@@ -17540,6 +17607,7 @@ class PySILLS(tk.Frame):
                     activebackground=background_color_listbox, activeforeground=font_color_dark,
                     anchor=tk.CENTER, highlightthickness=0, bd=0)
 
+            cb_i.configure(font=font_table)
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
 
@@ -17562,7 +17630,7 @@ class PySILLS(tk.Frame):
                 activebackground=accent_color)
             opt_srm_i.config(
                 bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table)
             text_files.window_create("end", window=opt_srm_i)
             text_files.insert("end", "\t")
 
@@ -17585,6 +17653,8 @@ class PySILLS(tk.Frame):
                     activebackground=accent_color, activeforeground=font_color_light,
                     highlightthickness=0, highlightbackground=background_color_listbox,
                     command=lambda var_file=file_std, var_type="STD": self.fi_check_specific_file(var_file, var_type))
+
+            btn_i.configure(font=font_table)
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
 
@@ -17862,8 +17932,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -17889,7 +17961,7 @@ class PySILLS(tk.Frame):
         lbl_header = SE(
             parent=var_parent, row_id=var_row_start, column_id=var_column_start, n_rows=1, n_columns=var_header_n,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
 
         # Buttons
         if self.var_os == "darwin":
@@ -17902,6 +17974,7 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=6, fg=font_color_accent, bg=accent_color).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_filetype="SMPL": self.confirm_all_files_2(var_filetype))
+        btn_confirm.configure(font=font_element)
 
         # Frames
         frm_files = SE(
@@ -17914,7 +17987,7 @@ class PySILLS(tk.Frame):
         vsb_files.config(command=text_files.yview)
         vsb_files.pack(side="right", fill="y")
         text_files.pack(side="left", fill="both", expand=True)
-        #
+
         for index, file_smpl in enumerate(self.container_lists["SMPL"]["Long"]):
             parts = file_smpl.split("/")
             file_smpl_short = parts[-1]
@@ -18032,6 +18105,7 @@ class PySILLS(tk.Frame):
                     activebackground=background_color_light, activeforeground=font_color_dark,
                     anchor=tk.CENTER, highlightthickness=0, bd=0)
 
+            cb_i.configure(font=font_table)
             text_files.window_create("end", window=cb_i)
             text_files.insert("end", "\t")
 
@@ -18045,7 +18119,7 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, highlightthickness=0)
             text_files.window_create("end", window=opt_is_i)
             text_files.insert("end", "\t")
-            #
+
             if self.container_var["SMPL"][file_smpl]["ID"].get() != "A":
                 var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
             else:
@@ -18057,7 +18131,8 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, activebackground=accent_color)
             opt_id_i.config(
                 bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0)
+                activeforeground=font_color_light, highlightthickness=0, font=font_option)
+
             text_files.window_create("end", window=opt_id_i)
             text_files.insert("end", "\t")
 
@@ -18080,6 +18155,8 @@ class PySILLS(tk.Frame):
                     activebackground=accent_color, activeforeground=font_color_light,
                     highlightthickness=0, highlightbackground=background_color_light,
                     command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
+
+            btn_i.configure(font=font_table)
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
 
@@ -36815,6 +36892,8 @@ class PySILLS(tk.Frame):
                 parent=var_parent, row_id=start_row + 4, column_id=7, n_rows=1, n_columns=11,
                 fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
                 var=var_threshold, text_default=var_entr_09d_default)
+            entr_09c.configure(font=font_option)
+            entr_09d.configure(font=font_option)
 
             # Buttons
             btn_09e1 = SE(
@@ -37889,6 +37968,94 @@ class PySILLS(tk.Frame):
                 file_content.write("echo Script ended")
             else:
                 file_content.write(str(str_path_to_python) + " " + str(str_path_to_pysills_app))
+
+        self.container_var["Python path"].set(str_path_to_python)
+        self.container_var["PySILLS path"].set(str_path_to_pysills_app)
+
+    def get_current_path_pysills_folder(self):
+        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        self.container_var["PySILLS path"].set(str_path_to_pysills_app)
+
+    def get_current_path_pysills_script(self):
+        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_pysills_icon = os.path.join(self.path_pysills_main, "pysills", "lib", "images", "PySILLS_Icon.png")
+
+        if self.var_os == "linux":
+            filename = os.path.join(self.path_pysills_main, "pysills_app.desktop")
+        elif self.var_os == "darwin":
+            filename = os.path.join(self.path_pysills_main, "pysills_app.sh")
+        else:
+            filename = os.path.join(self.path_pysills_main, "pysills_app.bat")
+
+        list_paths = sys.path
+        for path in list_paths:
+            if "site-packages" in path:
+                key_path = path
+                if self.var_os == "win32":
+                    path_parts = key_path.split("\\")
+                    raw_path = "C:\\"
+                else:
+                    path_parts = key_path.split("/")
+                    raw_path = "/"
+
+                str_python_name = "python"
+
+                for part in path_parts:
+                    if "python" in part:
+                        str_python_name = part
+
+                for part in path_parts:
+                    if part in ["lib", "Lib"]:
+                        break
+                    else:
+                        raw_path = os.path.join(raw_path, part)
+
+                if self.var_os == "win32":
+                    str_path_to_pysills_app = os.path.join(raw_path, "Scripts", "pysills.exe")
+                elif self.var_os == "linux":
+                    str_path_to_pysills_app = os.path.join("usr", "bin", str_python_name)
+                else:
+                    str_path_to_pysills_app = os.path.join(raw_path, "bin", "python")
+                break
+
+        self.container_var["PySILLS script"].set(str_path_to_pysills_app)
+
+    def get_current_path_python(self):
+        str_path_to_python = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+
+        list_paths = sys.path
+        for path in list_paths:
+            if "site-packages" in path:
+                key_path = path
+                if self.var_os == "win32":
+                    path_parts = key_path.split("\\")
+                    raw_path = "C:\\"
+                else:
+                    path_parts = key_path.split("/")
+                    raw_path = "/"
+
+                str_python_name = "python"
+
+                for part in path_parts:
+                    if "python" in part:
+                        str_python_name = part
+
+                for part in path_parts:
+                    if part in ["lib", "Lib"]:
+                        break
+                    else:
+                        raw_path = os.path.join(raw_path, part)
+
+                if self.var_os == "win32":
+                    str_path_to_python = os.path.join(raw_path, "python.exe")
+                elif self.var_os == "linux":
+                    str_path_to_python = os.path.join("usr", "bin", str_python_name)
+                else:
+                    str_path_to_python = os.path.join(raw_path, "bin", "python")
+                break
+
+        self.container_var["Python path"].set(str_path_to_python)
 
     def extract_filename_information(self, variable):
         """Extracts the long and short filename and also its file ending."""
