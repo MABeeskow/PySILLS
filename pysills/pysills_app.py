@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.33
-# Date:		01.10.2024
+# Version:	v1.0.34
+# Date:		02.10.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.33"
-        self.val_version = self.str_version_number + " - 01.10.2024"
+        self.str_version_number = "1.0.34"
+        self.val_version = self.str_version_number + " - 02.10.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1814,8 +1814,8 @@ class PySILLS(tk.Frame):
                     "Table": "sans 10"}
             elif var_os == "darwin":
                 self.font_settings = {
-                    "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
-                    "Table": "sans 10"}
+                    "Header": "sans 16 bold", "Elements": "sans 14 bold", "Small": "sans 10 bold", "Options": "sans 14",
+                    "Table": "sans 14"}
             else:
                 self.font_settings = {
                     "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
