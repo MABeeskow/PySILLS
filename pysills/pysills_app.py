@@ -2115,7 +2115,7 @@ class PySILLS(tk.Frame):
             bg=background_color_elements).create_simple_button(
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="STD": self.project_manager(type))
-        btn_11_std.configure(state="disabled")
+
         btn_04 = SE(
             parent=self.parent, row_id=start_row + 15, column_id=11, n_rows=common_n_rows,
             n_columns=n_columns_button + 2, fg=font_color_dark,
@@ -2140,7 +2140,6 @@ class PySILLS(tk.Frame):
             bg=background_color_elements).create_simple_button(
             text=var_btn_11, bg_active=accent_color, fg_active=font_color_dark,
             command=lambda type="SMPL": self.project_manager(type))
-        btn_11_smpl.configure(state="disabled")
 
         btn_07 = SE(
             parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=common_n_rows,
@@ -14758,6 +14757,8 @@ class PySILLS(tk.Frame):
 
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
+                var_file_short = file_parts[-1]
+
                 if self.file_loaded == False:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -14781,6 +14782,12 @@ class PySILLS(tk.Frame):
                             df_exmpl = DE(filename_long=file_std).get_measurements(
                                 delimiter=",", skip_header=3, skip_footer=1)
 
+                if "Dataframe" not in self.container_measurements:
+                    self.container_measurements["Dataframe"] = {}
+
+                if var_file_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][var_file_short] = df_exmpl
+
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
                 self.container_lists["ISOTOPES"] = df_isotopes
@@ -14801,6 +14808,8 @@ class PySILLS(tk.Frame):
 
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
+                var_file_short = file_parts[-1]
+
                 if self.file_loaded == False:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -14823,6 +14832,9 @@ class PySILLS(tk.Frame):
                         else:
                             df_exmpl = DE(filename_long=file_smpl).get_measurements(
                                 delimiter=",", skip_header=3, skip_footer=1)
+
+                if var_file_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][var_file_short] = df_exmpl
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -25241,6 +25253,8 @@ class PySILLS(tk.Frame):
 
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
+                var_file_short = file_parts[-1]
+
                 if self.file_loaded == False:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -25256,6 +25270,12 @@ class PySILLS(tk.Frame):
                         df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     except:
                         print("File (" + str(file_std) + str(")"), "cannot be read.")
+
+                if "Dataframe" not in self.container_measurements:
+                    self.container_measurements["Dataframe"] = {}
+
+                if var_file_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][var_file_short] = df_exmpl
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -25277,6 +25297,8 @@ class PySILLS(tk.Frame):
 
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
+                var_file_short = file_parts[-1]
+
                 if self.file_loaded == False:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -25292,6 +25314,9 @@ class PySILLS(tk.Frame):
                         df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     except:
                         print("File (" + str(file_smpl) + str(")"), "cannot be read.")
+
+                if var_file_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][var_file_short] = df_exmpl
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -25613,6 +25638,8 @@ class PySILLS(tk.Frame):
 
             for file_std in self.list_std:
                 file_parts = file_std.split("/")
+                var_file_short = file_parts[-1]
+
                 if self.file_loaded == False:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -25625,6 +25652,12 @@ class PySILLS(tk.Frame):
                 else:
                     file_parts = file_std.split("/")
                     df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                if "Dataframe" not in self.container_measurements:
+                    self.container_measurements["Dataframe"] = {}
+
+                if var_file_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][var_file_short] = df_exmpl
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -25646,6 +25679,8 @@ class PySILLS(tk.Frame):
 
             for file_smpl in self.list_smpl:
                 file_parts = file_smpl.split("/")
+                var_file_short = file_parts[-1]
+
                 if self.file_loaded == False:
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
@@ -25658,6 +25693,9 @@ class PySILLS(tk.Frame):
                 else:
                     file_parts = file_smpl.split("/")
                     df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+
+                if var_file_short not in self.container_measurements["Dataframe"]:
+                    self.container_measurements["Dataframe"][var_file_short] = df_exmpl
 
                 self.times = DE().get_times(dataframe=df_exmpl)
                 df_isotopes = DE().get_isotopes(dataframe=df_exmpl)
@@ -37596,7 +37634,7 @@ class PySILLS(tk.Frame):
 
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
-        self.create_progress_bar_window_datareduction()
+        #self.create_progress_bar_window_datareduction()
         self.subwindow_manager = tk.Toplevel(self.parent)
         self.subwindow_manager.title("PySILLS - Project manager")
         self.subwindow_manager.geometry(var_geometry)
@@ -37640,7 +37678,7 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Very Light"]).create_simple_listbox()
             self.container_listbox_files["STD Manager"] = self.lb_std_manager
             self.lb_std_manager.bind(
-                "<Double-1>", lambda event, var_filetype="STD Manager": self.quick_plot_file(var_filetype, event))
+                "<Double-1>", lambda event, var_filetype="STD Manager": self.update_table_manager(var_filetype, event))
         else:
             self.lb_smpl_manager = SE(
                 parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=var_column_start, n_rows=n_rows - 5,
@@ -37648,7 +37686,7 @@ class PySILLS(tk.Frame):
                 bg=self.bg_colors["Very Light"]).create_simple_listbox()
             self.container_listbox_files["SMPL Manager"] = self.lb_smpl_manager
             self.lb_smpl_manager.bind(
-                "<Double-1>", lambda event, var_filetype="SMPL": self.quick_plot_file(var_filetype, event))
+                "<Double-1>", lambda event, var_filetype="SMPL Manager": self.update_table_manager(var_filetype, event))
 
         ## BUTTONS
         var_btn_01 = self.language_dict["Add"][self.var_language]
@@ -37676,6 +37714,10 @@ class PySILLS(tk.Frame):
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_04, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=type: self.rename_file_manager(filetype))
+        btn_01.configure(state="disabled")
+        btn_02.configure(state="disabled")
+        btn_03.configure(state="disabled")
+        btn_04.configure(state="disabled")
 
         ## RADIOBUTTONS
         rb_01a = SE(
@@ -37688,9 +37730,85 @@ class PySILLS(tk.Frame):
             n_columns=8, fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var[type]["Project manager"], value_rb=1, color_bg=self.bg_colors["Light"],
             fg=self.bg_colors["Dark Font"], text="Data manager", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
+        rb_01a.configure(state="disabled")
+        rb_01b.configure(state="disabled")
+
+        ## TABLE
+        self.tv_data = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=3*int_category_n + 1, n_rows=n_rows - 5,
+            n_columns=n_columns - (3*int_category_n + 1) - 1, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_treeview(
+            n_categories=2, text_n=["A", "B"], width_n=["100", "100"], individual=True)
+
+        self.scb_v_manager = ttk.Scrollbar(self.subwindow_manager, orient="vertical")
+        self.scb_h_manager = ttk.Scrollbar(self.subwindow_manager, orient="horizontal")
+        self.tv_data.configure(xscrollcommand=self.scb_h_manager.set, yscrollcommand=self.scb_v_manager.set)
+        self.scb_v_manager.config(command=self.tv_data.yview)
+        self.scb_h_manager.config(command=self.tv_data.xview)
+        self.scb_v_manager.grid(row=var_row_start + 4, column=n_columns - 1, rowspan=n_rows - 5, columnspan=1,
+                                sticky="ns")
+        self.scb_h_manager.grid(row=n_rows - 1, column=3*int_category_n + 1, rowspan=1,
+                                columnspan=n_columns - (3*int_category_n + 1) - 1, sticky="ew")
 
         ## INITIALIZATION
         self.fill_lb_manager(type=type, init=True)
+
+    def update_table_manager(self, var_filetype, event):
+        n_rows = self.window_dimensions["Project manager"][0]
+        n_columns = self.window_dimensions["Project manager"][1]
+        var_row_start = 0
+        var_column_start = 0
+        var_header_n = 15
+        int_category_n = 5
+
+        if var_filetype == "STD Manager":
+            click_id = self.lb_std_manager.curselection()
+            var_filetype = "STD"
+        elif var_filetype == "SMPL Manager":
+            click_id = self.lb_smpl_manager.curselection()
+            var_filetype = "SMPL"
+
+        self.tv_data.grid_remove()
+        self.scb_v_manager.grid_remove()
+        self.scb_h_manager.grid_remove()
+
+        click_id = click_id[0]
+        file_long = self.container_lists[var_filetype]["Long"][click_id]
+        file_short = self.container_lists[var_filetype]["Short"][click_id]
+        file_isotopes = self.container_lists["Measured Isotopes"][file_short]
+        df_data = self.container_measurements["Dataframe"][file_short]
+
+        list_categories = ["Index", "Time"]
+        list_categories.extend(file_isotopes)
+
+        self.tv_data = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 4, column_id=3*int_category_n + 1, n_rows=n_rows - 5,
+            n_columns=n_columns - (3*int_category_n + 1) - 1, fg=self.bg_colors["Dark Font"],
+            bg=self.bg_colors["Very Light"]).create_treeview(
+            n_categories=len(list_categories), text_n=list_categories,
+            width_n=np.full(len(list_categories), 100).tolist(), individual=True)
+
+        self.scb_v_manager = ttk.Scrollbar(self.subwindow_manager, orient="vertical")
+        self.scb_h_manager = ttk.Scrollbar(self.subwindow_manager, orient="horizontal")
+        self.tv_data.configure(xscrollcommand=self.scb_h_manager.set, yscrollcommand=self.scb_v_manager.set)
+        self.scb_v_manager.config(command=self.tv_data.yview)
+        self.scb_h_manager.config(command=self.tv_data.xview)
+        self.scb_v_manager.grid(row=var_row_start + 4, column=n_columns - 1, rowspan=n_rows - 5, columnspan=1,
+                                sticky="ns")
+        self.scb_h_manager.grid(row=n_rows - 1, column=3*int_category_n + 1, rowspan=1,
+                                columnspan=n_columns - (3*int_category_n + 1) - 1, sticky="ew")
+
+        for index in range(len(df_data.index)):
+            entry_data = []
+            entry_data.append(index)
+            data_values = np.array((df_data.iloc[[index]].values)).tolist()[0]
+            for index2, value in enumerate(data_values):
+                if index2 == 0:
+                    entry_data.append(round(value, 4))
+                else:
+                    entry_data.append(round(value, 2))
+            
+            self.tv_data.insert("", tk.END, values=entry_data)
 
     def fill_lb_manager(self, type, init=False):
         if type == "STD":
