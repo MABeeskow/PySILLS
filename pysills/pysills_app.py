@@ -1807,15 +1807,35 @@ class PySILLS(tk.Frame):
         if str_screen_resolution == "1920x1080":
             self.row_height = 24
             self.column_width = 21
-            self.font_settings = {
-                "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
-                "Table": "sans 10"}
+
+            if var_os == "linux":
+                self.font_settings = {
+                    "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 7 bold", "Options": "sans 10",
+                    "Table": "sans 10"}
+            elif var_os == "darwin":
+                self.font_settings = {
+                    "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
+                    "Table": "sans 10"}
+            else:
+                self.font_settings = {
+                    "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
+                    "Table": "sans 10"}
         elif str_screen_resolution == "1280x720":
             self.row_height = 16
             self.column_width = 14
-            self.font_settings = {
-                "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
-                "Table": "sans 8"}
+
+            if var_os == "linux":
+                self.font_settings = {
+                    "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
+                    "Table": "sans 8"}
+            elif var_os == "darwin":
+                self.font_settings = {
+                    "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
+                    "Table": "sans 8"}
+            else:
+                self.font_settings = {
+                    "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
+                    "Table": "sans 8"}
 
         self.window_dimensions = {
             "Main window": [33, 21], "MA main settings": [38, 65], "FI main settings": [40, 67],
