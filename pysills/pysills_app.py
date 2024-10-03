@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.34
-# Date:		02.10.2024
+# Version:	v1.0.35
+# Date:		03.10.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.34"
-        self.val_version = self.str_version_number + " - 02.10.2024"
+        self.str_version_number = "1.0.35"
+        self.val_version = self.str_version_number + " - 03.10.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1821,24 +1821,30 @@ class PySILLS(tk.Frame):
                     "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
                     "Table": "sans 10"}
         elif str_screen_resolution == "1280x720":
-            self.row_height = 16
+            self.row_height = 17
             self.column_width = 14
 
             if var_os == "linux":
                 self.font_settings = {
-                    "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
-                    "Table": "sans 8"}
+                    "Header": "sans 9 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
+                    "Table": "sans 7"}
             elif var_os == "darwin":
                 self.font_settings = {
-                    "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
-                    "Table": "sans 8"}
+                    "Header": "sans 9 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
+                    "Table": "sans 7"}
             else:
                 self.font_settings = {
-                    "Header": "sans 10 bold", "Elements": "sans 8 bold", "Small": "sans 5 bold", "Options": "sans 8",
-                    "Table": "sans 8"}
+                    "Header": "sans 9 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
+                    "Table": "sans 7"}
+
+        str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+        if str_screen_resolution == "1920x1080":
+            var_ncol_ma_settings = 65
+        elif str_screen_resolution == "1280x720":
+            var_ncol_ma_settings = 70
 
         self.window_dimensions = {
-            "Main window": [33, 21], "MA main settings": [38, 65], "FI main settings": [40, 67],
+            "Main window": [33, 21], "MA main settings": [38, var_ncol_ma_settings], "FI main settings": [40, 67],
             "MI main settings": [40, 63], "ICP-MS setup": [8, 17], "Quick plot": [28, 50],
             "Spike elimination threshold": [24, 15], "Check-up oxides": [29, 83], "Check-up IS": [16, 42],
             "General settings": [22, 35], "Check-up SRM": [23, 32], "Check-up intervals": [32, 54],
@@ -11646,8 +11652,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_element = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         var_title = self.language_dict["General Settings"][self.var_language]
 
@@ -11720,63 +11728,63 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_element)
         lbl_02 = SE(
             parent=subwindow_generalsettings, row_id=5, column_id=start_column, n_rows=2, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Standard Reference\n Material (SRM)", relief=tk.FLAT, fontsize="sans 10 bold")
+            text="Standard Reference\n Material (SRM)", relief=tk.FLAT, fontsize=font_element)
         lbl_13 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_13, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_13, relief=tk.FLAT, fontsize=font_element)
         lbl_14 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_14, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_14, relief=tk.FLAT, fontsize=font_element)
         lbl_06 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_04, relief=tk.FLAT, fontsize=font_element)
         lbl_07 = SE(
             parent=subwindow_generalsettings, row_id=5, column_id=11, n_rows=2, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_05, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_05, relief=tk.FLAT, fontsize=font_element)
         lbl_08 = SE(
             parent=subwindow_generalsettings, row_id=9, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize=font_element)
         lbl_09 = SE(
             parent=subwindow_generalsettings, row_id=18, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize=font_element)
         lbl_10 = SE(
             parent=subwindow_generalsettings, row_id=11, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_08, relief=tk.FLAT, fontsize=font_element)
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=0, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_09, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_09, relief=tk.FLAT, fontsize=font_element)
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=13, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_10, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_10, relief=tk.FLAT, fontsize=font_element)
         lbl_11 = SE(
             parent=subwindow_generalsettings, row_id=9, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_11, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_11, relief=tk.FLAT, fontsize=font_element)
         lbl_15 = SE(
             parent=subwindow_generalsettings, row_id=4, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_29, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_29, relief=tk.FLAT, fontsize=font_element)
         lbl_30 = SE(
             parent=subwindow_generalsettings, row_id=11, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_30, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_30, relief=tk.FLAT, fontsize=font_element)
         lbl_31 = SE(
             parent=subwindow_generalsettings, row_id=13, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_31, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_31, relief=tk.FLAT, fontsize=font_element)
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01, lbl_02, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
@@ -11784,39 +11792,39 @@ class PySILLS(tk.Frame):
         lbl_11a = SE(
             parent=subwindow_generalsettings, row_id=10, column_id=11, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_12, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_12, relief=tk.FLAT, fontsize=font_element)
         lbl_01a = SE(
             parent=subwindow_generalsettings, row_id=3, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_15, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_15, relief=tk.FLAT, fontsize=font_element)
         lbl_02a = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_16, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_16, relief=tk.FLAT, fontsize=font_element)
         lbl_06a = SE(
             parent=subwindow_generalsettings, row_id=1, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_17, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
+            text=str_lbl_17, relief=tk.FLAT, fontsize=font_element, anchor=tk.W)
         lbl_07a = SE(
             parent=subwindow_generalsettings, row_id=7, column_id=11, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_18, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_18, relief=tk.FLAT, fontsize=font_element)
         lbl_07b = SE(
             parent=subwindow_generalsettings, row_id=8, column_id=11, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_19, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_19, relief=tk.FLAT, fontsize=font_element)
         lbl_09a = SE(
             parent=subwindow_generalsettings, row_id=19, column_id=start_column, n_rows=1, n_columns=5,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_20, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_20, relief=tk.FLAT, fontsize=font_element)
         lbl_09b = SE(
             parent=subwindow_generalsettings, row_id=20, column_id=start_column, n_rows=1, n_columns=5,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_21, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_21, relief=tk.FLAT, fontsize=font_element)
         lbl_10a = SE(
             parent=subwindow_generalsettings, row_id=12, column_id=start_column, n_rows=1, n_columns=5,
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_22, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_22, relief=tk.FLAT, fontsize=font_element)
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01a, lbl_02a, lbl_06a, lbl_07a, lbl_07b, lbl_09a, lbl_09b, lbl_10a])
@@ -11872,6 +11880,17 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
             var=self.container_var["PySILLS script"], text_default=self.container_var["PySILLS script"].get(),
             command=None)
+
+        entr_11a.configure(font=font_element)
+        entr_01a.configure(font=font_element)
+        entr_07a.configure(font=font_element)
+        entr_07b.configure(font=font_element)
+        entr_07c.configure(font=font_element)
+        entr_07d.configure(font=font_element)
+        entr_10a.configure(font=font_element)
+        entr_30.configure(font=font_element)
+        entr_31.configure(font=font_element)
+        entr_32.configure(font=font_element)
 
         self.gui_elements["general_settings"]["Entry"]["General"].extend(
             [entr_01a, entr_07a, entr_07b, entr_07c, entr_07d, entr_10a])
@@ -11936,6 +11955,12 @@ class PySILLS(tk.Frame):
         opt_language["menu"].entryconfig("Greek", state="disable")
         opt_language["menu"].entryconfig("Russian", state="disable")
 
+        opt_srm.configure(font=font_option)
+        opt_colormaps.configure(font=font_option)
+        opt_filetype.configure(font=font_option)
+        opt_delimiter.configure(font=font_option)
+        opt_language.configure(font=font_option)
+
         opt_colorscheme = SE(
             parent=subwindow_generalsettings, row_id=3, column_id=25, n_rows=1, n_columns=9,
             fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
@@ -11948,6 +11973,9 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Screen resolution"],
             var_default=self.container_var["General Settings"]["Screen resolution"].get(),
             var_list=list_screenresolutions, fg_active=font_color_light, bg_active=accent_color)
+
+        opt_colorscheme.configure(font=font_option)
+        opt_screenresolution.configure(font=font_option)
 
         self.gui_elements["general_settings"]["Option Menu"]["General"].extend(
             [opt_srm, opt_colormaps, opt_filetype, opt_delimiter, opt_language])
@@ -11966,13 +11994,13 @@ class PySILLS(tk.Frame):
             color_bg=background_color_elements, fg=font_color_dark, text="Longerich et al. (1996)",
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
-        rb_06b = SE(
+        rb_06c = SE(
             parent=subwindow_generalsettings, row_id=14, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=1,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_25,
             sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_06b = SE(
+        rb_06d = SE(
             parent=subwindow_generalsettings, row_id=15, column_id=start_column, n_rows=1, n_columns=10,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["General Settings"]["Desired Average"], value_rb=2,
@@ -11996,6 +12024,13 @@ class PySILLS(tk.Frame):
         self.gui_elements["general_settings"]["Radiobutton"]["General"].extend(
             [rb_06a, rb_06b])
 
+        rb_06a.configure(font=font_element)
+        rb_06b.configure(font=font_element)
+        rb_06c.configure(font=font_element)
+        rb_06d.configure(font=font_element)
+        rb_07a.configure(font=font_element)
+        rb_07b.configure(font=font_element)
+
         ## Buttons
         if self.var_os == "darwin":
             font_color_accent = font_color_dark
@@ -12012,6 +12047,9 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_24, bg_active=accent_color, fg_active=font_color_accent,
             command=self.create_starter_file)
+
+        btn_01.configure(font=font_element)
+        btn_13.configure(font=font_element)
 
         self.gui_elements["general_settings"]["Button"]["General"].extend([btn_01])
 
@@ -14989,6 +15027,12 @@ class PySILLS(tk.Frame):
                     self.container_var["Spike Elimination"]["Threshold"][isotope].set(var_threshold.get())
 
         ## Static
+        str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+        if str_screen_resolution == "1920x1080":
+            var_n_last_column = 18
+        elif str_screen_resolution == "1280x720":
+            var_n_last_column = 23
+
         # Build section 'Project Information'
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_project_information(var_geometry_info=var_project_information)
@@ -15017,7 +15061,7 @@ class PySILLS(tk.Frame):
         var_checkup = {"Row start": 26, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
-        var_acquisition_times_check = {"Row start": 17, "Column start": 46, "N rows": 1, "N columns": 18}
+        var_acquisition_times_check = {"Row start": 17, "Column start": 46, "N rows": 1, "N columns": var_n_last_column}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
         # Build section 'Standard Files'
         var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 15, "N columns": 26}
@@ -15027,10 +15071,11 @@ class PySILLS(tk.Frame):
         self.place_sample_files_table(var_geometry_info=var_sample_files)
         # Build section 'Time-Signal Diagram Checker'
         self.define_isotope_colors()
-        var_time_signal_diagram_check = {"Row start": 25, "Column start": 46, "N rows": 1, "N columns": 18}
+        var_time_signal_diagram_check = {"Row start": 25, "Column start": 46, "N rows": 1,
+                                         "N columns": var_n_last_column}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
         # Build section 'Measured Isotopes'
-        var_measured_isotopes = {"Row start": 1, "Column start": 46, "N rows": 15, "N columns": 18}
+        var_measured_isotopes = {"Row start": 1, "Column start": 46, "N rows": 15, "N columns": var_n_last_column}
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
         ## INITIALIZATION
@@ -16384,6 +16429,14 @@ class PySILLS(tk.Frame):
 
         str_lbl_01 = self.language_dict["Measured isotopes"][self.var_language]
 
+        str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+        if str_screen_resolution == "1920x1080":
+            var_width = 30
+            var_height = 25
+        elif str_screen_resolution == "1280x720":
+            var_width = 12 #16
+            var_height = 10 #12
+
         # Labels
         lbl_iso = SE(
             parent=var_parent, row_id=var_row_start - 1, column_id=var_column_start, n_rows=1,
@@ -16394,7 +16447,7 @@ class PySILLS(tk.Frame):
             n_columns=var_header_n, fg=font_color_dark, bg=background_color_light).create_frame()
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
-            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, fg=font_color_dark,
+            master=frm_iso, width=var_width, height=var_height, yscrollcommand=vsb_iso.set, fg=font_color_dark,
             bg=background_color_light)
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
@@ -16566,7 +16619,7 @@ class PySILLS(tk.Frame):
             activebackground=accent_color)
         opt_laser.config(
             bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-            activeforeground=font_color_light, highlightthickness=0)
+            activeforeground=font_color_light, highlightthickness=0, font=font_option)
 
     def place_acquisition_times_check(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Acquisition Times'
@@ -17621,7 +17674,7 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, activebackground=accent_color)
             opt_is_i.config(
                 bg=self.bg_colors["Light"], fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table)
             text_files.window_create("end", window=opt_is_i)
             text_files.insert("end", "\t")
 
@@ -17636,7 +17689,7 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, activebackground=accent_color)
             opt_id_i.config(
                 bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0, font=font_option)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table)
 
             text_files.window_create("end", window=opt_id_i)
             text_files.insert("end", "\t")
