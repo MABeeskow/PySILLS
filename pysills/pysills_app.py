@@ -663,6 +663,9 @@ class PySILLS(tk.Frame):
 
         self.container_checkup = {"STD": [], "SMPL": [], "Counter STD": 0, "Counter SMPL": 0}
 
+        self.initial_spike_elimination_std = False
+        self.initial_spike_elimination_smpl = False
+
         ## ALL
         self.container_intensity = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_intensity_mix = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
@@ -3155,8 +3158,10 @@ class PySILLS(tk.Frame):
 
         if filetype == "STD":
             self.btn_09e2.configure(state="normal")
+            self.initial_spike_elimination_std = True
         else:
             self.btn_09f2.configure(state="normal")
+            self.initial_spike_elimination_smpl = True
 
     def change_carrier_gas(self, var_opt):
         if var_opt == "Helium":
@@ -36526,10 +36531,18 @@ class PySILLS(tk.Frame):
                 command=self.create_spike_elimination_threshold_window)
 
             btn_09e1.configure(font=font_element)
-            self.btn_09e2.configure(font=font_element, state="disabled")
             btn_09f1.configure(font=font_element)
-            self.btn_09f2.configure(font=font_element, state="disabled")
             btn_09d.configure(font=font_element)
+
+            if self.initial_spike_elimination_std == False:
+                self.btn_09e2.configure(font=font_element, state="disabled")
+            else:
+                self.btn_09e2.configure(font=font_element, state="normal")
+
+            if self.initial_spike_elimination_smpl == False:
+                self.btn_09f2.configure(font=font_element, state="disabled")
+            else:
+                self.btn_09f2.configure(font=font_element, state="normal")
 
             # Frames
             if self.container_var["Spike Elimination"]["STD"]["State"]:
@@ -36795,7 +36808,6 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         self.possible_spk_isotopes_updated = None
-
         if len(list_spk_isotopes) > 0:
             self.show_spike_data(mode=mode)
 
