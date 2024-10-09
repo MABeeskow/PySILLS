@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.35
-# Date:		08.10.2024
+# Date:		09.10.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.35"
-        self.val_version = self.str_version_number + " - 08.10.2024"
+        self.val_version = self.str_version_number + " - 09.10.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -3152,6 +3152,11 @@ class PySILLS(tk.Frame):
                             self.frm_spk_smpl.config(background=self.sign_yellow, bd=1)
                         else:
                             self.frm_spk_smpl.config(background=self.sign_green, bd=1)
+
+        if filetype == "STD":
+            self.btn_09e2.configure(state="normal")
+        else:
+            self.btn_09f2.configure(state="normal")
 
     def change_carrier_gas(self, var_opt):
         if var_opt == "Helium":
@@ -36499,7 +36504,7 @@ class PySILLS(tk.Frame):
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda filetype="STD", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
-            btn_09e2 = SE(
+            self.btn_09e2 = SE(
                 parent=var_parent, row_id=start_row + 5, column_id=12, n_rows=1, n_columns=5,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
                 text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
@@ -36509,7 +36514,7 @@ class PySILLS(tk.Frame):
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda filetype="SMPL", algorithm="Grubbs": self.spike_elimination_all(filetype, algorithm))
-            btn_09f2 = SE(
+            self.btn_09f2 = SE(
                 parent=var_parent, row_id=start_row + 6, column_id=12, n_rows=1, n_columns=5,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
                 text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
@@ -36521,9 +36526,9 @@ class PySILLS(tk.Frame):
                 command=self.create_spike_elimination_threshold_window)
 
             btn_09e1.configure(font=font_element)
-            btn_09e2.configure(font=font_element)
+            self.btn_09e2.configure(font=font_element, state="disabled")
             btn_09f1.configure(font=font_element)
-            btn_09f2.configure(font=font_element)
+            self.btn_09f2.configure(font=font_element, state="disabled")
             btn_09d.configure(font=font_element)
 
             # Frames
@@ -36789,6 +36794,8 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, highlightthickness=0)
 
         ## INITIALIZATION
+        self.possible_spk_isotopes_updated = None
+
         if len(list_spk_isotopes) > 0:
             self.show_spike_data(mode=mode)
 
@@ -36813,8 +36820,9 @@ class PySILLS(tk.Frame):
 
         if var_file in self.container_lists["SMPL"]["Short"]:
             str_filetype = "SMPL"
-            for id, dataset in self.container_helper["SMPL"][var_file]["INCL"]["Content"].items():
-                limits_incl[id] = dataset["Indices"]
+            if self.pysills_mode in ["FI", "MI"]:
+                for id, dataset in self.container_helper["SMPL"][var_file]["INCL"]["Content"].items():
+                    limits_incl[id] = dataset["Indices"]
         else:
             str_filetype = "STD"
 
@@ -36959,26 +36967,29 @@ class PySILLS(tk.Frame):
         self.current_nspikes = len(self.list_indices)
         self.lbl_04a2.configure(text=self.current_nspikes)
 
-        value_0 = self.list_indices[0]
-        current_id = self.scl_01.get()
+        if len(self.list_indices) > 0:
+            value_0 = self.list_indices[0]
+            current_id = self.scl_01.get()
 
-        self.current_original_value = round(self.container_spikes[var_file][var_isotope]["Data RAW"][value_0], 2)
-        self.current_suggested_value = round(self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0], 2)
-        val_corrected = self.current_suggested_value
-        val_improved = round(self.container_spikes[var_file][var_isotope]["Data IMPROVED"][value_0], 2)
-        self.container_spike_values[var_file][var_isotope]["Save"][value_0] = val_improved
+            self.current_original_value = round(self.container_spikes[var_file][var_isotope]["Data RAW"][value_0], 2)
+            self.current_suggested_value = round(
+                self.container_spikes[var_file][var_isotope]["Data SMOOTHED"][value_0], 2)
+            val_corrected = self.current_suggested_value
+            val_improved = round(self.container_spikes[var_file][var_isotope]["Data IMPROVED"][value_0], 2)
+            self.container_spike_values[var_file][var_isotope]["Save"][value_0] = val_improved
 
-        if value_0 in self.container_spike_values[var_file][var_isotope]["Save"]:
-            value_current = self.container_spike_values[var_file][var_isotope]["Save"][value_0]
-            self.current_current_value = round(value_current, 2)
-            if value_current == self.current_original_value:
-                self.replace_spike_value(mode="RAW")
-        else:
-            if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
-                self.current_current_value = round(val_corrected, 2)
+            if value_0 in self.container_spike_values[var_file][var_isotope]["Save"]:
+                value_current = self.container_spike_values[var_file][var_isotope]["Save"][value_0]
+                self.current_current_value = round(value_current, 2)
+                if value_current == self.current_original_value:
+                    self.replace_spike_value(mode="RAW")
             else:
-                self.current_current_value = round(self.container_spike_values[var_file][var_isotope]["Current"][
-                    current_id - 1], 2)
+                if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
+                    self.current_current_value = round(val_corrected, 2)
+                else:
+                    self.current_current_value = round(self.container_spike_values[var_file][var_isotope]["Current"][
+                        current_id - 1], 2)
+
         self.lbl_03a.configure(text=self.current_original_value)
         self.lbl_03b.configure(text=self.current_suggested_value)
         self.lbl_03c.configure(text=self.current_current_value)
@@ -36989,6 +37000,9 @@ class PySILLS(tk.Frame):
         self.show_spike_diagram()
 
     def change_spk_isotope(self, var_opt_iso, mode=None, list_isotopes=None):
+        if self.possible_spk_isotopes_updated != None:
+            list_isotopes = self.possible_spk_isotopes_updated
+
         if mode == None:
             var_isotope = var_opt_iso
             self.var_opt_spk_iso.set(var_isotope)
@@ -37098,12 +37112,15 @@ class PySILLS(tk.Frame):
             self.var_opt_spk_file.set(self.current_file_spk)
 
         possible_spk_isotopes = self.check_spikes_isotope()
+        self.possible_spk_isotopes_updated = possible_spk_isotopes
+
         if len(possible_spk_isotopes) > 0:
             self.var_opt_spk_iso.set(possible_spk_isotopes[0])
             self.current_isotope = possible_spk_isotopes[0]
         else:
             self.var_opt_spk_iso.set("No isotope")
             self.current_isotope = "No isotope"
+
         if len(possible_spk_isotopes) > 0:
             self.scl_01.set(1)
 
@@ -37160,9 +37177,19 @@ class PySILLS(tk.Frame):
             pass
 
         var_file = self.current_file_spk
+
+        if var_file in self.container_lists["STD"]["Short"]:
+            var_filetype = "STD"
+        else:
+            var_filetype = "SMPL"
+
         var_isotope = self.current_isotope
         current_id = self.scl_01.get()
-        var_id_real = self.list_indices[current_id - 1]
+
+        if len(self.list_indices) > 1:
+            var_id_real = self.list_indices[current_id - 1]
+        else:
+            var_id_real = self.list_indices[0]
 
         ## Diagram
         self.fig_spikes = Figure(figsize=(10, 5), tight_layout=True, facecolor=background_color_light)
@@ -37203,6 +37230,31 @@ class PySILLS(tk.Frame):
         self.ax_spikes.axvline(
             x=data_x[var_id_real], color=color_position, label=str_lbl_04, linewidth=2,
             linestyle="dotted")
+
+        signal_key = "MAT"
+        var_check_sig = self.container_helper[var_filetype][var_file][signal_key]["Content"]
+
+        if len(var_check_sig) > 0:
+            for var_id, var_content in self.container_helper[var_filetype][var_file][signal_key][
+                "Content"].items():
+                times_sig = var_content["Times"]
+                var_color = self.colors_intervals[signal_key]
+                if times_sig[0] != None and times_sig[1] != None:
+                    box_mat = self.ax_spikes.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                    var_content["Object"] = box_mat
+
+        if self.pysills_mode != "MA":
+            signal_key = "INCL"
+            var_check_sig = self.container_helper[var_filetype][var_file][signal_key]["Content"]
+
+            if len(var_check_sig) > 0:
+                for var_id, var_content in self.container_helper[var_filetype][var_file][signal_key][
+                    "Content"].items():
+                    times_incl = var_content["Times"]
+                    var_color = self.colors_intervals[signal_key]
+                    if times_incl[0] != None and times_incl[1] != None:
+                        box_incl = self.ax_spikes.axvspan(times_incl[0], times_incl[1], alpha=0.35, color=var_color)
+                        var_content["Object"] = box_incl
 
         self.ax_spikes.grid(True)
         self.ax_spikes.set_yscale("log")
