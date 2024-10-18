@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.36
-# Date:		10.10.2024
+# Date:		18.10.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.36"
-        self.val_version = self.str_version_number + " - 10.10.2024"
+        self.val_version = self.str_version_number + " - 18.10.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -680,7 +680,9 @@ class PySILLS(tk.Frame):
         self.container_mixed_concentration = {"SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_mixed_concentration_error = {"SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_concentration_ratio = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
+        self.container_lob = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_lod = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
+        self.container_loq = {"STD": {"RAW": {}, "SMOOTHED": {}}, "SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_mixed_concentration_ratio = {"SMPL": {"RAW": {}, "SMOOTHED": {}}}
         self.container_mixing_ratio = {"SMPL": {"RAW": {}, "SMOOTHED": {}}}
 
@@ -5579,10 +5581,18 @@ class PySILLS(tk.Frame):
         report_concentration_ratio = {}
         report_concentration_ratio["Total STD"] = {}
         report_concentration_ratio["Total SMPL"] = {}
+        # Limit of Blank
+        report_lob = {}
+        report_lob["Total STD"] = {}
+        report_lob["Total SMPL"] = {}
         # Limit of Detection
         report_lod = {}
         report_lod["Total STD"] = {}
         report_lod["Total SMPL"] = {}
+        # Limit of Quantification
+        report_loq = {}
+        report_loq["Total STD"] = {}
+        report_loq["Total SMPL"] = {}
         # Intensity
         report_intensity = {}
         report_intensity["Total STD"] = {}
@@ -5607,64 +5617,74 @@ class PySILLS(tk.Frame):
         report_rsf = {}
         report_rsf["Total STD"] = {}
         report_rsf["Total SMPL"] = {}
-        #
+
         for var_filetype in ["STD", "SMPL"]:
             var_key = "Total " + str(var_filetype)
-            #
+
             report_concentration[var_filetype] = {}
             report_concentration[var_key] = {}
             report_concentration[var_key]["filename"] = "All Files"
-            #
+
             report_concentration_sigma[var_filetype] = {}
             report_concentration_sigma[var_key] = {}
             report_concentration_sigma[var_key]["filename"] = "All Files"
-            #
+
             report_concentration_ratio[var_filetype] = {}
             report_concentration_ratio[var_key] = {}
             report_concentration_ratio[var_key]["filename"] = "All Files"
-            #
+
+            report_lob[var_filetype] = {}
+            report_lob[var_key] = {}
+            report_lob[var_key]["filename"] = "All Files"
+
             report_lod[var_filetype] = {}
             report_lod[var_key] = {}
             report_lod[var_key]["filename"] = "All Files"
-            #
+
+            report_loq[var_filetype] = {}
+            report_loq[var_key] = {}
+            report_loq[var_key]["filename"] = "All Files"
+
             report_intensity[var_filetype] = {}
             report_intensity[var_key] = {}
             report_intensity[var_key]["filename"] = "All Files"
-            #
+
             report_intensity_sigma[var_filetype] = {}
             report_intensity_sigma[var_key] = {}
             report_intensity_sigma[var_key]["filename"] = "All Files"
-            #
+
             report_intensity_ratio[var_filetype] = {}
             report_intensity_ratio[var_key] = {}
             report_intensity_ratio[var_key]["filename"] = "All Files"
-            #
+
             report_analytical_sensitivity[var_filetype] = {}
             report_analytical_sensitivity[var_key] = {}
             report_analytical_sensitivity[var_key]["filename"] = "All Files"
-            #
+
             report_normalized_sensitivity[var_filetype] = {}
             report_normalized_sensitivity[var_key] = {}
             report_normalized_sensitivity[var_key]["filename"] = "All Files"
-            #
+
             report_rsf[var_filetype] = {}
             report_rsf[var_key] = {}
             report_rsf[var_key]["filename"] = "All Files"
-            #
+
             for var_datatype in ["SMOOTHED", "RAW"]:
                 report_concentration[var_filetype][var_datatype] = {}
                 report_concentration_sigma[var_filetype][var_datatype] = {}
                 report_concentration_ratio[var_filetype][var_datatype] = {}
+                report_lob[var_filetype][var_datatype] = {}
                 report_lod[var_filetype][var_datatype] = {}
-                #
+                report_loq[var_filetype][var_datatype] = {}
+
                 report_intensity[var_filetype][var_datatype] = {}
                 report_intensity_sigma[var_filetype][var_datatype] = {}
                 report_intensity_ratio[var_filetype][var_datatype] = {}
-                #
+
                 report_analytical_sensitivity[var_filetype][var_datatype] = {}
                 report_normalized_sensitivity[var_filetype][var_datatype] = {}
                 report_rsf[var_filetype][var_datatype] = {}
-                #
+
                 for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
                     file_long = self.container_lists[var_filetype]["Long"][index]
                     ## Compositional Results
@@ -5674,19 +5694,30 @@ class PySILLS(tk.Frame):
                     report_concentration_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_concentration_ratio[var_filetype][var_datatype][file_short] = {}
                     report_concentration_ratio[var_filetype][var_datatype][file_short]["filename"] = file_short
+                    report_lob[var_filetype][var_datatype][file_short] = {}
+                    report_lob[var_filetype][var_datatype][file_short]["filename"] = file_short
                     report_lod[var_filetype][var_datatype][file_short] = {}
                     report_lod[var_filetype][var_datatype][file_short]["filename"] = file_short
+                    report_loq[var_filetype][var_datatype][file_short] = {}
+                    report_loq[var_filetype][var_datatype][file_short]["filename"] = file_short
                     if var_filetype == "STD":
                         report_concentration[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_concentration_ratio[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        report_lob[var_filetype][var_datatype][file_short]["ID"] = "---"
                         report_lod[var_filetype][var_datatype][file_short]["ID"] = "---"
+                        report_loq[var_filetype][var_datatype][file_short]["ID"] = "---"
                     else:
                         report_concentration[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
                         report_concentration_ratio[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                             var_filetype][file_long]["ID"].get()
+                        report_lob[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
+                            file_long]["ID"].get()
                         report_lod[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
                             file_long]["ID"].get()
+                        report_loq[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
+                            file_long]["ID"].get()
+
                     ## Intensity Results
                     report_intensity[var_filetype][var_datatype][file_short] = {}
                     report_intensity[var_filetype][var_datatype][file_short]["filename"] = file_short
@@ -5720,7 +5751,7 @@ class PySILLS(tk.Frame):
                             "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
                         report_rsf[var_filetype][var_datatype][file_short]["ID"] = self.container_var[var_filetype][
                             file_long]["ID"].get()
-                    #
+
                     for isotope in self.container_lists["ISOTOPES"]:
                         ## Compositional Results
                         # Concentration
@@ -5764,6 +5795,15 @@ class PySILLS(tk.Frame):
                         except:
                             report_concentration_ratio[var_filetype][var_datatype][file_short][isotope] = "---"
 
+                        # Limit of Blank
+                        value_i = self.container_lob[var_filetype][var_datatype][file_short]["MAT"][isotope]
+
+                        if value_i != None:
+                            report_lob[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_concentration)
+                        else:
+                            report_lob[var_filetype][var_datatype][file_short][isotope] = "---"
+
                         # Limit of Detection
                         value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
 
@@ -5771,7 +5811,16 @@ class PySILLS(tk.Frame):
                             report_lod[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_decimals_concentration)
                         else:
-                            report_intensity[var_filetype][var_datatype][file_short][isotope] = "---"
+                            report_lod[var_filetype][var_datatype][file_short][isotope] = "---"
+
+                        # Limit of Quantification
+                        value_i = self.container_loq[var_filetype][var_datatype][file_short]["MAT"][isotope]
+
+                        if value_i != None:
+                            report_loq[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_decimals_concentration)
+                        else:
+                            report_loq[var_filetype][var_datatype][file_short][isotope] = "---"
 
                         ## Intensity Results
                         # Intensity
@@ -5844,7 +5893,7 @@ class PySILLS(tk.Frame):
 
         for isotope in self.container_lists["ISOTOPES"]:
             header.append(isotope)
-        #
+
         var_file_extension_pre = self.container_var["General Settings"]["File type"].get()
         if var_file_extension_pre == "*.csv":
             var_file_extension = ".csv"
@@ -5859,27 +5908,30 @@ class PySILLS(tk.Frame):
 
         if self.rb_report.get() == 0:  # All in one
             self.ma_export_report_0(
-                report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
+                report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
+                report_loq,
                 report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
                 report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header)
         elif self.rb_report.get() == 1:  # STD vs. SMPL
             self.ma_export_report_1(
-                report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
+                report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
+                report_loq,
                 report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
                 report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header)
         elif self.rb_report.get() == 2:  # RAW vs. SMOOTHED
             self.ma_export_report_2(
-                report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
+                report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
+                report_loq,
                 report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
                 report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header)
 
     def ma_export_report_0(
-            self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
-            report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
+            self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
+            report_loq, report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
             report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header):
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename = export_file.name
-        #
+
         with open(filename, "w", newline="") as report_file:
             writer = csv.DictWriter(report_file, fieldnames=header, delimiter=var_delimiter)
             report_file.write("CALCULATION REPORT\n")
@@ -5923,11 +5975,25 @@ class PySILLS(tk.Frame):
                             writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
                         report_file.write("\n")
 
+                        report_file.write("Limit of Blank\n")  # Limit of Blank
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lob[var_filetype][var_datatype][file_short])
+                        report_file.write("\n")
+
                         report_file.write("Limit of Detection\n")  # Limit of Detection
                         report_file.write("(ppm)\n")
                         writer.writeheader()
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod[var_filetype][var_datatype][file_short])
+                        report_file.write("\n")
+
+                        report_file.write("Limit of Quantification\n")  # Limit of Quantification
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_loq[var_filetype][var_datatype][file_short])
                         report_file.write("\n")
 
                     report_file.write("INTENSITY ANALYSIS\n")
@@ -5979,8 +6045,8 @@ class PySILLS(tk.Frame):
                         report_file.write("\n")
 
     def ma_export_report_1(
-            self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
-            report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
+            self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
+            report_loq, report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
             report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header):
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename_base = export_file.name
@@ -6032,11 +6098,25 @@ class PySILLS(tk.Frame):
                             writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
                         report_file_std.write("\n")
 
+                        report_file_std.write("Limit of Blank\n")  # Limit of Blank
+                        report_file_std.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lob[var_filetype][var_datatype][file_short])
+                        report_file_std.write("\n")
+
                         report_file_std.write("Limit of Detection\n")  # Limit of Detection
                         report_file_std.write("(ppm)\n")
                         writer.writeheader()
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod[var_filetype][var_datatype][file_short])
+                        report_file_std.write("\n")
+
+                        report_file_std.write("Limit of Quantification\n")  # Limit of Quantification
+                        report_file_std.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_loq[var_filetype][var_datatype][file_short])
                         report_file_std.write("\n")
 
                     report_file_std.write("INTENSITY ANALYSIS\n")
@@ -6130,11 +6210,25 @@ class PySILLS(tk.Frame):
                             writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
                         report_file_smpl.write("\n")
 
+                        report_file_smpl.write("Limit of Blank\n")  # Limit of Blank
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lob[var_filetype][var_datatype][file_short])
+                        report_file_smpl.write("\n")
+
                         report_file_smpl.write("Limit of Detection\n")  # Limit of Detection
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod[var_filetype][var_datatype][file_short])
+                        report_file_smpl.write("\n")
+
+                        report_file_smpl.write("Limit of Quantification\n")  # Limit of Quantification
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_loq[var_filetype][var_datatype][file_short])
                         report_file_smpl.write("\n")
 
                     report_file_smpl.write("INTENSITY ANALYSIS\n")
@@ -6198,8 +6292,8 @@ class PySILLS(tk.Frame):
             print("The file does not exist!")
 
     def ma_export_report_2(
-            self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lod,
-            report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
+            self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
+            report_loq, report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
             report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header):
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename_base = export_file.name
@@ -6251,11 +6345,25 @@ class PySILLS(tk.Frame):
                             writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
                         report_file_raw.write("\n")
 
+                        report_file_raw.write("Limit of Blank\n")  # Limit of Blank
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lob[var_filetype][var_datatype][file_short])
+                        report_file_raw.write("\n")
+
                         report_file_raw.write("Limit of Detection\n")  # Limit of Detection
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod[var_filetype][var_datatype][file_short])
+                        report_file_raw.write("\n")
+
+                        report_file_raw.write("Limit of Quantification\n")  # Limit of Quantification
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_loq[var_filetype][var_datatype][file_short])
                         report_file_raw.write("\n")
 
                     report_file_raw.write("INTENSITY ANALYSIS\n")
@@ -6342,11 +6450,25 @@ class PySILLS(tk.Frame):
                             writer.writerow(report_concentration_ratio[var_filetype][var_datatype][file_short])
                         report_file_smoothed.write("\n")
 
+                        report_file_smoothed.write("Limit of Blank\n")  # Limit of Blank
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_lob[var_filetype][var_datatype][file_short])
+                        report_file_smoothed.write("\n")
+
                         report_file_smoothed.write("Limit of Detection\n")  # Limit of Detection
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
                         for file_short in self.container_lists[var_filetype]["Short"]:
                             writer.writerow(report_lod[var_filetype][var_datatype][file_short])
+                        report_file_smoothed.write("\n")
+
+                        report_file_smoothed.write("Limit of Quantification\n")  # Limit of Quantification
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+                        for file_short in self.container_lists[var_filetype]["Short"]:
+                            writer.writerow(report_loq[var_filetype][var_datatype][file_short])
                         report_file_smoothed.write("\n")
 
                     report_file_smoothed.write("INTENSITY ANALYSIS\n")
@@ -6418,6 +6540,13 @@ class PySILLS(tk.Frame):
         report_concentration_mix_1_sigma = {}
         report_concentration_mix["Total STD"] = {}
         report_concentration_mix["Total SMPL"] = {}
+        # Limit of Blank
+        report_lob_incl = {}
+        report_lob_incl["Total STD"] = {}
+        report_lob_incl["Total SMPL"] = {}
+        report_lob_mat = {}
+        report_lob_mat["Total STD"] = {}
+        report_lob_mat["Total SMPL"] = {}
         # Limit of Detection
         report_lod_incl = {}
         report_lod_incl["Total STD"] = {}
@@ -6425,6 +6554,13 @@ class PySILLS(tk.Frame):
         report_lod_mat = {}
         report_lod_mat["Total STD"] = {}
         report_lod_mat["Total SMPL"] = {}
+        # Limit of Quantification
+        report_loq_incl = {}
+        report_loq_incl["Total STD"] = {}
+        report_loq_incl["Total SMPL"] = {}
+        report_loq_mat = {}
+        report_loq_mat["Total STD"] = {}
+        report_loq_mat["Total SMPL"] = {}
         # Mixing ratio
         report_mixingratio_a = {}
         report_mixingratio_a["Total STD"] = {}
@@ -6482,6 +6618,14 @@ class PySILLS(tk.Frame):
             report_concentration_mix_1_sigma[var_key] = {}
             report_concentration_mix[var_key]["filename"] = "All Files"
 
+            report_lob_incl[var_filetype] = {}
+            report_lob_incl[var_key] = {}
+            report_lob_incl[var_key]["filename"] = "All Files"
+
+            report_lob_mat[var_filetype] = {}
+            report_lob_mat[var_key] = {}
+            report_lob_mat[var_key]["filename"] = "All Files"
+
             report_lod_incl[var_filetype] = {}
             report_lod_incl[var_key] = {}
             report_lod_incl[var_key]["filename"] = "All Files"
@@ -6489,6 +6633,14 @@ class PySILLS(tk.Frame):
             report_lod_mat[var_filetype] = {}
             report_lod_mat[var_key] = {}
             report_lod_mat[var_key]["filename"] = "All Files"
+
+            report_loq_incl[var_filetype] = {}
+            report_loq_incl[var_key] = {}
+            report_loq_incl[var_key]["filename"] = "All Files"
+
+            report_loq_mat[var_filetype] = {}
+            report_loq_mat[var_key] = {}
+            report_loq_mat[var_key]["filename"] = "All Files"
 
             report_mixingratio_a[var_filetype] = {}
             report_mixingratio_a[var_key] = {}
@@ -6533,8 +6685,12 @@ class PySILLS(tk.Frame):
                 report_concentration_mat_1_sigma[var_filetype][var_datatype] = {}
                 report_concentration_mix[var_filetype][var_datatype] = {}
                 report_concentration_mix_1_sigma[var_filetype][var_datatype] = {}
+                report_lob_incl[var_filetype][var_datatype] = {}
+                report_lob_mat[var_filetype][var_datatype] = {}
                 report_lod_incl[var_filetype][var_datatype] = {}
                 report_lod_mat[var_filetype][var_datatype] = {}
+                report_loq_incl[var_filetype][var_datatype] = {}
+                report_loq_mat[var_filetype][var_datatype] = {}
                 report_mixingratio_a[var_filetype][var_datatype] = {}
                 report_mixingratio_x[var_filetype][var_datatype] = {}
 
@@ -6564,10 +6720,18 @@ class PySILLS(tk.Frame):
                         report_concentration_mix[var_filetype][var_datatype][file_short]["filename"] = file_short
                         report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short] = {}
                         report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_lob_incl[var_filetype][var_datatype][file_short] = {}
+                        report_lob_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_lob_mat[var_filetype][var_datatype][file_short] = {}
+                        report_lob_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
                         report_lod_incl[var_filetype][var_datatype][file_short] = {}
                         report_lod_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
                         report_lod_mat[var_filetype][var_datatype][file_short] = {}
                         report_lod_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_loq_incl[var_filetype][var_datatype][file_short] = {}
+                        report_loq_incl[var_filetype][var_datatype][file_short]["filename"] = file_short
+                        report_loq_mat[var_filetype][var_datatype][file_short] = {}
+                        report_loq_mat[var_filetype][var_datatype][file_short]["filename"] = file_short
                         report_mixingratio_a[var_filetype][var_datatype][file_short] = {}
                         report_mixingratio_a[var_filetype][var_datatype][file_short]["filename"] = file_short
                         report_mixingratio_x[var_filetype][var_datatype][file_short] = {}
@@ -6580,8 +6744,12 @@ class PySILLS(tk.Frame):
                             report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
                             report_concentration_mix[var_filetype][var_datatype][file_short]["ID"] = "---"
                             report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_lob_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_lob_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
                             report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
                             report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_loq_incl[var_filetype][var_datatype][file_short]["ID"] = "---"
+                            report_loq_mat[var_filetype][var_datatype][file_short]["ID"] = "---"
                             report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = "---"
                             report_mixingratio_x[var_filetype][var_datatype][file_short]["ID"] = "---"
                         else:
@@ -6597,9 +6765,17 @@ class PySILLS(tk.Frame):
                                 var_filetype][file_long]["ID"].get()
                             report_concentration_mix_1_sigma[var_filetype][var_datatype][file_short][
                                 "ID"] = self.container_var[var_filetype][file_long]["ID"].get()
+                            report_lob_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_lob_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
                             report_lod_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                                 var_filetype][file_long]["ID"].get()
                             report_lod_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_loq_incl[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
+                                var_filetype][file_long]["ID"].get()
+                            report_loq_mat[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                                 var_filetype][file_long]["ID"].get()
                             report_mixingratio_a[var_filetype][var_datatype][file_short]["ID"] = self.container_var[
                                 var_filetype][file_long]["ID"].get()
@@ -6715,6 +6891,16 @@ class PySILLS(tk.Frame):
                             report_concentration_mix[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
 
+                            # Limit of Blank (Inclusion)
+                            if var_filetype == "SMPL":
+                                value_i = self.container_lob[var_filetype][var_datatype][file_short]["INCL"][isotope]
+                            else:
+                                value_i = 0.0
+
+                            n_digits = 5
+                            report_lob_incl[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
                             # Limit of Detection (Inclusion)
                             if var_filetype == "SMPL":
                                 value_i = self.container_lod[var_filetype][var_datatype][file_short]["INCL"][isotope]
@@ -6725,10 +6911,32 @@ class PySILLS(tk.Frame):
                             report_lod_incl[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
 
+                            # Limit of Quantification (Inclusion)
+                            if var_filetype == "SMPL":
+                                value_i = self.container_loq[var_filetype][var_datatype][file_short]["INCL"][isotope]
+                            else:
+                                value_i = 0.0
+
+                            n_digits = 5
+                            report_loq_incl[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Limit of Blank (Matrix)
+                            value_i = self.container_lob[var_filetype][var_datatype][file_short]["MAT"][isotope]
+                            n_digits = 5
+                            report_lob_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
                             # Limit of Detection (Matrix)
                             value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
                             report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                value_i, n_digits)
+
+                            # Limit of Quantification (Matrix)
+                            value_i = self.container_loq[var_filetype][var_datatype][file_short]["MAT"][isotope]
+                            n_digits = 5
+                            report_loq_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
 
                             # Mixing Ratio (Factor a)
@@ -6841,30 +7049,34 @@ class PySILLS(tk.Frame):
             self.fi_export_report_0(
                 report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
                 report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
-                report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
-                report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
-                report_rsf, var_file_extension, var_delimiter, header)
+                report_mixingratio_x, report_lob_incl, report_lob_mat, report_lod_incl, report_lod_mat, report_loq_incl,
+                report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
+                report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
+                var_delimiter, header)
         elif self.rb_report.get() == 1:  # STD vs. SMPL
             self.fi_export_report_1(
                 report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
                 report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
-                report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
-                report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
-                report_rsf, var_file_extension, var_delimiter, header)
+                report_mixingratio_x, report_lob_incl, report_lob_mat, report_lod_incl, report_lod_mat, report_loq_incl,
+                report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
+                report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
+                var_delimiter, header)
         elif self.rb_report.get() == 2:  # RAW vs. SMOOTHED
             self.fi_export_report_2(
                 report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
                 report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
-                report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
-                report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
-                report_rsf, var_file_extension, var_delimiter, header)
+                report_mixingratio_x, report_lob_incl, report_lob_mat, report_lod_incl, report_lod_mat, report_loq_incl,
+                report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
+                report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
+                var_delimiter, header)
 
     def fi_export_report_0(
             self, report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
             report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
-            report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
-            report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
-            report_rsf, var_file_extension, var_delimiter, header):
+            report_mixingratio_x, report_lob_incl, report_lob_mat, report_lod_incl, report_lod_mat, report_loq_incl,
+            report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
+            report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
+            var_delimiter, header):
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename = export_file.name
 
@@ -6915,6 +7127,17 @@ class PySILLS(tk.Frame):
 
                         report_file.write("\n")
 
+                        report_file.write("Limit of Blank (Inclusion)\n")  # Limit of Blank (Inclusion)
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lob_incl[var_filetype][var_datatype][file_short])
+
+                        report_file.write("\n")
+
                         report_file.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
                         report_file.write("(ppm)\n")
                         writer.writeheader()
@@ -6923,6 +7146,17 @@ class PySILLS(tk.Frame):
                             file_long = self.container_lists[var_filetype]["Long"][index]
                             if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                                 writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file.write("\n")
+
+                        report_file.write("Limit of Quantification (Inclusion)\n")  # Limit of Quantification (Inclusion)
+                        report_file.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_loq_incl[var_filetype][var_datatype][file_short])
 
                         report_file.write("\n")
 
@@ -6950,6 +7184,17 @@ class PySILLS(tk.Frame):
 
                     report_file.write("\n")
 
+                    report_file.write("Limit of Blank (Matrix)\n")  # Limit of Blank (Matrix)
+                    report_file.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lob_mat[var_filetype][var_datatype][file_short])
+
+                    report_file.write("\n")
+
                     report_file.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file.write("(ppm)\n")
                     writer.writeheader()
@@ -6958,6 +7203,17 @@ class PySILLS(tk.Frame):
                         file_long = self.container_lists[var_filetype]["Long"][index]
                         if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                             writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file.write("\n")
+
+                    report_file.write("Limit of Quantification (Matrix)\n")  # Limit of Quantification (Matrix)
+                    report_file.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_loq_mat[var_filetype][var_datatype][file_short])
 
                     report_file.write("\n")
 
@@ -7080,9 +7336,10 @@ class PySILLS(tk.Frame):
     def fi_export_report_1(
             self, report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
             report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
-            report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
-            report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
-            report_rsf, var_file_extension, var_delimiter, header):
+            report_mixingratio_x, report_lob_incl, report_lob_mat, report_lod_incl, report_lod_mat, report_loq_incl,
+            report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
+            report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
+            var_delimiter, header):
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename_base = export_file.name
         filename_base_parts = filename_base.split(".")
@@ -7119,6 +7376,17 @@ class PySILLS(tk.Frame):
 
                     report_file_std.write("\n")
 
+                    report_file_std.write("Limit of Blank (Matrix)\n")  # Limit of Blank (Matrix)
+                    report_file_std.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lob_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
                     report_file_std.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_std.write("(ppm)\n")
                     writer.writeheader()
@@ -7127,6 +7395,17 @@ class PySILLS(tk.Frame):
                         file_long = self.container_lists[var_filetype]["Long"][index]
                         if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                             writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_std.write("\n")
+
+                    report_file_std.write("Limit of Quantification (Matrix)\n")  # Limit of Quantification (Matrix)
+                    report_file_std.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_loq_mat[var_filetype][var_datatype][file_short])
 
                     report_file_std.write("\n")
 
@@ -7232,6 +7511,17 @@ class PySILLS(tk.Frame):
 
                         report_file_smpl.write("\n")
 
+                        report_file_smpl.write("Limit of Blank (Inclusion)\n")  # Limit of Blank (Inclusion)
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lob_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
                         report_file_smpl.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
                         report_file_smpl.write("(ppm)\n")
                         writer.writeheader()
@@ -7240,6 +7530,17 @@ class PySILLS(tk.Frame):
                             file_long = self.container_lists[var_filetype]["Long"][index]
                             if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                                 writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smpl.write("\n")
+
+                        report_file_smpl.write("Limit of Quantification (Inclusion)\n")  # Limit of Quantification (Inclusion)
+                        report_file_smpl.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_loq_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smpl.write("\n")
 
@@ -7265,6 +7566,17 @@ class PySILLS(tk.Frame):
 
                     report_file_smpl.write("\n")
 
+                    report_file_smpl.write("Limit of Blank (Matrix)\n")  # Limit of Blank (Matrix)
+                    report_file_smpl.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lob_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
                     report_file_smpl.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_smpl.write("(ppm)\n")
                     writer.writeheader()
@@ -7273,6 +7585,17 @@ class PySILLS(tk.Frame):
                         file_long = self.container_lists[var_filetype]["Long"][index]
                         if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                             writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smpl.write("\n")
+
+                    report_file_smpl.write("Limit of Quantification (Matrix)\n")  # Limit of Quantification (Matrix)
+                    report_file_smpl.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_loq_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smpl.write("\n")
 
@@ -7400,9 +7723,10 @@ class PySILLS(tk.Frame):
     def fi_export_report_2(
             self, report_concentration_incl, report_concentration_incl_1_sigma, report_concentration_mat,
             report_concentration_mat_1_sigma, report_concentration_mix, report_mixingratio_a,
-            report_mixingratio_x, report_lod_incl, report_lod_mat, report_intensity_incl, report_intensity_mat,
-            report_intensity_bg, report_intensity_mix, report_analytical_sensitivity, report_normalized_sensitivity,
-            report_rsf, var_file_extension, var_delimiter, header):
+            report_mixingratio_x, report_lob_incl, report_lob_mat, report_lod_incl, report_lod_mat, report_loq_incl,
+            report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
+            report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
+            var_delimiter, header):
         export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
         filename_base = export_file.name
         filename_base_parts = filename_base.split(".")
@@ -7454,6 +7778,17 @@ class PySILLS(tk.Frame):
 
                         report_file_raw.write("\n")
 
+                        report_file_raw.write("Limit of Blank (Inclusion)\n")  # Limit of Blank (Inclusion)
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lob_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
                         report_file_raw.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
                         report_file_raw.write("(ppm)\n")
                         writer.writeheader()
@@ -7462,6 +7797,17 @@ class PySILLS(tk.Frame):
                             file_long = self.container_lists[var_filetype]["Long"][index]
                             if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                                 writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_raw.write("\n")
+
+                        report_file_raw.write("Limit of Quantification (Inclusion)\n")  # Limit of Quantification (Inclusion)
+                        report_file_raw.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_loq_incl[var_filetype][var_datatype][file_short])
 
                         report_file_raw.write("\n")
 
@@ -7488,6 +7834,17 @@ class PySILLS(tk.Frame):
 
                         report_file_raw.write("\n")
 
+                    report_file_raw.write("Limit of Blank (Matrix)\n")  # Limit of Blank (Matrix)
+                    report_file_raw.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lob_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
                     report_file_raw.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_raw.write("(ppm)\n")
                     writer.writeheader()
@@ -7496,6 +7853,17 @@ class PySILLS(tk.Frame):
                         file_long = self.container_lists[var_filetype]["Long"][index]
                         if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                             writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_raw.write("\n")
+
+                    report_file_raw.write("Limit of Quantification (Matrix)\n")  # Limit of Quantification (Matrix)
+                    report_file_raw.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_loq_mat[var_filetype][var_datatype][file_short])
 
                     report_file_raw.write("\n")
 
@@ -7659,6 +8027,17 @@ class PySILLS(tk.Frame):
 
                         report_file_smoothed.write("\n")
 
+                        report_file_smoothed.write("Limit of Blank (Inclusion)\n")  # Limit of Blank (Inclusion)
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_lob_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
                         report_file_smoothed.write("Limit of Detection (Inclusion)\n")  # Limit of Detection (Inclusion)
                         report_file_smoothed.write("(ppm)\n")
                         writer.writeheader()
@@ -7667,6 +8046,17 @@ class PySILLS(tk.Frame):
                             file_long = self.container_lists[var_filetype]["Long"][index]
                             if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                                 writer.writerow(report_lod_incl[var_filetype][var_datatype][file_short])
+
+                        report_file_smoothed.write("\n")
+
+                        report_file_smoothed.write("Limit of Quantification (Inclusion)\n")  # Limit of Quantification (Inclusion)
+                        report_file_smoothed.write("(ppm)\n")
+                        writer.writeheader()
+
+                        for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                            file_long = self.container_lists[var_filetype]["Long"][index]
+                            if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                                writer.writerow(report_loq_incl[var_filetype][var_datatype][file_short])
 
                         report_file_smoothed.write("\n")
 
@@ -7693,6 +8083,17 @@ class PySILLS(tk.Frame):
 
                         report_file_smoothed.write("\n")
 
+                    report_file_smoothed.write("Limit of Blank (Matrix)\n")  # Limit of Blank (Matrix)
+                    report_file_smoothed.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_lob_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
                     report_file_smoothed.write("Limit of Detection (Matrix)\n")  # Limit of Detection (Matrix)
                     report_file_smoothed.write("(ppm)\n")
                     writer.writeheader()
@@ -7701,6 +8102,17 @@ class PySILLS(tk.Frame):
                         file_long = self.container_lists[var_filetype]["Long"][index]
                         if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
                             writer.writerow(report_lod_mat[var_filetype][var_datatype][file_short])
+
+                    report_file_smoothed.write("\n")
+
+                    report_file_smoothed.write("Limit of Quantification (Matrix)\n")  # Limit of Quantification (Matrix)
+                    report_file_smoothed.write("(ppm)\n")
+                    writer.writeheader()
+
+                    for index, file_short in enumerate(self.container_lists[var_filetype]["Short"]):
+                        file_long = self.container_lists[var_filetype]["Long"][index]
+                        if self.container_var[var_filetype][file_long]["Checkbox"].get() == 1:
+                            writer.writerow(report_loq_mat[var_filetype][var_datatype][file_short])
 
                     report_file_smoothed.write("\n")
 
@@ -20372,7 +20784,9 @@ class PySILLS(tk.Frame):
                 entries_concentration_i = ["Concentration"]
                 entries_concentration_sigma_i = ["Concentration 1 SIGMA SMPL"]
                 entries_concentration_ratio_i = ["Concentration Ratio"]
+                entries_lob_i = ["Limit of Blank"]
                 entries_lod_i = ["Limit of Detection"]
+                entries_loq_i = ["Limit of Quantification"]
                 entries_empty = [""]
 
                 for isotope in list_considered_isotopes:
@@ -20403,17 +20817,19 @@ class PySILLS(tk.Frame):
                     concentration_i = self.container_concentration[var_type][str_keyword][var_file_short]["MAT"][isotope]
                     concentration_sigma_i = self.container_concentration[var_type][str_keyword][var_file_short][
                         "1 SIGMA MAT"][isotope]
+                    lob_i = self.container_lob[var_type][str_keyword][var_file_short]["MAT"][isotope]
                     lod_i = self.container_lod[var_type][str_keyword][var_file_short]["MAT"][isotope]
+                    loq_i = self.container_loq[var_type][str_keyword][var_file_short]["MAT"][isotope]
 
                     if var_type == "SMPL":
-                        intensity_ratio_i = self.container_intensity_ratio[var_type][str_keyword][var_file_short]["MAT"][
-                            isotope]
-                        rsf_i = self.container_rsf[var_type][str_keyword][var_file_short]["MAT"][isotope]
-                        concentration_ratio_i = self.container_concentration_ratio[var_type][str_keyword][var_file_short][
+                        intensity_ratio_i = self.container_intensity_ratio[var_type][str_keyword][var_file_short][
                             "MAT"][isotope]
+                        rsf_i = self.container_rsf[var_type][str_keyword][var_file_short]["MAT"][isotope]
+                        concentration_ratio_i = self.container_concentration_ratio[var_type][str_keyword][
+                            var_file_short]["MAT"][isotope]
                     else:
-                        intensity_ratio_i = self.container_intensity_ratio[var_type][str_keyword][var_file_short]["MAT"][
-                            isotope]
+                        intensity_ratio_i = self.container_intensity_ratio[var_type][str_keyword][var_file_short][
+                            "MAT"][isotope]
 
                     if var_srm_file == None or var_srm_file == var_srm_i:
                         entries_intensity_bg_i.append(f"{intensity_bg_i:.{4}f}")
@@ -20422,13 +20838,17 @@ class PySILLS(tk.Frame):
                         entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
                         entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{4}f}")
                         entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
+
                         if var_type == "SMPL":
                             entries_concentration_i.append(f"{concentration_i:.{4}f}")
                             entries_concentration_sigma_i.append(f"{concentration_sigma_i:.{4}f}")
                         else:
                             entries_concentration_i.append(f"{concentration_i:.{1}f}")
                             entries_concentration_sigma_i.append(f"{concentration_sigma_i:.{1}f}")
+
+                        entries_lob_i.append(f"{lob_i:.{4}f}")
                         entries_lod_i.append(f"{lod_i:.{4}f}")
+                        entries_loq_i.append(f"{loq_i:.{4}f}")
                     else:
                         entries_intensity_bg_i.append("---")
                         entries_intensity_mat_i.append("---")
@@ -20437,7 +20857,9 @@ class PySILLS(tk.Frame):
                         entries_normalized_sensitivity_i.append("---")
                         entries_concentration_i.append("---")
                         entries_concentration_sigma_i.append("---")
+                        entries_lob_i.append("---")
                         entries_lod_i.append("---")
+                        entries_loq_i.append("---")
 
                     if var_type == "SMPL":
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
@@ -20461,7 +20883,9 @@ class PySILLS(tk.Frame):
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
 
+                self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
 
     def ma_show_all_lines(self, var_type, var_file_short, key="ALL"):
         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -23790,7 +24214,16 @@ class PySILLS(tk.Frame):
                                                    var_n_mat*var_tau_i)*(var_concentration_i/var_intensity_i)
                         else:
                             var_result_i = 0.0
-                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                        a = 3.29/3.3
+                        b = 1/3.29
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*b*var_result_i
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*b*var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -23800,7 +24233,16 @@ class PySILLS(tk.Frame):
 
                         var_result_i = (3*var_sigma_bg_i*var_concentration_i)/(var_intensity_i)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
-                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                        a = 3/3.3
+                        b = 1/3.0
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*b*var_result_i
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*b*var_result_i
 
             elif var_filetype == "SMPL":
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -23850,7 +24292,16 @@ class PySILLS(tk.Frame):
                                                        var_concentration_is/var_intensity_is)
                         else:
                             var_result_i = 0.0
-                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                        a = 3.29/3.3
+                        b = 1/3.29
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*b*var_result_i
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*b*var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -23863,7 +24314,16 @@ class PySILLS(tk.Frame):
 
                         var_result_i = (3*var_sigma_bg_i*var_concentration_is)/(var_sensitivity_i*var_intensity_is)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
-                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                        a = 3/3.3
+                        b = 1/3.0
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*b*var_result_i
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*b*var_result_i
         else:
             for var_filetype in ["STD", "SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -23962,7 +24422,17 @@ class PySILLS(tk.Frame):
                                                    var_n_mat*var_tau_i)*(var_concentration_i/var_intensity_i)
                         else:
                             var_result_i = 0.0
-                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                        a = 3.29/3.3
+                        b = 1/3.29
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*b*var_result_i
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*b*var_result_i
+                        #self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -23972,7 +24442,17 @@ class PySILLS(tk.Frame):
 
                         var_result_i = (3*var_sigma_bg_i*var_concentration_i)/(var_intensity_i)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
-                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
+
+                        a = 3.0/3.3
+                        b = 1/3.0
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*b*var_result_i
+                        self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*b*var_result_i
+                        #self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][isotope] = var_result_i
 
             elif var_filetype == "SMPL":
                 file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -24040,8 +24520,17 @@ class PySILLS(tk.Frame):
                         else:
                             var_result_i = np.nan
 
+                        a = 3.29/3.3
+                        b = 1/3.29
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 1.65*a*b*var_result_i
                         self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 10*a*b*var_result_i
+                        # self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
+                        #     isotope] = var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -24054,8 +24543,18 @@ class PySILLS(tk.Frame):
 
                         var_result_i = (3*var_sigma_bg_i*var_concentration_is)/(var_sensitivity_i*var_intensity_is)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
+
+                        a = 3.0/3.3
+                        b = 1/3.0
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 1.65*a*b*var_result_i
                         self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 10*a*b*var_result_i
+                        # self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
+                        #     isotope] = var_result_i
         else:
             for var_filetype in ["STD", "SMPL"]:
                 if self.pysills_mode == "MA":
@@ -24364,7 +24863,7 @@ class PySILLS(tk.Frame):
         if len(list_categories) > 1:
             self.tv_results_files = SE(
                 parent=self.subwindow_ma_datareduction_files, row_id=0, column_id=11, n_rows=24, n_columns=51,
-                fg=font_color_dark, bg=background_color_light).create_treeview(
+                fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
 
@@ -24873,11 +25372,12 @@ class PySILLS(tk.Frame):
                 pass
             elif var_opt == "Limit of Detection":
                 for isotope in file_isotopes:
-                    value_i = self.container_lod[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
-                    entries_i = [isotope, round(value_i, 4)]
-                    self.tv_results_detailed.insert("", tk.END, values=entries_i)
-                    if isotope not in helper_values:
-                        helper_values[isotope] = value_i
+                    if str_focus in self.container_lod[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_lod[str_filetype][str_datatype][str_filename_short][str_focus][isotope]
+                        entries_i = [isotope, round(value_i, 4)]
+                        self.tv_results_detailed.insert("", tk.END, values=entries_i)
+                        if isotope not in helper_values:
+                            helper_values[isotope] = value_i
             elif var_opt == "\u03C3 Concentration":
                 pass
 
@@ -28150,8 +28650,16 @@ class PySILLS(tk.Frame):
                         else:
                             var_result_i = 0.0
 
+                        a = 3.29/3.3
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*var_result_i
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
+                            isotope] = 3.3*a*var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*var_result_i
+                        # self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                        #     isotope] = var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -28161,8 +28669,17 @@ class PySILLS(tk.Frame):
 
                         var_result_i = (3*var_sigma_bg_i*var_concentration_i)/(var_intensity_i)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
+
+                        a = 3.0/3.3
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 1.65*a*var_result_i
                         self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
-                            isotope] = var_result_i
+                            isotope] = 3.3*a*var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short]["MAT"][
+                            isotope] = 10*a*var_result_i
+                        # self.container_lod[var_filetype][var_datatype][var_file_short]["MAT"][
+                        #     isotope] = var_result_i
 
             elif var_filetype == "SMPL":
                 for isotope in file_isotopes:
@@ -28205,9 +28722,17 @@ class PySILLS(tk.Frame):
                                                        var_concentration_is/var_intensity_is)
                         else:
                             var_result_i = 0.0
+
+                        a = 3.29/3.3
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 1.65*a*var_result_i
                         self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
-                            isotope] = var_result_i
-                        #
+                            isotope] = 3.3*a*var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 10*a*var_result_i
+                        # self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
+                        #     isotope] = var_result_i
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
                             var_sigma_bg_i = np.mean(helper_sigma_i)
@@ -28221,9 +28746,17 @@ class PySILLS(tk.Frame):
                                     var_sensitivity_i*var_intensity_is)*(1/var_n_bg + 1/var_n_mat)**(0.5)
                         else:
                             var_result_i = 0.0
+
+                        a = 3.29/3.3
+
+                        self.container_lob[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 1.65*a*var_result_i
                         self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
-                            isotope] = var_result_i
-            #
+                            isotope] = 3.3*a*var_result_i
+                        self.container_loq[var_filetype][var_datatype][var_file_short][var_focus][
+                            isotope] = 10*a*var_result_i
+                        # self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
+                        #     isotope] = var_result_i
         else:
             for var_filetype in ["STD", "SMPL"]:
                 if var_filetype == "STD":
@@ -30291,7 +30824,7 @@ class PySILLS(tk.Frame):
 
         self.tv_results_files = SE(
             parent=self.subwindow_fi_datareduction_files, row_id=0, column_id=11, n_rows=28, n_columns=51,
-            fg=font_color_dark, bg=background_color_light).create_treeview(
+            fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
             n_categories=len(list_categories), text_n=list_categories,
             width_n=list_width, individual=True)
 
@@ -32635,9 +33168,6 @@ class PySILLS(tk.Frame):
                 self.fi_get_concentration_ratio(
                     var_filetype=var_type, var_datatype=str_keyword, var_file_short=var_file_short, var_file_long=var_file,
                     var_focus="MAT")
-                # self.fi_get_lod(
-                #     var_filetype=var_type, var_datatype=str_keyword, var_file_short=var_file_short, var_file_long=var_file,
-                #     var_focus="MAT")
                 self.get_lod(
                     var_filetype=var_type, var_datatype=str_keyword, var_file_short=var_file_short,
                     var_file_long=var_file, var_focus="MAT")
@@ -32656,9 +33186,6 @@ class PySILLS(tk.Frame):
                     self.get_lod(
                         var_filetype=var_type, var_datatype=str_keyword, var_file_short=var_file_short,
                         var_file_long=var_file, var_focus="INCL")
-                    # self.fi_get_lod(
-                    #     var_filetype=var_type, var_datatype=str_keyword, var_file_short=var_file_short,
-                    #     var_file_long=var_file, var_focus="INCL")
                     self.fi_get_mixed_concentration_ratio(
                         var_datatype=str_keyword, var_file_short=var_file_short, var_file_long=var_file)
                     self.fi_get_mixing_ratio(
@@ -32676,7 +33203,9 @@ class PySILLS(tk.Frame):
                 entries_concentration_i = ["Concentration MAT"]
                 entries_concentration_ratio_i = ["Concentration Ratio MAT"]
                 entries_concentration_sigma_mat_i = ["Concentration 1 SIGMA MAT"]
+                entries_lob_i = ["Limit of Blank MAT"]
                 entries_lod_i = ["Limit of Detection MAT"]
+                entries_loq_i = ["Limit of Quantification MAT"]
                 entries_empty = [""]
 
                 if var_type == "SMPL":
@@ -32691,7 +33220,9 @@ class PySILLS(tk.Frame):
                     entries_concentration_sigma_mix_i = ["Concentration 1 SIGMA MIX"]
                     entries_a_i = ["Mixed Concentration Ratio"]
                     entries_x_i = ["Mixing Ratio"]
+                    entries_lob_incl_i = ["Limit of Blank INCL"]
                     entries_lod_incl_i = ["Limit of Detection INCL"]
+                    entries_loq_incl_i = ["Limit of Quantification INCL"]
 
                 for isotope in list_considered_isotopes:
                     entries_empty.append("")
@@ -32742,7 +33273,9 @@ class PySILLS(tk.Frame):
 
                     concentration_ratio_i = self.container_concentration_ratio[var_type][str_keyword][var_file_short]["MAT"][
                         isotope]
+                    lob_i = self.container_lob[var_type][str_keyword][var_file_short]["MAT"][isotope]
                     lod_i = self.container_lod[var_type][str_keyword][var_file_short]["MAT"][isotope]
+                    loq_i = self.container_loq[var_type][str_keyword][var_file_short]["MAT"][isotope]
 
                     if var_type == "SMPL":
                         concentration_incl_i = self.container_concentration[var_type][str_keyword][var_file_short]["INCL"][
@@ -32754,7 +33287,9 @@ class PySILLS(tk.Frame):
                         concentration_mix_i = self.container_mixed_concentration["SMPL"][str_keyword][var_file_short][isotope]
                         concentration_sigma_mix_i = self.container_mixed_concentration_error["SMPL"][str_keyword][
                             var_file_short][isotope]
+                        lob_incl_i = self.container_lob[var_type][str_keyword][var_file_short]["INCL"][isotope]
                         lod_incl_i = self.container_lod[var_type][str_keyword][var_file_short]["INCL"][isotope]
+                        loq_incl_i = self.container_loq[var_type][str_keyword][var_file_short]["INCL"][isotope]
                         a_i = self.container_mixed_concentration_ratio[var_type][str_keyword][var_file_short][isotope]
                         x_i = self.container_mixing_ratio[var_type][str_keyword][var_file_short][isotope]
 
@@ -32788,7 +33323,9 @@ class PySILLS(tk.Frame):
 
                     if var_type == "SMPL":
                         entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
+                        entries_lob_i.append(f"{lob_i:.{4}f}")
                         entries_lod_i.append(f"{lod_i:.{4}f}")
+                        entries_loq_i.append(f"{loq_i:.{4}f}")
                         entries_concentration_incl_i.append(f"{concentration_incl_i:.{4}f}")
                         entries_concentration_ratio__incl_i.append(f"{concentration_ratio_incl_i:.{4}E}")
                         entries_concentration_sigma_incl_i.append(f"{concentration_sigma_incl_i:.{4}f}")
@@ -32796,7 +33333,9 @@ class PySILLS(tk.Frame):
                         entries_concentration_sigma_mix_i.append(f"{concentration_sigma_mix_i:.{4}f}")
                         entries_a_i.append(f"{a_i:.{4}f}")
                         entries_x_i.append(f"{x_i:.{4}E}")
+                        entries_lob_incl_i.append(f"{lob_incl_i:.{4}f}")
                         entries_lod_incl_i.append(f"{lod_incl_i:.{4}f}")
+                        entries_loq_incl_i.append(f"{loq_incl_i:.{4}f}")
 
                 # Intensity Results
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
@@ -32827,13 +33366,17 @@ class PySILLS(tk.Frame):
 
                 if var_type == "SMPL":
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio__incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_mix_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mix_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_lob_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_lod_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_loq_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_a_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_x_i)
 
@@ -35389,9 +35932,6 @@ class PySILLS(tk.Frame):
             self.get_lod(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
                 var_file_long=var_file_long, var_focus=None, mode="All")
-            # self.fi_get_lod(
-            #     var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #     var_file_long=var_file_long, var_focus=var_focus, mode="All")
             self.fi_get_mixed_concentration_ratio(
                 var_datatype=var_datatype, var_file_short=var_file_short, var_file_long=var_file_long, mode="All")
             self.fi_get_mixing_ratio(
@@ -38073,12 +38613,20 @@ class PySILLS(tk.Frame):
                 self.container_mixing_ratio[var_filetype]["SMOOTHED"][var_file_short] = {}
         ## Limit of Detection
         if mode == "MA":
+            self.container_lob[var_filetype]["RAW"][var_file_short] = {"MAT": {}}
+            self.container_lob[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}}
             self.container_lod[var_filetype]["RAW"][var_file_short] = {"MAT": {}}
             self.container_lod[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}}
+            self.container_loq[var_filetype]["RAW"][var_file_short] = {"MAT": {}}
+            self.container_loq[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}}
         else:
+            self.container_lob[var_filetype]["RAW"][var_file_short] = {"MAT": {}, "INCL": {}}
+            self.container_lob[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}, "INCL": {}}
             self.container_lod[var_filetype]["RAW"][var_file_short] = {"MAT": {}, "INCL": {}}
             self.container_lod[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}, "INCL": {}}
-        #
+            self.container_loq[var_filetype]["RAW"][var_file_short] = {"MAT": {}, "INCL": {}}
+            self.container_loq[var_filetype]["SMOOTHED"][var_file_short] = {"MAT": {}, "INCL": {}}
+
         for isotope in self.container_lists["ISOTOPES"]:
             if var_file_short not in self.container_measurements["EDITED"]:
                 self.container_measurements["EDITED"][var_file_short] = {}
@@ -38160,17 +38708,25 @@ class PySILLS(tk.Frame):
             ## Concentration Ratio
             self.container_concentration_ratio[var_filetype]["RAW"][var_file_short]["MAT"][isotope] = None
             self.container_concentration_ratio[var_filetype]["SMOOTHED"][var_file_short]["MAT"][isotope] = None
-            #
+
             if mode != "MA":
                 self.container_concentration_ratio[var_filetype]["RAW"][var_file_short]["INCL"][isotope] = None
                 self.container_concentration_ratio[var_filetype]["SMOOTHED"][var_file_short]["INCL"][isotope] = None
             ## Limit of Detection
+            self.container_lob[var_filetype]["RAW"][var_file_short]["MAT"][isotope] = None
+            self.container_lob[var_filetype]["SMOOTHED"][var_file_short]["MAT"][isotope] = None
             self.container_lod[var_filetype]["RAW"][var_file_short]["MAT"][isotope] = None
             self.container_lod[var_filetype]["SMOOTHED"][var_file_short]["MAT"][isotope] = None
-            #
+            self.container_loq[var_filetype]["RAW"][var_file_short]["MAT"][isotope] = None
+            self.container_loq[var_filetype]["SMOOTHED"][var_file_short]["MAT"][isotope] = None
+
             if mode != "MA":
+                self.container_lob[var_filetype]["RAW"][var_file_short]["INCL"][isotope] = None
+                self.container_lob[var_filetype]["SMOOTHED"][var_file_short]["INCL"][isotope] = None
                 self.container_lod[var_filetype]["RAW"][var_file_short]["INCL"][isotope] = None
                 self.container_lod[var_filetype]["SMOOTHED"][var_file_short]["INCL"][isotope] = None
+                self.container_loq[var_filetype]["RAW"][var_file_short]["INCL"][isotope] = None
+                self.container_loq[var_filetype]["SMOOTHED"][var_file_short]["INCL"][isotope] = None
 
 if __name__ == "__main__":
     root = tk.Tk()
