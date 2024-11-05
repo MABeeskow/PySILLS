@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.37
-# Date:		18.10.2024
+# Date:		05.11.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -19896,7 +19896,7 @@ class PySILLS(tk.Frame):
                 1)
             self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][var_filename_short][
                 "MAT"].set(1)
-        #
+
         cb_bg = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 25,
             fg=font_color_dark, n_rows=1, n_columns=2,
@@ -19963,6 +19963,7 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
+                self.container_var["ma_setting"]["Display RAW"][str_filetype][var_filename_short][isotope].set(1)
                 cb_raw_i = tk.Checkbutton(
                     frm_iso,
                     variable=self.container_var["ma_setting"]["Display RAW"][str_filetype][var_filename_short][isotope],
@@ -19973,6 +19974,7 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=cb_raw_i)
                 text_iso.insert("end", "\t")
 
+                self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][var_filename_short][isotope].set(1)
                 cb_smoothed_i = tk.Checkbutton(
                     frm_iso,
                     variable=self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][var_filename_short][
@@ -20207,20 +20209,37 @@ class PySILLS(tk.Frame):
 
         for isotope in df_isotopes:
             if isotope in self.isotope_colors:
-                ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                                 linewidth=var_lw, visible=True)
-                self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                    "RAW"] = ln_raw
+                if self.container_var["ma_setting"]["Display RAW"][str_filetype][str_filename_short][
+                    isotope].get() == 1:
+                    ln_raw = ax.plot(
+                        self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
+                        linewidth=var_lw, visible=True)
+                    self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                        "RAW"] = ln_raw
+                else:
+                    ln_raw = ax.plot(
+                        self.dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
+                        linewidth=var_lw, visible=True)
+                    self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                        "RAW"] = ln_raw
+                    ln_raw[0].set_visible(False)
 
                 if (self.container_var["Spike Elimination"][str_filetype]["State"] == True and
                         isotope in self.container_spikes[str_filename_short]):
-                    ln_smoothed = ax.plot(
-                        self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
-                        label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                    self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
-                        isotope]["SMOOTHED"] = ln_smoothed
-                    self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
-                        isotope].set(1)
+                    if self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][str_filename_short][
+                        isotope].get() == 1:
+                        ln_smoothed = ax.plot(
+                            self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                            label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                        self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
+                            isotope]["SMOOTHED"] = ln_smoothed
+                    else:
+                        ln_smoothed = ax.plot(
+                            self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                            label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                        self.container_var["ma_setting"]["Time-Signal Lines"][str_filetype][str_filename_short][
+                            isotope]["SMOOTHED"] = ln_smoothed
+                        ln_smoothed[0].set_visible(False)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -20323,14 +20342,14 @@ class PySILLS(tk.Frame):
                 for var_id in critical_id:
                     self.container_helper[str_filetype][str_filename_short]["MAT"]["Indices"].remove(var_id)
                     del self.container_helper[str_filetype][str_filename_short]["MAT"]["Content"][var_id]
-        #
+
         if self.pysills_mode == "MA":
             inclusion_key = "INCL"
             var_check_incl = []
         else:
             inclusion_key = "INCL"
             var_check_incl = self.container_helper[str_filetype][str_filename_short][inclusion_key]["Content"]
-        #
+
         if len(var_check_incl) > 0:
             if self.pysills_mode in ["FI"]:
                 critical_id = []
@@ -20392,9 +20411,9 @@ class PySILLS(tk.Frame):
         ax.set_ylabel(str_lbl_02 + " $I$ (cps)", labelpad=0.5, fontsize=8)
         ax.xaxis.set_tick_params(labelsize=8)
         ax.yaxis.set_tick_params(labelsize=8)
-        #
+
         self.canvas_specific.draw()
-        #
+
         self.canvas_specific.mpl_connect(
             "button_press_event", lambda event, var_type=str_filetype, var_file_short=str_filename_short:
             self.ma_add_interval_to_diagram(var_type, var_file_short, event))
@@ -20925,13 +20944,11 @@ class PySILLS(tk.Frame):
         var_key = "Display " + str(var_datatype)
         if self.container_var["ma_setting"][var_key][var_type][var_file_short][var_isotope].get() == 1:
             self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][var_isotope][
-                var_datatype][
-                0].set_visible(True)
+                var_datatype][0].set_visible(True)
         elif self.container_var["ma_setting"][var_key][var_type][var_file_short][var_isotope].get() == 0:
             self.container_var["ma_setting"]["Time-Signal Lines"][var_type][var_file_short][var_isotope][
-                var_datatype][
-                0].set_visible(False)
-        #
+                var_datatype][0].set_visible(False)
+
         self.canvas_specific.draw()
 
     def ma_add_interval_to_diagram(self, var_type, var_file_short, event):
@@ -32537,6 +32554,7 @@ class PySILLS(tk.Frame):
                     self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][
                         isotope] = tk.IntVar()
 
+                self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope].set(1)
                 cb_raw_i = tk.Checkbutton(
                     frm_iso, variable=self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][
                         isotope], text="RAW", onvalue=1, offvalue=0, bg=background_color_light,
@@ -32550,6 +32568,7 @@ class PySILLS(tk.Frame):
                     self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
                         isotope] = tk.IntVar()
 
+                self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
                 cb_smoothed_i = tk.Checkbutton(
                     frm_iso, variable=self.container_var[key_setting]["Display SMOOTHED"][str_filetype][
                         str_filename_short][isotope], text="SMOOTHED", onvalue=1, offvalue=0,
@@ -32695,20 +32714,34 @@ class PySILLS(tk.Frame):
                 print("There is a problem with an isotope that is probably just a number. "
                       "Please check this and correct it. Thank you!")
             else:
-                ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope,
-                                 color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                    "RAW"] = ln_raw
+                if self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope].get() == 1:
+                    ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope,
+                                     color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                    self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                        "RAW"] = ln_raw
+                else:
+                    ln_raw = ax.plot(self.dataset_time, df_data[isotope], label=isotope,
+                                     color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                    self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
+                        "RAW"] = ln_raw
+                    ln_raw[0].set_visible(False)
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
                     if isotope in self.container_spikes[str_filename_short]:
-                        ln_smoothed = ax.plot(
-                            self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
-                            label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
-                        self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][isotope][
-                            "SMOOTHED"] = ln_smoothed
-                        self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
-                            isotope].set(1)
+                        if self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                            isotope].get() == 1:
+                            ln_smoothed = ax.plot(
+                                self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                                label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                            self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][
+                                isotope]["SMOOTHED"] = ln_smoothed
+                        else:
+                            ln_smoothed = ax.plot(
+                                self.dataset_time, self.container_spikes[str_filename_short][isotope]["Data IMPROVED"],
+                                label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw, visible=True)
+                            self.container_var[key_setting]["Time-Signal Lines"][str_filetype][str_filename_short][
+                                isotope]["SMOOTHED"] = ln_smoothed
+                            ln_smoothed[0].set_visible(False)
 
         if self.pysills_mode in ["FI", "MI"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
