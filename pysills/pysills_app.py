@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.38
-# Date:		05.11.2024
+# Version:	v1.0.39
+# Date:		07.11.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.38"
-        self.val_version = self.str_version_number + " - 05.11.2024"
+        self.str_version_number = "1.0.39"
+        self.val_version = self.str_version_number + " - 07.11.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -706,6 +706,10 @@ class PySILLS(tk.Frame):
             "Set salinity": {"English": "Set salinity", "German": "Salinität eingeben"},
             "Interval setup": {"English": "Interval setup", "German": "Zeintfenster Einstellungen"},
             "Remove interval": {"English": "Remove interval", "German": "Zeitfenster entfernen"},
+            "Remove sample intervals": {"English": "Remove sample intervals", "German": "Probenintervalle entfernen"},
+            "Remove inclusion intervals": {
+                "English": "Remove inclusion intervals", "German": "Einschlussintervalle entfernen"},
+            "Remove matrix intervals": {"English": "Remove matrix intervals", "German": "Matrixintervalle entfernen"},
             "Update": {"English": "Update", "German": "Aktualisieren"},
             "Parallelism": {"English": "Parallelism", "German": "Parallelität"},
             "No selection": {"English": "No selection", "German": "Keine Auswahl"},
@@ -19705,6 +19709,7 @@ class PySILLS(tk.Frame):
         str_lbl_17 = self.language_dict["Set end time"][self.var_language]
         str_lbl_18 = self.language_dict["Interval setup"][self.var_language]
         str_lbl_19 = self.language_dict["Remove interval"][self.var_language]
+        str_lbl_19b = self.language_dict["Remove sample intervals"][self.var_language]
         str_lbl_20 = self.language_dict["Confirm all"][self.var_language]
         str_lbl_21 = self.language_dict["Update"][self.var_language]
         str_lbl_22 = self.language_dict["Parallelism"][self.var_language]
@@ -19780,11 +19785,17 @@ class PySILLS(tk.Frame):
             command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=1, n_columns=14,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_19, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_remove_interval(var_type, var_file_short))
+        btn_04b = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 26, column_id=0, n_rows=1, n_columns=14,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_19b, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=var_filename_short, focus="MAT":
+            self.remove_intervals(filetype, filename_short, focus))
         btn_05a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -20019,6 +20030,31 @@ class PySILLS(tk.Frame):
         for isotope in df_isotopes:
             entry_parallelism = [isotope, "---", "---"]
             self.tv_parallelism.insert("", tk.END, values=entry_parallelism)
+
+    def remove_intervals(self, filetype, filename_short, focus):
+        if self.pysills_mode == "MA":
+            var_setting_key = "ma_setting"
+            self.temp_lines_checkup2[filetype][filename_short] = 0
+            self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
+        elif self.pysills_mode == "FI":
+            var_setting_key = "fi_setting"
+            self.temp_lines_checkup2[filetype][filename_short] = 0
+            self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
+        elif self.pysills_mode == "MI":
+            var_setting_key = "mi_setting"
+            self.temp_lines_checkup2[filetype][filename_short] = 0
+            self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
+
+        var_lb = self.container_helper[filetype][filename_short][focus]["Listbox"]
+        var_lb.delete(0, tk.END)
+
+        for var_id in list(self.container_helper[filetype][filename_short][focus]["Content"].keys()):
+            self.container_helper[filetype][filename_short][focus]["Content"][var_id]["Object"].set_visible(False)
+            del self.container_helper[filetype][filename_short][focus]["Content"][var_id]
+
+        self.container_helper[filetype][filename_short][focus]["Indices"].clear()
+        self.container_helper[filetype][filename_short][focus]["ID"] = 0
+        self.canvas_specific.draw()
 
     def update_parallelism_values(self, var_filetype, var_filename_short, var_filename_long):
         if var_filetype == "SMPL":
@@ -32283,6 +32319,8 @@ class PySILLS(tk.Frame):
         str_lbl_17 = self.language_dict["Set end time"][self.var_language]
         str_lbl_18 = self.language_dict["Interval setup"][self.var_language]
         str_lbl_19 = self.language_dict["Remove interval"][self.var_language]
+        str_lbl_19b = self.language_dict["Remove matrix intervals"][self.var_language]
+        str_lbl_19c = self.language_dict["Remove inclusion intervals"][self.var_language]
         str_lbl_20 = self.language_dict["Confirm all"][self.var_language]
         str_lbl_21 = self.language_dict["Update"][self.var_language]
         str_lbl_22 = self.language_dict["Parallelism"][self.var_language]
@@ -32353,11 +32391,23 @@ class PySILLS(tk.Frame):
             command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
-            parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=2, n_columns=14,
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 25, column_id=0, n_rows=1, n_columns=14,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_19, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=str_filename_short:
             self.fi_remove_interval(var_type, var_file_short))
+        btn_04b = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 26, column_id=0, n_rows=1, n_columns=14,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_19b, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=str_filename_short, focus="MAT":
+            self.remove_intervals(filetype, filename_short, focus))
+        btn_04c = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 27, column_id=0, n_rows=1, n_columns=14,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_19c, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=str_filename_short, focus="INCL":
+            self.remove_intervals(filetype, filename_short, focus))
         btn_05a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
