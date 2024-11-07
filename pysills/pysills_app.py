@@ -1316,6 +1316,8 @@ class PySILLS(tk.Frame):
         self.container_var["fi_dataexploration"] = {}
         self.var_mode_fi = False
 
+        self.container_intervals = {}
+
         self.container_var["mi_setting"]["Time BG Start"] = tk.StringVar()
         self.container_var["mi_setting"]["Time BG Start"].set("Set start time")
         self.container_var["mi_setting"]["Time BG End"] = tk.StringVar()
@@ -17297,6 +17299,10 @@ class PySILLS(tk.Frame):
         var_file_long = self.container_lists[var_filetype]["Long"][self.current_file_id_checker]
         var_file_short = self.container_lists[var_filetype]["Short"][self.current_file_id_checker]
 
+        if var_file_short not in self.container_intervals:
+            self.container_intervals[var_file_short] = {
+                "Setup": {"BG": [], "MAT": [], "INCL": []}, "Checker": {"BG": [], "MAT": [], "INCL": []}}
+
         var_lw = float(self.container_var["General Settings"]["Line width"].get())
         if var_lw < 0.25:
             var_lw = 0.25
@@ -17346,6 +17352,7 @@ class PySILLS(tk.Frame):
                             "Content"].items():
                             times_bg = var_content["Times"]
                             box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
+                            self.container_intervals[var_file_short]["Checker"]["BG"].append(box_bg)
 
             # Sample/Matrix window
             if var_file_short in self.container_helper[var_filetype]:
@@ -17358,18 +17365,21 @@ class PySILLS(tk.Frame):
                             times_sig = var_content["Times"]
                             var_color = self.colors_intervals["MAT"]
                             box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                            self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
                     elif self.pysills_mode in ["MI"]:
                         for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
                             "Content"].items():
                             times_sig = var_content["Times"]
                             var_color = self.colors_intervals["MAT"]
                             box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                            self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
                     else:
                         for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
                             "Content"].items():
                             times_sig = var_content["Times"]
                             var_color = self.colors_intervals["MAT"]
                             box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                            self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
 
             # Inclusion window
             if self.pysills_mode != "MA":
@@ -17378,19 +17388,19 @@ class PySILLS(tk.Frame):
                     var_check_incl = self.container_helper[var_filetype][var_file_short][inclusion_key]["Content"]
                     if len(var_check_incl) > 0:
                         if self.pysills_mode == "FI":
-                            for var_id, var_content in \
-                            self.container_helper[var_filetype][var_file_short][inclusion_key][
-                                "Content"].items():
+                            for var_id, var_content in self.container_helper[var_filetype][var_file_short][
+                                inclusion_key]["Content"].items():
                                 times_incl = var_content["Times"]
                                 box_incl = ax.axvspan(
                                     times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
+                                self.container_intervals[var_file_short]["Checker"]["INCL"].append(box_incl)
                         elif self.pysills_mode == "MI":
-                            for var_id, var_content in \
-                            self.container_helper[var_filetype][var_file_short][inclusion_key][
-                                "Content"].items():
+                            for var_id, var_content in self.container_helper[var_filetype][var_file_short][
+                                inclusion_key]["Content"].items():
                                 times_incl = var_content["Times"]
                                 box_incl = ax.axvspan(
                                     times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
+                                self.container_intervals[var_file_short]["Checker"]["INCL"].append(box_incl)
 
             ax.set_title("Current file: " + str(var_file_short), fontsize=9)
             ax.set_xlabel("Time (s)", labelpad=0.5, fontsize=8)
@@ -20054,7 +20064,14 @@ class PySILLS(tk.Frame):
 
         self.container_helper[filetype][filename_short][focus]["Indices"].clear()
         self.container_helper[filetype][filename_short][focus]["ID"] = 0
+
         self.canvas_specific.draw()
+
+        if filename_short in self.container_intervals:
+            for var_object in self.container_intervals[filename_short]["Checker"][focus]:
+                var_object.set_visible(False)
+
+            self.canvas_time_signal_checker.draw()
 
     def update_parallelism_values(self, var_filetype, var_filename_short, var_filename_long):
         if var_filetype == "SMPL":
@@ -37041,6 +37058,12 @@ class PySILLS(tk.Frame):
                     var_setting_key = "mi_setting"
                     self.temp_lines_checkup2[var_file_type][var_file_short] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
+
+                if var_file_short in self.container_intervals:
+                    for var_object in self.container_intervals[var_file_short]["Checker"][mode]:
+                        var_object.set_visible(False)
+
+                    self.canvas_time_signal_checker.draw()
 
         if mode == "BG":
             self.container_var[var_setting_key]["Time BG Start"].set("Set start time")
