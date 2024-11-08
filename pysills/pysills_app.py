@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.39
-# Date:		07.11.2024
+# Version:	v1.0.40
+# Date:		08.11.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.39"
-        self.val_version = self.str_version_number + " - 07.11.2024"
+        self.str_version_number = "1.0.40"
+        self.val_version = self.str_version_number + " - 08.11.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -8788,6 +8788,9 @@ class PySILLS(tk.Frame):
             line_std = str(loaded_lines[i].strip())
             splitted_std = line_std.split(";")
 
+            if len(splitted_std) == 1:
+                splitted_std = line_std.split(",")
+
             self.container_var[key_setting]["Author"].set(splitted_std[0])
             self.container_var[key_setting]["Source ID"].set(splitted_std[1])
             self.container_var["LASER"].set(splitted_std[2])
@@ -8801,6 +8804,9 @@ class PySILLS(tk.Frame):
         for i in range(index_container["STANDARD FILES"] + 1, index_container["SAMPLE FILES"] - 1):
             line_std = str(loaded_lines[i].strip())
             splitted_std = line_std.split(";")
+
+            if len(splitted_std) == 1:
+                splitted_std = line_std.split(",")
 
             var_file_long = splitted_std[0]
             var_file_short = splitted_std[0].split("/")[-1]
@@ -8842,6 +8848,10 @@ class PySILLS(tk.Frame):
         for i in range(index_container["SAMPLE FILES"] + 1, index_container["ISOTOPES"] - 1):
             line_smpl = str(loaded_lines[i].strip())
             splitted_data_smpl = line_smpl.split(";")
+
+            if len(splitted_data_smpl) == 1:
+                splitted_data_smpl = line_smpl.split(",")
+
             var_file_long = splitted_data_smpl[0]
             var_file_short = splitted_data_smpl[0].split("/")[-1]
 
@@ -8931,6 +8941,10 @@ class PySILLS(tk.Frame):
         for i in range(index_container["ISOTOPES"] + 1, index_container[title_next] - 1):
             line_std = str(loaded_lines[i].strip())
             splitted_lines = line_std.split(";")
+
+            if len(splitted_lines) == 1:
+                splitted_lines = line_std.split(",")
+
             if len(splitted_lines) > 1:
                 isotope = splitted_lines[0]
                 self.container_var["SRM"][isotope] = tk.StringVar()
@@ -8963,6 +8977,9 @@ class PySILLS(tk.Frame):
             line_std = str(loaded_lines[i].strip())
             splitted_lines = line_std.split(";")
 
+            if len(splitted_lines) == 1:
+                splitted_lines = line_std.split(",")
+
             if len(splitted_lines) == 2:
                 self.container_var[key_setting]["Inclusion Setup Selection"] = tk.IntVar()
                 self.container_var[key_setting]["Inclusion Setup Selection"].set(splitted_lines[1])
@@ -8992,6 +9009,9 @@ class PySILLS(tk.Frame):
             line_std = str(loaded_lines[i].strip())
             splitted_lines = line_std.split(";")
 
+            if len(splitted_lines) == 1:
+                splitted_lines = line_std.split(",")
+
             isotope = splitted_lines[0]
             self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
             self.container_var["dwell_times"]["Entry"][isotope].set(splitted_lines[1])
@@ -9002,6 +9022,9 @@ class PySILLS(tk.Frame):
         for i in range(index_container["INTERVAL SETTINGS"] + 1, index_container["SPIKE ELIMINATION"] - 1):
             line_std = str(loaded_lines[i].strip())
             splitted_lines = line_std.split(";")
+
+            if len(splitted_lines) == 1:
+                splitted_lines = [element for element in csv.reader(splitted_lines, delimiter=",")][0]
 
             if splitted_lines[1] in ["STD", "SMPL"]:
                 var_filetype = splitted_lines[1]
@@ -9021,64 +9044,70 @@ class PySILLS(tk.Frame):
                 if splitted_lines[0] == "BG":
                     var_id = int(splitted_lines[1])
                     var_times = splitted_lines[2]
-                    var_indices = splitted_lines[3]
+                    try:
+                        var_indices = splitted_lines[3]
 
-                    key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
-                    key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
-                    helper_times = [float(key_times.group(1)), float(key_times.group(3))]
-                    helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
-                    helper_times.sort()
-                    helper_indices.sort()
-                    self.container_helper[var_filetype][var_file_short]["BG"]["ID"] = var_id
-                    self.container_helper[var_filetype][var_file_short]["BG"]["Content"][var_id] = {}
-                    self.container_helper[var_filetype][var_file_short]["BG"]["Content"][var_id][
-                        "Times"] = helper_times
-                    self.container_helper[var_filetype][var_file_short]["BG"]["Content"][var_id][
-                        "Indices"] = helper_indices
+                        key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
+                        key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
+                        helper_times = [float(key_times.group(1)), float(key_times.group(3))]
+                        helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
+                        helper_times.sort()
+                        helper_indices.sort()
+                        self.container_helper[var_filetype][var_file_short]["BG"]["ID"] = var_id
+                        self.container_helper[var_filetype][var_file_short]["BG"]["Content"][var_id] = {}
+                        self.container_helper[var_filetype][var_file_short]["BG"]["Content"][var_id][
+                            "Times"] = helper_times
+                        self.container_helper[var_filetype][var_file_short]["BG"]["Content"][var_id][
+                            "Indices"] = helper_indices
 
-                    self.container_helper[var_filetype][var_file_short]["BG"]["Indices"].append(var_id)
-
+                        self.container_helper[var_filetype][var_file_short]["BG"]["Indices"].append(var_id)
+                    except:
+                        print("There is a problem with the background interval data. It seems that they are damaged.")
                 elif splitted_lines[0] == "MAT":
                     var_id = int(splitted_lines[1])
                     var_times = splitted_lines[2]
-                    var_indices = splitted_lines[3]
+                    try:
+                        var_indices = splitted_lines[3]
 
-                    key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
-                    key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
+                        key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
+                        key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
 
-                    helper_times = [float(key_times.group(1)), float(key_times.group(3))]
-                    helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
-                    helper_times.sort()
-                    helper_indices.sort()
-                    self.container_helper[var_filetype][var_file_short]["MAT"]["ID"] = var_id
-                    self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id] = {}
-                    self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id][
-                        "Times"] = helper_times
-                    self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id][
-                        "Indices"] = helper_indices
+                        helper_times = [float(key_times.group(1)), float(key_times.group(3))]
+                        helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
+                        helper_times.sort()
+                        helper_indices.sort()
+                        self.container_helper[var_filetype][var_file_short]["MAT"]["ID"] = var_id
+                        self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id] = {}
+                        self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id][
+                            "Times"] = helper_times
+                        self.container_helper[var_filetype][var_file_short]["MAT"]["Content"][var_id][
+                            "Indices"] = helper_indices
 
-                    self.container_helper[var_filetype][var_file_short]["MAT"]["Indices"].append(var_id)
-
+                        self.container_helper[var_filetype][var_file_short]["MAT"]["Indices"].append(var_id)
+                    except:
+                        print("There is a problem with the matrix interval data. It seems that they are damaged.")
                 elif splitted_lines[0] == "INCL":
                     var_id = int(splitted_lines[1])
                     var_times = splitted_lines[2]
-                    var_indices = splitted_lines[3]
+                    try:
+                        var_indices = splitted_lines[3]
 
-                    key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
-                    key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
-                    helper_times = [float(key_times.group(1)), float(key_times.group(3))]
-                    helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
-                    helper_times.sort()
-                    helper_indices.sort()
-                    self.container_helper[var_filetype][var_file_short]["INCL"]["ID"] = var_id
-                    self.container_helper[var_filetype][var_file_short]["INCL"]["Content"][var_id] = {}
-                    self.container_helper[var_filetype][var_file_short]["INCL"]["Content"][var_id][
-                        "Times"] = helper_times
-                    self.container_helper[var_filetype][var_file_short]["INCL"]["Content"][var_id][
-                        "Indices"] = helper_indices
+                        key_times = re.search(r"\[(\d+\.\d+)(\,\s+)(\d+\.\d+)\]", var_times)
+                        key_indices = re.search(r"\[(\d+)(\,\s+)(\d+)\]", var_indices)
+                        helper_times = [float(key_times.group(1)), float(key_times.group(3))]
+                        helper_indices = [int(key_indices.group(1)), int(key_indices.group(3))]
+                        helper_times.sort()
+                        helper_indices.sort()
+                        self.container_helper[var_filetype][var_file_short]["INCL"]["ID"] = var_id
+                        self.container_helper[var_filetype][var_file_short]["INCL"]["Content"][var_id] = {}
+                        self.container_helper[var_filetype][var_file_short]["INCL"]["Content"][var_id][
+                            "Times"] = helper_times
+                        self.container_helper[var_filetype][var_file_short]["INCL"]["Content"][var_id][
+                            "Indices"] = helper_indices
 
-                    self.container_helper[var_filetype][var_file_short]["INCL"]["Indices"].append(var_id)
-
+                        self.container_helper[var_filetype][var_file_short]["INCL"]["Indices"].append(var_id)
+                    except:
+                        print("There is a problem with the inclusion interval data. It seems that they are damaged.")
             if splitted_lines[0] == "BG":
                 self.container_helper[var_filetype][var_file_short]["BG"]["ID"] = len(
                     self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
@@ -9101,6 +9130,9 @@ class PySILLS(tk.Frame):
         for i in range(index_container["SPIKE ELIMINATION"] + 1, final_line):
             line_std = str(loaded_lines[i].strip())
             splitted_lines = line_std.split(";")
+
+            if len(splitted_lines) == 1:
+                splitted_lines = line_std.split(",")
 
             if index == 0:
                 self.container_var["Spike Elimination"]["STD"]["State"] = bool(splitted_lines[1])
@@ -9147,6 +9179,10 @@ class PySILLS(tk.Frame):
             for index, i in enumerate(range(index_container["EXPERIMENTAL DATA"] + 1, index_container["END"] - 1)):
                 line_std = str(loaded_lines[i].strip())
                 splitted_lines = line_std.split(";")
+
+                if len(splitted_lines) == 1:
+                    splitted_lines = line_std.split(",")
+
                 if len(splitted_lines) == 1:
                     if splitted_lines[0] not in ["Standard Files", "Sample Files", ""]:
                         if splitted_lines[0] not in helper_indices:
@@ -9162,9 +9198,15 @@ class PySILLS(tk.Frame):
                 filename_short = key
                 header_names = ["Time"]
                 header_names.extend(self.container_lists["ISOTOPES"])
-                dataframe = pd.read_csv(
-                    filename, sep=";", header=0, skiprows=data[0], nrows=data[1] - data[0], usecols=header_names,
-                    engine="python")
+
+                try:
+                    dataframe = pd.read_csv(
+                        filename, sep=";", header=0, skiprows=data[0], nrows=data[1] - data[0], usecols=header_names,
+                        engine="python")
+                except:
+                    dataframe = pd.read_csv(
+                        filename, sep=",", header=0, skiprows=data[0], nrows=data[1] - data[0], usecols=header_names,
+                        engine="python")
 
                 dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
                 if len(dataframe_blank) > 0:
@@ -9251,16 +9293,32 @@ class PySILLS(tk.Frame):
             self.lbl_prg_spk.configure(text="Opening project started!", anchor=tk.W)
 
             filename = filedialog.askopenfilename()
+            n_commas = 0
+            n_semicolons = 0
 
             try:
                 file_loaded = open(str(filename), "r")
                 loaded_lines = file_loaded.readlines()
                 n_lines = len(loaded_lines)
+                for i in range(10):
+                    if i == 2:
+                        n_commas += loaded_lines[i].count(",")
+                        n_semicolons += loaded_lines[i].count(";")
+                        if n_commas > 0 and n_semicolons == 0:
+                            delimiter = ","
+                        elif n_commas == 0 and n_semicolons > 0:
+                            delimiter = ";"
 
-                if ",,\n" in loaded_lines:
-                    loaded_lines = [sub.replace(",,\n", "") for sub in loaded_lines]
-                elif ";;\n" in loaded_lines:
-                    loaded_lines = [sub.replace(";;\n", "") for sub in loaded_lines]
+                if delimiter == "," and loaded_lines[2].count(",") > 3:
+                    if str("\n") in loaded_lines[0]:
+                        cleaned_lines = [sub.replace(str("\n"), "") for sub in loaded_lines]
+                        cleaned_lines_final = [sub.rstrip(",") for sub in cleaned_lines]
+                        loaded_lines = cleaned_lines_final
+                else:
+                    if ",,\n" in loaded_lines:
+                        loaded_lines = [sub.replace(",,\n", "") for sub in loaded_lines]
+                    elif ";;\n" in loaded_lines:
+                        loaded_lines = [sub.replace(";;\n", "") for sub in loaded_lines]
 
                 n_settings = 0
                 strings = ["PROJECT INFORMATION", "STANDARD FILES"]
@@ -9285,6 +9343,7 @@ class PySILLS(tk.Frame):
                 for i in range(index_container["PROJECT INFORMATION"] + 1, index_container["STANDARD FILES"] - 1):
                     line_std = str(loaded_lines[i].strip())
                     splitted_line = line_std.split(";")
+
                     var_mode = splitted_line[0]
                     if var_mode == "Mineral Analysis":
                         key_setting = "ma_setting"
@@ -9310,6 +9369,15 @@ class PySILLS(tk.Frame):
                     else:
                         if ("PYPITZER SETTINGS\n" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)\n"
                                 in loaded_lines and "QUANTIFICATION SETTINGS (BORISOVA2021)\n" in loaded_lines):
+                            strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
+                                       "INCLUSION SETTINGS", "PYPITZER SETTINGS",
+                                       "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
+                                       "QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)",
+                                       "QUANTIFICATION SETTINGS (HALTER2002)", "QUANTIFICATION SETTINGS (BORISOVA2021)",
+                                       "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS",
+                                       "SPIKE ELIMINATION", "EXPERIMENTAL DATA", "END"]
+                        elif ("PYPITZER SETTINGS" in loaded_lines and "QUANTIFICATION SETTINGS (HALTER2002)"
+                                in loaded_lines and "QUANTIFICATION SETTINGS (BORISOVA2021)" in loaded_lines):
                             strings = ["PROJECT INFORMATION", "STANDARD FILES", "SAMPLE FILES", "ISOTOPES",
                                        "INCLUSION SETTINGS", "PYPITZER SETTINGS",
                                        "QUANTIFICATION SETTINGS (MATRIX-ONLY TRACER)",
@@ -9459,6 +9527,9 @@ class PySILLS(tk.Frame):
                             line_data = str(loaded_lines[i].strip())
                             splitted_data = line_data.split(";")
 
+                            if len(splitted_data) == 1:
+                                splitted_data = line_data.split(",")
+
                             if splitted_data[0] == "Cations":
                                 self.container_lists["Selected Cations"].extend(splitted_data[1:])
                             elif splitted_data[0] == "Anions":
@@ -9488,7 +9559,10 @@ class PySILLS(tk.Frame):
                                    index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] - 1):
                         line_data = str(loaded_lines[i].strip())
                         splitted_data = line_data.split(";")
-                        #
+
+                        if len(splitted_data) == 1:
+                            splitted_data = line_data.split(",")
+
                         if index == 0:
                             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
                             self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
@@ -9506,7 +9580,7 @@ class PySILLS(tk.Frame):
                             info_matrix = splitted_data[2]
                             info_isotope = splitted_data[3]
                             info_concentration = splitted_data[4]
-                            #
+
                             self.container_var["SMPL"][info_file]["Host Only Tracer"] = {
                                 "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
                                 "Amount": tk.StringVar()}
@@ -9514,7 +9588,7 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][info_file]["Host Only Tracer"]["Matrix"].set(info_matrix)
                             self.container_var["SMPL"][info_file]["Host Only Tracer"]["Name"].set(info_isotope)
                             self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
-                        #
+
                         index += 1
 
                     current_step = 66
@@ -9531,7 +9605,10 @@ class PySILLS(tk.Frame):
                                    index_container[keyword] - 1):
                         line_data = str(loaded_lines[i].strip())
                         splitted_data = line_data.split(";")
-                        #
+
+                        if len(splitted_data) == 1:
+                            splitted_data = line_data.split(",")
+
                         if index == 0:
                             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
                             self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
@@ -9555,7 +9632,7 @@ class PySILLS(tk.Frame):
                                     info_isotope)
                                 self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
                                     info_concentration)
-                        #
+
                         index += 1
 
                     current_step = 69
@@ -9568,6 +9645,9 @@ class PySILLS(tk.Frame):
                                        index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
                             line_data = str(loaded_lines[i].strip())
                             splitted_data = line_data.split(";")
+
+                            if len(splitted_data) == 1:
+                                splitted_data = line_data.split(",")
 
                             if index == 0:
                                 val_method = int(splitted_data[1])
@@ -9606,6 +9686,9 @@ class PySILLS(tk.Frame):
                             line_data = str(loaded_lines[i].strip())
                             splitted_data = line_data.split(";")
 
+                            if len(splitted_data) == 1:
+                                splitted_data = line_data.split(",")
+
                             if index == 0:
                                 val_method = int(splitted_data[1])
                                 if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
@@ -9640,6 +9723,9 @@ class PySILLS(tk.Frame):
                                    index_container["DWELL TIME SETTINGS"] - 1):
                         line_std = str(loaded_lines[i].strip())
                         splitted_std = line_std.split(";")
+
+                        if len(splitted_std) == 1:
+                            splitted_std = line_std.split(",")
 
                         info_file = splitted_std[0]
                         info_isotope = splitted_std[1]
@@ -9724,6 +9810,9 @@ class PySILLS(tk.Frame):
                             line_data = str(loaded_lines[i].strip())
                             splitted_data = line_data.split(";")
 
+                            if len(splitted_data) == 1:
+                                splitted_data = line_data.split(",")
+
                             if splitted_data[0] == "Cations":
                                 self.container_lists["Selected Cations"].extend(splitted_data[1:])
                             elif splitted_data[0] == "Anions":
@@ -9754,7 +9843,10 @@ class PySILLS(tk.Frame):
                                    index_container["QUANTIFICATION SETTINGS (SECOND INTERNAL STANDARD)"] - 1):
                         line_data = str(loaded_lines[i].strip())
                         splitted_data = line_data.split(";")
-                        #
+
+                        if len(splitted_data) == 1:
+                            splitted_data = line_data.split(",")
+
                         if index == 0:
                             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
                             self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
@@ -9772,7 +9864,7 @@ class PySILLS(tk.Frame):
                             info_matrix = splitted_data[2]
                             info_isotope = splitted_data[3]
                             info_concentration = splitted_data[4]
-                            #
+
                             self.container_var["SMPL"][info_file]["Host Only Tracer"] = {
                                 "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
                                 "Amount": tk.StringVar()}
@@ -9780,7 +9872,7 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][info_file]["Host Only Tracer"]["Matrix"].set(info_matrix)
                             self.container_var["SMPL"][info_file]["Host Only Tracer"]["Name"].set(info_isotope)
                             self.container_var["SMPL"][info_file]["Host Only Tracer"]["Value"].set(info_concentration)
-                        #
+
                         index += 1
 
                     current_step = 66
@@ -9797,7 +9889,10 @@ class PySILLS(tk.Frame):
                                    index_container[keyword] - 1):
                         line_data = str(loaded_lines[i].strip())
                         splitted_data = line_data.split(";")
-                        #
+
+                        if len(splitted_data) == 1:
+                            splitted_data = line_data.split(",")
+
                         if index == 0:
                             self.container_var[key_setting]["Quantification Method"] = tk.IntVar()
                             self.container_var[key_setting]["Quantification Method"].set(splitted_data[1])
@@ -9813,13 +9908,13 @@ class PySILLS(tk.Frame):
                             info_file = splitted_data[0]
                             info_isotope = splitted_data[1]
                             info_concentration = splitted_data[2]
-                            #
+
                             self.container_var["SMPL"][info_file]["Second Internal Standard"] = {
                                 "Name": tk.StringVar(), "Value": tk.StringVar()}
                             self.container_var["SMPL"][info_file]["Second Internal Standard"]["Name"].set(info_isotope)
                             self.container_var["SMPL"][info_file]["Second Internal Standard"]["Value"].set(
                                 info_concentration)
-                        #
+
                         index += 1
 
                     current_step = 69
@@ -9832,6 +9927,9 @@ class PySILLS(tk.Frame):
                                        index_container["QUANTIFICATION SETTINGS (BORISOVA2021)"] - 1):
                             line_data = str(loaded_lines[i].strip())
                             splitted_data = line_data.split(";")
+
+                            if len(splitted_data) == 1:
+                                splitted_data = line_data.split(",")
 
                             if index == 0:
                                 val_method = int(splitted_data[1])
@@ -9870,6 +9968,9 @@ class PySILLS(tk.Frame):
                             line_data = str(loaded_lines[i].strip())
                             splitted_data = line_data.split(";")
 
+                            if len(splitted_data) == 1:
+                                splitted_data = line_data.split(",")
+
                             if index == 0:
                                 val_method = int(splitted_data[1])
                                 if "Inclusion Intensity Calculation" not in self.container_var[key_setting]:
@@ -9904,6 +10005,9 @@ class PySILLS(tk.Frame):
                                    index_container["DWELL TIME SETTINGS"] - 1):
                         line_std = str(loaded_lines[i].strip())
                         splitted_std = line_std.split(";")
+
+                        if len(splitted_data) == 1:
+                            splitted_data = line_data.split(",")
 
                         info_file = splitted_std[0]
                         info_isotope = splitted_std[1]
