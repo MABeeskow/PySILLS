@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.40
-# Date:		08.11.2024
+# Version:	v1.0.41
+# Date:		19.11.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.40"
-        self.val_version = self.str_version_number + " - 08.11.2024"
+        self.str_version_number = "1.0.41"
+        self.val_version = self.str_version_number + " - 19.11.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -10109,6 +10109,48 @@ class PySILLS(tk.Frame):
     ####################
     ## DATA PROCESSING #
     ####################
+    def find_icpms_data_in_file(self, filename_long):
+        str_filename_long = filename_long
+        potential_isotopes = ["Na23", "Al27", "Si29", "P31", "S32", "S33", "K39", "Ca43", "Ca44", "Fe57", "Pb208",
+                              "U238"]
+        list_indices = []
+
+        with open(str_filename_long, "r", encoding="utf-8", errors="ignore") as file:
+            for lineno, line in enumerate(file, start=0):
+                for isotope in potential_isotopes:
+                    if isotope in line:
+                        list_indices.append(lineno)
+
+        # list_indices = []
+        #
+        # try:
+        #     file = pd.read_csv(str_filename_long, sep=",", engine="python")
+        # except:
+        #     file = pd.read_csv(str_filename_long, sep=";", engine="python")
+        #
+        # for isotope in potential_isotopes:
+        #     a = file[file.columns[file.dtypes == "object"]].apply(lambda x: " ".join(x), axis=1).str.contains(isotope)
+        #     matches = file.index[a]
+        #     if len(matches) > 0:
+        #         list_indices.append(matches[0])
+        #
+        # var_skipheader = int(list_indices[0] + 1)
+        var_skipheader = int(list_indices[0])
+        var_skipfooter = 0
+
+        for skip_footer in range(10):
+            try:
+                df = DE(filename_long=str_filename_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=skip_footer)
+            except:
+                var_skipfooter += 1
+
+        df = DE(filename_long=str_filename_long).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+        file_info = {"skipheader": var_skipheader, "skipfooter": var_skipfooter, "delimiter": ","}
+
+        return df, file_info
+
     def open_csv(self, datatype):
         if datatype == "STD":
             if "Default_STD_01.csv" in self.list_std:
@@ -10126,9 +10168,6 @@ class PySILLS(tk.Frame):
             filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
                        ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
 
-        # if "mat" in filename[0]:
-        #     mat = scipy.io.loadmat(filename[0])
-
         for i in filename:
             if i not in var_list:
                 var_list.append(i)
@@ -10136,15 +10175,17 @@ class PySILLS(tk.Frame):
                 var_listbox.insert(tk.END, file_parts[-1])
                 str_filename_long = i
                 str_filename_short = file_parts[-1]
-
                 if self.container_icpms["name"] != None:
                     var_skipheader = self.container_icpms["skipheader"]
                     var_skipfooter = self.container_icpms["skipfooter"]
                     df_exmpl = DE(filename_long=str_filename_long).get_measurements(
                         delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
                 else:
-                    df_exmpl = DE(filename_long=str_filename_long).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
+                    df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=str_filename_long)
+                    self.container_icpms["name"] = "Undefined ICP-MS"
+                    self.container_icpms["skipheader"] = file_info["skipheader"]
+                    self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                    self.var_opt_icp.set(self.container_icpms["name"])
 
                 if "Dataframe" not in self.container_measurements:
                     self.container_measurements["Dataframe"] = {}

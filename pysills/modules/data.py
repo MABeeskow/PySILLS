@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 09.09.2024
+# 19.11.2024
 # ----------------------
 #
 ## MODULES
@@ -36,7 +36,6 @@ class Data:
         return dataframe
     #
     def import_as_list(self, skip_header=0, skip_footer=0, timestamp=None, delimiter=",", icpms=None):
-        #
         f = open(self.filename, 'r')
         imported_data = f.readlines()
 
@@ -84,6 +83,14 @@ class Data:
 
                 dates = [date_start, date_end]
                 times = [time_start, time_end]
+            elif icpms in ["Undefined", "Undefined ICP-MS"]:
+                date_start = ["01", "01", "2000"]
+                date_end = ["31", "12", "2000"]
+                time_start = ["00", "00", "00"]
+                time_end = ["23", "59", "59"]
+
+                dates = [date_start, date_end]
+                times = [time_start, time_end]
         else:
             line_time_start = imported_data[2]
             line_time_end = imported_data[-1]
@@ -105,7 +112,7 @@ class Data:
             times = [time_start, time_end]
 
         return dates, times
-#
+
 class Import:
     #
     def __init__(self, filename):
