@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.41
-# Date:		19.11.2024
+# Version:	v1.0.42
+# Date:		21.11.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.41"
-        self.val_version = self.str_version_number + " - 19.11.2024"
+        self.str_version_number = "1.0.42"
+        self.val_version = self.str_version_number + " - 21.11.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -771,6 +771,7 @@ class PySILLS(tk.Frame):
             "Calculation Accuracy": {"English": "Calculation Accuracy", "German": "Numerische Genauigkeit"},
             "Sensitivity Drift": {"English": "Sensitivity Drift", "German": "Sensitivitätsverschiebung"},
             "Limit of Detection": {"English": "Limit of Detection", "German": "Nachweisgrenze"},
+            "Default ICP-MS": {"English": "Default ICP-MS", "German": "Voreinstellung ICP-MS"},
             "Offset Automatic Interval Detection": {
                 "English": "Offset Automatic Interval Detection",
                 "German": "Versatz der automatischen Intervalerkennung"},
@@ -1798,6 +1799,10 @@ class PySILLS(tk.Frame):
         project_path_prew = self.path_pysills[:]
         project_path = project_path_prew.strip("/pysills")
 
+        self.var_opt_icp = tk.StringVar()
+        str_opt_icpms = self.language_dict["Select ICP-MS"][self.var_language]
+        self.var_opt_icp.set(str_opt_icpms)
+
         try:
             file_usersettings = open(self.path_pysills_main + str("/user_settings.txt"), "r")
             for index, file_data in enumerate(file_usersettings):
@@ -1810,6 +1815,30 @@ class PySILLS(tk.Frame):
 
                 if "Dwell Times" in file_data_splitted:
                     self.container_var["dwell_times"]["Entry"]["Default"].set(file_data_splitted[1])
+
+                if "Default ICP-MS" in file_data_splitted:
+                    self.var_opt_icp.set(file_data_splitted[1])
+
+                    str_icpms = file_data_splitted[1]
+                    var_instrument = str_icpms.replace(" ", "_")
+                    var_instrument_raw = str_icpms
+
+                    if var_instrument_raw != "Select ICP-MS":
+                        try:
+                            file_long = self.path_pysills_main + str("/lib/icpms/" + var_instrument + ".csv")
+                            file_content = open(file_long)
+                        except:
+                            file_long = self.path_pysills_main + str("/pysills/lib/icpms/" + var_instrument + ".csv")
+                            file_content = open(file_long)
+
+                        for index, line in enumerate(file_content):
+                            line_parts = line.split(",")
+                            if "\n" in line_parts[-1]:
+                                line_parts[-1] = line_parts[-1].replace("\n", "")
+                            try:
+                                self.container_icpms[line_parts[0]] = int(line_parts[-1])
+                            except:
+                                self.container_icpms[line_parts[0]] = line_parts[-1]
         except:
             print("There is no user_settings file!")
 
@@ -2226,9 +2255,6 @@ class PySILLS(tk.Frame):
         btn_icp.configure(font=font_element)
 
         # OPTION MENUS
-        self.var_opt_icp = tk.StringVar()
-        str_opt_icpms = self.language_dict["Select ICP-MS"][self.var_language]
-        self.var_opt_icp.set(str_opt_icpms)
         opt_icp = SE(
             parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
@@ -2395,6 +2421,7 @@ class PySILLS(tk.Frame):
     def select_icp_ms(self, var_opt):
         path = os.getcwd()
         path = self.path_pysills
+        var_instrument_raw = "Select ICP-MS"
 
         if self.file_loaded == False:
             if self.demo_mode:
@@ -2402,9 +2429,12 @@ class PySILLS(tk.Frame):
                     var_instrument_raw = var_opt.get()
                 except:
                     var_instrument_raw = var_opt
+
                 var_instrument = var_instrument_raw.replace(" ", "_")
             else:
                 var_instrument = var_opt.replace(" ", "_")
+                if var_instrument != "Select_ICP-MS":
+                    var_instrument_raw = var_opt
         else:
             var_instrument_raw = var_opt.get()
             if var_instrument_raw != "Select ICP-MS":
@@ -12297,6 +12327,7 @@ class PySILLS(tk.Frame):
         str_lbl_29 = self.language_dict["Screen resolution"][self.var_language]
         str_lbl_30 = self.language_dict["Python path"][self.var_language]
         str_lbl_31 = self.language_dict["PySILLS path"][self.var_language]
+        str_lbl_32 = self.language_dict["Default ICP-MS"][self.var_language]
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -12358,6 +12389,10 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=13, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_31, relief=tk.FLAT, fontsize=font_element)
+        lbl_09 = SE(
+            parent=subwindow_generalsettings, row_id=18, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_32, relief=tk.FLAT, fontsize=font_element)
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01, lbl_02, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
@@ -12520,6 +12555,11 @@ class PySILLS(tk.Frame):
             var_opt=self.container_var["General Settings"]["Language"],
             var_default=self.container_var["General Settings"]["Language"].get(), var_list=list_languages,
             fg_active=font_color_light, bg_active=accent_color)
+        opt_icpms_default = SE(
+            parent=subwindow_generalsettings, row_id=19, column_id=11, n_rows=1, n_columns=13,
+            fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
+            var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
+            var_list=self.container_lists["ICPMS Library"], fg_active=font_color_light, bg_active=accent_color)
         # opt_language["menu"].entryconfig("German", state="disable")
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
@@ -12658,6 +12698,8 @@ class PySILLS(tk.Frame):
                 str_key = str(key) + ";" + str(value.get()) + ";\n"
                 file_settings.write(str_key)
             str_key = str("Dwell Times") + ";" + str(self.container_var["dwell_times"]["Entry"]["Default"].get()) + ";\n"
+            file_settings.write(str_key)
+            str_key = str("Default ICP-MS") + ";" + str(self.var_opt_icp.get()) + ";\n"
             file_settings.write(str_key)
 
     def check_srm_settings(self):
@@ -15394,8 +15436,16 @@ class PySILLS(tk.Frame):
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
                         var_skipfooter = self.container_icpms["skipfooter"]
-                        df_exmpl = DE(filename_long=file_std).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        try:
+                            df_exmpl = DE(filename_long=file_std).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        except:
+                            print("ERROR - Data import failed.")
+                            print("Possible problem: imported files were created by different ICP-MS instruments.")
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                            self.container_icpms["skipheader"] = file_info["skipheader"]
+                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
                     else:
                         df_exmpl = DE(filename_long=file_std).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
@@ -15445,8 +15495,16 @@ class PySILLS(tk.Frame):
                     if self.container_icpms["name"] != None:
                         var_skipheader = self.container_icpms["skipheader"]
                         var_skipfooter = self.container_icpms["skipfooter"]
-                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        try:
+                            df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        except:
+                            print("ERROR - Data import failed.")
+                            print("Possible problem: imported files were created by different ICP-MS instruments.")
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_smpl)
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                            self.container_icpms["skipheader"] = file_info["skipheader"]
+                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
                     else:
                         df_exmpl = DE(filename_long=file_smpl).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
@@ -17459,8 +17517,11 @@ class PySILLS(tk.Frame):
                 if self.container_icpms["name"] != None:
                     var_skipheader = self.container_icpms["skipheader"]
                     var_skipfooter = self.container_icpms["skipfooter"]
-                    df_data = DE(filename_long=var_file_long).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    try:
+                        df_data = DE(filename_long=var_file_long).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    except:
+                        df_data, file_info = self.find_icpms_data_in_file(filename_long=var_file_long)
                 else:
                     df_data = DE(filename_long=var_file_long).get_measurements(
                         delimiter=",", skip_header=3, skip_footer=1)
@@ -17828,8 +17889,11 @@ class PySILLS(tk.Frame):
             if self.container_icpms["name"] != None:
                 var_skipheader = self.container_icpms["skipheader"]
                 var_skipfooter = self.container_icpms["skipfooter"]
-                df_i = DE(filename_long=filename_long).get_measurements(
-                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                try:
+                    df_i = DE(filename_long=filename_long).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                except:
+                    df_i, file_info = self.find_icpms_data_in_file(filename_long=filename_long)
             else:
                 df_i = DE(filename_long=filename_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
         else:
@@ -20378,8 +20442,11 @@ class PySILLS(tk.Frame):
             if self.container_icpms["name"] != None:
                 var_skipheader = self.container_icpms["skipheader"]
                 var_skipfooter = self.container_icpms["skipfooter"]
-                df_data = DE(filename_long=var_file).get_measurements(
-                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                try:
+                    df_data = DE(filename_long=var_file).get_measurements(
+                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                except:
+                    df_data, file_info = self.find_icpms_data_in_file(filename_long=var_file)
             else:
                 df_data = DE(filename_long=var_file).get_measurements(
                     delimiter=",", skip_header=3, skip_footer=1)
