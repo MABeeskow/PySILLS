@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.42
-# Date:		27.11.2024
+# Date:		30.11.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.42"
-        self.val_version = self.str_version_number + " - 27.11.2024"
+        self.val_version = self.str_version_number + " - 30.11.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -2139,6 +2139,8 @@ class PySILLS(tk.Frame):
                 var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
                 text=mode, sticky="NESW", relief=tk.FLAT, font=font_element, command=lambda var_rb=self.var_rb_mode:
                 self.select_experiment(var_rb))
+            if index == 0:
+                self.rb_ma = rb_mode
             if mode in ["Report Analysis"]:
                 rb_mode.configure(state="disabled")
 
@@ -3745,19 +3747,19 @@ class PySILLS(tk.Frame):
                         bg=self.green_dark).create_simple_label(text=str(var_srm) + " - Element Concentrations (ppm)",
                                                                 relief=tk.GROOVE, fontsize="sans 10 bold")
         self.container_elements["SRM"]["Label"].append(lbl_srm_03)
-        #
+
         if default:
             for file in self.list_std:
                 parts = file.split("/")
                 self.container_var["SRM"][file].set(var_srm)
                 self.container_files["STD"][parts[-1]]["SRM"].set(var_srm)
-        #
+
         try:
             ESRM().place_srm_values(srm_name=var_srm, srm_dict=self.srm_actual)
         except:
             self.srm_actual[var_srm] = {}
             ESRM().place_srm_values(srm_name=var_srm, srm_dict=self.srm_actual)
-        #
+
         for element in self.list_pse:
             if element in self.srm_actual[var_srm]:
                 self.container_var["SRM"][element].set(self.srm_actual[var_srm][element])
@@ -9378,6 +9380,27 @@ class PySILLS(tk.Frame):
                 "Data RAW": data_raw, "Data SMOOTHED": data_smoothed, "Data IMPROVED": data_improved,
                 "Indices": data_indices, "Times": data_times}
 
+    def build_intervals(self, filetype, filename, focus, list_time, start_i, end_i, id):
+        index_start_i = list_time.index(start_i)
+        index_end_i = list_time.index(start_i)
+        int_id = id + 1
+
+        if len(self.container_helper[filetype][filename][focus]["Indices"]) > 0:
+            int_id = self.container_helper[filetype][filename][focus]["Indices"][-1] + 1
+
+        helper_times = [float(start_i), float(end_i)]
+        helper_indices = [int(index_start_i), int(index_end_i)]
+        helper_times.sort()
+        helper_indices.sort()
+
+        self.container_helper[filetype][filename][focus]["ID"] = int_id
+        self.container_helper[filetype][filename][focus]["Content"][int_id] = {}
+        self.container_helper[filetype][filename][focus]["Content"][int_id][
+            "Times"] = helper_times
+        self.container_helper[filetype][filename][focus]["Content"][int_id][
+            "Indices"] = helper_indices
+        self.container_helper[filetype][filename][focus]["Indices"].append(int_id)
+
     def load_sills_file(self, filename):
         data_sills = scipy.io.loadmat(filename)
         if "SRM" in data_sills:
@@ -9402,6 +9425,15 @@ class PySILLS(tk.Frame):
                     list_time = []
                     str_acquisition_pre = str(data_file[1][2][0][0])
 
+                    self.container_spikes[str_std] = {}
+                    self.container_helper["STD"][str_std] = {"BG": {"Content": {}, "Indices": []},
+                                                             "MAT": {"Content": {}, "Indices": []},
+                                                             "INCL": {"Content": {}, "Indices": []}}
+                    self.container_files["STD"][str_std] = {"SRM": tk.StringVar()}
+                    self.container_var["STD"][str_std] = {
+                        "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Checkbox": tk.IntVar(), "Sign Color": tk.StringVar(), "SRM": tk.StringVar()}
+
                     if "Acquired" in str_acquisition_pre:
                         key_start = re.search(
                             r"Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)",
@@ -9421,6 +9453,7 @@ class PySILLS(tk.Frame):
                             helper_std[str_std][isotope] = []
 
                     for index3, data in enumerate(data_file):
+                        #print(index3, data)
                         if index3 == 0:
                             for line, values in enumerate(data):
                                 value_time = float(values[0])
@@ -9429,9 +9462,74 @@ class PySILLS(tk.Frame):
                                     if j > 0:
                                         isotope = list_isotopes[j - 1]
                                         helper_std[str_std][isotope].append(float(value))
+                        elif index3 == 6:    # Background interval
+                            for i, interval in enumerate(data):
+                                start_i = interval[0]
+                                end_i = interval[1]
+                                self.build_intervals(filetype="STD", filename=str_std, focus="BG", list_time=list_time,
+                                                     start_i=start_i, end_i=end_i, id=i)
+                        elif index3 == 7:    # Matrix interval
+                            for i, interval in enumerate(data):
+                                start_i = interval[0]
+                                end_i = interval[1]
+                                self.build_intervals(filetype="STD", filename=str_std, focus="MAT", list_time=list_time,
+                                                     start_i=start_i, end_i=end_i, id=i)
+                        elif index3 == 38:    # SRM data
+                            helper_srm_i = {}
+                            unique_srm = []
+                            self.srm_isotopes = {}
+
+                            for i, srm_value in enumerate(data[0]):
+                                isotope = list_isotopes[i]
+                                helper_srm_i[isotope] = float(srm_value)
+
+                            for isotope, value in helper_srm_i.items():
+                                if value not in unique_srm:
+                                    unique_srm.append(value)
+
+                            for srm, srm_dataset in helper_srm.items():
+                                data_srm_i = list(srm_dataset.values())
+                                common_data_i = list(set(data_srm_i).intersection(unique_srm))
+
+                                if unique_srm.sort() == common_data_i.sort():
+                                    self.container_files["STD"][str_std]["SRM"].set(srm)
+                                    self.container_var["STD"][str_std]["SRM"].set(srm)
+                                    self.container_var["SRM"]["default"][0].set(srm)
+                                    self.container_var["SRM"]["default"][1].set(srm)
+
+                                    if srm not in self.srm_actual:
+                                        self.srm_actual[srm] = {}
+
+                                    for isotope, value in helper_srm_i.items():
+                                        self.srm_isotopes[isotope] = {}
+                                        key_element = re.search(r"(\D+)(\d+)", isotope)
+                                        element = key_element.group(1)
+
+                                        if element not in self.container_var["SRM"]:
+                                            self.container_var["SRM"][element] = tk.StringVar()
+                                        if isotope not in self.container_var["SRM"]:
+                                            self.container_var["SRM"][isotope] = tk.StringVar()
+                                        if element not in self.container_var["STD"]:
+                                            self.container_var["STD"][element] = {"SRM": tk.StringVar()}
+
+                                        self.container_var["STD"][element]["SRM"].set(srm)
+                                        self.container_var["SRM"][isotope].set(srm)
+                                        self.srm_isotopes[isotope]["SRM"] = srm
+
+                                        if element in helper_srm[srm]:
+                                            self.srm_actual[srm][element] = helper_srm[srm][element]
+                                        else:
+                                            self.srm_actual[srm][element] = 0.0
+
+                                        if element in self.srm_actual[srm]:
+                                            self.srm_isotopes[isotope]["Concentration"] = self.srm_actual[srm][element]
+                                        else:
+                                            self.srm_isotopes[isotope]["Concentration"] = 0.0
 
                     helper_std[str_std]["Time"] = list_time
 
+                    self.container_var["STD"][str_std]["Checkbox"].set(1)
+                    self.container_var["STD"][str_std]["Sign Color"].set(self.sign_yellow)
                     self.lb_std.insert(tk.END, str(str_std))
                     self.list_std.append(str_std)
                     self.container_lists["STD"]["Long"].append(str_std)
@@ -9451,6 +9549,7 @@ class PySILLS(tk.Frame):
 
         if "UNK" in data_sills:
             helper_smpl = {}
+            self.mode_ma = True
             for index, data_smpl in enumerate(data_sills["UNK"]):
                 for index2, data_file in enumerate(data_smpl):
                     str_smpl = str(data_file[3][0][0][0][0])
@@ -9458,6 +9557,17 @@ class PySILLS(tk.Frame):
                     list_isotopes = []
                     list_time = []
                     str_acquisition_pre = str(data_file[1][2][0][0])
+
+                    self.container_helper["SMPL"][str_smpl] = {"BG": {"Content": {}, "Indices": []},
+                                                               "MAT": {"Content": {}, "Indices": []},
+                                                               "INCL": {"Content": {}, "Indices": []}}
+                    self.container_var["SMPL"][str_smpl] = {
+                        "IS Data": {"IS": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Checkbox": tk.IntVar(), "ID": tk.StringVar(), "Sign Color": tk.StringVar()}
+                    self.container_var["SMPL"][str_smpl]["Matrix Setup"] = {
+                        "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
+                        "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
 
                     if "Acquired" in str_acquisition_pre:
                         key_start = re.search(
@@ -9478,6 +9588,7 @@ class PySILLS(tk.Frame):
                             helper_smpl[str_smpl][isotope] = []
 
                     for index3, data in enumerate(data_file):
+                        print(index3, len(data), data)
                         if index3 == 0:
                             for line, values in enumerate(data):
                                 value_time = float(values[0])
@@ -9486,9 +9597,59 @@ class PySILLS(tk.Frame):
                                     if j > 0:
                                         isotope = list_isotopes[j - 1]
                                         helper_smpl[str_smpl][isotope].append(float(value))
+                        elif index3 == 6:    # Background interval (MA/FI/MI)
+                            for i, interval in enumerate(data):
+                                start_i = interval[0]
+                                end_i = interval[1]
+                                self.build_intervals(filetype="SMPL", filename=str_smpl, focus="BG",
+                                                     list_time=list_time, start_i=start_i, end_i=end_i, id=i)
+                        elif index3 == 7 and len(data) > 0: # Matrix interval (FI/MI)
+                            for i, interval in enumerate(data):
+                                start_i = interval[0]
+                                end_i = interval[1]
+                                self.build_intervals(filetype="SMPL", filename=str_smpl, focus="MAT",
+                                                     list_time=list_time, start_i=start_i, end_i=end_i, id=i)
+                                self.mode_ma = False
+                        elif index3 == 8 and len(data) > 0: # Matrix interval (FI/MI)
+                            for i, interval in enumerate(data):
+                                start_i = interval[0]
+                                end_i = interval[1]
+                                self.build_intervals(filetype="SMPL", filename=str_smpl, focus="MAT",
+                                                     list_time=list_time, start_i=start_i, end_i=end_i, id=i)
+                                self.mode_ma = False
+                        elif index3 == 10:    # Matrix interval (MA) / Inclusion interval (FI/MI)
+                            for i, interval in enumerate(data):
+                                start_i = interval[0]
+                                end_i = interval[1]
+
+                                if self.mode_ma == True:
+                                    self.build_intervals(filetype="SMPL", filename=str_smpl, focus="MAT",
+                                                         list_time=list_time, start_i=start_i, end_i=end_i, id=i)
+                                elif self.mode_ma == False:
+                                    self.pysills_mode = "FIMI"
+                                    self.build_intervals(filetype="SMPL", filename=str_smpl, focus="INCL",
+                                                         list_time=list_time, start_i=start_i, end_i=end_i, id=i)
+                        elif index3 == 29 and len(data) > 0:    # Concentration (Matrix) sex
+                            for i, value in enumerate(data[0]):
+                                self.container_var["SMPL"][str_smpl]["Matrix Setup"]["IS"]["Concentration"].set(value)
+                        elif index3 == 40 and len(data) > 0:    # Concentration (Inclusion)
+                            for i, value in enumerate(data[0]):
+                                self.container_var["SMPL"][str_smpl]["IS Data"]["Concentration"].set(value)
+                        elif index3 == 104 and self.mode_ma == True:
+                            for i, val_sensitivity in enumerate(data[0]):
+                                if round(float(val_sensitivity), 2) == 1.00:
+                                    self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
+                        elif index3 == 105 and self.mode_ma == False:
+                            for i, val_sensitivity in enumerate(data[0]):
+                                if np.isnan(val_sensitivity) == False:
+                                    if round(float(val_sensitivity), 2) == 1.00:
+                                        self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
 
                     helper_smpl[str_smpl]["Time"] = list_time
 
+                    self.container_var["SMPL"][str_smpl]["ID"].set("A")
+                    self.container_var["SMPL"][str_smpl]["Checkbox"].set(1)
+                    self.container_var["SMPL"][str_smpl]["Sign Color"].set(self.sign_yellow)
                     self.lb_smpl.insert(tk.END, str(str_smpl))
                     self.list_smpl.append(str_smpl)
                     self.container_lists["SMPL"]["Long"].append(str_smpl)
@@ -9546,10 +9707,9 @@ class PySILLS(tk.Frame):
 
                 if self.pysills_mode == "MA":
                     self.ma_settings()
-                elif self.pysills_mode == "FI":
-                    self.fi_settings()
-                elif self.pysills_mode == "MI":
-                    self.mi_settings()
+                elif self.pysills_mode == "FIMI":
+                    self.rb_ma.configure(state="disabled")
+                    print("Please select the correct analysis mode (Fluid/Melt inclusion analysis).")
             else:
                 try:
                     file_loaded = open(str(filename), "r")
@@ -13078,10 +13238,15 @@ class PySILLS(tk.Frame):
                 var_tv.delete(item)
 
         if var_opt != "Select SRM":
-            for element in np.sort(list(self.srm_actual[var_opt].keys())):
-                entry_isotope = [element, self.srm_actual[var_opt][element]]
-                #
-                var_tv.insert("", tk.END, values=entry_isotope)
+            if var_opt in self.srm_actual:
+                for element in np.sort(list(self.srm_actual[var_opt].keys())):
+                    entry_isotope = [element, self.srm_actual[var_opt][element]]
+                    var_tv.insert("", tk.END, values=entry_isotope)
+            else:
+                for str_srm in np.sort(list(self.srm_actual.keys())):
+                    for element in np.sort(list(self.srm_actual[str_srm].keys())):
+                        entry_isotope = [element, self.srm_actual[var_opt][element]]
+                        var_tv.insert("", tk.END, values=entry_isotope)
 
     def check_interval_settings(self):
         # Colors
