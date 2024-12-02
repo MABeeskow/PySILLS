@@ -9413,10 +9413,12 @@ class PySILLS(tk.Frame):
 
     def load_sills_file(self, filename):
         data_sills = scipy.io.loadmat(filename)
+        list_srm = []
         if "SRM" in data_sills:
             helper_srm = {}
             for index, data_srm in enumerate(data_sills["SRM"]):
                 str_srm = str(data_srm[0][4][0])
+                list_srm.append(str_srm)
                 helper_srm[str_srm] = {}
                 container_values = data_srm[0][0]
                 container_elements = data_srm[0][1]
@@ -9496,6 +9498,10 @@ class PySILLS(tk.Frame):
                                     if j > 0:
                                         isotope = list_isotopes[j - 1]
                                         helper_std[str_std][isotope].append(float(value))
+                        elif index3 == 5:    # Standard Reference Material (SRM) sex
+                            index_srm = data[0][0] - 1
+                            self.container_files["STD"][str_std]["SRM"].set(list_srm[index_srm])
+                            self.container_var["STD"][str_std]["SRM"].set(list_srm[index_srm])
                         elif index3 == 6:    # Background interval
                             for i, interval in enumerate(data):
                                 start_i = interval[0]
@@ -9531,8 +9537,8 @@ class PySILLS(tk.Frame):
                                 common_data_i = list(set(data_srm_i).intersection(unique_srm))
 
                                 if unique_srm.sort() == common_data_i.sort():
-                                    self.container_files["STD"][str_std]["SRM"].set(srm)
-                                    self.container_var["STD"][str_std]["SRM"].set(srm)
+                                    # self.container_files["STD"][str_std]["SRM"].set(srm)
+                                    # self.container_var["STD"][str_std]["SRM"].set(srm)
                                     self.container_var["SRM"]["default"][0].set(srm)
                                     self.container_var["SRM"]["default"][1].set(srm)
 
@@ -9598,6 +9604,38 @@ class PySILLS(tk.Frame):
                     self.build_file_data_09(key=str_std, df_isotopes=list_isotopes, dataframe=df_std, times=list_time,
                                             dataframe_smoothed=df_std_smoothed, with_smoothed=False)
                     #self.container_var["Spike Elimination"]["STD"]["State"] = True
+            helper_srm_2 = {}
+            for srm, dataset in self.srm_actual.items():
+                helper_srm_2[srm] = 0
+                for isotope, value in dataset.items():
+                    if value == 0:
+                        helper_srm_2[srm] += 1
+
+            if len(helper_srm_2) > 1:
+                for isotope in list_isotopes:
+                    srm = list_srm[1]
+                    key_element = re.search(r"(\D+)(\d+)", isotope)
+                    element = key_element.group(1)
+                    self.container_var["STD"][element]["SRM"].set(srm)
+                    self.container_var["SRM"][isotope].set(srm)
+                    self.srm_isotopes[isotope]["SRM"] = srm
+
+                    if element in self.srm_actual[srm]:
+                        self.srm_isotopes[isotope]["Concentration"] = self.srm_actual[srm][element]
+                    else:
+                        self.srm_isotopes[isotope]["Concentration"] = 0.0
+
+                    if element in ["Cl", "Br", "I"]:
+                        for srm in list_srm:
+                            if "Sca" in srm or "sca" in srm:
+                                self.container_var["STD"][element]["SRM"].set(srm)
+                                self.container_var["SRM"][isotope].set(srm)
+                                self.srm_isotopes[isotope]["SRM"] = srm
+
+                                if element in self.srm_actual[srm]:
+                                    self.srm_isotopes[isotope]["Concentration"] = self.srm_actual[srm][element]
+                                else:
+                                    self.srm_isotopes[isotope]["Concentration"] = 0.0
 
         if "UNK" in data_sills:
             helper_smpl = {}
