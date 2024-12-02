@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.42
+# Version:	v1.0.43
 # Date:		02.12.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.42"
+        self.str_version_number = "1.0.43"
         self.val_version = self.str_version_number + " - 02.12.2024"
 
         ## Colors
@@ -9382,7 +9382,7 @@ class PySILLS(tk.Frame):
 
     def build_intervals(self, filetype, filename, focus, list_time, start_i, end_i, id):
         index_start_i = list_time.index(start_i)
-        index_end_i = list_time.index(start_i)
+        index_end_i = list_time.index(end_i)
         int_id = id + 1
 
         if len(self.container_helper[filetype][filename][focus]["Indices"]) > 0:
@@ -9423,7 +9423,13 @@ class PySILLS(tk.Frame):
                     helper_std[str_std] = {}
                     list_isotopes = []
                     list_time = []
-                    str_acquisition_pre = str(data_file[1][2][0][0])
+
+                    if "xl" in str_std:
+                        str_acquisition_pre = str(data_file[3][0][0][1][0])
+                    elif "csv" in str_std:
+                        str_acquisition_pre = str(data_file[1][2][0][0])
+                    else:
+                        str_acquisition_pre = str(data_file[3][0][0][1][0])
 
                     self.container_spikes[str_std] = {}
                     self.container_helper["STD"][str_std] = {"BG": {"Content": {}, "Indices": []},
@@ -9445,12 +9451,27 @@ class PySILLS(tk.Frame):
                             self.container_var["acquisition times"]["STD"][str_std].set(str_acquisition[0] + ":"
                                                                                         + str_acquisition[1] + ":"
                                                                                         + str_acquisition[2])
+                    else:
+                        if "xl" in str_std:
+                            key_time = re.search(r"(\d+)\-(\w+)\-(\d+)\s+(\d+)\:(\d+)\:(\d+)",
+                                                 str_acquisition_pre)
+                            if key_time:
+                                str_acquisition = [
+                                    str(key_time.group(4)), str(key_time.group(5)), str(key_time.group(6))]
+
+                                self.container_var["acquisition times"]["STD"][str_std] = tk.StringVar()
+                                self.container_var["acquisition times"]["STD"][str_std].set(str_acquisition[0] + ":"
+                                                                                            + str_acquisition[1] + ":"
+                                                                                            + str_acquisition[2])
 
                     for i, item in enumerate(data_file[2][0]):
                         if i > 0:
                             isotope = str(item[0])
                             list_isotopes.append(isotope)
                             helper_std[str_std][isotope] = []
+                            if isotope not in self.container_var["dwell_times"]["Entry"]:
+                                self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
+                                self.container_var["dwell_times"]["Entry"][isotope].set("0.002")
 
                     for index3, data in enumerate(data_file):
                         #print(index3, data)
@@ -9550,13 +9571,20 @@ class PySILLS(tk.Frame):
         if "UNK" in data_sills:
             helper_smpl = {}
             self.mode_ma = True
+            self.mode_2ndis = False
             for index, data_smpl in enumerate(data_sills["UNK"]):
                 for index2, data_file in enumerate(data_smpl):
                     str_smpl = str(data_file[3][0][0][0][0])
                     helper_smpl[str_smpl] = {}
                     list_isotopes = []
                     list_time = []
-                    str_acquisition_pre = str(data_file[1][2][0][0])
+
+                    if "xl" in str_std:
+                        str_acquisition_pre = str(data_file[3][0][0][1][0])
+                    elif "csv" in str_std:
+                        str_acquisition_pre = str(data_file[1][2][0][0])
+                    else:
+                        str_acquisition_pre = str(data_file[3][0][0][1][0])
 
                     self.container_helper["SMPL"][str_smpl] = {"BG": {"Content": {}, "Indices": []},
                                                                "MAT": {"Content": {}, "Indices": []},
@@ -9568,6 +9596,11 @@ class PySILLS(tk.Frame):
                         "IS": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
                         "Oxide": {"Name": tk.StringVar(), "Concentration": tk.StringVar()},
                         "Element": {"Name": tk.StringVar(), "Concentration": tk.StringVar()}}
+                    self.container_var["SMPL"][str_smpl]["Host Only Tracer"] = {
+                        "Name": tk.StringVar(), "Value": tk.StringVar(), "Matrix": tk.StringVar(),
+                        "Amount": tk.StringVar()}
+                    self.container_var["SMPL"][str_smpl]["Second Internal Standard"] = {
+                        "Name": tk.StringVar(), "Value": tk.StringVar()}
 
                     if "Acquired" in str_acquisition_pre:
                         key_start = re.search(
@@ -9580,6 +9613,17 @@ class PySILLS(tk.Frame):
                             self.container_var["acquisition times"]["SMPL"][str_smpl].set(str_acquisition[0] + ":"
                                                                                           + str_acquisition[1] + ":"
                                                                                           + str_acquisition[2])
+                    else:
+                        if "xl" in str_smpl:
+                            key_time = re.search(r"(\d+)\-(\w+)\-(\d+)\s+(\d+)\:(\d+)\:(\d+)", str_acquisition_pre)
+                            if key_time:
+                                str_acquisition = [
+                                    str(key_time.group(4)), str(key_time.group(5)), str(key_time.group(6))]
+
+                                self.container_var["acquisition times"]["SMPL"][str_smpl] = tk.StringVar()
+                                self.container_var["acquisition times"]["SMPL"][str_smpl].set(str_acquisition[0] + ":"
+                                                                                            + str_acquisition[1] + ":"
+                                                                                            + str_acquisition[2])
 
                     for i, item in enumerate(data_file[2][0]):
                         if i > 0:
@@ -9629,21 +9673,79 @@ class PySILLS(tk.Frame):
                                     self.pysills_mode = "FIMI"
                                     self.build_intervals(filetype="SMPL", filename=str_smpl, focus="INCL",
                                                          list_time=list_time, start_i=start_i, end_i=end_i, id=i)
-                        elif index3 == 29 and len(data) > 0:    # Concentration (Matrix) sex
+                        elif index3 == 26 and len(data) > 0:  # IS (Matrix)
+                            index_isotope = data[0][0] - 1
+                            if self.mode_ma == False:
+                                self.container_var["SMPL"][str_smpl]["Matrix Setup"]["IS"]["Name"].set(
+                                    list_isotopes[index_isotope])
+                            else:
+                                self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[index_isotope])
+                        elif index3 == 29 and len(data) > 0 and self.mode_ma == False:    # Concentration (Matrix)
                             for i, value in enumerate(data[0]):
                                 self.container_var["SMPL"][str_smpl]["Matrix Setup"]["IS"]["Concentration"].set(value)
-                        elif index3 == 40 and len(data) > 0:    # Concentration (Inclusion)
+                        elif index3 == 30 and len(data) > 0 and self.mode_ma == False:    # Amount oxide (Matrix)
+                            amount_oxide = float(data[0][0])
+                            self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set(
+                                amount_oxide)
+                        elif index3 == 31 and len(data) > 0:    # Oxide (Matrix)
+                            index_oxide = data[0][0] - 1
+                            list_oxides = ["SiO2", "TiO2", "Fe2O3", "FeO", "MnO", "MgO", "CaO", "Na2O", "K2O"]
+                            self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Name"].set(
+                                list_oxides[index_oxide])
+                        elif index3 == 33 and len(data) > 0 and self.mode_ma == True:    # Amount oxide (Sample) sex
+                            amount_oxide = float(data[0][0])
+                            self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set(
+                                amount_oxide)
+                            key = re.search(r"(\D+)(\d*)(\D+)(\d*)", list_oxides[index_oxide])
+                            element_cation = key.group(1)
+
+                            if len(key.group(2)) > 0:
+                                n_cation = int(key.group(2))
+                            else:
+                                n_cation = 1
+
+                            value_is = round((n_cation*self.chemistry_data[element_cation]/self.chemistry_data_oxides[
+                                list_oxides[index_oxide]])*10**6, 4)
+                            if self.mode_ma == True:
+                                self.container_var["SMPL"][str_smpl]["IS Data"]["Concentration"].set(value_is)
+                        elif index3 == 37 and len(data) > 0 and self.mode_ma == False:    # IS (Sample/Inclusion)
+                            index_isotope = data[0][0] - 1
+                            self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[index_isotope])
+                        elif index3 == 40 and len(data) > 0:    # Concentration (Sample/Inclusion)
                             for i, value in enumerate(data[0]):
                                 self.container_var["SMPL"][str_smpl]["IS Data"]["Concentration"].set(value)
-                        elif index3 == 104 and self.mode_ma == True:
-                            for i, val_sensitivity in enumerate(data[0]):
-                                if round(float(val_sensitivity), 2) == 1.00:
-                                    self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
-                        elif index3 == 105 and self.mode_ma == False:
-                            for i, val_sensitivity in enumerate(data[0]):
-                                if np.isnan(val_sensitivity) == False:
-                                    if round(float(val_sensitivity), 2) == 1.00:
-                                        self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
+                        elif index3 == 44 and len(data) > 0 and self.mode_ma == False:  # 2nd IS sex
+                            index_isotope = data[0][0] - 1
+                            self.container_var["SMPL"][str_smpl]["Second Internal Standard"]["Name"].set(
+                                list_isotopes[index_isotope])
+                        elif index3 == 47 and len(data) > 0 and self.mode_ma == False:  # 2nd IS concentration
+                            value = data[0][0]
+                            self.container_var["SMPL"][str_smpl]["Second Internal Standard"]["Value"].set(value)
+                            self.mode_2ndis = True
+                            for key_setting in ["fi_setting", "mi_setting"]:
+                                self.container_var[key_setting]["Quantification Method Option"].set(
+                                    "Second Internal Standard (SILLS)")
+                        elif index3 == 60 and len(data) > 0 and self.mode_ma == False:  # Matrix-only tracer (MOT)
+                            index_isotope = data[0][0] - 1
+                            self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Name"].set(
+                                list_isotopes[index_isotope])
+                            self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Value"].set("0.0")
+                            self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Amount"].set(amount_oxide)
+                            self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Matrix"].set(
+                                list_oxides[index_oxide])
+                            if self.mode_2ndis == False:
+                                for key_setting in ["fi_setting", "mi_setting"]:
+                                    self.container_var[key_setting]["Quantification Method Option"].set(
+                                        "Matrix-only Tracer (SILLS)")
+                        # elif index3 == 104 and self.mode_ma == True:
+                        #     for i, val_sensitivity in enumerate(data[0]):
+                        #         if round(float(val_sensitivity), 2) == 1.00:
+                        #             self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
+                        # elif index3 == 105 and self.mode_ma == False:
+                        #     for i, val_sensitivity in enumerate(data[0]):
+                        #         if np.isnan(val_sensitivity) == False:
+                        #             if round(float(val_sensitivity), 2) == 1.00:
+                        #                 self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
 
                     helper_smpl[str_smpl]["Time"] = list_time
 
@@ -20748,6 +20850,7 @@ class PySILLS(tk.Frame):
                     var_incl_is][0]
                 value_incl2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
                     var_incl_is][1]
+
             for isotope in file_isotopes:
                 value_mat1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                     isotope][0]
@@ -23504,8 +23607,11 @@ class PySILLS(tk.Frame):
 
                             var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][
                                 filename_short]["MAT"][isotope]
-                            var_result_i = (var_intensity_i/var_intensity_is)*(
-                                    var_concentration_is/var_concentration_i)
+                            if var_intensity_is > 0 and var_concentration_i > 0:
+                                var_result_i = (var_intensity_i/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_i)
+                            else:
+                                var_result_i = np.nan
                         else:
                             var_result_i = 0.0
 
