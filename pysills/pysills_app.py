@@ -9313,7 +9313,7 @@ class PySILLS(tk.Frame):
                         "Data RAW": data_raw, "Data SMOOTHED": data_smoothed, "Data IMPROVED": data_improved,
                         "Indices": data_indices, "Times": data_times}
 
-    def build_file_data_09(self, key, df_isotopes, dataframe, times):
+    def build_file_data_09(self, key, df_isotopes, dataframe, times, dataframe_smoothed=None, with_smoothed=None):
         self.container_lists["Measured Isotopes"][key] = df_isotopes
 
         if key not in self.container_lists["Measured Elements"]:
@@ -9346,7 +9346,11 @@ class PySILLS(tk.Frame):
 
         for isotope in df_isotopes:
             self.container_measurements["RAW"][key][isotope] = dataframe[isotope].tolist()
-            self.container_measurements["EDITED"][key][isotope] = {}
+
+            if with_smoothed != None:
+                self.container_measurements["EDITED"][key][isotope] = dataframe_smoothed[isotope].tolist()
+            else:
+                self.container_measurements["EDITED"][key][isotope] = {}
 
             if "RAW" not in self.container_measurements["SELECTED"][key]:
                 self.container_measurements["SELECTED"][key]["RAW"] = {}
@@ -9358,8 +9362,14 @@ class PySILLS(tk.Frame):
             self.container_measurements["SELECTED"][key]["SMOOTHED"][isotope] = {}
 
             data_raw = self.container_measurements["RAW"][key][isotope]
-            data_smoothed = data_raw.copy()
-            data_improved = data_raw.copy()
+
+            if with_smoothed != None:
+                data_smoothed = self.container_measurements["EDITED"][key][isotope]
+                data_improved = data_smoothed.copy()
+            else:
+                data_smoothed = data_raw.copy()
+                data_improved = data_raw.copy()
+
             data_indices = []
             data_times = self.container_measurements["SELECTED"][key]["Time"]
 
@@ -9417,10 +9427,12 @@ class PySILLS(tk.Frame):
 
         if "STD" in data_sills:
             helper_std = {}
+            helper_std_smoothed = {}
             for index, data_std in enumerate(data_sills["STD"]):
                 for index2, data_file in enumerate(data_std):
                     str_std = str(data_file[3][0][0][0][0])
                     helper_std[str_std] = {}
+                    helper_std_smoothed[str_std] = {}
                     list_isotopes = []
                     list_time = []
 
@@ -9469,12 +9481,13 @@ class PySILLS(tk.Frame):
                             isotope = str(item[0])
                             list_isotopes.append(isotope)
                             helper_std[str_std][isotope] = []
+                            helper_std_smoothed[str_std][isotope] = []
                             if isotope not in self.container_var["dwell_times"]["Entry"]:
                                 self.container_var["dwell_times"]["Entry"][isotope] = tk.StringVar()
                                 self.container_var["dwell_times"]["Entry"][isotope].set("0.002")
 
                     for index3, data in enumerate(data_file):
-                        #print(index3, data)
+                        #print(index3, len(data), data)
                         if index3 == 0:
                             for line, values in enumerate(data):
                                 value_time = float(values[0])
@@ -9495,6 +9508,11 @@ class PySILLS(tk.Frame):
                                 end_i = interval[1]
                                 self.build_intervals(filetype="STD", filename=str_std, focus="MAT", list_time=list_time,
                                                      start_i=start_i, end_i=end_i, id=i)
+                        # elif index3 == 26:
+                        #     for line, values in enumerate(data):
+                        #         for j, value in enumerate(values):
+                        #             isotope = list_isotopes[j - 1]
+                        #             helper_std_smoothed[str_std][isotope].append(float(value))
                         elif index3 == 38:    # SRM data
                             helper_srm_i = {}
                             unique_srm = []
@@ -9566,16 +9584,31 @@ class PySILLS(tk.Frame):
 
                     data_dict = {col: values for col, values in zip(column_names, data_columns)}
                     df_std = pd.DataFrame(data_dict)
-                    self.build_file_data_09(key=str_std, df_isotopes=list_isotopes, dataframe=df_std, times=list_time)
+                    df_std_smoothed = df_std.copy()
+                    # column_names = []
+                    # column_names.extend(list_isotopes)
+                    # data_columns = []
+                    #
+                    # for isotope in list_isotopes:   # Smoothed data
+                    #     data_columns.append(helper_std_smoothed[str_std][isotope])
+                    #
+                    # data_dict = {col: values for col, values in zip(column_names, data_columns)}
+                    # df_std_smoothed = pd.DataFrame(data_dict)
+
+                    self.build_file_data_09(key=str_std, df_isotopes=list_isotopes, dataframe=df_std, times=list_time,
+                                            dataframe_smoothed=df_std_smoothed, with_smoothed=False)
+                    #self.container_var["Spike Elimination"]["STD"]["State"] = True
 
         if "UNK" in data_sills:
             helper_smpl = {}
+            helper_smpl_smoothed = {}
             self.mode_ma = True
             self.mode_2ndis = False
             for index, data_smpl in enumerate(data_sills["UNK"]):
                 for index2, data_file in enumerate(data_smpl):
                     str_smpl = str(data_file[3][0][0][0][0])
                     helper_smpl[str_smpl] = {}
+                    helper_smpl_smoothed[str_smpl] = {}
                     list_isotopes = []
                     list_time = []
 
@@ -9630,9 +9663,10 @@ class PySILLS(tk.Frame):
                             isotope = str(item[0])
                             list_isotopes.append(isotope)
                             helper_smpl[str_smpl][isotope] = []
+                            helper_smpl_smoothed[str_smpl][isotope] = []
 
                     for index3, data in enumerate(data_file):
-                        print(index3, len(data), data)
+                        #print(index3, len(data), data)
                         if index3 == 0:
                             for line, values in enumerate(data):
                                 value_time = float(values[0])
@@ -9684,7 +9718,11 @@ class PySILLS(tk.Frame):
                             for i, value in enumerate(data[0]):
                                 self.container_var["SMPL"][str_smpl]["Matrix Setup"]["IS"]["Concentration"].set(value)
                         elif index3 == 30 and len(data) > 0 and self.mode_ma == False:    # Amount oxide (Matrix)
-                            amount_oxide = float(data[0][0])
+                            try:
+                                amount_oxide = float(data[0][0])
+                            except:
+                                amount_oxide = 0.0
+
                             self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set(
                                 amount_oxide)
                         elif index3 == 31 and len(data) > 0:    # Oxide (Matrix)
@@ -9692,7 +9730,7 @@ class PySILLS(tk.Frame):
                             list_oxides = ["SiO2", "TiO2", "Fe2O3", "FeO", "MnO", "MgO", "CaO", "Na2O", "K2O"]
                             self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Name"].set(
                                 list_oxides[index_oxide])
-                        elif index3 == 33 and len(data) > 0 and self.mode_ma == True:    # Amount oxide (Sample) sex
+                        elif index3 == 33 and len(data) > 0 and self.mode_ma == True:    # Amount oxide (Sample)
                             amount_oxide = float(data[0][0])
                             self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set(
                                 amount_oxide)
@@ -9719,9 +9757,14 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][str_smpl]["Second Internal Standard"]["Name"].set(
                                 list_isotopes[index_isotope])
                         elif index3 == 47 and len(data) > 0 and self.mode_ma == False:  # 2nd IS concentration
-                            value = data[0][0]
+                            try:
+                                value = data[0][0]
+                            except:
+                                value = 0.0
+
                             self.container_var["SMPL"][str_smpl]["Second Internal Standard"]["Value"].set(value)
                             self.mode_2ndis = True
+
                             for key_setting in ["fi_setting", "mi_setting"]:
                                 self.container_var[key_setting]["Quantification Method Option"].set(
                                     "Second Internal Standard (SILLS)")
@@ -9730,22 +9773,23 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Name"].set(
                                 list_isotopes[index_isotope])
                             self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Value"].set("0.0")
-                            self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Amount"].set(amount_oxide)
-                            self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Matrix"].set(
-                                list_oxides[index_oxide])
+
+                            try:
+                                self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Amount"].set(amount_oxide)
+                                self.container_var["SMPL"][str_smpl]["Host Only Tracer"]["Matrix"].set(
+                                    list_oxides[index_oxide])
+                            except:
+                                print("No oxide amount found.")
+
                             if self.mode_2ndis == False:
                                 for key_setting in ["fi_setting", "mi_setting"]:
                                     self.container_var[key_setting]["Quantification Method Option"].set(
                                         "Matrix-only Tracer (SILLS)")
-                        # elif index3 == 104 and self.mode_ma == True:
-                        #     for i, val_sensitivity in enumerate(data[0]):
-                        #         if round(float(val_sensitivity), 2) == 1.00:
-                        #             self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
-                        # elif index3 == 105 and self.mode_ma == False:
-                        #     for i, val_sensitivity in enumerate(data[0]):
-                        #         if np.isnan(val_sensitivity) == False:
-                        #             if round(float(val_sensitivity), 2) == 1.00:
-                        #                 self.container_var["SMPL"][str_smpl]["IS Data"]["IS"].set(list_isotopes[i])
+                        # elif index3 == 73:
+                        #     for line, values in enumerate(data):
+                        #         for j, value in enumerate(values):
+                        #             isotope = list_isotopes[j - 1]
+                        #             helper_smpl_smoothed[str_smpl][isotope].append(float(value))
 
                     helper_smpl[str_smpl]["Time"] = list_time
 
@@ -9767,7 +9811,20 @@ class PySILLS(tk.Frame):
 
                     data_dict = {col: values for col, values in zip(column_names, data_columns)}
                     df_smpl = pd.DataFrame(data_dict)
-                    self.build_file_data_09(key=str_smpl, df_isotopes=list_isotopes, dataframe=df_smpl, times=list_time)
+                    df_smpl_smoothed = df_smpl.copy()
+                    # column_names = []
+                    # column_names.extend(list_isotopes)
+                    # data_columns = []
+                    #
+                    # for isotope in list_isotopes:   # Smoothed data
+                    #     data_columns.append(helper_smpl_smoothed[str_smpl][isotope])
+                    #
+                    # data_dict = {col: values for col, values in zip(column_names, data_columns)}
+                    # df_smpl_smoothed = pd.DataFrame(data_dict)
+
+                    self.build_file_data_09(key=str_smpl, df_isotopes=list_isotopes, dataframe=df_smpl, times=list_time,
+                                            dataframe_smoothed=df_smpl_smoothed, with_smoothed=False)
+                    #self.container_var["Spike Elimination"]["SMPL"]["State"] = True
 
     def open_project(self):
         if len(self.container_lists["Measured Isotopes"]["All"]) > 0:
@@ -9785,10 +9842,10 @@ class PySILLS(tk.Frame):
             n_semicolons = 0
 
             if ".mat" in filename:
-                print("Filename:", filename)
+                #print("Filename:", filename)
                 self.load_sills_file(filename=filename)
                 mat_data = scipy.io.loadmat(filename)
-                print(mat_data.keys())
+                #print(mat_data.keys())
 
                 current_step = 100
                 self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
@@ -31675,11 +31732,12 @@ class PySILLS(tk.Frame):
         for isotope in self.container_lists["ISOTOPES"]:
             var_srm_i = self.container_var["SRM"][isotope].get()
 
-            if var_srm_i not in self.srm_actual:
-                self.srm_actual[var_srm_i] = {}
-                ESRM().place_srm_values(srm_name=var_srm_i, srm_dict=self.srm_actual)
+            if var_srm_i != "Select SRM":
+                if var_srm_i not in self.srm_actual:
+                    self.srm_actual[var_srm_i] = {}
+                    ESRM().place_srm_values(srm_name=var_srm_i, srm_dict=self.srm_actual)
 
-            self.fill_srm_values(var_srm=var_srm_i)
+                self.fill_srm_values(var_srm=var_srm_i)
 
     def select_srm_initialization(self):
         for isotope in self.container_lists["ISOTOPES"]:
