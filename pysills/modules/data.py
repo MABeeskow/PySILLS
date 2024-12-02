@@ -3,7 +3,7 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 19.11.2024
+# 02.12.2024
 # ----------------------
 #
 ## MODULES
@@ -41,6 +41,7 @@ class Data:
 
         if timestamp != None and icpms != None:
             line_time = imported_data[timestamp]
+
             if icpms == "Finnigan MAT ELEMENT":
                 key_time = re.search(r"(\w+)\,\s+(\w+)\s+(\d+)\,\s+(\d+)\s+(\d+)\:(\d+)\:(\d+)", line_time)
                 dict_months = {
@@ -77,6 +78,7 @@ class Data:
                     time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
 
                 key_end = re.search(r"\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
+
                 if key_end:
                     date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
                     time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]
@@ -94,16 +96,20 @@ class Data:
         else:
             line_time_start = imported_data[2]
             line_time_end = imported_data[-1]
+
             if "Printed" not in line_time_end:
                 line_time_end = imported_data[-2]
 
             key_start = re.search(
-                r"Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)", line_time_start)
+                r"Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)",
+                line_time_start)
+
             if key_start:
                 date_start = [str(key_start.group(1)), str(key_start.group(2)), str(key_start.group(3))]
                 time_start = [str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
 
             key_end = re.search(r"\s+Printed:(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)(.*)+", line_time_end)
+
             if key_end:
                 date_end = [str(key_end.group(1)), str(key_end.group(2)), str(key_end.group(3))]
                 time_end = [str(key_end.group(4)), str(key_end.group(5)), str(key_end.group(6))]
@@ -114,51 +120,51 @@ class Data:
         return dates, times
 
 class Import:
-    #
+
     def __init__(self, filename):
         self.filename = filename
-    #
+
     def import_csv_files(self, rows_header, rows_footer, delimiter=","):
         input_data = np.genfromtxt(fname=self.filename, delimiter=delimiter,
                                    dtype=str, skip_header=rows_header, skip_footer=rows_footer)
         n_rows = len(input_data)
         n_columns = len(input_data[0])
         data = []
-        #
+
         for i in range(n_columns):
             data.append([str(input_data[0][i]), [], str(self.filename)])
         for i in range(n_columns):
             for j in range(1, n_rows):
                 data[i][1].append(float(input_data[j][i]))
-        #
+
         return data
-#
+
 class general:
-    #
+
     def __init__(self):
         pass
-    #
+
     def importData(self, filename, delimiter, skipHeader, skipFooter):
-        #
+
         self.filename = filename
         self.delimiter = delimiter
         self.skipHeader = skipHeader
         self.skipFooter = skipFooter
-        #
+
         inputData = np.genfromtxt(self.filename, delimiter=self.delimiter, dtype=str, skip_header=self.skipHeader,
                                   skip_footer=self.skipFooter)
         nLines = len(inputData)
         nRows = len(inputData[0])
         data = []
-        #
+
         for i in range(0, nRows):
             data.append([str(inputData[0][i]), [], str(self.filename)])
         for i in range(0, nRows):
             for j in range(1, nLines):
                 data[i][1].append(float(inputData[j][i]))
-        #
+
         return data
-    #
+
     def importSRM(self, filename, delimiter=";", skipHeader=0, skipFooter=0):
         self.filename = filename
         self.delimiter = delimiter

@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.42
-# Date:		30.11.2024
+# Date:		02.12.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.42"
-        self.val_version = self.str_version_number + " - 30.11.2024"
+        self.val_version = self.str_version_number + " - 02.12.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -10579,6 +10579,20 @@ class PySILLS(tk.Frame):
 
         return df, file_info
 
+    def get_delimiter(self, var_line):
+        n_commas = 0
+        n_semicolons = 0
+
+        n_commas += var_line.count(",")
+        n_semicolons += var_line.count(";")
+
+        if n_commas > 0 and n_semicolons == 0:
+            delimiter = ","
+        elif n_commas == 0 and n_semicolons > 0:
+            delimiter = ";"
+
+        return delimiter
+
     def open_csv(self, datatype):
         if datatype == "STD":
             if "Default_STD_01.csv" in self.list_std:
@@ -10603,6 +10617,7 @@ class PySILLS(tk.Frame):
                 var_listbox.insert(tk.END, file_parts[-1])
                 str_filename_long = i
                 str_filename_short = file_parts[-1]
+
                 if self.container_icpms["name"] != None:
                     var_skipheader = self.container_icpms["skipheader"]
                     var_skipfooter = self.container_icpms["skipfooter"]
@@ -10610,9 +10625,32 @@ class PySILLS(tk.Frame):
                         delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
                 else:
                     df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=str_filename_long)
-                    self.container_icpms["name"] = "Undefined ICP-MS"
+                    var_skipheader = file_info["skipheader"]
+                    var_skipfooter = file_info["skipfooter"]
                     self.container_icpms["skipheader"] = file_info["skipheader"]
                     self.container_icpms["skipfooter"] = file_info["skipfooter"]
+
+                    if var_skipheader == 3 and var_skipfooter == 1:
+                        try:
+                            dates, times = Data(filename=str_filename_long).import_as_list(
+                                skip_header=3, skip_footer=1, timestamp=2, icpms="Agilent 7900s")
+                            var_timestamp = 2
+                            self.container_icpms["timestamp"] = var_timestamp
+                            self.container_icpms["name"] = "Agilent 7900s"
+                        except:
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                    elif var_skipheader == 3 and var_skipfooter == 0:
+                        try:
+                            dates, times = Data(filename=str_filename_long).import_as_list(
+                                skip_header=3, skip_footer=1, timestamp=2, icpms="Agilent 7900s")
+                            var_timestamp = 2
+                            self.container_icpms["timestamp"] = var_timestamp
+                            self.container_icpms["name"] = "Agilent 7900s"
+                        except:
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                    else:
+                        self.container_icpms["name"] = "Undefined ICP-MS"
+
                     self.var_opt_icp.set(self.container_icpms["name"])
 
                 if "Dataframe" not in self.container_measurements:
@@ -10635,7 +10673,6 @@ class PySILLS(tk.Frame):
                     var_skipfooter = self.container_icpms["skipfooter"]
                     var_timestamp = self.container_icpms["timestamp"]
                     var_icpms = self.container_icpms["name"]
-
                     dates, times = Data(filename=str_filename_long).import_as_list(
                         skip_header=var_skipheader, skip_footer=var_skipfooter, timestamp=var_timestamp,
                         icpms=var_icpms)
@@ -21339,15 +21376,19 @@ class PySILLS(tk.Frame):
 
             list_considered_isotopes = []
             file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
             for isotope in file_isotopes:
-                var_srm_i = self.container_var["SRM"][isotope].get()
-                if var_srm_i == var_srm_file:
-                    list_considered_isotopes.append(isotope)
+                if isotope in self.container_var["SRM"]:
+                    var_srm_i = self.container_var["SRM"][isotope].get()
+                    if var_srm_i == var_srm_file:
+                        list_considered_isotopes.append(isotope)
+
             list_categories.extend(list_considered_isotopes)
 
             key_element_is = re.search(r"(\D+)(\d+)", var_is)
             element_is = key_element_is.group(1)
             stop_calculation = False
+
             if element_is in self.srm_actual[var_srm_file]:
                 stop_calculation = False
             else:
