@@ -23773,8 +23773,11 @@ class PySILLS(tk.Frame):
                             var_concentration_i = self.srm_actual[srm_file][element]
                             var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][filename_short][
                                 "MAT"][isotope]
-                            var_result_i = (var_intensity_i/var_intensity_is)*(
-                                    var_concentration_is/var_concentration_i)
+                            if var_intensity_is > 0 and var_concentration_i > 0:
+                                var_result_i = (var_intensity_i/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_i)
+                            else:
+                                var_result_i = np.nan
                         else:
                             var_result_i = 0.0
 
