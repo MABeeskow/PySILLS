@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.44
-# Date:		02.12.2024
+# Date:		03.12.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.44"
-        self.val_version = self.str_version_number + " - 02.12.2024"
+        self.val_version = self.str_version_number + " - 03.12.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -9427,6 +9427,10 @@ class PySILLS(tk.Frame):
                     value = float(container_values[index2][0])
                     helper_srm[str_srm][element] = value
 
+        # if "A" in data_sills:
+        #     for index, data in enumerate(data_sills["A"]):
+        #         print(index, data)
+
         if "STD" in data_sills:
             helper_std = {}
             helper_std_smoothed = {}
@@ -9883,7 +9887,7 @@ class PySILLS(tk.Frame):
                 #print("Filename:", filename)
                 self.load_sills_file(filename=filename)
                 mat_data = scipy.io.loadmat(filename)
-                #print(mat_data.keys())
+                print(mat_data.keys())
 
                 current_step = 100
                 self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
