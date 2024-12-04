@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.44
-# Date:		03.12.2024
+# Version:	v1.0.45
+# Date:		04.12.2024
 
 # -----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.44"
-        self.val_version = self.str_version_number + " - 03.12.2024"
+        self.str_version_number = "1.0.45"
+        self.val_version = self.str_version_number + " - 04.12.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -9414,6 +9414,7 @@ class PySILLS(tk.Frame):
     def load_sills_file(self, filename):
         data_sills = scipy.io.loadmat(filename)
         list_srm = []
+
         if "SRM" in data_sills:
             helper_srm = {}
             for index, data_srm in enumerate(data_sills["SRM"]):
@@ -9608,12 +9609,73 @@ class PySILLS(tk.Frame):
                     self.build_file_data_09(key=str_std, df_isotopes=list_isotopes, dataframe=df_std, times=list_time,
                                             dataframe_smoothed=df_std_smoothed, with_smoothed=False)
                     #self.container_var["Spike Elimination"]["STD"]["State"] = True
+
             helper_srm_2 = {}
-            for srm, dataset in self.srm_actual.items():
-                helper_srm_2[srm] = 0
-                for isotope, value in dataset.items():
-                    if value == 0:
-                        helper_srm_2[srm] += 1
+
+            if len(self.srm_actual) > 0:
+                for srm, dataset in self.srm_actual.items():
+                    helper_srm_2[srm] = 0
+                    for isotope, value in dataset.items():
+                        if value == 0:
+                            helper_srm_2[srm] += 1
+            else:
+                helper_srm_i = {}
+                unique_srm = []
+                self.srm_isotopes = {}
+
+                for srm, dataset in helper_srm.items():
+                    for isotope in list_isotopes:
+                        key_element = re.search(r"(\D+)(\d+)", isotope)
+                        element = key_element.group(1)
+                        if element in dataset:
+                            helper_srm_i[isotope] = float(dataset[element])
+
+                for isotope, value in helper_srm_i.items():
+                    if value not in unique_srm:
+                        unique_srm.append(value)
+
+                for srm, srm_dataset in helper_srm.items():
+                    data_srm_i = list(srm_dataset.values())
+                    common_data_i = list(set(data_srm_i).intersection(unique_srm))
+
+                    if unique_srm.sort() == common_data_i.sort():
+                        self.container_var["SRM"]["default"][0].set(srm)
+                        self.container_var["SRM"]["default"][1].set(srm)
+
+                        if srm not in self.srm_actual:
+                            self.srm_actual[srm] = {}
+
+                        for isotope, value in helper_srm_i.items():
+                            self.srm_isotopes[isotope] = {}
+                            key_element = re.search(r"(\D+)(\d+)", isotope)
+                            element = key_element.group(1)
+
+                            if element not in self.container_var["SRM"]:
+                                self.container_var["SRM"][element] = tk.StringVar()
+                            if isotope not in self.container_var["SRM"]:
+                                self.container_var["SRM"][isotope] = tk.StringVar()
+                            if element not in self.container_var["STD"]:
+                                self.container_var["STD"][element] = {"SRM": tk.StringVar()}
+
+                            self.container_var["STD"][element]["SRM"].set(srm)
+                            self.container_var["SRM"][isotope].set(srm)
+                            self.srm_isotopes[isotope]["SRM"] = srm
+
+                            if element in helper_srm[srm]:
+                                self.srm_actual[srm][element] = helper_srm[srm][element]
+                            else:
+                                self.srm_actual[srm][element] = 0.0
+
+                            if element in self.srm_actual[srm]:
+                                self.srm_isotopes[isotope]["Concentration"] = self.srm_actual[srm][element]
+                            else:
+                                self.srm_isotopes[isotope]["Concentration"] = 0.0
+
+                for srm, dataset in self.srm_actual.items():
+                    helper_srm_2[srm] = 0
+                    for isotope, value in dataset.items():
+                        if value == 0:
+                            helper_srm_2[srm] += 1
 
             if len(helper_srm_2) > 1:
                 for isotope in list_isotopes:
@@ -9786,6 +9848,7 @@ class PySILLS(tk.Frame):
 
                             value_is = round((n_cation*self.chemistry_data[element_cation]/self.chemistry_data_oxides[
                                 list_oxides[index_oxide]])*10**6, 4)
+
                             if self.mode_ma == True:
                                 self.container_var["SMPL"][str_smpl]["IS Data"]["Concentration"].set(value_is)
                         elif index3 == 37 and len(data) > 0 and self.mode_ma == False:    # IS (Sample/Inclusion)
@@ -9887,7 +9950,7 @@ class PySILLS(tk.Frame):
                 #print("Filename:", filename)
                 self.load_sills_file(filename=filename)
                 mat_data = scipy.io.loadmat(filename)
-                print(mat_data.keys())
+                #print(mat_data.keys())
 
                 current_step = 100
                 self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
@@ -23746,8 +23809,12 @@ class PySILLS(tk.Frame):
 
                             var_intensity_i = self.container_intensity_corrected["STD"][var_datatype][
                                 filename_short]["MAT"][isotope]
-                            var_result_i = (var_intensity_i/var_intensity_is)*(
-                                    var_concentration_is/var_concentration_i)
+
+                            if var_intensity_is > 0 and var_concentration_i > 0:
+                                var_result_i = (var_intensity_i/var_intensity_is)*(
+                                        var_concentration_is/var_concentration_i)
+                            else:
+                                var_result_i = np.nan
                         else:
                             var_result_i = 0.0
 
@@ -24097,8 +24164,11 @@ class PySILLS(tk.Frame):
                                 var_concentration_i = self.srm_actual[var_srm_file][element]
                                 var_intensity_i = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["MAT"][isotope]
-                                var_result_i = (var_intensity_i/var_intensity_is)*(
-                                        var_concentration_is/var_concentration_i)
+                                if var_intensity_is > 0 and var_concentration_i > 0:
+                                    var_result_i = (var_intensity_i/var_intensity_is)*(
+                                            var_concentration_is/var_concentration_i)
+                                else:
+                                    var_result_i = np.nan
                             else:
                                 var_result_i = 0.0
 
@@ -24148,6 +24218,7 @@ class PySILLS(tk.Frame):
 
                                 sensitivity_i = self.container_analytical_sensitivity["STD"][var_datatype][
                                     file_std_short]["MAT"][isotope]
+
                                 if var_srm_host == var_srm_i:
                                     sensitivity_is = self.container_analytical_sensitivity["STD"][var_datatype][
                                         file_std_short]["MAT"][var_is_host]
@@ -32795,11 +32866,14 @@ class PySILLS(tk.Frame):
             text_smpl.window_create("end", window=lbl_i)
             text_smpl.insert("end", "\t")
 
-            if float(self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].get()) > 100.0:
-                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].set("100.0")
+            try:
+                if float(self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].get()) > 100.0:
+                    self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].set("100.0")
 
-            if float(self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].get()) < 0.0:
-                self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].set("0.0")
+                if float(self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].get()) < 0.0:
+                    self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Amount"].set("0.0")
+            except:
+                print("Problem with the variable 'Host-only tracer amount'. It's actually not needed anymore.")
 
             if (self.container_var["SMPL"][file_smpl_long]["Host Only Tracer"]["Name"].get() ==
                     self.container_var["SMPL"][file_smpl_long]["Matrix Setup"]["IS"]["Name"].get()):
