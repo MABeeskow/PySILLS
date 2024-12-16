@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # -*-coding: utf-8 -*-
 
-# -----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.45
-# Date:		04.12.2024
+# Version:	v1.0.46
+# Date:		16.12.2024
 
-# -----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
 ## MODULES
 # external
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.45"
-        self.val_version = self.str_version_number + " - 04.12.2024"
+        self.str_version_number = "1.0.46"
+        self.val_version = self.str_version_number + " - 16.12.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -5814,7 +5814,7 @@ class PySILLS(tk.Frame):
                                     value_i, n_decimals_concentration)
                             else:
                                 report_concentration[var_filetype][var_datatype][file_short][isotope] = round(
-                                    -value_i, n_decimals_concentration)
+                                    -value_lod_i, n_decimals_concentration)
                         else:
                             report_concentration[var_filetype][var_datatype][file_short][isotope] = "---"
 
@@ -6882,7 +6882,8 @@ class PySILLS(tk.Frame):
                             if value_i >= lod_i:
                                 value_i = value_i
                             else:
-                                value_i *= -1
+                                #value_i *= -1
+                                value_i = -lod_i
 
                             report_concentration_incl[var_filetype][var_datatype][file_short][isotope] = round(
                                 value_i, n_digits)
@@ -6901,22 +6902,24 @@ class PySILLS(tk.Frame):
                             if value_i >= lod_i:
                                 value_i = value_i
                             else:
-                                value_i *= -1
+                                #value_i *= -1
+                                value_i = -lod_i
 
                             if var_filetype == "SMPL":
                                 value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
                                     "1 SIGMA MAT"][isotope]
                                 report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                     value_i, n_digits)
-                                report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][isotope] = round(
-                                    value_sigma_i, n_digits)
+                                report_concentration_mat_1_sigma[var_filetype][var_datatype][file_short][
+                                    isotope] = round(value_sigma_i, n_digits)
 
                             else:
                                 if var_srm_i == var_srm_file:
                                     report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = round(
                                         value_i, n_digits)
                                 else:
-                                    report_concentration_mat[var_filetype][var_datatype][file_short][isotope] = "undefined"
+                                    report_concentration_mat[var_filetype][var_datatype][file_short][
+                                        isotope] = "undefined"
 
                             # Concentration Mixed
                             if var_filetype == "SMPL":
@@ -6979,8 +6982,8 @@ class PySILLS(tk.Frame):
 
                             # Mixing Ratio (Factor a)
                             if var_filetype == "SMPL":
-                                value_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][file_short][
-                                    isotope]
+                                value_i = self.container_mixed_concentration_ratio[var_filetype][var_datatype][
+                                    file_short][isotope]
                             else:
                                 value_i = 0.0
 
