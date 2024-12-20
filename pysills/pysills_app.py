@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.46
-# Date:		16.12.2024
+# Version:	v1.0.47
+# Date:		20.12.2024
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.46"
-        self.val_version = self.str_version_number + " - 16.12.2024"
+        self.str_version_number = "1.0.47"
+        self.val_version = self.str_version_number + " - 20.12.2024"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -580,7 +580,7 @@ class PySILLS(tk.Frame):
         self.container_var["Plotting"] = {"MA": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
                                           "FI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
                                           "MI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}}}
-        self.container_var["Subwindows"] = {"MA": {}, "FI": {}, "MI": {}}
+        self.container_var["Subwindows"] = {"MA": {}, "FI": {}, "MI": {}, "INCL": {}}
 
         self.container_var["Spike Elimination Check"] = {"RB Value STD": tk.IntVar(), "RB Value SMPL": tk.IntVar()}
         self.container_var["Spike Elimination Check"]["RB Value STD"].set(1)
@@ -701,6 +701,7 @@ class PySILLS(tk.Frame):
             "ICP-MS file setup": {"English": "ICP-MS file setup", "German": "ICP-MS Dateikonfiguration"},
             "Define ICP-MS": {"English": "Define ICP-MS", "German": "ICP-MS einstellen"},
             "Project": {"English": "Project", "German": "Projekt"},
+            "Inclusions": {"English": "Inclusion Analysis", "German": "Einschlüsse"},
             "Add": {"English": "Add", "German": "Hinzufügen"},
             "Isotope": {"English": "Isotope", "German": "Isotop"},
             "Set salinity": {"English": "Set salinity", "German": "Salinität eingeben"},
@@ -2127,9 +2128,9 @@ class PySILLS(tk.Frame):
 
         # RADIOBUTTONS
         if self.var_language == "English":
-            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions"]
+            list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Inclusion Analysis"]
         elif self.var_language == "German":
-            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse"]
+            list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse", "Einschlüsse"]
 
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
@@ -2462,7 +2463,7 @@ class PySILLS(tk.Frame):
     def copy_file(self, filetype):
         if self.pysills_mode == "MA":
             info_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             info_key = "fi_setting"
         elif self.pysills_mode == "MI":
             info_key = "mi_setting"
@@ -2566,7 +2567,7 @@ class PySILLS(tk.Frame):
                 if self.pysills_mode == "MA":
                     self.subwindow_ma_settings.destroy()
                     self.ma_settings()
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     self.subwindow_fi_settings.destroy()
                     self.fi_settings()
                 elif self.pysills_mode == "MI":
@@ -2575,7 +2576,7 @@ class PySILLS(tk.Frame):
             except:
                 if self.pysills_mode == "MA":
                     self.ma_settings()
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     self.fi_settings()
                 elif self.pysills_mode == "MI":
                     self.mi_settings()
@@ -2658,7 +2659,7 @@ class PySILLS(tk.Frame):
                 if self.pysills_mode == "MA":
                     self.subwindow_ma_settings.destroy()
                     self.ma_settings()
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     self.subwindow_fi_settings.destroy()
                     self.fi_settings()
                 elif self.pysills_mode == "MI":
@@ -2667,7 +2668,7 @@ class PySILLS(tk.Frame):
             except:
                 if self.pysills_mode == "MA":
                     self.ma_settings()
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     self.fi_settings()
                 elif self.pysills_mode == "MI":
                     self.mi_settings()
@@ -2675,7 +2676,7 @@ class PySILLS(tk.Frame):
     def add_needed_variables_for_later_added_files(self, filename_long, filename_short, filetype, file_isotopes):
         if self.pysills_mode == "MA":
             info_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             info_key = "fi_setting"
         elif self.pysills_mode == "MI":
             info_key = "mi_setting"
@@ -2848,7 +2849,44 @@ class PySILLS(tk.Frame):
 
             self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
 
-        elif var_rb.get() == 3:  # Report Analysis
+        elif var_rb.get() == 3:  # Inclusion Analysis
+            self.pysills_mode = "INCL"
+            ## Cleaning
+            for gui_category in ["Label", "Button"]:
+                if len(self.gui_elements["main"][gui_category]["Specific"]) > 0:
+                    for gui_item in self.gui_elements["main"][gui_category]["Specific"]:
+                        gui_item.grid_remove()
+                    self.gui_elements["main"][gui_category]["Specific"].clear()
+
+            ## Labels
+            str_lbl_01 = self.language_dict["Inclusions"][self.var_language]
+            lb_01 = SE(
+                parent=self.parent, row_id=start_row, column_id=start_column, n_rows=2, n_columns=10,
+                fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
+                text=str_lbl_01, relief=tk.FLAT, fontsize=font_header)
+
+            self.gui_elements["main"]["Label"]["Specific"].append(lb_01)
+
+            ## Buttons
+            btn_01 = SE(
+                parent=self.parent, row_id=start_row + 2, column_id=start_column, n_rows=1, n_columns=10,
+                fg=font_color_dark, bg=background_color_elements).create_simple_button(
+                text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+                command=self.fi_settings)
+            btn_02 = SE(
+                parent=self.parent, row_id=start_row + 3, column_id=start_column, n_rows=1, n_columns=10,
+                fg=font_color_dark, bg=background_color_elements).create_simple_button(
+                text=str_btn_02, bg_active=accent_color, fg_active=font_color_light,
+                command=self.fi_datareduction_files)
+            btn_03 = SE(
+                parent=self.parent, row_id=start_row + 4, column_id=start_column, n_rows=1, n_columns=10,
+                fg=font_color_dark, bg=background_color_elements).create_simple_button(
+                text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
+                command=lambda init=True: self.fi_extras(init))
+
+            self.gui_elements["main"]["Button"]["Specific"].extend([btn_01, btn_02, btn_03])
+
+        elif var_rb.get() == 4:  # Report Analysis
             self.pysills_mode = "OA"
             ## Cleaning
             for gui_category in ["Label", "Button"]:
@@ -2963,7 +3001,7 @@ class PySILLS(tk.Frame):
                 self.container_measurements["SELECTED"][filename_short]["RAW"][isotope]["MAT"] = []
                 self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
                 self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
-            elif self.pysills_mode in ["FI", "MI"]:
+            elif self.pysills_mode in ["FI", "MI", "INCL"]:
                 self.container_measurements["EDITED"][filename_short][isotope]["MAT"] = []
                 self.container_measurements["SELECTED"][filename_short]["RAW"][isotope]["MAT"] = []
                 self.container_measurements["SELECTED"][filename_short]["SMOOTHED"][isotope]["MAT"] = []
@@ -2976,7 +3014,7 @@ class PySILLS(tk.Frame):
     def spike_elimination_all(self, filetype, algorithm, mode="MA"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -3187,7 +3225,7 @@ class PySILLS(tk.Frame):
                 #
                 if self.pysills_mode == "MA":
                     self.frm_spk_smpl.config(background=self.sign_green, bd=1)
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     if self.container_var[key_setting]["Spike Elimination Inclusion"].get() == 1:
                         self.frm_spk_smpl.config(background=self.sign_green, bd=1)
                     elif self.container_var[key_setting]["Spike Elimination Inclusion"].get() == 2:
@@ -4988,7 +5026,7 @@ class PySILLS(tk.Frame):
     def do_spike_elimination_all_grubbs(self, filetype, spike_elimination_performed=True):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -5005,7 +5043,7 @@ class PySILLS(tk.Frame):
                 var_method = 1
             elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
             if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
@@ -5274,7 +5312,7 @@ class PySILLS(tk.Frame):
                                                 indices_outl = []
 
                                             data_improved = data_smoothed.copy()
-                                            if self.pysills_mode in ["FI", "MI"]:
+                                            if self.pysills_mode in ["FI", "MI", "INCL"]:
                                                 if self.container_var[key_setting][
                                                     "Spike Elimination Inclusion"].get() == 2:
                                                     length_incl_datasets = len(
@@ -5379,7 +5417,7 @@ class PySILLS(tk.Frame):
     def single_spike_elimination(self, var_filetype, var_filename_short, var_spike_elimination_performed=True):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -5393,7 +5431,7 @@ class PySILLS(tk.Frame):
                 var_method = 1
             elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
             if self.container_var["Spike Elimination Method"].get() in ["Grubbs-Test (SILLS)", "Grubbs test"]:
@@ -5517,7 +5555,7 @@ class PySILLS(tk.Frame):
                                         indices_outl = []
 
                                     data_improved = data_smoothed.copy()
-                                    if self.pysills_mode in ["FI", "MI"]:
+                                    if self.pysills_mode in ["FI", "MI", "INCL"]:
                                         if self.container_var[key_setting][
                                             "Spike Elimination Inclusion"].get() == 2 and var_filetype == "SMPL":
                                             length_incl_datasets = len(
@@ -6556,7 +6594,7 @@ class PySILLS(tk.Frame):
             print("The file does not exist!")
 
     def fi_export_calculation_report(self):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -8289,10 +8327,10 @@ class PySILLS(tk.Frame):
         # Save information about 'Measured Isotopes'
         self.save_measured_isotopes_in_file(save_file=save_file)
 
-        if self.pysills_mode in ["FI", "MI"]:
+        if self.pysills_mode in ["FI", "MI", "INCL"]:
             # Save information about 'Inclusion Setup'
             self.save_inclusion_information_in_file(save_file=save_file)
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 # Save information about 'PyPitzer'
                 self.save_pypitzer_settings_in_file(save_file=save_file)
 
@@ -8300,7 +8338,7 @@ class PySILLS(tk.Frame):
             self.save_quantification_method_matrix_only_in_file(save_file=save_file)
             # Save information about 'Quantification Setup (Second Internal Standard)'
             self.save_quantification_method_second_internal_in_file(save_file=save_file)
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 # Save information about 'Geometric Approach (Halter2002)'
                 self.save_quantification_method_halter2002(save_file=save_file)
                 # Save information about 'Geometric Approach (Borisova2021)'
@@ -8324,7 +8362,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             info_mode = "Mineral Analysis"
             info_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             info_mode = "Fluid Inclusion Analysis"
             info_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -8431,7 +8469,7 @@ class PySILLS(tk.Frame):
     def save_inclusion_information_in_file(self, save_file):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -8512,7 +8550,7 @@ class PySILLS(tk.Frame):
     def save_quantification_method_matrix_only_in_file(self, save_file):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -8547,7 +8585,7 @@ class PySILLS(tk.Frame):
     def save_quantification_method_second_internal_in_file(self, save_file):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -8576,7 +8614,7 @@ class PySILLS(tk.Frame):
     def save_quantification_method_halter2002(self, save_file):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -8611,7 +8649,7 @@ class PySILLS(tk.Frame):
     def save_quantification_method_borisova2021(self, save_file):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -8644,7 +8682,7 @@ class PySILLS(tk.Frame):
     def save_mineralphase_information_in_file(self, save_file):
         if self.pysills_mode == "MA":
             info_title = "SAMPLE SETTINGS"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             info_title = "MATRIX SETTINGS"
         elif self.pysills_mode == "MI":
             info_title = "MATRIX SETTINGS"
@@ -8723,7 +8761,7 @@ class PySILLS(tk.Frame):
 
                     str_intervals += "MAT" + ";" + str(info_id) + ";" + str(info_times) + ";" + str(info_indices) + "\n"
 
-                if self.pysills_mode in ["FI", "MI"]:
+                if self.pysills_mode in ["FI", "MI", "INCL"]:
                     for key, item in self.container_helper["SMPL"][filename_short]["INCL"]["Content"].items():
                         info_id = key
                         info_times = item["Times"]
@@ -8739,7 +8777,7 @@ class PySILLS(tk.Frame):
     def save_spike_elimination_information_in_file(self, save_file):
         if self.pysills_mode == "MA":
             mode_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             mode_key = "fi_setting"
         elif self.pysills_mode == "MI":
             mode_key = "mi_setting"
@@ -10173,7 +10211,7 @@ class PySILLS(tk.Frame):
                         if current_step >= 100:
                             self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
                             subwindow_progressbar.destroy()
-                    elif self.pysills_mode == "FI":
+                    elif self.pysills_mode in ["FI", "INCL"]:
                         ## PROJECT INFORMATION
                         self.open_project_part_01(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
@@ -10762,7 +10800,7 @@ class PySILLS(tk.Frame):
 
                     if self.pysills_mode == "MA":
                         self.ma_settings()
-                    elif self.pysills_mode == "FI":
+                    elif self.pysills_mode in ["FI", "INCL"]:
                         self.fi_settings()
                     elif self.pysills_mode == "MI":
                         self.mi_settings()
@@ -11105,7 +11143,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
         elif self.pysills_mode == "MI":
@@ -11233,7 +11271,7 @@ class PySILLS(tk.Frame):
     def detect_signal_interval(self, mode="BG"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -11436,7 +11474,7 @@ class PySILLS(tk.Frame):
                 self.container_var[key_setting]["Time BG Start"].set("auto-detection used")
                 self.container_var[key_setting]["Time BG End"].set("auto-detection used")
             else:
-                if self.pysills_mode == "FI":
+                if self.pysills_mode in ["FI", "INCL"]:
                     self.container_var[key_setting]["Time BG Start"].set("auto-detection used")
                     self.container_var[key_setting]["Time BG End"].set("auto-detection used")
                 else:
@@ -11452,7 +11490,7 @@ class PySILLS(tk.Frame):
             if self.pysills_mode == "MA":
                 self.container_var[key_setting]["Time MAT Start"].set("auto-detection used")
                 self.container_var[key_setting]["Time MAT End"].set("auto-detection used")
-            elif self.pysills_mode == "FI":
+            elif self.pysills_mode in ["FI", "INCL"]:
                 self.container_var[key_setting]["Time MAT Start"].set("auto-detection used")
                 self.container_var[key_setting]["Time MAT End"].set("auto-detection used")
             elif self.pysills_mode == "MI":
@@ -11493,7 +11531,7 @@ class PySILLS(tk.Frame):
                 if self.pysills_mode == "MA":
                     self.temp_lines_checkup2[filetype][filename] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=key_setting)
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     self.temp_lines_checkup2[filetype][filename] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=key_setting)
                 elif self.pysills_mode == "MI":
@@ -13604,7 +13642,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_categories = [str_lbl_03, str_lbl_04, str_lbl_05, str_lbl_06, str_lbl_07]
             var_widths = ["160", "90", "90", "90", "90"]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_categories = [str_lbl_03, str_lbl_04, str_lbl_05, str_lbl_06, str_lbl_07]
             var_widths = ["160", "90", "90", "90", "90"]
         elif self.pysills_mode == "MI":
@@ -13676,7 +13714,7 @@ class PySILLS(tk.Frame):
                 text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_filename_long=self.ma_current_file_std, var_filetype="STD", checkup_mode=True:
                 self.ma_check_specific_file(var_filename_long, var_filetype, checkup_mode))
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             btn_std_03 = SE(
                 parent=subwindow_intervals, row_id=start_row, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -13709,7 +13747,7 @@ class PySILLS(tk.Frame):
                 text=str_lbl_07, bg_active=accent_color, fg_active=font_color_light,
                 command=lambda var_filename_long=self.ma_current_file_smpl, var_filetype="SMPL", checkup_mode=True:
                 self.ma_check_specific_file(var_filename_long, var_filetype, checkup_mode))
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             btn_smpl_03 = SE(
                 parent=subwindow_intervals, row_id=start_row + 16, column_id=start_column + 38, n_rows=1, n_columns=6,
                 fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -14399,13 +14437,13 @@ class PySILLS(tk.Frame):
                 ln = ax.plot(dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
                              linewidth=1, visible=True)
             #
-            if self.pysills_mode in ["FI", "MI"]:
+            if self.pysills_mode in ["FI", "MI", "INCL"]:
                 var_check_bg = self.container_helper[filetype][var_file_short]["BG"]["Content"]
             else:
                 var_check_bg = self.container_helper[filetype][var_file_short]["BG"]["Content"]
             #
             if len(var_check_bg) > 0:
-                if self.pysills_mode in ["FI", "MI"]:
+                if self.pysills_mode in ["FI", "MI", "INCL"]:
                     for var_id, var_content in self.container_helper[filetype][var_file_short]["BG"]["Content"].items():
                         times_bg = var_content["Times"]
                         #
@@ -14882,7 +14920,7 @@ class PySILLS(tk.Frame):
         """Main window of additional analysis tools for a fluid inclusion analysis project."""
         str_title_02 = self.language_dict["Extras"][self.var_language]
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
@@ -15435,7 +15473,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
             subwindow_diagram_xy.title(str_title_01 + " - " + str_title_02)
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
             subwindow_diagram_xy.title(str_title_01 + " - " + str_title_02)
         elif self.pysills_mode == "MI":
@@ -16339,7 +16377,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
         elif self.pysills_mode == "MI":
@@ -16471,7 +16509,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -16542,7 +16580,7 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
@@ -16641,7 +16679,7 @@ class PySILLS(tk.Frame):
             var_parent = self.subwindow_ma_settings
             str_lbl_01 = self.language_dict["Sample Settings"][self.var_language]
             str_btn_01 = self.language_dict["Setup"][self.var_language]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             str_lbl_01 = self.language_dict["Matrix Settings"][self.var_language]
             str_btn_01 = self.language_dict["Setup"][self.var_language]
@@ -16713,7 +16751,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             str_title_window = self.language_dict["Sample Settings"][self.var_language]
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             str_title_window = self.language_dict["Matrix Settings"][self.var_language]
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -16877,7 +16915,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -16894,7 +16932,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             pass
         else:
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 key_setting = "fi_setting"
                 int_row_start_quantification = 2
             elif self.pysills_mode == "MI":
@@ -16917,7 +16955,7 @@ class PySILLS(tk.Frame):
 
             # Option Menu
             str_default_inclusion_setup = self.container_var[key_setting]["Inclusion Setup Option"].get()
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 list_opt_incl_is_quantification = ["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2024)",
                                                    "Custom Data", "External Calculation"]
             elif self.pysills_mode == "MI":
@@ -16978,7 +17016,7 @@ class PySILLS(tk.Frame):
         var_column_n = dict_geometry_info["N columns"]
         var_category_n = var_column_n - 6
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
@@ -17139,7 +17177,7 @@ class PySILLS(tk.Frame):
         var_column_n = dict_geometry_info["N columns"]
         var_category_n = var_column_n - 6
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
@@ -17240,7 +17278,7 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
@@ -17301,7 +17339,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -17355,7 +17393,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -17454,7 +17492,7 @@ class PySILLS(tk.Frame):
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
             str_lbl_01 = self.language_dict["Default Time Window (Sample)"][self.var_language]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
             str_lbl_01 = self.language_dict["Default Time Window (Matrix)"][self.var_language]
@@ -17554,7 +17592,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -17642,7 +17680,7 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
@@ -17751,7 +17789,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -17978,7 +18016,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -18093,7 +18131,7 @@ class PySILLS(tk.Frame):
             var_parent = self.subwindow_ma_settings
             var_mode_setting = "ma_setting"
             row_correction = 0
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_mode_setting = "fi_setting"
             row_correction = 1
@@ -18300,7 +18338,7 @@ class PySILLS(tk.Frame):
                     inclusion_key = "INCL"
                     var_check_incl = self.container_helper[var_filetype][var_file_short][inclusion_key]["Content"]
                     if len(var_check_incl) > 0:
-                        if self.pysills_mode == "FI":
+                        if self.pysills_mode in ["FI", "INCL"]:
                             for var_id, var_content in self.container_helper[var_filetype][var_file_short][
                                 inclusion_key]["Content"].items():
                                 times_incl = var_content["Times"]
@@ -18356,7 +18394,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -18548,7 +18586,7 @@ class PySILLS(tk.Frame):
                     highlightthickness=0, highlightbackground=background_color_listbox,
                     command=lambda var_filename_long=file_std, var_filetype="STD":
                     self.ma_check_specific_file(var_filename_long, var_filetype))
-            elif self.pysills_mode == "FI":
+            elif self.pysills_mode in ["FI", "INCL"]:
                 btn_i = tk.Button(
                     master=frm_files, text=str_lbl_02, bg=background_color_elements, fg=font_color_dark,
                     activebackground=accent_color, activeforeground=font_color_light,
@@ -18636,7 +18674,7 @@ class PySILLS(tk.Frame):
     def build_all_needed_variables(self, filetype, filename_long, filename_short):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
@@ -18850,7 +18888,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -18953,7 +18991,7 @@ class PySILLS(tk.Frame):
 
                 self.spikes_isotopes["SMPL"][file_smpl_short] = {}
             elif len(self.container_lists["SMPL"]["Long"]) == len(self.list_smpl) and self.file_loaded == True:
-                if self.pysills_mode in ["FI", "MI"]:
+                if self.pysills_mode in ["FI", "MI", "INCL"]:
                     list_focus = ["BG", "MAT", "INCL"]
                 else:
                     list_focus = ["BG", "MAT"]
@@ -19053,7 +19091,7 @@ class PySILLS(tk.Frame):
                     highlightthickness=0, highlightbackground=background_color_light,
                     command=lambda var_filename_long=file_smpl, var_filetype="SMPL":
                     self.ma_check_specific_file(var_filename_long, var_filetype))
-            elif self.pysills_mode == "FI":
+            elif self.pysills_mode in ["FI", "INCL"]:
                 btn_i = tk.Button(
                     master=frm_files, text=str_lbl_02, bg=background_color_elements, fg=font_color_dark,
                     activebackground=accent_color, activeforeground=font_color_light,
@@ -19212,7 +19250,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
             var_window_header = self.language_dict["Sample Settings"][self.var_language]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
             var_window_header = self.language_dict["Matrix Settings"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -19769,7 +19807,7 @@ class PySILLS(tk.Frame):
         """
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
@@ -19856,7 +19894,7 @@ class PySILLS(tk.Frame):
     def ma_change_matrix_concentration(self, var_entr, var_file, state_default, event):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
@@ -19910,7 +19948,7 @@ class PySILLS(tk.Frame):
         """
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
@@ -20132,7 +20170,7 @@ class PySILLS(tk.Frame):
             val_column_start = 14
             val_row_span = 20
             val_column_span = 46
-        elif self.pysills_mode in ["FI", "MI"]:
+        elif self.pysills_mode in ["FI", "MI", "INCL"]:
             parent = self.subwindow_fi_checkfile
             val_row_start = 0
             val_column_start = 14
@@ -20280,7 +20318,7 @@ class PySILLS(tk.Frame):
             val_column_start = 14
             val_row_span = 20
             val_column_span = 46
-        elif self.pysills_mode in ["FI", "MI"]:
+        elif self.pysills_mode in ["FI", "MI", "INCL"]:
             parent = self.subwindow_fi_checkfile
             val_row_start = 0
             val_column_start = 14
@@ -20387,7 +20425,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             str_title = "MINERAL ANALYSIS - " + str(filename_short)
             str_matrix = "Sample"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             str_title = "FLUID INCLUSION ANALYSIS - " + str(filename_short)
             str_matrix = "Matrix"
         elif self.pysills_mode == "MELT":
@@ -20962,7 +21000,7 @@ class PySILLS(tk.Frame):
             var_setting_key = "ma_setting"
             self.temp_lines_checkup2[filetype][filename_short] = 0
             self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
             self.temp_lines_checkup2[filetype][filename_short] = 0
             self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
@@ -21010,7 +21048,7 @@ class PySILLS(tk.Frame):
                 var_mat_is][0]
             value_mat2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                 var_mat_is][1]
-            if self.pysills_mode in ["FI", "MI"]:
+            if self.pysills_mode in ["FI", "MI", "INCL"]:
                 value_incl1_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
                     var_incl_is][0]
                 value_incl2_is = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism INCL"][
@@ -21021,7 +21059,7 @@ class PySILLS(tk.Frame):
                     isotope][0]
                 value_mat2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short]["Parallelism MAT"][
                     isotope][1]
-                if self.pysills_mode in ["FI", "MI"]:
+                if self.pysills_mode in ["FI", "MI", "INCL"]:
                     value_incl1_i = self.container_intensity[var_filetype]["RAW"][var_filename_short][
                         "Parallelism INCL"][isotope][0]
                     value_incl2_i = self.container_intensity[var_filetype]["RAW"][var_filename_short][
@@ -21032,7 +21070,7 @@ class PySILLS(tk.Frame):
                 else:
                     result_mat_i = np.nan
 
-                if self.pysills_mode in ["FI", "MI"]:
+                if self.pysills_mode in ["FI", "MI", "INCL"]:
                     if value_incl2_is > 0 and value_incl1_is > 0 and value_incl1_i > 0:
                         result_incl_i = round((value_incl2_i/value_incl2_is)/(value_incl1_i/value_incl1_is), 2)
                     else:
@@ -21069,7 +21107,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             self.subwindow_ma_checkfile.destroy()
             self.ma_check_specific_file(var_filename_long=filename_long, var_filetype=filetype, checkup_mode=False)
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             self.subwindow_fi_checkfile.destroy()
             self.fi_check_specific_file(var_file=filename_long, var_type=filetype, checkup_mode=False)
         elif self.pysills_mode == "MI":
@@ -21214,7 +21252,7 @@ class PySILLS(tk.Frame):
                             isotope]["SMOOTHED"] = ln_smoothed
                         ln_smoothed[0].set_visible(False)
 
-        if self.pysills_mode in ["FI", "MI"]:
+        if self.pysills_mode in ["FI", "MI", "INCL"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
         else:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
@@ -22069,7 +22107,7 @@ class PySILLS(tk.Frame):
         if mode == "default":
             time = var_entr.get()
             time = time.replace(",", ".")
-            if self.pysills_mode in ["FI", "MI"]:
+            if self.pysills_mode in ["FI", "MI", "INCL"]:
                 if var_interval == "MAT":
                     list_filetypes = ["STD"]
                 else:
@@ -22141,7 +22179,7 @@ class PySILLS(tk.Frame):
                         if self.pysills_mode == "MA":
                             self.temp_lines_checkup2[var_type][var_file_short] = 0
                             self.show_time_signal_diagram_checker(var_setting_key="ma_setting")
-                        elif self.pysills_mode == "FI":
+                        elif self.pysills_mode in ["FI", "INCL"]:
                             self.temp_lines_checkup2[var_type][var_file_short] = 0
                             self.show_time_signal_diagram_checker(var_setting_key="fi_setting")
                         elif self.pysills_mode == "MI":
@@ -23117,7 +23155,7 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -23128,7 +23166,7 @@ class PySILLS(tk.Frame):
             condensed_intervals_mat = self.container_var[var_filetype][var_file_short]["Intervals"]["MAT"]
             str_datakey = "Data " + str(var_datatype)
 
-            if self.pysills_mode in ["FI", "MI"]:
+            if self.pysills_mode in ["FI", "MI", "INCL"]:
                 condensed_intervals_incl = self.container_var[var_filetype][var_file_short]["Intervals"]["INCL"]
             else:
                 condensed_intervals_incl = None
@@ -23155,7 +23193,7 @@ class PySILLS(tk.Frame):
 
             str_var_01 = self.language_dict["Select isotope"][self.var_language]
 
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 mode_id = self.container_var[key_setting]["Inclusion Intensity Calculation"].get()
                 if var_filetype == "SMPL":
                     var_index = self.container_lists[var_filetype]["Short"].index(var_file_short)
@@ -23259,7 +23297,7 @@ class PySILLS(tk.Frame):
                                         "MAT"]
                                     str_datakey = "Data " + str(var_datatype)
 
-                                    if self.pysills_mode in ["FI", "MI"]:
+                                    if self.pysills_mode in ["FI", "MI", "INCL"]:
                                         condensed_intervals_incl = self.container_var[var_filetype][var_file_short][
                                             "Intervals"]["INCL"]
                                     else:
@@ -23296,7 +23334,7 @@ class PySILLS(tk.Frame):
                                     "MAT"]
                                 str_datakey = "Data " + str(var_datatype)
 
-                                if self.pysills_mode in ["FI", "MI"]:
+                                if self.pysills_mode in ["FI", "MI", "INCL"]:
                                     condensed_intervals_incl = self.container_var[var_filetype][var_file_short][
                                         "Intervals"]["INCL"]
                                 else:
@@ -24568,7 +24606,7 @@ class PySILLS(tk.Frame):
         """
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
@@ -25573,7 +25611,7 @@ class PySILLS(tk.Frame):
                         list_focus = ["MAT"]
                     else:
                         list_focus = ["MAT", "INCL"]
-                    if self.pysills_mode == "FI":
+                    if self.pysills_mode in ["FI", "INCL"]:
                         var_init_datareduction = self.var_init_fi_datareduction
                     else:
                         var_init_datareduction = self.var_init_mi_datareduction
@@ -25920,7 +25958,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
             str_title_window = str_title_01 + " - " + str_title_02
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
             str_title_window = str_title_01 + " - " + str_title_02
         elif self.pysills_mode == "MI":
@@ -26763,7 +26801,7 @@ class PySILLS(tk.Frame):
                 fg=font_color_accent, bg=accent_color).create_simple_button(
                 text=str_title_02, bg_active=accent_color, fg_active=font_color_accent,
                 command=self.ma_export_calculation_report)
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             btn_06a = SE(
                 parent=subwindow_report_setup, row_id=start_row + 6, column_id=start_column, n_rows=2, n_columns=12,
                 fg=font_color_accent, bg=accent_color).create_simple_button(
@@ -26996,7 +27034,12 @@ class PySILLS(tk.Frame):
         var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
 
         self.subwindow_fi_settings = tk.Toplevel(self.parent)
-        self.subwindow_fi_settings.title("FLUID INCLUSION ANALYSIS - Setup")
+
+        if self.pysills_mode == "FI":
+            self.subwindow_fi_settings.title("FLUID INCLUSION ANALYSIS - Setup")
+        elif self.pysills_mode == "INCL":
+            self.subwindow_fi_settings.title("INCLUSION ANALYSIS - Setup")
+
         self.subwindow_fi_settings.geometry(var_geometry)
         self.subwindow_fi_settings.resizable(False, False)
         self.subwindow_fi_settings["bg"] = self.bg_colors["BG Window"]
@@ -27017,7 +27060,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
         elif self.pysills_mode == "MI":
@@ -27389,7 +27432,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
         elif self.pysills_mode == "MI":
@@ -27520,7 +27563,7 @@ class PySILLS(tk.Frame):
         self.build_srm_database()
 
     def change_rb_inclusion_setup(self):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -27540,7 +27583,7 @@ class PySILLS(tk.Frame):
 
     #
     def change_rb_quantification_setup(self):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             var_setting_key = "fi_setting"
         elif self.pysills_mode == "MI":
             var_setting_key = "mi_setting"
@@ -27548,7 +27591,7 @@ class PySILLS(tk.Frame):
         if self.container_var[var_setting_key]["Quantification Method"].get() == 1:
             self.btn_setup_quantification_matrixonly.configure(state="normal")
             self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 self.btn_setup_quantification_plugin.configure(state="disabled")
             elif self.pysills_mode == "MI":
                 self.btn_setup_quantification_halter.configure(state="disabled")
@@ -27556,7 +27599,7 @@ class PySILLS(tk.Frame):
         elif self.container_var[var_setting_key]["Quantification Method"].get() == 2:
             self.btn_setup_quantification_matrixonly.configure(state="disabled")
             self.btn_setup_quantification_secondinternal.configure(state="normal")
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 self.btn_setup_quantification_plugin.configure(state="disabled")
             elif self.pysills_mode == "MI":
                 self.btn_setup_quantification_halter.configure(state="disabled")
@@ -27564,7 +27607,7 @@ class PySILLS(tk.Frame):
         elif self.container_var[var_setting_key]["Quantification Method"].get() == 3:
             self.btn_setup_quantification_matrixonly.configure(state="disabled")
             self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 self.btn_setup_quantification_plugin.configure(state="normal")
             elif self.pysills_mode == "MI":
                 self.btn_setup_quantification_halter.configure(state="normal")
@@ -27615,7 +27658,7 @@ class PySILLS(tk.Frame):
                     self.container_intensity_mix[var_filetype][var_datatype][isotope] = var_result_i
 
     def fi_get_intensity_corrected(self, var_filetype, var_datatype, var_file_short, var_focus, mode="Specific"):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -28114,7 +28157,7 @@ class PySILLS(tk.Frame):
     #     Returns
     #     -------
     #     """
-    #     if self.pysills_mode == "FI":
+    #     if self.pysills_mode in ["FI", "INCL"]:
     #         key_setting = "fi_setting"
     #     elif self.pysills_mode == "MI":
     #         key_setting = "mi_setting"
@@ -28621,7 +28664,7 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -29220,7 +29263,7 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -29316,7 +29359,7 @@ class PySILLS(tk.Frame):
         Returns
         -------
         """
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -29800,7 +29843,7 @@ class PySILLS(tk.Frame):
     ####################################################################################################################
     #
     def fi_datareduction_tables(self, init=False):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -30356,7 +30399,7 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
             self.subwindow_fi_graphical_sensitivity.title(str_title_01 + " - " + str_title_02)
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
             self.subwindow_fi_graphical_sensitivity.title(str_title_01 + " - " + str_title_02)
         elif self.pysills_mode == "MI":
@@ -31557,7 +31600,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -31994,7 +32037,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -32417,7 +32460,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -32704,7 +32747,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -32920,7 +32963,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -33097,7 +33140,7 @@ class PySILLS(tk.Frame):
             text_smpl.insert("end", "\n")
 
     def fi_change_default_2nd_is(self, var_opt):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -33107,7 +33150,7 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Name"].set(var_opt_default)
 
     def fi_change_default_2nd_is_concentration(self, var_entr):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -33117,7 +33160,7 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][file_smpl]["Second Internal Standard"]["Value"].set(var_entr_default)
 
     def fi_change_default_matrixonly_is_concentration(self, var_entr):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -33141,7 +33184,7 @@ class PySILLS(tk.Frame):
                 var_entr_default_amount*var_entr_default)
 
     def fi_change_default_matrix_amount(self, var_entr):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -33176,7 +33219,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -33645,7 +33688,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -33752,13 +33795,13 @@ class PySILLS(tk.Frame):
                                 isotope]["SMOOTHED"] = ln_smoothed
                             ln_smoothed[0].set_visible(False)
 
-        if self.pysills_mode in ["FI", "MI"]:
+        if self.pysills_mode in ["FI", "MI", "INCL"]:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]["Content"]
         else:
             var_check_bg = self.container_helper[str_filetype][str_filename_short]["BG"]
 
         if len(var_check_bg) > 0:
-            if self.pysills_mode in ["FI", "MI"]:
+            if self.pysills_mode in ["FI", "MI", "INCL"]:
                 critical_id = []
                 for var_id, var_content in self.container_helper[str_filetype][str_filename_short]["BG"][
                     "Content"].items():
@@ -33914,7 +33957,7 @@ class PySILLS(tk.Frame):
             self.fi_add_interval_to_diagram(var_type, var_file_short, var_file_long, event))
 
     def fi_show_time_ratio_diagram(self, var_type, var_file):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34423,7 +34466,7 @@ class PySILLS(tk.Frame):
                     self.tv_results_quick.insert("", tk.END, values=entries_x_i)
 
     def fi_show_all_lines(self, var_type, var_file_short, key="ALL"):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34455,7 +34498,7 @@ class PySILLS(tk.Frame):
             self.canvas_specific_ratio.draw()
 
     def fi_hide_all_lines(self, var_type, var_file_short, key="ALL"):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34487,7 +34530,7 @@ class PySILLS(tk.Frame):
             self.canvas_specific_ratio.draw()
 
     def fi_change_line_visibility(self, var_type, var_file_short, var_datatype, var_isotope):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34515,7 +34558,7 @@ class PySILLS(tk.Frame):
 
     #
     def fi_add_interval_to_diagram(self, var_type, var_file_short, var_file_long, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34605,7 +34648,7 @@ class PySILLS(tk.Frame):
 
     #
     def fi_change_interval_visibility(self, var_key, var_type, var_file_short):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34622,7 +34665,7 @@ class PySILLS(tk.Frame):
         self.canvas_specific.draw()
 
     def fi_remove_interval(self, var_type, var_file_short):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34650,7 +34693,7 @@ class PySILLS(tk.Frame):
         self.canvas_specific.draw()
 
     def fi_set_bg_interval(self, var_entr, var_key, mode, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -34998,7 +35041,7 @@ class PySILLS(tk.Frame):
                             item.set("Set end value")
 
     def fi_change_matrix_compound(self, var_opt, var_file=None, state_default=False, matrix_only=False):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35061,7 +35104,7 @@ class PySILLS(tk.Frame):
             self.container_var["SMPL"][filename_long]["Host Only Tracer"]["Name"].set(var_opt)
 
     def change_matrix_only_tracer2(self, var_opt, var_file, state_default):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35116,7 +35159,7 @@ class PySILLS(tk.Frame):
 
     #
     def change_specific_matrix_amount(self, var_file, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35129,7 +35172,7 @@ class PySILLS(tk.Frame):
         self.container_var["SMPL"][var_file]["Host Only Tracer"]["Value"].set(round(var_concentration, 4))
 
     def fi_change_matrix_is(self, var_opt, var_file, state_default):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35206,7 +35249,7 @@ class PySILLS(tk.Frame):
     ## INCLUSION SETUP #################################################################################################
 
     def fi_change_is_default(self, var_isotope, var_key):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35220,7 +35263,7 @@ class PySILLS(tk.Frame):
         self.container_var[var_key][var_file]["IS Data"]["IS"].set(var_isotope)
 
     def fi_check_elements_checkbutton(self):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35302,7 +35345,7 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[fluid]["Cation"] = "H"
 
     def calculate_chloride_data(self):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35531,7 +35574,7 @@ class PySILLS(tk.Frame):
                     self.molar_masses_compounds[salt]["Cation Charge"] = 5
 
     def prepare_nacl_equivalents(self, amount_fluid, amount_nacl_equiv, total_ppm):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35574,7 +35617,7 @@ class PySILLS(tk.Frame):
                             amount_fluid*self.molar_masses_compounds[fluid][element]*total_ppm, 0))
 
     def fi_calculate_chargebalance(self, var_entr, mode, var_file, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -35976,7 +36019,7 @@ class PySILLS(tk.Frame):
         self.charge_balance_check[filename_short].set(round(val_c, 3))
 
     def fi_calculate_massbalance(self, var_entr, mode, var_file, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -36369,7 +36412,7 @@ class PySILLS(tk.Frame):
             # print(isotope, concentration_i)
 
     def fi_set_concentration_is_massbalance(self, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -36384,7 +36427,7 @@ class PySILLS(tk.Frame):
                     self.container_var[key_setting]["Salt Correction"]["Default Concentration"].get())
 
     def fi_set_concentration_is_chargebalance(self, event):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -36409,7 +36452,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -37088,7 +37131,7 @@ class PySILLS(tk.Frame):
         for i in range(0, n_columns):
             subwindow_fi_inclusion_massbalance_new.grid_columnconfigure(i, minsize=column_min)
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
 
         if "IS" not in self.container_optionmenu["SMPL"]:
@@ -37476,7 +37519,7 @@ class PySILLS(tk.Frame):
     def calculate_threshold_spike_elimination(self, mode="default"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -37494,7 +37537,7 @@ class PySILLS(tk.Frame):
                 self.container_var["Spike Elimination"]["Threshold"][isotope].set(value)
 
     def guess_salt_composition(self):
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -37516,7 +37559,7 @@ class PySILLS(tk.Frame):
         font_header = "sans 14 bold"
         font_elements = "sans 10 bold"
 
-        if self.pysills_mode == "FI":
+        if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
             str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
@@ -37536,13 +37579,13 @@ class PySILLS(tk.Frame):
 
         if self.bool_incl_is_custom:
             str_title_02 = self.language_dict["Custom data"][self.var_language]
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 str_title = str_title_01 + " - " + str_title_02
             elif self.pysills_mode == "MI":
                 str_title = str_title_01 + " - " + str_title_02
         else:
             str_title_02 = self.language_dict["External quantification support"][self.var_language]
-            if self.pysills_mode == "FI":
+            if self.pysills_mode in ["FI", "INCL"]:
                 str_title = str_title_01 + " - " + str_title_02
             elif self.pysills_mode == "MI":
                 str_title = str_title_01 + " - " + str_title_02
@@ -37777,7 +37820,7 @@ class PySILLS(tk.Frame):
     def export_data_for_external_calculations(self):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -37992,7 +38035,7 @@ class PySILLS(tk.Frame):
                     var_setting_key = "ma_setting"
                     self.temp_lines_checkup2[var_file_type][var_file_short] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
-                elif self.pysills_mode == "FI":
+                elif self.pysills_mode in ["FI", "INCL"]:
                     var_setting_key = "fi_setting"
                     self.temp_lines_checkup2[var_file_type][var_file_short] = 0
                     self.show_time_signal_diagram_checker(var_setting_key=var_setting_key)
@@ -38034,7 +38077,7 @@ class PySILLS(tk.Frame):
             var_row_correction = -2
             var_alpha = self.container_var[var_setting_key]["SE Alpha"]
             var_threshold = self.container_var[var_setting_key]["SE Threshold"]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             var_parent = self.subwindow_fi_settings
             var_setting_key = "fi_setting"
             var_row_correction = -1
@@ -38166,7 +38209,7 @@ class PySILLS(tk.Frame):
         str_filetype = mode
         if self.pysills_mode == "MA":
             str_focus = self.language_dict["Mineral Analysis"][self.var_language]
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             str_focus = self.language_dict["Fluid Inclusions"][self.var_language]
         elif self.pysills_mode == "MI":
             str_focus = self.language_dict["Melt Inclusions"][self.var_language]
@@ -38187,7 +38230,7 @@ class PySILLS(tk.Frame):
         self.subwindow_spike_check = tk.Toplevel(self.parent)
         if self.pysills_mode == "MA":
             self.subwindow_spike_check.title(str_focus + " - " + str_title)
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             self.subwindow_spike_check.title("FLUID INCLUSION ANALYSIS -  Spike Check")
         elif self.pysills_mode == "MI":
             self.subwindow_spike_check.title("MELT INCLUSION ANALYSIS -  Spike Check")
@@ -38402,7 +38445,7 @@ class PySILLS(tk.Frame):
     def check_spikes_isotope(self, var_file=None):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
@@ -38420,7 +38463,7 @@ class PySILLS(tk.Frame):
 
         if var_file in self.container_lists["SMPL"]["Short"]:
             str_filetype = "SMPL"
-            if self.pysills_mode in ["FI", "MI"]:
+            if self.pysills_mode in ["FI", "MI", "INCL"]:
                 for id, dataset in self.container_helper["SMPL"][var_file]["INCL"]["Content"].items():
                     limits_incl[id] = dataset["Indices"]
         else:
@@ -38509,7 +38552,7 @@ class PySILLS(tk.Frame):
     def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
-        elif self.pysills_mode == "FI":
+        elif self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
             key_setting = "mi_setting"
