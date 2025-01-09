@@ -1872,27 +1872,45 @@ class PySILLS(tk.Frame):
                     "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
                     "Table": "sans 10"}
         elif str_screen_resolution == "1280x720":
-            self.row_height = 17
+            self.row_height = 16
             self.column_width = 14
 
             if var_os == "linux":
                 self.font_settings = {
-                    "Header": "sans 9 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
+                    "Header": "sans 8 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
                     "Table": "sans 7"}
             elif var_os == "darwin":
                 self.font_settings = {
-                    "Header": "sans 9 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
-                    "Table": "sans 7"}
+                    "Header": "sans 11 bold", "Elements": "sans 9 bold", "Small": "sans 7 bold", "Options": "sans 9",
+                    "Table": "sans 9"}
             else:
                 self.font_settings = {
-                    "Header": "sans 9 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
+                    "Header": "sans 8 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
                     "Table": "sans 7"}
+        elif str_screen_resolution == "3840x2160":
+            self.row_height = 48
+            self.column_width = 42
+
+            if var_os == "linux":
+                self.font_settings = {
+                    "Header": "sans 24 bold", "Elements": "sans 20 bold", "Small": "sans 14 bold", "Options": "sans 20",
+                    "Table": "sans 20"}
+            elif var_os == "darwin":
+                self.font_settings = {
+                    "Header": "sans 32 bold", "Elements": "sans 28 bold", "Small": "sans 20 bold", "Options": "sans 28",
+                    "Table": "sans 28"}
+            else:
+                self.font_settings = {
+                    "Header": "sans 24 bold", "Elements": "sans 20 bold", "Small": "sans 16 bold", "Options": "sans 20",
+                    "Table": "sans 10"}
 
         str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
-        if str_screen_resolution == "1920x1080":
+        if str_screen_resolution == "1920x1080":    # Full HD
             var_ncol_ma_settings = 65
-        elif str_screen_resolution == "1280x720":
+        elif str_screen_resolution == "1280x720":   # HD ready
             var_ncol_ma_settings = 70
+        elif str_screen_resolution == "3840x2160":  # 4K
+            var_ncol_ma_settings = 65
 
         self.window_dimensions = {
             "Main window": [33, 21], "MA main settings": [38, var_ncol_ma_settings], "FI main settings": [40, 67],
@@ -13261,7 +13279,7 @@ class PySILLS(tk.Frame):
         list_colorschemes = [
             "Dark scheme", "Light scheme", "Boho theme 1", "Boho theme 2", "Synthwave theme", "Gunmetal theme",
             "Dark Jungle", "Noble Room"]
-        list_screenresolutions = ["1920x1080", "1280x720"]
+        list_screenresolutions = ["3840x2160", "1920x1080", "1280x720"]
         list_colormaps.sort()
         list_filetypes = ["*.csv", "*.txt"]
         list_filetypes.sort()
@@ -16418,6 +16436,8 @@ class PySILLS(tk.Frame):
             var_n_last_column = 18
         elif str_screen_resolution == "1280x720":
             var_n_last_column = 23
+        elif str_screen_resolution == "3840x2160":
+            var_n_last_column = 18
 
         # Build section 'Project Information'
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
@@ -17822,6 +17842,9 @@ class PySILLS(tk.Frame):
         elif str_screen_resolution == "1280x720":
             var_width = 12 #16
             var_height = 10 #12
+        elif str_screen_resolution == "3840x2160":
+            var_width = 30
+            var_height = 25
 
         # Labels
         lbl_iso = SE(
