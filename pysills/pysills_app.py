@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.47
-# Date:		09.01.2025
+# Version:	v1.0.48
+# Date:		13.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.47"
-        self.val_version = self.str_version_number + " - 09.01.2025"
+        self.str_version_number = "1.0.48"
+        self.val_version = self.str_version_number + " - 13.01.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -9243,10 +9243,15 @@ class PySILLS(tk.Frame):
                     if splitted_lines[5] in ["Grubbs-Test", "Grubbs-Test (SILLS)"]:
                         splitted_lines[5] = "Grubbs test"
 
-                    self.container_var[key_setting]["Spike Elimination Inclusion"].set(splitted_lines[4])
-                    self.container_var["Spike Elimination Method"].set(splitted_lines[5])
-                    self.container_var[key_setting]["SE Alpha"].set(splitted_lines[6])
-                    self.container_var[key_setting]["SE Threshold"].set(int(splitted_lines[7]))
+                    if len(splitted_lines) == 8:
+                        self.container_var[key_setting]["Spike Elimination Inclusion"].set(splitted_lines[4])
+                        self.container_var["Spike Elimination Method"].set(splitted_lines[5])
+                        self.container_var[key_setting]["SE Alpha"].set(splitted_lines[6])
+                        self.container_var[key_setting]["SE Threshold"].set(int(splitted_lines[7]))
+                    else:
+                        self.container_var["Spike Elimination Method"].set(splitted_lines[4])
+                        self.container_var[key_setting]["SE Alpha"].set(splitted_lines[5])
+                        self.container_var[key_setting]["SE Threshold"].set(int(splitted_lines[6]))
 
                 index += 1
             else:
