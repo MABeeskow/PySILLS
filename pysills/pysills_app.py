@@ -1888,21 +1888,21 @@ class PySILLS(tk.Frame):
                     "Header": "sans 8 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
                     "Table": "sans 7"}
         elif str_screen_resolution == "3840x2160":
-            self.row_height = 48
-            self.column_width = 42
+            self.row_height = 32
+            self.column_width = 28
 
             if var_os == "linux":
                 self.font_settings = {
-                    "Header": "sans 24 bold", "Elements": "sans 20 bold", "Small": "sans 14 bold", "Options": "sans 20",
-                    "Table": "sans 20"}
+                    "Header": "sans 16 bold", "Elements": "sans 14 bold", "Small": "sans 14 bold", "Options": "sans 14",
+                    "Table": "sans 12"}
             elif var_os == "darwin":
                 self.font_settings = {
-                    "Header": "sans 32 bold", "Elements": "sans 28 bold", "Small": "sans 20 bold", "Options": "sans 28",
-                    "Table": "sans 28"}
+                    "Header": "sans 18 bold", "Elements": "sans 16 bold", "Small": "sans 14 bold", "Options": "sans 16",
+                    "Table": "sans 16"}
             else:
                 self.font_settings = {
-                    "Header": "sans 24 bold", "Elements": "sans 20 bold", "Small": "sans 16 bold", "Options": "sans 20",
-                    "Table": "sans 10"}
+                    "Header": "sans 16 bold", "Elements": "sans 14 bold", "Small": "sans 14 bold", "Options": "sans 14",
+                    "Table": "sans 12"}
 
         str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
         if str_screen_resolution == "1920x1080":    # Full HD
