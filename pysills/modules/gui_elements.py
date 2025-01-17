@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 26.06.2024
+# 17.01.2025
 # ----------------------
 #
 ## MODULES
@@ -660,31 +660,73 @@ class SimpleElements:
         frame_lb.rowconfigure(self.row_id, weight=1)
         #
         return listbox
-    #
-    def create_simple_listbox(self, include_scrb_x=True):
-        frame_lb = tk.Frame(self.parent, bg=self.bg)
+
+    def create_simple_listbox2(self, include_scrb_x=True):
+        frame_lb = tk.Frame(self.parent, bg=self.bg, relief=tk.FLAT)
         frame_lb.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
                       sticky="nesw")
-        #
+
         scrollbar_y = tk.Scrollbar(frame_lb, orient="vertical")
         if include_scrb_x == True:
             scrollbar_x = tk.Scrollbar(frame_lb, orient="horizontal")
             listbox = tk.Listbox(
-                frame_lb, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set)
+                frame_lb, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set,
+                relief=tk.FLAT)
         else:
-            listbox = tk.Listbox(frame_lb, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set)
-        #
+            listbox = tk.Listbox(frame_lb, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set, relief=tk.FLAT)
+
         scrollbar_y.config(command=listbox.yview)
         if include_scrb_x == True:
             scrollbar_x.config(command=listbox.xview)
             scrollbar_x.pack(side="bottom", fill="x", pady=0)
-        listbox.pack(side="left", fill="both", padx=0, pady=0, expand=True)
+
+        listbox.pack(side="left", fill="both", padx=10, pady=10, expand=True)
         scrollbar_y.pack(side="right", fill="y", padx=0)
         frame_lb.columnconfigure(self.column_id, weight=1)
         frame_lb.rowconfigure(self.row_id, weight=1)
-        #
+
         return listbox
-    #
+
+    def create_simple_listbox(self, include_scrb_x=True):
+        frame_lb = tk.Frame(self.parent, bg=self.bg, relief=tk.FLAT)
+        frame_lb.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
+                      sticky="nesw")
+
+        frame_lb2 = tk.Label(self.parent, text="", bg=self.bg, relief=tk.RIDGE)
+        frame_lb2.grid(row=self.row_id + self.n_rows - 1, column=self.column_id + self.n_columns - 1, rowspan=1,
+                       columnspan=1, sticky="nesw")
+
+        scrollbar_y = ttk.Scrollbar(self.parent, orient="vertical")
+
+        #scrollbar_y = tk.Scrollbar(self.parent, orient="vertical")
+        if include_scrb_x == True:
+            scrollbar_x = ttk.Scrollbar(self.parent, orient="horizontal")
+            listbox = tk.Listbox(
+                self.parent, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set, xscrollcommand=scrollbar_x.set,
+                relief=tk.FLAT, highlightthickness=0)
+        else:
+            listbox = tk.Listbox(self.parent, fg=self.fg, bg=self.bg, yscrollcommand=scrollbar_y.set, relief=tk.FLAT,
+                                 highlightthickness=0)
+
+        scrollbar_y.config(command=listbox.yview)
+
+        if include_scrb_x == True:
+            scrollbar_x.config(command=listbox.xview)
+            #scrollbar_x.pack(side="bottom", fill="x", pady=0)
+
+            scrollbar_x.grid(row=self.row_id + self.n_rows - 1, column=self.column_id, rowspan=1,
+                             columnspan=self.n_columns - 1, sticky="ew")
+        listbox.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows - 1, columnspan=self.n_columns - 1,
+                     sticky="nesw", padx=10, pady=10)
+        scrollbar_y.grid(row=self.row_id, column=self.column_id + self.n_columns - 1, rowspan=self.n_rows - 1,
+                         columnspan=1, sticky="ns")
+        #listbox.pack(side="left", fill="both", padx=10, pady=10, expand=True)
+        #scrollbar_y.pack(side="right", fill="y", padx=0)
+        frame_lb.columnconfigure(self.column_id, weight=1)
+        frame_lb.rowconfigure(self.row_id, weight=1)
+
+        return listbox
+
     def create_simple_listbox_grid(self, include_scrb_x=True):
         scrollbar_y = tk.Scrollbar(self.parent, orient="vertical")
         if include_scrb_x == True:

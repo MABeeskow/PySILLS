@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.49
+# Version:	v1.0.50
 # Date:		17.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.49"
+        self.str_version_number = "1.0.50"
         self.val_version = self.str_version_number + " - 17.01.2025"
 
         ## Colors
@@ -2132,9 +2132,9 @@ class PySILLS(tk.Frame):
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
             text=var_lbl_03, relief=tk.FLAT, fontsize=font_header)
         lbl_04c = SE(
-            parent=self.parent, row_id=start_row + 11, column_id=start_column, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text=var_lbl_04c, relief=tk.FLAT, fontsize=font_element)
+            text=var_lbl_04c, relief=tk.FLAT, fontsize=font_header)
         lbl_version = SE(
             parent=self.parent, row_id=start_row + 29, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
@@ -2290,7 +2290,7 @@ class PySILLS(tk.Frame):
 
         # OPTION MENUS
         opt_icp = SE(
-            parent=self.parent, row_id=start_row + 10, column_id=start_column, n_rows=common_n_rows,
+            parent=self.parent, row_id=start_row + 11, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
             var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
             var_list=self.container_lists["ICPMS Library"], fg_active=font_color_light, bg_active=accent_color,
@@ -17865,7 +17865,7 @@ class PySILLS(tk.Frame):
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
             master=frm_iso, width=var_width, height=var_height, yscrollcommand=vsb_iso.set, fg=font_color_dark,
-            bg=background_color_light)
+            bg=background_color_light, padx=10, pady=10)
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
@@ -17893,8 +17893,10 @@ class PySILLS(tk.Frame):
                         if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
                             self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
                             self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][
+                                file_std_short] = {}
+                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][
+                                file_std_short] = tk.IntVar()
                             self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
                             self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
                                 file_std_short] = {}
@@ -17915,7 +17917,8 @@ class PySILLS(tk.Frame):
                         if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
                             self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
                             self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][
+                                file_smpl_short] = {}
                             self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
                                 file_smpl_short] = tk.IntVar()
                             self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
@@ -17939,8 +17942,10 @@ class PySILLS(tk.Frame):
                         if file_std_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["STD"]:
                             self.container_var[var_setting_key]["Time-Signal Lines"]["STD"][file_std_short] = {}
                             self.container_var[var_setting_key]["Time-Ratio Lines"]["STD"][file_std_short] = {}
-                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][file_std_short] = {}
-                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short] = tk.IntVar()
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["STD"][
+                                file_std_short] = {}
+                            self.container_var[var_setting_key]["Calculation Interval"]["STD"][
+                                file_std_short] = tk.IntVar()
                             self.container_var[var_setting_key]["Calculation Interval"]["STD"][file_std_short].set(3)
                             self.container_var[var_setting_key]["Calculation Interval Visibility"]["STD"][
                                 file_std_short] = {}
@@ -17961,7 +17966,8 @@ class PySILLS(tk.Frame):
                         if file_smpl_short not in self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"]:
                             self.container_var[var_setting_key]["Time-Signal Lines"]["SMPL"][file_smpl_short] = {}
                             self.container_var[var_setting_key]["Time-Ratio Lines"]["SMPL"][file_smpl_short] = {}
-                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][file_smpl_short] = {}
+                            self.container_var[var_setting_key]["Checkboxes Isotope Diagram"]["SMPL"][
+                                file_smpl_short] = {}
                             self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][
                                 file_smpl_short] = tk.IntVar()
                             self.container_var[var_setting_key]["Calculation Interval"]["SMPL"][file_smpl_short].set(3)
@@ -17980,7 +17986,8 @@ class PySILLS(tk.Frame):
                                  highlightbackground="black", bd=1)
                 text_iso.window_create("end", window=frm_i)
                 text_iso.insert("end", "")
-                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_table)
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_table,
+                                 width=5, anchor="w")
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
@@ -17993,9 +18000,11 @@ class PySILLS(tk.Frame):
                     activeforeground=font_color_light, activebackground=accent_color)
                 opt_srm_i.config(
                     bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                    activeforeground=font_color_light, highlightthickness=0, font=font_table)
+                    activeforeground=font_color_light, highlightthickness=0, font=font_table, width=22, anchor=tk.W)
+
                 text_iso.window_create("end", window=opt_srm_i)
                 text_iso.insert("end", "\t")
+                opt_srm_i.configure(justify="left", compound="right")
 
                 key_element = re.search(r"(\D+)(\d+)", isotope)
                 element = key_element.group(1)
@@ -18053,6 +18062,7 @@ class PySILLS(tk.Frame):
         font_element = self.font_settings["Elements"]
         font_option = self.font_settings["Options"]
         font_table = self.font_settings["Table"]
+        font_small = self.font_settings["Small"]
 
         if self.pysills_mode == "MA":
             var_parent = self.subwindow_ma_settings
@@ -18088,7 +18098,7 @@ class PySILLS(tk.Frame):
             bg=background_color_light).create_frame()
         vsb_02 = ttk.Scrollbar(frm_02, orient="vertical")
         text_02 = tk.Text(
-            master=frm_02, width=25, height=25, yscrollcommand=vsb_02.set, bg=background_color_light)
+            master=frm_02, width=25, height=25, yscrollcommand=vsb_02.set, bg=background_color_light, padx=10, pady=10)
         vsb_02.config(command=text_02.yview)
         vsb_02.pack(side="right", fill="y")
         text_02.pack(side="left", fill="both", expand=True)
@@ -18099,12 +18109,13 @@ class PySILLS(tk.Frame):
             self.get_acquisition_times(var_filetype="SMPL")
 
         lbl_i = tk.Label(
-            frm_02, text=str_lbl_02, bg=background_color_light, fg=font_color_dark, font=font_table)
+            frm_02, text=str_lbl_02, bg=background_color_light, fg=font_color_dark, font=font_element)
         text_02.window_create("end", window=lbl_i)
         text_02.insert("end", "\n")
         for var_file_short in self.container_lists["STD"]["Short"]:
             lbl_i = tk.Label(
-                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark, font=font_table)
+                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark, font=font_table,
+                width=len(var_file_short), anchor=tk.W)
             text_02.window_create("end", window=lbl_i)
             text_02.insert("end", "\t")
 
@@ -18114,13 +18125,16 @@ class PySILLS(tk.Frame):
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
 
+        text_02.insert("end", "\n")
+
         lbl_i = tk.Label(
-            frm_02, text=str_lbl_03, bg=background_color_light, fg=font_color_dark, font=font_table)
+            frm_02, text=str_lbl_03, bg=background_color_light, fg=font_color_dark, font=font_element)
         text_02.window_create("end", window=lbl_i)
         text_02.insert("end", "\n")
         for var_file_short in self.container_lists["SMPL"]["Short"]:
             lbl_i = tk.Label(
-                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark, font=font_table)
+                frm_02, text=var_file_short, bg=background_color_light, fg=font_color_dark, font=font_table,
+                width=len(var_file_short), anchor=tk.W)
             text_02.window_create("end", window=lbl_i)
             text_02.insert("end", "\t")
 
@@ -18477,8 +18491,8 @@ class PySILLS(tk.Frame):
             n_columns=var_header_n, fg=font_color_dark, bg=background_color_listbox).create_frame()
         vsb_files = ttk.Scrollbar(master=frm_files, orient="vertical")
         text_files = tk.Text(
-            master=frm_files, width=30, height=25, yscrollcommand=vsb_files.set, fg=font_color_dark,
-            bg=background_color_listbox)
+            master=frm_files, width=50, height=25, yscrollcommand=vsb_files.set, fg=font_color_dark,
+            bg=background_color_listbox, padx=10, pady=10)
         vsb_files.config(command=text_files.yview)
         vsb_files.pack(side="right", fill="y")
         text_files.pack(side="left", fill="both", expand=True)
@@ -18580,7 +18594,7 @@ class PySILLS(tk.Frame):
                     bg=background_color_listbox, variable=self.container_var["STD"][file_std]["Checkbox"],
                     onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
                     activebackground=background_color_listbox, activeforeground=font_color_dark,
-                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+                    anchor=tk.W, highlightthickness=0, bd=0, width=len(file_std_short))
             except:
                 self.check_variable_on_existence(
                     var_name_check=self.container_var["STD"], filetype="STD", filename_long=file_std,
@@ -18591,11 +18605,11 @@ class PySILLS(tk.Frame):
                     bg=background_color_listbox, variable=self.container_var["STD"][file_std]["Checkbox"],
                     onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
                     activebackground=background_color_listbox, activeforeground=font_color_dark,
-                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+                    anchor=tk.W, highlightthickness=0, bd=0, width=len(file_std_short))
 
             cb_i.configure(font=font_table)
             text_files.window_create("end", window=cb_i)
-            text_files.insert("end", "\t")
+            text_files.insert("end", "\t\t")
 
             if self.container_var["STD"][file_std]["SRM"].get() != "Select SRM":
                 var_text = self.container_var["STD"][file_std]["SRM"].get()
@@ -18616,9 +18630,14 @@ class PySILLS(tk.Frame):
                 activebackground=accent_color)
             opt_srm_i.config(
                 bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0, font=font_table)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=22, anchor=tk.W)
             text_files.window_create("end", window=opt_srm_i)
             text_files.insert("end", "\t")
+
+            lbl_i = tk.Label(
+                frm_files, text="", bg=background_color_listbox, fg=font_color_dark, font=font_table, anchor=tk.W)
+            text_files.window_create("end", window=lbl_i)
+            text_files.insert("end", " ")
 
             if self.pysills_mode == "MA":
                 btn_i = tk.Button(
@@ -18643,6 +18662,11 @@ class PySILLS(tk.Frame):
             btn_i.configure(font=font_table)
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
+
+            lbl_i = tk.Label(
+                frm_files, text="", bg=background_color_listbox, fg=font_color_dark, font=font_table, anchor=tk.W)
+            text_files.window_create("end", window=lbl_i)
+            text_files.insert("end", " ")
 
             try:
                 color_sign = self.container_var["STD"][file_std]["Sign Color"].get()
@@ -18971,8 +18995,8 @@ class PySILLS(tk.Frame):
             n_columns=var_header_n, fg=font_color_dark, bg=background_color_light).create_frame()
         vsb_files = ttk.Scrollbar(master=frm_files, orient="vertical")
         text_files = tk.Text(
-            master=frm_files, width=30, height=25, yscrollcommand=vsb_files.set, fg=font_color_dark,
-            bg=background_color_light)
+            master=frm_files, width=50, height=25, yscrollcommand=vsb_files.set, fg=font_color_dark,
+            bg=background_color_light, padx=10, pady=10)
         vsb_files.config(command=text_files.yview)
         vsb_files.pack(side="right", fill="y")
         text_files.pack(side="left", fill="both", expand=True)
@@ -19081,7 +19105,7 @@ class PySILLS(tk.Frame):
                     bg=background_color_light, variable=self.container_var["SMPL"][file_smpl]["Checkbox"],
                     onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
                     activebackground=background_color_light, activeforeground=font_color_dark,
-                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+                    anchor=tk.W, highlightthickness=0, bd=0, width=len(file_smpl_short))
             except:
                 self.check_variable_on_existence(
                     var_name_check=self.container_var["SMPL"], filetype="SMPL", filename_long=file_smpl,
@@ -19092,11 +19116,11 @@ class PySILLS(tk.Frame):
                     bg=background_color_light, variable=self.container_var["SMPL"][file_smpl]["Checkbox"],
                     onvalue=1, offvalue=0, selectcolor=self.bg_colors["White"],
                     activebackground=background_color_light, activeforeground=font_color_dark,
-                    anchor=tk.CENTER, highlightthickness=0, bd=0)
+                    anchor=tk.W, highlightthickness=0, bd=0, width=len(file_smpl_short))
 
             cb_i.configure(font=font_table)
             text_files.window_create("end", window=cb_i)
-            text_files.insert("end", "\t")
+            text_files.insert("end", "\t\t")
 
             opt_is_i = tk.OptionMenu(
                 frm_files, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"], *file_isotopes)
@@ -19105,14 +19129,20 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, activebackground=accent_color)
             opt_is_i.config(
                 bg=self.bg_colors["Light"], fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0, font=font_table)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=5, anchor=tk.W)
             text_files.window_create("end", window=opt_is_i)
             text_files.insert("end", "\t")
+
+            lbl_i = tk.Label(
+                frm_files, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
+            text_files.window_create("end", window=lbl_i)
+            text_files.insert("end", " ")
 
             if self.container_var["SMPL"][file_smpl]["ID"].get() != "A":
                 var_text = self.container_var["SMPL"][file_smpl]["ID"].get()
             else:
                 var_text = "A"
+
             opt_id_i = tk.OptionMenu(
                 frm_files, self.container_var["SMPL"][file_smpl]["ID"], *np.sort(self.list_alphabet))
             opt_id_i["menu"].config(
@@ -19120,10 +19150,15 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, activebackground=accent_color)
             opt_id_i.config(
                 bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0, font=font_table)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=5, anchor=tk.W)
 
             text_files.window_create("end", window=opt_id_i)
             text_files.insert("end", "\t")
+
+            lbl_i = tk.Label(
+                frm_files, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
+            text_files.window_create("end", window=lbl_i)
+            text_files.insert("end", " ")
 
             if self.pysills_mode == "MA":
                 btn_i = tk.Button(
@@ -19145,9 +19180,14 @@ class PySILLS(tk.Frame):
                     highlightthickness=0, highlightbackground=background_color_light,
                     command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
 
-            btn_i.configure(font=font_table)
+            btn_i.configure(font=font_table, anchor=tk.W)
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
+
+            lbl_i = tk.Label(
+                frm_files, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
+            text_files.window_create("end", window=lbl_i)
+            text_files.insert("end", " ")
 
             try:
                 color_sign = self.container_var["SMPL"][file_smpl]["Sign Color"].get()
@@ -20994,7 +21034,8 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_light).create_frame()
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
-            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=background_color_light)
+            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=background_color_light, padx=10,
+            pady=10)
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
@@ -21008,7 +21049,8 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=frm_i)
                 text_iso.insert("end", "")
 
-                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_option)
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_option,
+                                 width=5, anchor="w")
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
