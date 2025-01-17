@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.48
-# Date:		13.01.2025
+# Version:	v1.0.49
+# Date:		17.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.48"
-        self.val_version = self.str_version_number + " - 13.01.2025"
+        self.str_version_number = "1.0.49"
+        self.val_version = self.str_version_number + " - 17.01.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1862,15 +1862,15 @@ class PySILLS(tk.Frame):
             if var_os == "linux":
                 self.font_settings = {
                     "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 7 bold", "Options": "sans 10",
-                    "Table": "sans 10"}
+                    "Table": "sans 10", "Tiny": "sans 7 bold"}
             elif var_os == "darwin":
                 self.font_settings = {
                     "Header": "sans 16 bold", "Elements": "sans 14 bold", "Small": "sans 10 bold", "Options": "sans 14",
-                    "Table": "sans 14"}
+                    "Table": "sans 14", "Tiny": "sans 10 bold"}
             else:
                 self.font_settings = {
                     "Header": "sans 12 bold", "Elements": "sans 10 bold", "Small": "sans 8 bold", "Options": "sans 10",
-                    "Table": "sans 10"}
+                    "Table": "sans 10", "Tiny": "sans 8 bold"}
         elif str_screen_resolution == "1280x720":
             self.row_height = 16
             self.column_width = 14
@@ -1878,15 +1878,15 @@ class PySILLS(tk.Frame):
             if var_os == "linux":
                 self.font_settings = {
                     "Header": "sans 8 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
-                    "Table": "sans 7"}
+                    "Table": "sans 7", "Tiny": "sans 5 bold"}
             elif var_os == "darwin":
                 self.font_settings = {
                     "Header": "sans 11 bold", "Elements": "sans 9 bold", "Small": "sans 7 bold", "Options": "sans 9",
-                    "Table": "sans 9"}
+                    "Table": "sans 9", "Tiny": "sans 5 bold"}
             else:
                 self.font_settings = {
                     "Header": "sans 8 bold", "Elements": "sans 7 bold", "Small": "sans 5 bold", "Options": "sans 7",
-                    "Table": "sans 7"}
+                    "Table": "sans 7", "Tiny": "sans 5 bold"}
         elif str_screen_resolution == "3840x2160":
             self.row_height = 32
             self.column_width = 28
@@ -1894,15 +1894,15 @@ class PySILLS(tk.Frame):
             if var_os == "linux":
                 self.font_settings = {
                     "Header": "sans 16 bold", "Elements": "sans 14 bold", "Small": "sans 14 bold", "Options": "sans 14",
-                    "Table": "sans 12"}
+                    "Table": "sans 12", "Tiny": "sans 12 bold"}
             elif var_os == "darwin":
                 self.font_settings = {
                     "Header": "sans 18 bold", "Elements": "sans 16 bold", "Small": "sans 14 bold", "Options": "sans 16",
-                    "Table": "sans 16"}
+                    "Table": "sans 16", "Tiny": "sans 12 bold"}
             else:
                 self.font_settings = {
                     "Header": "sans 16 bold", "Elements": "sans 14 bold", "Small": "sans 14 bold", "Options": "sans 14",
-                    "Table": "sans 12"}
+                    "Table": "sans 12", "Tiny": "sans 12 bold"}
 
         str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
         if str_screen_resolution == "1920x1080":    # Full HD
@@ -2034,6 +2034,7 @@ class PySILLS(tk.Frame):
         font_element = self.font_settings["Elements"] # "sans 10 bold"
         font_option = self.font_settings["Options"]
         font_small = self.font_settings["Small"]
+        font_tiny = self.font_settings["Tiny"]
         self.var_language = self.container_var["General Settings"]["Language"].get()
         self.update_variables_initial_values()
         self.parent["bg"] = self.bg_colors["BG Window"]
@@ -2137,11 +2138,11 @@ class PySILLS(tk.Frame):
         lbl_version = SE(
             parent=self.parent, row_id=start_row + 29, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=background_color_header).create_simple_label(
-            text="Version: " + self.val_version, relief=tk.FLAT, fontsize=font_small)
+            text="Version: " + self.val_version, relief=tk.FLAT, fontsize=font_tiny)
         lbl_dev = SE(
             parent=self.parent, row_id=start_row - 1, column_id=start_column, n_rows=common_n_rows,
             n_columns=common_n_columns + 11, fg=font_color_light, bg=accent_color).create_simple_label(
-            text=var_lbl_dev, relief=tk.FLAT, fontsize=font_small, sticky="news")
+            text=var_lbl_dev, relief=tk.FLAT, fontsize=font_tiny, sticky="news")
 
         # LISTBOXES
         self.lb_std = SE(
@@ -2151,6 +2152,8 @@ class PySILLS(tk.Frame):
             parent=self.parent, row_id=start_row + 17, column_id=start_column + 11, n_rows=12,
             n_columns=common_n_columns, fg=font_color_dark, bg=background_color_listbox).create_simple_listbox()
 
+        self.lb_std.configure(font=font_option)
+        self.lb_smpl.configure(font=font_option)
         self.container_listbox_files["STD"] = self.lb_std
         self.container_listbox_files["SMPL"] = self.lb_smpl
 
@@ -19282,8 +19285,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode == "MA":
             var_setting_key = "ma_setting"
@@ -20205,9 +20210,9 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             parent = self.subwindow_ma_checkfile
             val_row_start = 0
-            val_column_start = 14
+            val_column_start = 16
             val_row_span = 20
-            val_column_span = 46
+            val_column_span = 44
         elif self.pysills_mode in ["FI", "MI", "INCL"]:
             parent = self.subwindow_fi_checkfile
             val_row_start = 0
@@ -20353,9 +20358,9 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             parent = self.subwindow_ma_checkfile
             val_row_start = 0
-            val_column_start = 14
+            val_column_start = 16
             val_row_span = 20
-            val_column_span = 46
+            val_column_span = 44
         elif self.pysills_mode in ["FI", "MI", "INCL"]:
             parent = self.subwindow_fi_checkfile
             val_row_start = 0
@@ -20604,9 +20609,11 @@ class PySILLS(tk.Frame):
         background_color_dark = self.bg_colors["BG Window"]
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
-        accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_filename_long = var_filename_long
         str_filetype = var_filetype
@@ -20663,7 +20670,7 @@ class PySILLS(tk.Frame):
 
         start_row = 0
         start_column = 0
-        n_navigation = 14
+        n_navigation = 16
         half_navigation = int(n_navigation/2)
 
         if var_filetype == "STD":
@@ -20725,89 +20732,99 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text=str_lbl_01, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_elements)
         lbl_02 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 15, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_02, relief=tk.FLAT, fontsize=font_elements)
         lbl_03 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 18, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_03, relief=tk.FLAT, fontsize=font_elements)
         lbl_04 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column, n_rows=1,
             n_columns=n_navigation, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text=str_lbl_18, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_18, relief=tk.FLAT, fontsize=font_elements)
         lbl_04a = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column, n_rows=1,
             n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_06, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_06, relief=tk.FLAT, fontsize=font_elements)
         lbl_04b = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column, n_rows=1,
             n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text=str_lbl_07, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_07, relief=tk.FLAT, fontsize=font_elements)
         lbl_05 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 40, n_rows=1,
             n_columns=n_columns - (start_column + 40) - 6, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
-            text=str_lbl_22, relief=tk.FLAT, fontsize="sans 10 bold")
+            text=str_lbl_22, relief=tk.FLAT, fontsize=font_elements)
 
         ## BUTTONS
         btn_02a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_08, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_show_all_lines(
                 var_type, var_file_short, ))
         btn_02b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_09, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
                 var_type, var_file_short))
         btn_02c = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=start_column, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=start_column, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_08a, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short, key="RAW": self.ma_show_all_lines(
                 var_type, var_file_short, key))
         btn_02d = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_09a, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short, key="RAW": self.ma_hide_all_lines(
                 var_type, var_file_short, key))
         btn_03 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_15, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.stepwise_analysis_file_specific(filetype, filename_long))
         btn_04a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 25, column_id=0, n_rows=1, n_columns=n_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_19, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_remove_interval(var_type, var_file_short))
         btn_04b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 26, column_id=0, n_rows=1, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 26, column_id=0, n_rows=1, n_columns=n_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_19b, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_short=var_filename_short, focus="MAT":
             self.remove_intervals(filetype, filename_short, focus))
         btn_05a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=0, n_rows=2, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_04, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="back": self.switch_to_another_file(filetype, mode))
         btn_05b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=7, n_rows=2, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=half_navigation, n_rows=2, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
+
+        btn_02a.configure(font=font_elements)
+        btn_02b.configure(font=font_elements)
+        btn_02c.configure(font=font_elements)
+        btn_02d.configure(font=font_elements)
+        btn_03.configure(font=font_elements)
+        btn_04a.configure(font=font_elements)
+        btn_04b.configure(font=font_elements)
+        btn_05a.configure(font=font_elements)
+        btn_05b.configure(font=font_elements)
 
         if self.var_os == "darwin":
             font_color_accent = font_color_dark
@@ -20815,7 +20832,7 @@ class PySILLS(tk.Frame):
             font_color_accent = font_color_light
 
         btn_08 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=n_rows - 2, column_id=0, n_rows=2, n_columns=n_navigation,
             fg=font_color_accent, bg=accent_color).create_simple_button(
             text=str_lbl_20, bg_active=accent_color, fg_active=font_color_accent,
             command=lambda var_parent=self.subwindow_ma_checkfile, var_type=str_filetype,
@@ -20830,6 +20847,9 @@ class PySILLS(tk.Frame):
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
+        btn_08.configure(font=font_elements)
+        btn_09.configure(font=font_elements)
+
         if str_filetype == "STD" or "IS" in var_mat_is:
             btn_09.configure(state="disabled")
 
@@ -20837,54 +20857,60 @@ class PySILLS(tk.Frame):
 
         ## RADIOBUTTONS
         rb_03a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=0,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_10, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_filetype=str_filetype, var_lb_state=False:
             self.ma_show_time_signal_diagram(var_file, var_filetype, var_lb_state))
         rb_03b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 19, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=1,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_11, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_time_ratio_diagram(var_file, var_type))
         rb_03c = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=0, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=3,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_12, sticky="nesw",
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_spectral_data_view(filetype, filename_long))
         rb_03d = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 20, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=4,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_13, sticky="nesw",
             relief=tk.FLAT, command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.show_boxplot_data_view(filetype, filename_long))
         rb_03e = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=0, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short], value_rb=2,
             color_bg=background_color_elements, fg=font_color_dark, text=str_lbl_14, sticky="nesw",
             relief=tk.FLAT, command=lambda var_file=str_filename_long, var_type=str_filetype:
             self.ma_show_quick_results(var_file, var_type))
 
+        rb_03a.configure(font=font_option)
+        rb_03b.configure(font=font_option)
+        rb_03c.configure(font=font_option)
+        rb_03d.configure(font=font_option)
+        rb_03e.configure(font=font_option)
+
         if "IS" in var_is_i:
             rb_03b.configure(state="disabled")
             rb_03e.configure(state="disabled")
 
         rb_05 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 14, n_rows=1,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + n_navigation, n_rows=1,
             n_columns=13, fg=font_color_light, bg=self.colors_intervals["BG"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=0,
             color_bg=self.colors_intervals["BG"], fg=font_color_light, text=str_lbl_24,
             sticky="nesw", relief=tk.FLAT)
         rb_06 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 27, n_rows=1,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 28, n_rows=1,
             n_columns=13, fg=font_color_light, bg=self.colors_intervals["MAT"]).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=1,
@@ -20892,12 +20918,16 @@ class PySILLS(tk.Frame):
             sticky="nesw",
             relief=tk.FLAT)
         rb_08 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + 14, n_rows=1,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=start_column + n_navigation, n_rows=1,
             n_columns=26, fg=font_color_light, bg=background_color_dark).create_radiobutton(
             var_rb=self.container_var["ma_setting"]["Calculation Interval"][str_filetype][var_filename_short],
             value_rb=3,
             color_bg=background_color_dark, fg=font_color_light, text=str_lbl_23,
             sticky="nesw", relief=tk.FLAT)
+
+        rb_05.configure(font=font_option)
+        rb_06.configure(font=font_option)
+        rb_08.configure(font=font_option)
 
         ## CHECKBOXES
         if "BG" not in self.container_var["ma_setting"]["Calculation Interval Visibility"][str_filetype][
@@ -20931,6 +20961,9 @@ class PySILLS(tk.Frame):
             command=lambda var_key="MAT", var_type=str_filetype, var_file_short=var_filename_short:
             self.ma_change_interval_visibility(var_key, var_type, var_file_short))
 
+        cb_bg.configure(font=font_option)
+        cb_mat.configure(font=font_option)
+
         ## ENTRIES
         var_entr_start = tk.StringVar()
         var_entr_start.set(str_lbl_16)
@@ -20939,22 +20972,25 @@ class PySILLS(tk.Frame):
         self.helper_time_entries = {"Start": var_entr_start, "End": var_entr_end}
 
         entr_04a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_start, text_default=var_entr_start.get(),
             command=lambda event, var_entr=var_entr_start, var_key="Start", mode=str_filename_long, var_interval=None:
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
         entr_04b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=7, n_rows=1, n_columns=7,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
             fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
             var=var_entr_end, text_default=var_entr_end.get(),
             command=lambda event, var_entr=var_entr_end, var_key="End", mode=str_filename_long, var_interval=None:
             self.ma_set_bg_interval(var_entr, var_key, mode, var_interval, event))
 
+        entr_04a.configure(font=font_option)
+        entr_04b.configure(font=font_option)
+
         ## MEASURED ISOTOPES
         frm_iso = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 1, column_id=start_column, n_rows=14,
-            n_columns=14,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 1, column_id=start_column, n_rows=n_navigation,
+            n_columns=n_navigation,
             fg=font_color_dark, bg=background_color_light).create_frame()
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
@@ -20972,7 +21008,7 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=frm_i)
                 text_iso.insert("end", "")
 
-                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark)
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_option)
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
@@ -20980,7 +21016,7 @@ class PySILLS(tk.Frame):
                 cb_raw_i = tk.Checkbutton(
                     frm_iso,
                     variable=self.container_var["ma_setting"]["Display RAW"][str_filetype][var_filename_short][isotope],
-                    text="RAW", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark,
+                    text="RAW", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark, font=font_option,
                     command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="RAW",
                                    var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
                                                                                        var_datatype, var_isotope))
@@ -20991,8 +21027,8 @@ class PySILLS(tk.Frame):
                 cb_smoothed_i = tk.Checkbutton(
                     frm_iso,
                     variable=self.container_var["ma_setting"]["Display SMOOTHED"][str_filetype][var_filename_short][
-                        isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=background_color_light,
-                    fg=font_color_dark,
+                        isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark,
+                    font=font_option,
                     command=lambda var_type=str_filetype, var_file_short=var_filename_short, var_datatype="SMOOTHED",
                                    var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
                                                                                        var_datatype, var_isotope))
@@ -21006,7 +21042,7 @@ class PySILLS(tk.Frame):
 
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 14, n_rows=8,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + n_navigation, n_rows=8,
             n_columns=13, fg=font_color_dark,
             bg=self.colors_intervals["BG LB"]).create_simple_listbox_grid(
             include_scrb_x=False)
@@ -21014,16 +21050,23 @@ class PySILLS(tk.Frame):
 
         ## MATRIX INTERVAL
         lb_mat, scrollbar_mat_y = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 27, n_rows=8,
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + 28, n_rows=8,
             n_columns=13, fg=font_color_dark,
             bg=self.colors_intervals["MAT LB"]).create_simple_listbox_grid(include_scrb_x=False)
         self.container_helper[str_filetype][var_filename_short]["MAT"]["Listbox"] = lb_mat
+
+        lb_bg.configure(font=font_option)
+        lb_mat.configure(font=font_option)
 
         ## TREEVIEWS
         self.tv_parallelism = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=start_column + 40, n_rows=9,
             n_columns=n_columns - 40, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
             n_categories=2, text_n=[str_lbl_26, str_lbl_27], width_n=["90", "100"], individual=True)
+
+        style = ttk.Style()
+        style.configure("Treeview", font=font_table)
+        style.configure("Treeview.Heading", font=font_elements)
 
         ## INITIALIZATION
 
@@ -21206,9 +21249,9 @@ class PySILLS(tk.Frame):
 
         self.fig_specific = Figure(figsize=(10, 5), tight_layout=True, facecolor=background_color_light)
         self.canvas_specific = FigureCanvasTkAgg(self.fig_specific, master=self.subwindow_ma_checkfile)
-        self.canvas_specific.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=46, sticky="nesw")
+        self.canvas_specific.get_tk_widget().grid(row=0, column=16, rowspan=20, columnspan=44, sticky="nesw")
         self.toolbarFrame_specific = tk.Frame(master=self.subwindow_ma_checkfile)
-        self.toolbarFrame_specific.grid(row=20, column=14, rowspan=2, columnspan=46, sticky="ew")
+        self.toolbarFrame_specific.grid(row=20, column=16, rowspan=2, columnspan=44, sticky="ew")
         self.toolbar_specific = NavigationToolbar2Tk(self.canvas_specific, self.toolbarFrame_specific)
         self.toolbar_specific.config(
             bg=background_color_light, highlightthickness=0, highlightbackground=background_color_light,
@@ -21528,9 +21571,9 @@ class PySILLS(tk.Frame):
         self.container_helper[var_type][var_file_short]["AXES"] = {"Time-Ratio": ax_ratio}
 
         self.canvas_specific_ratio = FigureCanvasTkAgg(self.fig_specific_ratio, master=self.subwindow_ma_checkfile)
-        self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=14, rowspan=20, columnspan=46, sticky="nesw")
+        self.canvas_specific_ratio.get_tk_widget().grid(row=0, column=16, rowspan=20, columnspan=44, sticky="nesw")
         self.toolbarFrame_specific_ratio = tk.Frame(master=self.subwindow_ma_checkfile)
-        self.toolbarFrame_specific_ratio.grid(row=20, column=14, rowspan=2, columnspan=46, sticky="w")
+        self.toolbarFrame_specific_ratio.grid(row=20, column=16, rowspan=2, columnspan=44, sticky="w")
         self.toolbar_specific_ratio = NavigationToolbar2Tk(self.canvas_specific_ratio, self.toolbarFrame_specific_ratio)
         self.toolbar_specific_ratio.config(background=background_color_light)
         self.toolbar_specific_ratio._message_label.config(
@@ -21703,7 +21746,7 @@ class PySILLS(tk.Frame):
 
         ## FRAMES
         frm_quick = SE(
-            parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=32, n_columns=46,
+            parent=self.subwindow_ma_checkfile, row_id=0, column_id=16, n_rows=32, n_columns=44,
             fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
 
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
@@ -21760,7 +21803,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_ma_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=45,
+                parent=self.subwindow_ma_checkfile, row_id=0, column_id=16, n_rows=18, n_columns=43,
                 fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -21771,7 +21814,7 @@ class PySILLS(tk.Frame):
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
             scb_v.grid(row=0, column=59, rowspan=18, columnspan=1, sticky="ns")
-            scb_h.grid(row=18, column=14, rowspan=1, columnspan=45, sticky="ew")
+            scb_h.grid(row=18, column=16, rowspan=1, columnspan=43, sticky="ew")
 
             if var_is != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0 and n_intervals_incl > 0:
                 ## INITIALIZATION
