@@ -18011,6 +18011,11 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
+                if self.var_os == "darwin":
+                    width_opt = 16
+                else:
+                    width_opt = 22
+
                 opt_srm_i = tk.OptionMenu(
                     frm_iso, self.container_var["SRM"][isotope], *np.sort(self.container_lists["SRM Library"]),
                     command=lambda var_opt=self.container_var["SRM"][isotope], var_indiv=isotope, mode="ISOTOPES":
@@ -18020,7 +18025,8 @@ class PySILLS(tk.Frame):
                     activeforeground=font_color_light, activebackground=accent_color)
                 opt_srm_i.config(
                     bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                    activeforeground=font_color_light, highlightthickness=0, font=font_table, width=22, anchor=tk.W)
+                    activeforeground=font_color_light, highlightthickness=0, font=font_table, width=width_opt,
+                    anchor=tk.W)
 
                 text_iso.window_create("end", window=opt_srm_i)
                 text_iso.insert("end", "\t")
@@ -18642,6 +18648,11 @@ class PySILLS(tk.Frame):
                     self.container_var["SRM"][file_std].set(var_text)
                     self.container_files["STD"][file_std_short]["SRM"].set(var_text)
 
+            if self.var_os == "darwin":
+                width_opt = 16
+            else:
+                width_opt = 22
+
             opt_srm_i = tk.OptionMenu(
                 frm_files, self.container_var["STD"][file_std]["SRM"],
                 *np.sort(self.container_lists["SRM Library"]),
@@ -18652,7 +18663,7 @@ class PySILLS(tk.Frame):
                 activebackground=accent_color)
             opt_srm_i.config(
                 bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=22, anchor=tk.W)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=width_opt, anchor=tk.W)
             text_files.window_create("end", window=opt_srm_i)
             text_files.insert("end", "\t")
 
@@ -18681,7 +18692,7 @@ class PySILLS(tk.Frame):
                     highlightthickness=0, highlightbackground=background_color_listbox,
                     command=lambda var_file=file_std, var_type="STD": self.fi_check_specific_file(var_file, var_type))
 
-            btn_i.configure(font=font_table)
+            btn_i.configure(font=font_table, anchor=tk.CENTER)
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
 
@@ -19204,7 +19215,7 @@ class PySILLS(tk.Frame):
                     highlightthickness=0, highlightbackground=background_color_light,
                     command=lambda var_file=file_smpl, var_type="SMPL": self.fi_check_specific_file(var_file, var_type))
 
-            btn_i.configure(font=font_table, anchor=tk.W)
+            btn_i.configure(font=font_table, anchor=tk.CENTER)
             text_files.window_create("end", window=btn_i)
             text_files.insert("end", "\t")
 
