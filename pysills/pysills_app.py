@@ -11038,8 +11038,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title = self.language_dict["Dwell Time Settings"][self.var_language]
         str_lbl_01 = self.language_dict["Dwell times (in s)"][self.var_language]
@@ -11141,8 +11143,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         ## Window Settings
         row_min = self.row_height
@@ -11580,8 +11584,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         ## Window Settings
         row_min = self.row_height
@@ -12554,8 +12560,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
         str_lbl_02 = self.language_dict["Internal standard"][self.var_language]
@@ -13483,8 +13491,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title = self.language_dict["Check-Up - Standard Reference Material"][self.var_language]
         str_lbl_01 = self.language_dict["Standard Files"][self.var_language]
@@ -13631,8 +13641,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
         str_lbl_02 = self.language_dict["Calculation Intervals"][self.var_language]
@@ -13906,8 +13918,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
         str_lbl_02 = self.language_dict["Acquisition Times"][self.var_language]
@@ -14197,8 +14211,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_lbl_01 = self.language_dict["Check-Up"][self.var_language]
         str_lbl_02 = self.language_dict["Imported Files"][self.var_language]
@@ -17046,8 +17062,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         var_row_start = dict_geometry_info["Row start"]
         var_row_n = dict_geometry_info["N rows"]
@@ -17207,8 +17225,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         var_row_start = dict_geometry_info["Row start"]
         var_row_n = dict_geometry_info["N rows"]
@@ -17865,7 +17885,7 @@ class PySILLS(tk.Frame):
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
             master=frm_iso, width=var_width, height=var_height, yscrollcommand=vsb_iso.set, fg=font_color_dark,
-            bg=background_color_light, padx=10, pady=10)
+            bg=background_color_light, padx=10, pady=10, state="disabled")
         vsb_iso.config(command=text_iso.yview)
         vsb_iso.pack(side="right", fill="y")
         text_iso.pack(side="left", fill="both", expand=True)
@@ -18143,6 +18163,8 @@ class PySILLS(tk.Frame):
                 fg=font_color_dark, bg=self.bg_colors["White"], highlightthickness=0, width=12, font=font_table)
             text_02.window_create("insert", window=entr_i)
             text_02.insert("end", "\n")
+
+        text_02.configure(state="disabled")
 
     def get_acquisition_times(self, var_filetype):
         for var_file_long in self.container_lists[var_filetype]["Long"]:
@@ -18682,6 +18704,8 @@ class PySILLS(tk.Frame):
 
             self.container_var["STD"][file_std]["Frame"] = frm_i
 
+        text_files.configure(state="disabled")
+
     def check_variable_on_existence(self, var_name_check, filetype, filename_long, filename_short):
         if filename_long not in var_name_check:
             self.build_all_needed_variables(
@@ -19129,7 +19153,7 @@ class PySILLS(tk.Frame):
                 activeforeground=font_color_light, activebackground=accent_color)
             opt_is_i.config(
                 bg=self.bg_colors["Light"], fg=font_color_dark, activebackground=accent_color,
-                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=5, anchor=tk.W)
+                activeforeground=font_color_light, highlightthickness=0, font=font_table, width=8, anchor=tk.W)
             text_files.window_create("end", window=opt_is_i)
             text_files.insert("end", "\t")
 
@@ -19202,6 +19226,8 @@ class PySILLS(tk.Frame):
             text_files.insert("end", "\n")
 
             self.container_var["SMPL"][file_smpl]["Frame"] = frm_i
+
+        text_files.configure(state="disabled")
 
     def change_filetype_time_signal_diagram_checker(self, var_setting_key):
         self.current_file_id_checker = 0
@@ -20804,32 +20830,32 @@ class PySILLS(tk.Frame):
 
         ## BUTTONS
         btn_02a = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1, n_columns=half_navigation,
-            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=start_column, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_08, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_show_all_lines(
                 var_type, var_file_short, ))
         btn_02b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
-            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 16, column_id=half_navigation, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_09, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short: self.ma_hide_all_lines(
                 var_type, var_file_short))
         btn_02c = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=start_column, n_rows=1, n_columns=half_navigation,
-            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=start_column, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_08a, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short, key="RAW": self.ma_show_all_lines(
                 var_type, var_file_short, key))
         btn_02d = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
-            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 17, column_id=half_navigation, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_09a, bg_active=accent_color, fg_active=font_color_light,
             command=lambda var_type=str_filetype, var_file_short=var_filename_short, key="RAW": self.ma_hide_all_lines(
                 var_type, var_file_short, key))
         btn_03 = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=half_navigation, n_rows=1, n_columns=half_navigation,
-            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 21, column_id=half_navigation, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_15, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_long=str_filename_long:
             self.stepwise_analysis_file_specific(filetype, filename_long))
@@ -20851,8 +20877,8 @@ class PySILLS(tk.Frame):
             text=str_lbl_04, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="back": self.switch_to_another_file(filetype, mode))
         btn_05b = SE(
-            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=half_navigation, n_rows=2, n_columns=half_navigation,
-            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 28, column_id=half_navigation, n_rows=2,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
 
@@ -20863,8 +20889,8 @@ class PySILLS(tk.Frame):
         btn_03.configure(font=font_elements)
         btn_04a.configure(font=font_elements)
         btn_04b.configure(font=font_elements)
-        btn_05a.configure(font=font_elements)
-        btn_05b.configure(font=font_elements)
+        btn_05a.configure(font=font_header)
+        btn_05b.configure(font=font_header)
 
         if self.var_os == "darwin":
             font_color_accent = font_color_dark
@@ -20887,7 +20913,7 @@ class PySILLS(tk.Frame):
                            var_filename_long=str_filename_long:
             self.update_parallelism_values(var_filetype, var_filename_short, var_filename_long))
 
-        btn_08.configure(font=font_elements)
+        btn_08.configure(font=font_header)
         btn_09.configure(font=font_elements)
 
         if str_filetype == "STD" or "IS" in var_mat_is:
@@ -21082,6 +21108,8 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=cb_smoothed_i)
                 text_iso.insert("end", "\n")
 
+        text_iso.configure(state="disabled")
+
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 24, column_id=start_column + n_navigation, n_rows=8,
@@ -21250,8 +21278,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_filename_long = var_file
         str_filetype = var_filetype
@@ -21560,8 +21590,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         parts = var_file.split("/")
         var_file_short = parts[-1]
@@ -21756,8 +21788,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         parts = var_file.split("/")
         var_file_short = parts[-1]
@@ -25786,8 +25820,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title_01 = self.language_dict["Mineral Analysis"][self.var_language]
         str_title_02 = self.language_dict["Results"][self.var_language]
@@ -26076,8 +26112,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title_02 = self.language_dict["Further data analysis"][self.var_language]
 
@@ -26584,8 +26622,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         var_title = self.language_dict["About"][self.var_language]
 
@@ -26845,8 +26885,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title_01 = self.language_dict["Setup"][self.var_language]
         str_title_02 = self.language_dict["Export results"][self.var_language]
@@ -30510,8 +30552,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title_02 = self.language_dict["Sensitivity drift"][self.var_language]
 
@@ -31728,8 +31772,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -32168,8 +32214,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -32591,8 +32639,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -32878,8 +32928,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -33094,8 +33146,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -33350,8 +33404,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -33579,6 +33635,9 @@ class PySILLS(tk.Frame):
             btn_09.configure(state="disabled")
 
         btn_03.configure(state="disabled")
+        btn_05a.configure(font=font_header)
+        btn_05b.configure(font=font_header)
+        btn_08.configure(font=font_header)
 
         rb_03a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
@@ -33732,7 +33791,8 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=frm_i)
                 text_iso.insert("end", "")
 
-                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark)
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, width=5,
+                                 anchor=tk.W)
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\t")
 
@@ -33770,6 +33830,8 @@ class PySILLS(tk.Frame):
 
                 text_iso.window_create("end", window=cb_smoothed_i)
                 text_iso.insert("end", "\n")
+
+        text_iso.configure(state="disabled")
 
         ## BACKGROUND INTERVAL
         lb_bg, scrollbar_bg_y = SE(
@@ -33819,8 +33881,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -36583,8 +36647,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -37224,8 +37290,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
 
@@ -37690,8 +37758,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -38337,8 +38407,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         str_filetype = mode
         if self.pysills_mode == "MA":
@@ -38939,8 +39011,10 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = "sans 14 bold"
-        font_elements = "sans 10 bold"
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
 
         color_original = "#3A615E"
         color_smoothed = "#E7A152"
