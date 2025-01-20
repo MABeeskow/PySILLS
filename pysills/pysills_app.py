@@ -39787,14 +39787,14 @@ class PySILLS(tk.Frame):
                 click_id = self.new_id
 
         if key == "up":
-            if click_id > 1:
+            if click_id > 0:
                 file_long = self.container_lists[var_filetype]["Long"].pop(click_id)
                 file_short = self.container_lists[var_filetype]["Short"].pop(click_id)
                 self.container_lists[var_filetype]["Long"].insert(click_id - 1, file_long)
                 self.container_lists[var_filetype]["Short"].insert(click_id - 1, file_short)
                 self.new_id = click_id - 1
         elif key == "down":
-            if click_id < len(self.container_lists[var_filetype]["Long"]) - 2:
+            if click_id < len(self.container_lists[var_filetype]["Long"]) - 1:
                 file_long = self.container_lists[var_filetype]["Long"].pop(click_id)
                 file_short = self.container_lists[var_filetype]["Short"].pop(click_id)
                 self.container_lists[var_filetype]["Long"].insert(click_id + 1, file_long)
@@ -39817,9 +39817,9 @@ class PySILLS(tk.Frame):
             self.lb_std_manager.focus_set()
         elif var_filetype == "SMPL Manager":
             self.lb_smpl_manager.selection_clear(0, tk.END)
-            self.lb_smpl_manager.selection_set(click_id)
-            self.lb_smpl_manager.activate(click_id)
-            self.lb_smpl_manager.see(click_id)
+            self.lb_smpl_manager.selection_set(self.new_id)
+            self.lb_smpl_manager.activate(self.new_id)
+            self.lb_smpl_manager.see(self.new_id)
             self.lb_smpl_manager.focus_set()
 
     def update_table_manager(self, var_filetype, event):
