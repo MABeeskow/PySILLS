@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.51
+# Version:	v1.0.52
 # Date:		20.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -9570,15 +9570,20 @@ class PySILLS(tk.Frame):
 
                     for index3, data in enumerate(data_file):
                         #print(index3, len(data), data)
-                        if index3 == 0:
+                        if index3 == 0: # Corrected values
                             for line, values in enumerate(data):
                                 value_time = float(values[0])
                                 list_time.append(value_time)
                                 for j, value in enumerate(values):
                                     if j > 0:
                                         isotope = list_isotopes[j - 1]
-                                        helper_std[str_std][isotope].append(float(value))
-                        elif index3 == 5:    # Standard Reference Material (SRM) sex
+                                        helper_std_smoothed[str_std][isotope].append(float(value))
+                        elif index3 == 26:   # Original values
+                            for line, values in enumerate(data):
+                                for j, value in enumerate(values):
+                                    isotope = list_isotopes[j]
+                                    helper_std[str_std][isotope].append(float(value))
+                        elif index3 == 5:    # Standard Reference Material (SRM)
                             index_srm = data[0][0] - 1
                             self.container_files["STD"][str_std]["SRM"].set(list_srm[index_srm])
                             self.container_var["STD"][str_std]["SRM"].set(list_srm[index_srm])
@@ -9594,11 +9599,6 @@ class PySILLS(tk.Frame):
                                 end_i = interval[1]
                                 self.build_intervals(filetype="STD", filename=str_std, focus="MAT", list_time=list_time,
                                                      start_i=start_i, end_i=end_i, id=i)
-                        # elif index3 == 26:
-                        #     for line, values in enumerate(data):
-                        #         for j, value in enumerate(values):
-                        #             isotope = list_isotopes[j - 1]
-                        #             helper_std_smoothed[str_std][isotope].append(float(value))
                         elif index3 == 38:    # SRM data
                             helper_srm_i = {}
                             unique_srm = []
@@ -9652,6 +9652,7 @@ class PySILLS(tk.Frame):
                                             self.srm_isotopes[isotope]["Concentration"] = 0.0
 
                     helper_std[str_std]["Time"] = list_time
+                    helper_std_smoothed[str_std]["Time"] = list_time
 
                     self.container_var["STD"][str_std]["Checkbox"].set(1)
                     self.container_var["STD"][str_std]["Sign Color"].set(self.sign_yellow)
@@ -9664,26 +9665,20 @@ class PySILLS(tk.Frame):
                     column_names = ["Time"]
                     column_names.extend(list_isotopes)
                     data_columns = [list_time]
+                    data_columns_smoothed = [list_time]
 
                     for isotope in list_isotopes:
                         data_columns.append(helper_std[str_std][isotope])
+                        data_columns_smoothed.append(helper_std_smoothed[str_std][isotope])
 
                     data_dict = {col: values for col, values in zip(column_names, data_columns)}
+                    data_dict_smoothed = {col: values for col, values in zip(column_names, data_columns_smoothed)}
                     df_std = pd.DataFrame(data_dict)
-                    df_std_smoothed = df_std.copy()
-                    # column_names = []
-                    # column_names.extend(list_isotopes)
-                    # data_columns = []
-                    #
-                    # for isotope in list_isotopes:   # Smoothed data
-                    #     data_columns.append(helper_std_smoothed[str_std][isotope])
-                    #
-                    # data_dict = {col: values for col, values in zip(column_names, data_columns)}
-                    # df_std_smoothed = pd.DataFrame(data_dict)
+                    df_std_smoothed = pd.DataFrame(data_dict_smoothed)
 
                     self.build_file_data_09(key=str_std, df_isotopes=list_isotopes, dataframe=df_std, times=list_time,
                                             dataframe_smoothed=df_std_smoothed, with_smoothed=False)
-                    #self.container_var["Spike Elimination"]["STD"]["State"] = True
+                    self.container_var["Spike Elimination"]["STD"]["State"] = True
 
             helper_srm_2 = {}
 
@@ -9846,14 +9841,19 @@ class PySILLS(tk.Frame):
 
                     for index3, data in enumerate(data_file):
                         #print(index3, len(data), data)
-                        if index3 == 0:
+                        if index3 == 0: # Corrected values
                             for line, values in enumerate(data):
                                 value_time = float(values[0])
                                 list_time.append(value_time)
                                 for j, value in enumerate(values):
                                     if j > 0:
                                         isotope = list_isotopes[j - 1]
-                                        helper_smpl[str_smpl][isotope].append(float(value))
+                                        helper_smpl_smoothed[str_smpl][isotope].append(float(value))
+                        if index3 == 73: # Original values
+                            for line, values in enumerate(data):
+                                for j, value in enumerate(values):
+                                    isotope = list_isotopes[j]
+                                    helper_smpl[str_smpl][isotope].append(float(value))
                         elif index3 == 6:    # Background interval (MA/FI/MI)
                             for i, interval in enumerate(data):
                                 start_i = interval[0]
@@ -9965,13 +9965,9 @@ class PySILLS(tk.Frame):
                                 for key_setting in ["fi_setting", "mi_setting"]:
                                     self.container_var[key_setting]["Quantification Method Option"].set(
                                         "Matrix-only Tracer (SILLS)")
-                        # elif index3 == 73:
-                        #     for line, values in enumerate(data):
-                        #         for j, value in enumerate(values):
-                        #             isotope = list_isotopes[j - 1]
-                        #             helper_smpl_smoothed[str_smpl][isotope].append(float(value))
 
                     helper_smpl[str_smpl]["Time"] = list_time
+                    helper_smpl_smoothed[str_smpl]["Time"] = list_time
 
                     self.container_var["SMPL"][str_smpl]["ID"].set("A")
                     self.container_var["SMPL"][str_smpl]["Checkbox"].set(1)
@@ -9985,26 +9981,20 @@ class PySILLS(tk.Frame):
                     column_names = ["Time"]
                     column_names.extend(list_isotopes)
                     data_columns = [list_time]
+                    data_columns_smoothed = [list_time]
 
                     for isotope in list_isotopes:
                         data_columns.append(helper_smpl[str_smpl][isotope])
+                        data_columns_smoothed.append(helper_smpl_smoothed[str_smpl][isotope])
 
                     data_dict = {col: values for col, values in zip(column_names, data_columns)}
+                    data_dict_smoothed = {col: values for col, values in zip(column_names, data_columns_smoothed)}
                     df_smpl = pd.DataFrame(data_dict)
-                    df_smpl_smoothed = df_smpl.copy()
-                    # column_names = []
-                    # column_names.extend(list_isotopes)
-                    # data_columns = []
-                    #
-                    # for isotope in list_isotopes:   # Smoothed data
-                    #     data_columns.append(helper_smpl_smoothed[str_smpl][isotope])
-                    #
-                    # data_dict = {col: values for col, values in zip(column_names, data_columns)}
-                    # df_smpl_smoothed = pd.DataFrame(data_dict)
+                    df_smpl_smoothed = pd.DataFrame(data_dict_smoothed)
 
                     self.build_file_data_09(key=str_smpl, df_isotopes=list_isotopes, dataframe=df_smpl, times=list_time,
                                             dataframe_smoothed=df_smpl_smoothed, with_smoothed=False)
-                    #self.container_var["Spike Elimination"]["SMPL"]["State"] = True
+                    self.container_var["Spike Elimination"]["SMPL"]["State"] = True
 
     def open_project(self):
         if len(self.container_lists["Measured Isotopes"]["All"]) > 0:
