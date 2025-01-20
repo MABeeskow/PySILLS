@@ -39660,6 +39660,8 @@ class PySILLS(tk.Frame):
         var_header_n = 15
         int_category_n = 5
 
+        self.new_id = None
+
         ## LABELS
         if type == "STD":
             str_lbl_01 = "Standard files"
@@ -39770,15 +39772,19 @@ class PySILLS(tk.Frame):
 
     def change_file_order(self, var_filetype, key):
         if var_filetype == "STD Manager":
-            click_id = self.lb_std_manager.curselection()
             var_filetype = "STD"
+            click_id = self.lb_std_manager.curselection()
         elif var_filetype == "SMPL Manager":
-            click_id = self.lb_smpl_manager.curselection()
             var_filetype = "SMPL"
+            click_id = self.lb_smpl_manager.curselection()
 
-        click_id = click_id[0]
-        file_long = self.container_lists[var_filetype]["Long"][click_id]
-        file_short = self.container_lists[var_filetype]["Short"][click_id]
+        if self.new_id == None:
+            click_id = click_id[0]
+        else:
+            if len(click_id) > 0:
+                click_id = click_id[0]
+            else:
+                click_id = self.new_id
 
         if key == "up":
             if click_id > 1:
@@ -39786,12 +39792,14 @@ class PySILLS(tk.Frame):
                 file_short = self.container_lists[var_filetype]["Short"].pop(click_id)
                 self.container_lists[var_filetype]["Long"].insert(click_id - 1, file_long)
                 self.container_lists[var_filetype]["Short"].insert(click_id - 1, file_short)
+                self.new_id = click_id - 1
         elif key == "down":
             if click_id < len(self.container_lists[var_filetype]["Long"]) - 2:
                 file_long = self.container_lists[var_filetype]["Long"].pop(click_id)
                 file_short = self.container_lists[var_filetype]["Short"].pop(click_id)
                 self.container_lists[var_filetype]["Long"].insert(click_id + 1, file_long)
                 self.container_lists[var_filetype]["Short"].insert(click_id + 1, file_short)
+                self.new_id = click_id + 1
 
         # Update listboxes
         self.fill_lb_manager(type=var_filetype, init=True)
@@ -39800,6 +39808,19 @@ class PySILLS(tk.Frame):
             self.fill_lb_manager(type=var_filetype, init=True, var_lb=self.lb_std)
         elif var_filetype == "SMPL":
             self.fill_lb_manager(type=var_filetype, init=True, var_lb=self.lb_smpl)
+
+        if var_filetype == "STD Manager":
+            self.lb_std_manager.selection_clear(0, tk.END)
+            self.lb_std_manager.selection_set(click_id)
+            self.lb_std_manager.activate(click_id)
+            self.lb_std_manager.see(click_id)
+            self.lb_std_manager.focus_set()
+        elif var_filetype == "SMPL Manager":
+            self.lb_smpl_manager.selection_clear(0, tk.END)
+            self.lb_smpl_manager.selection_set(click_id)
+            self.lb_smpl_manager.activate(click_id)
+            self.lb_smpl_manager.see(click_id)
+            self.lb_smpl_manager.focus_set()
 
     def update_table_manager(self, var_filetype, event):
         n_rows = self.window_dimensions["Project manager"][0]
