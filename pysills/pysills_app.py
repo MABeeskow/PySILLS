@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.50
-# Date:		17.01.2025
+# Version:	v1.0.51
+# Date:		20.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.50"
-        self.val_version = self.str_version_number + " - 17.01.2025"
+        self.str_version_number = "1.0.51"
+        self.val_version = self.str_version_number + " - 20.01.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -951,6 +951,8 @@ class PySILLS(tk.Frame):
             "Sample": {"English": "Sample", "German": "Probe"},
             "of": {"English": "of", "German": "von"},
             "with": {"English": "with", "German": "mit"},
+            "Up": {"English": "Up", "German": "Hoch"},
+            "Down": {"English": "Down", "German": "Runter"},
             "without": {"English": "without", "German": "ohne"},
             "Densities": {"English": "Densities", "German": "Dichten"},
             "Dimensions": {"English": "Dimensions", "German": "Abmessungen"},
@@ -9159,6 +9161,7 @@ class PySILLS(tk.Frame):
 
                         self.container_helper[var_filetype][var_file_short]["BG"]["Indices"].append(var_id)
                     except:
+                        print("File:", var_file_short)
                         print("There is a problem with the background interval data. It seems that they are damaged.")
                 elif splitted_lines[0] == "MAT":
                     var_id = int(splitted_lines[1])
@@ -9182,6 +9185,7 @@ class PySILLS(tk.Frame):
 
                         self.container_helper[var_filetype][var_file_short]["MAT"]["Indices"].append(var_id)
                     except:
+                        print("File:", var_file_short)
                         print("There is a problem with the matrix interval data. It seems that they are damaged.")
                 elif splitted_lines[0] == "INCL":
                     var_id = int(splitted_lines[1])
@@ -9204,6 +9208,7 @@ class PySILLS(tk.Frame):
 
                         self.container_helper[var_filetype][var_file_short]["INCL"]["Indices"].append(var_id)
                     except:
+                        print("File:", var_file_short)
                         print("There is a problem with the inclusion interval data. It seems that they are damaged.")
             if splitted_lines[0] == "BG":
                 self.container_helper[var_filetype][var_file_short]["BG"]["ID"] = len(
@@ -39690,27 +39695,40 @@ class PySILLS(tk.Frame):
         var_btn_02 = self.language_dict["Copy"][self.var_language]
         var_btn_03 = self.language_dict["Delete"][self.var_language]
         var_btn_04 = self.language_dict["Rename"][self.var_language]
+        var_btn_05 = self.language_dict["Up"][self.var_language]
+        var_btn_06 = self.language_dict["Down"][self.var_language]
 
         btn_01 = SE(
-            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=var_column_start, n_rows=2,
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_01, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=type: self.add_file_manager(filetype))
         btn_02 = SE(
-            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=int_category_n, n_rows=1,
+            parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=var_column_start, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_02, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=type: self.copy_file_manager(filetype))
         btn_03 = SE(
-            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=2*int_category_n, n_rows=2,
+            parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=int_category_n, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_03, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=type: self.remove_file_manager(filetype))
         btn_04 = SE(
-            parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=int_category_n, n_rows=1,
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=int_category_n, n_rows=1,
             n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
             text=var_btn_04, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=type: self.rename_file_manager(filetype))
+        btn_05 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 1, column_id=2*int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text=var_btn_05, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_filetype=type + " Manager", key="up": self.change_file_order(var_filetype, key))
+        btn_06 = SE(
+            parent=self.subwindow_manager, row_id=var_row_start + 2, column_id=2*int_category_n, n_rows=1,
+            n_columns=int_category_n, fg=self.bg_colors["Very Dark"], bg=self.bg_colors["Light"]).create_simple_button(
+            text=var_btn_06, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_filetype=type + " Manager", key="down": self.change_file_order(var_filetype, key))
+
         btn_01.configure(state="disabled")
         btn_02.configure(state="disabled")
         btn_03.configure(state="disabled")
@@ -39749,6 +39767,39 @@ class PySILLS(tk.Frame):
 
         ## INITIALIZATION
         self.fill_lb_manager(type=type, init=True)
+
+    def change_file_order(self, var_filetype, key):
+        if var_filetype == "STD Manager":
+            click_id = self.lb_std_manager.curselection()
+            var_filetype = "STD"
+        elif var_filetype == "SMPL Manager":
+            click_id = self.lb_smpl_manager.curselection()
+            var_filetype = "SMPL"
+
+        click_id = click_id[0]
+        file_long = self.container_lists[var_filetype]["Long"][click_id]
+        file_short = self.container_lists[var_filetype]["Short"][click_id]
+
+        if key == "up":
+            if click_id > 1:
+                file_long = self.container_lists[var_filetype]["Long"].pop(click_id)
+                file_short = self.container_lists[var_filetype]["Short"].pop(click_id)
+                self.container_lists[var_filetype]["Long"].insert(click_id - 1, file_long)
+                self.container_lists[var_filetype]["Short"].insert(click_id - 1, file_short)
+        elif key == "down":
+            if click_id < len(self.container_lists[var_filetype]["Long"]) - 2:
+                file_long = self.container_lists[var_filetype]["Long"].pop(click_id)
+                file_short = self.container_lists[var_filetype]["Short"].pop(click_id)
+                self.container_lists[var_filetype]["Long"].insert(click_id + 1, file_long)
+                self.container_lists[var_filetype]["Short"].insert(click_id + 1, file_short)
+
+        # Update listboxes
+        self.fill_lb_manager(type=var_filetype, init=True)
+
+        if var_filetype == "STD":
+            self.fill_lb_manager(type=var_filetype, init=True, var_lb=self.lb_std)
+        elif var_filetype == "SMPL":
+            self.fill_lb_manager(type=var_filetype, init=True, var_lb=self.lb_smpl)
 
     def update_table_manager(self, var_filetype, event):
         n_rows = self.window_dimensions["Project manager"][0]
@@ -39807,11 +39858,13 @@ class PySILLS(tk.Frame):
             
             self.tv_data.insert("", tk.END, values=entry_data)
 
-    def fill_lb_manager(self, type, init=False):
-        if type == "STD":
+    def fill_lb_manager(self, type, init=False, var_lb=None):
+        if type == "STD" and var_lb == None:
             var_lb_manager = self.lb_std_manager
-        else:
+        elif type == "SMPL" and var_lb == None:
             var_lb_manager = self.lb_smpl_manager
+        else:
+            var_lb_manager = var_lb
 
         var_lb_manager.delete(0, tk.END)
 
