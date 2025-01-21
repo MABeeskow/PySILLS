@@ -1910,6 +1910,8 @@ class PySILLS(tk.Frame):
         if str_screen_resolution == "1920x1080":    # Full HD
             if var_os == "linux":
                 var_ncol_ma_settings = 68
+            elif var_os == "darwin":
+                var_ncol_ma_settings = 65
             else:
                 var_ncol_ma_settings = 65
         elif str_screen_resolution == "1280x720":   # HD ready
@@ -18004,12 +18006,12 @@ class PySILLS(tk.Frame):
                 frm_i = tk.Frame(frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
                                  highlightbackground="black", bd=1)
                 text_iso.window_create("end", window=frm_i)
-                text_iso.insert("end", "")
+                text_iso.insert("end", "\t\t")
 
-                lbl_i = tk.Label(
-                    frm_iso, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
-                text_iso.window_create("end", window=lbl_i)
-                text_iso.insert("end", " ")
+                # lbl_i = tk.Label(
+                #     frm_iso, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
+                # text_iso.window_create("end", window=lbl_i)
+                # text_iso.insert("end", " ")
 
                 lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_table,
                                  width=5, anchor="w")
@@ -18055,18 +18057,19 @@ class PySILLS(tk.Frame):
                     self.container_var["charge"][isotope]["textvar"].set("1+ charged")
                     charge_fg = font_color_dark
 
-                lbl_i = tk.Label(
-                    frm_iso, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
-                text_iso.window_create("end", window=lbl_i)
-                text_iso.insert("end", " ")
+                # lbl_i = tk.Label(
+                #     frm_iso, text="", bg=background_color_light, fg=font_color_dark, font=font_table, anchor=tk.W)
+                # text_iso.window_create("end", window=lbl_i)
+                # text_iso.insert("end", " ")
 
                 lbl_i = tk.Label(
                     frm_iso, text=self.container_var["charge"][isotope]["textvar"].get(),
                     textvariable=self.container_var["charge"][isotope]["textvar"], bg=background_color_light,
                     fg=charge_fg, font=font_table)
-                self.container_var["charge"][isotope]["labelvar"] = lbl_i
                 text_iso.window_create("end", window=lbl_i)
                 text_iso.insert("end", "\n")
+
+                self.container_var["charge"][isotope]["labelvar"] = lbl_i
 
         # Option Menus
         list_opt_gas = ["Helium", "Neon", "Argon", "Krypton", "Xenon", "Radon"]
