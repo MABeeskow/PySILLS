@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.55
-# Date:		22.01.2025
+# Version:	v1.0.56
+# Date:		23.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.55"
-        self.val_version = self.str_version_number + " - 22.01.2025"
+        self.str_version_number = "1.0.56"
+        self.val_version = self.str_version_number + " - 23.01.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -1910,25 +1910,32 @@ class PySILLS(tk.Frame):
         str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
         if str_screen_resolution == "1920x1080":    # Full HD
             if var_os == "linux":
-                var_ncol_ma_settings = 68
+                var_ncol_ma_settings = 66
+                var_ncol_fi_settings = 68
+                var_ncol_mi_settings = 64
             elif var_os == "darwin":
                 var_ncol_ma_settings = 65
+                var_ncol_fi_settings = 67
+                var_ncol_mi_settings = 63
             else:
                 var_ncol_ma_settings = 65
+                var_ncol_fi_settings = 67
+                var_ncol_mi_settings = 63
         elif str_screen_resolution == "1280x720":   # HD ready
             var_ncol_ma_settings = 70
         elif str_screen_resolution == "3840x2160":  # 4K
             var_ncol_ma_settings = 65
 
         self.window_dimensions = {
-            "Main window": [33, 21], "MA main settings": [38, var_ncol_ma_settings], "FI main settings": [40, 67],
-            "MI main settings": [40, 63], "ICP-MS setup": [8, 17], "Quick plot": [28, 50],
-            "Spike elimination threshold": [24, 15], "Check-up oxides": [29, 83], "Check-up IS": [16, 42],
-            "General settings": [22, 35], "Check-up SRM": [23, 32], "Check-up intervals": [32, 54],
-            "Check-up acquisition times": [33, 26], "Check-up files": [32, 50], "MA Extras": [8, 25],
-            "FI Extras": [9, 34], "MI Extras": [8, 34], "Geothermometry": [16, 40], "Diagram xy": [24, 50],
-            "Diagram halogen ratios": [24, 40], "Matrix quantification": [5, 24], "Mineral quantification": [18, 40],
-            "Stepwise analysis": [32, 55], "MA specific file": [34, 60], "MA datareduction files": [25, 63],
+            "Main window": [33, 21], "MA main settings": [38, var_ncol_ma_settings],
+            "FI main settings": [40, var_ncol_fi_settings], "MI main settings": [40, var_ncol_mi_settings],
+            "ICP-MS setup": [8, 17], "Quick plot": [28, 50], "Spike elimination threshold": [24, 15],
+            "Check-up oxides": [29, 83], "Check-up IS": [16, 42], "General settings": [22, 35],
+            "Check-up SRM": [23, 32], "Check-up intervals": [32, 54], "Check-up acquisition times": [33, 26],
+            "Check-up files": [32, 50], "MA Extras": [8, 25], "FI Extras": [9, 34], "MI Extras": [8, 34],
+            "Geothermometry": [16, 40], "Diagram xy": [24, 50], "Diagram halogen ratios": [24, 40],
+            "Matrix quantification": [5, 24], "Mineral quantification": [18, 40], "Stepwise analysis": [32, 55],
+            "MA specific file": [34, 60], "MA datareduction files": [25, 63],
             "Detailed analysis": [32, 45], "About PySILLS": [22, 32], "Calculation report": [9, 13],
             "Sensitivity drift": [32, 70], "FI datareduction files": [29, 63], "Setup Halter": [24, 34],
             "Setup Borisova": [22, 34], "Setup matrix-only tracer": [15, 41], "Setup 2nd IS": [15, 36],
@@ -27609,6 +27616,14 @@ class PySILLS(tk.Frame):
                     self.container_var["Spike Elimination"]["Threshold"][isotope].set(var_threshold.get())
 
         ## Static
+        str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+        if str_screen_resolution == "1920x1080":
+            var_n_last_column = 18
+            var_n_last_column = n_columns - 49
+        elif str_screen_resolution == "1280x720":
+            var_n_last_column = 23
+        elif str_screen_resolution == "3840x2160":
+            var_n_last_column = 18
         # Build section 'Project Information'
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_project_information(var_geometry_info=var_project_information)
@@ -27640,7 +27655,7 @@ class PySILLS(tk.Frame):
         var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
-        var_acquisition_times_check = {"Row start": 18, "Column start": 48, "N rows": 1, "N columns": 18}
+        var_acquisition_times_check = {"Row start": 18, "Column start": 48, "N rows": 1, "N columns": var_n_last_column}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
         # Build section 'Standard Files'
         var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 16, "N columns": 28}
@@ -27650,10 +27665,10 @@ class PySILLS(tk.Frame):
         self.place_sample_files_table(var_geometry_info=var_sample_files)
         # Build section 'Time-Signal Diagram Checker'
         self.define_isotope_colors()
-        var_time_signal_diagram_check = {"Row start": 26, "Column start": 48, "N rows": 1, "N columns": 18}
+        var_time_signal_diagram_check = {"Row start": 26, "Column start": 48, "N rows": 1, "N columns": var_n_last_column}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
         # Build section 'Measured Isotopes'
-        var_measured_isotopes = {"Row start": 1, "Column start": 48, "N rows": 16, "N columns": 18}
+        var_measured_isotopes = {"Row start": 1, "Column start": 48, "N rows": 16, "N columns": var_n_last_column}
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
         ## INITIALIZATION
@@ -27965,6 +27980,14 @@ class PySILLS(tk.Frame):
                     self.container_var["Spike Elimination"]["Threshold"][isotope].set(var_threshold.get())
 
         ## Static
+        str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+        if str_screen_resolution == "1920x1080":
+            var_n_last_column = 18
+            var_n_last_column = n_columns - 45
+        elif str_screen_resolution == "1280x720":
+            var_n_last_column = 23
+        elif str_screen_resolution == "3840x2160":
+            var_n_last_column = 18
         # Build section 'Project Information'
         var_project_information = {"Row start": 0, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_project_information(var_geometry_info=var_project_information)
@@ -27996,7 +28019,7 @@ class PySILLS(tk.Frame):
         var_checkup = {"Row start": 31, "Column start": 0, "N rows": 1, "N columns": 18}
         self.place_checkup_feature(var_geometry_info=var_checkup)
         # Build section 'Acquisition Times'
-        var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": 18}
+        var_acquisition_times_check = {"Row start": 18, "Column start": 44, "N rows": 1, "N columns": var_n_last_column}
         self.place_acquisition_times_check(var_geometry_info=var_acquisition_times_check)
         # Build section 'Standard Files'
         var_standard_files = {"Row start": 0, "Column start": 19, "N rows": 16, "N columns": 24}
@@ -28006,10 +28029,10 @@ class PySILLS(tk.Frame):
         self.place_sample_files_table(var_geometry_info=var_sample_files)
         # Build section 'Time-Signal Diagram Checker'
         self.define_isotope_colors()
-        var_time_signal_diagram_check = {"Row start": 26, "Column start": 44, "N rows": 1, "N columns": 18}
+        var_time_signal_diagram_check = {"Row start": 26, "Column start": 44, "N rows": 1, "N columns": var_n_last_column}
         self.place_time_signal_plot_checker(var_geometry_info=var_time_signal_diagram_check)
         # Build section 'Measured Isotopes'
-        var_measured_isotopes = {"Row start": 1, "Column start": 44, "N rows": 16, "N columns": 18}
+        var_measured_isotopes = {"Row start": 1, "Column start": 44, "N rows": 16, "N columns": var_n_last_column}
         self.place_measured_isotopes_overview(var_geometry_info=var_measured_isotopes)
 
         ## INITIALIZATION
