@@ -5,8 +5,8 @@
 
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
-# Version:	pre-release
-# Date:		11.06.2024
+# Version:	v1.0.56
+# Date:		31.01.2025
 
 #-----------------------------------------------
 
@@ -101,6 +101,20 @@ class OutlierDetection:
 
         return helper_values
 
+    def extract_surrounding_values(self, index_spike, steps):
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = self.dataset_complete[index_spike]
+        helper_values["POI"] = val_poi
+
+        index_start = max(0, index_spike - steps)
+        index_end = min(len(self.dataset_complete), index_spike + (steps + 1))
+
+        helper_values["All"].append(self.dataset_complete[index_start:index_end])
+        helper_values["SP"].append((self.dataset_complete[index_start:index_spike] +
+                                    self.dataset_complete[index_spike + 1:index_end]))
+
+        return helper_values
+
     def calculate_grubbs_critical_value(self, size):
         t_dist = stats.t.ppf(1 - self.alpha/(2*size), size - 2)
         numerator = (size - 1)*np.sqrt(np.square(t_dist))
@@ -114,14 +128,51 @@ class GrubbsTestSILLS:
         self.raw_data = raw_data
         self.alpha = alpha
         self.threshold = threshold
-        #self.val_check_3 = 2.097
-        #self.val_check_4 = 2.323
+        #self.val_check_7 = 2.097
+        #self.val_check_9 = 2.323
         self.smoothed_data = []
         self.spike_indices = []
         self.start_index = start_index
         self.dataset_complete = dataset_complete
 
+    def calculate_grubbs_critical(self, N, alpha=0.01):
+        df = N - 2
+        t_val = stats.t.ppf(1 - (alpha/(2*N)), df)
+        grubbs_val = (N - 1)/(N**0.5)*((t_val**2)/(df + t_val**2))**0.5
+        return grubbs_val
+
     def determine_outlier(self):
+        N_low = 7
+        N_high = 9
+        G_comp_7 = round(self.calculate_grubbs_critical(N=N_low), 3)
+        G_comp_9 = round(self.calculate_grubbs_critical(N=N_high), 3)
+        helper_data = {}
+
+        for index, value in enumerate(self.raw_data):
+            if value > self.threshold:
+                surrounding_7 = self.extract_surrounding_values(index_spike=index, steps=N_low)
+                surrounding_9 = self.extract_surrounding_values(index_spike=index, steps=N_high)
+
+                mean_6 = np.mean(surrounding_7["SP"])
+                mean_7 = np.mean(surrounding_7["All"])
+                std_7 = np.std(surrounding_7["All"], ddof=1)
+                mean_9 = np.mean(surrounding_9["All"])
+                std_9 = np.std(surrounding_9["All"], ddof=1)
+
+                if np.abs(value - mean_7)/std_7 > G_comp_7 and np.abs(value - mean_9)/std_9 > G_comp_9:
+                    val_corr = mean_6
+                    self.spike_indices.append(index + self.start_index)
+                    helper_data[index + self.start_index] = val_corr
+
+        for index, value in enumerate(self.dataset_complete):
+            if index in self.spike_indices:
+                self.smoothed_data.append(helper_data[index])
+            else:
+                self.smoothed_data.append(value)
+
+        return self.smoothed_data, self.spike_indices
+
+    def determine_outlier2(self):
         helper_data = {}
         for index, value in enumerate(self.raw_data):
             if value >= self.threshold:
@@ -158,6 +209,20 @@ class GrubbsTestSILLS:
                 self.smoothed_data.append(value)
 
         return self.smoothed_data, self.spike_indices
+
+    def extract_surrounding_values(self, index_spike, steps):
+        helper_values = {"POI": 0, "SP": [], "All": []}
+        val_poi = self.dataset_complete[index_spike]
+        helper_values["POI"] = val_poi
+
+        index_start = max(0, index_spike - steps)
+        index_end = min(len(self.dataset_complete), index_spike + (steps + 1))
+
+        helper_values["All"].append(self.dataset_complete[index_start:index_end])
+        helper_values["SP"].append((self.dataset_complete[index_start:index_spike] +
+                                    self.dataset_complete[index_spike + 1:index_end]))
+
+        return helper_values
 
     def determine_surrounded_values(self, index, stepsize=4):
         helper_values = {"POI": 0, "SP": [], "All": []}

@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.56
-# Date:		23.01.2025
+# Date:		31.01.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.56"
-        self.val_version = self.str_version_number + " - 23.01.2025"
+        self.val_version = self.str_version_number + " - 31.01.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -21374,7 +21374,10 @@ class PySILLS(tk.Frame):
                                     entries_data = [symbol + "(Inclusion " + str(key) + ")" + ending]
 
                                 for isotope in df_isotopes:
-                                    x_data = df_data["Time"][interval[0]:interval[1] + 1]
+                                    try:
+                                        x_data = df_data["Time"][interval[0]:interval[1] + 1]
+                                    except:
+                                        x_data = df_data["Time [Sec]"][interval[0]:interval[1] + 1]
                                     y_data = df_data[isotope][interval[0]:interval[1] + 1]
                                     slope, intercept = np.polyfit(x_data, y_data, 1)
 
