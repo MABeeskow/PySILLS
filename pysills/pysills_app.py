@@ -3636,7 +3636,37 @@ class PySILLS(tk.Frame):
 
         click_id = click_id[0]
         file_long = self.container_lists[var_filetype]["Long"][click_id]
-        file_short = self.container_lists[var_filetype]["Short"][click_id]
+
+        self.build_quick_plot_window(filetype=var_filetype, filename_long=file_long)
+
+    def previous_quick_plot_file(self, filetype, filename_long, subwindow):
+        index_filename = self.container_lists[filetype]["Long"].index(filename_long)
+
+        if index_filename > 0:
+            filename_long = self.container_lists[filetype]["Long"][index_filename - 1]
+        else:
+            filename_long = self.container_lists[filetype]["Long"][-1]
+
+        subwindow.destroy()
+
+        self.build_quick_plot_window(filetype=filetype, filename_long=filename_long)
+
+    def next_quick_plot_file(self, filetype, filename_long, subwindow):
+        index_filename = self.container_lists[filetype]["Long"].index(filename_long)
+
+        if index_filename < len(self.container_lists[filetype]["Long"]) - 1:
+            filename_long = self.container_lists[filetype]["Long"][index_filename + 1]
+        else:
+            filename_long = self.container_lists[filetype]["Long"][0]
+
+        subwindow.destroy()
+
+        self.build_quick_plot_window(filetype=filetype, filename_long=filename_long)
+
+    def build_quick_plot_window(self, filetype, filename_long):
+        var_filetype = filetype
+        file_long = filename_long
+        file_short = filename_long.split("/")[-1]
         file_isotopes = self.container_lists["Measured Isotopes"][file_short]
 
         font_color_dark = self.bg_colors["Dark Font"]
@@ -3725,7 +3755,7 @@ class PySILLS(tk.Frame):
             text="", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_07 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt, column_id=column_start + n_columns_isotopes,
-            n_rows=1,  n_columns=n_columns_sections, fg=self.colors_intervals["BG LB"],
+            n_rows=1, n_columns=n_columns_sections, fg=self.colors_intervals["BG LB"],
             bg=self.colors_intervals["BG"]).create_simple_label(
             text="Background", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_08 = SE(
@@ -3772,19 +3802,25 @@ class PySILLS(tk.Frame):
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=0, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="Background", sticky="nesw", relief=tk.FLAT)
+            fg=self.bg_colors["Dark Font"], text="Background", sticky="nesw", relief=tk.FLAT,
+            command=lambda list_isotopes=file_isotopes, section="BG":
+            self.fill_tv_quick_plot_file(list_isotopes, section))
         rb_02 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 3, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=1, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="Matrix", sticky="nesw", relief=tk.FLAT)
+            fg=self.bg_colors["Dark Font"], text="Matrix", sticky="nesw", relief=tk.FLAT,
+            command=lambda list_isotopes=file_isotopes, section="MAT":
+            self.fill_tv_quick_plot_file(list_isotopes, section))
         rb_03 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 4, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=2, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="Inclusion", sticky="nesw", relief=tk.FLAT)
+            fg=self.bg_colors["Dark Font"], text="Inclusion", sticky="nesw", relief=tk.FLAT,
+            command=lambda list_isotopes=file_isotopes, section="INCL":
+            self.fill_tv_quick_plot_file(list_isotopes, section))
         rb_04 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 1, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
@@ -3932,13 +3968,15 @@ class PySILLS(tk.Frame):
             column_id=column_start, n_rows=2, n_columns=int(n_columns_isotopes/2),
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Previous", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_file_short=file_short: self.hide_all_lines(var_file_short))
+            command=lambda filetype=var_filetype, filename_long=file_long, subwindow=subwindow_quickplotter:
+            self.previous_quick_plot_file(filetype, filename_long, subwindow))
         btn_04 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2,
             column_id=column_start + int(n_columns_isotopes/2), n_rows=2, n_columns=int(n_columns_isotopes/2),
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_file_short=file_short: self.hide_all_lines(var_file_short))
+            command=lambda filetype=var_filetype, filename_long=file_long, subwindow=subwindow_quickplotter:
+            self.next_quick_plot_file(filetype, filename_long, subwindow))
         btn_05 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 5,
             column_id=column_start, n_rows=2, n_columns=n_columns_isotopes,
@@ -3963,19 +4001,19 @@ class PySILLS(tk.Frame):
 
         cb_01 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
-            column_id=column_start + n_columns_isotopes + (n_columns_sections - 1), n_rows=1,  n_columns=1,
+            column_id=column_start + n_columns_isotopes + (n_columns_sections - 1), n_rows=1, n_columns=1,
             fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["BG"]).create_simple_checkbox(
             var_cb=self.qpl_cb_bg, text="", set_sticky="nesw", own_color=True,
             command=lambda key="Background": self.show_or_hide_interval(key))
         cb_02 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
-            column_id=column_start + n_columns_isotopes + n_columns_sections  + (n_columns_sections - 1), n_rows=1,
+            column_id=column_start + n_columns_isotopes + n_columns_sections + (n_columns_sections - 1), n_rows=1,
             n_columns=1, fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["MAT"]).create_simple_checkbox(
             var_cb=self.qpl_cb_mat, text="", set_sticky="nesw", own_color=True,
             command=lambda key="Matrix": self.show_or_hide_interval(key))
         cb_03 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
-            column_id=column_start + n_columns_isotopes + 2*n_columns_sections  + (n_columns_sections - 1), n_rows=1,
+            column_id=column_start + n_columns_isotopes + 2*n_columns_sections + (n_columns_sections - 1), n_rows=1,
             n_columns=1, fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["INCL"]).create_simple_checkbox(
             var_cb=self.qpl_cb_incl, text="", set_sticky="nesw", own_color=True,
             command=lambda key="Inclusion": self.show_or_hide_interval(key))
@@ -4020,6 +4058,31 @@ class PySILLS(tk.Frame):
             cb_03.configure(state="disabled")
             self.qpl_cb_incl.set(0)
             self.lb_quick_plot_file_incl.configure(state="disabled")
+
+        self.fill_tv_quick_plot_file(list_isotopes=file_isotopes, init=True)
+
+    def fill_tv_quick_plot_file(self, list_isotopes, section="MAT", init=False):
+        if init == True:
+            for isotope in list_isotopes:
+                helper_values = [isotope, "---", "---", "---"]
+                self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
+        else:
+            if len(self.tv_quick_file_statistics.get_children()) > 0:
+                for item in self.tv_quick_file_statistics.get_children():
+                    self.tv_quick_file_statistics.delete(item)
+
+            if section == "BG":
+                for isotope in list_isotopes:
+                    helper_values = [isotope, "AAA", "BBB", "CCC"]
+                    self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
+            elif section == "MAT":
+                for isotope in list_isotopes:
+                    helper_values = [isotope, "DDD", "EEE", "FFF"]
+                    self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
+            elif section == "INCL":
+                for isotope in list_isotopes:
+                    helper_values = [isotope, "GG", "HHH", "III"]
+                    self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
 
     def show_or_hide_interval(self, key):
         print("Selected section:", key)
@@ -10188,7 +10251,7 @@ class PySILLS(tk.Frame):
                         elif index3 == 40 and len(data) > 0:    # Concentration (Sample/Inclusion)
                             for i, value in enumerate(data[0]):
                                 self.container_var["SMPL"][str_smpl]["IS Data"]["Concentration"].set(value)
-                        elif index3 == 44 and len(data) > 0 and self.mode_ma == False:  # 2nd IS sex
+                        elif index3 == 44 and len(data) > 0 and self.mode_ma == False:  # 2nd IS
                             index_isotope = data[0][0] - 1
                             self.container_var["SMPL"][str_smpl]["Second Internal Standard"]["Name"].set(
                                 list_isotopes[index_isotope])
