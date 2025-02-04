@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.56
-# Date:		04.02.2025
+# Date:		05.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -73,7 +73,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.56"
-        self.val_version = self.str_version_number + " - 04.02.2025"
+        self.val_version = self.str_version_number + " - 05.02.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -3803,24 +3803,25 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=0, color_bg=self.bg_colors["Light"],
             fg=self.bg_colors["Dark Font"], text="Background", sticky="nesw", relief=tk.FLAT,
-            command=lambda list_isotopes=file_isotopes, section="BG":
-            self.fill_tv_quick_plot_file(list_isotopes, section))
+            command=lambda var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes, section="BG":
+            self.fill_tv_quick_plot_file(var_type, var_file_short, list_isotopes, section))
         rb_02 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 3, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=1, color_bg=self.bg_colors["Light"],
             fg=self.bg_colors["Dark Font"], text="Matrix", sticky="nesw", relief=tk.FLAT,
-            command=lambda list_isotopes=file_isotopes, section="MAT":
-            self.fill_tv_quick_plot_file(list_isotopes, section))
+            command=lambda var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes, section="MAT":
+            self.fill_tv_quick_plot_file(var_type, var_file_short, list_isotopes, section))
         rb_03 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 4, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=2, color_bg=self.bg_colors["Light"],
             fg=self.bg_colors["Dark Font"], text="Inclusion", sticky="nesw", relief=tk.FLAT,
-            command=lambda list_isotopes=file_isotopes, section="INCL":
-            self.fill_tv_quick_plot_file(list_isotopes, section))
+            command=lambda var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes,
+                           section="INCL":
+            self.fill_tv_quick_plot_file(var_type, var_file_short, list_isotopes, section))
         rb_04 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 1, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
@@ -3844,9 +3845,13 @@ class PySILLS(tk.Frame):
             else:
                 df_data = self.container_measurements["Dataframe"][file_short]
 
+        if file_short not in self.container_measurements["Dataframe"]:
+            self.container_measurements["Dataframe"][file_short] = df_data
+
         list_keys = list(df_data.columns.values)
         del list_keys[0]
         dataset_time = list(df_data.iloc[:, 0])
+        self.dataset_time = dataset_time
         x_max = max(dataset_time)
 
         if len(file_isotopes) == 0:
@@ -3923,10 +3928,11 @@ class PySILLS(tk.Frame):
         var_ax.set_ylabel("Signal (cps)", labelpad=0.5, fontsize=8)
         var_ax.xaxis.set_tick_params(labelsize=8)
         var_ax.yaxis.set_tick_params(labelsize=8)
+        self.var_ax = var_ax
 
         # Canvas
-        var_canvas = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
-        var_canvas.get_tk_widget().grid(
+        self.var_canvas_qpl = FigureCanvasTkAgg(var_fig, master=subwindow_quickplotter)
+        self.var_canvas_qpl.get_tk_widget().grid(
             row=row_start + 1, column=column_start + n_columns_isotopes, rowspan=n_rows_diagram,
             columnspan=n_columns_diagram, sticky="nesw")
         # Toolbar
@@ -3934,7 +3940,7 @@ class PySILLS(tk.Frame):
         var_toolbarFrame.grid(
             row=n_rows_diagram + 1, column=column_start + n_columns_isotopes, rowspan=2, columnspan=n_columns_diagram,
             sticky="ew")
-        var_toolbar = NavigationToolbar2Tk(var_canvas, var_toolbarFrame)
+        var_toolbar = NavigationToolbar2Tk(self.var_canvas_qpl, var_toolbarFrame)
         var_toolbar.config(
             bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
             highlightcolor=self.bg_colors["Dark Font"], bd=0)
@@ -3943,7 +3949,11 @@ class PySILLS(tk.Frame):
         var_toolbar.winfo_children()[-2].config(background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
 
         self.container_var["Plotting"][self.pysills_mode]["Quickview"][file_short] = {
-            "Figure": var_fig, "Canvas": var_canvas, "Toolbar": var_toolbar, "Axes": var_ax}
+            "Figure": var_fig, "Canvas": self.var_canvas_qpl, "Toolbar": var_toolbar, "Axes": var_ax}
+
+        self.var_canvas_qpl.mpl_connect(
+            "button_press_event", lambda event, var_type=filetype, var_file_short=file_short:
+            self.add_interval_to_diagram_qpl(var_type, var_file_short, event))
 
         ## BUTTONS
         btn_01 = SE(
@@ -3982,14 +3992,15 @@ class PySILLS(tk.Frame):
             column_id=column_start, n_rows=2, n_columns=n_columns_isotopes,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
             text="Remove interval", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
-            command=lambda var_file_short=file_short: self.hide_all_lines(var_file_short))
+            command=lambda var_type=var_filetype, var_file_short=file_short:
+            self.remove_interval_qpl(var_type, var_file_short))
 
         btn_01.configure(font=font_elements)
         btn_02.configure(font=font_elements)
         btn_03.configure(font=font_elements)
         btn_04.configure(font=font_elements)
         btn_05.configure(font=font_elements)
-        btn_06.configure(font=font_elements)
+        btn_06.configure(font=font_elements, state="disabled")
 
         ## CHECKBOXES
         self.qpl_cb_bg = tk.IntVar()
@@ -4004,19 +4015,22 @@ class PySILLS(tk.Frame):
             column_id=column_start + n_columns_isotopes + (n_columns_sections - 1), n_rows=1, n_columns=1,
             fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["BG"]).create_simple_checkbox(
             var_cb=self.qpl_cb_bg, text="", set_sticky="nesw", own_color=True,
-            command=lambda key="Background": self.show_or_hide_interval(key))
+            command=lambda key="Background", var_type=var_filetype, var_file_short=file_short:
+            self.show_or_hide_interval(key, var_type, var_file_short))
         cb_02 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
             column_id=column_start + n_columns_isotopes + n_columns_sections + (n_columns_sections - 1), n_rows=1,
             n_columns=1, fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["MAT"]).create_simple_checkbox(
             var_cb=self.qpl_cb_mat, text="", set_sticky="nesw", own_color=True,
-            command=lambda key="Matrix": self.show_or_hide_interval(key))
+            command=lambda key="Matrix", var_type=var_filetype, var_file_short=file_short:
+            self.show_or_hide_interval(key, var_type, var_file_short))
         cb_03 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
             column_id=column_start + n_columns_isotopes + 2*n_columns_sections + (n_columns_sections - 1), n_rows=1,
             n_columns=1, fg=self.bg_colors["Dark Font"], bg=self.colors_intervals["INCL"]).create_simple_checkbox(
             var_cb=self.qpl_cb_incl, text="", set_sticky="nesw", own_color=True,
-            command=lambda key="Inclusion": self.show_or_hide_interval(key))
+            command=lambda key="Inclusion", var_type=var_filetype, var_file_short=file_short:
+            self.show_or_hide_interval(key, var_type, var_file_short))
 
         cb_01.configure(font=font_elements, onvalue=1, offvalue=0)
         cb_02.configure(font=font_elements, onvalue=1, offvalue=0)
@@ -4051,6 +4065,27 @@ class PySILLS(tk.Frame):
             bg=self.colors_intervals["INCL LB"]).create_simple_listbox()
 
         ## INITIALIZATION
+        self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
+
+        if var_filetype not in self.container_helper:
+            self.container_helper[var_filetype] = {}
+            if file_short not in self.container_helper[var_filetype]:
+                self.container_helper[var_filetype][file_short] = {}
+                if "AXES" not in self.container_helper[var_filetype][file_short]:
+                    self.container_helper[var_filetype][file_short]["AXES"] = {
+                        "Quick Plot": var_ax, "Canvas QPL": self.var_canvas_qpl}
+        else:
+            if file_short not in self.container_helper[var_filetype]:
+                self.build_container_helper(mode=var_filetype)
+
+            for key in ["BG", "MAT", "INCL"]:
+                if key not in self.container_helper[var_filetype][file_short]:
+                    self.container_helper[var_filetype][file_short][key] = {"ID": 0, "Content": {}, "Indices": []}
+
+            if "Quick Plot" not in self.container_helper[var_filetype][file_short]["AXES"]:
+                self.container_helper[var_filetype][file_short]["AXES"] = {
+                    "Quick Plot": var_ax, "Canvas QPL": self.var_canvas_qpl}
+
         if self.pysills_mode == "MA":
             lbl_08.configure(text="Sample")
             rb_02.configure(text="Sample")
@@ -4059,9 +4094,130 @@ class PySILLS(tk.Frame):
             self.qpl_cb_incl.set(0)
             self.lb_quick_plot_file_incl.configure(state="disabled")
 
-        self.fill_tv_quick_plot_file(list_isotopes=file_isotopes, init=True)
+        self.fill_tv_quick_plot_file(
+            var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes, init=True)
+        self.check_for_intervals_qpl(filetype=var_filetype, filename_short=file_short)
 
-    def fill_tv_quick_plot_file(self, list_isotopes, section="MAT", init=False):
+    def add_interval_to_diagram_qpl(self, var_type, var_file_short, event):
+        filename_index = self.container_lists[var_type]["Short"].index(var_file_short)
+        var_file_long = self.container_lists[var_type]["Long"][filename_index]
+
+        if self.container_var["Radiobuttons"]["Quick Plot File"].get() == 0:    # BG
+            var_key = "BG"
+            var_color = self.colors_intervals[var_key]
+        elif self.container_var["Radiobuttons"]["Quick Plot File"].get() == 1:  # MAT
+            var_key = "MAT"
+            var_color = self.colors_intervals[var_key]
+        elif self.container_var["Radiobuttons"]["Quick Plot File"].get() == 2:  # INCL
+            var_key = "INCL"
+            var_color = self.colors_intervals[var_key]
+
+        if self.container_var["Radiobuttons"]["Quick Plot File"].get() in [0, 1, 2]:
+            x_nearest = min(self.dataset_time, key=lambda x: abs(x - event.xdata))
+
+            if len(self.helper_intervals[var_key]) < 1:
+                x_id = self.dataset_time.index(x_nearest)
+                self.helper_intervals[var_key].append([x_nearest, x_id])
+            else:
+                x_id = self.dataset_time.index(x_nearest)
+                self.helper_intervals[var_key].append([x_nearest, x_id])
+                key_id = self.container_helper[var_type][var_file_short][var_key]["ID"] + 1
+                time_0_pre = self.helper_intervals[var_key][0][0]
+                time_1_pre = self.helper_intervals[var_key][1][0]
+                index_0_pre = self.helper_intervals[var_key][0][1]
+                index_1_pre = self.helper_intervals[var_key][1][1]
+
+                if time_1_pre < time_0_pre:
+                    time_0 = time_1_pre
+                    time_1 = time_0_pre
+                    index_0 = index_1_pre
+                    index_1 = index_0_pre
+                else:
+                    time_0 = time_0_pre
+                    time_1 = time_1_pre
+                    index_0 = index_0_pre
+                    index_1 = index_1_pre
+
+                box_key = self.var_ax.axvspan(time_0, time_1, alpha=0.35, color=var_color)
+                self.var_canvas_qpl.draw()
+
+                self.container_helper[var_type][var_file_short][var_key]["Content"][key_id] = {
+                    "Times": [time_0, time_1], "Indices": [index_0, index_1], "Object": box_key}
+
+                if var_key == "BG":
+                    var_lb = self.lb_quick_plot_file_bg
+                elif var_key == "MAT":
+                    var_lb = self.lb_quick_plot_file_mat
+                elif var_key == "INCL":
+                    var_lb = self.lb_quick_plot_file_incl
+
+                var_lb.insert(tk.END, var_key + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                self.helper_intervals[var_key].clear()
+                self.container_helper[var_type][var_file_short][var_key]["ID"] = key_id
+                self.container_helper[var_type][var_file_short][var_key]["Indices"].append(key_id)
+
+                self.var_canvas_qpl.draw()
+        if var_type == "STD":
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) < 2:
+                if var_file_long in self.container_var[var_type]:
+                    self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+            else:
+                if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
+                else:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+        else:
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["INCL"]["Content"]) < 3:
+                if var_file_long in self.container_var[var_type]:
+                    self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+            else:
+                if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["INCL"]["Content"]) > 0:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
+                else:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+
+    def remove_interval_qpl(self, var_type, var_file_short):
+        if self.container_var["Radiobuttons"]["Quick Plot File"].get() == 0:  # BG
+            var_key = "BG"
+            var_lb = self.lb_quick_plot_file_bg
+        elif self.container_var["Radiobuttons"]["Quick Plot File"].get() == 1:  # MAT
+            var_key = "MAT"
+            var_lb = self.lb_quick_plot_file_mat
+        elif self.container_var["Radiobuttons"]["Quick Plot File"].get() == 2:  # INCL
+            var_key = "INCL"
+            var_lb = self.lb_quick_plot_file_incl
+
+        item = var_lb.curselection()[0]
+        value = var_lb.get(item)
+        value_parts = value.split(" ")
+        key_id = re.search(r"(\D+)(\d+)", value_parts[0])
+        var_id = int(key_id.group(2))
+
+        self.container_helper[var_type][var_file_short][var_key]["Indices"].remove(var_id)
+        var_lb.delete(tk.ANCHOR)
+        self.container_helper[var_type][var_file_short][var_key]["Content"][var_id]["Object"].set_visible(False)
+        del self.container_helper[var_type][var_file_short][var_key]["Content"][var_id]
+
+        self.var_canvas_qpl.draw()
+
+    def fill_tv_quick_plot_file(self, var_type, var_file_short, list_isotopes, section="MAT", init=False):
         if init == True:
             for isotope in list_isotopes:
                 helper_values = [isotope, "---", "---", "---"]
@@ -4071,41 +4227,93 @@ class PySILLS(tk.Frame):
                 for item in self.tv_quick_file_statistics.get_children():
                     self.tv_quick_file_statistics.delete(item)
 
-            if section == "BG":
+            if len(self.container_helper[var_type][var_file_short][section]["Indices"]) > 0:
+                df_data  = self.container_measurements["Dataframe"][var_file_short]
+                condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                    interval_set=self.container_helper[var_type][var_file_short][section]["Content"])
+
+                if self.qpl_opt_is.get() != "Select isotope":
+                    isotope_is = self.qpl_opt_is.get()
+                    for isotope in list_isotopes:
+                        helper = {"Mean": [], "Standard deviation": [], "Ratio": []}
+                        for index, interval in condensed_intervals.items():
+                            start_index = interval[0]
+                            end_index = interval[1] + 1
+                            dataset_i = df_data[isotope][start_index:end_index]
+                            dataset_is = df_data[isotope_is][start_index:end_index]
+                            helper["Mean"].append(np.mean(dataset_i))
+                            helper["Standard deviation"].append(np.std(dataset_i, ddof=1))
+                            helper["Ratio"].append(np.mean(dataset_i)/np.mean(dataset_is))
+                        helper_values = [
+                            isotope, round(np.mean(helper["Mean"]), 2), round(np.mean(helper["Standard deviation"]), 2),
+                            "{:0.2e}".format(np.mean(helper["Ratio"]))]
+                        self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
+                else:
+                    for isotope in list_isotopes:
+                        helper_values = [isotope, "---", "---", "---"]
+                        self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
+
+            else:
                 for isotope in list_isotopes:
-                    helper_values = [isotope, "AAA", "BBB", "CCC"]
-                    self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
-            elif section == "MAT":
-                for isotope in list_isotopes:
-                    helper_values = [isotope, "DDD", "EEE", "FFF"]
-                    self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
-            elif section == "INCL":
-                for isotope in list_isotopes:
-                    helper_values = [isotope, "GG", "HHH", "III"]
+                    helper_values = [isotope, "---", "---", "---"]
                     self.tv_quick_file_statistics.insert("", tk.END, values=helper_values)
 
-    def show_or_hide_interval(self, key):
-        print("Selected section:", key)
+    def check_for_intervals_qpl(self, filetype, filename_short):
+        if self.pysills_mode == "MA":
+            list_sections = ["BG", "MAT"]
+        else:
+            list_sections = ["BG", "MAT", "INCL"]
+
+        for section in list_sections:
+            if len(self.container_helper[filetype][filename_short][section]["Indices"]) > 0:
+                if section == "BG":
+                    var_lb = self.lb_quick_plot_file_bg
+                elif section == "MAT":
+                    var_lb = self.lb_quick_plot_file_mat
+                elif section == "INCL":
+                    var_lb = self.lb_quick_plot_file_incl
+
+                var_color = self.colors_intervals[section]
+
+                for key_id, container in self.container_helper[filetype][filename_short][section]["Content"].items():
+                    list_times = container["Times"]
+                    time_0 = list_times[0]
+                    time_1 = list_times[1]
+                    var_lb.insert(tk.END, section + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    box = self.var_ax.axvspan(time_0, time_1, alpha=0.35, color=var_color)
+                    container["Object"] = box
+
+        self.var_canvas_qpl.draw()
+
+    def show_or_hide_interval(self, key, var_type, var_file_short):
         if key == "Background":
+            var_key = "BG"
             state_var = self.qpl_cb_bg.get()
-            print("State (before):", state_var)
             if state_var == 1:
-                print("Checkbox was activated, so user wants to hide the interval!")
+                state = True
             elif state_var == 0:
-                print("Checkbox was deactivated, so user wants to show the interval!")
-            print("State (after):", self.container_var["Checkboxes"]["Quick Plot File BG"].get())
+                state = False
         elif key in ["Matrix", "Sample"]:
+            var_key = "MAT"
             state_var = self.qpl_cb_mat.get()
             if state_var == 1:
-                print("Checkbox was activated, so user wants to hide the interval!")
+                state = True
             elif state_var == 0:
-                print("Checkbox was deactivated, so user wants to show the interval!")
+                state = False
         elif key == "Inclusion":
+            var_key = "INCL"
             state_var = self.qpl_cb_incl.get()
             if state_var == 1:
-                print("Checkbox was activated, so user wants to hide the interval!")
+                state = True
             elif state_var == 0:
-                print("Checkbox was deactivated, so user wants to show the interval!")
+                state = False
+
+        for id, container in self.container_helper[var_type][var_file_short][var_key]["Content"].items():
+            obj_interval = container["Object"]
+            obj_interval.set_visible(state)
+
+        self.var_canvas_qpl.draw()
 
     def show_line(self, var_isotope, var_file_short):
         if self.temp_checkbuttons[var_isotope].get() == 1:
@@ -4115,7 +4323,6 @@ class PySILLS(tk.Frame):
         #
         self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short]["Canvas"].draw()
 
-    #
     def show_all_lines(self, var_file_short):
         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
         for isotope in file_isotopes:
@@ -18644,137 +18851,139 @@ class PySILLS(tk.Frame):
 
             self.canvas_time_signal_checker.draw()
 
-        var_file_long = self.container_lists[var_filetype]["Long"][self.current_file_id_checker]
-        var_file_short = self.container_lists[var_filetype]["Short"][self.current_file_id_checker]
+        if len(self.container_lists[var_filetype]["Long"]) > 0:
+            var_file_long = self.container_lists[var_filetype]["Long"][self.current_file_id_checker]
+            var_file_short = self.container_lists[var_filetype]["Short"][self.current_file_id_checker]
 
-        if var_file_short not in self.container_intervals:
-            self.container_intervals[var_file_short] = {
-                "Setup": {"BG": [], "MAT": [], "INCL": []}, "Checker": {"BG": [], "MAT": [], "INCL": []}}
+            if var_file_short not in self.container_intervals:
+                self.container_intervals[var_file_short] = {
+                    "Setup": {"BG": [], "MAT": [], "INCL": []}, "Checker": {"BG": [], "MAT": [], "INCL": []}}
 
-        var_lw = float(self.container_var["General Settings"]["Line width"].get())
-        if var_lw < 0.25:
-            var_lw = 0.25
-        elif var_lw > 2.5:
-            var_lw = 2.5
+            var_lw = float(self.container_var["General Settings"]["Line width"].get())
+            if var_lw < 0.25:
+                var_lw = 0.25
+            elif var_lw > 2.5:
+                var_lw = 2.5
 
-        if self.temp_lines_checkup2[var_filetype][var_file_short] == 0:
-            if self.file_loaded == False:
-                if self.container_icpms["name"] != None:
-                    var_skipheader = self.container_icpms["skipheader"]
-                    var_skipfooter = self.container_icpms["skipfooter"]
-                    try:
-                        df_data = DE(filename_long=var_file_long).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                    except:
-                        df_data, file_info = self.find_icpms_data_in_file(filename_long=var_file_long)
-                else:
-                    df_data = DE(filename_long=var_file_long).get_measurements(
-                        delimiter=",", skip_header=3, skip_footer=1)
-            else:
-                df_data = self.container_measurements["Dataframe"][var_file_short]
-
-            dataset_time = list(DE().get_times(dataframe=df_data))
-            x_max = max(dataset_time)
-            icp_measurements = np.array(
-                [[df_data[isotope] for isotope in self.container_lists["Measured Isotopes"]["All"]
-                  if isotope in df_data]])
-            y_max = np.amax(icp_measurements)
-
-            if var_filetype == "STD":
-                ax = self.fig_time_signal_checker.add_subplot(label=np.random.uniform())
-            else:
-                ax = self.fig_time_signal_checker.add_subplot(label=np.random.uniform())
-
-            self.temp_axes_checkup2[var_filetype][var_file_short] = ax
-
-            for isotope in self.container_lists["Measured Isotopes"]["All"]:
-                if isotope in df_data:
-                    ln_raw = ax.plot(
-                        dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
-                        linewidth=var_lw, visible=True)
-
-            # Background window
-            if var_file_short in self.container_helper[var_filetype]:
-                var_check_bg = self.container_helper[var_filetype][var_file_short]["BG"]["Content"]
-
-                if len(var_check_bg) > 0:
-                    if self.pysills_mode in ["MA", "FI", "MI"]:
-                        for var_id, var_content in self.container_helper[var_filetype][var_file_short]["BG"][
-                            "Content"].items():
-                            times_bg = var_content["Times"]
-                            box_bg = ax.axvspan(times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
-                            self.container_intervals[var_file_short]["Checker"]["BG"].append(box_bg)
-
-            # Sample/Matrix window
-            if var_file_short in self.container_helper[var_filetype]:
-                var_check_sig = self.container_helper[var_filetype][var_file_short]["MAT"]["Content"]
-
-                if len(var_check_sig) > 0:
-                    if self.pysills_mode in ["FI"]:
-                        for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
-                            "Content"].items():
-                            times_sig = var_content["Times"]
-                            var_color = self.colors_intervals["MAT"]
-                            box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                            self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
-                    elif self.pysills_mode in ["MI"]:
-                        for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
-                            "Content"].items():
-                            times_sig = var_content["Times"]
-                            var_color = self.colors_intervals["MAT"]
-                            box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                            self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
+            if self.temp_lines_checkup2[var_filetype][var_file_short] == 0:
+                if self.file_loaded == False:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        try:
+                            df_data = DE(filename_long=var_file_long).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        except:
+                            df_data, file_info = self.find_icpms_data_in_file(filename_long=var_file_long)
                     else:
-                        for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
-                            "Content"].items():
-                            times_sig = var_content["Times"]
-                            var_color = self.colors_intervals["MAT"]
-                            box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
-                            self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
+                        df_data = DE(filename_long=var_file_long).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+                else:
+                    df_data = self.container_measurements["Dataframe"][var_file_short]
 
-            # Inclusion window
-            if self.pysills_mode != "MA":
-                if var_filetype == "SMPL":
-                    inclusion_key = "INCL"
-                    var_check_incl = self.container_helper[var_filetype][var_file_short][inclusion_key]["Content"]
-                    if len(var_check_incl) > 0:
-                        if self.pysills_mode in ["FI", "INCL"]:
-                            for var_id, var_content in self.container_helper[var_filetype][var_file_short][
-                                inclusion_key]["Content"].items():
-                                times_incl = var_content["Times"]
-                                box_incl = ax.axvspan(
-                                    times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
-                                self.container_intervals[var_file_short]["Checker"]["INCL"].append(box_incl)
-                        elif self.pysills_mode == "MI":
-                            for var_id, var_content in self.container_helper[var_filetype][var_file_short][
-                                inclusion_key]["Content"].items():
-                                times_incl = var_content["Times"]
-                                box_incl = ax.axvspan(
-                                    times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
-                                self.container_intervals[var_file_short]["Checker"]["INCL"].append(box_incl)
+                dataset_time = list(DE().get_times(dataframe=df_data))
+                x_max = max(dataset_time)
+                icp_measurements = np.array(
+                    [[df_data[isotope] for isotope in self.container_lists["Measured Isotopes"]["All"]
+                      if isotope in df_data]])
+                y_max = np.amax(icp_measurements)
 
-            ax.set_title("Current file: " + str(var_file_short), fontsize=9)
-            ax.set_xlabel("Time (s)", labelpad=0.5, fontsize=8)
-            ax.set_ylabel("Intensity (cps)", labelpad=0.5, fontsize=8)
+                if var_filetype == "STD":
+                    ax = self.fig_time_signal_checker.add_subplot(label=np.random.uniform())
+                else:
+                    ax = self.fig_time_signal_checker.add_subplot(label=np.random.uniform())
 
-            ax.set_yscale("log")
-            ax.set_xlim(left=0, right=x_max)
-            ax.set_xticks(np.arange(0, x_max, 20))
-            ax.set_ylim(bottom=100, top=1.5*y_max)
-            ax.grid(which="major", linestyle="-", linewidth=1)
-            ax.minorticks_on()
-            ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
-            ax.set_axisbelow(True)
-            ax.xaxis.set_tick_params(labelsize=8)
-            ax.yaxis.set_tick_params(labelsize=8)
+                self.temp_axes_checkup2[var_filetype][var_file_short] = ax
 
-            self.canvas_time_signal_checker.draw()
-            self.temp_lines_checkup2[var_filetype][var_file_short] = 1
-        else:
-            self.temp_axes_checkup2[var_filetype][var_file_short].axis("on")
-            self.temp_axes_checkup2[var_filetype][var_file_short].set_visible(True)
+                for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                    if isotope in df_data:
+                        ln_raw = ax.plot(
+                            dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
+                            linewidth=var_lw, visible=True)
 
-            self.canvas_time_signal_checker.draw()
+                # Background window
+                if var_file_short in self.container_helper[var_filetype]:
+                    var_check_bg = self.container_helper[var_filetype][var_file_short]["BG"]["Content"]
+
+                    if len(var_check_bg) > 0:
+                        if self.pysills_mode in ["MA", "FI", "MI"]:
+                            for var_id, var_content in self.container_helper[var_filetype][var_file_short]["BG"][
+                                "Content"].items():
+                                times_bg = var_content["Times"]
+                                box_bg = ax.axvspan(
+                                    times_bg[0], times_bg[1], alpha=0.35, color=self.colors_intervals["BG"])
+                                self.container_intervals[var_file_short]["Checker"]["BG"].append(box_bg)
+
+                # Sample/Matrix window
+                if var_file_short in self.container_helper[var_filetype]:
+                    var_check_sig = self.container_helper[var_filetype][var_file_short]["MAT"]["Content"]
+
+                    if len(var_check_sig) > 0:
+                        if self.pysills_mode in ["FI"]:
+                            for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
+                                "Content"].items():
+                                times_sig = var_content["Times"]
+                                var_color = self.colors_intervals["MAT"]
+                                box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                                self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
+                        elif self.pysills_mode in ["MI"]:
+                            for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
+                                "Content"].items():
+                                times_sig = var_content["Times"]
+                                var_color = self.colors_intervals["MAT"]
+                                box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                                self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
+                        else:
+                            for var_id, var_content in self.container_helper[var_filetype][var_file_short]["MAT"][
+                                "Content"].items():
+                                times_sig = var_content["Times"]
+                                var_color = self.colors_intervals["MAT"]
+                                box_mat = ax.axvspan(times_sig[0], times_sig[1], alpha=0.35, color=var_color)
+                                self.container_intervals[var_file_short]["Checker"]["MAT"].append(box_mat)
+
+                # Inclusion window
+                if self.pysills_mode != "MA":
+                    if var_filetype == "SMPL":
+                        inclusion_key = "INCL"
+                        var_check_incl = self.container_helper[var_filetype][var_file_short][inclusion_key]["Content"]
+                        if len(var_check_incl) > 0:
+                            if self.pysills_mode in ["FI", "INCL"]:
+                                for var_id, var_content in self.container_helper[var_filetype][var_file_short][
+                                    inclusion_key]["Content"].items():
+                                    times_incl = var_content["Times"]
+                                    box_incl = ax.axvspan(
+                                        times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
+                                    self.container_intervals[var_file_short]["Checker"]["INCL"].append(box_incl)
+                            elif self.pysills_mode == "MI":
+                                for var_id, var_content in self.container_helper[var_filetype][var_file_short][
+                                    inclusion_key]["Content"].items():
+                                    times_incl = var_content["Times"]
+                                    box_incl = ax.axvspan(
+                                        times_incl[0], times_incl[1], alpha=0.35, color=self.colors_intervals["INCL"])
+                                    self.container_intervals[var_file_short]["Checker"]["INCL"].append(box_incl)
+
+                ax.set_title("Current file: " + str(var_file_short), fontsize=9)
+                ax.set_xlabel("Time (s)", labelpad=0.5, fontsize=8)
+                ax.set_ylabel("Intensity (cps)", labelpad=0.5, fontsize=8)
+
+                ax.set_yscale("log")
+                ax.set_xlim(left=0, right=x_max)
+                ax.set_xticks(np.arange(0, x_max, 20))
+                ax.set_ylim(bottom=100, top=1.5*y_max)
+                ax.grid(which="major", linestyle="-", linewidth=1)
+                ax.minorticks_on()
+                ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+                ax.set_axisbelow(True)
+                ax.xaxis.set_tick_params(labelsize=8)
+                ax.yaxis.set_tick_params(labelsize=8)
+
+                self.canvas_time_signal_checker.draw()
+                self.temp_lines_checkup2[var_filetype][var_file_short] = 1
+            else:
+                self.temp_axes_checkup2[var_filetype][var_file_short].axis("on")
+                self.temp_axes_checkup2[var_filetype][var_file_short].set_visible(True)
+
+                self.canvas_time_signal_checker.draw()
 
     def place_standard_files_table(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Standard Files'
