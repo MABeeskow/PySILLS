@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.57
+# Version:	v1.0.58
 # Date:		05.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.57"
+        self.str_version_number = "1.0.58"
         self.val_version = self.str_version_number + " - 05.02.2025"
 
         ## Colors
@@ -4215,6 +4215,9 @@ class PySILLS(tk.Frame):
         var_filetype = var_type
         var_filename_short = var_file_short
         var_list_isotopes = list_isotopes
+        var_row_start = row_start
+        var_column_start = column_start
+        var_df_data = df_data
 
         rb_01 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 5, column_id=column_start, n_rows=1,
@@ -4248,15 +4251,27 @@ class PySILLS(tk.Frame):
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_02, value_rb=0, color_bg=background_color_elements,
-            fg=font_color_dark, text="Scatter plot", sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text="Scatter plot", sticky="nesw", relief=tk.FLAT,
+            command=lambda filetype=var_filetype, filename_short=var_filename_short, df_data=var_df_data,
+                           subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
+                           column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
+                           n_columns_diagram=n_columns_plot, init=False:
+            self.create_qpl_extra_diagram(filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                          n_rows_diagram, n_columns_diagram, init))
         rb_05 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 12, column_id=column_start, n_rows=1,
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_02, value_rb=1, color_bg=background_color_elements,
-            fg=font_color_dark, text="Histogram plot", sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text="Histogram plot", sticky="nesw", relief=tk.FLAT,
+            command=lambda filetype=var_filetype, filename_short=var_filename_short, df_data=var_df_data,
+                           subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
+                           column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
+                           n_columns_diagram=n_columns_plot, init=False:
+            self.create_qpl_extra_diagram(filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                          n_rows_diagram, n_columns_diagram, init))
 
-        rb_05.configure(state="disabled")
+        #rb_05.configure(state="disabled")
 
         if self.pysills_mode == "MA":
             rb_02.configure(text="Sample")
@@ -4270,21 +4285,17 @@ class PySILLS(tk.Frame):
         self.var_opt_qpl_extra_03 = tk.StringVar()
         self.var_opt_qpl_extra_03.set(list_keys[0])
 
-        var_row_start = row_start
-        var_column_start = column_start
-        var_df_data = df_data
-
         opt_01 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 2, column_id=column_start + 2, n_rows=1,
             n_columns=n_colums_navigation - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
             var_iso=self.var_opt_qpl_extra_01, option_list=list_isotopes, text_set=self.var_opt_qpl_extra_01.get(),
             fg_active=font_color_light, bg_active=accent_color,
-            command=lambda filetype=var_type, filename_short=var_file_short, df_data=var_df_data,
-            subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
+            command=lambda filetype=var_filetype, filename_short=var_filename_short, df_data=var_df_data,
+                           subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
                            column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
-                           n_columns_diagram=n_columns_plot:
-            self.create_qpl_scatter_plot(filetype, filename_short, df_data, subwindow, row_start, column_start,
-                                         n_rows_diagram, n_columns_diagram))
+                           n_columns_diagram=n_columns_plot, init=False:
+            self.create_qpl_extra_diagram(filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                          n_rows_diagram, n_columns_diagram, init))
         opt_02 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 3, column_id=column_start + 2, n_rows=1,
             n_columns=n_colums_navigation - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
@@ -4351,6 +4362,103 @@ class PySILLS(tk.Frame):
             opt_01.configure(state="disabled")
             opt_02.configure(state="disabled")
             opt_03.configure(state="disabled")
+
+    def create_qpl_extra_diagram(self, filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                  n_rows_diagram, n_columns_diagram, init=False):
+        if self.var_rb_qpl_extra_02.get() == 0: # Scatter
+            self.create_qpl_scatter_plot(
+                filetype, filename_short, df_data, subwindow, row_start, column_start, n_rows_diagram,
+                n_columns_diagram, init)
+        elif self.var_rb_qpl_extra_02.get() == 1: # Histogram
+            self.create_qpl_histogram_plot(
+                filetype, filename_short, df_data, subwindow, row_start, column_start, n_rows_diagram,
+                n_columns_diagram, init)
+
+    def create_qpl_histogram_plot(self, filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                  n_rows_diagram, n_columns_diagram, init=False):
+        # Data preparation
+        list_isotopes = list(df_data.keys())[1:]
+        if filename_short in self.container_lists["STD"]["Short"]:
+            filetype = "STD"
+        elif filename_short in self.container_lists["SMPL"]["Short"]:
+            filetype = "SMPL"
+
+        if init == False:
+            var_x = self.var_opt_qpl_extra_01.get()
+            var_y = self.var_opt_qpl_extra_02.get()
+            var_z = self.var_opt_qpl_extra_03.get()
+        else:
+            var_x = list_isotopes[0]
+            var_y = list_isotopes[1]
+            var_z = list_isotopes[2]
+
+        if self.var_rb_qpl_extra_01.get() == 0:
+            section = "BG"
+        elif self.var_rb_qpl_extra_01.get() == 1:
+            section = "MAT"
+        elif self.var_rb_qpl_extra_01.get() == 2:
+            section = "INCL"
+
+        var_section = section
+
+        if (len(self.container_helper[filetype][filename_short][section]["Indices"]) > 0 and
+                "Select isotope" not in [var_x, var_y]):
+            condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                interval_set=self.container_helper[filetype][filename_short][section]["Content"])
+            helper_data = {}
+
+            helper_data[var_x] = []
+            helper_data[var_y] = []
+            for index, interval in condensed_intervals.items():
+                start_index = interval[0]
+                end_index = interval[1] + 1
+                dataset_x = df_data[var_x][start_index:end_index]
+                dataset_y = df_data[var_y][start_index:end_index]
+                if var_z != "None" and var_z not in [var_x, var_y]:
+                    if var_z not in helper_data:
+                        helper_data[var_z] = []
+
+                    dataset_z = df_data[var_z][start_index:end_index]
+                    helper_data[var_z].extend(list(dataset_z))
+
+                helper_data[var_x].extend(list(dataset_x))
+                helper_data[var_y].extend(list(dataset_y))
+
+            data_x = helper_data[var_x]
+            data_y = helper_data[var_y]
+
+            min_x = min(data_x)
+            max_x = max(data_x)
+            min_y = min(data_y)
+            max_y = max(data_y)
+            lim_x_min, lim_x_max = self.round_to_the_next_natural_limit(minimum=min_x, maximum=max_x)
+            lim_y_min, lim_y_max = self.round_to_the_next_natural_limit(minimum=min_y, maximum=max_y)
+
+            # Diagram
+            var_fig = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Light"])
+            var_ax = var_fig.add_subplot(label=np.random.uniform())
+
+            n_bins = 30
+            var_ax.hist(data_x, bins=n_bins, color=self.accent_color, edgecolor="black")
+
+            var_ax.grid(which="major", linestyle="-", linewidth=1)
+            var_ax.minorticks_on()
+            var_ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+            var_ax.set_axisbelow(True)
+            var_ax.set_title(filename_short, fontsize=9)
+            var_ax.set_xlabel("Signal " + var_x + " (cps)", labelpad=0.5, fontsize="x-small")
+            var_ax.set_ylabel("Frequency", labelpad=0.5, fontsize="x-small")
+            var_ax.xaxis.set_tick_params(labelsize="x-small")
+            var_ax.yaxis.set_tick_params(labelsize="x-small")
+
+            self.var_canvas_qpl_extra = FigureCanvasTkAgg(var_fig, master=subwindow)
+            self.var_canvas_qpl_extra.get_tk_widget().grid(
+                row=row_start, column=column_start, rowspan=n_rows_diagram, columnspan=n_columns_diagram, sticky="nesw")
+
+            # TREEVIEW UPDATE
+        self.fill_tv_qpl_extra(
+            var_type=filetype, var_file_short=filename_short, list_isotopes=list_isotopes, section=var_section,
+            isotope_is=var_x)
 
     def create_qpl_scatter_plot(
             self, filetype, filename_short, df_data, subwindow, row_start, column_start, n_rows_diagram,
