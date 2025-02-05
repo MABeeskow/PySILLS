@@ -18,8 +18,8 @@ setup(
     install_requires=["numpy", "scipy", "pandas", "matplotlib", "sympy"],
     entry_points={"console_scripts": ["pysills = pysills.pysills_app:pysills"]},
     include_package_data=True,
-    package_data={"": ["lib/srm/*.csv", "lib/icpms/*.csv", "lib/demo_files/*.csv", "lib/images/*.png",
-                       "lib/images/*.ico"]},
+    package_data={"": ["lib/srm/*.csv", "lib/icpms/*.csv", "lib/translations/*.csv", "lib/demo_files/*.csv",
+                       "lib/images/*.png", "lib/images/*.ico"]},
     long_description=description,
     long_description_content_type="text/markdown",
 )

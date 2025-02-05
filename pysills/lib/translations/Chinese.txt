@@ -1,0 +1,302 @@
+Select Mode	选择模式
+Standard Files	标准文件
+Sample Files	样本文件
+ICP-MS file setup	文件设置
+Define ICP-MS	定义ICP-MS
+Project	项目
+Inclusions	包含分析
+Add	添加
+Isotope	同位素
+Set salinity	设置盐度
+Interval setup	时间窗口设置
+Remove interval	移除时间窗口
+Remove sample intervals	移除样本时间窗口
+Remove inclusion intervals	移除包含时间窗口
+Remove matrix intervals	移除矩阵时间窗口
+Update	更新
+Error course	错误过程
+Parallelism	并行性
+No selection	未选择
+Background interval	背景时间窗口
+Sample interval	样本时间窗口
+Matrix interval	矩阵时间窗口
+Inclusion interval	包含时间窗口
+Standard file	标准文件
+Sample file	样本文件
+Confirm all	全部确认
+Measured isotopes	测量的同位素
+Display options	显示选项
+Analysis mode	分析模式
+Show all	显示全部
+Hide all	隐藏全部
+Show only RAW	仅显示RAW
+Hide only RAW	隐藏RAW
+Time series view	时间序列视图
+Time ratios view	时间比率视图
+Spectral data view	光谱数据视图
+Box plot data view	箱形图数据视图
+Quick analysis	快速分析
+Stepwise analysis	分步分析
+Copy	复制
+Delete	删除
+Rename	重命名
+Data analysis	数据分析
+Interval options	时间窗口选项
+Reference isotope	参考同位素
+Additional analysis	额外分析
+Time-Signal Diagram	时间-信号图
+New Project	新项目
+Load Project	加载项目
+Save Project	保存项目
+General Settings	常规设置
+About	关于
+Python path	路径
+PySILLS path	路径
+Before	上一步
+Previous	上一页
+Next	下一页
+Quit	退出
+Manager	管理员
+Setup	设置
+Select ICP-MS	选择 ICP-MS
+Mineral Analysis	矿物分析
+Settings	设置
+Results	结果
+Extras	附加功能
+Mass balance	质量平衡
+Charge balance	电荷平衡
+Fluid Inclusions	流体包含物
+Geometric approach	几何方法
+External quantification support	外部定量支持
+Custom data	自定义数据
+Melt Inclusions	融化包含物
+Development	开发
+Additional Information	额外信息
+Citation	引用 PySILLS
+Matrix Settings	矩阵设置
+References	参考文献
+Project Information	项目信息
+Calculation Accuracy	计算精度
+Sensitivity Drift	灵敏度漂移
+Limit of Detection	检测限
+Default ICP-MS	默认 ICP-MS
+Offset Automatic Interval Detection	偏移自动时间窗口检测
+Colormap	色彩图
+Report File	报告文件
+Plotting Setup	绘图设置
+Language Selection	语言选择
+Data Processing	数据处理
+MINERAL ANALYSIS - Setup	矿物分析 - 设置
+FLUID INCLUSION ANALYSIS - Setup	流体包含物分析 – 设置
+INCLUSION ANALYSIS - Setup	包含物分析 – 设置
+MELT INCLUSION ANALYSIS - Setup	融化包含物分析 – 设置
+Author	作者
+Select last solid	选择最后一个固体
+Source ID	来源ID
+Standard Reference Material (SRM)	标准参考材料（SRM）
+Isotopes	同位素
+Dwell times (in s)	停留时间（秒）
+Sample Settings	样本设置
+Dwell Time Settings	停留时间设置
+Default Time Window (Background)	默认时间窗口（背景）
+Default Time Window (Matrix)	默认时间窗口（矩阵）
+Default Time Window (Sample)	默认时间窗口（样本）
+Check-Up - Standard Reference Material	检查 - 标准参考材料
+SRM values	值
+Name	名称
+Category	类别
+Primary isotope	主要同位素
+Secondary isotope	次要同位素
+Intensity results	强度结果
+Sensitivity results	灵敏度结果
+Composition results	组成结果
+ID	ID
+SRM	SRM
+Concentration (ppm)	浓度（ppm)
+Element	元素
+Start	开始
+End	结束
+Run	运行
+N(isotopes)	N(同位素)
+t(start)	t(开始)
+t(end)	t(结束)
+t(day)	t(天)
+date	日期
+Spike Elimination	异常值消除
+Calculation Method	计算方法
+Check-Up	检查
+Internal Standard	内部标准
+Exclude inclusion	排除包含物
+Check inclusion	仅检查包含物
+Quantification Method	定量方法
+Significance level	显著性水平
+Threshold	阈值
+Remove all	移除全部
+Apply to all	应用于所有
+Check	检查
+Calculation Intervals	计算时间窗口
+Acquisition Times	获取时间
+Acquisition Time	获取时间
+Imported Files	导入文件
+Line of time stamp	时间戳线
+Skip header	跳过头部
+Skip footer	跳过尾部
+Save ICP-MS setup	保存 ICP-MS 设置
+100 wt.% oxides	重量氧化物
+Auto-Detection	自动检测
+Set start time	设置开始时间
+Set end time	设置结束时间
+Select oxide	选择氧化物
+Select isotope	选择同位素
+Select element	选择元素
+Select file	选择文件
+Select all	选择全部
+Select	选择
+Alkali metals	碱金属
+Alkaline earth metals	碱土金属
+Transition metals	过渡金属
+Other metals	其他金属
+Metalloids	半金属
+Lanthanides	镧系元素
+Actinides	锕系元素
+Non-metals	非金属
+Halogens	卤素
+Noble gases	惰性气体
+Select all oxides	选择所有氧化物
+Deselect all oxides	取消选择所有氧化物
+Rock-forming elements	岩石形成元素
+Fix quantification	修复定量
+Calculate again	重新计算
+Molality-based quantification	基于摩尔浓度的定量
+Guess the composition	猜测组成
+Setup - Oxide ratios	设置 - 氧化物比例
+Setup - Reference element	设置 - 参考元素
+Setup - Oxide selection	设置 - 氧化物选择
+Run 100 wt.% oxides calculation for	运行 100.00% 重量氧化物计算 
+Setup - Files	设置- 文件
+Mineral quantification	矿物定量
+Inclusion quantification	包含物定量
+Assemblage Settings	构配设置
+Isotope Dwell Times	同位素停留时间
+Inclusion Settings	包含物设置
+Internal Standard Setup	内部标准设置
+Oxide stoichiometry	氧化物化学计量
+Default settings	默认设置
+Composition	组成
+Cations	阳离子
+Anions	阴离子
+Melting temperature of the last solid	最后固体的熔点
+Melting temperature	熔点
+Last solid	最后固体
+Select IS	选择 IS
+Select mineral	选择矿物
+Element Calculation	元素计算
+Experimental Data	实验数据
+Import external data	导入外部数据
+LA-ICP-MS data export	数据导出
+Oxide Setup	氧化物设置
+Import data	导入数据
+Application launcher	应用启动器
+Dwell times	停留时间
+Default author	默认作者
+Default SRM	默认 SRM
+Median	中位数
+Standard deviation	标准偏差
+Charge	电荷
+charged	带电的
+Screen resolution	屏幕分辨率
+Arithmetic mean	算术平均
+Average of every interval	每个时间窗口的平均值
+Stack all intervals into one	将所有时间窗口堆叠为一个
+File type	文件类型
+Data type	数据类型
+Data selection	数据选择
+Assemblage	构配
+Value	值
+Select standard file	选择标准文件
+Select sample file	选择样本文件
+Select parameter	选择参数
+Original data	原始数据
+Smoothed data	平滑数据
+Current data	当前数据
+Current outlier	当前异常值
+Scatter plot	散点图
+Histogram plot	直方图图
+Diagram selection	图形选择
+Plotting setup	绘图设置
+Section selection	阶段选择
+Color coding	颜色编码
+Isotope selection	同位素选择
+Outlier selection	异常值选择
+Outlier correction	异常值修正
+Number of outliers	异常值数量
+File selection	文件选择
+Original value	原始值
+Smoothed value	平滑值
+Current value	当前值
+Value selection	选择值
+Outlier check	异常值检查
+Signal intensity	信号强度
+Experiment time	实验时间
+Delimiter	分隔符
+Sample	样本
+of	的
+with	与
+Up	向上
+Down	向下
+without	没有
+Densities	密度
+Dimensions	尺寸
+Inclusion intensity	包含物强度
+Inclusion dimensions	包含物尺寸
+Inclusion concentration	包含物浓度
+Length of	长度
+semi-axis	半轴
+Ablation radius	脱落半径
+Inclusion radius	包含物半径
+Inclusion density	包含物密度
+Matrix density	矩阵密度
+elements	元素
+element ratios	元素比率
+oxides	氧化物
+oxide ratios	氧化物比率
+with respect to	相对于
+x-y diagram	图
+Ternary diagram	三元图
+Geothermometry	地温计学
+Matrix	矩阵
+Inclusion	包含物
+Additional Settings	额外设置
+Select x	选择 x
+Select y	选择 y
+Select z	选择 z
+Mixed signal	混合信号
+Concentration	浓度
+Concentration ratio	浓度比率
+Limit of detection	检测限
+Mixed intensity	混合强度
+Mixed concentration	混合浓度
+Mixing ratio	混合比率
+Intensity	强度
+Intensity ratio	强度比率
+Analytical sensitivity	分析灵敏度
+Normalized sensitivity	标准化灵敏度
+Relative sensitivity factor	相对灵敏度因子
+Export results	导出结果
+Further data analysis	进一步的数据分析
+Sensitivity drift	灵敏度漂移
+Internal standard	内部标准
+Sorting by	排序依据
+All in one file	所有内容一个文件
+Background	背景
+Main signal	主要信号
+Line width	线宽
+Save settings	保存设置
+Create launcher	创建启动器
+Calculation formula from ...	计算公式来自
+PySILLS color scheme	颜色方案
+Default value	默认值
+Composition Setup	组成设置
+Mineral stoichiometry	矿物化学计量
+PySILLS subtitle	的矿物、流体和熔体包含物的元素分析
+File-specific Setup	文件特定设置

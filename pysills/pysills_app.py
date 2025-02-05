@@ -1698,7 +1698,28 @@ class PySILLS(tk.Frame):
             self.path_pysills_main = self.path_pysills_main.replace("pysills", "")
 
         folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
+        folder_path_translations = os.path.join(self.path_pysills_main, "pysills", "lib", "translations", "")
         helper_srm_library = os.listdir(folder_path)
+
+        for language in ["Chinese"]:
+            if language == "Chinese":
+                var_ending = ".txt"
+            else:
+                var_ending = ".csv"
+
+            path_language = folder_path_translations + language + var_ending
+
+            if language == "Chinese":
+                var_encoding = "utf-8"
+            else:
+                var_encoding = "utf-8"
+            with open(path_language, mode="r", newline="", encoding=var_encoding) as file:
+                reader = csv.reader(file)
+                for row in reader:
+                    if language == "Chinese":
+                        key = row[0].split("\t")[0]
+                        translation = row[0].split("\t")[-1]
+                        self.language_dict[key][language] = translation
 
         helper_srm_library.remove("__init__.py")
 
@@ -2194,6 +2215,12 @@ class PySILLS(tk.Frame):
             list_mode = ["Mineral Analysis", "Fluid Inclusions", "Melt Inclusions", "Inclusion Analysis"]
         elif self.var_language == "German":
             list_mode = ["Minerale", "Flüssigkeitseinschlüsse", "Schmelzeinschlüsse", "Einschlüsse"]
+        elif self.var_language == "Chinese":
+            str_01 = self.language_dict["Mineral Analysis"][self.var_language]
+            str_02 = self.language_dict["Fluid Inclusions"][self.var_language]
+            str_03 = self.language_dict["Melt Inclusions"][self.var_language]
+            str_04 = "包含分析"
+            list_mode = [str_01, str_02, str_03, str_04]
 
         self.var_rb_mode = tk.IntVar()
         for index, mode in enumerate(list_mode):
@@ -14446,7 +14473,7 @@ class PySILLS(tk.Frame):
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
         opt_language["menu"].entryconfig("French", state="disable")
-        opt_language["menu"].entryconfig("Chinese", state="disable")
+        #opt_language["menu"].entryconfig("Chinese", state="disable")
         opt_language["menu"].entryconfig("Greek", state="disable")
         opt_language["menu"].entryconfig("Russian", state="disable")
 
