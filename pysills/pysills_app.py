@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.56
+# Version:	v1.0.57
 # Date:		05.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.56"
+        self.str_version_number = "1.0.57"
         self.val_version = self.str_version_number + " - 05.02.2025"
 
         ## Colors
@@ -1948,7 +1948,7 @@ class PySILLS(tk.Frame):
             "FI specific file": [34, 68], "Setup PyPitzer": [20, 60], "Setup mass balance": [24, 55],
             "Setup external calculation": [11, 33], "Custom spike check": [24, 45], "Popup window error": [12, 20],
             "Popup window progress": [4, 20], "Popup window progress datareduction": [16, 20],
-            "Project manager": [16, 50]}
+            "Project manager": [16, 50], "Quick Plot Extra": [34, 46]}
 
         row_min = self.row_height
         self.n_rows = 33
@@ -3972,7 +3972,9 @@ class PySILLS(tk.Frame):
             parent=subwindow_quickplotter, row_id=row_display_opt + 3,
             column_id=column_start, n_rows=1, n_columns=n_columns_isotopes,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Scatter plot", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"])
+            text="Additional anaylsis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            command=lambda var_type=var_filetype, var_file_short=file_short:
+            self.qpl_additional_diagrams(var_type, var_file_short))
         btn_03 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2,
             column_id=column_start, n_rows=2, n_columns=int(n_columns_isotopes/2),
@@ -4000,7 +4002,7 @@ class PySILLS(tk.Frame):
         btn_03.configure(font=font_elements)
         btn_04.configure(font=font_elements)
         btn_05.configure(font=font_elements)
-        btn_06.configure(font=font_elements, state="disabled")
+        btn_06.configure(font=font_elements)
 
         ## CHECKBOXES
         self.qpl_cb_bg = tk.IntVar()
@@ -4097,6 +4099,431 @@ class PySILLS(tk.Frame):
         self.fill_tv_quick_plot_file(
             var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes, init=True)
         self.check_for_intervals_qpl(filetype=var_filetype, filename_short=file_short)
+
+    def qpl_additional_diagrams(self, var_type, var_file_short):
+        list_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+        df_data = self.container_measurements["Dataframe"][var_file_short]
+        list_keys = list_isotopes.copy()
+        list_keys.insert(0, "None")
+        list_keys.insert(1, "Time")
+
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]  # self.accent_color
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
+        ## Window Settings
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Quick Plot Extra"][0]
+        n_columns = self.window_dimensions["Quick Plot Extra"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        subwindow_qpl_extra = tk.Toplevel(self.parent)
+        subwindow_qpl_extra.title("Quick Plotter")
+        subwindow_qpl_extra.geometry(var_geometry)
+        subwindow_qpl_extra.resizable(False, False)
+        subwindow_qpl_extra["bg"] = background_color_light
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_qpl_extra, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_qpl_extra, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_qpl_extra.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_qpl_extra.grid_columnconfigure(i, minsize=column_min)
+
+        ###########################################################
+
+        row_start = 0
+        column_start = 0
+        n_rows_navigation = n_rows
+        n_colums_navigation = int(1/3*n_columns)
+        n_columns_plot = n_columns - n_colums_navigation
+        rows_tv = n_rows - 12
+        n_rows_tv = 12
+
+        ## FRAMES
+        frm_01 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start, column_id=column_start, n_rows=n_rows_navigation,
+            n_columns=n_colums_navigation, fg=font_color_dark, bg=background_color_dark).create_frame(relief=tk.FLAT)
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Plotting setup", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_02 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 1, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Isotope selection", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_02a = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 2, column_id=column_start, n_rows=1,
+            n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="x", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_02b = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 3, column_id=column_start, n_rows=1,
+            n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="y", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_03 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 4, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Section selection", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_04 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 8, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Color coding", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_04a = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 9, column_id=column_start, n_rows=1,
+            n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="z", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_05 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 10, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Diagram selection", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_06 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start, column_id=column_start + n_colums_navigation, n_rows=1,
+            n_columns=n_columns_plot, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Scatter plot", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_07 = SE(
+            parent=subwindow_qpl_extra, row_id=rows_tv - 1, column_id=column_start + n_colums_navigation, n_rows=1,
+            n_columns=n_columns_plot, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Data analysis", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+
+        self.lbl_qpl_extra_06 = lbl_06
+
+        ## RADIOBUTTONS
+        self.var_rb_qpl_extra_01 = tk.IntVar()
+        self.var_rb_qpl_extra_01.set(1)
+        self.var_rb_qpl_extra_02 = tk.IntVar()
+        self.var_rb_qpl_extra_02.set(0)
+
+        var_filetype = var_type
+        var_filename_short = var_file_short
+        var_list_isotopes = list_isotopes
+
+        rb_01 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 5, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_dark,
+            bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_qpl_extra_01, value_rb=0, color_bg=background_color_elements,
+            fg=font_color_dark, text="Background", sticky="nesw", relief=tk.FLAT,
+            command=lambda var_type=var_filetype, var_file_short=var_filename_short, list_isotopes=var_list_isotopes,
+                           section="BG":
+            self.fill_tv_qpl_extra(var_type, var_file_short, list_isotopes, section))
+        rb_02 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 6, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_dark,
+            bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_qpl_extra_01, value_rb=1, color_bg=background_color_elements,
+            fg=font_color_dark, text="Matrix", sticky="nesw", relief=tk.FLAT,
+            command=lambda var_type=var_filetype, var_file_short=var_filename_short, list_isotopes=var_list_isotopes,
+                           section="MAT":
+            self.fill_tv_qpl_extra(var_type, var_file_short, list_isotopes, section))
+        rb_03 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 7, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_dark,
+            bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_qpl_extra_01, value_rb=2, color_bg=background_color_elements,
+            fg=font_color_dark, text="Inclusion", sticky="nesw", relief=tk.FLAT,
+            command=lambda var_type=var_filetype, var_file_short=var_filename_short, list_isotopes=var_list_isotopes,
+                           section="INCL":
+            self.fill_tv_qpl_extra(var_type, var_file_short, list_isotopes, section))
+        rb_04 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 11, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_dark,
+            bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_qpl_extra_02, value_rb=0, color_bg=background_color_elements,
+            fg=font_color_dark, text="Scatter plot", sticky="nesw", relief=tk.FLAT)
+        rb_05 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 12, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_dark,
+            bg=background_color_elements).create_radiobutton(
+            var_rb=self.var_rb_qpl_extra_02, value_rb=1, color_bg=background_color_elements,
+            fg=font_color_dark, text="Histogram plot", sticky="nesw", relief=tk.FLAT)
+
+        rb_05.configure(state="disabled")
+
+        if self.pysills_mode == "MA":
+            rb_02.configure(text="Sample")
+            rb_03.configure(state="disabled")
+
+        ## OPTION MENUS
+        self.var_opt_qpl_extra_01 = tk.StringVar()
+        self.var_opt_qpl_extra_01.set("Select isotope")
+        self.var_opt_qpl_extra_02 = tk.StringVar()
+        self.var_opt_qpl_extra_02.set("Select isotope")
+        self.var_opt_qpl_extra_03 = tk.StringVar()
+        self.var_opt_qpl_extra_03.set(list_keys[0])
+
+        var_row_start = row_start
+        var_column_start = column_start
+        var_df_data = df_data
+
+        opt_01 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 2, column_id=column_start + 2, n_rows=1,
+            n_columns=n_colums_navigation - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.var_opt_qpl_extra_01, option_list=list_isotopes, text_set=self.var_opt_qpl_extra_01.get(),
+            fg_active=font_color_light, bg_active=accent_color,
+            command=lambda filetype=var_type, filename_short=var_file_short, df_data=var_df_data,
+            subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
+                           column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
+                           n_columns_diagram=n_columns_plot:
+            self.create_qpl_scatter_plot(filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                         n_rows_diagram, n_columns_diagram))
+        opt_02 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 3, column_id=column_start + 2, n_rows=1,
+            n_columns=n_colums_navigation - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.var_opt_qpl_extra_02, option_list=list_isotopes, text_set=self.var_opt_qpl_extra_02.get(),
+            fg_active=font_color_light, bg_active=accent_color,
+            command=lambda filetype=var_type, filename_short=var_file_short, df_data=var_df_data,
+            subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
+                           column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
+                           n_columns_diagram=n_columns_plot:
+            self.create_qpl_scatter_plot(filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                         n_rows_diagram, n_columns_diagram))
+        opt_03 = SE(
+            parent=subwindow_qpl_extra, row_id=row_start + 9, column_id=column_start + 2, n_rows=1,
+            n_columns=n_colums_navigation - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.var_opt_qpl_extra_03, option_list=list_keys, text_set=self.var_opt_qpl_extra_03.get(),
+            fg_active=font_color_light, bg_active=accent_color,
+            command=lambda filetype=var_type, filename_short=var_file_short, df_data=var_df_data,
+            subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
+                           column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
+                           n_columns_diagram=n_columns_plot:
+            self.create_qpl_scatter_plot(filetype, filename_short, df_data, subwindow, row_start, column_start,
+                                         n_rows_diagram, n_columns_diagram))
+
+        ## TREEVIEWS
+        list_widths = 6*[112]
+        list_widths[0] = 80
+
+        self.tv_qpl_extra = SE(
+            parent=subwindow_qpl_extra, row_id=rows_tv, column_id=column_start + n_colums_navigation, n_rows=n_rows_tv,
+            n_columns=n_columns_plot, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
+            n_categories=6, text_n=["Isotope", "Minimum", "Maximum", "\u03bc", "\u03c3", "I(i)/I(IS)"],
+            width_n=list_widths, individual=True)
+
+        style = ttk.Style()
+        style.configure("Treeview", font=font_table)
+        style.configure("Treeview.Heading", font=font_elements)
+
+        ## INITIALIZATION
+        self.fill_tv_qpl_extra(
+            var_type=var_type, var_file_short=var_file_short, list_isotopes=list_isotopes, init=True)
+        self.create_qpl_scatter_plot(
+            filetype=var_type, filename_short=var_file_short, df_data=df_data, subwindow=subwindow_qpl_extra,
+            row_start=row_start + 1, column_start=column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
+            n_columns_diagram=n_columns_plot, init=True)
+
+        n_intervals = 0
+        for section in ["BG", "MAT", "INCL"]:
+            n_intervals += len(self.container_helper[var_type][var_file_short][section]["Indices"])
+
+        if n_intervals > 0:
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Indices"]) == 0:
+                rb_01.configure(state="disabled")
+            elif len(self.container_helper[var_type][var_file_short]["MAT"]["Indices"]) == 0:
+                rb_02.configure(state="disabled")
+            elif len(self.container_helper[var_type][var_file_short]["INCL"]["Indices"]) == 0:
+                rb_03.configure(state="disabled")
+        else:
+            rb_01.configure(state="disabled")
+            rb_02.configure(state="disabled")
+            rb_03.configure(state="disabled")
+            rb_04.configure(state="disabled")
+            rb_05.configure(state="disabled")
+
+            opt_01.configure(state="disabled")
+            opt_02.configure(state="disabled")
+            opt_03.configure(state="disabled")
+
+    def create_qpl_scatter_plot(
+            self, filetype, filename_short, df_data, subwindow, row_start, column_start, n_rows_diagram,
+            n_columns_diagram, init=False):
+        # Data preparation
+        list_isotopes = list(df_data.keys())[1:]
+        if filename_short in self.container_lists["STD"]["Short"]:
+            filetype = "STD"
+        elif filename_short in self.container_lists["SMPL"]["Short"]:
+            filetype = "SMPL"
+
+        if init == False:
+            var_x = self.var_opt_qpl_extra_01.get()
+            var_y = self.var_opt_qpl_extra_02.get()
+            var_z = self.var_opt_qpl_extra_03.get()
+        else:
+            var_x = list_isotopes[0]
+            var_y = list_isotopes[1]
+            var_z = list_isotopes[2]
+
+        if self.var_rb_qpl_extra_01.get() == 0:
+            section = "BG"
+        elif self.var_rb_qpl_extra_01.get() == 1:
+            section = "MAT"
+        elif self.var_rb_qpl_extra_01.get() == 2:
+            section = "INCL"
+
+        var_section = section
+
+        if (len(self.container_helper[filetype][filename_short][section]["Indices"]) > 0 and
+                "Select isotope" not in [var_x, var_y]):
+            condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                interval_set=self.container_helper[filetype][filename_short][section]["Content"])
+            helper_data = {}
+
+            helper_data[var_x] = []
+            helper_data[var_y] = []
+            for index, interval in condensed_intervals.items():
+                start_index = interval[0]
+                end_index = interval[1] + 1
+                dataset_x = df_data[var_x][start_index:end_index]
+                dataset_y = df_data[var_y][start_index:end_index]
+                if var_z != "None" and var_z not in [var_x, var_y]:
+                    if var_z not in helper_data:
+                        helper_data[var_z] = []
+
+                    dataset_z = df_data[var_z][start_index:end_index]
+                    helper_data[var_z].extend(list(dataset_z))
+
+                helper_data[var_x].extend(list(dataset_x))
+                helper_data[var_y].extend(list(dataset_y))
+
+            data_x = helper_data[var_x]
+            data_y = helper_data[var_y]
+
+            min_x = min(data_x)
+            max_x = max(data_x)
+            min_y = min(data_y)
+            max_y = max(data_y)
+            lim_x_min, lim_x_max = self.round_to_the_next_natural_limit(minimum=min_x, maximum=max_x)
+            lim_y_min, lim_y_max = self.round_to_the_next_natural_limit(minimum=min_y, maximum=max_y)
+
+            # Diagram
+            var_fig = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Light"])
+            var_ax = var_fig.add_subplot(label=np.random.uniform())
+
+            if var_z == "None":
+                sct = var_ax.scatter(data_x, data_y)
+            else:
+                data_z = helper_data[var_z]
+
+                min_z = min(data_z)
+                max_z = max(data_z)
+                sct = var_ax.scatter(data_x, data_y, c=data_z)
+                cbar = var_fig.colorbar(sct, ax=var_ax)
+                cbar.set_ticks(np.linspace(min_z, max_z, 6, endpoint=True))
+                cbar.ax.tick_params(labelsize="x-small")
+                if var_z != "Time":
+                    cbar.set_label("Signal " + var_z + " (cps)", fontsize=8)
+                else:
+                    cbar.set_label(var_z + " (s)", fontsize="x-small")
+
+            var_ax.grid(True)
+            var_ax.set_xlim(left=lim_x_min, right=lim_x_max)
+            var_ax.set_xticks(np.linspace(lim_x_min, lim_x_max, 6, endpoint=True))
+            var_ax.set_ylim(bottom=lim_y_min, top=lim_y_max)
+            var_ax.set_yticks(np.linspace(lim_y_min, lim_y_max, 6, endpoint=True))
+            var_ax.grid(which="major", linestyle="-", linewidth=1)
+            var_ax.minorticks_on()
+            var_ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+            var_ax.set_axisbelow(True)
+            var_ax.set_title(filename_short, fontsize=9)
+            var_ax.set_xlabel("Signal " + var_x + " (cps)", labelpad=0.5, fontsize="x-small")
+            var_ax.set_ylabel("Signal " + var_y + " (cps)", labelpad=0.5, fontsize="x-small")
+            var_ax.xaxis.set_tick_params(labelsize="x-small")
+            var_ax.yaxis.set_tick_params(labelsize="x-small")
+
+            self.var_canvas_qpl_extra = FigureCanvasTkAgg(var_fig, master=subwindow)
+            self.var_canvas_qpl_extra.get_tk_widget().grid(
+                row=row_start, column=column_start, rowspan=n_rows_diagram, columnspan=n_columns_diagram, sticky="nesw")
+
+        # TREEVIEW UPDATE
+        self.fill_tv_qpl_extra(
+            var_type=filetype, var_file_short=filename_short, list_isotopes=list_isotopes, section=var_section,
+            isotope_is=var_x)
+
+    def round_to_the_next_natural_limit(self, minimum, maximum):
+        data_range = maximum - minimum
+        scale_order = np.floor(np.log10(data_range))
+        rounding_factor = 10**scale_order
+
+        lim_min = np.floor(minimum/rounding_factor)*rounding_factor
+
+        if lim_min == minimum:
+            lim_min = lim_min
+        else:
+            lim_min = rounding_factor*np.floor(minimum/rounding_factor)
+
+        lim_max = np.ceil(maximum/rounding_factor)*rounding_factor
+        if lim_max == maximum:
+            lim_max = lim_max
+        else:
+            lim_max = rounding_factor*np.ceil(maximum/rounding_factor)
+
+        return lim_min, lim_max
+
+    def fill_tv_qpl_extra(self, var_type, var_file_short, list_isotopes, section="MAT", init=False, isotope_is=None):
+        if init == True:
+            for isotope in list_isotopes:
+                helper_values = [isotope, "---", "---", "---", "---", "---"]
+                self.tv_qpl_extra.insert("", tk.END, values=helper_values)
+        else:
+            if len(self.tv_qpl_extra.get_children()) > 0:
+                for item in self.tv_qpl_extra.get_children():
+                    self.tv_qpl_extra.delete(item)
+
+            if len(self.container_helper[var_type][var_file_short][section]["Indices"]) > 0:
+                df_data  = self.container_measurements["Dataframe"][var_file_short]
+                condensed_intervals = IQ(dataframe=None).combine_all_intervals(
+                    interval_set=self.container_helper[var_type][var_file_short][section]["Content"])
+
+                if isotope_is == None:
+                    reference_is = self.var_opt_qpl_extra_01.get()
+                else:
+                    reference_is = isotope_is
+                if reference_is != "Select isotope":
+                    isotope_is = reference_is
+                    for isotope in list_isotopes:
+                        helper = {"Min": [], "Max": [], "Mean": [], "Standard deviation": [], "Ratio": []}
+                        for index, interval in condensed_intervals.items():
+                            start_index = interval[0]
+                            end_index = interval[1] + 1
+                            dataset_i = df_data[isotope][start_index:end_index]
+                            dataset_is = df_data[isotope_is][start_index:end_index]
+                            helper["Min"].append(min(dataset_i))
+                            helper["Max"].append(max(dataset_i))
+                            helper["Mean"].append(np.mean(dataset_i))
+                            helper["Standard deviation"].append(np.std(dataset_i, ddof=1))
+                            helper["Ratio"].append(np.mean(dataset_i)/np.mean(dataset_is))
+                        helper_values = [
+                            isotope, round(np.mean(helper["Min"]), 2), round(np.mean(helper["Max"]), 2),
+                            round(np.mean(helper["Mean"]), 2), round(np.mean(helper["Standard deviation"]), 2),
+                            "{:0.2e}".format(np.mean(helper["Ratio"]))]
+                        self.tv_qpl_extra.insert("", tk.END, values=helper_values)
+                else:
+                    for isotope in list_isotopes:
+                        helper_values = [isotope, "---", "---", "---", "---", "---"]
+                        self.tv_qpl_extra.insert("", tk.END, values=helper_values)
+
+            else:
+                for isotope in list_isotopes:
+                    helper_values = [isotope, "---", "---", "---", "---", "---"]
+                    self.tv_qpl_extra.insert("", tk.END, values=helper_values)
 
     def add_interval_to_diagram_qpl(self, var_type, var_file_short, event):
         filename_index = self.container_lists[var_type]["Short"].index(var_file_short)
