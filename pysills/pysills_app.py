@@ -738,7 +738,11 @@ class PySILLS(tk.Frame):
             "Copy": {"English": "Copy", "German": "Kopieren"},
             "Delete": {"English": "Delete", "German": "Löschen"},
             "Rename": {"English": "Rename", "German": "Umbenennen"},
-            "Time-Signal Diagram": {"English": "Time-Signal Diagram", "German": "Zeit-Signal Diagramm"},
+            "Data analysis": {"English": "Data analysis", "German": "Datenanalyse"},
+            "Interval options": {"English": "Interval options", "German": "Intervalleinstellungen"},
+            "Reference isotope": {"English": "Reference isotope", "German": "Referenzisotop"},
+            "Additional analysis": {"English": "Additional analysis", "German": "Weitere Analysen"},
+            "Time-Signal Diagram": {"English": "Time-signal diagram", "German": "Zeit-Signal Diagramm"},
             "New Project": {"English": "New Project", "German": "Neues Projekt"},
             "Load Project": {"English": "Open Project", "German": "Projekt laden"},
             "Save Project": {"English": "Save Project", "German": "Projekt speichern"},
@@ -746,7 +750,8 @@ class PySILLS(tk.Frame):
             "About": {"English": "About PySILLS", "German": "Über PySILLS"},
             "Python path": {"English": "Python path", "German": "Python Pfad"},
             "PySILLS path": {"English": "PySILLS path", "German": "PySILLS Pfad"},
-            "Before": {"English": "Before", "German": "Zurück"},
+            "Before": {"English": "Previous", "German": "Zurück"},
+            "Previous": {"English": "Previous", "German": "Zurück"},
             "Next": {"English": "Next", "German": "Weiter"},
             "Quit": {"English": "Quit", "German": "Beenden"},
             "Manager": {"English": "Manager", "German": "Manager"},
@@ -936,6 +941,12 @@ class PySILLS(tk.Frame):
             "Smoothed data": {"English": "Smoothed data", "German": "Korrigierte Daten"},
             "Current data": {"English": "Current data", "German": "Aktuelle Daten"},
             "Current outlier": {"English": "Current outlier", "German": "Aktueller Ausreißer"},
+            "Scatter plot": {"English": "Scatter plot", "German": "Streudiagramm"},
+            "Histogram plot": {"English": "Histogram plot", "German": "Häufigkeitsdiagramm"},
+            "Diagram selection": {"English": "Diagram selection", "German": "Diagrammauswahl"},
+            "Plotting setup": {"English": "Plotting setup", "German": "Ploteinstellungen"},
+            "Section selection": {"English": "Phase selection", "German": "Phasenauswahl"},
+            "Color coding": {"English": "Color coding", "German": "Farbkodierung"},
             "Isotope selection": {"English": "Isotope selection", "German": "Isotopauswahl"},
             "Outlier selection": {"English": "Outlier selection", "German": "Ausreißerauswahl"},
             "Outlier correction": {"English": "Outlier correction", "German": "Ausreißerkorrektur"},
@@ -3722,32 +3733,52 @@ class PySILLS(tk.Frame):
         row_interval_opt = row_display_opt + 4
         n_columns_sections = int(n_columns_diagram/3)
 
+        ## TRANSLATIONS
+        str_var_01 = self.language_dict["Time-Signal Diagram"][self.var_language]
+        str_var_02 = self.language_dict["Isotopes"][self.var_language]
+        str_var_03 = self.language_dict["Data analysis"][self.var_language]
+        str_var_04 = self.language_dict["Display options"][self.var_language]
+        str_var_05 = self.language_dict["Interval options"][self.var_language]
+        str_var_06 = self.language_dict["Background"][self.var_language]
+        str_var_07 = self.language_dict["Matrix"][self.var_language]
+        str_var_08 = self.language_dict["Inclusion"][self.var_language]
+        str_var_09 = self.language_dict["Reference isotope"][self.var_language]
+        str_var_10 = self.language_dict["Internal standard"][self.var_language]
+        str_var_11 = self.language_dict["No selection"][self.var_language]
+        str_var_12 = self.language_dict["Show all"][self.var_language]
+        str_var_13 = self.language_dict["Hide all"][self.var_language]
+        str_var_14 = self.language_dict["Remove interval"][self.var_language]
+        str_var_15 = self.language_dict["Previous"][self.var_language]
+        str_var_16 = self.language_dict["Next"][self.var_language]
+        str_var_17 = self.language_dict["Additional analysis"][self.var_language]
+        str_var_18 = self.language_dict["Sample"][self.var_language]
+
         ## LABELS
         lbl_01 = SE(
             parent=subwindow_quickplotter, row_id=row_start, column_id=column_start + n_columns_isotopes, n_rows=1,
             n_columns=n_columns_diagram, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Time-Signal Diagram", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_02 = SE(
             parent=subwindow_quickplotter, row_id=row_start, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Isotopes", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_02, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_03 = SE(
             parent=subwindow_quickplotter, row_id=row_start,
             column_id=column_start + n_columns_isotopes + n_columns_diagram, n_rows=1, n_columns=n_columns_statistics,
             fg=self.bg_colors["Light Font"], bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Data analysis", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_03, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_04 = SE(
             parent=subwindow_quickplotter, row_id=row_display_opt, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Display options", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_04, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_05 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Light Font"],
             bg=self.bg_colors["BG Window"]).create_simple_label(
-            text="Interval options", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_05, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_06 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 3, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Light Font"],
@@ -3757,17 +3788,17 @@ class PySILLS(tk.Frame):
             parent=subwindow_quickplotter, row_id=row_interval_opt, column_id=column_start + n_columns_isotopes,
             n_rows=1, n_columns=n_columns_sections, fg=self.colors_intervals["BG LB"],
             bg=self.colors_intervals["BG"]).create_simple_label(
-            text="Background", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_06, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_08 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
             column_id=column_start + n_columns_isotopes + n_columns_sections, n_rows=1, n_columns=n_columns_sections,
             fg=self.colors_intervals["MAT LB"], bg=self.colors_intervals["MAT"]).create_simple_label(
-            text="Matrix", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_07, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_09 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt,
             column_id=column_start + n_columns_isotopes + 2*n_columns_sections, n_rows=1, n_columns=n_columns_sections,
             fg=self.colors_intervals["INCL LB"], bg=self.colors_intervals["INCL"]).create_simple_label(
-            text="Inclusion", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_08, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
 
         if var_filetype == "STD":
             lbl_10 = SE(
@@ -3775,14 +3806,14 @@ class PySILLS(tk.Frame):
                 column_id=column_start + n_columns_isotopes + n_columns_diagram, n_rows=1,
                 n_columns=int(n_columns_statistics/2), fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Very Light"]).create_simple_label(
-                text="Reference isotope", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+                text=str_var_09, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         elif var_filetype == "SMPL":
             lbl_10 = SE(
                 parent=subwindow_quickplotter, row_id=row_start + 1,
                 column_id=column_start + n_columns_isotopes + n_columns_diagram, n_rows=1,
                 n_columns=int(n_columns_statistics/2), fg=self.bg_colors["Dark Font"],
                 bg=self.bg_colors["Very Light"]).create_simple_label(
-                text="Internal standard", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+                text=str_var_10, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
 
         ## OPTION MENU
         self.qpl_opt_is = tk.StringVar()
@@ -3802,7 +3833,7 @@ class PySILLS(tk.Frame):
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=0, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="Background", sticky="nesw", relief=tk.FLAT,
+            fg=self.bg_colors["Dark Font"], text=str_var_06, sticky="nesw", relief=tk.FLAT,
             command=lambda var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes, section="BG":
             self.fill_tv_quick_plot_file(var_type, var_file_short, list_isotopes, section))
         rb_02 = SE(
@@ -3810,7 +3841,7 @@ class PySILLS(tk.Frame):
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=1, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="Matrix", sticky="nesw", relief=tk.FLAT,
+            fg=self.bg_colors["Dark Font"], text=str_var_07, sticky="nesw", relief=tk.FLAT,
             command=lambda var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes, section="MAT":
             self.fill_tv_quick_plot_file(var_type, var_file_short, list_isotopes, section))
         rb_03 = SE(
@@ -3818,7 +3849,7 @@ class PySILLS(tk.Frame):
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=2, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="Inclusion", sticky="nesw", relief=tk.FLAT,
+            fg=self.bg_colors["Dark Font"], text=str_var_08, sticky="nesw", relief=tk.FLAT,
             command=lambda var_type=var_filetype, var_file_short=file_short, list_isotopes=file_isotopes,
                            section="INCL":
             self.fill_tv_quick_plot_file(var_type, var_file_short, list_isotopes, section))
@@ -3827,7 +3858,7 @@ class PySILLS(tk.Frame):
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_radiobutton(
             var_rb=self.container_var["Radiobuttons"]["Quick Plot File"], value_rb=3, color_bg=self.bg_colors["Light"],
-            fg=self.bg_colors["Dark Font"], text="No selection", sticky="nesw", relief=tk.FLAT)
+            fg=self.bg_colors["Dark Font"], text=str_var_11, sticky="nesw", relief=tk.FLAT)
 
         if self.file_loaded == False:
             if self.container_icpms["name"] != None:
@@ -3903,8 +3934,8 @@ class PySILLS(tk.Frame):
         try:
             for isotope in file_isotopes:
                 ln = var_ax.plot(
-                    dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
-                    visible=True)
+                    dataset_time, df_data[isotope], label=isotope, color=self.isotope_colors[isotope],
+                    linewidth=var_lw, visible=True)
                 self.temp_lines[isotope] = ln
         except:
             self.define_temporary_colors(filename_short=file_short)
@@ -3960,40 +3991,40 @@ class PySILLS(tk.Frame):
             parent=subwindow_quickplotter, row_id=row_display_opt + 1, column_id=column_start, n_rows=1,
             n_columns=n_columns_isotopes, fg=self.bg_colors["Dark Font"],
             bg=self.bg_colors["Light"]).create_simple_button(
-            text="Show All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_var_12, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_file_short=file_short: self.show_all_lines(var_file_short))
         btn_02 = SE(
             parent=subwindow_quickplotter, row_id=row_display_opt + 2,
             column_id=column_start, n_rows=1, n_columns=n_columns_isotopes,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Hide All", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_var_13, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_file_short=file_short: self.hide_all_lines(var_file_short))
         btn_06 = SE(
             parent=subwindow_quickplotter, row_id=row_display_opt + 3,
             column_id=column_start, n_rows=1, n_columns=n_columns_isotopes,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Additional anaylsis", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_var_17, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_type=var_filetype, var_file_short=file_short:
             self.qpl_additional_diagrams(var_type, var_file_short))
         btn_03 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2,
             column_id=column_start, n_rows=2, n_columns=int(n_columns_isotopes/2),
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Previous", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_var_15, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=var_filetype, filename_long=file_long, subwindow=subwindow_quickplotter:
             self.previous_quick_plot_file(filetype, filename_long, subwindow))
         btn_04 = SE(
             parent=subwindow_quickplotter, row_id=n_rows - 2,
             column_id=column_start + int(n_columns_isotopes/2), n_rows=2, n_columns=int(n_columns_isotopes/2),
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Next", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_var_16, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda filetype=var_filetype, filename_long=file_long, subwindow=subwindow_quickplotter:
             self.next_quick_plot_file(filetype, filename_long, subwindow))
         btn_05 = SE(
             parent=subwindow_quickplotter, row_id=row_interval_opt + 5,
             column_id=column_start, n_rows=2, n_columns=n_columns_isotopes,
             fg=self.bg_colors["Dark Font"], bg=self.bg_colors["Light"]).create_simple_button(
-            text="Remove interval", bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
+            text=str_var_14, bg_active=self.accent_color, fg_active=self.bg_colors["Dark Font"],
             command=lambda var_type=var_filetype, var_file_short=file_short:
             self.remove_interval_qpl(var_type, var_file_short))
 
@@ -4089,8 +4120,8 @@ class PySILLS(tk.Frame):
                     "Quick Plot": var_ax, "Canvas QPL": self.var_canvas_qpl}
 
         if self.pysills_mode == "MA":
-            lbl_08.configure(text="Sample")
-            rb_02.configure(text="Sample")
+            lbl_08.configure(text=str_var_18)
+            rb_02.configure(text=str_var_18)
             rb_03.configure(state="disabled")
             cb_03.configure(state="disabled")
             self.qpl_cb_incl.set(0)
@@ -4157,6 +4188,20 @@ class PySILLS(tk.Frame):
         rows_tv = n_rows - 12
         n_rows_tv = 12
 
+        ## TRANSLATIONS
+        str_var_01 = self.language_dict["Plotting setup"][self.var_language]
+        str_var_02 = self.language_dict["Isotope selection"][self.var_language]
+        str_var_03 = self.language_dict["Section selection"][self.var_language]
+        str_var_04 = self.language_dict["Color coding"][self.var_language]
+        str_var_05 = self.language_dict["Diagram selection"][self.var_language]
+        str_var_06 = self.language_dict["Data analysis"][self.var_language]
+        str_var_07 = self.language_dict["Background"][self.var_language]
+        str_var_08 = self.language_dict["Matrix"][self.var_language]
+        str_var_09 = self.language_dict["Inclusion"][self.var_language]
+        str_var_10 = self.language_dict["Scatter plot"][self.var_language]
+        str_var_11 = self.language_dict["Histogram plot"][self.var_language]
+        str_var_12 = self.language_dict["Sample"][self.var_language]
+
         ## FRAMES
         frm_01 = SE(
             parent=subwindow_qpl_extra, row_id=row_start, column_id=column_start, n_rows=n_rows_navigation,
@@ -4166,11 +4211,11 @@ class PySILLS(tk.Frame):
         lbl_01 = SE(
             parent=subwindow_qpl_extra, row_id=row_start, column_id=column_start, n_rows=1,
             n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Plotting setup", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_02 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 1, column_id=column_start, n_rows=1,
             n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Isotope selection", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            text=str_var_02, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_02a = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 2, column_id=column_start, n_rows=1,
             n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
@@ -4182,11 +4227,11 @@ class PySILLS(tk.Frame):
         lbl_03 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 4, column_id=column_start, n_rows=1,
             n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Section selection", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            text=str_var_03, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_04 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 8, column_id=column_start, n_rows=1,
             n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Color coding", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            text=str_var_04, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_04a = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 9, column_id=column_start, n_rows=1,
             n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
@@ -4194,15 +4239,15 @@ class PySILLS(tk.Frame):
         lbl_05 = SE(
             parent=subwindow_qpl_extra, row_id=row_start + 10, column_id=column_start, n_rows=1,
             n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Diagram selection", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+            text=str_var_05, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_06 = SE(
             parent=subwindow_qpl_extra, row_id=row_start, column_id=column_start + n_colums_navigation, n_rows=1,
             n_columns=n_columns_plot, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Scatter plot", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text="", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_07 = SE(
             parent=subwindow_qpl_extra, row_id=rows_tv - 1, column_id=column_start + n_colums_navigation, n_rows=1,
             n_columns=n_columns_plot, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Data analysis", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+            text=str_var_06, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
 
         self.lbl_qpl_extra_06 = lbl_06
 
@@ -4224,7 +4269,7 @@ class PySILLS(tk.Frame):
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_01, value_rb=0, color_bg=background_color_elements,
-            fg=font_color_dark, text="Background", sticky="nesw", relief=tk.FLAT,
+            fg=font_color_dark, text=str_var_07, sticky="nesw", relief=tk.FLAT,
             command=lambda var_type=var_filetype, var_file_short=var_filename_short, list_isotopes=var_list_isotopes,
                            section="BG":
             self.fill_tv_qpl_extra(var_type, var_file_short, list_isotopes, section))
@@ -4233,7 +4278,7 @@ class PySILLS(tk.Frame):
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_01, value_rb=1, color_bg=background_color_elements,
-            fg=font_color_dark, text="Matrix", sticky="nesw", relief=tk.FLAT,
+            fg=font_color_dark, text=str_var_08, sticky="nesw", relief=tk.FLAT,
             command=lambda var_type=var_filetype, var_file_short=var_filename_short, list_isotopes=var_list_isotopes,
                            section="MAT":
             self.fill_tv_qpl_extra(var_type, var_file_short, list_isotopes, section))
@@ -4242,7 +4287,7 @@ class PySILLS(tk.Frame):
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_01, value_rb=2, color_bg=background_color_elements,
-            fg=font_color_dark, text="Inclusion", sticky="nesw", relief=tk.FLAT,
+            fg=font_color_dark, text=str_var_09, sticky="nesw", relief=tk.FLAT,
             command=lambda var_type=var_filetype, var_file_short=var_filename_short, list_isotopes=var_list_isotopes,
                            section="INCL":
             self.fill_tv_qpl_extra(var_type, var_file_short, list_isotopes, section))
@@ -4251,7 +4296,7 @@ class PySILLS(tk.Frame):
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_02, value_rb=0, color_bg=background_color_elements,
-            fg=font_color_dark, text="Scatter plot", sticky="nesw", relief=tk.FLAT,
+            fg=font_color_dark, text=str_var_10, sticky="nesw", relief=tk.FLAT,
             command=lambda filetype=var_filetype, filename_short=var_filename_short, df_data=var_df_data,
                            subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
                            column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
@@ -4263,7 +4308,7 @@ class PySILLS(tk.Frame):
             n_columns=n_colums_navigation, fg=font_color_dark,
             bg=background_color_elements).create_radiobutton(
             var_rb=self.var_rb_qpl_extra_02, value_rb=1, color_bg=background_color_elements,
-            fg=font_color_dark, text="Histogram plot", sticky="nesw", relief=tk.FLAT,
+            fg=font_color_dark, text=str_var_11, sticky="nesw", relief=tk.FLAT,
             command=lambda filetype=var_filetype, filename_short=var_filename_short, df_data=var_df_data,
                            subwindow=subwindow_qpl_extra, row_start=var_row_start + 1,
                            column_start=var_column_start + n_colums_navigation, n_rows_diagram=n_rows - 14,
@@ -4274,7 +4319,7 @@ class PySILLS(tk.Frame):
         #rb_05.configure(state="disabled")
 
         if self.pysills_mode == "MA":
-            rb_02.configure(text="Sample")
+            rb_02.configure(text=str_var_12)
             rb_03.configure(state="disabled")
 
         ## OPTION MENUS
