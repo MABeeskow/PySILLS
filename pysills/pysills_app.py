@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.59
+# Version:	v1.0.60
 # Date:		06.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.59"
+        self.str_version_number = "1.0.60"
         self.val_version = self.str_version_number + " - 06.02.2025"
 
         ## Colors
@@ -1696,6 +1696,9 @@ class PySILLS(tk.Frame):
 
         if "pysills" in self.path_pysills_main:
             self.path_pysills_main = self.path_pysills_main.replace("pysills", "")
+
+        if "\\" in self.path_pysills_main:
+            self.path_pysills_main = self.path_pysills_main[:-1]
 
         folder_path = os.path.join(self.path_pysills_main, "pysills", "lib", "srm")
         folder_path_translations = os.path.join(self.path_pysills_main, "pysills", "lib", "translations", "")
