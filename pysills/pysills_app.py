@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.61
+# Version:	v1.0.62
 # Date:		06.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.61"
+        self.str_version_number = "1.0.62"
         self.val_version = self.str_version_number + " - 06.02.2025"
 
         ## Colors
@@ -713,6 +713,7 @@ class PySILLS(tk.Frame):
             "Remove matrix intervals": {"English": "Remove matrix intervals", "German": "Matrixintervalle entfernen"},
             "Update": {"English": "Update", "German": "Aktualisieren"},
             "Error course": {"English": "Error course", "German": "Fehlerverlauf"},
+            "Chart analysis": {"English": "Chart analysis", "German": "Chartanalyse", "Chinese": "图表分析"},
             "Parallelism": {"English": "Parallelism", "German": "Parallelität"},
             "No selection": {"English": "No selection", "German": "Keine Auswahl"},
             "Background interval": {"English": "Background interval", "German": "Zeitfenster Untergrund"},
@@ -21963,6 +21964,7 @@ class PySILLS(tk.Frame):
         str_lbl_26 = self.language_dict["Isotope"][self.var_language]
         str_lbl_27 = self.language_dict["Sample"][self.var_language]
         str_lbl_28 = self.language_dict["Error course"][self.var_language]
+        str_lbl_30 = self.language_dict["Chart analysis"][self.var_language]
 
         lbl_01 = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row, column_id=start_column, n_rows=1,
@@ -22051,6 +22053,12 @@ class PySILLS(tk.Frame):
             n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_05, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
+        btn_06 = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 22, column_id=half_navigation, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_30, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=var_filename_short:
+            self.create_chart_analysis_window(filetype, filename_short))
 
         btn_02a.configure(font=font_elements)
         btn_02b.configure(font=font_elements)
@@ -22061,6 +22069,7 @@ class PySILLS(tk.Frame):
         btn_04b.configure(font=font_elements)
         btn_05a.configure(font=font_header)
         btn_05b.configure(font=font_header)
+        btn_06.configure(font=font_elements)
 
         if self.var_os == "darwin":
             font_color_accent = font_color_dark
@@ -35029,6 +35038,7 @@ class PySILLS(tk.Frame):
         str_lbl_25 = self.language_dict["Matrix interval"][self.var_language]
         str_lbl_28 = self.language_dict["Inclusion interval"][self.var_language]
         str_lbl_29 = self.language_dict["Error course"][self.var_language]
+        str_lbl_30 = self.language_dict["Chart analysis"][self.var_language]
 
         lbl_01 = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row, column_id=start_column, n_rows=1, n_columns=14,
@@ -35119,6 +35129,12 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_lbl_05, bg_active=self.bg_colors["Dark"], fg_active=font_color_light,
             command=lambda filetype=str_filetype, mode="next": self.switch_to_another_file(filetype, mode))
+        btn_06 = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 22, column_id=7, n_rows=1, n_columns=7,
+            fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_lbl_30, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=str_filename_short:
+            self.create_chart_analysis_window(filetype, filename_short))
 
         if self.var_os == "darwin":
             font_color_accent = font_color_dark
@@ -35402,6 +35418,632 @@ class PySILLS(tk.Frame):
         for isotope in file_isotopes:
             entry_parallelism = [isotope, "---", "---"]
             self.tv_parallelism.insert("", tk.END, values=entry_parallelism)
+
+    def create_chart_analysis_window(self, filetype, filename_short):
+        str_filetype = filetype
+        self.ca_filetype = str_filetype
+        str_filename_short = filename_short
+        self.ca_filename_short = str_filename_short
+        list_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+        list_opt_isotopes = list_isotopes.copy()
+        list_opt_isotopes.insert(0, "None")
+        df_data = self.container_measurements["Dataframe"][filename_short]
+        list_keys = list_isotopes.copy()
+        list_keys.insert(0, "None")
+        list_keys.insert(1, "Time")
+
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
+        ## Window Settings
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Quick Plot Extra"][0]
+        n_columns = self.window_dimensions["Quick Plot Extra"][1] + 8
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        subwindow_chart_analysis = tk.Toplevel(self.parent)
+        subwindow_chart_analysis.title("Chart analysis")
+        subwindow_chart_analysis.geometry(var_geometry)
+        subwindow_chart_analysis.resizable(False, False)
+        subwindow_chart_analysis["bg"] = background_color_light
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(subwindow_chart_analysis, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(subwindow_chart_analysis, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            subwindow_chart_analysis.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            subwindow_chart_analysis.grid_columnconfigure(i, minsize=column_min)
+
+        ###########################################################
+
+        row_start = 0
+        column_start = 0
+        n_rows_navigation = n_rows
+        n_colums_navigation = int(1/3.5*n_columns)
+        n_columns_plot = n_columns - n_colums_navigation
+        rows_tv = n_rows - 12
+        n_rows_tv = 12
+        row_start_lb = n_rows - 8
+        column_start_lb = n_colums_navigation
+        n_column_lb = int(1/3*n_columns_plot)
+
+        ## TRANSLATIONS
+        str_var_01 = self.language_dict["Plotting setup"][self.var_language]
+        str_var_02 = self.language_dict["Isotope selection"][self.var_language]
+        str_var_03 = self.language_dict["Show all"][self.var_language]
+        str_var_04 = self.language_dict["Hide all"][self.var_language]
+        str_var_05 = self.language_dict["Remove interval"][self.var_language]
+        str_var_06 = self.language_dict["Data analysis"][self.var_language]
+        str_var_07 = self.language_dict["Background"][self.var_language]
+        str_var_08 = self.language_dict["Matrix"][self.var_language]
+        str_var_09 = self.language_dict["Inclusion"][self.var_language]
+        str_var_10 = self.language_dict["No selection"][self.var_language]
+        str_var_11 = self.language_dict["Histogram plot"][self.var_language]
+        str_var_12 = self.language_dict["Update"][self.var_language]
+
+        ## FRAMES
+        frm_01 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start, column_id=column_start, n_rows=n_rows_navigation,
+            n_columns=n_colums_navigation, fg=font_color_dark, bg=background_color_dark).create_frame(relief=tk.FLAT)
+
+        ## LABELS
+        lbl_01 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_var_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_02 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 1, column_id=column_start, n_rows=1,
+            n_columns=n_colums_navigation, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_var_02, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_03 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 2, column_id=column_start, n_rows=1,
+            n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="#1", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_04 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 3, column_id=column_start, n_rows=1,
+            n_columns=2, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="#2", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+
+        ## OPTION MENUS
+        self.helper_opt_ca_1 = tk.StringVar()
+        self.helper_opt_ca_1.set(list_opt_isotopes[0])
+        self.helper_opt_ca_2 = tk.StringVar()
+        self.helper_opt_ca_2.set(list_opt_isotopes[0])
+
+        opt_ca_1 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 2, column_id=2, n_rows=1,
+            n_columns=n_colums_navigation - 3, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_opt_ca_1, option_list=list_opt_isotopes, text_set=self.helper_opt_ca_1.get(),
+            fg_active=font_color_light, bg_active=accent_color,
+            command=lambda filename_short=str_filename_short, geometry=[
+                subwindow_chart_analysis, 0, n_colums_navigation, row_start_lb - 3, n_columns_plot]:
+            self.create_chart_analysis_diagram(filename_short, geometry))
+        opt_ca_2 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 3, column_id=2, n_rows=1,
+            n_columns=n_colums_navigation - 3, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_opt_ca_2, option_list=list_opt_isotopes, text_set=self.helper_opt_ca_2.get(),
+            fg_active=font_color_light, bg_active=accent_color,
+            command=lambda filename_short=str_filename_short, geometry=[
+                subwindow_chart_analysis, 0, n_colums_navigation, row_start_lb - 3, n_columns_plot]:
+            self.create_chart_analysis_diagram(filename_short, geometry))
+
+        ## LISTBOXES
+        frm_ca_iso = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 9, column_id=column_start + 2,
+            n_rows=n_rows - 10, n_columns=n_colums_navigation - 3, fg=font_color_dark,
+            bg=background_color_light).create_frame()
+        vsb_ca_iso = ttk.Scrollbar(master=frm_ca_iso, orient="vertical")
+        text_ca_iso = tk.Text(
+            master=frm_ca_iso, width=30, height=25, yscrollcommand=vsb_ca_iso.set,
+            bg=background_color_light)
+        vsb_ca_iso.config(command=text_ca_iso.yview)
+        vsb_ca_iso.pack(side="right", fill="y")
+        text_ca_iso.pack(side="left", fill="both", expand=True)
+
+        self.lb_ca_bg = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb, column_id=column_start_lb,
+            n_rows=n_rows - row_start_lb, n_columns=n_column_lb, fg=font_color_dark,
+            bg=self.colors_intervals["BG LB"]).create_simple_listbox()
+        self.lb_ca_mat = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb,
+            column_id=column_start_lb + n_column_lb, n_rows=n_rows - row_start_lb,
+            n_columns=n_column_lb, fg=font_color_dark, bg=self.colors_intervals["MAT LB"]).create_simple_listbox()
+        self.lb_ca_incl = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb, column_id=column_start_lb + 2*n_column_lb,
+            n_rows=n_rows - row_start_lb, n_columns=n_column_lb, fg=font_color_dark,
+            bg=self.colors_intervals["INCL LB"]).create_simple_listbox()
+
+        ## BUTTONS
+        btn_01 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 5, column_id=2, n_rows=1,
+            n_columns=n_colums_navigation - 3, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_var_12, bg_active=accent_color, fg_active=font_color_light, command=self.refresh_plot_ca)
+        btn_02 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 6, column_id=2, n_rows=1,
+            n_columns=int((n_colums_navigation - 3)/2), fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text=str_var_03, bg_active=accent_color, fg_active=font_color_light, command=self.chart_analysis_show_all)
+        btn_03 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 6, column_id=2 + int((n_colums_navigation - 3)/2),
+            n_rows=1, n_columns=int((n_colums_navigation - 3)/2), fg=font_color_dark,
+            bg=background_color_elements).create_simple_button(
+            text=str_var_04, bg_active=accent_color, fg_active=font_color_light, command=self.chart_analysis_hide_all)
+        btn_04 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start + 7, column_id=2, n_rows=1,
+            n_columns=n_colums_navigation - 3, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_var_05, bg_active=accent_color, fg_active=font_color_light, command=self.remove_interval_ca)
+
+        ## RADIOBUTTONS
+        self.helper_rb_ca_bg = tk.IntVar()
+        self.helper_rb_ca_bg.set(0)
+
+        rb_01 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 1, column_id=column_start_lb, n_rows=1,
+            n_columns=n_column_lb, fg=font_color_light, bg=self.colors_intervals["BG"]).create_radiobutton(
+            var_rb=self.helper_rb_ca_bg, value_rb=1, color_bg=self.colors_intervals["BG"],
+            fg=self.colors_intervals["BG LB"], text=str_var_07, sticky="nesw", relief=tk.FLAT)
+        rb_02 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 1, column_id=column_start_lb + n_column_lb, n_rows=1,
+            n_columns=n_column_lb, fg=font_color_light, bg=self.colors_intervals["MAT"]).create_radiobutton(
+            var_rb=self.helper_rb_ca_bg, value_rb=2, color_bg=self.colors_intervals["MAT"],
+            fg=self.colors_intervals["MAT LB"], text=str_var_08, sticky="nesw", relief=tk.FLAT)
+        rb_03 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 1, column_id=column_start_lb + 2*n_column_lb,
+            n_rows=1, n_columns=n_column_lb, fg=font_color_light, bg=self.colors_intervals["INCL"]).create_radiobutton(
+            var_rb=self.helper_rb_ca_bg, value_rb=3, color_bg=self.colors_intervals["INCL"],
+            fg=self.colors_intervals["INCL LB"], text=str_var_09, sticky="nesw", relief=tk.FLAT)
+        rb_04 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 2, column_id=column_start_lb, n_rows=1,
+            n_columns=3*n_column_lb, fg=font_color_light, bg=background_color_dark).create_radiobutton(
+            var_rb=self.helper_rb_ca_bg, value_rb=0, color_bg=background_color_dark, fg=font_color_light,
+            text=str_var_10, sticky="nesw", relief=tk.FLAT)
+
+        rb_01.configure(font=font_elements)
+        rb_02.configure(font=font_elements)
+        rb_03.configure(font=font_elements)
+        rb_04.configure(font=font_elements)
+
+        ## CHECKBOXES
+        self.helper_cb_ca_bg = tk.IntVar()
+        self.helper_cb_ca_mat = tk.IntVar()
+        self.helper_cb_ca_incl = tk.IntVar()
+        self.helper_cb_ca_bg.set(1)
+        self.helper_cb_ca_mat.set(1)
+        self.helper_cb_ca_incl.set(1)
+
+        cb_01 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 1,
+            column_id=column_start_lb + (n_column_lb - 1), n_rows=1, n_columns=1,
+            fg=font_color_dark, bg=self.colors_intervals["BG"]).create_simple_checkbox(
+            var_cb=self.helper_cb_ca_bg, text="", set_sticky="nesw", own_color=True,
+            command=lambda key="Background": self.show_or_hide_intervals_ca(key))
+        cb_02 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 1,
+            column_id=column_start_lb + n_column_lb + (n_column_lb - 1), n_rows=1, n_columns=1,
+            fg=font_color_dark, bg=self.colors_intervals["MAT"]).create_simple_checkbox(
+            var_cb=self.helper_cb_ca_mat, text="", set_sticky="nesw", own_color=True,
+            command=lambda key="Matrix": self.show_or_hide_intervals_ca(key))
+        cb_03 = SE(
+            parent=subwindow_chart_analysis, row_id=row_start_lb - 1,
+            column_id=column_start_lb + 2*n_column_lb + (n_column_lb - 1), n_rows=1, n_columns=1,
+            fg=font_color_dark, bg=self.colors_intervals["INCL"]).create_simple_checkbox(
+            var_cb=self.helper_cb_ca_incl, text="", set_sticky="nesw", own_color=True,
+            command=lambda key="Inclusion": self.show_or_hide_intervals_ca(key))
+
+        ## INITIALIZATION
+        self.temp_ca_cb_iso = {}
+        for isotope in list_isotopes:
+            self.temp_ca_cb_iso[isotope] = tk.IntVar()
+            self.temp_ca_cb_iso[isotope].set(1)
+            frm_i = tk.Frame(frm_ca_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                             highlightbackground="black", bd=1)
+            text_ca_iso.window_create("end", window=frm_i)
+            text_ca_iso.insert("end", "\t")
+
+            cb_i = tk.Checkbutton(
+                master=frm_ca_iso, text=isotope, fg=font_color_dark,
+                bg=background_color_light, variable=self.temp_ca_cb_iso[isotope])
+
+            text_ca_iso.window_create("end", window=cb_i)
+            text_ca_iso.insert("end", "\n")
+
+        text_ca_iso.configure(state="disabled")
+
+        self.ca_geometry_diagram = [subwindow_chart_analysis, 0, n_colums_navigation, row_start_lb - 3, n_columns_plot]
+
+        self.create_chart_analysis_diagram(filename_short=str_filename_short, geometry=self.ca_geometry_diagram,
+                                           init=True)
+
+        self.check_for_intervals_ca()
+
+    def show_or_hide_intervals_ca(self, key):
+        if key == "Background":
+            var_key = "BG"
+            state_var = self.helper_cb_ca_bg.get()
+            if state_var == 1:
+                state = True
+            elif state_var == 0:
+                state = False
+        elif key in ["Matrix", "Sample"]:
+            var_key = "MAT"
+            state_var = self.helper_cb_ca_mat.get()
+            if state_var == 1:
+                state = True
+            elif state_var == 0:
+                state = False
+        elif key == "Inclusion":
+            var_key = "INCL"
+            state_var = self.helper_cb_ca_incl.get()
+            if state_var == 1:
+                state = True
+            elif state_var == 0:
+                state = False
+
+        for id, container in self.container_helper[self.ca_filetype][self.ca_filename_short][var_key][
+            "Content"].items():
+            obj_interval = container["Object"]
+            obj_interval.set_visible(state)
+
+        self.var_canvas_ca.draw()
+
+    def refresh_plot_ca(self):
+        self.create_chart_analysis_diagram(filename_short=self.ca_filename_short, geometry=self.ca_geometry_diagram)
+
+    def chart_analysis_show_all(self):
+        for isotope, variable in self.temp_ca_cb_iso.items():
+            variable.set(1)
+
+        self.create_chart_analysis_diagram(filename_short=self.ca_filename_short, geometry=self.ca_geometry_diagram)
+
+    def chart_analysis_hide_all(self):
+        for isotope, variable in self.temp_ca_cb_iso.items():
+            variable.set(0)
+
+        self.create_chart_analysis_diagram(filename_short=self.ca_filename_short, geometry=self.ca_geometry_diagram)
+
+    def create_chart_analysis_diagram(self, filename_short, geometry, init=False, refresh=False):
+        if init == False:
+            self.var_canvas_ca.get_tk_widget().destroy()
+            self.var_toolbarFrame_ca.destroy()
+            self.var_toolbar_ca.destroy()
+            plt.close(self.var_canvas_ca.figure)
+
+        df_data = self.container_measurements["Dataframe"][self.ca_filename_short]
+        data_x = list(df_data.iloc[:, 0])
+        self.dataset_time = data_x
+        x_max = max(data_x)
+
+        ref_iso_1 = self.helper_opt_ca_1.get()
+        ref_iso_2 = self.helper_opt_ca_2.get()
+        list_isotopes = []
+        for isotope, variable in self.temp_ca_cb_iso.items():
+            if variable.get() == 1 and isotope not in [ref_iso_1, ref_iso_2]:
+                list_isotopes.append(isotope)
+
+        # Diagram
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0.25:
+            var_lw = 0.25
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
+        var_fig = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        var_ax = var_fig.add_subplot(label=np.random.uniform())
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            # Time-Signal diagram
+            for isotope in list_isotopes:
+                data_y = df_data[isotope]
+                var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=var_lw)
+        else:
+            # Time-Ratio diagram
+            if ref_iso_1 != "None":
+                for index, isotope in enumerate(list_isotopes):
+                    data_ref_iso_1 = df_data[ref_iso_1]
+                    data_i = df_data[isotope]
+                    data_y = data_i/data_ref_iso_1
+                    if index > 0:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1)
+                    else:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1,
+                                    label="i/" + ref_iso_1)
+
+            if ref_iso_2 != "None":
+                for index, isotope in enumerate(list_isotopes):
+                    data_ref_iso_2 = df_data[ref_iso_2]
+                    data_i = df_data[isotope]
+                    data_y = data_i/data_ref_iso_2
+                    if index > 0:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2)
+                    else:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2,
+                                    label="i/" + ref_iso_2)
+
+        var_ax.grid(True)
+        var_ax.set_yscale("log")
+        var_ax.set_xlim(left=0, right=x_max)
+        var_ax.set_xticks(np.linspace(0, x_max, 11, endpoint=True))
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            var_ax.set_ylim(bottom=1e2, top=1e9)
+            var_ax.set_yticks([1e2, 1e3, 1e4, 1e5, 1e6, 1e6, 1e7, 1e8, 1e9])
+        else:
+            var_ax.set_ylim(bottom=1e-4, top=1e5)
+            var_ax.set_yticks([1e-4, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
+
+        var_ax.grid(which="major", linestyle="-", linewidth=1)
+        var_ax.minorticks_on()
+        var_ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+        var_ax.set_axisbelow(True)
+        var_ax.set_title(self.ca_filename_short, fontsize=9)
+        var_ax.set_xlabel("Time (s)", labelpad=0.5, fontsize="x-small")
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            var_ax.set_ylabel("Signal intensity (cps)", labelpad=0.5, fontsize="x-small")
+        else:
+            var_ax.set_ylabel("Signal intensity ratio (cps/cps)", labelpad=0.5, fontsize="x-small")
+
+        var_ax.xaxis.set_tick_params(labelsize="x-small")
+        var_ax.yaxis.set_tick_params(labelsize="x-small")
+
+        self.var_ax_ca = var_ax
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            pass
+        else:
+            var_ax.legend(loc="upper left", framealpha=1.0, fontsize="x-small")
+
+        subwindow = geometry[0]
+        row_start = geometry[1]
+        column_start = geometry[2]
+        n_rows_diagram = geometry[3]
+        n_columns_diagram = geometry[4]
+
+        self.var_canvas_ca = FigureCanvasTkAgg(var_fig, master=subwindow)
+        self.var_canvas_ca.get_tk_widget().grid(
+            row=row_start, column=column_start, rowspan=n_rows_diagram, columnspan=n_columns_diagram,
+            sticky="nesw")
+
+        self.var_toolbarFrame_ca = tk.Frame(master=subwindow)
+        self.var_toolbarFrame_ca.grid(
+            row=n_rows_diagram, column=column_start, rowspan=1, columnspan=n_columns_diagram, sticky="ew")
+        self.var_toolbar_ca = NavigationToolbar2Tk(self.var_canvas_ca, self.var_toolbarFrame_ca)
+        self.var_toolbar_ca.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        self.var_toolbar_ca._message_label.config(
+            background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        self.var_toolbar_ca.winfo_children()[-2].config(
+            background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+
+        self.var_canvas_ca.mpl_connect(
+            "button_press_event", lambda event, var_type=self.ca_filetype, var_file_short=self.ca_filename_short:
+            self.add_interval_to_diagram_ca(var_type, var_file_short, event))
+
+        if init == True:
+            self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
+
+            if self.ca_filetype not in self.container_helper:
+                self.container_helper[self.ca_filetype] = {}
+                if self.ca_filename_short not in self.container_helper[self.ca_filetype]:
+                    self.container_helper[self.ca_filetype][self.ca_filename_short] = {}
+                    if "AXES" not in self.container_helper[self.ca_filetype][self.ca_filename_short]:
+                        self.container_helper[self.ca_filetype][self.ca_filename_short]["AXES"] = {
+                            "Chart analysis": var_ax, "Canvas CA": self.var_canvas_ca}
+            else:
+                if self.ca_filename_short not in self.container_helper[self.ca_filetype]:
+                    self.build_container_helper(mode=self.ca_filetype)
+
+                for key in ["BG", "MAT", "INCL"]:
+                    if key not in self.container_helper[self.ca_filetype][self.ca_filename_short]:
+                        self.container_helper[self.ca_filetype][self.ca_filename_short][key] = {
+                            "ID": 0, "Content": {}, "Indices": []}
+
+                if "Chart analysis" not in self.container_helper[self.ca_filetype][self.ca_filename_short]["AXES"]:
+                    self.container_helper[self.ca_filetype][self.ca_filename_short]["AXES"]["Chart analysis"] = var_ax
+                    self.container_helper[self.ca_filetype][self.ca_filename_short]["AXES"][
+                        "Canvas CA"] = self.var_canvas_ca
+
+        if init == False:
+            self.check_for_intervals_ca(only_boxes=True)
+
+    def add_interval_to_diagram_ca(self, var_type, var_file_short, event):
+        filename_index = self.container_lists[var_type]["Short"].index(var_file_short)
+        var_file_long = self.container_lists[var_type]["Long"][filename_index]
+
+        if self.helper_rb_ca_bg.get() == 1:  # BG
+            var_key = "BG"
+            var_color = self.colors_intervals[var_key]
+        elif self.helper_rb_ca_bg.get() == 2:  # MAT
+            var_key = "MAT"
+            var_color = self.colors_intervals[var_key]
+        elif self.helper_rb_ca_bg.get() == 3:  # INCL
+            var_key = "INCL"
+            var_color = self.colors_intervals[var_key]
+
+        if self.helper_rb_ca_bg.get() in [1, 2, 3]:
+            x_nearest = min(self.dataset_time, key=lambda x: abs(x - event.xdata))
+
+            if len(self.helper_intervals[var_key]) < 1:
+                x_id = self.dataset_time.index(x_nearest)
+                self.helper_intervals[var_key].append([x_nearest, x_id])
+            else:
+                x_id = self.dataset_time.index(x_nearest)
+                self.helper_intervals[var_key].append([x_nearest, x_id])
+                key_id = self.container_helper[var_type][var_file_short][var_key]["ID"] + 1
+                time_0_pre = self.helper_intervals[var_key][0][0]
+                time_1_pre = self.helper_intervals[var_key][1][0]
+                index_0_pre = self.helper_intervals[var_key][0][1]
+                index_1_pre = self.helper_intervals[var_key][1][1]
+
+                if time_1_pre < time_0_pre:
+                    time_0 = time_1_pre
+                    time_1 = time_0_pre
+                    index_0 = index_1_pre
+                    index_1 = index_0_pre
+                else:
+                    time_0 = time_0_pre
+                    time_1 = time_1_pre
+                    index_0 = index_0_pre
+                    index_1 = index_1_pre
+
+                box_key = self.var_ax_ca.axvspan(time_0, time_1, alpha=0.35, color=var_color)
+                self.var_canvas_ca.draw()
+
+                self.container_helper[var_type][var_file_short][var_key]["Content"][key_id] = {
+                    "Times": [time_0, time_1], "Indices": [index_0, index_1], "Object": box_key}
+
+                if var_key == "BG":
+                    var_lb = self.lb_ca_bg
+                elif var_key == "MAT":
+                    var_lb = self.lb_ca_mat
+                elif var_key == "INCL":
+                    var_lb = self.lb_ca_incl
+
+                var_lb.insert(tk.END, var_key + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                self.helper_intervals[var_key].clear()
+                self.container_helper[var_type][var_file_short][var_key]["ID"] = key_id
+                self.container_helper[var_type][var_file_short][var_key]["Indices"].append(key_id)
+
+                self.var_canvas_ca.draw()
+        if var_type == "STD":
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) < 2:
+                if var_file_long in self.container_var[var_type]:
+                    self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+            else:
+                if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
+                else:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+        else:
+            if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) + \
+                    len(self.container_helper[var_type][var_file_short]["INCL"]["Content"]) < 3:
+                if var_file_long in self.container_var[var_type]:
+                    self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                    self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+            else:
+                if len(self.container_helper[var_type][var_file_short]["BG"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["MAT"]["Content"]) > 0 and \
+                        len(self.container_helper[var_type][var_file_short]["INCL"]["Content"]) > 0:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_green, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
+                else:
+                    if var_file_long in self.container_var[var_type]:
+                        self.container_var[var_type][var_file_long]["Frame"].config(background=self.sign_yellow, bd=1)
+                        self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_yellow)
+
+    def remove_interval_ca(self):
+        if self.helper_rb_ca_bg.get() == 1:  # BG
+            var_key = "BG"
+            var_lb = self.lb_ca_bg
+        elif self.helper_rb_ca_bg.get() == 2:  # MAT
+            var_key = "MAT"
+            var_lb = self.lb_ca_mat
+        elif self.helper_rb_ca_bg.get() == 3:  # INCL
+            var_key = "INCL"
+            var_lb = self.lb_ca_incl
+
+        item = var_lb.curselection()[0]
+        value = var_lb.get(item)
+        value_parts = value.split(" ")
+        key_id = re.search(r"(\D+)(\d+)", value_parts[0])
+        var_id = int(key_id.group(2))
+
+        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Indices"].remove(var_id)
+        var_lb.delete(tk.ANCHOR)
+        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id][
+            "Object"].set_visible(False)
+        del self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id]
+
+        self.var_canvas_ca.draw()
+
+    def check_for_intervals_ca(self, only_boxes=False):
+        if self.pysills_mode == "MA":
+            list_sections = ["BG", "MAT"]
+        else:
+            list_sections = ["BG", "MAT", "INCL"]
+
+        for section in list_sections:
+            if len(self.container_helper[self.ca_filetype][self.ca_filename_short][section]["Indices"]) > 0:
+                if section == "BG":
+                    var_lb = self.lb_ca_bg
+                elif section == "MAT":
+                    var_lb = self.lb_ca_mat
+                elif section == "INCL":
+                    var_lb = self.lb_ca_incl
+
+                var_color = self.colors_intervals[section]
+
+                for key_id, container in self.container_helper[self.ca_filetype][self.ca_filename_short][section][
+                    "Content"].items():
+                    list_times = container["Times"]
+                    time_0 = list_times[0]
+                    time_1 = list_times[1]
+
+                    if only_boxes == False:
+                        var_lb.insert(tk.END, section + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    box = self.var_ax_ca.axvspan(time_0, time_1, alpha=0.35, color=var_color)
+                    container["Object"] = box
+
+        self.var_canvas_ca.draw()
+
+    def ca_show_or_hide_interval(self, key, var_type, var_file_short):
+        if key == "Background":
+            var_key = "BG"
+            state_var = self.qpl_cb_bg.get()
+            if state_var == 1:
+                state = True
+            elif state_var == 0:
+                state = False
+        elif key in ["Matrix", "Sample"]:
+            var_key = "MAT"
+            state_var = self.qpl_cb_mat.get()
+            if state_var == 1:
+                state = True
+            elif state_var == 0:
+                state = False
+        elif key == "Inclusion":
+            var_key = "INCL"
+            state_var = self.qpl_cb_incl.get()
+            if state_var == 1:
+                state = True
+            elif state_var == 0:
+                state = False
+
+        for id, container in self.container_helper[var_type][var_file_short][var_key]["Content"].items():
+            obj_interval = container["Object"]
+            obj_interval.set_visible(state)
+
+        self.var_canvas_qpl.draw()
 
     def fi_show_time_signal_diagram(self, var_type, var_file, var_lb_state=True):
         # Colors
