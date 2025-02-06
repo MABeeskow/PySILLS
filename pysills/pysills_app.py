@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.58
-# Date:		05.02.2025
+# Version:	v1.0.59
+# Date:		06.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -72,8 +72,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.58"
-        self.val_version = self.str_version_number + " - 05.02.2025"
+        self.str_version_number = "1.0.59"
+        self.val_version = self.str_version_number + " - 06.02.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -21862,6 +21862,7 @@ class PySILLS(tk.Frame):
         parts = str_filename_long.split("/")
         var_filename_short = parts[-1]
         filename_short = var_filename_short
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
         self.helper_intervals = {"BG": [], "MAT": []}
         self.container_var["ma_setting"]["Analyse Mode Plot"][str_filetype][var_filename_short].set(0)
 
@@ -22086,6 +22087,18 @@ class PySILLS(tk.Frame):
             btn_09.configure(state="disabled")
 
         btn_03.configure(state="disabled")
+
+        ## OPTION MENUS
+        self.helper_opt_ri = tk.StringVar()
+        self.helper_opt_ri.set("Select isotope")
+        if self.container_var[str_filetype][filename_short]["IS Data"]["IS"].get() != "Select IS":
+            self.helper_opt_ri.set(self.container_var[str_filetype][filename_short]["IS Data"]["IS"].get())
+
+        opt_ri = SE(
+            parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=0, n_rows=1,
+            n_columns=half_navigation, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_opt_ri, option_list=file_isotopes, text_set=self.helper_opt_ri.get(),
+            fg_active=font_color_light, bg_active=accent_color)
 
         ## RADIOBUTTONS
         rb_03a = SE(
@@ -23086,15 +23099,19 @@ class PySILLS(tk.Frame):
         except AttributeError:
             pass
 
-        if var_type == "STD":
-            var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
-            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
-                if element in self.container_lists["Measured Elements"][var_file_short]:
-                    var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
-                    self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_is)
-                break
+        if self.helper_opt_ri.get() == "Select isotope":
+            if var_type == "STD":
+                var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+                for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1],
+                                             reverse=True):
+                    if element in self.container_lists["Measured Elements"][var_file_short]:
+                        var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
+                        self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_is)
+                    break
+            else:
+                var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
         else:
-            var_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+            var_is = self.helper_opt_ri.get()
 
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
@@ -34914,6 +34931,7 @@ class PySILLS(tk.Frame):
         ## INPUT
         parts = str_filename_long.split("/")
         str_filename_short = parts[-1]
+        file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
         self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
 
         str_title = self.language_dict["Mineral Analysis"][self.var_language]
@@ -35126,6 +35144,20 @@ class PySILLS(tk.Frame):
         btn_05b.configure(font=font_header)
         btn_08.configure(font=font_header)
 
+        ## OPTION MENUS
+        self.helper_opt_ri = tk.StringVar()
+        self.helper_opt_ri.set("Select isotope")
+        if str_filename_short in self.container_var[str_filetype]:
+            if self.container_var[str_filetype][str_filename_short]["IS Data"]["IS"].get() != "Select IS":
+                self.helper_opt_ri.set(self.container_var[str_filetype][str_filename_short]["IS Data"]["IS"].get())
+
+        opt_ri = SE(
+            parent=self.subwindow_fi_checkfile, row_id=start_row + 23, column_id=0, n_rows=1, n_columns=7,
+            fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_opt_ri, option_list=file_isotopes, text_set=self.helper_opt_ri.get(),
+            fg_active=font_color_light, bg_active=accent_color)
+
+        ## RADIOBUTTONS
         rb_03a = SE(
             parent=self.subwindow_fi_checkfile, row_id=start_row + 19, column_id=0, n_rows=1, n_columns=7,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
@@ -35693,21 +35725,25 @@ class PySILLS(tk.Frame):
         except AttributeError:
             pass
 
-        if var_type == "STD":
-            var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
-            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
-                if element in self.container_lists["Measured Elements"][var_file_short]:
-                    var_key_isotope = self.container_lists["Measured Elements"][var_file_short][element][0]
-                    self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_key_isotope)
-                break
-        else:
-            if self.pysills_mode == "MA":
-                var_mat_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
-                var_key_isotope = var_mat_is
+        if self.helper_opt_ri.get() == "Select isotope":
+            if var_type == "STD":
+                var_srm_file = self.container_var["STD"][var_file]["SRM"].get()
+                for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1],
+                                             reverse=True):
+                    if element in self.container_lists["Measured Elements"][var_file_short]:
+                        var_key_isotope = self.container_lists["Measured Elements"][var_file_short][element][0]
+                        self.container_var[var_type][var_file]["IS Data"]["IS"].set(var_key_isotope)
+                    break
             else:
-                var_mat_is = self.container_var[var_type][var_file]["Matrix Setup"]["IS"]["Name"].get()
-                var_incl_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
-                var_key_isotope = var_incl_is
+                if self.pysills_mode == "MA":
+                    var_mat_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+                    var_key_isotope = var_mat_is
+                else:
+                    var_mat_is = self.container_var[var_type][var_file]["Matrix Setup"]["IS"]["Name"].get()
+                    var_incl_is = self.container_var[var_type][var_file]["IS Data"]["IS"].get()
+                    var_key_isotope = var_incl_is
+        else:
+            var_key_isotope = self.helper_opt_ri.get()
 
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
@@ -35772,7 +35808,12 @@ class PySILLS(tk.Frame):
             ax_ratio.set_yscale("log")
             ax_ratio.set_xlim(left=0, right=x_max)
             ax_ratio.set_xticks(np.arange(0, x_max, 20))
-            ax_ratio.set_ylim(bottom=10**(-5), top=1.5*y_max)
+
+            if isinstance(y_max, (int, float)) and not np.isnan(y_max):
+                ax_ratio.set_ylim(bottom=10**(-5), top=1.5*y_max)
+            else:
+                ax_ratio.set_ylim(bottom=10**(-5), top=10**(8))
+
             ax_ratio.grid(which="major", linestyle="-", linewidth=1)
             ax_ratio.minorticks_on()
             ax_ratio.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
