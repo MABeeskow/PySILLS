@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.60
+# Version:	v1.0.61
 # Date:		06.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.60"
+        self.str_version_number = "1.0.61"
         self.val_version = self.str_version_number + " - 06.02.2025"
 
         ## Colors
@@ -22094,8 +22094,9 @@ class PySILLS(tk.Frame):
         ## OPTION MENUS
         self.helper_opt_ri = tk.StringVar()
         self.helper_opt_ri.set("Select isotope")
-        if self.container_var[str_filetype][filename_short]["IS Data"]["IS"].get() != "Select IS":
-            self.helper_opt_ri.set(self.container_var[str_filetype][filename_short]["IS Data"]["IS"].get())
+        if filename_short in self.container_var[str_filetype]:
+            if self.container_var[str_filetype][filename_short]["IS Data"]["IS"].get() != "Select IS":
+                self.helper_opt_ri.set(self.container_var[str_filetype][filename_short]["IS Data"]["IS"].get())
 
         opt_ri = SE(
             parent=self.subwindow_ma_checkfile, row_id=start_row + 23, column_id=0, n_rows=1,
