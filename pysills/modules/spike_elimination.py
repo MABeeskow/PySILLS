@@ -5,8 +5,8 @@
 
 # Name:		spike_elimination.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.56
-# Date:		31.01.2025
+# Version:	v1.0.64
+# Date:		07.02.2025
 
 #-----------------------------------------------
 
@@ -140,6 +140,28 @@ class GrubbsTestSILLS:
         t_val = stats.t.ppf(1 - (alpha/(2*N)), df)
         grubbs_val = (N - 1)/(N**0.5)*((t_val**2)/(df + t_val**2))**0.5
         return grubbs_val
+
+    def outlier_elimination_zsore(self): # outlier_elimination_zsore
+        data = self.raw_data
+        z_scores = np.abs(stats.zscore(data))
+        zscore_threshold = 2
+        helper_data = {}
+
+        for index, value in enumerate(self.raw_data):
+            if value > self.threshold:
+                if z_scores[index] > zscore_threshold:
+                    self.spike_indices.append(index + self.start_index)
+                    surrounding_6 = self.extract_surrounding_values(index_spike=index, steps=4)
+                    mean_5 = np.mean(surrounding_6["SP"])
+                    helper_data[index + self.start_index] = mean_5
+
+        for index, value in enumerate(self.dataset_complete):
+            if index in self.spike_indices:
+                self.smoothed_data.append(helper_data[index])
+            else:
+                self.smoothed_data.append(value)
+
+        return self.smoothed_data, self.spike_indices
 
     def determine_outlier(self):
         N_low = 7

@@ -1418,7 +1418,7 @@ class PySILLS(tk.Frame):
         self.container_var["Gas Energy"].set("15.760")
         self.container_var["Spike Elimination Method"] = tk.StringVar()
         self.container_var["Spike Elimination Method"].set("Grubbs test")
-        self.list_se_methods = ["Grubbs test", "Whisker analysis"]
+        self.list_se_methods = ["Grubbs test", "Whisker analysis", "Z-score analysis"]
         self.list_isotopes = []
         self.srm_actual = {}
         self.container_files = {}
@@ -2036,12 +2036,14 @@ class PySILLS(tk.Frame):
             self.bg_colors = {
                 "BG Window": "#2C2C2C", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090",
                 "Light": "#BABABA", "Very Light": "#E3E3E3", "Dark Font": "#292929", "Light Font": "#F7F7F7",
-                "White": "#FFFFFF", "Black": "#000000", "Accent": "#E76F51"}
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#E76F51",
+                "BG Interval": 0, "MAT Interval": 0, "INCL Interval": 0,
+                "BG Light": 0, "MAT Light": 0, "INCL Light": 0}
         elif str_color_scheme == "Light scheme":
             self.bg_colors = {
-                "BG Window": "#F8F9FA", "Very Dark": "#91A1B1", "Dark": "#BAC4CE", "Medium": "#CFD6DD",
-                "Light": "#E4E8EC", "Very Light": "#FEFEFE", "Dark Font": "#2C2C2C", "Light Font": "#2C2C2C",
-                "White": "#FFFFFF", "Black": "#000000", "Accent": "#E76F51"}
+                "BG Window": "#cccccc", "Very Dark": "#91A1B1", "Dark": "#BAC4CE", "Medium": "#CFD6DD",
+                "Light": "#e5e5e5", "Very Light": "#f2f2f2", "Dark Font": "#2C2C2C", "Light Font": "#2C2C2C",
+                "White": "#FFFFFF", "Black": "#000000", "Accent": "#bd7966"}
         elif str_color_scheme == "Boho theme 1":
             self.bg_colors = {
                 "BG Window": "#463F3A", "Very Dark": "#a3573a", "Dark": "#e5af9e", "Medium": "#e7b7a7",
@@ -6220,6 +6222,8 @@ class PySILLS(tk.Frame):
                 var_method = 1
             elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
+            elif self.container_var["Spike Elimination Method"].get() in ["Z-score analysis"]:
+                var_method = 3
         elif self.pysills_mode in ["FI", "INCL"]:
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
@@ -6229,6 +6233,8 @@ class PySILLS(tk.Frame):
                 var_method = 1
             elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
+            elif self.container_var["Spike Elimination Method"].get() in ["Z-score analysis"]:
+                var_method = 3
         elif self.pysills_mode == "MI":
             var_alpha = float(self.container_var[key_setting]["SE Alpha"].get())
             var_threshold = int(self.container_var[key_setting]["SE Threshold"].get())
@@ -6238,6 +6244,8 @@ class PySILLS(tk.Frame):
                 var_method = 1
             elif self.container_var["Spike Elimination Method"].get() in ["PySILLS Spike Finder", "Whisker analysis"]:
                 var_method = 2
+            elif self.container_var["Spike Elimination Method"].get() in ["Z-score analysis"]:
+                var_method = 3
 
         if filetype == "STD":
             subwindow_progressbar_spike_elimination, prgbar_spk = self.create_progress_bar_spike_elimination()
@@ -6309,6 +6317,12 @@ class PySILLS(tk.Frame):
                                                             raw_data=dataset_raw, alpha=var_alpha,
                                                             threshold=var_threshold, isotope=isotope,
                                                             dataset_complete=dataset_complete).find_outlier()
+                                                    elif var_method == 3:
+                                                        data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                            raw_data=dataset_raw, alpha=var_alpha,
+                                                            threshold=var_threshold, start_index=interval[0],
+                                                            dataset_complete=dataset_complete).outlier_elimination_zsore()
+
                                                     time_end = datetime.datetime.now()
                                                     time_delta = (time_end - time_start)*1000
                                                 else:
@@ -6485,6 +6499,12 @@ class PySILLS(tk.Frame):
                                                             raw_data=dataset_raw, alpha=var_alpha,
                                                             threshold=var_threshold, isotope=isotope,
                                                             dataset_complete=dataset_complete).find_outlier()
+                                                    elif var_method == 3:
+                                                        data_smoothed, indices_outl = GrubbsTestSILLS(
+                                                            raw_data=dataset_raw, alpha=var_alpha,
+                                                            threshold=var_threshold, start_index=interval[0],
+                                                            dataset_complete=dataset_complete).outlier_elimination_zsore()
+
                                                     time_end = datetime.datetime.now()
                                                     time_delta = (time_end - time_start)*1000
                                                     list_times[file_smpl].append(time_delta.total_seconds())
