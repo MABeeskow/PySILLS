@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.62
-# Date:		06.02.2025
+# Version:	v1.0.63
+# Date:		07.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,7 +62,9 @@ import string
 ###############
 class PySILLS(tk.Frame):
     #
-    def __init__(self, parent, var_screen_width, var_screen_height, var_path=None):
+    def __init__(
+            self, parent, var_screen_width, var_screen_height, var_path=None, restart=False, last_used_directory=None,
+            last_used_directory_input=None):
         tk.Frame.__init__(self, parent)
         var_screen_width = var_screen_width
         var_screen_height = var_screen_height
@@ -72,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.62"
-        self.val_version = self.str_version_number + " - 06.02.2025"
+        self.str_version_number = "1.0.63"
+        self.val_version = self.str_version_number + " - 07.02.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -551,7 +553,8 @@ class PySILLS(tk.Frame):
             "Accuracy Concentration": tk.IntVar(), "Sensitivity Drift": tk.IntVar(), "LOD Selection": tk.IntVar(),
             "Desired Average": tk.IntVar(), "Interval Processing": tk.IntVar(), "BG Offset Start": tk.IntVar(),
             "BG Offset End": tk.IntVar(), "MAT Offset Start": tk.IntVar(), "MAT Offset End": tk.IntVar(),
-            "Calculation Accuracy": tk.IntVar(), "Color scheme": tk.StringVar(), "Screen resolution": tk.StringVar()}
+            "Calculation Accuracy": tk.IntVar(), "Color scheme": tk.StringVar(), "Screen resolution": tk.StringVar(),
+            "Project type": tk.StringVar()}
         self.container_var["General Settings"]["Screen resolution"].set("1920x1080")
         self.container_var["General Settings"]["Language"].set("English")
         self.container_var["General Settings"]["Color scheme"].set("Dark scheme")
@@ -560,6 +563,7 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["Colormap"].set("turbo")
         self.container_var["General Settings"]["Line width"].set("1.0")
         self.container_var["General Settings"]["File type"].set("*.csv")
+        self.container_var["General Settings"]["Project type"].set("*.proj")
         self.container_var["General Settings"]["Delimiter"].set("semicolon")
         self.container_var["General Settings"]["Default IS MA"].set("Select IS")
         self.container_var["General Settings"]["Default IS FI"].set("Select IS")
@@ -752,6 +756,7 @@ class PySILLS(tk.Frame):
             "Python path": {"English": "Python path", "German": "Python Pfad"},
             "PySILLS path": {"English": "PySILLS path", "German": "PySILLS Pfad"},
             "Before": {"English": "Previous", "German": "Zurück"},
+            "Project file": {"English": "Project file", "German": "Projektdatei"},
             "Previous": {"English": "Previous", "German": "Zurück"},
             "Next": {"English": "Next", "German": "Weiter"},
             "Quit": {"English": "Quit", "German": "Beenden"},
@@ -1141,6 +1146,13 @@ class PySILLS(tk.Frame):
         self.var_init_fi_datareduction = False
         self.var_init_mi_datareduction = False
         self.var_init_ma_dataexploration = False
+
+        if restart == False:
+            self.last_used_directory = os.getcwd()
+            self.last_used_directory_input = os.getcwd()
+        else:
+            self.last_used_directory = last_used_directory
+            self.last_used_directory_input = last_used_directory_input
 
         ## FLUID/MELT INCLUSION ANALYSIS
         keys = ["fi_setting", "mi_setting"]
@@ -1972,7 +1984,7 @@ class PySILLS(tk.Frame):
             "Main window": [33, 21], "MA main settings": [38, var_ncol_ma_settings],
             "FI main settings": [40, var_ncol_fi_settings], "MI main settings": [40, var_ncol_mi_settings],
             "ICP-MS setup": [8, 17], "Quick plot": [35, 70], "Spike elimination threshold": [24, 15],
-            "Check-up oxides": [29, 83], "Check-up IS": [16, 42], "General settings": [22, 35],
+            "Check-up oxides": [29, 83], "Check-up IS": [16, 42], "General settings": [23, 35],
             "Check-up SRM": [23, 32], "Check-up intervals": [32, 54], "Check-up acquisition times": [33, 26],
             "Check-up files": [32, 50], "MA Extras": [8, 25], "FI Extras": [9, 34], "MI Extras": [8, 34],
             "Geothermometry": [16, 40], "Diagram xy": [24, 50], "Diagram halogen ratios": [24, 40],
@@ -2031,11 +2043,6 @@ class PySILLS(tk.Frame):
                 "Light": "#E4E8EC", "Very Light": "#FEFEFE", "Dark Font": "#2C2C2C", "Light Font": "#2C2C2C",
                 "White": "#FFFFFF", "Black": "#000000", "Accent": "#E76F51"}
         elif str_color_scheme == "Boho theme 1":
-            self.bg_colors = {
-                "BG Window": "#72574f", "Very Dark": "#a3573a", "Dark": "#e5af9e", "Medium": "#e7b7a7",
-                "Light": "#f2d7ce", "Very Light": "#f9efeb", "Dark Font": "#2d231f", "Light Font": "#f9efeb",
-                "White": "#FFFFFF", "Black": "#000000", "Accent": "#B15C4D"}
-        elif str_color_scheme == "Boho theme 2":
             self.bg_colors = {
                 "BG Window": "#463F3A", "Very Dark": "#a3573a", "Dark": "#e5af9e", "Medium": "#e7b7a7",
                 "Light": "#BCB8B1", "Very Light": "#F4F3EE", "Dark Font": "#463F3A", "Light Font": "#F4F3EE",
@@ -9480,7 +9487,9 @@ class PySILLS(tk.Frame):
             print("The file does not exist!")
 
     def save_project(self):
-        save_file = filedialog.asksaveasfile(mode="w", defaultextension=".csv")
+        file_ending_pre = self.container_var["General Settings"]["Project type"].get()
+        file_ending = file_ending_pre[1:]
+        save_file = filedialog.asksaveasfile(mode="w", defaultextension=file_ending)
         # Save information about the project
         self.save_project_information_in_file(save_file=save_file)
         # Save information about 'Standard Files Setup'
@@ -11144,9 +11153,12 @@ class PySILLS(tk.Frame):
             self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
             self.lbl_prg_spk.configure(text="Opening project started!", anchor=tk.W)
 
-            filename = filedialog.askopenfilename()
+            filename = filedialog.askopenfilename(
+                filetypes=[("PySILLS files", "*.proj;*.csv"), ("SILLS files", ".mat"), ("All files", "*.*")],
+                initialdir=self.last_used_directory)
             self.projectname = filename.split("/")[-1]
-
+            split_filename = filename.split("/")
+            self.last_used_directory = '/'.join(split_filename[:-1])
             self.parent.title("PySILLS - " + str(self.projectname))
 
             n_commas = 0
@@ -12001,7 +12013,9 @@ class PySILLS(tk.Frame):
         root = tk.Tk()
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
-        PySILLS(parent=root, var_screen_width=screen_width, var_screen_height=screen_height)
+        PySILLS(
+            parent=root, var_screen_width=screen_width, var_screen_height=screen_height, restart=True,
+            last_used_directory=self.last_used_directory, last_used_directory_input=self.last_used_directory_input)
         root.mainloop()
 
     ####################
@@ -12078,7 +12092,12 @@ class PySILLS(tk.Frame):
         filename = filedialog.askopenfilenames(
             parent=self.parent,
             filetypes=(("LA-ICP-MS files", "*.csv *.FIN2 *.xl *.txt"), ("csv files", "*.csv"), ("FIN2 files", "*.FIN2"),
-                       ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")), initialdir=os.getcwd())
+                       ("xl files", "*.xl"), ("txt files", "*.txt"), ("all files", "*.*")),
+            initialdir=self.last_used_directory_input)
+
+        split_filename = filename[0].split("/")
+
+        self.last_used_directory_input = '/'.join(split_filename[:-1])
 
         for i in filename:
             if i not in var_list:
@@ -14241,6 +14260,7 @@ class PySILLS(tk.Frame):
         str_lbl_30 = self.language_dict["Python path"][self.var_language]
         str_lbl_31 = self.language_dict["PySILLS path"][self.var_language]
         str_lbl_32 = self.language_dict["Default ICP-MS"][self.var_language]
+        str_lbl_33 = self.language_dict["Project file"][self.var_language]
 
         lbl_01 = SE(
             parent=subwindow_generalsettings, row_id=2, column_id=start_column, n_rows=1, n_columns=10,
@@ -14306,6 +14326,10 @@ class PySILLS(tk.Frame):
             parent=subwindow_generalsettings, row_id=18, column_id=11, n_rows=1, n_columns=13,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_32, relief=tk.FLAT, fontsize=font_element)
+        lbl_33 = SE(
+            parent=subwindow_generalsettings, row_id=21, column_id=start_column, n_rows=1, n_columns=5,
+            fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text=str_lbl_33, relief=tk.FLAT, fontsize=font_element)
 
         self.gui_elements["general_settings"]["Label"]["General"].extend(
             [lbl_01, lbl_02, lbl_06, lbl_07, lbl_08, lbl_09, lbl_10, lbl_11])
@@ -14425,7 +14449,7 @@ class PySILLS(tk.Frame):
             "cividis", "brg"]
         list_languages = ["English", "German", "Spanish", "Italian", "French", "Chinese", "Greek", "Russian"]
         list_colorschemes = [
-            "Dark scheme", "Light scheme", "Boho theme 1", "Boho theme 2", "Synthwave theme", "Gunmetal theme",
+            "Dark scheme", "Light scheme", "Boho theme 1", "Synthwave theme", "Gunmetal theme",
             "Dark Jungle", "Noble Room"]
         list_screenresolutions = ["3840x2160", "1920x1080", "1280x720"]
         list_colormaps.sort()
@@ -14434,6 +14458,8 @@ class PySILLS(tk.Frame):
         list_delimiter = ["comma", "semicolon"]
         list_delimiter.sort()
         list_languages.sort()
+        list_projecttypes = ["*.proj", "*.csv"]
+        list_projecttypes.sort()
 
         opt_srm = SE(
             parent=subwindow_generalsettings, row_id=8, column_id=start_column, n_rows=1, n_columns=10,
@@ -14473,6 +14499,13 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
             var_opt=self.var_opt_icp, var_default=self.var_opt_icp.get(),
             var_list=self.container_lists["ICPMS Library"], fg_active=font_color_light, bg_active=accent_color)
+        opt_projecttype = SE(
+            parent=subwindow_generalsettings, row_id=21, column_id=5, n_rows=1, n_columns=5,
+            fg=font_color_dark, bg=background_color_elements).create_simple_optionmenu(
+            var_opt=self.container_var["General Settings"]["Project type"],
+            var_default=self.container_var["General Settings"]["Project type"].get(), var_list=list_projecttypes,
+            fg_active=font_color_light, bg_active=accent_color)
+
         # opt_language["menu"].entryconfig("German", state="disable")
         opt_language["menu"].entryconfig("Italian", state="disable")
         opt_language["menu"].entryconfig("Spanish", state="disable")
