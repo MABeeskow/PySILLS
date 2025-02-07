@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.63
+# Version:	v1.0.64
 # Date:		07.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.63"
+        self.str_version_number = "1.0.64"
         self.val_version = self.str_version_number + " - 07.02.2025"
 
         ## Colors
@@ -9489,7 +9489,15 @@ class PySILLS(tk.Frame):
     def save_project(self):
         file_ending_pre = self.container_var["General Settings"]["Project type"].get()
         file_ending = file_ending_pre[1:]
-        save_file = filedialog.asksaveasfile(mode="w", defaultextension=file_ending)
+
+        if "csv" in file_ending:
+            list_file_endings = [("CSV files *.csv", "*.csv"), ("Project files *.proj", "*.proj")]
+        elif "proj" in file_ending:
+            list_file_endings = [("Project files *.proj", "*.proj"), ("CSV files *.csv", "*.csv")]
+
+        save_file = filedialog.asksaveasfile(
+            mode="w", defaultextension=file_ending, title="Save as", filetypes=list_file_endings)
+
         # Save information about the project
         self.save_project_information_in_file(save_file=save_file)
         # Save information about 'Standard Files Setup'
@@ -11153,9 +11161,21 @@ class PySILLS(tk.Frame):
             self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
             self.lbl_prg_spk.configure(text="Opening project started!", anchor=tk.W)
 
+            file_ending_pre = self.container_var["General Settings"]["Project type"].get()
+            file_ending = file_ending_pre[1:]
+
+            if "csv" in file_ending:
+                list_file_endings = [("CSV files *.csv", "*.csv"), ("Project files *.proj", "*.proj"),
+                                     ("SILLS files *.mat", "*.mat")]
+            elif "proj" in file_ending:
+                list_file_endings = [("Project files *.proj", "*.proj"), ("CSV files *.csv", "*.csv"),
+                                     ("SILLS files *.mat", "*.mat")]
+
             filename = filedialog.askopenfilename(
-                filetypes=[("PySILLS files", "*.proj;*.csv"), ("SILLS files", ".mat"), ("All files", "*.*")],
+                title="Open as", defaultextension=file_ending,
+                filetypes=list_file_endings,
                 initialdir=self.last_used_directory)
+
             self.projectname = filename.split("/")[-1]
             split_filename = filename.split("/")
             self.last_used_directory = '/'.join(split_filename[:-1])
