@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.64
-# Date:		07.02.2025
+# Version:	v1.0.65
+# Date:		11.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.64"
-        self.val_version = self.str_version_number + " - 07.02.2025"
+        self.str_version_number = "1.0.65"
+        self.val_version = self.str_version_number + " - 11.02.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -21450,6 +21450,17 @@ class PySILLS(tk.Frame):
     ## FILE-SPECIFIC ANALYSIS ##########################################################################################
 
     def show_boxplot_data_view(self, filetype, filename_long):
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
         index_file = self.container_lists[filetype]["Long"].index(filename_long)
         filename_short = self.container_lists[filetype]["Short"][index_file]
 
@@ -21495,7 +21506,7 @@ class PySILLS(tk.Frame):
         try:
             errorframe = self.container_helper[filetype][filename_short]["ERROR FRAME"]
 
-            if errorframe != None:
+            if errorframe == None:
                 errorframe.destroy()
         except AttributeError:
             pass
@@ -21516,6 +21527,11 @@ class PySILLS(tk.Frame):
             val_column_start = 14
             val_row_span = 22
             val_column_span = 54
+
+        frm_00 = SE(
+            parent=parent, row_id=0, column_id=val_column_start, n_rows=24, n_columns=val_column_span,
+            fg=font_color_dark, bg=background_color_light).create_frame(
+            relief=tk.SOLID)
 
         self.canvas_specific_spectrum = FigureCanvasTkAgg(
             self.fig_specific_spectrum, master=parent)
@@ -21606,6 +21622,17 @@ class PySILLS(tk.Frame):
         self.canvas_specific_spectrum.draw()
 
     def show_spectral_data_view(self, filetype, filename_long):
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
         index_file = self.container_lists[filetype]["Long"].index(filename_long)
         filename_short = self.container_lists[filetype]["Short"][index_file]
 
@@ -21651,7 +21678,7 @@ class PySILLS(tk.Frame):
         try:
             errorframe = self.container_helper[filetype][filename_short]["ERROR FRAME"]
 
-            if errorframe != None:
+            if errorframe == None:
                 errorframe.destroy()
         except AttributeError:
             pass
@@ -21672,6 +21699,11 @@ class PySILLS(tk.Frame):
             val_column_start = 14
             val_row_span = 22
             val_column_span = 54
+
+        frm_00 = SE(
+            parent=parent, row_id=0, column_id=val_column_start, n_rows=24, n_columns=val_column_span,
+            fg=font_color_dark, bg=background_color_light).create_frame(
+            relief=tk.SOLID)
 
         self.canvas_specific_spectrum = FigureCanvasTkAgg(
             self.fig_specific_spectrum, master=parent)
@@ -23180,7 +23212,7 @@ class PySILLS(tk.Frame):
         try:
             errorframe = self.container_helper[var_type][var_file_short]["ERROR FRAME"]
 
-            if errorframe != None:
+            if errorframe == None:
                 errorframe.destroy()
         except AttributeError:
             pass
@@ -23382,7 +23414,7 @@ class PySILLS(tk.Frame):
         try:
             errorframe = self.container_helper[var_type][var_file_short]["ERROR FRAME"]
 
-            if errorframe != None:
+            if errorframe == None:
                 errorframe.destroy()
         except AttributeError:
             pass
@@ -23433,7 +23465,7 @@ class PySILLS(tk.Frame):
             stop_calculation = False
         list_width = list(85*np.ones(len(list_categories)))
         list_width = [int(item) for item in list_width]
-        list_width[0] = 175
+        list_width[0] = 200
 
         n_intervals_bg = len(self.container_helper[var_type][var_file_short]["BG"]["Content"])
         n_intervals_mat = len(self.container_helper[var_type][var_file_short]["MAT"]["Content"])
@@ -23593,12 +23625,12 @@ class PySILLS(tk.Frame):
                             "MAT"][isotope]
 
                     if var_srm_file == None or var_srm_file == var_srm_i:
-                        entries_intensity_bg_i.append(f"{intensity_bg_i:.{4}f}")
-                        entries_intensity_mat_i.append(f"{intensity_mat_i:.{4}f}")
-                        entries_intensity_mat_sigma_i.append(f"{intensity_mat_sigma_i:.{4}f}")
-                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{4}E}")
-                        entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{4}f}")
-                        entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{4}f}")
+                        entries_intensity_bg_i.append(f"{intensity_bg_i:.{1}f}")
+                        entries_intensity_mat_i.append(f"{intensity_mat_i:.{1}f}")
+                        entries_intensity_mat_sigma_i.append(f"{intensity_mat_sigma_i:.{1}f}")
+                        entries_intensity_ratio_i.append(f"{intensity_ratio_i:.{2}E}")
+                        entries_analytical_sensitivity_i.append(f"{analytical_sensitivity_i:.{2}f}")
+                        entries_normalized_sensitivity_i.append(f"{normalized_sensitivity_i:.{2}f}")
 
                         if var_type == "SMPL":
                             entries_concentration_i.append(f"{concentration_i:.{4}f}")
@@ -23623,14 +23655,22 @@ class PySILLS(tk.Frame):
                         entries_loq_i.append("---")
 
                     if var_type == "SMPL":
-                        entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{4}E}")
-                        entries_rsf_i.append(f"{rsf_i:.{4}f}")
+                        entries_concentration_ratio_i.append(f"{concentration_ratio_i:.{2}E}")
+                        entries_rsf_i.append(f"{rsf_i:.{2}f}")
 
-                self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_sigma_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
+                # Filling treeview
+                self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
+
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
+
                 self.tv_results_quick.insert("", tk.END, values=entries_empty)
+
                 self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
 
@@ -23638,15 +23678,11 @@ class PySILLS(tk.Frame):
                     self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
 
                 self.tv_results_quick.insert("", tk.END, values=entries_empty)
-                self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_i)
 
-                if var_type == "SMPL":
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
-
-                self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_sigma_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
 
     def ma_show_all_lines(self, var_type, var_file_short, key="ALL"):
         file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
@@ -36142,6 +36178,11 @@ class PySILLS(tk.Frame):
         str_filename_short = parts[-1]
         file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
 
+        frm_00 = SE(
+            parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=24, n_columns=54, fg=font_color_dark,
+            bg=background_color_light).create_frame(
+            relief=tk.SOLID)
+
         ## Cleaning
         try:
             canvas_ratio = self.container_helper[str_filetype][str_filename_short]["CANVAS RATIO"]
@@ -36408,6 +36449,18 @@ class PySILLS(tk.Frame):
             self.fi_add_interval_to_diagram(var_type, var_file_short, var_file_long, event))
 
     def fi_show_time_ratio_diagram(self, var_type, var_file):
+        # Colors
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
         elif self.pysills_mode == "MI":
@@ -36439,10 +36492,15 @@ class PySILLS(tk.Frame):
         try:
             errorframe = self.container_helper[var_type][var_file_short]["ERROR FRAME"]
 
-            if errorframe != None:
+            if errorframe == None:
                 errorframe.destroy()
         except AttributeError:
             pass
+
+        frm_00 = SE(
+            parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=24, n_columns=54, fg=font_color_dark,
+            bg=background_color_light).create_frame(
+            relief=tk.SOLID)
 
         if self.helper_opt_ri.get() == "Select isotope":
             if var_type == "STD":
@@ -36577,7 +36635,7 @@ class PySILLS(tk.Frame):
         try:
             errorframe = self.container_helper[var_type][var_file_short]["ERROR FRAME"]
 
-            if errorframe != None:
+            if errorframe == None:
                 errorframe.destroy()
         except AttributeError:
             pass
@@ -36648,7 +36706,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=18, n_columns=53,
+                parent=self.subwindow_fi_checkfile, row_id=0, column_id=14, n_rows=18 + 5, n_columns=53,
                 fg=self.bg_colors["Dark Font"], bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -36658,8 +36716,8 @@ class PySILLS(tk.Frame):
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
-            scb_v.grid(row=0, column=67, rowspan=18, columnspan=1, sticky="ns")
-            scb_h.grid(row=18, column=14, rowspan=1, columnspan=53, sticky="ew")
+            scb_v.grid(row=0, column=67, rowspan=18 + 5, columnspan=1, sticky="ns")
+            scb_h.grid(row=18 + 5, column=14, rowspan=1, columnspan=53, sticky="ew")
 
             if var_is != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0 and n_intervals_incl > 0:
                 ## INITIALIZATION
@@ -36898,7 +36956,48 @@ class PySILLS(tk.Frame):
                         entries_lod_incl_i.append(f"{lod_incl_i:.{4}f}")
                         entries_loq_incl_i.append(f"{loq_incl_i:.{4}f}")
 
-                # Intensity Results
+                ## Filling treeview
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio__incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_incl_i)
+
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_mix_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mix_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
+
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mat_i)
+
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_lod_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_lob_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_loq_incl_i)
+
+                    self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
+
+                    self.tv_results_quick.insert("", tk.END, values=entries_a_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_x_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_empty)
+
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_incl_i)
+                    self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_incl_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
+                self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
+
+                if var_type == "SMPL":
+                    self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
+
+                self.tv_results_quick.insert("", tk.END, values=entries_empty)
+
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
                 self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
 
@@ -36908,38 +37007,49 @@ class PySILLS(tk.Frame):
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_incl_i)
                     self.tv_results_quick.insert("", tk.END, values=entries_intensity_mix_i)
 
-                self.tv_results_quick.insert("", tk.END, values=entries_empty)
-
-                # Sensitivity Results
-                self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
-
-                if var_type == "SMPL":
-                    self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
-
-                self.tv_results_quick.insert("", tk.END, values=entries_empty)
-
-                # Concentration Results
-                self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
-                self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mat_i)
-
-                if var_type == "SMPL":
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio__incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_mix_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mix_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_lob_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_lod_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_loq_incl_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_a_i)
-                    self.tv_results_quick.insert("", tk.END, values=entries_x_i)
+                # ##
+                # # Intensity Results
+                # self.tv_results_quick.insert("", tk.END, values=entries_intensity_bg_i)
+                # self.tv_results_quick.insert("", tk.END, values=entries_intensity_mat_i)
+                #
+                # if var_type == "SMPL":
+                #     self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_intensity_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_intensity_ratio_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_intensity_mix_i)
+                #
+                # self.tv_results_quick.insert("", tk.END, values=entries_empty)
+                #
+                # # Sensitivity Results
+                # self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_i)
+                # self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_i)
+                #
+                # if var_type == "SMPL":
+                #     self.tv_results_quick.insert("", tk.END, values=entries_analytical_sensitivity_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_normalized_sensitivity_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_rsf_i)
+                #
+                # self.tv_results_quick.insert("", tk.END, values=entries_empty)
+                #
+                # # Concentration Results
+                # self.tv_results_quick.insert("", tk.END, values=entries_concentration_i)
+                # self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mat_i)
+                #
+                # if var_type == "SMPL":
+                #     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_lob_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_lod_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_loq_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_concentration_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_concentration_ratio__incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_concentration_mix_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_concentration_sigma_mix_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_lob_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_lod_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_loq_incl_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_a_i)
+                #     self.tv_results_quick.insert("", tk.END, values=entries_x_i)
 
     def fi_show_all_lines(self, var_type, var_file_short, key="ALL"):
         if self.pysills_mode in ["FI", "INCL"]:
