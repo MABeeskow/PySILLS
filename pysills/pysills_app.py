@@ -756,7 +756,7 @@ class PySILLS(tk.Frame):
             "Python path": {"English": "Python path", "German": "Python Pfad"},
             "PySILLS path": {"English": "PySILLS path", "German": "PySILLS Pfad"},
             "Before": {"English": "Previous", "German": "Zurück"},
-            "Project file": {"English": "Project file", "German": "Projektdatei"},
+            "Project file": {"English": "Project file", "German": "Projektdatei", "Chinese": "项目文件"},
             "Previous": {"English": "Previous", "German": "Zurück"},
             "Next": {"English": "Next", "German": "Weiter"},
             "Quit": {"English": "Quit", "German": "Beenden"},
