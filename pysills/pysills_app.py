@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.65
-# Date:		11.02.2025
+# Version:	v1.0.66
+# Date:		26.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.65"
-        self.val_version = self.str_version_number + " - 11.02.2025"
+        self.str_version_number = "1.0.66"
+        self.val_version = self.str_version_number + " - 26.02.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -694,6 +694,21 @@ class PySILLS(tk.Frame):
         self.rb_report = tk.IntVar()
         self.rb_report.set(0)
 
+        self.helper_var_rb = {
+            "File setup": {"QA section": tk.IntVar(), "Section": tk.IntVar(), "Analysis mode": tk.IntVar()}}
+        self.helper_var_rb["File setup"]["QA section"].set(1)
+        self.helper_var_rb["File setup"]["Section"].set(0)
+        self.helper_var_rb["File setup"]["Analysis mode"].set(0)
+
+        self.helper_var_entr = {"File setup": {"Start": tk.StringVar(), "End": tk.StringVar()}}
+        self.helper_var_entr["File setup"]["Start"].set("Set start value")
+        self.helper_var_entr["File setup"]["End"].set("Set end value")
+
+        self.helper_var_opt = {"File setup": {
+            "Reference isotope 1": tk.StringVar(), "Reference isotope 2": tk.StringVar()}}
+        self.helper_var_opt["File setup"]["Reference isotope 1"].set("None")
+        self.helper_var_opt["File setup"]["Reference isotope 2"].set("None")
+
         ## LANGUAGE SUPPORT
         self.language_dict = {
             "Select Mode": {
@@ -711,6 +726,7 @@ class PySILLS(tk.Frame):
             "Set salinity": {"English": "Set salinity", "German": "Salinität eingeben"},
             "Interval setup": {"English": "Interval setup", "German": "Zeintfenster Einstellungen"},
             "Remove interval": {"English": "Remove interval", "German": "Zeitfenster entfernen"},
+            "Remove": {"English": "Remove", "German": "Entfernen"},
             "Remove sample intervals": {"English": "Remove sample intervals", "German": "Probenintervalle entfernen"},
             "Remove inclusion intervals": {
                 "English": "Remove inclusion intervals", "German": "Einschlussintervalle entfernen"},
@@ -727,6 +743,9 @@ class PySILLS(tk.Frame):
             "Standard file": {"English": "Standard file", "German": "Standardmessung"},
             "Sample file": {"English": "Sample file", "German": "Probenmessung"},
             "Confirm all": {"English": "Confirm all", "German": "Alles bestätigen"},
+            "Confirm": {"English": "Confirm", "German": "Bestätigen"},
+            "Extend left": {"English": "Extend left", "German": "Links erweitern"},
+            "Extend right": {"English": "Extend right", "German": "Rechts erweitern"},
             "Measured isotopes": {"English": "Measured isotopes", "German": "Gemessene Isotope"},
             "Display options": {"English": "Display options", "German": "Anzeigeoptionen"},
             "Analysis mode": {"English": "Analysis mode", "German": "Analysemodus"},
@@ -736,10 +755,12 @@ class PySILLS(tk.Frame):
             "Hide only RAW": {"English": "Hide only RAW", "German": "RAW ausblenden"},
             "Time series view": {"English": "Time series view", "German": "Zeitreihe Messung"},
             "Time ratios view": {"English": "Time ratios view", "German": "Zeitreihe Verhältnisse"},
+            "Time signal view": {"English": "Time signal view", "German": "Zeit-Signal Diagramm"},
             "Spectral data view": {"English": "Spectral data view", "German": "Datenspektrum"},
             "Box plot data view": {"English": "Box plot data view", "German": "Kastengrafik"},
             "Quick analysis": {"English": "Quick analysis", "German": "Schnellanalyse"},
             "Stepwise analysis": {"English": "Stepwise analysis", "German": "Schrittweise Analyse"},
+            "Additional diagrams": {"English": "Additional diagrams", "German": "Weitere Diagramme"},
             "Copy": {"English": "Copy", "German": "Kopieren"},
             "Delete": {"English": "Delete", "German": "Löschen"},
             "Rename": {"English": "Rename", "German": "Umbenennen"},
@@ -952,6 +973,8 @@ class PySILLS(tk.Frame):
             "Diagram selection": {"English": "Diagram selection", "German": "Diagrammauswahl"},
             "Plotting setup": {"English": "Plotting setup", "German": "Ploteinstellungen"},
             "Section selection": {"English": "Phase selection", "German": "Phasenauswahl"},
+            "Select section": {"English": "Select section", "German": "Abschnitt auswählen"},
+            "Parameter selection": {"English": "Select parameter", "German": "Parameter auswählen"},
             "Color coding": {"English": "Color coding", "German": "Farbkodierung"},
             "Isotope selection": {"English": "Isotope selection", "German": "Isotopauswahl"},
             "Outlier selection": {"English": "Outlier selection", "German": "Ausreißerauswahl"},
@@ -1996,7 +2019,7 @@ class PySILLS(tk.Frame):
             "FI specific file": [34, 68], "Setup PyPitzer": [20, 60], "Setup mass balance": [24, 55],
             "Setup external calculation": [11, 33], "Custom spike check": [24, 45], "Popup window error": [12, 20],
             "Popup window progress": [4, 20], "Popup window progress datareduction": [16, 20],
-            "Project manager": [16, 50], "Quick Plot Extra": [34, 46]}
+            "Project manager": [16, 50], "Quick Plot Extra": [34, 46], "Specific file setup": [38, 75]}
 
         row_min = self.row_height
         self.n_rows = 33
@@ -21939,6 +21962,603 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             rb_02c.configure(state="disabled")
 
+    def specific_file_setup(self, filetype, filename_long):
+        """ File-specific setup window where further settings like intervals can be defined.
+        -------
+        Parameters
+        filetype : str, the file category, e.g. STD
+        filename_long : str, the complete filename, including its whole path
+        -------
+        Returns
+        -------
+        """
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Colors
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
+        # Initial parameters and variables
+        str_filetype = filetype
+        str_filename_long = filename_long
+        str_filename_short = str_filename_long.split("/")[-1]
+        file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+
+        df_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+        str_title = self.language_dict["Setup"][self.var_language]
+
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        else:
+            key_setting = "fi_setting"
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Window settings
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Specific file setup"][0]
+        n_columns = self.window_dimensions["Specific file setup"][1]
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        self.subwindow_file_setup = tk.Toplevel(self.parent)
+        self.subwindow_file_setup.title(str_title + " - " + str(str_filename_short))
+        self.subwindow_file_setup.geometry(var_geometry)
+        self.subwindow_file_setup.resizable(False, False)
+        self.subwindow_file_setup["bg"] = background_color_dark
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_file_setup, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_file_setup, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_file_setup.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_file_setup.grid_columnconfigure(i, minsize=column_min)
+
+        n_1st_column = int(0.24*n_columns)
+        n_3rd_column = int(0.12*n_columns)
+        n_2nd_column = n_columns - n_1st_column - n_3rd_column
+        n_1st_column_half = int(n_1st_column/2)
+        n_1st_column_third = int(n_1st_column/3)
+        n_2nd_column_third = int(n_2nd_column/3)
+        start_2nd_column = n_1st_column
+        start_3rd_column = n_1st_column + n_2nd_column
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Frames
+        frm_00 = SE(
+            parent=self.subwindow_file_setup, row_id=0, column_id=n_1st_column, n_rows=n_rows, n_columns=n_2nd_column,
+            fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
+
+        # Labels
+        str_lbl_01 = self.language_dict["Measured isotopes"][self.var_language]
+        str_lbl_02 = self.language_dict["Quick analysis"][self.var_language]
+        str_lbl_03 = self.language_dict["Select section"][self.var_language]
+        str_lbl_04 = self.language_dict["Parameter selection"][self.var_language]
+        str_lbl_05 = self.language_dict["Results"][self.var_language]
+        str_lbl_06 = self.language_dict["Analysis mode"][self.var_language]
+        str_lbl_07 = self.language_dict["Start"][self.var_language]
+        str_lbl_08 = self.language_dict["End"][self.var_language]
+        str_lbl_09 = self.language_dict["Interval setup"][self.var_language]
+        str_lbl_10 = self.language_dict["Reference isotope"][self.var_language]
+        str_lbl_13 = self.language_dict["Background"][self.var_language]
+        str_lbl_15 = self.language_dict["Inclusion"][self.var_language]
+
+        if self.pysills_mode == "MA":
+            str_lbl_14 = self.language_dict["Sample"][self.var_language]
+        else:
+            str_lbl_14 = self.language_dict["Matrix"][self.var_language]
+
+        lbl_01 = SE(
+            parent=self.subwindow_file_setup, row_id=0, column_id=0, n_rows=1, n_columns=n_1st_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_01, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_02 = SE(
+            parent=self.subwindow_file_setup, row_id=0, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_02, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_03 = SE(
+            parent=self.subwindow_file_setup, row_id=1, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_03, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_04 = SE(
+            parent=self.subwindow_file_setup, row_id=5, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_04, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_05 = SE(
+            parent=self.subwindow_file_setup, row_id=7, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_05, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_06 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 15, column_id=0, n_rows=1, n_columns=n_1st_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_06, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_07 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 7, column_id=0, n_rows=1, n_columns=n_1st_column_third,
+            fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text=str_lbl_07, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_08 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 6, column_id=0, n_rows=1, n_columns=n_1st_column_third,
+            fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text=str_lbl_08, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_09 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=0, n_rows=1, n_columns=n_1st_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_09, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_10 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 18, column_id=0, n_rows=1, n_columns=n_1st_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text=str_lbl_10, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_11 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 17, column_id=0, n_rows=1, n_columns=2,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="#1", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_12 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 16, column_id=0, n_rows=1, n_columns=2,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="#2", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
+        lbl_13 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=n_1st_column, n_rows=1,
+            n_columns=n_2nd_column_third, fg=self.colors_intervals["BG LB"],
+            bg=self.colors_intervals["BG"]).create_simple_label(
+            text=str_lbl_13, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_14 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=n_1st_column + n_2nd_column_third, n_rows=1,
+            n_columns=n_2nd_column_third, fg=self.colors_intervals["MAT LB"],
+            bg=self.colors_intervals["MAT"]).create_simple_label(
+            text=str_lbl_14, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_14 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=n_1st_column + 2*n_2nd_column_third,
+            n_rows=1, n_columns=n_2nd_column_third, fg=self.colors_intervals["INCL LB"],
+            bg=self.colors_intervals["INCL"]).create_simple_label(
+            text=str_lbl_15, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+
+        # Buttons
+        str_btn_01 = self.language_dict["Confirm all"][self.var_language]
+        str_btn_02 = self.language_dict["Previous"][self.var_language]
+        str_btn_03 = self.language_dict["Next"][self.var_language]
+        str_btn_04 = self.language_dict["Confirm"][self.var_language]
+        str_btn_05 = self.language_dict["Extend left"][self.var_language]
+        str_btn_06 = self.language_dict["Extend right"][self.var_language]
+        str_btn_07 = self.language_dict["Copy"][self.var_language]
+        str_btn_08 = self.language_dict["Remove"][self.var_language]
+        str_btn_09 = self.language_dict["Additional diagrams"][self.var_language]
+        str_btn_10 = self.language_dict["Stepwise analysis"][self.var_language]
+        str_btn_11 = self.language_dict["Show only RAW"][self.var_language]
+        str_btn_12 = self.language_dict["Hide only RAW"][self.var_language]
+        str_btn_13 = self.language_dict["Show all"][self.var_language]
+        str_btn_14 = self.language_dict["Hide all"][self.var_language]
+
+        btn_01 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 2, column_id=2*n_1st_column_third, n_rows=2,
+            n_columns=n_1st_column_third, fg=font_color_light, bg=accent_color).create_simple_button(
+            text=str_btn_01, bg_active=background_color_elements, fg_active=font_color_dark)
+        btn_02 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 2, column_id=0, n_rows=2,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_02, bg_active=accent_color, fg_active=font_color_light)
+        btn_03 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 2, column_id=n_1st_column_third, n_rows=2,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_03, bg_active=accent_color, fg_active=font_color_light)
+        btn_04 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=2*n_1st_column_third, n_rows=2,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_04, bg_active=accent_color, fg_active=font_color_light)
+        btn_05 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 4, column_id=0, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_05, bg_active=accent_color, fg_active=font_color_light)
+        btn_06 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 4, column_id=n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_06, bg_active=accent_color, fg_active=font_color_light)
+        btn_07 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=0, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_07, bg_active=accent_color, fg_active=font_color_light)
+        btn_08 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_08, bg_active=accent_color, fg_active=font_color_light)
+        btn_09 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 11, column_id=0, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_09, bg_active=accent_color, fg_active=font_color_light)
+        btn_10 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 11, column_id=n_1st_column_half, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_10, bg_active=accent_color, fg_active=font_color_light)
+        btn_11 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=0, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_11, bg_active=accent_color, fg_active=font_color_light)
+        btn_12 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=n_1st_column_half, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_12, bg_active=accent_color, fg_active=font_color_light)
+        btn_13 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_13, bg_active=accent_color, fg_active=font_color_light)
+        btn_14 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=n_1st_column_half, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_14, bg_active=accent_color, fg_active=font_color_light)
+
+        # Radiobuttons
+        str_rb_01 = self.language_dict["Background"][self.var_language]
+        str_rb_03 = self.language_dict["Inclusion"][self.var_language]
+        str_rb_04 = self.language_dict["No selection"][self.var_language]
+        str_rb_05 = str_rb_01
+        str_rb_07 = str_rb_03
+        str_rb_08 = str_lbl_05
+        str_rb_09 = self.language_dict["Error course"][self.var_language]
+        str_rb_10 = self.language_dict["Spectral data view"][self.var_language]
+        str_rb_11 = self.language_dict["Box plot data view"][self.var_language]
+        str_rb_12 = self.language_dict["Time signal view"][self.var_language]
+
+        if self.pysills_mode == "MA":
+            str_rb_02 = self.language_dict["Sample"][self.var_language]
+        else:
+            str_rb_02 = self.language_dict["Matrix"][self.var_language]
+
+        str_rb_06 = str_rb_02
+        var_rb_qa = self.helper_var_rb["File setup"]["QA section"]
+
+        rb_01 = SE(
+            parent=self.subwindow_file_setup, row_id=2, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_radiobutton(
+            var_rb=var_rb_qa, value_rb=0, color_bg=background_color_dark, fg=font_color_light, text=str_rb_01,
+            sticky="nesw", relief=tk.FLAT)
+        rb_02 = SE(
+            parent=self.subwindow_file_setup, row_id=3, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_radiobutton(
+            var_rb=var_rb_qa, value_rb=1, color_bg=background_color_dark, fg=font_color_light, text=str_rb_02,
+            sticky="nesw", relief=tk.FLAT)
+        rb_03 = SE(
+            parent=self.subwindow_file_setup, row_id=4, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            fg=font_color_light, bg=background_color_dark).create_radiobutton(
+            var_rb=var_rb_qa, value_rb=2, color_bg=background_color_dark, fg=font_color_light, text=str_rb_03,
+            sticky="nesw", relief=tk.FLAT)
+        rb_04 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=0, n_rows=1, n_columns=n_1st_column,
+            fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=0, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_04, sticky="nesw", relief=tk.FLAT)
+        rb_05 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=0, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=1, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_05, sticky="nesw", relief=tk.FLAT)
+        rb_06 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=2, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_06, sticky="nesw", relief=tk.FLAT)
+        rb_07 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=2*n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=3, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_07, sticky="nesw", relief=tk.FLAT)
+        rb_08 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=0, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=3, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_08, sticky="nesw", relief=tk.FLAT)
+        rb_09 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=n_1st_column_half, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=4, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_09, sticky="nesw", relief=tk.FLAT)
+        rb_10 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=0, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=1, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_10, sticky="nesw", relief=tk.FLAT)
+        rb_11 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=n_1st_column_half, n_rows=1,
+            n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=2, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_11, sticky="nesw", relief=tk.FLAT)
+        rb_12 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=0, n_rows=1,
+            n_columns=n_1st_column, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=0, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_12, sticky="nesw", relief=tk.FLAT)
+
+        # Option Menues
+        list_parameters = [
+            "Concentration", "Concentration ratio", "1-sigma concentration", "Limit of detection", "Intensity",
+            "Intensity ratio", "Sensitivity"]
+        var_opt_qa = tk.StringVar()
+        var_opt_qa.set(list_parameters[0])
+
+        opt_qa_param = SE(
+            parent=self.subwindow_file_setup, row_id=6, column_id=start_3rd_column, n_rows=1,
+            n_columns=n_3rd_column, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=var_opt_qa, option_list=list_parameters, text_set=var_opt_qa.get(), fg_active=font_color_light,
+            bg_active=accent_color)
+        opt_ref1 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 17, column_id=2, n_rows=1,
+            n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_var_opt["File setup"]["Reference isotope 1"], option_list=file_isotopes,
+            text_set=self.helper_var_opt["File setup"]["Reference isotope 1"].get(), fg_active=font_color_light,
+            bg_active=accent_color)
+        opt_ref2 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 16, column_id=2, n_rows=1,
+            n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_var_opt["File setup"]["Reference isotope 2"], option_list=file_isotopes,
+            text_set=self.helper_var_opt["File setup"]["Reference isotope 2"].get(), fg_active=font_color_light,
+            bg_active=accent_color)
+
+        # Checkboxes
+
+        # Entries
+        entr_01 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 7, column_id=n_1st_column_third, n_rows=1,
+            n_columns=2*n_1st_column_third, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.helper_var_entr["File setup"]["Start"],
+            text_default=self.helper_var_entr["File setup"]["Start"].get())
+        entr_02 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 6, column_id=n_1st_column_third, n_rows=1,
+            n_columns=2*n_1st_column_third, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=self.helper_var_entr["File setup"]["End"],
+            text_default=self.helper_var_entr["File setup"]["End"].get())
+
+        # Listboxes
+        self.lb_filesetup_bg = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=n_1st_column, n_rows=n_rows - 9,
+            n_columns=n_2nd_column_third, fg=self.bg_colors["Dark Font"],
+            bg=self.colors_intervals["BG LB"]).create_simple_listbox()
+        self.lb_filesetup_mat = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=n_1st_column + n_2nd_column_third,
+            n_rows=n_rows - 9, n_columns=n_2nd_column_third, fg=self.bg_colors["Dark Font"],
+            bg=self.colors_intervals["MAT LB"]).create_simple_listbox()
+        self.lb_filesetup_incl = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=n_1st_column + 2*n_2nd_column_third,
+            n_rows=n_rows - 9, n_columns=n_2nd_column_third, fg=self.bg_colors["Dark Font"],
+            bg=self.colors_intervals["INCL LB"]).create_simple_listbox()
+
+        frm_iso = SE(
+            parent=self.subwindow_file_setup, row_id=1, column_id=0, n_rows=17, n_columns=n_1st_column,
+            fg=font_color_dark, bg=background_color_light).create_frame()
+        vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
+        text_iso = tk.Text(
+            master=frm_iso, width=30, height=25, yscrollcommand=vsb_iso.set, bg=background_color_light, padx=10,
+            pady=10)
+        vsb_iso.config(command=text_iso.yview)
+        vsb_iso.pack(side="right", fill="y")
+        text_iso.pack(side="left", fill="both", expand=True)
+
+        for index, isotope in enumerate(file_isotopes):
+            if isotope in self.isotope_colors:
+                frm_i = tk.Frame(
+                    frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
+                    highlightbackground="black", bd=1)
+                text_iso.window_create("end", window=frm_i)
+                text_iso.insert("end", "")
+
+                lbl_i = tk.Label(frm_iso, text=isotope, bg=background_color_light, fg=font_color_dark, font=font_option,
+                                 width=5, anchor="w")
+                text_iso.window_create("end", window=lbl_i)
+                text_iso.insert("end", "\t")
+
+                self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope].set(1)
+                cb_raw_i = tk.Checkbutton(
+                    frm_iso,
+                    variable=self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope],
+                    text="RAW", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark, font=font_option,
+                    command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="RAW",
+                                   var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
+                                                                                       var_datatype, var_isotope))
+                text_iso.window_create("end", window=cb_raw_i)
+                text_iso.insert("end", "\t")
+
+                self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
+                cb_smoothed_i = tk.Checkbutton(
+                    frm_iso,
+                    variable=self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                        isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark,
+                    font=font_option,
+                    command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
+                                   var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
+                                                                                       var_datatype, var_isotope))
+
+                if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
+                    cb_smoothed_i.configure(state="disabled")
+                else:
+                    cb_smoothed_i.configure(state="normal")
+                text_iso.window_create("end", window=cb_smoothed_i)
+                text_iso.insert("end", "\n")
+
+        text_iso.configure(state="disabled")
+
+        # Treeviews
+        self.tv_filesetup_qa = SE(
+            parent=self.subwindow_file_setup, row_id=8, column_id=start_3rd_column, n_rows=n_rows - 8,
+            n_columns=n_3rd_column, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
+            n_categories=2, text_n=["Isotope", "Parameter"],
+            width_n=["75", "112"], individual=True)
+
+        style = ttk.Style()
+        style.configure("Treeview", font=font_table)
+        style.configure("Treeview.Heading", font=font_elements)
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Initialization
+        btn_10.configure(state="disabled")
+
+        if self.pysills_mode == "MA":
+            rb_03.configure(state="disabled")
+
+        var_geometry = [self.subwindow_file_setup, 0, start_2nd_column, n_rows - 11, n_2nd_column]
+        self.create_time_signal_diagram(geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long,
+                                        init=True)
+
+    def create_time_signal_diagram(self, geometry, filetype, filename_long, init=False):
+        if init == False:
+            self.var_canvas_ca.get_tk_widget().destroy()
+            self.var_toolbarFrame_ca.destroy()
+            self.var_toolbar_ca.destroy()
+            plt.close(self.var_canvas_ca.figure)
+
+        str_filename_short = filename_long.split("/")[-1]
+        df_data = self.container_measurements["Dataframe"][str_filename_short]
+
+        data_x = list(df_data.iloc[:, 0])
+        self.dataset_time = data_x
+        x_max = max(data_x)
+
+        ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
+        ref_iso_2 = self.helper_var_opt["File setup"]["Reference isotope 2"].get()
+        #list_isotopes = []
+        list_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+        #for isotope, variable in self.temp_ca_cb_iso.items():
+        #    if variable.get() == 1 and isotope not in [ref_iso_1, ref_iso_2]:
+        #        list_isotopes.append(isotope)
+
+        # Diagram
+        var_lw = float(self.container_var["General Settings"]["Line width"].get())
+        if var_lw < 0.25:
+            var_lw = 0.25
+        elif var_lw > 2.5:
+            var_lw = 2.5
+
+        var_fig = Figure(figsize=(10, 5), tight_layout=True, facecolor=self.bg_colors["Very Light"])
+        var_ax = var_fig.add_subplot(label=np.random.uniform())
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            # Time-Signal diagram
+            for isotope in list_isotopes:
+                data_y = df_data[isotope]
+                var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=var_lw)
+        else:
+            # Time-Ratio diagram
+            if ref_iso_1 != "None":
+                for index, isotope in enumerate(list_isotopes):
+                    data_ref_iso_1 = df_data[ref_iso_1]
+                    data_i = df_data[isotope]
+                    data_y = data_i/data_ref_iso_1
+                    if index > 0:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1)
+                    else:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1,
+                                    label="i/" + ref_iso_1)
+
+            if ref_iso_2 != "None":
+                for index, isotope in enumerate(list_isotopes):
+                    data_ref_iso_2 = df_data[ref_iso_2]
+                    data_i = df_data[isotope]
+                    data_y = data_i/data_ref_iso_2
+                    if index > 0:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2)
+                    else:
+                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2,
+                                    label="i/" + ref_iso_2)
+
+        var_ax.grid(True)
+        var_ax.set_yscale("log")
+        var_ax.set_xlim(left=0, right=x_max)
+        var_ax.set_xticks(np.linspace(0, x_max, 11, endpoint=True))
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            var_ax.set_ylim(bottom=1e2, top=1e9)
+            var_ax.set_yticks([1e2, 1e3, 1e4, 1e5, 1e6, 1e6, 1e7, 1e8, 1e9])
+        else:
+            var_ax.set_ylim(bottom=1e-4, top=1e5)
+            var_ax.set_yticks([1e-4, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
+
+        var_ax.grid(which="major", linestyle="-", linewidth=1)
+        var_ax.minorticks_on()
+        var_ax.grid(which="minor", linestyle=":", linewidth=0.5, alpha=0.75)
+        var_ax.set_axisbelow(True)
+        var_ax.set_title(str_filename_short, fontsize=9)
+        var_ax.set_xlabel("Time (s)", labelpad=0.5, fontsize="x-small")
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            var_ax.set_ylabel("Signal intensity (cps)", labelpad=0.5, fontsize="x-small")
+        else:
+            var_ax.set_ylabel("Signal intensity ratio (cps/cps)", labelpad=0.5, fontsize="x-small")
+
+        var_ax.xaxis.set_tick_params(labelsize="x-small")
+        var_ax.yaxis.set_tick_params(labelsize="x-small")
+
+        self.var_ax_ca = var_ax
+
+        if ref_iso_1 == "None" and ref_iso_2 == "None":
+            pass
+        else:
+            var_ax.legend(loc="upper left", framealpha=1.0, fontsize="x-small")
+
+        subwindow = geometry[0]
+        row_start = geometry[1]
+        column_start = geometry[2]
+        n_rows_diagram = geometry[3]
+        n_columns_diagram = geometry[4]
+
+        self.var_canvas_ca = FigureCanvasTkAgg(var_fig, master=subwindow)
+        self.var_canvas_ca.get_tk_widget().grid(
+            row=row_start, column=column_start, rowspan=n_rows_diagram, columnspan=n_columns_diagram,
+            sticky="nesw")
+
+        self.var_toolbarFrame_ca = tk.Frame(master=subwindow)
+        self.var_toolbarFrame_ca.grid(
+            row=n_rows_diagram, column=column_start, rowspan=1, columnspan=n_columns_diagram, sticky="ew")
+        self.var_toolbar_ca = NavigationToolbar2Tk(self.var_canvas_ca, self.var_toolbarFrame_ca)
+        self.var_toolbar_ca.config(
+            bg=self.bg_colors["Very Light"], highlightthickness=0, highlightbackground=self.bg_colors["Very Light"],
+            highlightcolor=self.bg_colors["Dark Font"], bd=0)
+        self.var_toolbar_ca._message_label.config(
+            background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"], font="sans 12")
+        self.var_toolbar_ca.winfo_children()[-2].config(
+            background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
+
+        #self.var_canvas_ca.mpl_connect(
+        #    "button_press_event", lambda event, var_type=filetype, var_file_short=str_filename_short:
+        #    self.add_interval_to_diagram_ca(var_type, var_file_short, event))
+
+        if init == True:
+            self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
+
+            if filetype not in self.container_helper:
+                self.container_helper[filetype] = {}
+                if str_filename_short not in self.container_helper[filetype]:
+                    self.container_helper[filetype][str_filename_short] = {}
+                    if "AXES" not in self.container_helper[filetype][str_filename_short]:
+                        self.container_helper[filetype][str_filename_short]["AXES"] = {
+                            "Chart analysis": var_ax, "Canvas CA": self.var_canvas_ca}
+            else:
+                if str_filename_short not in self.container_helper[filetype]:
+                    self.build_container_helper(mode=filetype)
+
+                for key in ["BG", "MAT", "INCL"]:
+                    if key not in self.container_helper[filetype][str_filename_short]:
+                        self.container_helper[filetype][str_filename_short][key] = {
+                            "ID": 0, "Content": {}, "Indices": []}
+
+                if "Chart analysis" not in self.container_helper[filetype][str_filename_short]["AXES"]:
+                    self.container_helper[filetype][str_filename_short]["AXES"]["Chart analysis"] = var_ax
+                    self.container_helper[filetype][str_filename_short]["AXES"][
+                        "Canvas CA"] = self.var_canvas_ca
+
+        if init == False:
+            self.check_for_intervals_ca(only_boxes=True)
+
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         # Colors
         font_color_dark = self.bg_colors["Dark Font"]
@@ -21955,6 +22575,8 @@ class PySILLS(tk.Frame):
         str_filename_long = var_filename_long
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
+
+        self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
@@ -22844,7 +23466,7 @@ class PySILLS(tk.Frame):
         self.container_var[var_type][var_file_long]["Sign Color"].set(self.sign_green)
         var_parent.destroy()
 
-    def ma_show_time_signal_diagram(self, var_file, var_filetype, var_lb_state=True):
+    def ma_show_time_signal_diagram(self, var_file, var_filetype, var_lb_state=True, custom_parent=None):
         # Colors
         font_color_dark = self.bg_colors["Dark Font"]
         font_color_light = self.bg_colors["Light Font"]
