@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.67
+# Version:	v1.0.68
 # Date:		27.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.67"
+        self.str_version_number = "1.0.68"
         self.val_version = self.str_version_number + " - 27.02.2025"
 
         ## Colors
@@ -1987,6 +1987,11 @@ class PySILLS(tk.Frame):
                     "Table": "sans 12", "Tiny": "sans 12 bold"}
 
         str_screen_resolution = self.container_var["General Settings"]["Screen resolution"].get()
+
+        var_ncol_ma_settings = 65
+        var_ncol_fi_settings = 67
+        var_ncol_mi_settings = 63
+
         if str_screen_resolution == "1920x1080":    # Full HD
             if var_os == "linux":
                 var_ncol_ma_settings = 66
@@ -2002,9 +2007,13 @@ class PySILLS(tk.Frame):
                 var_ncol_mi_settings = 63
         elif str_screen_resolution == "1280x720":   # HD ready
             var_ncol_ma_settings = 70
+            var_ncol_fi_settings = 72
+            var_ncol_mi_settings = 68
         elif str_screen_resolution == "3840x2160":  # 4K
             var_ncol_ma_settings = 65
-        # "Quick plot": [28, 50]
+            var_ncol_fi_settings = 67
+            var_ncol_mi_settings = 63
+
         self.window_dimensions = {
             "Main window": [33, 21], "MA main settings": [38, var_ncol_ma_settings],
             "FI main settings": [40, var_ncol_fi_settings], "MI main settings": [40, var_ncol_mi_settings],
@@ -22271,14 +22280,14 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_13, bg_active=accent_color, fg_active=font_color_light,
-            command=lambda filename_short=str_filename_short:
-            self.filesetup_visibility_all_lines(filename_short))
+            command=lambda filetype=str_filetype, filename_short=str_filename_short:
+            self.filesetup_visibility_all_lines(filetype, filename_short))
         btn_14 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_14, bg_active=accent_color, fg_active=font_color_light,
-            command=lambda filename_short=str_filename_short, hide=True:
-            self.filesetup_visibility_all_lines(filename_short, hide))
+            command=lambda filetype=str_filetype, filename_short=str_filename_short, hide=True:
+            self.filesetup_visibility_all_lines(filetype, filename_short, hide))
 
         # Radiobuttons
         str_rb_01 = self.language_dict["Background"][self.var_language]
@@ -22426,6 +22435,7 @@ class PySILLS(tk.Frame):
         text_iso.pack(side="left", fill="both", expand=True)
 
         for index, isotope in enumerate(file_isotopes):
+            str_isotope = isotope
             if isotope in self.isotope_colors:
                 frm_i = tk.Frame(
                     frm_iso, bg=self.isotope_colors[isotope], relief=tk.SOLID, height=15, width=15,
@@ -22443,9 +22453,9 @@ class PySILLS(tk.Frame):
                     frm_iso,
                     variable=self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope],
                     text="RAW", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark, font=font_option,
-                    command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="RAW",
-                                   var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
-                                                                                       var_datatype, var_isotope))
+                    command=lambda filetype=str_filetype, filename_short=str_filename_short, isotope=str_isotope,
+                                   datatype="RAW":
+                    self.filesetup_visibility_isotope(filetype, filename_short, isotope, datatype))
                 text_iso.window_create("end", window=cb_raw_i)
                 text_iso.insert("end", "\t")
 
@@ -22677,7 +22687,12 @@ class PySILLS(tk.Frame):
         if init == False:
             self.check_for_intervals_ca(only_boxes=True)
 
-    def filesetup_visibility_all_lines(self, filename_short, hide=False):
+    def filesetup_visibility_all_lines(self, filetype, filename_short, hide=False):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        else:
+            key_setting = "fi_setting"
+
         if hide == False:
             visibility = True
         else:
@@ -22691,10 +22706,29 @@ class PySILLS(tk.Frame):
             if dict_lines["SMOOTHED"] != None:
                 dict_lines["SMOOTHED"][0].set_visible(visibility)
 
+            if hide == True:
+                self.container_var[key_setting]["Display RAW"][filetype][filename_short][isotope].set(0)
+                self.container_var[key_setting]["Display SMOOTHED"][filetype][filename_short][isotope].set(0)
+            else:
+                self.container_var[key_setting]["Display RAW"][filetype][filename_short][isotope].set(1)
+                self.container_var[key_setting]["Display SMOOTHED"][filetype][filename_short][isotope].set(1)
+
         self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
 
-    def filesetup_visibility_isotope(self, filename_short, hide=False):
-        pass
+    def filesetup_visibility_isotope(self, filetype, filename_short, isotope, datatype):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        else:
+            key_setting = "fi_setting"
+
+        key_datatype = "Display " + datatype
+
+        if self.container_var[key_setting][key_datatype][filetype][filename_short][isotope].get() == 0:
+            self.helper_filesetup_lines[filename_short][isotope][datatype][0].set_visible(False)
+        else:
+            self.helper_filesetup_lines[filename_short][isotope][datatype][0].set_visible(True)
+
+        self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
 
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         # Colors
@@ -22713,7 +22747,7 @@ class PySILLS(tk.Frame):
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
 
-        #self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
+        self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
