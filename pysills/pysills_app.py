@@ -22747,7 +22747,7 @@ class PySILLS(tk.Frame):
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
 
-        self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
+        #self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
