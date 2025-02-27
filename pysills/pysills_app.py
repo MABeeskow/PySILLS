@@ -22078,7 +22078,7 @@ class PySILLS(tk.Frame):
 
         if str_filename_short not in self.helper_filesetup_lines:
             self.helper_filesetup_lines[str_filename_short] = {}
-
+        self.helper_filesetup_lines[str_filename_short] = {}
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
         else:
@@ -22271,11 +22271,15 @@ class PySILLS(tk.Frame):
         btn_11 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_11, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_11, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=str_filename_short:
+            self.filesetup_visibility_all_raw_lines(filetype, filename_short))
         btn_12 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_12, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_12, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filetype=str_filetype, filename_short=str_filename_short, hide=True:
+            self.filesetup_visibility_all_raw_lines(filetype, filename_short, hide))
         btn_13 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -22471,9 +22475,9 @@ class PySILLS(tk.Frame):
                     variable=self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
                         isotope], text="SMOOTHED", onvalue=1, offvalue=0, bg=background_color_light, fg=font_color_dark,
                     font=font_option,
-                    command=lambda var_type=str_filetype, var_file_short=str_filename_short, var_datatype="SMOOTHED",
-                                   var_isotope=isotope: self.ma_change_line_visibility(var_type, var_file_short,
-                                                                                       var_datatype, var_isotope))
+                    command=lambda filetype=str_filetype, filename_short=str_filename_short, isotope=str_isotope,
+                                   datatype="SMOOTHED":
+                    self.filesetup_visibility_isotope(filetype, filename_short, isotope, datatype))
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
                     cb_smoothed_i.configure(state="disabled")
@@ -22564,7 +22568,7 @@ class PySILLS(tk.Frame):
                         ln_smoothed_i = var_ax.plot(
                             data_x, data_y, label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
                             visible=True)
-                        self.helper_filesetup_lines[str_filename_short][isotope]["SMOOTHED"] = ln_raw_i
+                        self.helper_filesetup_lines[str_filename_short][isotope]["SMOOTHED"] = ln_smoothed_i
 
                         if self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
                             isotope].get() == 0:
@@ -22687,6 +22691,27 @@ class PySILLS(tk.Frame):
         if init == False:
             self.check_for_intervals_ca(only_boxes=True)
 
+    def filesetup_visibility_all_raw_lines(self, filetype, filename_short, hide=False):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        else:
+            key_setting = "fi_setting"
+
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+        for isotope in file_isotopes:
+            dict_lines = self.helper_filesetup_lines[filename_short][isotope]
+
+            if hide == False:  # show only RAW
+                if dict_lines["SMOOTHED"] != None:
+                    dict_lines["SMOOTHED"][0].set_visible(False)
+                    self.container_var[key_setting]["Display SMOOTHED"][filetype][filename_short][isotope].set(0)
+            else:               # hide only RAW
+                dict_lines["RAW"][0].set_visible(False)
+                self.container_var[key_setting]["Display RAW"][filetype][filename_short][isotope].set(0)
+
+        self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
+
+
     def filesetup_visibility_all_lines(self, filetype, filename_short, hide=False):
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
@@ -22747,7 +22772,7 @@ class PySILLS(tk.Frame):
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
 
-        #self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
+        self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
