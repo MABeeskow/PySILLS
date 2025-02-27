@@ -22123,6 +22123,9 @@ class PySILLS(tk.Frame):
         start_2nd_column = n_1st_column
         start_3rd_column = n_1st_column + n_2nd_column
 
+        var_geometry = [self.subwindow_file_setup, 0, start_2nd_column, n_rows - 11, n_2nd_column]
+        self.var_geometry = var_geometry
+
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # Frames
         frm_00 = SE(
@@ -22278,26 +22281,26 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_11, bg_active=accent_color, fg_active=font_color_light,
-            command=lambda filetype=str_filetype, filename_short=str_filename_short:
-            self.filesetup_visibility_all_raw_lines(filetype, filename_short))
+            command=lambda filename_short=str_filename_short:
+            self.filesetup_visibility_all_raw_lines(filename_short))
         btn_12 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_12, bg_active=accent_color, fg_active=font_color_light,
-            command=lambda filetype=str_filetype, filename_short=str_filename_short, hide=True:
-            self.filesetup_visibility_all_raw_lines(filetype, filename_short, hide))
+            command=lambda filename_short=str_filename_short, hide=True:
+            self.filesetup_visibility_all_raw_lines(filename_short, hide))
         btn_13 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_13, bg_active=accent_color, fg_active=font_color_light,
-            command=lambda filetype=str_filetype, filename_short=str_filename_short:
-            self.filesetup_visibility_all_lines(filetype, filename_short))
+            command=lambda filename_short=str_filename_short:
+            self.filesetup_visibility_all_lines(filename_short))
         btn_14 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_14, bg_active=accent_color, fg_active=font_color_light,
-            command=lambda filetype=str_filetype, filename_short=str_filename_short, hide=True:
-            self.filesetup_visibility_all_lines(filetype, filename_short, hide))
+            command=lambda filename_short=str_filename_short, hide=True:
+            self.filesetup_visibility_all_lines(filename_short, hide))
 
         # Radiobuttons
         str_rb_01 = self.language_dict["Background"][self.var_language]
@@ -22378,7 +22381,9 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=0, n_rows=1,
             n_columns=n_1st_column, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=0, color_bg=background_color_elements,
-            fg=font_color_dark, text=str_rb_12, sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text=str_rb_12, sticky="nesw", relief=tk.FLAT,
+            command=lambda geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long:
+            self.create_time_signal_diagram(geometry, filetype, filename_long))
 
         # Option Menues
         list_parameters = [
@@ -22399,13 +22404,17 @@ class PySILLS(tk.Frame):
             n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
             var_iso=self.helper_var_opt["File setup"]["Reference isotope 1"], option_list=list_isotopes_opt,
             text_set=self.helper_var_opt["File setup"]["Reference isotope 1"].get(), fg_active=font_color_light,
-            bg_active=accent_color)
+            bg_active=accent_color,
+            command=lambda geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long:
+            self.create_time_signal_diagram(geometry, filetype, filename_long))
         opt_ref2 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 16, column_id=2, n_rows=1,
             n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
             var_iso=self.helper_var_opt["File setup"]["Reference isotope 2"], option_list=list_isotopes_opt,
             text_set=self.helper_var_opt["File setup"]["Reference isotope 2"].get(), fg_active=font_color_light,
-            bg_active=accent_color)
+            bg_active=accent_color,
+            command=lambda geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long:
+            self.create_time_signal_diagram(geometry, filetype, filename_long))
 
         # Checkboxes
 
@@ -22463,14 +22472,14 @@ class PySILLS(tk.Frame):
 
                 self.temp_cb_i["RAW"][isotope] = tk.IntVar()
                 self.temp_cb_i["RAW"][isotope].set(1)
-                #self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope].set(1)
+
                 cb_raw_i = tk.Checkbutton(
                     frm_iso,
                     variable=self.temp_cb_i["RAW"][isotope], text="RAW", onvalue=1, offvalue=0,
                     bg=background_color_light, fg=font_color_dark, font=font_option,
-                    command=lambda filetype=str_filetype, filename_short=str_filename_short, isotope=str_isotope,
+                    command=lambda filename_short=str_filename_short, isotope=str_isotope,
                                    datatype="RAW":
-                    self.filesetup_visibility_isotope(filetype, filename_short, isotope, datatype))
+                    self.filesetup_visibility_isotope(filename_short, isotope, datatype))
                 text_iso.window_create("end", window=cb_raw_i)
                 text_iso.insert("end", "\t")
 
@@ -22484,9 +22493,9 @@ class PySILLS(tk.Frame):
                     frm_iso,
                     variable=self.temp_cb_i["SMOOTHED"][isotope], text="SMOOTHED", onvalue=1, offvalue=0,
                     bg=background_color_light, fg=font_color_dark, font=font_option,
-                    command=lambda filetype=str_filetype, filename_short=str_filename_short, isotope=str_isotope,
+                    command=lambda filename_short=str_filename_short, isotope=str_isotope,
                                    datatype="SMOOTHED":
-                    self.filesetup_visibility_isotope(filetype, filename_short, isotope, datatype))
+                    self.filesetup_visibility_isotope(filename_short, isotope, datatype))
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
                     cb_smoothed_i.configure(state="disabled")
@@ -22516,7 +22525,6 @@ class PySILLS(tk.Frame):
         if self.pysills_mode == "MA":
             rb_03.configure(state="disabled")
 
-        var_geometry = [self.subwindow_file_setup, 0, start_2nd_column, n_rows - 11, n_2nd_column]
         self.create_time_signal_diagram(geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long,
                                         init=True)
 
@@ -22544,11 +22552,6 @@ class PySILLS(tk.Frame):
         self.specific_file_setup(filetype=filetype, filename_long=filename_long_new)
 
     def create_time_signal_diagram(self, geometry, filetype, filename_long, init=False):
-        if self.pysills_mode == "MA":
-            key_setting = "ma_setting"
-        else:
-            key_setting = "fi_setting"
-
         if init == False:
             self.var_canvas_ca.get_tk_widget().destroy()
             self.var_toolbarFrame_ca.destroy()
@@ -22565,11 +22568,13 @@ class PySILLS(tk.Frame):
 
         ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
         ref_iso_2 = self.helper_var_opt["File setup"]["Reference isotope 2"].get()
-        #list_isotopes = []
-        list_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
-        #for isotope, variable in self.temp_ca_cb_iso.items():
-        #    if variable.get() == 1 and isotope not in [ref_iso_1, ref_iso_2]:
-        #        list_isotopes.append(isotope)
+        list_isotopes = []
+        #list_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+        for datatype in ["RAW", "SMOOTHED"]:
+            for isotope, variable in self.temp_cb_i[datatype].items():
+                if variable.get() == 1 and isotope not in [ref_iso_1, ref_iso_2]:
+                    if isotope not in list_isotopes:
+                        list_isotopes.append(isotope)
 
         # Diagram
         var_lw = float(self.container_var["General Settings"]["Line width"].get())
@@ -22591,7 +22596,7 @@ class PySILLS(tk.Frame):
                 ln_raw_i = var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=var_lw)
                 self.helper_filesetup_lines[str_filename_short][isotope]["RAW"] = ln_raw_i
 
-                if self.temp_cb_i["RAW"][isotope].get() == 0: # self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope].get()
+                if self.temp_cb_i["RAW"][isotope].get() == 0:
                     ln_raw_i[0].set_visible(False)
 
                 if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
@@ -22609,25 +22614,36 @@ class PySILLS(tk.Frame):
             # Time-Ratio diagram
             if ref_iso_1 != "None":
                 for index, isotope in enumerate(list_isotopes):
+                    if "RAW 1" not in self.helper_filesetup_lines[str_filename_short][isotope]:
+                        self.helper_filesetup_lines[str_filename_short][isotope]["RAW 1"] = None
+
                     data_ref_iso_1 = df_data[ref_iso_1]
                     data_i = df_data[isotope]
                     data_y = data_i/data_ref_iso_1
-                    if index > 0:
-                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1)
-                    else:
-                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1,
-                                    label="i/" + ref_iso_1)
 
+                    if index > 0:
+                        ln_raw_1_i = var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1)
+                    else:
+                        ln_raw_1_i = var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=1,
+                                                 label="i/" + ref_iso_1)
+
+                    self.helper_filesetup_lines[str_filename_short][isotope]["RAW 1"] = ln_raw_1_i
             if ref_iso_2 != "None":
                 for index, isotope in enumerate(list_isotopes):
+                    if "RAW 2" not in self.helper_filesetup_lines[str_filename_short][isotope]:
+                        self.helper_filesetup_lines[str_filename_short][isotope]["RAW 2"] = None
+
                     data_ref_iso_2 = df_data[ref_iso_2]
                     data_i = df_data[isotope]
                     data_y = data_i/data_ref_iso_2
+
                     if index > 0:
-                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2)
+                        ln_raw_2_i = var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2)
                     else:
-                        var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2,
-                                    label="i/" + ref_iso_2)
+                        ln_raw_2_i = var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=2,
+                                                 label="i/" + ref_iso_2)
+
+                    self.helper_filesetup_lines[str_filename_short][isotope]["RAW 2"] = ln_raw_2_i
 
         var_ax.grid(True)
         var_ax.set_yscale("log")
@@ -22658,11 +22674,15 @@ class PySILLS(tk.Frame):
         var_ax.yaxis.set_tick_params(labelsize="x-small")
 
         self.var_ax_ca = var_ax
+        self.var_fig_ca = var_fig
 
         if ref_iso_1 == "None" and ref_iso_2 == "None":
             pass
         else:
             var_ax.legend(loc="upper left", framealpha=1.0, fontsize="x-small")
+
+        if type(geometry) != list:
+            geometry = self.var_geometry
 
         subwindow = geometry[0]
         row_start = geometry[1]
@@ -22690,6 +22710,9 @@ class PySILLS(tk.Frame):
         #self.var_canvas_ca.mpl_connect(
         #    "button_press_event", lambda event, var_type=filetype, var_file_short=str_filename_short:
         #    self.add_interval_to_diagram_ca(var_type, var_file_short, event))
+
+        self.helper_filesetup_lines[str_filename_short]["AXIS"] = var_ax
+        self.helper_filesetup_lines[str_filename_short]["CANVAS"] = self.var_canvas_ca
 
         if init == True:
             if "AXIS" not in self.helper_filesetup_lines[str_filename_short]:
@@ -22719,14 +22742,12 @@ class PySILLS(tk.Frame):
                     self.container_helper[filetype][str_filename_short]["AXES"][
                         "Canvas CA"] = self.var_canvas_ca
 
-        if init == False:
-            self.check_for_intervals_ca(only_boxes=True)
+        #if init == False:
+        #    self.check_for_intervals_ca(only_boxes=True)
 
-    def filesetup_visibility_all_raw_lines(self, filetype, filename_short, hide=False):
-        if self.pysills_mode == "MA":
-            key_setting = "ma_setting"
-        else:
-            key_setting = "fi_setting"
+    def filesetup_visibility_all_raw_lines(self, filename_short, hide=False):
+        ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
+        ref_iso_2 = self.helper_var_opt["File setup"]["Reference isotope 2"].get()
 
         file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
         for isotope in file_isotopes:
@@ -22737,27 +22758,41 @@ class PySILLS(tk.Frame):
                     dict_lines["SMOOTHED"][0].set_visible(False)
                     self.temp_cb_i["SMOOTHED"][isotope].set(0)
             else:               # hide only RAW
-                dict_lines["RAW"][0].set_visible(False)
+                if ref_iso_1 == "None" and ref_iso_2 == "None":
+                    dict_lines["RAW"][0].set_visible(False)
+                else:
+                    if ref_iso_1 != "None":
+                        if "RAW 1" in dict_lines:
+                            dict_lines["RAW 1"][0].set_visible(False)
+                    if ref_iso_2 != "None":
+                        if "RAW 2" in dict_lines:
+                            dict_lines["RAW 2"][0].set_visible(False)
+
                 self.temp_cb_i["RAW"][isotope].set(0)
 
         self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
 
-
-    def filesetup_visibility_all_lines(self, filetype, filename_short, hide=False):
-        if self.pysills_mode == "MA":
-            key_setting = "ma_setting"
-        else:
-            key_setting = "fi_setting"
-
+    def filesetup_visibility_all_lines(self, filename_short, hide=False):
         if hide == False:
             visibility = True
         else:
             visibility = False
 
+        ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
+        ref_iso_2 = self.helper_var_opt["File setup"]["Reference isotope 2"].get()
         file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+
         for isotope in file_isotopes:
             dict_lines = self.helper_filesetup_lines[filename_short][isotope]
-            dict_lines["RAW"][0].set_visible(visibility)
+            if ref_iso_1 == "None" and ref_iso_2 == "None":
+                dict_lines["RAW"][0].set_visible(visibility)
+            else:
+                if ref_iso_1 != "None":
+                    if "RAW 1" in dict_lines:
+                        dict_lines["RAW 1"][0].set_visible(visibility)
+                if ref_iso_2 != "None":
+                    if "RAW 2" in dict_lines:
+                        dict_lines["RAW 2"][0].set_visible(visibility)
 
             if dict_lines["SMOOTHED"] != None:
                 dict_lines["SMOOTHED"][0].set_visible(visibility)
@@ -22769,20 +22804,34 @@ class PySILLS(tk.Frame):
                 self.temp_cb_i["RAW"][isotope].set(1)
                 self.temp_cb_i["SMOOTHED"][isotope].set(1)
 
+        self.var_canvas_ca.draw()
         self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
 
-    def filesetup_visibility_isotope(self, filetype, filename_short, isotope, datatype):
-        if self.pysills_mode == "MA":
-            key_setting = "ma_setting"
-        else:
-            key_setting = "fi_setting"
-
-        key_datatype = "Display " + datatype
+    def filesetup_visibility_isotope(self, filename_short, isotope, datatype):
+        ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
+        ref_iso_2 = self.helper_var_opt["File setup"]["Reference isotope 2"].get()
+        dict_lines = self.helper_filesetup_lines[filename_short][isotope]
 
         if self.temp_cb_i[datatype][isotope].get() == 0:
-            self.helper_filesetup_lines[filename_short][isotope][datatype][0].set_visible(False)
+            if ref_iso_1 == "None" and ref_iso_2 == "None":
+                dict_lines[datatype][0].set_visible(False)
+            else:
+                if ref_iso_1 != "None":
+                    if "RAW 1" in dict_lines:
+                        dict_lines["RAW 1"][0].set_visible(False)
+                if ref_iso_2 != "None":
+                    if "RAW 2" in dict_lines:
+                        dict_lines["RAW 2"][0].set_visible(False)
         else:
-            self.helper_filesetup_lines[filename_short][isotope][datatype][0].set_visible(True)
+            if ref_iso_1 == "None" and ref_iso_2 == "None":
+                dict_lines[datatype][0].set_visible(True)
+            else:
+                if ref_iso_1 != "None":
+                    if "RAW 1" in dict_lines:
+                        dict_lines["RAW 1"][0].set_visible(True)
+                if ref_iso_2 != "None":
+                    if "RAW 2" in dict_lines:
+                        dict_lines["RAW 2"][0].set_visible(True)
 
         self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
 
