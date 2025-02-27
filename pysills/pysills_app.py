@@ -695,10 +695,12 @@ class PySILLS(tk.Frame):
         self.rb_report.set(0)
 
         self.helper_var_rb = {
-            "File setup": {"QA section": tk.IntVar(), "Section": tk.IntVar(), "Analysis mode": tk.IntVar()}}
+            "File setup": {"QA section": tk.IntVar(), "Section": tk.IntVar(), "Analysis mode": tk.IntVar(),
+                           "Interval limits": tk.IntVar()}}
         self.helper_var_rb["File setup"]["QA section"].set(1)
         self.helper_var_rb["File setup"]["Section"].set(0)
         self.helper_var_rb["File setup"]["Analysis mode"].set(0)
+        self.helper_var_rb["File setup"]["Interval limits"].set(0)
 
         self.helper_var_entr = {"File setup": {"Start": tk.StringVar(), "End": tk.StringVar()}}
         self.helper_var_entr["File setup"]["Start"].set("Set start value")
@@ -22072,17 +22074,13 @@ class PySILLS(tk.Frame):
         str_filename_long = filename_long
         str_filename_short = str_filename_long.split("/")[-1]
         file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
-
-        df_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+        self.ca_filetype = str_filetype
+        self.ca_filename_short = str_filename_short
         str_title = self.language_dict["Setup"][self.var_language]
 
         if str_filename_short not in self.helper_filesetup_lines:
             self.helper_filesetup_lines[str_filename_short] = {}
         self.helper_filesetup_lines[str_filename_short] = {}
-        if self.pysills_mode == "MA":
-            key_setting = "ma_setting"
-        else:
-            key_setting = "fi_setting"
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # Window settings
@@ -22172,7 +22170,7 @@ class PySILLS(tk.Frame):
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_05, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_06 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 15, column_id=0, n_rows=1, n_columns=n_1st_column,
+            parent=self.subwindow_file_setup, row_id=n_rows - 16, column_id=0, n_rows=1, n_columns=n_1st_column,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_06, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_07 = SE(
@@ -22184,19 +22182,19 @@ class PySILLS(tk.Frame):
             fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=str_lbl_08, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_09 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=0, n_rows=1, n_columns=n_1st_column,
+            parent=self.subwindow_file_setup, row_id=n_rows - 11, column_id=0, n_rows=1, n_columns=n_1st_column,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_09, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_10 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 18, column_id=0, n_rows=1, n_columns=n_1st_column,
+            parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=0, n_rows=1, n_columns=n_1st_column,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_10, relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_11 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 17, column_id=0, n_rows=1, n_columns=2,
+            parent=self.subwindow_file_setup, row_id=n_rows - 18, column_id=0, n_rows=1, n_columns=2,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text="#1", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_12 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 16, column_id=0, n_rows=1, n_columns=2,
+            parent=self.subwindow_file_setup, row_id=n_rows - 17, column_id=0, n_rows=1, n_columns=2,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text="#2", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_13 = SE(
@@ -22268,35 +22266,35 @@ class PySILLS(tk.Frame):
         btn_08 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_08, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_08, bg_active=accent_color, fg_active=font_color_light, command=self.remove_interval_ca)
         btn_09 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 11, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_09, bg_active=accent_color, fg_active=font_color_light)
         btn_10 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 11, column_id=n_1st_column_half, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_10, bg_active=accent_color, fg_active=font_color_light)
         btn_11 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_11, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filename_short=str_filename_short:
             self.filesetup_visibility_all_raw_lines(filename_short))
         btn_12 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 19, column_id=n_1st_column_half, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_12, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filename_short=str_filename_short, hide=True:
             self.filesetup_visibility_all_raw_lines(filename_short, hide))
         btn_13 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 21, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_13, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filename_short=str_filename_short:
             self.filesetup_visibility_all_lines(filename_short))
         btn_14 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=n_1st_column_half, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 21, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_14, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filename_short=str_filename_short, hide=True:
@@ -22313,6 +22311,9 @@ class PySILLS(tk.Frame):
         str_rb_10 = self.language_dict["Spectral data view"][self.var_language]
         str_rb_11 = self.language_dict["Box plot data view"][self.var_language]
         str_rb_12 = self.language_dict["Time signal view"][self.var_language]
+        str_rb_13 = "left limit"
+        str_rb_14 = "right limit"
+        str_rb_15 = "both limits"
 
         if self.pysills_mode == "MA":
             str_rb_02 = self.language_dict["Sample"][self.var_language]
@@ -22321,6 +22322,9 @@ class PySILLS(tk.Frame):
 
         str_rb_06 = str_rb_02
         var_rb_qa = self.helper_var_rb["File setup"]["QA section"]
+        var_rb_section = self.helper_var_rb["File setup"]["Section"]
+        var_rb_limits = self.helper_var_rb["File setup"]["Interval limits"]
+        self.helper_rb_ca_bg = var_rb_section
 
         rb_01 = SE(
             parent=self.subwindow_file_setup, row_id=2, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
@@ -22338,52 +22342,67 @@ class PySILLS(tk.Frame):
             var_rb=var_rb_qa, value_rb=2, color_bg=background_color_dark, fg=font_color_light, text=str_rb_03,
             sticky="nesw", relief=tk.FLAT)
         rb_04 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=0, n_rows=1, n_columns=n_1st_column,
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=0, n_rows=1, n_columns=n_1st_column,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=0, color_bg=background_color_elements,
+            var_rb=var_rb_section, value_rb=0, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_04, sticky="nesw", relief=tk.FLAT)
         rb_05 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=0, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=1, color_bg=background_color_elements,
+            var_rb=var_rb_section, value_rb=1, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_05, sticky="nesw", relief=tk.FLAT)
         rb_06 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=n_1st_column_third, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=2, color_bg=background_color_elements,
+            var_rb=var_rb_section, value_rb=2, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_06, sticky="nesw", relief=tk.FLAT)
         rb_07 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=2*n_1st_column_third, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 9, column_id=2*n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Section"], value_rb=3, color_bg=background_color_elements,
+            var_rb=var_rb_section, value_rb=3, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_07, sticky="nesw", relief=tk.FLAT)
         rb_08 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=3, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_08, sticky="nesw", relief=tk.FLAT)
         rb_09 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=n_1st_column_half, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=4, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_09, sticky="nesw", relief=tk.FLAT)
         rb_10 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=1, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_10, sticky="nesw", relief=tk.FLAT)
         rb_11 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=n_1st_column_half, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=2, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_11, sticky="nesw", relief=tk.FLAT)
         rb_12 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=0, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 15, column_id=0, n_rows=1,
             n_columns=n_1st_column, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=0, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_12, sticky="nesw", relief=tk.FLAT,
             command=lambda geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long:
             self.create_time_signal_diagram(geometry, filetype, filename_long))
+        rb_13 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=0, n_rows=1, n_columns=n_1st_column_third,
+            fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=0, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_13, sticky="nesw", relief=tk.FLAT)
+        rb_14 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=1, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_14, sticky="nesw", relief=tk.FLAT)
+        rb_15 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=2*n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=2, color_bg=background_color_elements,
+            fg=font_color_dark, text=str_rb_15, sticky="nesw", relief=tk.FLAT)
 
         # Option Menues
         list_parameters = [
@@ -22400,7 +22419,7 @@ class PySILLS(tk.Frame):
             var_iso=var_opt_qa, option_list=list_parameters, text_set=var_opt_qa.get(), fg_active=font_color_light,
             bg_active=accent_color)
         opt_ref1 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 17, column_id=2, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 18, column_id=2, n_rows=1,
             n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
             var_iso=self.helper_var_opt["File setup"]["Reference isotope 1"], option_list=list_isotopes_opt,
             text_set=self.helper_var_opt["File setup"]["Reference isotope 1"].get(), fg_active=font_color_light,
@@ -22408,7 +22427,7 @@ class PySILLS(tk.Frame):
             command=lambda geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long:
             self.create_time_signal_diagram(geometry, filetype, filename_long))
         opt_ref2 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 16, column_id=2, n_rows=1,
+            parent=self.subwindow_file_setup, row_id=n_rows - 17, column_id=2, n_rows=1,
             n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
             var_iso=self.helper_var_opt["File setup"]["Reference isotope 2"], option_list=list_isotopes_opt,
             text_set=self.helper_var_opt["File setup"]["Reference isotope 2"].get(), fg_active=font_color_light,
@@ -22417,18 +22436,49 @@ class PySILLS(tk.Frame):
             self.create_time_signal_diagram(geometry, filetype, filename_long))
 
         # Checkboxes
+        self.helper_cb_ca_bg = tk.IntVar()
+        self.helper_cb_ca_mat = tk.IntVar()
+        self.helper_cb_ca_incl = tk.IntVar()
+        self.helper_cb_ca_bg.set(1)
+        self.helper_cb_ca_mat.set(1)
+        self.helper_cb_ca_incl.set(1)
+
+        cb_01 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=n_1st_column + n_2nd_column_third - 1,
+            n_rows=1, n_columns=1, fg=font_color_dark, bg=self.colors_intervals["BG"]).create_simple_checkbox(
+            var_cb=self.helper_cb_ca_bg, text="", set_sticky="nesw", own_color=True,
+            command=lambda key="Background": self.show_or_hide_intervals_ca(key))
+        cb_02 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=n_1st_column + 2*n_2nd_column_third - 1,
+            n_rows=1, n_columns=1, fg=font_color_dark, bg=self.colors_intervals["MAT"]).create_simple_checkbox(
+            var_cb=self.helper_cb_ca_mat, text="", set_sticky="nesw", own_color=True,
+            command=lambda key="Matrix": self.show_or_hide_intervals_ca(key))
+        cb_03 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 10, column_id=n_1st_column + 3*n_2nd_column_third - 1,
+            n_rows=1, n_columns=1, fg=font_color_dark, bg=self.colors_intervals["INCL"]).create_simple_checkbox(
+            var_cb=self.helper_cb_ca_incl, text="", set_sticky="nesw", own_color=True,
+            command=lambda key="Inclusion": self.show_or_hide_intervals_ca(key))
 
         # Entries
         entr_01 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 7, column_id=n_1st_column_third, n_rows=1,
             n_columns=2*n_1st_column_third, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
             var=self.helper_var_entr["File setup"]["Start"],
-            text_default=self.helper_var_entr["File setup"]["Start"].get())
+            text_default=self.helper_var_entr["File setup"]["Start"].get(),
+            command=lambda event, var_entr=self.helper_var_entr["File setup"]["Start"], var_key="Start",
+                           mode=str_filename_long:
+            self.filesetup_set_interval(var_entr, var_key, mode, event))
         entr_02 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 6, column_id=n_1st_column_third, n_rows=1,
             n_columns=2*n_1st_column_third, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
             var=self.helper_var_entr["File setup"]["End"],
-            text_default=self.helper_var_entr["File setup"]["End"].get())
+            text_default=self.helper_var_entr["File setup"]["End"].get(),
+            command=lambda event, var_entr=self.helper_var_entr["File setup"]["End"], var_key="End",
+                           mode=str_filename_long:
+            self.filesetup_set_interval(var_entr, var_key, mode, event))
+
+        entr_01.configure(font=font_option)
+        entr_02.configure(font=font_option)
 
         # Listboxes
         self.lb_filesetup_bg = SE(
@@ -22444,8 +22494,12 @@ class PySILLS(tk.Frame):
             n_rows=n_rows - 9, n_columns=n_2nd_column_third, fg=self.bg_colors["Dark Font"],
             bg=self.colors_intervals["INCL LB"]).create_simple_listbox()
 
+        self.lb_ca_bg = self.lb_filesetup_bg
+        self.lb_ca_mat = self.lb_filesetup_mat
+        self.lb_ca_incl = self.lb_filesetup_incl
+
         frm_iso = SE(
-            parent=self.subwindow_file_setup, row_id=1, column_id=0, n_rows=17, n_columns=n_1st_column,
+            parent=self.subwindow_file_setup, row_id=1, column_id=0, n_rows=16, n_columns=n_1st_column,
             fg=font_color_dark, bg=background_color_light).create_frame()
         vsb_iso = ttk.Scrollbar(frm_iso, orient="vertical")
         text_iso = tk.Text(
@@ -22524,9 +22578,386 @@ class PySILLS(tk.Frame):
 
         if self.pysills_mode == "MA":
             rb_03.configure(state="disabled")
+            rb_07.configure(state="disabled")
+            cb_03.configure(state="disabled")
+            self.lb_ca_incl.configure(state="disabled")
 
-        self.create_time_signal_diagram(geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long,
-                                        init=True)
+        self.create_time_signal_diagram(
+            geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long, init=True)
+        self.check_for_intervals_ca(filesetup=True)
+
+    def filesetup_set_interval(self, var_entr, var_key, mode, event):
+        if mode == "default":
+            time = var_entr.get()
+            time = time.replace(",", ".")
+
+            for var_type in ["STD", "SMPL"]:
+                for var_file in self.container_lists[var_type]["Long"]:
+                    if self.container_icpms["name"] != None:
+                        var_skipheader = self.container_icpms["skipheader"]
+                        var_skipfooter = self.container_icpms["skipfooter"]
+                        df_data = DE(filename_long=var_file).get_measurements(
+                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    else:
+                        df_data = DE(filename_long=var_file).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
+
+                    dataset_time = list(DE().get_times(dataframe=df_data))
+                    var_file_short = var_file.split("/")[-1]
+
+                    if 1 not in self.container_helper[var_type][var_file_short]["BG"]["Content"]:
+                        self.container_helper[var_type][var_file_short]["BG"]["Content"][1] = {
+                            "Times": [None, None], "Indices": [None, None], "Object": None}
+                        self.container_helper[var_type][var_file_short]["BG"]["ID"] += 1
+                        self.container_helper[var_type][var_file_short]["BG"]["Indices"].append(1)
+
+                    x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
+
+                    if var_key == "Start":
+                        var_entr.set("Start value set!")
+                        var_time = x_nearest
+                        var_index = dataset_time.index(var_time)
+
+                        self.container_helper[var_type][var_file_short]["BG"]["Content"][1]["Times"][0] = var_time
+                        self.container_helper[var_type][var_file_short]["BG"]["Content"][1]["Indices"][0] = var_index
+                    elif var_key == "End":
+                        var_entr.set("End value set!")
+                        var_time = x_nearest
+                        var_index = dataset_time.index(var_time)
+
+                        self.container_helper[var_type][var_file_short]["BG"]["Content"][1]["Times"][1] = var_time
+                        self.container_helper[var_type][var_file_short]["BG"]["Content"][1]["Indices"][1] = var_index
+
+        elif mode in self.container_lists["STD"]["Long"]:
+            var_file = mode
+            filetype = "STD"
+
+            if self.container_icpms["name"] != None:
+                var_skipheader = self.container_icpms["skipheader"]
+                var_skipfooter = self.container_icpms["skipfooter"]
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+            else:
+                df_data = DE(filename_long=var_file).get_measurements(
+                    delimiter=",", skip_header=3, skip_footer=1)
+
+            dataset_time = list(DE().get_times(dataframe=df_data))
+            var_file_short = var_file.split("/")[-1]
+
+            if self.helper_rb_ca_bg.get() == 1:
+                var_category = "BG"
+            elif self.helper_rb_ca_bg.get() == 2:
+                var_category = "MAT"
+            elif self.helper_rb_ca_bg.get() == 3:
+                var_category = "INCL"
+
+            time = var_entr.get()
+            time = time.replace(",", ".")
+            x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
+
+            current_id = self.container_helper["STD"][var_file_short][var_category]["ID"]
+
+            if var_key == "Start":
+                var_id = current_id + 1
+            elif var_key == "End":
+                var_id = current_id
+                if var_id == 0:
+                    var_id = 1
+                elif var_id == 1:
+                    if var_id in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][1]["Times"][1] == None:
+                            var_id = var_id
+                        else:
+                            var_id = current_id + 1
+                        if var_id not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(var_id)
+
+            var_entr.set(x_nearest)
+            var_time = x_nearest
+            var_index = dataset_time.index(var_time)
+
+            if var_id > 1:
+                condition = False
+                var_id_previous = var_id - 1
+                while condition == False:
+                    if var_id_previous in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                        condition = True
+                    elif len(self.container_helper["STD"][var_file_short][var_category]["Content"]) == 0:
+                        var_id_previous = 1
+                        if var_id_previous not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                            self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id_previous
+                            self.container_helper["STD"][var_file_short][var_category]["Indices"].append(
+                                var_id_previous)
+                        condition = True
+                    else:
+                        var_id_previous -= 1
+
+                if var_key == "Start":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        1] == None:
+                        var_id = var_id_previous
+                    else:
+                        if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous][
+                            "Times"][0] == None:
+                            var_id = var_id_previous
+                elif var_key == "End":
+                    if self.container_helper["STD"][var_file_short][var_category]["Content"][var_id_previous]["Times"][
+                        0] == None:
+                        var_id = var_id_previous
+                    elif self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][
+                        0] != None and self.container_helper["STD"][var_file_short][var_category]["Content"][var_id][
+                        "Times"][1] != None:
+                        var_id = var_id + 1
+
+            if var_id not in self.container_helper["STD"][var_file_short][var_category]["Content"]:
+                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id] = {
+                    "Times": [None, None], "Indices": [None, None], "Object": None}
+                self.container_helper["STD"][var_file_short][var_category]["ID"] = var_id
+                self.container_helper["STD"][var_file_short][var_category]["Indices"].append(var_id)
+
+            if var_key == "Start":
+                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0] = var_time
+                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Indices"][0] = var_index
+
+                time_0 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.var_ax_ca.axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    if var_category == "BG":
+                        var_lb = self.lb_ca_bg
+                    elif var_category == "MAT":
+                        var_lb = self.lb_ca_mat
+                    elif var_category == "INCL":
+                        var_lb = self.lb_ca_mat
+
+                    var_lb.insert(tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.var_canvas_ca.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
+            elif var_key == "End":
+                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1] = var_time
+                self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Indices"][1] = var_index
+
+                time_0 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.var_ax_ca.axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper["STD"][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    if var_category == "BG":
+                        var_lb = self.lb_ca_bg
+                    elif var_category == "MAT":
+                        var_lb = self.lb_ca_mat
+                    elif var_category == "INCL":
+                        var_lb = self.lb_ca_mat
+
+                    var_lb.insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.var_canvas_ca.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
+        elif mode in self.container_lists["SMPL"]["Long"]:
+            filetype = "SMPL"
+            var_file = mode
+            filename_long = var_file
+            index_filename = self.container_lists[filetype]["Long"].index(filename_long)
+            filename_short = self.container_lists[filetype]["Short"][index_filename]
+
+            df_data, times = self.load_data_as_dataframe(
+                filename_short=filename_short, filename_long=filename_long)
+            dataset_time = list(times)
+
+            var_file_short = filename_short
+
+            if self.helper_rb_ca_bg.get() == 1:
+                var_category = "BG"
+            elif self.helper_rb_ca_bg.get() == 2:
+                var_category = "MAT"
+            elif self.helper_rb_ca_bg.get() == 3:
+                var_category = "INCL"
+
+            time = var_entr.get()
+            time = time.replace(",", ".")
+            x_nearest = round(min(dataset_time, key=lambda x: abs(x - float(time))), 8)
+
+            current_id = self.container_helper[filetype][var_file_short][var_category]["ID"]
+            if var_key == "Start":
+                var_id = current_id + 1
+            elif var_key == "End":
+                var_id = current_id
+                if var_id == 0:
+                    var_id = 1
+                elif var_id == 1:
+                    if var_id in self.container_helper[filetype][var_file_short][var_category]["Content"]:
+                        if self.container_helper[filetype][var_file_short][var_category]["Content"][1]["Times"][
+                            1] == None:
+                            var_id = var_id
+                        else:
+                            var_id = current_id + 1
+                        if var_id not in self.container_helper[filetype][var_file_short][var_category]["Content"]:
+                            self.container_helper[filetype][var_file_short][var_category]["Content"][var_id] = {
+                                "Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper[filetype][var_file_short][var_category]["ID"] = var_id
+                            self.container_helper[filetype][var_file_short][var_category]["Indices"].append(var_id)
+
+            var_entr.set(x_nearest)
+            var_time = x_nearest
+            var_index = dataset_time.index(var_time)
+
+            if var_id > 1:
+                condition = False
+                var_id_previous = var_id - 1
+                while condition == False:
+                    if var_id_previous in self.container_helper[filetype][var_file_short][var_category]["Content"]:
+                        condition = True
+                    elif len(self.container_helper[filetype][var_file_short][var_category]["Content"]) == 0:
+                        var_id_previous = 1
+                        if var_id_previous not in self.container_helper[filetype][var_file_short][var_category][
+                            "Content"]:
+                            self.container_helper[filetype][var_file_short][var_category]["Content"][
+                                var_id_previous] = {"Times": [None, None], "Indices": [None, None], "Object": None}
+                            self.container_helper[filetype][var_file_short][var_category]["ID"] = var_id_previous
+                            self.container_helper[filetype][var_file_short][var_category]["Indices"].append(
+                                var_id_previous)
+                        condition = True
+                    else:
+                        var_id_previous -= 1
+
+                if var_key == "Start":
+                    if self.container_helper[filetype][var_file_short][var_category]["Content"][var_id_previous][
+                        "Times"][1] == None:
+                        var_id = var_id_previous
+                    else:
+                        if self.container_helper[filetype][var_file_short][var_category]["Content"][var_id_previous][
+                            "Times"][0] == None:
+                            var_id = var_id_previous
+                elif var_key == "End":
+                    if self.container_helper[filetype][var_file_short][var_category]["Content"][var_id_previous][
+                        "Times"][0] == None:
+                        var_id = var_id_previous
+                    elif self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][
+                        0] != None and self.container_helper[filetype][var_file_short][var_category]["Content"][var_id][
+                        "Times"][1] != None:
+                        var_id = var_id + 1
+
+            if var_id not in self.container_helper[filetype][var_file_short][var_category]["Content"]:
+                self.container_helper[filetype][var_file_short][var_category]["Content"][var_id] = {
+                    "Times": [None, None], "Indices": [None, None], "Object": None}
+                self.container_helper[filetype][var_file_short][var_category]["ID"] = var_id
+                self.container_helper[filetype][var_file_short][var_category]["Indices"].append(var_id)
+
+            if var_key == "Start":
+                self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][0] = var_time
+                self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Indices"][
+                    0] = var_index
+
+                time_0 = self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.var_ax_ca.axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    if var_category == "BG":
+                        var_lb = self.lb_ca_bg
+                    elif var_category == "MAT":
+                        var_lb = self.lb_ca_mat
+                    elif var_category == "INCL":
+                        var_lb = self.lb_ca_mat
+
+                    var_lb.insert(tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.var_canvas_ca.draw()
+
+                    for key, item in self.helper_time_entries.items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
+            elif var_key == "End":
+                self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][1] = var_time
+                self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Indices"][
+                    1] = var_index
+
+                time_0 = self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][0]
+                time_1 = self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"][1]
+
+                if time_0 != None and time_1 != None:
+                    val_time_0 = float(time_0)
+                    val_time_1 = float(time_1)
+                    if val_time_1 < val_time_0:
+                        time_0 = val_time_1
+                        time_1 = val_time_0
+                        self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Times"] = [
+                            time_0, time_1]
+
+                    box_key = self.var_ax_ca.axvspan(
+                        time_0, time_1, alpha=0.35, color=self.colors_intervals[var_category])
+                    self.container_helper[filetype][var_file_short][var_category]["Content"][var_id]["Object"] = box_key
+
+                    if var_category == "BG":
+                        var_lb = self.lb_ca_bg
+                    elif var_category == "MAT":
+                        var_lb = self.lb_ca_mat
+                    elif var_category == "INCL":
+                        var_lb = self.lb_ca_mat
+
+                    var_lb.insert(
+                        tk.END, var_category + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
+
+                    self.var_canvas_ca.draw()
+
+                    for key, item in self.helper_var_entr["File setup"].items():
+                        if key == "Start":
+                            item.set("Set start value")
+                        elif key == "End":
+                            item.set("Set end value")
 
     def confirm_and_close_filesetup(self, filetype, filename_long):
         self.container_var[filetype][filename_long]["Frame"].config(background=self.sign_green, bd=1)
@@ -22569,7 +23000,7 @@ class PySILLS(tk.Frame):
         ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
         ref_iso_2 = self.helper_var_opt["File setup"]["Reference isotope 2"].get()
         list_isotopes = []
-        #list_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+
         for datatype in ["RAW", "SMOOTHED"]:
             for isotope, variable in self.temp_cb_i[datatype].items():
                 if variable.get() == 1 and isotope not in [ref_iso_1, ref_iso_2]:
@@ -22609,7 +23040,6 @@ class PySILLS(tk.Frame):
 
                         if self.temp_cb_i["SMOOTHED"][isotope].get() == 0:
                             ln_smoothed_i[0].set_visible(False)
-
         else:
             # Time-Ratio diagram
             if ref_iso_1 != "None":
@@ -22651,7 +23081,6 @@ class PySILLS(tk.Frame):
         var_ax.set_xticks(np.linspace(0, x_max, 11, endpoint=True))
 
         if ref_iso_1 == "None" and ref_iso_2 == "None":
-            #var_ax.set_ylim(bottom=1e2, top=1e9)
             var_ax.set_ylim(bottom=5e1, top=1e9)
             var_ax.set_yticks([5e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e6, 1e7, 1e8, 1e9])
         else:
@@ -22707,9 +23136,9 @@ class PySILLS(tk.Frame):
         self.var_toolbar_ca.winfo_children()[-2].config(
             background=self.bg_colors["Very Light"], fg=self.bg_colors["Dark Font"])
 
-        #self.var_canvas_ca.mpl_connect(
-        #    "button_press_event", lambda event, var_type=filetype, var_file_short=str_filename_short:
-        #    self.add_interval_to_diagram_ca(var_type, var_file_short, event))
+        self.var_canvas_ca.mpl_connect(
+            "button_press_event", lambda event, var_type=filetype, var_file_short=str_filename_short:
+            self.add_interval_to_diagram_ca(var_type, var_file_short, event))
 
         self.helper_filesetup_lines[str_filename_short]["AXIS"] = var_ax
         self.helper_filesetup_lines[str_filename_short]["CANVAS"] = self.var_canvas_ca
@@ -22742,8 +23171,8 @@ class PySILLS(tk.Frame):
                     self.container_helper[filetype][str_filename_short]["AXES"][
                         "Canvas CA"] = self.var_canvas_ca
 
-        #if init == False:
-        #    self.check_for_intervals_ca(only_boxes=True)
+        if init == False:
+            self.check_for_intervals_ca(only_boxes=True, filesetup=True)
 
     def filesetup_visibility_all_raw_lines(self, filename_short, hide=False):
         ref_iso_1 = self.helper_var_opt["File setup"]["Reference isotope 1"].get()
@@ -22851,8 +23280,6 @@ class PySILLS(tk.Frame):
         str_filename_long = var_filename_long
         str_filetype = var_filetype
         bool_checkup_mode = checkup_mode
-
-        self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
         if str_filetype == "STD":
             self.index_file_std = self.container_lists[str_filetype]["Long"].index(str_filename_long)
@@ -23348,6 +23775,8 @@ class PySILLS(tk.Frame):
         for isotope in df_isotopes:
             entry_parallelism = [isotope, "---", "---"]
             self.tv_parallelism.insert("", tk.END, values=entry_parallelism)
+
+        self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
     def error_course(self, var_file, var_type):
         # Colors
@@ -37016,7 +37445,7 @@ class PySILLS(tk.Frame):
 
         self.var_canvas_ca.draw()
 
-    def check_for_intervals_ca(self, only_boxes=False):
+    def check_for_intervals_ca(self, only_boxes=False, filesetup=False):
         if self.pysills_mode == "MA":
             list_sections = ["BG", "MAT"]
         else:
@@ -37043,6 +37472,7 @@ class PySILLS(tk.Frame):
                         var_lb.insert(tk.END, section + str(key_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
 
                     box = self.var_ax_ca.axvspan(time_0, time_1, alpha=0.35, color=var_color)
+
                     container["Object"] = box
 
         self.var_canvas_ca.draw()
