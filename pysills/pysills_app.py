@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.66
+# Version:	v1.0.67
 # Date:		27.02.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.66"
+        self.str_version_number = "1.0.67"
         self.val_version = self.str_version_number + " - 27.02.2025"
 
         ## Colors
@@ -1205,6 +1205,8 @@ class PySILLS(tk.Frame):
             self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
             self.container_var[key_setting]["Last solid"] = tk.StringVar()
             self.container_var[key_setting]["Last solid"].set("Select last solid")
+
+            self.helper_filesetup_lines = {}
 
             if key_setting == "mi_setting":
                 self.container_var[key_setting]["Inclusion Setup Option"].set("100 wt.% Oxides")
@@ -10111,6 +10113,10 @@ class PySILLS(tk.Frame):
                 var_file_long = splitted_lines[0]
                 var_file_short = splitted_lines[0].split("/")[-1]
 
+                self.list_std.append(var_file_long)
+                self.container_lists["STD"]["Long"].append(var_file_long)
+                self.container_lists["STD"]["Short"].append(var_file_short)
+
                 self.container_spikes[var_file_short] = {}
 
                 self.container_files["STD"][var_file_short] = {"SRM": tk.StringVar()}
@@ -10120,10 +10126,10 @@ class PySILLS(tk.Frame):
 
                 self.container_var["acquisition times"]["STD"][var_file_short] = tk.StringVar()
 
+                if self.old_file == True:
+                    df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=var_file_long, filetype="STD")
+
                 self.lb_std.insert(tk.END, str(var_file_short))
-                self.list_std.append(var_file_long)
-                self.container_lists["STD"]["Long"].append(var_file_long)
-                self.container_lists["STD"]["Short"].append(var_file_short)
                 self.container_var["STD"][var_file_long]["SRM"].set(splitted_lines[1])
                 self.container_var["STD"][var_file_long]["Checkbox"].set(splitted_lines[2])
 
@@ -10176,6 +10182,9 @@ class PySILLS(tk.Frame):
                 self.container_lists["SMPL"]["Long"].append(var_file_long)
                 self.container_lists["SMPL"]["Short"].append(var_file_short)
                 self.container_var["SMPL"][var_file_long]["Checkbox"].get()
+
+                if self.old_file == True:
+                    df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=var_file_long, filetype="SMPL")
 
                 if analysis_mode == "ma":
                     self.container_var["SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].set("Select IS")
@@ -12116,17 +12125,30 @@ class PySILLS(tk.Frame):
     ####################
     ## DATA PROCESSING #
     ####################
-    def find_icpms_data_in_file(self, filename_long):
+    def find_icpms_data_in_file(self, filename_long, filetype=None):
         str_filename_long = filename_long
+        str_filename_short = str_filename_long.split("/")[-1]
         potential_isotopes = ["Na23", "Al27", "Si29", "P31", "S32", "S33", "K39", "Ca43", "Ca44", "Fe57", "Pb208",
                               "U238"]
         list_indices = []
+        var_timestamp = None
 
         with open(str_filename_long, "r", encoding="utf-8", errors="ignore") as file:
             for lineno, line in enumerate(file, start=0):
                 for isotope in potential_isotopes:
                     if isotope in line:
                         list_indices.append(lineno)
+                    if "Acquired" in line:
+                        key_start = re.search(
+                            r"Acquired\s+\:\s+(\d+)\/(\d+)\/(\d+)\s+(\d+)\:(\d+)\:(\d+)( using Batch )(\w+)", line)
+                        if key_start:
+                            str_acquisition = [
+                                str(key_start.group(4)), str(key_start.group(5)), str(key_start.group(6))]
+                            if filetype != None:
+                                self.container_var["acquisition times"][filetype][str_filename_short] = tk.StringVar()
+                                self.container_var["acquisition times"][filetype][str_filename_short].set(
+                                    str_acquisition[0] + ":" + str_acquisition[1] + ":" + str_acquisition[2])
+                        var_timestamp = lineno
 
         # list_indices = []
         #
@@ -12154,7 +12176,8 @@ class PySILLS(tk.Frame):
 
         df = DE(filename_long=str_filename_long).get_measurements(
                     delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-        file_info = {"skipheader": var_skipheader, "skipfooter": var_skipfooter, "delimiter": ","}
+        file_info = {"skipheader": var_skipheader, "skipfooter": var_skipfooter, "delimiter": ",",
+                     "timestamp": var_timestamp}
 
         return df, file_info
 
@@ -17506,7 +17529,13 @@ class PySILLS(tk.Frame):
                 else:
                     if "Dataframe" in self.container_measurements:
                         file_parts = file_std.split("/")
-                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                        if self.old_file == True:
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                            self.container_icpms["skipheader"] = file_info["skipheader"]
+                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                        else:
+                            df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     else:
                         if self.container_icpms["name"] != None:
                             var_skipheader = self.container_icpms["skipheader"]
@@ -17514,8 +17543,14 @@ class PySILLS(tk.Frame):
                             df_exmpl = DE(filename_long=file_std).get_measurements(
                                 delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
                         else:
-                            df_exmpl = DE(filename_long=file_std).get_measurements(
-                                delimiter=",", skip_header=3, skip_footer=1)
+                            if self.old_file == True:
+                                df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                                self.container_icpms["name"] = "Undefined ICP-MS"
+                                self.container_icpms["skipheader"] = file_info["skipheader"]
+                                self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                            else:
+                                df_exmpl = DE(filename_long=file_std).get_measurements(
+                                    delimiter=",", skip_header=3, skip_footer=1)
 
                 if "Dataframe" not in self.container_measurements:
                     self.container_measurements["Dataframe"] = {}
@@ -17565,7 +17600,13 @@ class PySILLS(tk.Frame):
                 else:
                     if "Dataframe" in self.container_measurements:
                         file_parts = file_smpl.split("/")
-                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                        if self.old_file == True:
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                            self.container_icpms["skipheader"] = file_info["skipheader"]
+                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                        else:
+                            df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     else:
                         if self.container_icpms["name"] != None:
                             var_skipheader = self.container_icpms["skipheader"]
@@ -22026,6 +22067,9 @@ class PySILLS(tk.Frame):
         df_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
         str_title = self.language_dict["Setup"][self.var_language]
 
+        if str_filename_short not in self.helper_filesetup_lines:
+            self.helper_filesetup_lines[str_filename_short] = {}
+
         if self.pysills_mode == "MA":
             key_setting = "ma_setting"
         else:
@@ -22226,11 +22270,15 @@ class PySILLS(tk.Frame):
         btn_13 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_13, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_13, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filename_short=str_filename_short:
+            self.filesetup_visibility_all_lines(filename_short))
         btn_14 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 20, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_14, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_14, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda filename_short=str_filename_short, hide=True:
+            self.filesetup_visibility_all_lines(filename_short, hide))
 
         # Radiobuttons
         str_rb_01 = self.language_dict["Background"][self.var_language]
@@ -22401,7 +22449,13 @@ class PySILLS(tk.Frame):
                 text_iso.window_create("end", window=cb_raw_i)
                 text_iso.insert("end", "\t")
 
-                self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(1)
+                if self.container_var["Spike Elimination"][str_filetype]["State"] == False:
+                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(
+                        0)
+                else:
+                    self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][isotope].set(
+                        1)
+
                 cb_smoothed_i = tk.Checkbutton(
                     frm_iso,
                     variable=self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
@@ -22415,6 +22469,7 @@ class PySILLS(tk.Frame):
                     cb_smoothed_i.configure(state="disabled")
                 else:
                     cb_smoothed_i.configure(state="normal")
+
                 text_iso.window_create("end", window=cb_smoothed_i)
                 text_iso.insert("end", "\n")
 
@@ -22443,6 +22498,11 @@ class PySILLS(tk.Frame):
                                         init=True)
 
     def create_time_signal_diagram(self, geometry, filetype, filename_long, init=False):
+        if self.pysills_mode == "MA":
+            key_setting = "ma_setting"
+        else:
+            key_setting = "fi_setting"
+
         if init == False:
             self.var_canvas_ca.get_tk_widget().destroy()
             self.var_toolbarFrame_ca.destroy()
@@ -22450,6 +22510,7 @@ class PySILLS(tk.Frame):
             plt.close(self.var_canvas_ca.figure)
 
         str_filename_short = filename_long.split("/")[-1]
+        str_filetype = filetype
         df_data = self.container_measurements["Dataframe"][str_filename_short]
 
         data_x = list(df_data.iloc[:, 0])
@@ -22477,8 +22538,28 @@ class PySILLS(tk.Frame):
         if ref_iso_1 == "None" and ref_iso_2 == "None":
             # Time-Signal diagram
             for isotope in list_isotopes:
+                if isotope not in self.helper_filesetup_lines[str_filename_short]:
+                    self.helper_filesetup_lines[str_filename_short][isotope] = {"RAW": None, "SMOOTHED": None}
+
                 data_y = df_data[isotope]
-                var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=var_lw)
+                ln_raw_i = var_ax.plot(data_x, data_y, color=self.isotope_colors[isotope], linewidth=var_lw)
+                self.helper_filesetup_lines[str_filename_short][isotope]["RAW"] = ln_raw_i
+
+                if self.container_var[key_setting]["Display RAW"][str_filetype][str_filename_short][isotope].get() == 0:
+                    ln_raw_i[0].set_visible(False)
+
+                if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
+                    if isotope in self.container_spikes[str_filename_short]:
+                        data_y = self.container_spikes[str_filename_short][isotope]["Data IMPROVED"]
+                        ln_smoothed_i = var_ax.plot(
+                            data_x, data_y, label=isotope, color=self.isotope_colors[isotope], linewidth=var_lw,
+                            visible=True)
+                        self.helper_filesetup_lines[str_filename_short][isotope]["SMOOTHED"] = ln_raw_i
+
+                        if self.container_var[key_setting]["Display SMOOTHED"][str_filetype][str_filename_short][
+                            isotope].get() == 0:
+                            ln_smoothed_i[0].set_visible(False)
+
         else:
             # Time-Ratio diagram
             if ref_iso_1 != "None":
@@ -22509,8 +22590,9 @@ class PySILLS(tk.Frame):
         var_ax.set_xticks(np.linspace(0, x_max, 11, endpoint=True))
 
         if ref_iso_1 == "None" and ref_iso_2 == "None":
-            var_ax.set_ylim(bottom=1e2, top=1e9)
-            var_ax.set_yticks([1e2, 1e3, 1e4, 1e5, 1e6, 1e6, 1e7, 1e8, 1e9])
+            #var_ax.set_ylim(bottom=1e2, top=1e9)
+            var_ax.set_ylim(bottom=5e1, top=1e9)
+            var_ax.set_yticks([5e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e6, 1e7, 1e8, 1e9])
         else:
             var_ax.set_ylim(bottom=1e-4, top=1e5)
             var_ax.set_yticks([1e-4, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
@@ -22565,6 +22647,10 @@ class PySILLS(tk.Frame):
         #    self.add_interval_to_diagram_ca(var_type, var_file_short, event))
 
         if init == True:
+            if "AXIS" not in self.helper_filesetup_lines[str_filename_short]:
+                self.helper_filesetup_lines[str_filename_short]["AXIS"] = var_ax
+                self.helper_filesetup_lines[str_filename_short]["CANVAS"] = self.var_canvas_ca
+
             self.helper_intervals = {"BG": [], "MAT": [], "INCL": []}
 
             if filetype not in self.container_helper:
@@ -22590,6 +22676,25 @@ class PySILLS(tk.Frame):
 
         if init == False:
             self.check_for_intervals_ca(only_boxes=True)
+
+    def filesetup_visibility_all_lines(self, filename_short, hide=False):
+        if hide == False:
+            visibility = True
+        else:
+            visibility = False
+
+        file_isotopes = self.container_lists["Measured Isotopes"][filename_short]
+        for isotope in file_isotopes:
+            dict_lines = self.helper_filesetup_lines[filename_short][isotope]
+            dict_lines["RAW"][0].set_visible(visibility)
+
+            if dict_lines["SMOOTHED"] != None:
+                dict_lines["SMOOTHED"][0].set_visible(visibility)
+
+        self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
+
+    def filesetup_visibility_isotope(self, filename_short, hide=False):
+        pass
 
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         # Colors
@@ -29329,7 +29434,13 @@ class PySILLS(tk.Frame):
                 else:
                     file_parts = file_std.split("/")
                     try:
-                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                        if self.old_file == True:
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                            self.container_icpms["skipheader"] = file_info["skipheader"]
+                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                        else:
+                            df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     except:
                         print("File (" + str(file_std) + str(")"), "cannot be read.")
 
@@ -29373,7 +29484,13 @@ class PySILLS(tk.Frame):
                 else:
                     file_parts = file_smpl.split("/")
                     try:
-                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                        if self.old_file == True:
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                            self.container_icpms["name"] = "Undefined ICP-MS"
+                            self.container_icpms["skipheader"] = file_info["skipheader"]
+                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                        else:
+                            df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
                     except:
                         print("File (" + str(file_smpl) + str(")"), "cannot be read.")
 
@@ -29731,7 +29848,13 @@ class PySILLS(tk.Frame):
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
                     file_parts = file_std.split("/")
-                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    if self.old_file == True:
+                        df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                        self.container_icpms["name"] = "Undefined ICP-MS"
+                        self.container_icpms["skipheader"] = file_info["skipheader"]
+                        self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                    else:
+                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
 
                 if "Dataframe" not in self.container_measurements:
                     self.container_measurements["Dataframe"] = {}
@@ -29772,7 +29895,13 @@ class PySILLS(tk.Frame):
                             delimiter=",", skip_header=3, skip_footer=1)
                 else:
                     file_parts = file_smpl.split("/")
-                    df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
+                    if self.old_file == True:
+                        df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                        self.container_icpms["name"] = "Undefined ICP-MS"
+                        self.container_icpms["skipheader"] = file_info["skipheader"]
+                        self.container_icpms["skipfooter"] = file_info["skipfooter"]
+                    else:
+                        df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
 
                 if var_file_short not in self.container_measurements["Dataframe"]:
                     self.container_measurements["Dataframe"][var_file_short] = df_exmpl
