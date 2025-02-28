@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 17.01.2025
+# 28.02.2025
 # ----------------------
 #
 ## MODULES
@@ -781,7 +781,7 @@ class SimpleElements:
             #
             for index, element in enumerate(columns):
                 treeview.heading(element, text=text_n[index])
-                treeview.column(element, minwidth=0, width=width_n[index], stretch=tk.NO, anchor=tk.CENTER)
+                treeview.column(element, minwidth=0, width=width_n[index], stretch=tk.NO, anchor=tk.W)
             #
             treeview.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
                           sticky="nesw")

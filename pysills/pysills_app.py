@@ -22237,7 +22237,7 @@ class PySILLS(tk.Frame):
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_04, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_05 = SE(
-            parent=self.subwindow_file_setup, row_id=7, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
+            parent=self.subwindow_file_setup, row_id=8, column_id=start_3rd_column, n_rows=1, n_columns=n_3rd_column,
             fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_05, relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
         lbl_06 = SE(
@@ -22299,6 +22299,7 @@ class PySILLS(tk.Frame):
         str_btn_12 = self.language_dict["Hide only RAW"][self.var_language]
         str_btn_13 = self.language_dict["Show all"][self.var_language]
         str_btn_14 = self.language_dict["Hide all"][self.var_language]
+        str_btn_15 = self.language_dict["Update"][self.var_language]
 
         btn_01 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 2, column_id=2*n_1st_column_third, n_rows=2,
@@ -22372,6 +22373,13 @@ class PySILLS(tk.Frame):
             text=str_btn_14, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filename_short=str_filename_short, hide=True:
             self.filesetup_visibility_all_lines(filename_short, hide))
+        btn_15 = SE(
+            parent=self.subwindow_file_setup, row_id=7, column_id=start_3rd_column, n_rows=1,
+            n_columns=n_3rd_column, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_15, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda opt=self.helper_var_opt["File setup"]["Parameter"], filetype=str_filetype,
+                           filename_long=str_filename_long:
+            self.fill_table_filesetup(opt, filetype, filename_long))
 
         btn_04.configure(state="disabled")
         btn_05.configure(state="disabled")
@@ -22490,9 +22498,9 @@ class PySILLS(tk.Frame):
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=2, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_15, sticky="nesw", relief=tk.FLAT)
 
-        rb_01.configure(state="disabled")
-        rb_02.configure(state="disabled")
-        rb_03.configure(state="disabled")
+        #rb_01.configure(state="disabled")
+        #rb_02.configure(state="disabled")
+        #rb_03.configure(state="disabled")
         rb_13.configure(state="disabled")
         rb_14.configure(state="disabled")
         rb_15.configure(state="disabled")
@@ -22531,7 +22539,7 @@ class PySILLS(tk.Frame):
             command=lambda geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long:
             self.create_time_signal_diagram(geometry, filetype, filename_long))
 
-        opt_qa_param.configure(state="disabled")
+        #opt_qa_param.configure(state="disabled")
 
         # Checkboxes
         self.helper_cb_ca_bg = tk.IntVar()
@@ -22661,7 +22669,7 @@ class PySILLS(tk.Frame):
 
         # Treeviews
         self.tv_filesetup_qa = SE(
-            parent=self.subwindow_file_setup, row_id=8, column_id=start_3rd_column, n_rows=n_rows - 8,
+            parent=self.subwindow_file_setup, row_id=9, column_id=start_3rd_column, n_rows=n_rows - 9,
             n_columns=n_3rd_column, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
             n_categories=2, text_n=["Isotope", "Parameter"],
             width_n=["75", "112"], individual=True)
@@ -22698,7 +22706,7 @@ class PySILLS(tk.Frame):
             for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                 if element in self.container_lists["Measured Elements"][str_filename_short]:
                     var_is = self.container_lists["Measured Elements"][str_filename_short][element][0]
-                    self.container_var[var_type][str_filename_long]["IS Data"]["IS"].set(var_is)
+                    self.container_var[str_filetype][str_filename_long]["IS Data"]["IS"].set(var_is)
                 break
 
             list_considered_isotopes = []
@@ -22710,29 +22718,212 @@ class PySILLS(tk.Frame):
                     if var_srm_i == var_srm_file:
                         list_considered_isotopes.append(isotope)
 
-            list_categories.extend(list_considered_isotopes)
-
             key_element_is = re.search(r"(\D+)(\d+)", var_is)
             element_is = key_element_is.group(1)
+            stop_calculation = False
 
             if element_is in self.srm_actual[var_srm_file]:
                 stop_calculation = False
             else:
                 stop_calculation = True
         else:
-            var_is = self.container_var[var_type][str_filename_long]["IS Data"]["IS"].get()
+            var_is = self.container_var[str_filetype][str_filename_long]["IS Data"]["IS"].get()
             list_considered_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
-            list_categories.extend(list_considered_isotopes)
             stop_calculation = False
 
-        return stop_calculation
+        return stop_calculation, list_considered_isotopes
 
     def fill_table_filesetup(self, opt, filetype, filename_long):
         str_filetype = filetype
         str_filename_long = filename_long
         str_filename_short = str_filename_long.split("/")[-1]
-        print(opt)
-        stop_calculation = self.check_if_quantification_possible(filetype, filename_long)
+        var_opt = self.helper_var_opt["File setup"]["Parameter"].get()
+        stop_calculation, list_considered_isotopes = self.check_if_quantification_possible(filetype, filename_long)
+
+        if self.helper_var_rb["File setup"]["QA section"].get() == 0:
+            focus = "BG"
+        elif self.helper_var_rb["File setup"]["QA section"].get() == 1:
+            focus = "MAT"
+        elif self.helper_var_rb["File setup"]["QA section"].get() == 2:
+            focus = "INCL"
+
+        if self.container_var["Spike Elimination"][str_filetype]["State"] == True:
+            str_datatype = "SMOOTHED"
+        else:
+            str_datatype = "RAW"
+
+        if len(list_considered_isotopes) > 0 and stop_calculation == False:
+            if len(self.tv_filesetup_qa.get_children()) > 0:
+                for item in self.tv_filesetup_qa.get_children():
+                    self.tv_filesetup_qa.delete(item)
+
+            if self.pysills_mode == "MA":
+                self.do_quantification_ma(filetype=str_filetype, datatype=str_datatype, filename_long=str_filename_long)
+            else:
+                self.do_quantification_incl(
+                    filetype=str_filetype, datatype=str_datatype, filename_long=str_filename_long)
+
+            value_i = None
+            for isotope in list_considered_isotopes:
+                if var_opt == "Concentration":
+                    if focus in self.container_concentration[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_concentration[str_filetype][str_datatype][str_filename_short][focus][
+                            isotope]
+                elif var_opt == "Concentration ratio":
+                    if focus in self.container_concentration_ratio[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_concentration_ratio[str_filetype][str_datatype][str_filename_short][
+                            focus][isotope]
+                elif var_opt == "1-sigma concentration":
+                    key_focus = "1 SIGMA " + focus
+                    if key_focus in self.container_concentration[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_concentration[str_filetype][str_datatype][str_filename_short][
+                            key_focus][isotope]
+                elif var_opt == "Limit of detection":
+                    if focus in self.container_lod[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_lod[str_filetype][str_datatype][str_filename_short][focus][isotope]
+                elif var_opt == "Intensity":
+                    if focus in ["MAT", "INCL"]:
+                        value_i = self.container_intensity_corrected[str_filetype][str_datatype][str_filename_short][
+                            focus][isotope]
+                    else:
+                        value_i = self.container_intensity[str_filetype][str_datatype][str_filename_short][focus][
+                            isotope]
+                elif var_opt == "Intensity ratio":
+                    if focus in self.container_intensity_ratio[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_intensity_ratio[str_filetype][str_datatype][str_filename_short][focus][
+                            isotope]
+                elif var_opt == "Sensitivity":
+                    if focus in self.container_analytical_sensitivity[str_filetype][str_datatype][str_filename_short]:
+                        value_i = self.container_analytical_sensitivity[str_filetype][str_datatype][str_filename_short][
+                            focus][isotope]
+
+                if var_opt != "None" and value_i != None:
+                    if var_opt in ["Concentration ratio", "Intensity ratio"]:
+                        entries = [isotope, "{:0.4e}".format(value_i)]
+                    else:
+                        entries = [isotope, "{:0.4f}".format(value_i)]
+                    self.tv_filesetup_qa.insert("", tk.END, values=entries)
+                else:
+                    entries = [isotope, "---"]
+                    self.tv_filesetup_qa.insert("", tk.END, values=entries)
+
+        if var_opt == "None":
+            if len(self.tv_filesetup_qa.get_children()) > 0:
+                for item in self.tv_filesetup_qa.get_children():
+                    self.tv_filesetup_qa.delete(item)
+
+            file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+            for isotope in file_isotopes:
+                entries = [isotope, "---"]
+                self.tv_filesetup_qa.insert("", tk.END, values=entries)
+
+    def do_quantification_incl(self, filetype, datatype, filename_long):
+        pass
+
+    def do_quantification_ma(self, filetype, datatype, filename_long):
+        str_filetype = filetype
+        str_filename_long = filename_long
+        var_file_short = str_filename_long.split("/")[-1]
+        var_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+        n_intervals_bg = len(self.container_helper[str_filetype][var_file_short]["BG"]["Content"])
+        n_intervals_mat = len(self.container_helper[str_filetype][var_file_short]["MAT"]["Content"])
+        str_keyword = datatype
+
+        if var_is != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0:
+            ## INITIALIZATION
+            # Intensity-related parameters
+            if str_filetype == "STD":
+                self.get_condensed_intervals_of_file(filetype=str_filetype, filename_short=var_file_short)
+                self.get_intensity(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, mode="Specific")
+                self.ma_get_concentration(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long)
+            else:
+                var_srm_file = None
+                for index, file_std_short in enumerate(self.container_lists["STD"]["Short"]):
+                    self.get_condensed_intervals_of_file(filetype="STD", filename_short=file_std_short)
+                    self.get_intensity(
+                        var_filetype="STD", var_datatype=str_keyword, var_file_short=file_std_short, mode="Specific")
+
+                if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    str_averagetype = "arithmetic mean"
+                else:
+                    str_averagetype = "median"
+                IQ(dataframe=None, project_type=self.pysills_mode,
+                   results_container=self.container_intensity_corrected["STD"][str_keyword]).get_averaged_intensities(
+                    data_container=self.container_intensity_corrected["STD"][str_keyword], average_type=str_averagetype)
+
+                self.get_intensity(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, mode="Specific")
+
+                self.ma_get_intensity_ratio(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long, var_focus="MAT")
+                # Sensitivity-related parameters
+                self.get_analytical_sensitivity_std(var_datatype=str_keyword, mode="all")
+                # self.get_analytical_sensitivity_std_alternative(var_datatype=str_keyword, mode="all")
+
+            self.get_analytical_sensitivity(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long)
+            results_is = self.determine_possible_is(filetype="ALL")
+            # Intensity Ratio
+            IQ(dataframe=None, project_type=self.pysills_mode,
+               results_container=self.container_intensity_ratio[str_filetype][str_keyword]).get_intensity_ratio(
+                data_container=self.container_intensity_corrected[str_filetype][str_keyword], dict_is=results_is,
+                filename_short=var_file_short)
+            # Concentration-related parameters
+            self.ma_get_concentration(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long)
+            # Normalized Sensitivity
+            SQ(dataframe_01=self.container_intensity_corrected[str_filetype][str_keyword][var_file_short],
+               dataframe_02=self.container_concentration[str_filetype][str_keyword][var_file_short],
+               results_container=self.container_normalized_sensitivity[str_filetype][
+                   str_keyword]).get_normalized_sensitivity(
+                filename_short=var_file_short, filetype=str_filetype,
+                data_sensitivity=self.container_analytical_sensitivity[str_filetype][str_keyword][var_file_short],
+                dict_is=results_is)
+
+            if str_filetype == "SMPL":
+                self.ma_get_rsf(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long)
+
+            if str_filetype == "SMPL":
+                self.ma_get_concentration_ratio(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long)
+
+            self.ma_get_lod(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long)
+
+    def filesetup_copy_interval(self):
+        if self.helper_rb_ca_bg.get() == 1:  # BG
+            var_key = "BG"
+            var_lb = self.lb_ca_bg
+        elif self.helper_rb_ca_bg.get() == 2:  # MAT
+            var_key = "MAT"
+            var_lb = self.lb_ca_mat
+        elif self.helper_rb_ca_bg.get() == 3:  # INCL
+            var_key = "INCL"
+            var_lb = self.lb_ca_incl
+
+        item = var_lb.curselection()[0]
+        value = var_lb.get(item)
+        value_parts = value.split(" ")
+        key_id = re.search(r"(\D+)(\d+)", value_parts[0])
+        var_id = int(key_id.group(2))
+
+        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Indices"].remove(var_id)
+        var_lb.delete(tk.ANCHOR)
+        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id][
+            "Object"].set_visible(False)
+        del self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id]
+
+        self.var_canvas_ca.draw()
 
     def filesetup_set_interval(self, var_entr, var_key, mode, event):
         if mode == "default":
