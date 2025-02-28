@@ -707,9 +707,10 @@ class PySILLS(tk.Frame):
         self.helper_var_entr["File setup"]["End"].set("Set end value")
 
         self.helper_var_opt = {"File setup": {
-            "Reference isotope 1": tk.StringVar(), "Reference isotope 2": tk.StringVar()}}
+            "Reference isotope 1": tk.StringVar(), "Reference isotope 2": tk.StringVar(), "Parameter": tk.StringVar()}}
         self.helper_var_opt["File setup"]["Reference isotope 1"].set("None")
         self.helper_var_opt["File setup"]["Reference isotope 2"].set("None")
+        self.helper_var_opt["File setup"]["Parameter"].set("None")
 
         ## LANGUAGE SUPPORT
         self.language_dict = {
@@ -21635,10 +21636,15 @@ class PySILLS(tk.Frame):
             val_row_span = 22
             val_column_span = 54
 
+        parent = self.var_geometry[0]
+        val_row_start = self.var_geometry[1]
+        val_column_start = self.var_geometry[2]
+        val_row_span = self.var_geometry[3] - 1
+        val_column_span = self.var_geometry[4]
+
         frm_00 = SE(
-            parent=parent, row_id=0, column_id=val_column_start, n_rows=24, n_columns=val_column_span,
-            fg=font_color_dark, bg=background_color_light).create_frame(
-            relief=tk.SOLID)
+            parent=parent, row_id=val_row_start, column_id=val_column_start, n_rows=val_row_span + 2,
+            n_columns=val_column_span, fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
 
         self.canvas_specific_spectrum = FigureCanvasTkAgg(
             self.fig_specific_spectrum, master=parent)
@@ -21807,10 +21813,15 @@ class PySILLS(tk.Frame):
             val_row_span = 22
             val_column_span = 54
 
+        parent = self.var_geometry[0]
+        val_row_start = self.var_geometry[1]
+        val_column_start = self.var_geometry[2]
+        val_row_span = self.var_geometry[3] - 1
+        val_column_span = self.var_geometry[4]
+
         frm_00 = SE(
-            parent=parent, row_id=0, column_id=val_column_start, n_rows=24, n_columns=val_column_span,
-            fg=font_color_dark, bg=background_color_light).create_frame(
-            relief=tk.SOLID)
+            parent=parent, row_id=val_row_start, column_id=val_column_start, n_rows=val_row_span + 2,
+            n_columns=val_column_span, fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
 
         self.canvas_specific_spectrum = FigureCanvasTkAgg(
             self.fig_specific_spectrum, master=parent)
@@ -22270,7 +22281,9 @@ class PySILLS(tk.Frame):
         btn_09 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_09, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_09, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda var_type=str_filetype, var_file_short=str_filename_short:
+            self.qpl_additional_diagrams(var_type, var_file_short))
         btn_10 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 12, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -22365,22 +22378,30 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=3, color_bg=background_color_elements,
-            fg=font_color_dark, text=str_rb_08, sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text=str_rb_08, sticky="nesw", relief=tk.FLAT,
+            command=lambda var_file=str_filename_long, var_type=str_filetype, filesetup=True:
+            self.ma_show_quick_results(var_file, var_type, filesetup))
         rb_09 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 13, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=4, color_bg=background_color_elements,
-            fg=font_color_dark, text=str_rb_09, sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text=str_rb_09, sticky="nesw", relief=tk.FLAT,
+            command=lambda var_file=str_filename_long, var_type=str_filetype, filesetup=True:
+            self.error_course(var_file, var_type, filesetup))
         rb_10 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=0, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=1, color_bg=background_color_elements,
-            fg=font_color_dark, text=str_rb_10, sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text=str_rb_10, sticky="nesw", relief=tk.FLAT,
+            command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.show_spectral_data_view(filetype, filename_long))  # Spectral data view
         rb_11 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 14, column_id=n_1st_column_half, n_rows=1,
             n_columns=n_1st_column_half, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
             var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=2, color_bg=background_color_elements,
-            fg=font_color_dark, text=str_rb_11, sticky="nesw", relief=tk.FLAT)
+            fg=font_color_dark, text=str_rb_11, sticky="nesw", relief=tk.FLAT,
+            command=lambda filetype=str_filetype, filename_long=str_filename_long:
+            self.show_boxplot_data_view(filetype, filename_long))   # Box plot data view
         rb_12 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 15, column_id=0, n_rows=1,
             n_columns=n_1st_column, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
@@ -22408,16 +22429,19 @@ class PySILLS(tk.Frame):
         list_parameters = [
             "Concentration", "Concentration ratio", "1-sigma concentration", "Limit of detection", "Intensity",
             "Intensity ratio", "Sensitivity"]
+        list_parameters.insert(0, "None")
         list_isotopes_opt = file_isotopes.copy()
         list_isotopes_opt.insert(0, "None")
-        var_opt_qa = tk.StringVar()
-        var_opt_qa.set(list_parameters[0])
 
         opt_qa_param = SE(
             parent=self.subwindow_file_setup, row_id=6, column_id=start_3rd_column, n_rows=1,
             n_columns=n_3rd_column, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=var_opt_qa, option_list=list_parameters, text_set=var_opt_qa.get(), fg_active=font_color_light,
-            bg_active=accent_color)
+            var_iso=self.helper_var_opt["File setup"]["Parameter"], option_list=list_parameters,
+            text_set=self.helper_var_opt["File setup"]["Parameter"].get(), fg_active=font_color_light,
+            bg_active=accent_color,
+            command=lambda opt=self.helper_var_opt["File setup"]["Parameter"], filetype=str_filetype,
+                           filename_long=str_filename_long:
+            self.fill_table_filesetup(opt, filetype, filename_long))
         opt_ref1 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 18, column_id=2, n_rows=1,
             n_columns=n_1st_column - 2, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
@@ -22585,6 +22609,56 @@ class PySILLS(tk.Frame):
         self.create_time_signal_diagram(
             geometry=var_geometry, filetype=str_filetype, filename_long=str_filename_long, init=True)
         self.check_for_intervals_ca(filesetup=True)
+
+        for isotope in file_isotopes:
+            entries = [isotope, "---"]
+            self.tv_filesetup_qa.insert("", tk.END, values=entries)
+
+    def check_if_quantification_possible(self, filetype, filename_long):
+        str_filetype = filetype
+        str_filename_long = filename_long
+        str_filename_short = str_filename_long.split("/")[-1]
+
+        if str_filetype == "STD":
+            var_srm_file = self.container_var["STD"][str_filename_long]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][str_filename_short]:
+                    var_is = self.container_lists["Measured Elements"][str_filename_short][element][0]
+                    self.container_var[var_type][str_filename_long]["IS Data"]["IS"].set(var_is)
+                break
+
+            list_considered_isotopes = []
+            file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+
+            for isotope in file_isotopes:
+                if isotope in self.container_var["SRM"]:
+                    var_srm_i = self.container_var["SRM"][isotope].get()
+                    if var_srm_i == var_srm_file:
+                        list_considered_isotopes.append(isotope)
+
+            list_categories.extend(list_considered_isotopes)
+
+            key_element_is = re.search(r"(\D+)(\d+)", var_is)
+            element_is = key_element_is.group(1)
+
+            if element_is in self.srm_actual[var_srm_file]:
+                stop_calculation = False
+            else:
+                stop_calculation = True
+        else:
+            var_is = self.container_var[var_type][str_filename_long]["IS Data"]["IS"].get()
+            list_considered_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
+            list_categories.extend(list_considered_isotopes)
+            stop_calculation = False
+
+        return stop_calculation
+
+    def fill_table_filesetup(self, opt, filetype, filename_long):
+        str_filetype = filetype
+        str_filename_long = filename_long
+        str_filename_short = str_filename_long.split("/")[-1]
+        print(opt)
+        stop_calculation = self.check_if_quantification_possible(filetype, filename_long)
 
     def filesetup_set_interval(self, var_entr, var_key, mode, event):
         if mode == "default":
@@ -23778,7 +23852,7 @@ class PySILLS(tk.Frame):
 
         self.specific_file_setup(filetype=str_filetype, filename_long=str_filename_long)
 
-    def error_course(self, var_file, var_type):
+    def error_course(self, var_file, var_type, filesetup=False):
         # Colors
         font_color_dark = self.bg_colors["Dark Font"]
         font_color_light = self.bg_colors["Light Font"]
@@ -23819,23 +23893,44 @@ class PySILLS(tk.Frame):
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
 
-
-        if self.pysills_mode == "MA":
-            parent = self.subwindow_ma_checkfile
-            start_column = 16
-            n_rows = 34
-            n_columns = 44
-            fix = 2
+        if filesetup == False:
+            if self.pysills_mode == "MA":
+                parent = self.subwindow_ma_checkfile
+                start_row = 0
+                start_column = 16
+                n_rows = 34
+                n_columns = 44
+                fix = 2
+                frm_n_rows = n_rows
+                hb_start_row = 18
+                vb_start_column = n_columns + 13 + fix
+                vb_n_rows = 18
+            else:
+                parent = self.subwindow_fi_checkfile
+                start_row = 0
+                start_column = 14
+                n_rows = 36
+                n_columns = 54
+                fix = 0
+                frm_n_rows = n_rows
+                hb_start_row = 18
+                vb_start_column = n_columns + 13 + fix
+                vb_n_rows = 18
         else:
-            parent = self.subwindow_fi_checkfile
-            start_column = 14
-            n_rows = 36
-            n_columns = 54
+            parent = self.var_geometry[0]
+            start_row = self.var_geometry[1]
+            start_column = self.var_geometry[2]
+            n_rows = self.var_geometry[3]
+            n_columns = self.var_geometry[4]
+            frm_n_rows = n_rows + 1
+            hb_start_row = n_rows
+            vb_start_column = n_columns + 17
+            vb_n_rows = n_rows
             fix = 0
 
         ## FRAMES
         frm_quick = SE(
-            parent=parent, row_id=0, column_id=start_column, n_rows=n_rows, n_columns=n_columns,
+            parent=parent, row_id=start_row, column_id=start_column, n_rows=frm_n_rows, n_columns=n_columns,
             fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
 
         self.container_helper[var_type][var_file_short]["ERROR FRAME"] = frm_quick
@@ -23893,7 +23988,7 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_error_course = SE(
-                parent=parent, row_id=0, column_id=start_column, n_rows=18, n_columns=n_columns - 1,
+                parent=parent, row_id=start_row, column_id=start_column, n_rows=vb_n_rows, n_columns=n_columns - 1,
                 fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
@@ -23903,8 +23998,8 @@ class PySILLS(tk.Frame):
             self.tv_error_course.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_error_course.yview)
             scb_h.config(command=self.tv_error_course.xview)
-            scb_v.grid(row=0, column=n_columns + 13 + fix, rowspan=18, columnspan=1, sticky="ns")
-            scb_h.grid(row=18, column=start_column, rowspan=1, columnspan=n_columns - 1, sticky="ew")
+            scb_v.grid(row=start_row, column=vb_start_column, rowspan=vb_n_rows, columnspan=1, sticky="ns")
+            scb_h.grid(row=hb_start_row, column=start_column, rowspan=1, columnspan=n_columns - 1, sticky="ew")
 
             if n_intervals_bg > 0 and n_intervals_mat > 0 and n_intervals_incl > 0:
                 ## INITIALIZATION
@@ -24701,7 +24796,7 @@ class PySILLS(tk.Frame):
         self.counter_calculation_runs += 1
         print("Number of calculation runs:", self.counter_calculation_runs)
 
-    def ma_show_quick_results(self, var_file, var_type):
+    def ma_show_quick_results(self, var_file, var_type, filesetup=False):
         # Colors
         font_color_dark = self.bg_colors["Dark Font"]
         font_color_light = self.bg_colors["Light Font"]
@@ -24749,10 +24844,31 @@ class PySILLS(tk.Frame):
         var_id = self.container_lists[var_type]["Long"].index(var_file)
         var_file_short = self.container_lists[var_type]["Short"][var_id]
 
+        if filesetup == False:
+            parent = self.subwindow_ma_checkfile
+            val_row_start = 0
+            val_column_start = 16
+            val_row_span = 34
+            val_column_span = 44
+            frm_n_rows = val_row_span
+            hb_start_row = val_column_start + 2
+            vb_start_column = val_column_span + 15
+            vb_n_rows = val_column_start + 2
+        else:
+            parent = self.var_geometry[0]
+            val_row_start = self.var_geometry[1]
+            val_column_start = self.var_geometry[2]
+            val_row_span = self.var_geometry[3]
+            val_column_span = self.var_geometry[4]
+            frm_n_rows = val_row_span + 1
+            hb_start_row = val_row_span
+            vb_start_column = val_column_span + 17
+            vb_n_rows = val_row_span
+
         ## FRAMES
         frm_quick = SE(
-            parent=self.subwindow_ma_checkfile, row_id=0, column_id=16, n_rows=34, n_columns=44,
-            fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
+            parent=parent, row_id=val_row_start, column_id=val_column_start, n_rows=frm_n_rows,
+            n_columns=val_column_span, fg=font_color_dark, bg=background_color_light).create_frame(relief=tk.FLAT)
 
         self.container_helper[var_type][var_file_short]["RESULTS FRAME"] = frm_quick
 
@@ -24808,18 +24924,20 @@ class PySILLS(tk.Frame):
 
         if len(list_categories) > 1 and stop_calculation == False:
             self.tv_results_quick = SE(
-                parent=self.subwindow_ma_checkfile, row_id=0, column_id=16, n_rows=18, n_columns=43,
-                fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
+                parent=parent, row_id=val_row_start, column_id=val_column_start, n_rows=vb_n_rows,
+                n_columns=val_column_span - 1, fg=font_color_dark, bg=self.bg_colors["White"]).create_treeview(
                 n_categories=len(list_categories), text_n=list_categories,
                 width_n=list_width, individual=True)
 
-            scb_v = ttk.Scrollbar(self.subwindow_ma_checkfile, orient="vertical")
-            scb_h = ttk.Scrollbar(self.subwindow_ma_checkfile, orient="horizontal")
+            scb_v = ttk.Scrollbar(parent, orient="vertical")
+            scb_h = ttk.Scrollbar(parent, orient="horizontal")
             self.tv_results_quick.configure(xscrollcommand=scb_h.set, yscrollcommand=scb_v.set)
             scb_v.config(command=self.tv_results_quick.yview)
             scb_h.config(command=self.tv_results_quick.xview)
-            scb_v.grid(row=0, column=59, rowspan=18, columnspan=1, sticky="ns")
-            scb_h.grid(row=18, column=16, rowspan=1, columnspan=43, sticky="ew")
+            scb_v.grid(row=val_row_start, column=vb_start_column, rowspan=vb_n_rows, columnspan=1,
+                       sticky="ns")
+            scb_h.grid(row=hb_start_row, column=val_column_start, rowspan=1, columnspan=val_column_span - 1,
+                       sticky="ew")
 
             if var_is != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0 and n_intervals_incl > 0:
                 ## INITIALIZATION
