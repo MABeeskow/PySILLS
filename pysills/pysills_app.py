@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.69
-# Date:		28.02.2025
+# Version:	v1.0.70
+# Date:		01.03.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.69"
-        self.val_version = self.str_version_number + " - 28.02.2025"
+        self.str_version_number = "1.0.70"
+        self.val_version = self.str_version_number + " - 01.03.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -747,8 +747,8 @@ class PySILLS(tk.Frame):
             "Sample file": {"English": "Sample file", "German": "Probenmessung"},
             "Confirm all": {"English": "Confirm all", "German": "Alles bestätigen"},
             "Confirm": {"English": "Confirm", "German": "Bestätigen"},
-            "Extend left": {"English": "Extend left", "German": "Links erweitern"},
-            "Extend right": {"English": "Extend right", "German": "Rechts erweitern"},
+            "Extend left": {"English": "Move left", "German": "Links verschieben"},
+            "Extend right": {"English": "Move right", "German": "Rechts verschieben"},
             "Measured isotopes": {"English": "Measured isotopes", "German": "Gemessene Isotope"},
             "Display options": {"English": "Display options", "German": "Anzeigeoptionen"},
             "Analysis mode": {"English": "Analysis mode", "German": "Analysemodus"},
@@ -22147,12 +22147,22 @@ class PySILLS(tk.Frame):
         file_isotopes = self.container_lists["Measured Isotopes"][str_filename_short]
         self.ca_filetype = str_filetype
         self.ca_filename_short = str_filename_short
+        self.ca_filename_long = str_filename_long
         str_title = self.language_dict["Setup"][self.var_language]
 
         if str_filename_short not in self.helper_filesetup_lines:
             self.helper_filesetup_lines[str_filename_short] = {}
         self.helper_filesetup_lines[str_filename_short] = {}
 
+        self.helper_var_rb["File setup"]["QA section"].set(1)
+        self.helper_var_rb["File setup"]["Section"].set(0)
+        self.helper_var_rb["File setup"]["Analysis mode"].set(0)
+        self.helper_var_rb["File setup"]["Interval limits"].set(0)
+        self.helper_var_entr["File setup"]["Start"].set("Set start value")
+        self.helper_var_entr["File setup"]["End"].set("Set end value")
+        self.helper_var_opt["File setup"]["Reference isotope 1"].set("None")
+        self.helper_var_opt["File setup"]["Reference isotope 2"].set("None")
+        self.helper_var_opt["File setup"]["Parameter"].set("None")
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # Window settings
         row_min = self.row_height
@@ -22319,22 +22329,25 @@ class PySILLS(tk.Frame):
             text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_long=str_filename_long, direction="next":
             self.switch_to_another_filesetup(filetype, filename_long, direction))
-        btn_04 = SE(
+        self.btn_04 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=2*n_1st_column_third, n_rows=2,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_04, bg_active=accent_color, fg_active=font_color_light)
-        btn_05 = SE(
+            text=str_btn_04, bg_active=accent_color, fg_active=font_color_light,
+            command=self.filesetup_confirm_new_interval)
+        self.btn_05 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 4, column_id=0, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_05, bg_active=accent_color, fg_active=font_color_light)
-        btn_06 = SE(
+            text=str_btn_05, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda mode="move left": self.filesetup_move_interval(mode))
+        self.btn_06 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 4, column_id=n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_06, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_06, bg_active=accent_color, fg_active=font_color_light,
+            command=lambda mode="move right": self.filesetup_move_interval(mode))
         btn_07 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=0, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-            text=str_btn_07, bg_active=accent_color, fg_active=font_color_light)
+            text=str_btn_07, bg_active=accent_color, fg_active=font_color_light, command=self.filesetup_copy_interval)
         btn_08 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
@@ -22380,11 +22393,6 @@ class PySILLS(tk.Frame):
             command=lambda opt=self.helper_var_opt["File setup"]["Parameter"], filetype=str_filetype,
                            filename_long=str_filename_long:
             self.fill_table_filesetup(opt, filetype, filename_long))
-
-        btn_04.configure(state="disabled")
-        btn_05.configure(state="disabled")
-        btn_06.configure(state="disabled")
-        btn_07.configure(state="disabled")
 
         # Radiobuttons
         str_rb_01 = self.language_dict["Background"][self.var_language]
@@ -22485,25 +22493,22 @@ class PySILLS(tk.Frame):
         rb_13 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=0, n_rows=1, n_columns=n_1st_column_third,
             fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=0, color_bg=background_color_elements,
+            var_rb=self.helper_var_rb["File setup"]["Interval limits"], value_rb=0, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_13, sticky="nesw", relief=tk.FLAT)
         rb_14 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=1, color_bg=background_color_elements,
+            var_rb=self.helper_var_rb["File setup"]["Interval limits"], value_rb=1, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_14, sticky="nesw", relief=tk.FLAT)
         rb_15 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 8, column_id=2*n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.helper_var_rb["File setup"]["Analysis mode"], value_rb=2, color_bg=background_color_elements,
+            var_rb=self.helper_var_rb["File setup"]["Interval limits"], value_rb=2, color_bg=background_color_elements,
             fg=font_color_dark, text=str_rb_15, sticky="nesw", relief=tk.FLAT)
 
         #rb_01.configure(state="disabled")
         #rb_02.configure(state="disabled")
         #rb_03.configure(state="disabled")
-        rb_13.configure(state="disabled")
-        rb_14.configure(state="disabled")
-        rb_15.configure(state="disabled")
 
         # Option Menues
         list_parameters = [
@@ -22680,7 +22685,13 @@ class PySILLS(tk.Frame):
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # Initialization
+        #self.btn_04.configure(state="disabled")
+        #self.btn_05.configure(state="disabled")
+        #self.btn_06.configure(state="disabled")
         btn_10.configure(state="disabled")
+
+        self.copy_button_pressed = False
+        self.still_not_confirmed = False
 
         if self.pysills_mode == "MA":
             rb_03.configure(state="disabled")
@@ -22901,6 +22912,13 @@ class PySILLS(tk.Frame):
                 var_file_long=str_filename_long)
 
     def filesetup_copy_interval(self):
+        self.copy_button_pressed = True
+        self.btn_05.configure(state="normal")
+        self.btn_06.configure(state="normal")
+
+        self.copy_index_start_new = None
+        self.copy_index_end_new = None
+
         if self.helper_rb_ca_bg.get() == 1:  # BG
             var_key = "BG"
             var_lb = self.lb_ca_bg
@@ -22911,19 +22929,175 @@ class PySILLS(tk.Frame):
             var_key = "INCL"
             var_lb = self.lb_ca_incl
 
-        item = var_lb.curselection()[0]
-        value = var_lb.get(item)
-        value_parts = value.split(" ")
-        key_id = re.search(r"(\D+)(\d+)", value_parts[0])
-        var_id = int(key_id.group(2))
+        if self.helper_rb_ca_bg.get() != 0:
+            item = var_lb.curselection()[0]
+            value = var_lb.get(item)
+            value_parts = value.split(" ")
+            key_id = re.search(r"(\D+)(\d+)", value_parts[0])
+            var_id = int(key_id.group(2))
 
-        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Indices"].remove(var_id)
-        var_lb.delete(tk.ANCHOR)
-        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id][
-            "Object"].set_visible(False)
-        del self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id]
+            condition = False
+            new_id = self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["ID"]
+            while condition == False:
+                new_id += 1
+                if new_id not in self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"]:
+                    condition = True
 
+            self.new_copy_id = new_id
+            dict_content = self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id]
+            time_start = dict_content["Times"][0]
+            time_end = dict_content["Times"][1]
+            self.helper_var_entr["File setup"]["Start"].set(time_start)
+            self.helper_var_entr["File setup"]["End"].set(time_end)
+            self.copy_index_start = dict_content["Indices"][0]
+            self.copy_index_end = dict_content["Indices"][1]
+
+    def filesetup_move_interval(self, mode):
+        self.btn_04.configure(state="normal")
+
+        if self.copy_button_pressed == True:
+            if self.copy_index_start_new == None:
+                copy_index_start = self.copy_index_start
+            else:
+                copy_index_start = self.copy_index_start_new
+
+            if self.copy_index_end_new == None:
+                copy_index_end = self.copy_index_end
+            else:
+                copy_index_end = self.copy_index_end_new
+        else:
+            if self.helper_rb_ca_bg.get() == 1:  # BG
+                var_key = "BG"
+                var_lb = self.lb_ca_bg
+            elif self.helper_rb_ca_bg.get() == 2:  # MAT
+                var_key = "MAT"
+                var_lb = self.lb_ca_mat
+            elif self.helper_rb_ca_bg.get() == 3:  # INCL
+                var_key = "INCL"
+                var_lb = self.lb_ca_incl
+
+            if self.helper_rb_ca_bg.get() != 0:
+                item = var_lb.curselection()[0]
+                value = var_lb.get(item)
+                value_parts = value.split(" ")
+                key_id = re.search(r"(\D+)(\d+)", value_parts[0])
+                var_id = int(key_id.group(2))
+
+            self.var_id = var_id
+            if self.still_not_confirmed == False:
+                dict_content = self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][
+                    var_id]
+                copy_index_start = dict_content["Indices"][0]
+                copy_index_end = dict_content["Indices"][1]
+                self.still_not_confirmed = True
+            else:
+                copy_index_start = self.copy_index_start_new
+                copy_index_end = self.copy_index_end_new
+
+        if mode == "move left":
+            if self.helper_var_rb["File setup"]["Interval limits"].get() == 0:      # left limit
+                if copy_index_start > 0:
+                    new_index_start = copy_index_start - 1
+                else:
+                    new_index_start = 0
+
+                new_index_end = copy_index_end
+            elif self.helper_var_rb["File setup"]["Interval limits"].get() == 1:    # right limit
+                new_index_start = copy_index_start
+
+                if copy_index_end > copy_index_start + 1:
+                    new_index_end = copy_index_end - 1
+                else:
+                    new_index_end = copy_index_start + 1
+            elif self.helper_var_rb["File setup"]["Interval limits"].get() == 2:    # both limits
+                if copy_index_start > 0:
+                    new_index_start = copy_index_start - 1
+                else:
+                    new_index_start = 0
+
+                if copy_index_end > copy_index_start + 1:
+                    new_index_end = copy_index_end - 1
+                else:
+                    new_index_end = copy_index_start + 1
+        elif mode == "move right":
+            if self.helper_var_rb["File setup"]["Interval limits"].get() == 0:  # left limit
+                if copy_index_start < copy_index_end - 1:
+                    new_index_start = copy_index_start + 1
+                else:
+                    new_index_start = copy_index_end - 1
+
+                new_index_end = copy_index_end
+            elif self.helper_var_rb["File setup"]["Interval limits"].get() == 1:  # right limit
+                new_index_start = copy_index_start
+
+                if copy_index_end < len(self.dataset_time) - 1:
+                    new_index_end = copy_index_end + 1
+                else:
+                    new_index_end = len(self.dataset_time) - 1
+            elif self.helper_var_rb["File setup"]["Interval limits"].get() == 2:  # both limits
+                if copy_index_start < copy_index_end - 1:
+                    new_index_start = copy_index_start + 1
+                else:
+                    new_index_start = copy_index_end - 1
+
+                if copy_index_end < len(self.dataset_time) - 1:
+                    new_index_end = copy_index_end + 1
+                else:
+                    new_index_end = len(self.dataset_time) - 1
+
+        time_0 = self.dataset_time[new_index_start]
+        time_1 = self.dataset_time[new_index_end]
+
+        self.helper_var_entr["File setup"]["Start"].set(time_0)
+        self.helper_var_entr["File setup"]["End"].set(time_1)
+        self.copy_index_start_new = new_index_start
+        self.copy_index_end_new = new_index_end
+
+    def filesetup_confirm_new_interval(self):
+        self.still_not_confirmed = False
+        self.btn_04.configure(state="disabled")
+        self.helper_var_entr["File setup"]["Start"].set("Set start value")
+        self.helper_var_entr["File setup"]["End"].set("Set end value")
+
+        if self.helper_rb_ca_bg.get() == 1:  # BG
+            var_key = "BG"
+            var_lb = self.lb_ca_bg
+        elif self.helper_rb_ca_bg.get() == 2:  # MAT
+            var_key = "MAT"
+            var_lb = self.lb_ca_mat
+        elif self.helper_rb_ca_bg.get() == 3:  # INCL
+            var_key = "INCL"
+            var_lb = self.lb_ca_incl
+
+        var_color = self.colors_intervals[var_key]
+
+        if self.copy_button_pressed == True:
+            self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["ID"] = self.new_copy_id
+            self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Indices"].append(self.new_copy_id)
+            var_id = self.new_copy_id
+        else:
+            #self.container_helper[var_type][var_file_short][var_key]["Indices"].remove(var_id)
+            var_lb.delete(tk.ANCHOR)
+            self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][self.var_id][
+                "Object"].set_visible(False)
+            del self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][self.var_id]
+            var_id = self.var_id
+
+        time_0 = self.dataset_time[self.copy_index_start_new]
+        time_1 = self.dataset_time[self.copy_index_end_new]
+
+        box_key = self.var_ax_ca.axvspan(time_0, time_1, alpha=0.35, color=var_color)
+
+        self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id] = {
+            "Times": [time_0, time_1], "Indices": [self.copy_index_start_new, self.copy_index_end_new],
+            "Object": box_key}
+
+        var_lb.insert(tk.END, var_key + str(var_id) + " [" + str(time_0) + "-" + str(time_1) + "]")
         self.var_canvas_ca.draw()
+
+        self.fill_table_filesetup(
+            opt=self.helper_var_opt["File setup"]["Parameter"], filetype=self.ca_filetype,
+            filename_long=self.ca_filename_long)
 
     def filesetup_set_interval(self, var_entr, var_key, mode, event):
         if mode == "default":
@@ -23602,6 +23776,27 @@ class PySILLS(tk.Frame):
                         dict_lines["RAW 2"][0].set_visible(True)
 
         self.helper_filesetup_lines[filename_short]["CANVAS"].draw()
+
+    def check_for_internal_standard(self, filetype, filename_long):
+        var_filename_short = filename_long.split("/")[-1]
+
+        if filetype == "STD":
+            var_srm_file = self.container_var[filetype][filename_long]["SRM"].get()
+            for element, value in sorted(self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
+                if element in self.container_lists["Measured Elements"][var_filename_short]:
+                    var_is_i = self.container_lists["Measured Elements"][var_filename_short][element][0]
+                    self.container_var[filetype][filename_long]["IS Data"]["IS"].set(var_is_i)
+                break
+        else:
+            if self.pysills_mode == "MA":
+                var_mat_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+                var_is_i = var_mat_is
+            else:
+                var_mat_is = self.container_var[filetype][filename_long]["Matrix Setup"]["IS"]["Name"].get()
+                var_incl_is = self.container_var[filetype][filename_long]["IS Data"]["IS"].get()
+                var_is_i = var_incl_is
+
+        return var_is_i
 
     def ma_check_specific_file(self, var_filename_long, var_filetype="STD", checkup_mode=False):
         # # Colors
@@ -27054,7 +27249,10 @@ class PySILLS(tk.Frame):
                                mode="Specific"):
         if mode == "Specific":
             if var_filetype == "STD":
-                var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                try:
+                    var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
+                except:
+                    var_is = self.check_for_internal_standard(filetype=var_filetype, filename_long=var_file_long)
             elif var_filetype == "SMPL":
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
 
