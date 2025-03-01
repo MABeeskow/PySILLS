@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.70
+# Version:	v1.0.71
 # Date:		01.03.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.70"
+        self.str_version_number = "1.0.71"
         self.val_version = self.str_version_number + " - 01.03.2025"
 
         ## Colors
@@ -4624,6 +4624,13 @@ class PySILLS(tk.Frame):
                 dataset_x = df_data[var_x][start_index:end_index]
                 dataset_y = df_data[var_y][start_index:end_index]
                 if var_z != "None" and var_z not in [var_x, var_y]:
+                    if "Time" not in var_z:
+                        pass
+                    else:
+                        if "Time" not in list(df_data.keys()):
+                            if list(df_data.keys())[0] not in list_isotopes:
+                                var_z = list(df_data.keys())[0]
+
                     if var_z not in helper_data:
                         helper_data[var_z] = []
 
@@ -4648,20 +4655,20 @@ class PySILLS(tk.Frame):
             var_ax = var_fig.add_subplot(label=np.random.uniform())
 
             if var_z == "None":
-                sct = var_ax.scatter(data_x, data_y)
+                sct = var_ax.scatter(data_x, data_y, edgecolor="black")
             else:
                 data_z = helper_data[var_z]
 
                 min_z = min(data_z)
                 max_z = max(data_z)
-                sct = var_ax.scatter(data_x, data_y, c=data_z)
+                sct = var_ax.scatter(data_x, data_y, c=data_z, edgecolor="black")
                 cbar = var_fig.colorbar(sct, ax=var_ax)
                 cbar.set_ticks(np.linspace(min_z, max_z, 6, endpoint=True))
                 cbar.ax.tick_params(labelsize="x-small")
-                if var_z != "Time":
+                if var_z != "Time" and "Time" not in var_z:
                     cbar.set_label("Signal " + var_z + " (cps)", fontsize=8)
                 else:
-                    cbar.set_label(var_z + " (s)", fontsize="x-small")
+                    cbar.set_label("Time (s)", fontsize="x-small")
 
             var_ax.grid(True)
             var_ax.set_xlim(left=lim_x_min, right=lim_x_max)
@@ -10134,6 +10141,8 @@ class PySILLS(tk.Frame):
                 var_file_long = splitted_lines[0]
                 var_file_short = splitted_lines[0].split("/")[-1]
 
+                self.lbl_prg_spk.configure(text=str(20) +" % - " + var_file_short, anchor=tk.W)
+
                 self.list_std.append(var_file_long)
                 self.container_lists["STD"]["Long"].append(var_file_long)
                 self.container_lists["STD"]["Short"].append(var_file_short)
@@ -10184,6 +10193,8 @@ class PySILLS(tk.Frame):
 
                 var_file_long = splitted_lines[0]
                 var_file_short = splitted_lines[0].split("/")[-1]
+
+                self.lbl_prg_spk.configure(text=str(30) +" % - " + var_file_short, anchor=tk.W)
 
                 self.container_spikes[var_file_short] = {}
 
@@ -19734,11 +19745,12 @@ class PySILLS(tk.Frame):
                     df_data = self.container_measurements["Dataframe"][var_file_short]
 
                 dataset_time = list(DE().get_times(dataframe=df_data))
-                x_max = max(dataset_time)
+                x_max = float(max(dataset_time))
+
                 icp_measurements = np.array(
                     [[df_data[isotope] for isotope in self.container_lists["Measured Isotopes"]["All"]
                       if isotope in df_data]])
-                y_max = np.amax(icp_measurements)
+                y_max = float(np.amax(icp_measurements))
 
                 if var_filetype == "STD":
                     ax = self.fig_time_signal_checker.add_subplot(label=np.random.uniform())
@@ -20124,8 +20136,16 @@ class PySILLS(tk.Frame):
                 if self.container_icpms["name"] != None:
                     var_skipheader = self.container_icpms["skipheader"]
                     var_skipfooter = self.container_icpms["skipfooter"]
-                    df_i = DE(filename_long=filename_long).get_measurements(
-                        delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                    
+                    if "Dataframe" in self.container_measurements:
+                        if filename_short in self.container_measurements["Dataframe"]:
+                            df_i = self.container_measurements["Dataframe"][filename_short]
+                    else:
+                        try:
+                            df_i = DE(filename_long=filename_long).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        except:
+                            df_i, file_info = self.find_icpms_data_in_file(filename_long=filename_long)
                 else:
                     df_i = DE(filename_long=filename_long).get_measurements(delimiter=",", skip_header=3, skip_footer=1)
 
