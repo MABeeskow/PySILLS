@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.71
-# Date:		01.03.2025
+# Version:	v1.0.72
+# Date:		13.03.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.71"
-        self.val_version = self.str_version_number + " - 01.03.2025"
+        self.str_version_number = "1.0.72"
+        self.val_version = self.str_version_number + " - 13.03.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -22860,7 +22860,102 @@ class PySILLS(tk.Frame):
                 self.tv_filesetup_qa.insert("", tk.END, values=entries)
 
     def do_quantification_incl(self, filetype, datatype, filename_long):
-        pass
+        str_filetype = filetype
+        str_filename_long = filename_long
+        var_file_short = str_filename_long.split("/")[-1]
+        var_is_host = self.container_var[str_filetype][str_filename_long]["Matrix Setup"]["IS"]["Name"].get()
+        var_is_smpl = self.container_var[str_filetype][str_filename_long]["IS Data"]["IS"].get()
+        n_intervals_bg = len(self.container_helper[str_filetype][var_file_short]["BG"]["Content"])
+        n_intervals_mat = len(self.container_helper[str_filetype][var_file_short]["MAT"]["Content"])
+        n_intervals_incl = len(self.container_helper[str_filetype][var_file_short]["INCL"]["Content"])
+        str_keyword = datatype
+
+        if (var_is_smpl != "Select IS" and var_is_host != "Select IS" and n_intervals_bg > 0 and n_intervals_mat > 0 and
+                n_intervals_incl > 0):
+            ## INITIALIZATION
+            if str_filetype == "STD":
+                # Intensity analysis
+                self.get_intensity(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, mode="Specific")
+                self.fi_get_intensity_corrected(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, var_focus="MAT",
+                    mode="Specific")
+            else:
+                # Intensity analysis
+                for file_std_short in self.container_lists["STD"]["Short"]:
+                    self.get_intensity(
+                        var_filetype="STD", var_datatype=str_keyword, var_file_short=file_std_short, mode="Specific")
+
+                self.fi_get_intensity_corrected(
+                    var_filetype="STD", var_datatype=str_keyword, var_file_short=None, var_focus="MAT", mode="only STD")
+
+                self.get_intensity(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, mode="Specific")
+                self.fi_get_intensity_corrected(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, var_focus="MAT",
+                    mode="Specific")
+                self.fi_get_intensity_corrected(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_focus="INCL", mode="Specific")
+                self.fi_get_intensity_ratio(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long, var_focus="INCL")
+                self.fi_get_intensity_mix(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short, mode="Specific")
+                self.get_analytical_sensitivity_std(
+                    var_datatype=str_keyword, mode="all", var_is_host=var_is_host, var_is_smpl=var_is_smpl)
+
+            self.fi_get_intensity_ratio(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long, var_focus="MAT")
+
+            # Sensitivity analysis
+            self.get_analytical_sensitivity(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long)
+            results_is = self.determine_possible_is(filetype="ALL", consider_matrix=True)
+
+            IQ(dataframe=None, project_type=self.pysills_mode,
+               results_container=self.container_intensity_ratio[str_filetype][str_keyword]).get_intensity_ratio(
+                data_container=self.container_intensity_corrected[str_filetype][str_keyword], dict_is=results_is,
+                filename_short=var_file_short)
+            self.fi_get_rsf(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long, var_focus="MAT")
+            # Concentration analysis
+            self.fi_get_concentration2(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long)
+            # Normalized Sensitivity
+            self.fi_get_normalized_sensitivity(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long, var_focus="MAT")
+            self.fi_get_concentration_ratio(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long, var_focus="MAT")
+            self.get_lod(
+                var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                var_file_long=str_filename_long, var_focus="MAT")
+
+            if str_filetype == "SMPL":
+                if self.molality_based_quantification.get() == False:
+                    self.fi_get_concentration2(
+                        var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                        var_file_long=str_filename_long, var_focus="INCL")
+                self.fi_get_normalized_sensitivity(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long, var_focus="INCL")
+                self.fi_get_concentration_ratio(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long, var_focus="INCL")
+                self.get_lod(
+                    var_filetype=str_filetype, var_datatype=str_keyword, var_file_short=var_file_short,
+                    var_file_long=str_filename_long, var_focus="INCL")
+                self.fi_get_mixed_concentration_ratio(
+                    var_datatype=str_keyword, var_file_short=var_file_short, var_file_long=str_filename_long)
+                self.fi_get_mixing_ratio(
+                    var_datatype=str_keyword, var_file_short=var_file_short, var_file_long=str_filename_long)
+                self.fi_get_concentration_mixed(var_datatype=str_keyword, var_file_short=var_file_short)
 
     def do_quantification_ma(self, filetype, datatype, filename_long):
         str_filetype = filetype
