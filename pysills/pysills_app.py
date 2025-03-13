@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.72
+# Version:	v1.0.73
 # Date:		13.03.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.72"
+        self.str_version_number = "1.0.73"
         self.val_version = self.str_version_number + " - 13.03.2025"
 
         ## Colors
@@ -39831,6 +39831,211 @@ class PySILLS(tk.Frame):
                         self.helper_nacl_equivalents[element] += int(round(
                             amount_fluid*self.molar_masses_compounds[fluid][element]*total_ppm, 0))
 
+    def setup_mass_charge_balance(self):
+        """ Setup window where the concentration of the internal standard can be calculated based on a mass or charge
+        balance calculation.
+        -------
+        Parameters
+        -------
+        Returns
+        -------
+        """
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Colors
+        font_color_dark = self.bg_colors["Dark Font"]
+        font_color_light = self.bg_colors["Light Font"]
+        background_color_dark = self.bg_colors["BG Window"]
+        background_color_elements = self.bg_colors["Light"]
+        background_color_light = self.bg_colors["Very Light"]
+        accent_color = self.bg_colors["Accent"]
+        font_header = self.font_settings["Header"]
+        font_elements = self.font_settings["Elements"]
+        font_option = self.font_settings["Options"]
+        font_table = self.font_settings["Table"]
+
+        # Initial parameters and variables
+        str_title = self.language_dict["Setup"][self.var_language]
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Window settings
+        row_min = self.row_height
+        column_min = self.column_width
+        n_rows = self.window_dimensions["Setup mass balance"][0]
+        n_columns = self.window_dimensions["Setup mass balance"][1] + 5
+
+        window_width = int(n_columns*self.column_width)
+        window_height = int(n_rows*self.row_height)
+
+        var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
+
+        self.subwindow_mass_charge_balance = tk.Toplevel(self.parent)
+        self.subwindow_mass_charge_balance.title(str_title + " - " + "Mass/Charge balance")
+        self.subwindow_mass_charge_balance.geometry(var_geometry)
+        self.subwindow_mass_charge_balance.resizable(False, False)
+        self.subwindow_mass_charge_balance["bg"] = background_color_dark
+
+        for x in range(n_columns):
+            tk.Grid.columnconfigure(self.subwindow_mass_charge_balance, x, weight=1)
+        for y in range(n_rows):
+            tk.Grid.rowconfigure(self.subwindow_mass_charge_balance, y, weight=1)
+
+        # Rows
+        for i in range(0, n_rows):
+            self.subwindow_mass_charge_balance.grid_rowconfigure(i, minsize=row_min)
+        # Columns
+        for i in range(0, n_columns):
+            self.subwindow_mass_charge_balance.grid_columnconfigure(i, minsize=column_min)
+
+        n_1st_column = int(0.25*n_columns)
+        n_settings_column = n_columns - n_1st_column
+
+        n_2nd_column = n_columns - n_1st_column - n_settings_column
+        n_1st_column_half = int(n_1st_column/2)
+        n_1st_column_third = int(n_1st_column/3)
+        n_2nd_column_third = int(n_2nd_column/3)
+        start_settings_row = n_rows - 6
+        start_3rd_column = n_1st_column + n_2nd_column
+        var_geometry = [self.subwindow_mass_charge_balance, 0, start_settings_row, n_rows - 11, n_2nd_column]
+        self.var_geometry = var_geometry
+
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Frames
+        frm_00 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 1,
+            n_rows=4, n_columns=n_settings_column - 2, fg=font_color_dark, bg=background_color_elements).create_frame(
+            relief=tk.FLAT)
+
+        # Labels
+        lbl_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=0, column_id=0, n_rows=1, n_columns=n_1st_column,
+            fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Chloride selection", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_02 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=n_settings_column, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Settings", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_03 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 21,
+            n_rows=1, n_columns=9, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text="Definity salinity (wt.%)", relief=tk.FLAT, fontsize=font_elements, anchor=tk.E)
+        lbl_04 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=0, column_id=n_1st_column + 1, n_rows=1,
+            n_columns=n_settings_column, fg=font_color_light, bg=background_color_dark).create_simple_label(
+            text="Results", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+
+        # Buttons
+        btn_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=1, column_id=0, n_rows=1,
+            n_columns=n_1st_column, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Guess composition", bg_active=accent_color, fg_active=font_color_light)
+        btn_02 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 2, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Previous file", bg_active=accent_color, fg_active=font_color_light)
+        btn_03 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 2, column_id=n_1st_column + 11,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Next file", bg_active=accent_color, fg_active=font_color_light)
+        btn_04 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 4, column_id=n_1st_column + 31,
+            n_rows=2, n_columns=13, fg=font_color_light, bg=accent_color).create_simple_button(
+            text="Calculate / Update", bg_active=accent_color, fg_active=font_color_light)
+        btn_05 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 2, column_id=n_1st_column + 31,
+            n_rows=1, n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text="Fix quantification", bg_active=accent_color, fg_active=font_color_light)
+
+        # Radiobuttons
+        var_rb_01 = tk.IntVar()
+        var_rb_01.set(0)
+
+        rb_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=20, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=var_rb_01, value_rb=0, color_bg=background_color_elements, fg=font_color_dark,
+            text="Apply to all files", sticky="nesw", relief=tk.FLAT)
+        rb_02 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 2, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=var_rb_01, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
+            text="Apply only to assemblage", sticky="nesw", relief=tk.FLAT)
+        rb_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 3, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=var_rb_01, value_rb=2, color_bg=background_color_elements, fg=font_color_dark,
+            text="Apply only to file", sticky="nesw", relief=tk.FLAT)
+
+        # Option Menues
+        list_assemblages = ["A", "B", "C", "D", "E", "F", "G", "H"]
+        list_files = self.container_lists["SMPL"]["Short"]
+        var_opt_assemblage = tk.StringVar()
+        var_opt_assemblage.set("A")
+        var_opt_file = tk.StringVar()
+        var_opt_file.set("Select file")
+
+        opt_assemblage = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 2, column_id=n_1st_column + 11,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=var_opt_assemblage, option_list=list_assemblages, text_set=var_opt_assemblage.get(),
+            fg_active=font_color_light, bg_active=accent_color)
+        opt_file = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 3, column_id=n_1st_column + 11,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=var_opt_file, option_list=list_files, text_set=var_opt_file.get(),
+            fg_active=font_color_light, bg_active=accent_color)
+
+        # Entry fields
+        var_entr_salinity = tk.StringVar()
+        var_entr_salinity.set("0.0")
+        var_entr_concentration_averaged = tk.StringVar()
+        var_entr_concentration_averaged.set("0.0")
+
+        entr_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 31,
+            n_rows=1, n_columns=5, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_salinity, text_default=var_entr_salinity.get())
+        entr_02 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 36,
+            n_rows=1, n_columns=8, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
+            var=var_entr_concentration_averaged, text_default=var_entr_concentration_averaged.get())
+        entr_02.configure(state="disabled")
+
+        # Checkboxes
+        var_cb = tk.IntVar()
+        var_cb.set(0)
+
+        cb_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 2, column_id=n_1st_column + 21,
+            n_rows=2, n_columns=9, fg=font_color_dark, bg=background_color_elements).create_simple_checkbox(
+            var_cb=var_cb, text="Molality-based calculation", set_sticky="nesw", own_color=True, var_anchor=tk.E)
+
+        # Listboxes
+        frm_chlorides = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=2, column_id=0, n_rows=n_rows - 2, n_columns=n_1st_column,
+            fg=font_color_dark, bg=background_color_light).create_frame()
+        vsb_chlorides = ttk.Scrollbar(frm_chlorides, orient="vertical")
+        text_chlorides = tk.Text(
+            master=frm_chlorides, width=30, height=25, yscrollcommand=vsb_chlorides.set, bg=background_color_light,
+            padx=10, pady=10)
+        vsb_chlorides.config(command=text_chlorides.yview)
+        vsb_chlorides.pack(side="right", fill="y")
+        text_chlorides.pack(side="left", fill="both", expand=True)
+
+        # Treeviews
+        self.tv_mass_charge_balance = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=1, column_id=n_1st_column + 1,
+            n_rows=start_settings_row - 1, n_columns=n_settings_column - 2, fg=font_color_dark,
+            bg=self.bg_colors["White"]).create_treeview(
+            n_categories=6,
+            text_n=["Filename", "Assemblage", "Salinity", "Concentration", "Cation/Anion", "Considered chlorides"],
+            width_n=["150", "100", "100", "150", "100", "300"], individual=True)
+
+        style = ttk.Style()
+        style.configure("Treeview", font=font_table)
+        style.configure("Treeview.Heading", font=font_elements)
+        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        # Initialization
+
+
     def fi_calculate_chargebalance(self, var_entr, mode, var_file, event):
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -41313,7 +41518,7 @@ class PySILLS(tk.Frame):
         font_table = self.font_settings["Table"]
 
         str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
-
+        self.setup_mass_charge_balance()
         ## Window Settings
         row_min = self.row_height
         column_min = self.column_width
