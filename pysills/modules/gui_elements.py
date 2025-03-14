@@ -3,7 +3,7 @@
 # ----------------------
 # gui_elements.py
 # Maximilian Beeskow
-# 28.02.2025
+# 14.03.2025
 # ----------------------
 #
 ## MODULES
@@ -760,7 +760,7 @@ class SimpleElements:
         style = ttk.Style()
         style.configure("Treeview.Heading", background=self.bg, pressed_color=self.bg,
                         highlight_color=self.bg, foreground=self.fg)
-        #
+
         if n_categories == 2 and individual == False:
             columns = ("#1", "#2")
             treeview = ttk.Treeview(self.parent, columns=columns, show="headings")
@@ -770,20 +770,20 @@ class SimpleElements:
             treeview.column("#2", minwidth=0, width=width_2, stretch=tk.YES, anchor=tk.CENTER)
             treeview.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
                           sticky="nesw")
-        #
+
         if n_categories > 1 and individual == True:
             columns = []
             for n in range(n_categories):
                 var_i = "#" + str(n + 1)
                 columns.append(var_i)
-            #
+
             treeview = ttk.Treeview(self.parent, columns=columns, show="headings")
-            #
+
             for index, element in enumerate(columns):
-                treeview.heading(element, text=text_n[index])
+                treeview.heading(element, text=text_n[index], anchor=tk.W)
                 treeview.column(element, minwidth=0, width=width_n[index], stretch=tk.NO, anchor=tk.W)
-            #
+
             treeview.grid(row=self.row_id, column=self.column_id, rowspan=self.n_rows, columnspan=self.n_columns,
                           sticky="nesw")
-        #
+
         return treeview

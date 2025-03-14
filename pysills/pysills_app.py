@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.73
-# Date:		13.03.2025
+# Date:		14.03.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.73"
-        self.val_version = self.str_version_number + " - 13.03.2025"
+        self.val_version = self.str_version_number + " - 14.03.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -696,21 +696,37 @@ class PySILLS(tk.Frame):
 
         self.helper_var_rb = {
             "File setup": {"QA section": tk.IntVar(), "Section": tk.IntVar(), "Analysis mode": tk.IntVar(),
-                           "Interval limits": tk.IntVar()}}
+                           "Interval limits": tk.IntVar()},
+            "Mass/Charge balance": {"File selection": tk.IntVar()}}
         self.helper_var_rb["File setup"]["QA section"].set(1)
         self.helper_var_rb["File setup"]["Section"].set(0)
         self.helper_var_rb["File setup"]["Analysis mode"].set(0)
         self.helper_var_rb["File setup"]["Interval limits"].set(0)
+        self.helper_var_rb["Mass/Charge balance"]["File selection"].set(0)
 
-        self.helper_var_entr = {"File setup": {"Start": tk.StringVar(), "End": tk.StringVar()}}
+        self.helper_var_entr = {
+            "File setup": {"Start": tk.StringVar(), "End": tk.StringVar()},
+            "Mass/Charge balance": {"Salinity": tk.StringVar(), "Concentration": tk.StringVar()}}
         self.helper_var_entr["File setup"]["Start"].set("Set start value")
         self.helper_var_entr["File setup"]["End"].set("Set end value")
+        self.helper_var_entr["Mass/Charge balance"]["Salinity"].set("0.0")
+        self.helper_var_entr["Mass/Charge balance"]["Concentration"].set("0.0")
 
-        self.helper_var_opt = {"File setup": {
-            "Reference isotope 1": tk.StringVar(), "Reference isotope 2": tk.StringVar(), "Parameter": tk.StringVar()}}
+        self.helper_var_opt = {
+            "File setup": {"Reference isotope 1": tk.StringVar(), "Reference isotope 2": tk.StringVar(),
+                           "Parameter": tk.StringVar()},
+            "Mass/Charge balance": {"Assemblage": tk.StringVar(), "File": tk.StringVar(), "IS": tk.StringVar()}}
         self.helper_var_opt["File setup"]["Reference isotope 1"].set("None")
         self.helper_var_opt["File setup"]["Reference isotope 2"].set("None")
         self.helper_var_opt["File setup"]["Parameter"].set("None")
+        self.helper_var_opt["Mass/Charge balance"]["Assemblage"].set("Select assemblage")
+        self.helper_var_opt["Mass/Charge balance"]["File"].set("Select file")
+        self.helper_var_opt["Mass/Charge balance"]["IS"].set("Select isotope")
+
+        self.helper_var_cb = {"Mass/Charge balance": {"Molality consideration": tk.IntVar()}}
+        self.helper_var_cb["Mass/Charge balance"]["Molality consideration"].set(0)
+
+        self.helper_lists = {"Considered chlorides": {}}
 
         ## LANGUAGE SUPPORT
         self.language_dict = {
@@ -39831,7 +39847,7 @@ class PySILLS(tk.Frame):
                         self.helper_nacl_equivalents[element] += int(round(
                             amount_fluid*self.molar_masses_compounds[fluid][element]*total_ppm, 0))
 
-    def setup_mass_charge_balance(self):
+    def setup_mass_charge_balance(self, mass_balance=True):
         """ Setup window where the concentration of the internal standard can be calculated based on a mass or charge
         balance calculation.
         -------
@@ -39855,12 +39871,13 @@ class PySILLS(tk.Frame):
 
         # Initial parameters and variables
         str_title = self.language_dict["Setup"][self.var_language]
+        bool_mass_balance = mass_balance
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # Window settings
         row_min = self.row_height
         column_min = self.column_width
-        n_rows = self.window_dimensions["Setup mass balance"][0]
-        n_columns = self.window_dimensions["Setup mass balance"][1] + 5
+        n_rows = self.window_dimensions["Setup mass balance"][0] + 3
+        n_columns = self.window_dimensions["Setup mass balance"][1] + 12
 
         window_width = int(n_columns*self.column_width)
         window_height = int(n_rows*self.row_height)
@@ -39892,7 +39909,7 @@ class PySILLS(tk.Frame):
         n_1st_column_half = int(n_1st_column/2)
         n_1st_column_third = int(n_1st_column/3)
         n_2nd_column_third = int(n_2nd_column/3)
-        start_settings_row = n_rows - 6
+        start_settings_row = n_rows - 7
         start_3rd_column = n_1st_column + n_2nd_column
         var_geometry = [self.subwindow_mass_charge_balance, 0, start_settings_row, n_rows - 11, n_2nd_column]
         self.var_geometry = var_geometry
@@ -39901,7 +39918,7 @@ class PySILLS(tk.Frame):
         # Frames
         frm_00 = SE(
             parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 1,
-            n_rows=4, n_columns=n_settings_column - 2, fg=font_color_dark, bg=background_color_elements).create_frame(
+            n_rows=5, n_columns=n_settings_column - 2, fg=font_color_dark, bg=background_color_elements).create_frame(
             relief=tk.FLAT)
 
         # Labels
@@ -39914,13 +39931,17 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=n_settings_column, fg=font_color_light, bg=background_color_dark).create_simple_label(
             text="Settings", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
         lbl_03 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 21,
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 27,
             n_rows=1, n_columns=9, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Definity salinity (wt.%)", relief=tk.FLAT, fontsize=font_elements, anchor=tk.E)
+            text="Define salinity (wt.%)", relief=tk.FLAT, fontsize=font_elements, anchor=tk.E)
         lbl_04 = SE(
             parent=self.subwindow_mass_charge_balance, row_id=0, column_id=n_1st_column + 1, n_rows=1,
             n_columns=n_settings_column, fg=font_color_light, bg=background_color_dark).create_simple_label(
             text="Results", relief=tk.FLAT, fontsize=font_header, anchor=tk.W)
+        lbl_05 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text="Define internal standard", relief=tk.FLAT, fontsize=font_elements, anchor=tk.W)
 
         # Buttons
         btn_01 = SE(
@@ -39936,79 +39957,92 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text="Next file", bg_active=accent_color, fg_active=font_color_light)
         btn_04 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 4, column_id=n_1st_column + 31,
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 4, column_id=n_1st_column + 37,
             n_rows=2, n_columns=13, fg=font_color_light, bg=accent_color).create_simple_button(
-            text="Calculate / Update", bg_active=accent_color, fg_active=font_color_light)
+            text="Calculate / Update", bg_active=accent_color, fg_active=font_color_light,
+            command=lambda mass_balance=bool_mass_balance:
+            self.calculate_mass_charge_balance_concentrations(mass_balance))
         btn_05 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 2, column_id=n_1st_column + 31,
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 2, column_id=n_1st_column + 37,
             n_rows=1, n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text="Fix quantification", bg_active=accent_color, fg_active=font_color_light)
 
         # Radiobuttons
-        var_rb_01 = tk.IntVar()
-        var_rb_01.set(0)
-
         rb_01 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 1,
-            n_rows=1, n_columns=20, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=var_rb_01, value_rb=0, color_bg=background_color_elements, fg=font_color_dark,
-            text="Apply to all files", sticky="nesw", relief=tk.FLAT)
-        rb_02 = SE(
             parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 2, column_id=n_1st_column + 1,
-            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=var_rb_01, value_rb=1, color_bg=background_color_elements, fg=font_color_dark,
-            text="Apply only to assemblage", sticky="nesw", relief=tk.FLAT)
-        rb_01 = SE(
+            n_rows=1, n_columns=20, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["Mass/Charge balance"]["File selection"], value_rb=0,
+            color_bg=background_color_elements, fg=font_color_dark, text="Apply to all files", sticky="nesw",
+            relief=tk.FLAT)
+        rb_02 = SE(
             parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 3, column_id=n_1st_column + 1,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=var_rb_01, value_rb=2, color_bg=background_color_elements, fg=font_color_dark,
-            text="Apply only to file", sticky="nesw", relief=tk.FLAT)
+            var_rb=self.helper_var_rb["Mass/Charge balance"]["File selection"], value_rb=1,
+            color_bg=background_color_elements, fg=font_color_dark, text="Apply only to assemblage", sticky="nesw",
+            relief=tk.FLAT)
+        rb_01 = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 4, column_id=n_1st_column + 1,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
+            var_rb=self.helper_var_rb["Mass/Charge balance"]["File selection"], value_rb=2,
+            color_bg=background_color_elements, fg=font_color_dark, text="Apply only to file", sticky="nesw",
+            relief=tk.FLAT)
 
         # Option Menues
-        list_assemblages = ["A", "B", "C", "D", "E", "F", "G", "H"]
+        list_assemblages = []
         list_files = self.container_lists["SMPL"]["Short"]
-        var_opt_assemblage = tk.StringVar()
-        var_opt_assemblage.set("A")
-        var_opt_file = tk.StringVar()
-        var_opt_file.set("Select file")
+        for filename_long in self.container_lists["SMPL"]["Long"]:
+            file_id = self.container_var["SMPL"][filename_long]["ID"].get()
+            if file_id not in list_assemblages:
+                list_assemblages.append(file_id)
 
         opt_assemblage = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 2, column_id=n_1st_column + 11,
-            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=var_opt_assemblage, option_list=list_assemblages, text_set=var_opt_assemblage.get(),
-            fg_active=font_color_light, bg_active=accent_color)
-        opt_file = SE(
             parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 3, column_id=n_1st_column + 11,
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=var_opt_file, option_list=list_files, text_set=var_opt_file.get(),
-            fg_active=font_color_light, bg_active=accent_color)
+            var_iso=self.helper_var_opt["Mass/Charge balance"]["Assemblage"], option_list=list_assemblages,
+            text_set=self.helper_var_opt["Mass/Charge balance"]["Assemblage"].get(), fg_active=font_color_light,
+            bg_active=accent_color)
+        opt_file = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 4, column_id=n_1st_column + 11,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_var_opt["Mass/Charge balance"]["File"], option_list=list_files,
+            text_set=self.helper_var_opt["Mass/Charge balance"]["File"].get(), fg_active=font_color_light,
+            bg_active=accent_color)
+        opt_is = SE(
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 11,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.helper_var_opt["Mass/Charge balance"]["IS"], option_list=list_files,
+            text_set=self.helper_var_opt["Mass/Charge balance"]["IS"].get(), fg_active=font_color_light,
+            bg_active=accent_color)
 
         # Entry fields
-        var_entr_salinity = tk.StringVar()
-        var_entr_salinity.set("0.0")
-        var_entr_concentration_averaged = tk.StringVar()
-        var_entr_concentration_averaged.set("0.0")
-
         entr_01 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 31,
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 37,
             n_rows=1, n_columns=5, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
-            var=var_entr_salinity, text_default=var_entr_salinity.get())
+            var=self.helper_var_entr["Mass/Charge balance"]["Salinity"],
+            text_default=self.helper_var_entr["Mass/Charge balance"]["Salinity"].get())
         entr_02 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 36,
+            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 1, column_id=n_1st_column + 42,
             n_rows=1, n_columns=8, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
-            var=var_entr_concentration_averaged, text_default=var_entr_concentration_averaged.get())
+            var=self.helper_var_entr["Mass/Charge balance"]["Concentration"],
+            text_default=self.helper_var_entr["Mass/Charge balance"]["Concentration"].get())
         entr_02.configure(state="disabled")
 
-        # Checkboxes
-        var_cb = tk.IntVar()
-        var_cb.set(0)
-
+        # Checkboxes sex
         cb_01 = SE(
-            parent=self.subwindow_mass_charge_balance, row_id=start_settings_row + 2, column_id=n_1st_column + 21,
-            n_rows=2, n_columns=9, fg=font_color_dark, bg=background_color_elements).create_simple_checkbox(
-            var_cb=var_cb, text="Molality-based calculation", set_sticky="nesw", own_color=True, var_anchor=tk.E)
+            parent=self.subwindow_mass_charge_balance, row_id=n_rows - 5, column_id=n_1st_column + 37,
+            n_rows=1, n_columns=13, fg=font_color_dark, bg=background_color_elements).create_simple_checkbox(
+            var_cb=self.helper_var_cb["Mass/Charge balance"]["Molality consideration"],
+            text="Molality-based calculation", set_sticky="nesw", own_color=True, var_anchor=tk.W)
 
         # Listboxes
+        list_salts = []
+        dict_salts = {}
+        for element, dataset in self.container_lists["Measured Elements"]["Cations"].items():
+            salt = dataset["Cl"]
+            dict_salts[salt] = element
+            if salt not in list_salts:
+                list_salts.append(salt)
+
         frm_chlorides = SE(
             parent=self.subwindow_mass_charge_balance, row_id=2, column_id=0, n_rows=n_rows - 2, n_columns=n_1st_column,
             fg=font_color_dark, bg=background_color_light).create_frame()
@@ -40020,21 +40054,829 @@ class PySILLS(tk.Frame):
         vsb_chlorides.pack(side="right", fill="y")
         text_chlorides.pack(side="left", fill="both", expand=True)
 
+        self.helper_salt_selection = {}
+        for salt in list_salts:
+            if salt not in self.helper_salt_selection:
+                self.helper_salt_selection[salt] = 0
+
+            if salt not in self.container_var["fi_setting"]["Salt Correction"]["Chlorides"]:
+                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt] = {
+                    "State": tk.IntVar(), "Weight": tk.StringVar()}
+                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["State"].set(0)
+                self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
+
+            cb_i = tk.Checkbutton(
+                master=frm_chlorides, text=salt + "\t", fg=font_color_dark, bg=background_color_light,
+                variable=self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt]["State"],
+                command=self.fi_check_elements_checkbutton)
+            text_chlorides.window_create("end", window=cb_i)
+            text_chlorides.insert("end", "\t")
+
+            entr_i = tk.Entry(
+                frm_chlorides, textvariable=self.container_var["fi_setting"]["Salt Correction"]["Chlorides"][salt][
+                    "Weight"], width=5, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+            text_chlorides.window_create("insert", window=entr_i)
+            text_chlorides.insert("end", "\t")
+
+            element = dict_salts[salt]
+            incl_i = []
+            incl_na = []
+            for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                list_isotopes = self.container_lists["Measured Elements"][file_smpl_short][element]
+                list_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"]
+                if index == 0:
+                    text = ""
+                    for isotope in list_isotopes:
+                        text += isotope + ","
+                    text = text[:-1]
+
+                for isotope_na in list_na:
+                    intensity_incl_na = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        isotope_na]
+                    if intensity_incl_na != None:
+                        incl_na.append(intensity_incl_na)
+                    else:
+                        incl_na.append(0.0)
+
+                for isotope in list_isotopes:
+                    intensity_incl_i = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["INCL"][
+                        isotope]
+                    if intensity_incl_i != None:
+                        if intensity_incl_i > 0:
+                            incl_i.append(intensity_incl_i)
+                        else:
+                            incl_i.append(0.0)
+                    else:
+                        incl_i.append(0.0)
+
+            incl_i = round(np.mean(incl_i), 1)
+            incl_na = round(np.mean(incl_na), 1)
+            if incl_na > 0:
+                magic_factor = round((incl_i/incl_na)*1000, 1)
+            else:
+                magic_factor = 0.0
+            self.helper_salt_selection[salt] = magic_factor
+
+            lbl_i = tk.Label(frm_chlorides, text=text + "\t", bg=background_color_light, fg=font_color_dark)
+            text_chlorides.window_create("end", window=lbl_i)
+            text_chlorides.insert("end", "\t")
+
+            lbl2_i = tk.Label(frm_chlorides, text=magic_factor, bg=background_color_light, fg=font_color_dark)
+            text_chlorides.window_create("end", window=lbl2_i)
+            text_chlorides.insert("end", "\n")
+
+            if salt == "NaCl":
+                cb_i.configure(state="disabled")
+                entr_i.configure(state="disabled")
+                lbl_i.configure(state="disabled")
+                lbl2_i.configure(state="disabled")
+
+        text_chlorides.configure(state="disabled")
+
         # Treeviews
         self.tv_mass_charge_balance = SE(
             parent=self.subwindow_mass_charge_balance, row_id=1, column_id=n_1st_column + 1,
             n_rows=start_settings_row - 1, n_columns=n_settings_column - 2, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_treeview(
-            n_categories=6,
-            text_n=["Filename", "Assemblage", "Salinity", "Concentration", "Cation/Anion", "Considered chlorides"],
-            width_n=["150", "100", "100", "150", "100", "300"], individual=True)
+            n_categories=7,
+            text_n=["Filename", "Assemblage", "Salinity (wt.%)", "Internal standard", "Concentration (ppm)",
+                    "Cation/Anion", "Considered chlorides"],
+            width_n=["125", "100", "100", "125", "150", "100", "325"], individual=True)
 
         style = ttk.Style()
         style.configure("Treeview", font=font_table)
         style.configure("Treeview.Heading", font=font_elements)
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         # Initialization
+        self.helper_tv_entries = {}
+        for index, filename_short in enumerate(list_files):
+            filename_long = self.container_lists["SMPL"]["Long"][index]
+            file_id = self.container_var["SMPL"][filename_long]["ID"].get()
+            file_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
+            entries = [filename_short, file_id, "0.0", file_is, "0.0", "---", "---"]
+            row_file = self.tv_mass_charge_balance.insert("", tk.END, values=entries)
+            self.helper_tv_entries[filename_short] = row_file
 
+    def calculate_mass_charge_balance_concentrations(self, mass_balance=True):
+        var_salinity = self.helper_var_entr["Mass/Charge balance"]["Salinity"]
+        val_salinity = float(var_salinity.get())
+        if val_salinity < 0:
+            var_salinity.set(0.0)
+        elif val_salinity > 100:
+            var_salinity.set(100.0)
+
+        if self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 0:
+            str_mode = "default"
+
+            if mass_balance == True:
+                self.calculate_mass_balance(var_entr=var_salinity, mode=str_mode, var_file=None)
+            else:
+                self.calculate_charge_balance(var_entr=var_salinity, mode=str_mode, var_file=None)
+
+            for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                str_filename_long = self.container_lists["SMPL"]["Long"][index]
+                file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
+                row_file = self.helper_tv_entries[str_filename_short]
+                str_salinity = var_salinity.get()
+                file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
+                str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+                str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
+                str_salts = "NaCl"
+                self.helper_lists[str_filename_short] = [str_salts]
+                for salt in self.container_lists["Selected Salts"]:
+                    if salt != "NaCl":
+                        str_salts += ", " + salt
+                        self.helper_lists[str_filename_short].append(salt)
+                entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration,
+                           str_cation_anion_ratio, str_salts]
+                self.tv_mass_charge_balance.item(row_file, values=entries)
+        elif self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 1:
+            str_mode = "specific"
+            str_assemblage = self.helper_var_opt["Mass/Charge balance"]["Assemblage"].get()
+            for str_filename_long in self.container_lists["SMPL"]["Long"]:
+                file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
+                if file_id == str_assemblage:
+                    index_file = self.container_lists["SMPL"]["Long"].index(str_filename_long)
+                    str_filename_short = self.container_lists["SMPL"]["Short"][index_file]
+
+                    if mass_balance == True:
+                        self.calculate_mass_balance(var_entr=var_salinity, mode=str_mode, var_file=str_filename_long)
+                    else:
+                        self.calculate_charge_balance(var_entr=var_salinity, mode=str_mode, var_file=str_filename_long)
+
+                    row_file = self.helper_tv_entries[str_filename_short]
+                    str_salinity = var_salinity.get()
+                    file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
+                    str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+                    str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
+                    str_salts = "NaCl"
+                    self.helper_lists[str_filename_short] = [str_salts]
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt != "NaCl":
+                            str_salts += ", " + salt
+                            self.helper_lists[str_filename_short].append(salt)
+                    entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration,
+                               str_cation_anion_ratio, str_salts]
+                    self.tv_mass_charge_balance.item(row_file, values=entries)
+        elif self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 2:
+            str_mode = "specific"
+            str_filename_short = self.helper_var_opt["Mass/Charge balance"]["File"].get()
+            index_file = self.container_lists["SMPL"]["Short"].index(str_filename_short)
+            str_filename_long = self.container_lists["SMPL"]["Long"][index_file]
+            file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
+
+            if mass_balance == True:
+                self.calculate_mass_balance(var_entr=var_salinity, mode=str_mode, var_file=str_filename_long)
+            else:
+                self.calculate_charge_balance(var_entr=var_salinity, mode=str_mode, var_file=str_filename_long)
+
+            row_file = self.helper_tv_entries[str_filename_short]
+            str_salinity = var_salinity.get()
+            file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
+            str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+            str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
+            str_salts = "NaCl"
+            self.helper_lists[str_filename_short] = [str_salts]
+            for salt in self.container_lists["Selected Salts"]:
+                if salt != "NaCl":
+                    str_salts += ", " + salt
+                    self.helper_lists[str_filename_short].append(salt)
+            entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration, str_cation_anion_ratio,
+                       str_salts]
+            self.tv_mass_charge_balance.item(row_file, values=entries)
+
+    def calculate_mass_balance(self, var_entr, mode, var_file):
+        if self.pysills_mode in ["FI", "INCL"]:
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
+        condition_std, condition_smpl = self.check_file_flags()
+        self.pypitzer_performed = False
+
+        is_defined = self.check_if_is_was_defined()
+        val_max_na = round((self.chemistry_data["Na"]/(self.chemistry_data["Na"] + self.chemistry_data["Cl"]))*10**6, 4)
+        val_max_cl = round((self.chemistry_data["Cl"]/(self.chemistry_data["Na"] + self.chemistry_data["Cl"]))*10**6, 4)
+
+        if condition_std == True and condition_smpl == True and is_defined == True:
+            if mode != "recalculate":
+                amount_fluid = (100 - float(var_entr.get()))/100
+                amount_nacl_equiv = float(var_entr.get())/100
+                total_ppm = 10**6
+
+                # Calculate fluid data
+                self.calculate_fluid_data()
+                # Calculate chloride data
+                self.calculate_chloride_data()
+                # Prepare NaCl equivalents  calculation
+                self.prepare_nacl_equivalents(
+                    amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+            else:
+                amount_fluid = (100 - 5)/100
+                amount_nacl_equiv = 5/100
+                total_ppm = 10**6
+
+                # Calculate fluid data
+                self.calculate_fluid_data()
+                # Calculate chloride data
+                self.calculate_chloride_data()
+                # Prepare NaCl equivalents  calculation
+                self.prepare_nacl_equivalents(
+                    amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+
+            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+                elements_masses = self.chemistry_data
+            else:
+                elements_masses =  self.chemistry_data_sills
+
+            val_molar_mass_na = elements_masses["Na"]
+            val_molar_mass_cl = elements_masses["Cl"]
+            val_molar_mass_nacl = val_molar_mass_na + val_molar_mass_cl
+
+            if mode in ["default", "recalculate"]:
+                helper = []
+                helper_is = []
+                helper_cl = []
+                helper2 = {}
+                helper3 = {}
+                molar_mass_nacl = self.molar_masses_compounds["NaCl"]["Total"]
+                for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    file_smpl = self.container_lists["SMPL"]["Long"][index]
+
+                    if mode == "recalculate":
+                        amount_fluid = (100 - float(self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
+                                                        file_smpl_short].get()))/100
+                        amount_nacl_equiv = float(self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
+                                                      file_smpl_short].get())/100
+                        total_ppm = 10**6
+
+                        # Calculate fluid data
+                        self.calculate_fluid_data()
+                        # Calculate chloride data
+                        self.calculate_chloride_data()
+                        # Prepare NaCl equivalents  calculation
+                        self.prepare_nacl_equivalents(
+                            amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+
+                    if self.container_var["SMPL"][file_smpl]["Checkbox"].get() == 1:
+                        salt_composition = "NaCl"
+                        helper2[file_smpl_short] = {}
+                        var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                        var_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"][0]
+                        var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                        var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
+                        var_salt_contribution_2 = 0
+                        file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                        for salt in self.container_lists["Selected Salts"]:
+                            if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
+                                var_weight = float(self.container_var[key_setting]["Salt Correction"]["Chlorides"][
+                                                       salt]["Weight"].get())
+                                var_weight_sum = var_weight*elements_masses["Na"]/molar_mass_nacl
+
+                            if salt != "NaCl":
+                                molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                                element = self.molar_masses_compounds[salt]["Cation"]
+                                salt_composition += ", " + str(salt)
+
+                                for isotope in file_isotopes:
+                                    key_isotope = re.search(r"(\D+)(\d+)", isotope)
+                                    isotope_atom = key_isotope.group(1)
+
+                                    if element == isotope_atom:
+                                        molar_mass_element = elements_masses[element]
+                                        helper3[salt] = molar_mass_element/molar_mass_salt
+                                        try:
+                                            var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                                file_smpl_short]["INCL"][isotope]
+                                            var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                                file_smpl_short]["INCL"][var_na]
+                                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][
+                                                "SMOOTHED"][file_smpl_short]["INCL"][isotope]
+                                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"][
+                                                "SMOOTHED"][file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                                        except:
+                                            var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][isotope]
+                                            var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][var_na]
+                                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][isotope]
+                                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][var_na]
+
+                                        if var_sensitivity_i != None and var_sensitivity_na != None:
+                                            var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                                            try:
+                                                if (var_intensity_na*var_sensitivity_i) > 0:
+                                                    var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                                else:
+                                                    var_conc_ratio = np.nan
+
+                                                var_salt_contribution_3 = var_conc_ratio*(
+                                                        molar_mass_salt/molar_mass_element)
+                                                helper2[file_smpl_short][salt] = var_salt_contribution_3
+                                                var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                                        val_molar_mass_na*molar_mass_salt)/(
+                                                        val_molar_mass_nacl*molar_mass_element)
+                                            except:
+                                                print("Error Mass Balance:", var_weight_sum, var_intensity_i,
+                                                      var_intensity_na, var_sensitivity_i, molar_mass_salt,
+                                                      molar_mass_element, val_molar_mass_na, val_molar_mass_nacl)
+                                        else:
+                                            print("Please close the window for the mass/charge balance calculation and "
+                                                  "open it again. The next time, the zeros on the left should also be "
+                                                  "replaced by intensity inclusion ratios. Please run again the "
+                                                  "mass/charge balance calculation. Thank you!")
+                                            self.parent.bell()
+                            else:
+                                var_na_equiv *= 1
+
+                        val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                        val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                        concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
+                        concentration_na_true = val_concentration_is
+                        concentration_cl_true = val_concentration_cl
+                        helper.append(val_concentration_is)
+                        helper_cl.append(val_concentration_cl)
+
+                        if var_is_i != var_na:
+                            try:
+                                var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_na]
+                                var_intensity_is = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                            except:
+                                var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_na]
+                                var_intensity_is = self.container_intensity_corrected["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_na]
+
+                            val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
+                                    var_sensitivity_is/var_sensitivity_na)), 4)
+
+                            if "Cl" in var_is_i:
+                                if val_concentration_is > val_max_cl:
+                                    val_concentration_is = val_max_na
+                                    self.parent.bell()
+                                    print("The concentration of the internal standard,", var_is_i + ",",
+                                          "was higher than the highest possible value, assuming that the whole "
+                                          "inclusion is composed of 100 % halite.")
+                        else:
+                            if val_concentration_is > val_max_na:
+                                val_concentration_is = val_max_na
+                                self.parent.bell()
+                                print("The concentration of the internal standard,", var_na+",",
+                                      "was higher than the highest possible value, assuming that the whole inclusion "
+                                      "is composed of 100 % halite.")
+
+                        helper_is.append(val_concentration_is)
+
+                        if mode != "recalculate":
+                            self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+                                var_entr.get())
+
+                        self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].set(var_is_i)
+                        self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
+                        if file_smpl_short in self.container_files["SMPL"]:
+                            self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
+
+                        self.helper_salt_composition[file_smpl_short].set(salt_composition)
+                        self.check_chargebalance(filename_long=file_smpl)
+
+                        if self.molality_based_quantification.get() == True:
+                            self.quantify_inclusion_based_on_molalities(
+                                var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                                var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                                var_concentration_is=val_concentration_is)
+
+                if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
+                        round(np.mean(helper_is), 4))
+                else:
+                    self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
+                        round(np.median(helper_is), 4))
+            elif mode == "specific":
+                file_smpl = var_file
+                if self.container_var["SMPL"][file_smpl]["Checkbox"].get() == 1:
+                    helper = []
+                    helper_cl = []
+                    helper2 = {}
+                    helper3 = {}
+
+                    salt_composition = "NaCl"
+                    file_smpl_short = file_smpl.split("/")[-1]
+                    helper2[file_smpl_short] = {}
+                    var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                    var_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"][0]
+                    var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                    var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
+                    var_salt_contribution_2 = 0
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
+                            var_weight = float(
+                                self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].get())
+                            var_weight_sum = var_weight*(elements_masses["Na"]/self.molar_masses_compounds["NaCl"][
+                                "Total"])
+
+                        if salt != "NaCl":
+                            molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                            element = self.molar_masses_compounds[salt]["Cation"]
+                            salt_composition += ", " + str(salt)
+
+                            for isotope in file_isotopes:
+                                key_isotope = re.search(r"(\D+)(\d+)", isotope)
+                                isotope_atom = key_isotope.group(1)
+
+                                if element == isotope_atom:
+                                    molar_mass_element = elements_masses[element]
+                                    helper3[salt] = molar_mass_element/molar_mass_salt
+                                    try:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_na]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                                    except:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_na]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_na]
+
+                                    var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                                    try:
+                                        var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                        var_salt_contribution_3 = var_conc_ratio*(molar_mass_salt/molar_mass_element)
+                                        helper2[file_smpl_short][salt] = var_salt_contribution_3
+                                        var_salt_contribution_2 += var_weight*var_conc_ratio*(
+                                                val_molar_mass_na*molar_mass_salt)/(
+                                                val_molar_mass_nacl*molar_mass_element)
+                                    except:
+                                        print("Error Mass Balance:", var_weight_sum, var_intensity_i, var_intensity_na,
+                                              var_sensitivity_i, molar_mass_salt, molar_mass_element, val_molar_mass_na,
+                                              val_molar_mass_nacl)
+                        else:
+                            var_na_equiv *= 1
+
+                    val_concentration_is = round((var_na_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                    val_concentration_cl = round((var_cl_equiv/(1 + var_salt_contribution_2))*total_ppm, 4)
+                    concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
+                    concentration_na_true = val_concentration_is
+                    concentration_cl_true = val_concentration_cl
+                    helper.append(val_concentration_is)
+                    helper_cl.append(val_concentration_cl)
+
+                    self.helper_salt_composition[file_smpl_short].set(salt_composition)
+
+                    if var_is_i != var_na:
+                        try:
+                            var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_na]
+                            var_intensity_is = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                        except:
+                            var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_na]
+                            var_intensity_is = self.container_intensity_corrected["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_na]
+
+                        val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
+                                var_sensitivity_is/var_sensitivity_na)), 4)
+
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
+                    if file_smpl_short in self.container_files["SMPL"]:
+                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
+
+                    self.check_chargebalance(filename_long=file_smpl)
+
+                    if self.molality_based_quantification.get() == True:
+                        self.quantify_inclusion_based_on_molalities(
+                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                            var_concentration_is=val_concentration_is)
+        else:
+            print("Please set the internal standard before you start any calculation. Thank you very much!")
+            self.parent.bell()
+
+    def calculate_charge_balance(self, var_entr, mode, var_file):
+        if self.pysills_mode in ["FI", "INCL"]:
+            key_setting = "fi_setting"
+        elif self.pysills_mode == "MI":
+            key_setting = "mi_setting"
+
+        condition_std, condition_smpl = self.check_file_flags()
+        self.pypitzer_performed = False
+
+        is_defined = self.check_if_is_was_defined()
+
+        if condition_std == True and condition_smpl == True and is_defined == True:
+            amount_fluid = (100 - float(var_entr.get()))/100
+            amount_nacl_equiv = float(var_entr.get())/100
+            total_ppm = 10**6
+
+            # Calculate fluid data
+            self.calculate_fluid_data()
+            # Calculate chloride data
+            self.calculate_chloride_data()
+            # Prepare NaCl equivalents  calculation
+            self.prepare_nacl_equivalents(
+                amount_fluid=amount_fluid, amount_nacl_equiv=amount_nacl_equiv, total_ppm=total_ppm)
+
+            if self.container_var["General Settings"]["Calculation Accuracy"].get() == 1:
+                elements_masses = self.chemistry_data
+            else:
+                elements_masses = self.chemistry_data_sills
+
+            val_molar_mass_na = elements_masses["Na"]
+            val_molar_mass_cl = elements_masses["Cl"]
+            val_molar_mass_nacl = val_molar_mass_na + val_molar_mass_cl
+
+            if mode == "default":
+                helper = []
+                helper_is = []
+                helper_cl = []
+                helper2 = {}
+                helper3 = {}
+                for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
+                    file_smpl = self.container_lists["SMPL"]["Long"][index]
+                    if self.container_var["SMPL"][file_smpl]["Checkbox"].get() == 1:
+                        salt_composition = "NaCl"
+                        helper2[file_smpl_short] = {}
+                        var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                        var_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"][0]
+                        var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                        var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
+                        var_na_true_base = var_na_equiv
+                        var_nacl_equiv = amount_nacl_equiv
+                        var_na_true_base = var_nacl_equiv*(val_molar_mass_na/val_molar_mass_nacl)
+                        file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                        salt_factor = 1
+                        salt_contribution = 0
+                        for salt in self.container_lists["Selected Salts"]:
+                            if salt != "NaCl":
+                                molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                                element = self.molar_masses_compounds[salt]["Cation"]
+                                charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
+                                molar_mass_na = elements_masses["Na"]
+                                salt_composition += ", " + str(salt)
+                                for isotope in file_isotopes:
+                                    key_isotope = re.search(r"(\D+)(\d+)", isotope)
+                                    isotope_atom = key_isotope.group(1)
+
+                                    if element == isotope_atom:
+                                        molar_mass_element = elements_masses[element]
+                                        helper3[salt] = molar_mass_element/molar_mass_salt
+
+                                        try:
+                                            var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                                file_smpl_short]["INCL"][isotope]
+                                            var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                                file_smpl_short]["INCL"][var_na]
+                                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][
+                                                "SMOOTHED"][file_smpl_short]["INCL"][isotope]
+                                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"][
+                                                "SMOOTHED"][file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                                        except:
+                                            var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][isotope]
+                                            var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][var_na]
+                                            var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][isotope]
+                                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                                file_smpl_short]["INCL"][var_na]
+
+                                        if var_sensitivity_i != None and var_sensitivity_na != None:
+                                            var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                                            try:
+                                                var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                                var_salt_contribution = charge_i*var_conc_ratio*(
+                                                        val_molar_mass_na/molar_mass_element)
+                                                helper2[file_smpl_short][salt] = var_salt_contribution
+                                                salt_contribution += var_salt_contribution
+                                            except:
+                                                print("Error Mass Balance:", var_intensity_i, var_intensity_na,
+                                                      var_sensitivity_i, molar_mass_salt,
+                                                      molar_mass_element, val_molar_mass_na, val_molar_mass_nacl)
+                                        else:
+                                            print("Please close the window for the mass/charge balance calculation and "
+                                                  "open it again. The next time, the zeros on the left should also be "
+                                                  "replaced by intensity inclusion ratios. Please run again the "
+                                                  "mass/charge balance calculation. Thank you!")
+                                            self.parent.bell()
+                            else:
+                                salt_factor += 0
+
+                        b_nacl = amount_nacl_equiv/val_molar_mass_nacl
+                        b_cl = b_nacl
+                        b_na = b_cl/(1 + salt_contribution)
+                        val_concentration_is = round(b_na*val_molar_mass_na*total_ppm, 4)
+                        helper.append(val_concentration_is)
+                        val_concentration_cl = round(b_cl*val_molar_mass_cl*total_ppm, 4)
+                        concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
+                        concentration_na_true = val_concentration_is
+                        concentration_cl_true = val_concentration_cl
+                        helper.append(val_concentration_is)
+                        helper_cl.append(val_concentration_cl)
+
+                        if var_is_i != var_na:
+                            try:
+                                var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_na]
+                                var_intensity_is = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                    file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                            except:
+                                var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_na]
+                                var_intensity_is = self.container_intensity_corrected["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_is_i]
+                                var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                    file_smpl_short]["INCL"][var_na]
+
+                            val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
+                                    var_sensitivity_is/var_sensitivity_na)), 4)
+
+                        helper_is.append(val_concentration_is)
+
+                        self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][file_smpl_short].set(
+                            var_entr.get())
+
+                        self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
+                        if file_smpl_short in self.container_files["SMPL"]:
+                            self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
+
+                        self.helper_salt_composition[file_smpl_short].set(salt_composition)
+                        self.check_chargebalance(filename_long=file_smpl)
+
+                        if self.molality_based_quantification.get() == True:
+                            self.quantify_inclusion_based_on_molalities(
+                                var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                                var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                                var_concentration_is=val_concentration_is)
+
+                if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
+                        round(np.mean(helper), 4))
+                else:
+                    self.container_var[key_setting]["Salt Correction"]["Default Concentration"].set(
+                        round(np.median(helper), 4))
+            elif mode == "specific":
+                file_smpl = var_file
+                if self.container_var["SMPL"][file_smpl]["Checkbox"].get() == 1:
+                    helper = []
+                    helper_is = []
+                    helper_cl = []
+                    helper2 = {}
+                    helper3 = {}
+
+                    salt_composition = "NaCl"
+                    file_smpl_short = file_smpl.split("/")[-1]
+                    helper2[file_smpl_short] = {}
+                    var_is_i = self.container_var["SMPL"][file_smpl]["IS Data"]["IS"].get()
+                    var_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"][0]
+                    var_na_equiv = (val_molar_mass_na/val_molar_mass_nacl)*amount_nacl_equiv
+                    var_cl_equiv = (val_molar_mass_cl/val_molar_mass_nacl)*amount_nacl_equiv
+                    var_na_true_base = var_na_equiv
+                    var_nacl_equiv = amount_nacl_equiv
+                    var_na_true_base = var_nacl_equiv*(val_molar_mass_na/val_molar_mass_nacl)
+                    file_isotopes = self.container_lists["Measured Isotopes"][file_smpl_short]
+                    salt_factor = 1
+                    salt_contribution = 0
+                    for salt in self.container_lists["Selected Salts"]:
+                        if salt != "NaCl":
+                            molar_mass_salt = self.molar_masses_compounds[salt]["Total"]
+                            element = self.molar_masses_compounds[salt]["Cation"]
+                            charge_i = self.molar_masses_compounds[salt]["Cation Charge"]
+                            molar_mass_na = elements_masses["Na"]
+                            salt_composition += ", " + str(salt)
+                            for isotope in file_isotopes:
+                                key_isotope = re.search(r"(\D+)(\d+)", isotope)
+                                isotope_atom = key_isotope.group(1)
+
+                                if element == isotope_atom:
+                                    molar_mass_element = elements_masses[element]
+                                    helper3[salt] = molar_mass_element/molar_mass_salt
+
+                                    try:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_na]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                            file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                                    except:
+                                        var_intensity_i = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_na]
+                                        var_sensitivity_i = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][isotope]
+                                        var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                            file_smpl_short]["INCL"][var_na]
+
+                                    if var_sensitivity_i != None and var_sensitivity_na != None:
+                                        var_sensitivity_i = var_sensitivity_i/var_sensitivity_na
+                                        try:
+                                            var_conc_ratio = var_intensity_i/(var_intensity_na*var_sensitivity_i)
+                                            var_salt_contribution = charge_i*var_conc_ratio*(
+                                                    val_molar_mass_na/molar_mass_element)
+                                            helper2[file_smpl_short][salt] = var_salt_contribution
+                                            salt_contribution += var_salt_contribution
+                                        except:
+                                            print("Error Mass Balance:", var_intensity_i, var_intensity_na,
+                                                  var_sensitivity_i, molar_mass_salt,
+                                                  molar_mass_element, val_molar_mass_na, val_molar_mass_nacl)
+                                    else:
+                                        print("Please close the window for the mass/charge balance calculation and "
+                                              "open it again. The next time, the zeros on the left should also be "
+                                              "replaced by intensity inclusion ratios. Please run again the "
+                                              "mass/charge balance calculation. Thank you!")
+                                        self.parent.bell()
+                        else:
+                            salt_factor += 0
+
+                    b_nacl = amount_nacl_equiv/val_molar_mass_nacl
+                    b_cl = b_nacl
+                    b_na = b_cl/(1 + salt_contribution)
+                    val_concentration_is = round(b_na*val_molar_mass_na*total_ppm, 4)
+                    helper.append(val_concentration_is)
+                    val_concentration_cl = round(b_cl*val_molar_mass_cl*total_ppm, 4)
+                    concentration_nacl = val_concentration_is*(val_molar_mass_nacl/val_molar_mass_na)
+                    concentration_na_true = val_concentration_is
+                    concentration_cl_true = val_concentration_cl
+                    helper.append(val_concentration_is)
+                    helper_cl.append(val_concentration_cl)
+
+                    if var_is_i != var_na:
+                        try:
+                            var_intensity_na = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_na]
+                            var_intensity_is = self.container_intensity_corrected["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["SMOOTHED"][
+                                file_smpl_short]["INCL"][var_na]  # SMOOTHED
+                        except:
+                            var_intensity_na = self.container_intensity_corrected["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_na]
+                            var_intensity_is = self.container_intensity_corrected["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_is = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_is_i]
+                            var_sensitivity_na = self.container_analytical_sensitivity["SMPL"]["RAW"][
+                                file_smpl_short]["INCL"][var_na]
+
+                        val_concentration_is = round(var_intensity_is/var_intensity_na*(concentration_na_true/(
+                                var_sensitivity_is/var_sensitivity_na)), 4)
+
+                    self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"].set(val_concentration_is)
+                    if file_smpl_short in self.container_files["SMPL"]:
+                        self.container_files["SMPL"][file_smpl_short]["IS Concentration"].set(val_concentration_is)
+
+                    self.check_chargebalance(filename_long=file_smpl)
+
+                    self.helper_salt_composition[file_smpl_short].set(salt_composition)
+
+                    if self.molality_based_quantification.get() == True:
+                        self.quantify_inclusion_based_on_molalities(
+                            var_filename_short=file_smpl_short, var_is_i=var_is_i,
+                            var_concentration_na=concentration_na_true, var_concentration_cl=concentration_cl_true,
+                            var_concentration_is=val_concentration_is)
+        else:
+            print("Please set the internal standard before you start any calculation. Thank you very much!")
+            self.parent.bell()
 
     def fi_calculate_chargebalance(self, var_entr, mode, var_file, event):
         if self.pysills_mode in ["FI", "INCL"]:
