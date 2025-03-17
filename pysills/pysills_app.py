@@ -40183,7 +40183,7 @@ class PySILLS(tk.Frame):
             bg=self.bg_colors["White"]).create_treeview(
             n_categories=7,
             text_n=["Filename", "Assemblage", "Salinity (wt.%)", "Internal standard", "Concentration (ppm)",
-                    "Cation/Anion", "Considered chlorides"],
+                    "Cation/Cl", "Considered chlorides"],
             width_n=["125", "100", "100", "125", "150", "100", "325"], individual=True)
 
         style = ttk.Style()
