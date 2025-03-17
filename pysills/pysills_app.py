@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.73
-# Date:		14.03.2025
+# Date:		17.03.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.73"
-        self.val_version = self.str_version_number + " - 14.03.2025"
+        self.val_version = self.str_version_number + " - 17.03.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -9680,7 +9680,6 @@ class PySILLS(tk.Frame):
 
         for index, filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
             filename_long = self.container_lists["SMPL"]["Long"][index]
-
             if filename_long in self.container_var["SMPL"]:
                 info_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
                 info_assemblage = self.container_var["SMPL"][filename_long]["ID"].get()
@@ -9753,15 +9752,18 @@ class PySILLS(tk.Frame):
             try:
                 info_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
                 info_concentration = self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].get()
-                info_salinity = self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
-                    filename_short].get()
+                #info_salinity = self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
+                #    filename_short].get()
+                info_salinity = self.helper_lists["Salinity"][filename_short]
+                info_chlorides = self.helper_lists["Considered chlorides"][filename_short]
             except:
                 info_is = "Select IS"
                 info_concentration = 0.0
                 info_salinity = 0.0
+                info_chlorides = []
 
             str_incl = (str(filename_short) + ";" + str(info_is) + ";" + str(info_concentration) + ";"
-                        + str(info_salinity))
+                        + str(info_salinity) + ";" + str(info_chlorides))
 
             str_incl += "\n"
             save_file.write(str_incl)
@@ -10371,6 +10373,12 @@ class PySILLS(tk.Frame):
                             info_file_short] = tk.StringVar()
                         self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
                             info_file_short].set(info_salinity)
+                        self.helper_lists["Salinity"][info_file_short] = info_salinity
+
+                        if len(splitted_lines) == 5:
+                            clean_content = splitted_lines[4].replace("'", "").replace("[", "").replace("]", "").split(
+                                ", ")
+                            self.helper_lists["Considered chlorides"][info_file_short] = list(clean_content)
 
     def open_project_part_06(self, key_setting, index_container, loaded_lines):
         ## DWELL TIME SETTINGS
@@ -40262,6 +40270,7 @@ class PySILLS(tk.Frame):
             else:
                 self.calculate_charge_balance(var_entr=var_salinity, mode=str_mode, var_file=None)
 
+            list_values = []
             for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
                 str_filename_long = self.container_lists["SMPL"]["Long"][index]
                 file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
@@ -40270,6 +40279,7 @@ class PySILLS(tk.Frame):
                 self.helper_lists["Salinity"][str_filename_short] = str_salinity
                 file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
                 str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+                list_values.append(float(str_concentration))
                 str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
                 str_salts = "NaCl"
                 self.helper_lists["Considered chlorides"][str_filename_short] = [str_salts]
@@ -40280,9 +40290,11 @@ class PySILLS(tk.Frame):
                 entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration,
                            str_cation_anion_ratio, str_salts]
                 self.tv_mass_charge_balance.item(row_file, values=entries)
+            self.helper_var_entr["Mass/Charge balance"]["Concentration"].set(round(np.mean(list_values), 4))
         elif self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 1:
             str_mode = "specific"
             str_assemblage = self.helper_var_opt["Mass/Charge balance"]["Assemblage"].get()
+            list_values = []
             for str_filename_long in self.container_lists["SMPL"]["Long"]:
                 file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
                 if file_id == str_assemblage:
@@ -40298,6 +40310,7 @@ class PySILLS(tk.Frame):
                     self.helper_lists["Salinity"][str_filename_short] = str_salinity
                     file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
                     str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+                    list_values.append(float(str_concentration))
                     str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
                     str_salts = "NaCl"
                     self.helper_lists["Considered chlorides"][str_filename_short] = [str_salts]
@@ -40308,6 +40321,7 @@ class PySILLS(tk.Frame):
                     entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration,
                                str_cation_anion_ratio, str_salts]
                     self.tv_mass_charge_balance.item(row_file, values=entries)
+            self.helper_var_entr["Mass/Charge balance"]["Concentration"].set(round(np.mean(list_values), 4))
         elif self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 2:
             str_mode = "specific"
             str_filename_short = self.helper_var_opt["Mass/Charge balance"]["File"].get()
@@ -40335,6 +40349,7 @@ class PySILLS(tk.Frame):
             entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration, str_cation_anion_ratio,
                        str_salts]
             self.tv_mass_charge_balance.item(row_file, values=entries)
+            self.helper_var_entr["Mass/Charge balance"]["Concentration"].set(round(float(str_concentration), 4))
 
     def calculate_mass_charge_balance_concentrations(self, mass_balance=True):
         var_salinity = self.helper_var_entr["Mass/Charge balance"]["Salinity"]
@@ -40352,6 +40367,7 @@ class PySILLS(tk.Frame):
             else:
                 self.calculate_charge_balance(var_entr=var_salinity, mode=str_mode, var_file=None)
 
+            list_values = []
             for index, str_filename_short in enumerate(self.container_lists["SMPL"]["Short"]):
                 str_filename_long = self.container_lists["SMPL"]["Long"][index]
                 file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
@@ -40360,6 +40376,7 @@ class PySILLS(tk.Frame):
                 self.helper_lists["Salinity"][str_filename_short] = str_salinity
                 file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
                 str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+                list_values.append(float(str_concentration))
                 str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
                 str_salts = "NaCl"
                 self.helper_lists["Considered chlorides"][str_filename_short] = [str_salts]
@@ -40370,9 +40387,11 @@ class PySILLS(tk.Frame):
                 entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration,
                            str_cation_anion_ratio, str_salts]
                 self.tv_mass_charge_balance.item(row_file, values=entries)
+            self.helper_var_entr["Mass/Charge balance"]["Concentration"].set(round(np.mean(list_values), 4))
         elif self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 1:
             str_mode = "specific"
             str_assemblage = self.helper_var_opt["Mass/Charge balance"]["Assemblage"].get()
+            list_values = []
             for str_filename_long in self.container_lists["SMPL"]["Long"]:
                 file_id = self.container_var["SMPL"][str_filename_long]["ID"].get()
                 if file_id == str_assemblage:
@@ -40388,6 +40407,7 @@ class PySILLS(tk.Frame):
                     self.helper_lists["Salinity"][str_filename_short] = str_salinity
                     file_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
                     str_concentration = self.container_var["SMPL"][str_filename_long]["IS Data"]["Concentration"].get()
+                    list_values.append(float(str_concentration))
                     str_cation_anion_ratio = self.charge_balance_check[str_filename_short].get()
                     str_salts = "NaCl"
                     self.helper_lists["Considered chlorides"][str_filename_short] = [str_salts]
@@ -40398,6 +40418,7 @@ class PySILLS(tk.Frame):
                     entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration,
                                str_cation_anion_ratio, str_salts]
                     self.tv_mass_charge_balance.item(row_file, values=entries)
+            self.helper_var_entr["Mass/Charge balance"]["Concentration"].set(round(np.mean(list_values), 4))
         elif self.helper_var_rb["Mass/Charge balance"]["File selection"].get() == 2:
             str_mode = "specific"
             str_filename_short = self.helper_var_opt["Mass/Charge balance"]["File"].get()
@@ -40425,6 +40446,7 @@ class PySILLS(tk.Frame):
             entries = [str_filename_short, file_id, str_salinity, file_is, str_concentration, str_cation_anion_ratio,
                        str_salts]
             self.tv_mass_charge_balance.item(row_file, values=entries)
+            self.helper_var_entr["Mass/Charge balance"]["Concentration"].set(round(float(str_concentration), 4))
 
     def calculate_mass_balance(self, var_entr, mode, var_file):
         if self.pysills_mode in ["FI", "INCL"]:
