@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.42
-# Date:		02.12.2024
+# Date:		20.03.2025
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -478,12 +478,18 @@ class IntensityQuantification:
                 for focus in list_focus:
                     if focus == "MAT":
                         intensity_sig2_i = data_container[focus][isotope]
-                        value_mat_i = intensity_sig2_i - intensity_bg_i
-
-                        if value_mat_i > 0:
-                            result_mat_i = value_mat_i
+                        if None in [intensity_sig2_i, intensity_bg_i]:
+                            value_mat_i = None
                         else:
-                            result_mat_i = 0.0
+                            value_mat_i = intensity_sig2_i - intensity_bg_i
+
+                        if value_mat_i != None:
+                            if value_mat_i > 0:
+                                result_mat_i = value_mat_i
+                            else:
+                                result_mat_i = 0.0
+                        else:
+                            result_mat_i = np.nan
 
                         self.results_container["BG"][isotope] = 0.0
                         self.results_container[focus][isotope] = result_mat_i
@@ -743,10 +749,13 @@ class SensitivityQuantification:
                         for isotope, intensity_i in dataset_01["MAT"].items():
                             sensitivity_i = data_sensitivity[filetype][datatype][filename_short]["MAT"][isotope]
 
-                            if concentration_is > 0:
-                                result_i = (sensitivity_i*intensity_is)/concentration_is
+                            if concentration_is != None:
+                                if concentration_is > 0:
+                                    result_i = (sensitivity_i*intensity_is)/concentration_is
+                                else:
+                                    result_i = np.nan
                             else:
-                                result_i = 0.0
+                                result_i = np.nan
 
                             self.results_container[filetype][datatype][filename_short]["MAT"][isotope] = result_i
 
