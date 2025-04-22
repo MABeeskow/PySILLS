@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.74
-# Date:		20.03.2025
+# Version:	v1.0.75
+# Date:		22.04.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.74"
-        self.val_version = self.str_version_number + " - 20.03.2025"
+        self.str_version_number = "1.0.75"
+        self.val_version = self.str_version_number + " - 22.04.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -9751,7 +9751,10 @@ class PySILLS(tk.Frame):
             filename_long = self.container_lists["SMPL"]["Long"][index]
             info_is = self.container_var["SMPL"][filename_long]["IS Data"]["IS"].get()
             info_concentration = self.container_var["SMPL"][filename_long]["IS Data"]["Concentration"].get()
-            info_salinity = self.helper_lists["Salinity"][filename_short]
+            if filename_short in self.helper_lists["Salinity"]:
+                info_salinity = self.helper_lists["Salinity"][filename_short]
+            else:
+                info_salinity = 0.0
             if filename_short in self.helper_lists["Considered chlorides"]:
                 info_chlorides = self.helper_lists["Considered chlorides"][filename_short]
             else:
