@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.75
-# Date:		22.04.2025
+# Version:	v1.0.76
+# Date:		03.05.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.75"
-        self.val_version = self.str_version_number + " - 22.04.2025"
+        self.str_version_number = "1.0.76"
+        self.val_version = self.str_version_number + " - 03.05.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -22352,6 +22352,7 @@ class PySILLS(tk.Frame):
         str_btn_13 = self.language_dict["Show all"][self.var_language]
         str_btn_14 = self.language_dict["Hide all"][self.var_language]
         str_btn_15 = self.language_dict["Update"][self.var_language]
+        str_btn_16 = self.language_dict["Remove all"][self.var_language]
 
         btn_01 = SE(
             parent=self.subwindow_file_setup, row_id=n_rows - 2, column_id=2*n_1st_column_third, n_rows=2,
@@ -22371,8 +22372,12 @@ class PySILLS(tk.Frame):
             text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
             command=lambda filetype=str_filetype, filename_long=str_filename_long, direction="next":
             self.switch_to_another_filesetup(filetype, filename_long, direction))
+        btn_16 = SE(
+            parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=2*n_1st_column_third, n_rows=1,
+            n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
+            text=str_btn_16, bg_active=accent_color, fg_active=font_color_light, command=self.remove_all_interval_ca)
         self.btn_04 = SE(
-            parent=self.subwindow_file_setup, row_id=n_rows - 5, column_id=2*n_1st_column_third, n_rows=2,
+            parent=self.subwindow_file_setup, row_id=n_rows - 4, column_id=2*n_1st_column_third, n_rows=1,
             n_columns=n_1st_column_third, fg=font_color_dark, bg=background_color_elements).create_simple_button(
             text=str_btn_04, bg_active=accent_color, fg_active=font_color_light,
             command=self.filesetup_confirm_new_interval)
@@ -37972,6 +37977,28 @@ class PySILLS(tk.Frame):
         self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id][
             "Object"].set_visible(False)
         del self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id]
+
+        self.var_canvas_ca.draw()
+
+    def remove_all_interval_ca(self):
+        for var_key in ["BG", "MAT", "INCL"]:
+            if var_key == "BG":
+                var_lb = self.lb_ca_bg
+            elif var_key == "MAT":
+                var_lb = self.lb_ca_mat
+            elif var_key == "INCL":
+                var_lb = self.lb_ca_incl
+
+            list_id = self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Indices"].copy()
+            for var_id in list_id:
+                self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id][
+                    "Object"].set_visible(False)
+                del self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Content"][var_id]
+
+            var_lb.delete(0, tk.END)
+
+            self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["Indices"].clear()
+            self.container_helper[self.ca_filetype][self.ca_filename_short][var_key]["ID"] = 0
 
         self.var_canvas_ca.draw()
 
