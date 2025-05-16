@@ -5,8 +5,8 @@
 
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.42
-# Date:		20.03.2025
+# Version:	v1.0.77
+# Date:		16.05.2025
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -499,10 +499,11 @@ class IntensityQuantification:
                         intensity_mix_i = intensity_sig3_i - intensity_bg_i
                         intensity_mat_i = intensity_sig2_i - intensity_bg_i
 
-                        intensity_bg_t = data_container["BG"][isotope_t]
-                        intensity_sig2_t = data_container["MAT"][isotope_t]
-                        intensity_sig3_t = data_container[focus][isotope_t]
-                        intensity_mat_t = intensity_sig2_t - intensity_bg_t
+                        if isotope_t != None:
+                            intensity_bg_t = data_container["BG"][isotope_t]
+                            intensity_sig2_t = data_container["MAT"][isotope_t]
+                            intensity_sig3_t = data_container[focus][isotope_t]
+                            intensity_mat_t = intensity_sig2_t - intensity_bg_t
 
                         if intensity_mix_i > 0:
                             intensity_mix_i = intensity_mix_i
@@ -514,10 +515,11 @@ class IntensityQuantification:
                         else:
                             intensity_mat_i = 0.0
 
-                        if intensity_mat_t > 0:
-                            intensity_mat_t = intensity_mat_t
-                        else:
-                            intensity_mat_t = 0.0
+                        if isotope_t != None:
+                            if intensity_mat_t > 0:
+                                intensity_mat_t = intensity_mat_t
+                            else:
+                                intensity_mat_t = 0.0
 
                         if mode == 0:   # Heinrich et al. (2003)
                             intensity_mix_t = intensity_sig3_t - intensity_bg_t
