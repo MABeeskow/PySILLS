@@ -3,14 +3,15 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 02.12.2024
+# 30.06.2025
 # ----------------------
 #
 ## MODULES
-import re
+import re, os
 import numpy as np
 import pandas as pd
 import tkinter as tk
+from pathlib import Path
 #
 ## TOOLS
 #
@@ -21,12 +22,12 @@ class Data:
     #
     def import_data_to_pandas(self, skip_header, skip_footer, delimiter=";", names=None):
         #
-        self.delimter = delimiter
+        self.delimiter = delimiter
         self.skip_header = skip_header
         self.skip_footer = skip_footer
         self.names = names
         #
-        dataframe = pd.read_csv(self.filename, sep=self.delimter, header=self.skip_header, skipfooter=self.skip_footer,
+        dataframe = pd.read_csv(self.filename, sep=self.delimiter, header=self.skip_header, skipfooter=self.skip_footer,
                            names=self.names, engine="python")
         blank_df = dataframe.loc[dataframe.isnull().all(1)]
         if len(blank_df) > 0:
@@ -171,12 +172,26 @@ class general:
         self.skipHeader = skipHeader
         self.skipFooter = skipFooter
 
-        if "(" in self.filename:
-            self.filename = self.filename.replace("(", "")
-        if ")" in self.filename:
-            self.filename = self.filename.replace(")", "")
-        if "-" in self.filename:
-            self.filename = self.filename.replace("-", "_")
+        obj_path = Path(self.filename)
+        str_directory = obj_path.parent
+        str_filename = obj_path.name
+
+        if "(" in str_filename:
+            str_filename_updated = str_filename.replace("(", "")
+        else:
+            str_filename_updated = str_filename
+
+        if ")" in str_filename:
+            str_filename_updated = str_filename.replace(")", "")
+        else:
+            str_filename_updated = str_filename
+
+        if "-" in str_filename:
+            str_filename_updated = str_filename.replace("-", "_")
+        else:
+            str_filename_updated = str_filename
+
+        self.filename = os.path.join(str_directory, str_filename_updated)
 
         if "venv_" in self.filename:
             self.filename = self.filename.replace("venv_", "venv-")
