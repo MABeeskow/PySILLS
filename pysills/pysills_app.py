@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.78
-# Date:		30.06.2025
+# Version:	v1.0.79
+# Date:		10.09.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.78"
-        self.val_version = self.str_version_number + " - 30.06.2025"
+        self.str_version_number = "1.0.79"
+        self.val_version = self.str_version_number + " - 10.09.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -583,7 +583,8 @@ class PySILLS(tk.Frame):
 
         self.container_var["Plotting"] = {"MA": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
                                           "FI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
-                                          "MI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}}}
+                                          "MI": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}},
+                                          "INCL": {"Quickview": {}, "Time-Signal": {}, "Time-Ratio": {}}}
         self.container_var["Subwindows"] = {"MA": {}, "FI": {}, "MI": {}, "INCL": {}}
 
         self.container_var["Spike Elimination Check"] = {"RB Value STD": tk.IntVar(), "RB Value SMPL": tk.IntVar()}
@@ -834,7 +835,7 @@ class PySILLS(tk.Frame):
             "Language Selection": {"English": "Language Selection", "German": "Sprachauswahl"},
             "Data Processing": {"English": "Data Processing", "German": "Datenverarbeitung"},
             "MINERAL ANALYSIS - Setup": {
-                "English": "MINERAL ANALYSIS - Setup", "German": "MINERALANALYSE - Einstellungen"},
+                "English": "Mineral analysis - Setup", "German": "Mineralanalyse - Einstellungen"},
             "FLUID INCLUSION ANALYSIS - Setup": {
                 "English": "Fluid inclusion analysis - Setup",
                 "German": "Flüssigkeitseinschlussanalyse - Einstellungen"},
