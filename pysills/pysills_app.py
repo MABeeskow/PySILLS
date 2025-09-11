@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.80
-# Date:		10.09.2025
+# Version:	v1.0.81
+# Date:		11.09.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.80"
-        self.val_version = self.str_version_number + " - 10.09.2025"
+        self.str_version_number = "1.0.81"
+        self.val_version = self.str_version_number + " - 11.09.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -10888,6 +10888,11 @@ class PySILLS(tk.Frame):
                                 self.container_var["dwell_times"]["Entry"][isotope].set("0.002")
 
                     for index3, data in enumerate(data_file):
+                        if index3 == 0:
+                            number_measurements = len(data)
+                            list_indices_measurements = []
+                        if len(data) == number_measurements:
+                            list_indices_measurements.append(index3)
                         #print(index3, len(data), data)
                         if index3 == 0: # Corrected values
                             for line, values in enumerate(data):
@@ -10992,8 +10997,69 @@ class PySILLS(tk.Frame):
 
                     data_dict = {col: values for col, values in zip(column_names, data_columns)}
                     data_dict_smoothed = {col: values for col, values in zip(column_names, data_columns_smoothed)}
-                    df_std = pd.DataFrame(data_dict)
-                    df_std_smoothed = pd.DataFrame(data_dict_smoothed)
+
+                    try:
+                        df_std = pd.DataFrame(data_dict)
+                        df_std_smoothed = pd.DataFrame(data_dict_smoothed)
+                    except:
+                        for index, data_std in enumerate(data_sills["STD"]):
+                            for index2, data_file in enumerate(data_std):
+                                if str_std == str(data_file[3][0][0][0][0]):
+                                    helper_std[str_std] = {}
+                                    helper_std_smoothed[str_std] = {}
+                                    list_time = []
+                                    for index3, data in enumerate(data_file):
+                                        if index3 in list_indices_measurements:
+                                            if index3 == 0:  # Corrected values
+                                                for line, values in enumerate(data):
+                                                    value_time = float(values[0])
+                                                    list_time.append(value_time)
+                                                    for j, value in enumerate(values):
+                                                        if j > 0:
+                                                            isotope = list_isotopes[j - 1]
+                                                            if isotope not in helper_std_smoothed[str_std]:
+                                                                helper_std_smoothed[str_std][isotope] = []
+                                                            helper_std_smoothed[str_std][isotope].append(float(value))
+                                            if index3 == list_indices_measurements[-1]:  # Original values
+                                                if len(list_indices_measurements) > 1:
+                                                    if len(data[0]) == len(list_isotopes):
+                                                        for line, values in enumerate(data):
+                                                            for j, value in enumerate(values):
+                                                                isotope = list_isotopes[j]
+                                                                if isotope not in helper_std[str_std]:
+                                                                    helper_std[str_std][isotope] = []
+                                                                helper_std[str_std][isotope].append(float(value))
+                                                    else:
+                                                        for index3, data in enumerate(data_file):
+                                                            if index3 == list_indices_measurements[-2]:
+                                                                if len(data[0]) == len(list_isotopes):
+                                                                    for line, values in enumerate(data):
+                                                                        for j, value in enumerate(values):
+                                                                            isotope = list_isotopes[j]
+                                                                            if isotope not in helper_std[str_std]:
+                                                                                helper_std[str_std][isotope] = []
+                                                                            helper_std[str_std][isotope].append(
+                                                                                float(value))
+                                                else:
+                                                    for line, values in enumerate(data):
+                                                        for j, value in enumerate(values):
+                                                            if j > 0:
+                                                                isotope = list_isotopes[j - 1]
+                                                                if isotope not in helper_std[str_std]:
+                                                                    helper_std[str_std][isotope] = []
+                                                                helper_std[str_std][isotope].append(float(value))
+
+                                    data_dict = {"Time": list_time}
+                                    data_dict_smoothed = {"Time": list_time}
+                                    for key, values in helper_std.items():
+                                        for isotope, data in values.items():
+                                            data_dict[isotope] = data
+                                    for key, values in helper_std_smoothed.items():
+                                        for isotope, data in values.items():
+                                            data_dict_smoothed[isotope] = data
+
+                                    df_std = pd.DataFrame(data_dict)
+                                    df_std_smoothed = pd.DataFrame(data_dict_smoothed)
 
                     self.build_file_data_09(key=str_std, df_isotopes=list_isotopes, dataframe=df_std, times=list_time,
                                             dataframe_smoothed=df_std_smoothed, with_smoothed=False)
@@ -11159,6 +11225,11 @@ class PySILLS(tk.Frame):
                             helper_smpl_smoothed[str_smpl][isotope] = []
 
                     for index3, data in enumerate(data_file):
+                        if index3 == 0:
+                            number_measurements = len(data)
+                            list_indices_measurements = []
+                        if len(data) == number_measurements:
+                            list_indices_measurements.append(index3)
                         #print(index3, len(data), data)
                         if index3 == 0: # Corrected values
                             for line, values in enumerate(data):
@@ -11229,7 +11300,10 @@ class PySILLS(tk.Frame):
                             self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Name"].set(
                                 list_oxides[index_oxide])
                         elif index3 == 33 and len(data) > 0 and self.mode_ma == True:    # Amount oxide (Sample)
-                            amount_oxide = float(data[0][0])
+                            if len(data[0]) > 1:
+                                amount_oxide = float(data[0][0])
+                            else:
+                                amount_oxide = 0.0
                             self.container_var["SMPL"][str_smpl]["Matrix Setup"]["Oxide"]["Concentration"].set(
                                 amount_oxide)
                             key = re.search(r"(\D+)(\d*)(\D+)(\d*)", list_oxides[index_oxide])
@@ -11308,8 +11382,69 @@ class PySILLS(tk.Frame):
 
                     data_dict = {col: values for col, values in zip(column_names, data_columns)}
                     data_dict_smoothed = {col: values for col, values in zip(column_names, data_columns_smoothed)}
-                    df_smpl = pd.DataFrame(data_dict)
-                    df_smpl_smoothed = pd.DataFrame(data_dict_smoothed)
+
+                    try:
+                        df_smpl = pd.DataFrame(data_dict)
+                        df_smpl_smoothed = pd.DataFrame(data_dict_smoothed)
+                    except:
+                        for index, data_smpl in enumerate(data_sills["UNK"]):
+                            for index2, data_file in enumerate(data_smpl):
+                                if str_smpl == str(data_file[3][0][0][0][0]):
+                                    helper_smpl[str_smpl] = {}
+                                    helper_smpl_smoothed[str_smpl] = {}
+                                    list_time = []
+                                    for index3, data in enumerate(data_file):
+                                        if index3 in list_indices_measurements:
+                                            if index3 == 0:  # Corrected values
+                                                for line, values in enumerate(data):
+                                                    value_time = float(values[0])
+                                                    list_time.append(value_time)
+                                                    for j, value in enumerate(values):
+                                                        if j > 0:
+                                                            isotope = list_isotopes[j - 1]
+                                                            if isotope not in helper_smpl_smoothed[str_smpl]:
+                                                                helper_smpl_smoothed[str_smpl][isotope] = []
+                                                            helper_smpl_smoothed[str_smpl][isotope].append(float(value))
+                                            if index3 == list_indices_measurements[-1]:  # Original values
+                                                if len(list_indices_measurements) > 1:
+                                                    if len(data[0]) == len(list_isotopes):
+                                                        for line, values in enumerate(data):
+                                                            for j, value in enumerate(values):
+                                                                isotope = list_isotopes[j]
+                                                                if isotope not in helper_smpl[str_smpl]:
+                                                                    helper_smpl[str_smpl][isotope] = []
+                                                                helper_smpl[str_smpl][isotope].append(float(value))
+                                                    else:
+                                                        for index3, data in enumerate(data_file):
+                                                            if index3 == list_indices_measurements[-2]:
+                                                                if len(data[0]) == len(list_isotopes):
+                                                                    for line, values in enumerate(data):
+                                                                        for j, value in enumerate(values):
+                                                                            isotope = list_isotopes[j]
+                                                                            if isotope not in helper_smpl[str_smpl]:
+                                                                                helper_smpl[str_smpl][isotope] = []
+                                                                            helper_smpl[str_smpl][isotope].append(
+                                                                                float(value))
+                                                else:
+                                                    for line, values in enumerate(data):
+                                                        for j, value in enumerate(values):
+                                                            if j > 0:
+                                                                isotope = list_isotopes[j - 1]
+                                                                if isotope not in helper_smpl[str_smpl]:
+                                                                    helper_smpl[str_smpl][isotope] = []
+                                                                helper_smpl[str_smpl][isotope].append(float(value))
+
+                                    data_dict = {"Time": list_time}
+                                    data_dict_smoothed = {"Time": list_time}
+                                    for key, values in helper_smpl.items():
+                                        for isotope, data in values.items():
+                                            data_dict[isotope] = data
+                                    for key, values in helper_smpl_smoothed.items():
+                                        for isotope, data in values.items():
+                                            data_dict_smoothed[isotope] = data
+
+                                    df_smpl = pd.DataFrame(data_dict)
+                                    df_smpl_smoothed = pd.DataFrame(data_dict_smoothed)
 
                     self.build_file_data_09(key=str_smpl, df_isotopes=list_isotopes, dataframe=df_smpl, times=list_time,
                                             dataframe_smoothed=df_smpl_smoothed, with_smoothed=False)
