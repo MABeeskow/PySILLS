@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.81
-# Date:		11.09.2025
+# Version:	v1.0.82
+# Date:		24.09.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.81"
-        self.val_version = self.str_version_number + " - 11.09.2025"
+        self.str_version_number = "1.0.82"
+        self.val_version = self.str_version_number + " - 24.09.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -41798,8 +41798,14 @@ class PySILLS(tk.Frame):
                 helper_molalities_na[file_smpl_short] = {"Na": b_na, "Cl": b_cl}
 
                 self.container_var["SMPL"][file_smpl_long]["IS Data"]["Concentration"].set(val_concentration_incl_is)
+
+                if var_datatype not in self.container_var["SMPL"][file_smpl_long]["IS Data"]:
+                    self.container_var["SMPL"][file_smpl_long]["IS Data"][var_datatype] = {
+                        "Concentration": tk.StringVar(), "IS": tk.StringVar()}
+
                 self.container_var["SMPL"][file_smpl_long]["IS Data"][var_datatype]["Concentration"].set(
                     val_concentration_incl_is)
+                self.container_var["SMPL"][file_smpl_long]["IS Data"][var_datatype]["IS"].set(str_is)
 
             #     print(file_smpl_short)
             #     print("Species input:", self.dict_species_pypitzer[var_datatype][file_smpl_short])

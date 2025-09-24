@@ -2,7 +2,7 @@
 # Author: Yiping Liu
 # Description:
 # Version: 1.0
-# Last Modified: May 7, 2023
+# Last Modified: 24.09.2025 (by Maximilian Beeskow)
 
 import sys
 import os
@@ -13,14 +13,14 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 
 import numpy as np
 from scipy.optimize import minimize
-from database.solid_data import solids
+from pysills.pypitzer. database.solid_data import solids
 
-import public.low_level as ll
+import pysills.pypitzer.public.low_level as ll
 
-import Pitzer.methods as pm
-from public.icemelting import (clegg_and_brimblecombe, spencer, monnin)
+import pysills.pypitzer.Pitzer.methods as pm
+from pysills.pypitzer.public.icemelting import (clegg_and_brimblecombe, spencer, monnin)
 
-from Pitzer.methods import get_charge_number
+from pysills.pypitzer.Pitzer.methods import get_charge_number
 
 from functools import lru_cache, wraps
 
@@ -707,7 +707,9 @@ class FluidPitzer:
                 ln_gamma = self.get_cation_activity_coefficients(species, x)
             elif species_type == -1:
                 ln_gamma = self.get_anion_activity_coefficients(species, x)
-            total_g += m_i * (0 + r * self.t * (np.log(m_i) + ln_gamma))
+
+            if m_i > 0:
+                total_g += m_i*(0 + r*self.t*(np.log(m_i) + ln_gamma))
 
         # gibbs energy of water
         ln_a_w = self.get_water_activity(x)
