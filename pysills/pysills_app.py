@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.82
-# Date:		24.09.2025
+# Version:	v1.0.83
+# Date:		25.09.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -821,7 +821,7 @@ class PySILLS(tk.Frame):
             "Citation": {"English": "Citing PySILLS", "German": "PySILLS zitieren"},
             "Matrix Settings": {"English": "Matrix Settings", "German": "Einstellungen - Matrix"},
             "References": {"English": "References", "German": "Quellen"},
-            "Project Information": {"English": "Project Information", "German": "Projektinformationen"},
+            "Project Information": {"English": "Project information", "German": "Projektinformationen"},
             "Calculation Accuracy": {"English": "Calculation Accuracy", "German": "Numerische Genauigkeit"},
             "Sensitivity Drift": {"English": "Sensitivity Drift", "German": "Sensitivitätsverschiebung"},
             "Limit of Detection": {"English": "Limit of Detection", "German": "Nachweisgrenze"},
@@ -9653,8 +9653,11 @@ class PySILLS(tk.Frame):
         info_source = self.container_var[info_key]["Source ID"].get()
         info_carrier_gas = self.container_var["LASER"].get()
         info_icpms = self.var_opt_icp.get()
+        info_used_quantification_method = self.container_var[info_key]["Quantification Method Option"].get()
+        info_used_incl_method = self.container_var[info_key]["Inclusion Setup Option"].get()
 
-        str_proj = str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms)
+        str_proj = (str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms) +
+                    ";" + info_used_quantification_method + ";" + info_used_incl_method)
         str_proj += "\n"
 
         save_file.write(str_proj)
@@ -9790,11 +9793,17 @@ class PySILLS(tk.Frame):
             else:
                 str_cations += cation + "\n"
 
-        for index, anion in enumerate(self.container_lists["Selected Anions"]):
-            if index < len(self.container_lists["Selected Anions"]) - 1:
-                str_anions += anion + ";"
-            else:
-                str_anions += anion + "\n"
+        if len(self.container_lists["Selected Anions"]) > 0:
+            for index, anion in enumerate(self.container_lists["Selected Anions"]):
+                if anion != "":
+                    if anion in self.temp_checkbuttons_pypitzer:
+                        if self.temp_checkbuttons_pypitzer[anion].get() == 1:
+                            if index < len(self.container_lists["Selected Anions"]) - 1:
+                                str_anions += anion + ";"
+                            else:
+                                str_anions += anion + "\n"
+            if index == len(self.container_lists["Selected Anions"]) - 1 and "\n" not in str_anions:
+                str_anions += "\n"
 
         for index, isotope in enumerate(list(self.helper_checkbuttons["Isotopes"].keys())):
             if self.helper_checkbuttons["Isotopes"][isotope].get() == 1:
@@ -10157,10 +10166,33 @@ class PySILLS(tk.Frame):
                 if len(splitted_lines) > 1:
                     self.container_var[key_setting]["Source ID"].set(splitted_lines[1])
                     self.container_var["LASER"].set(splitted_lines[2])
+
                     try:
                         self.var_opt_icp.set(splitted_lines[3])
                     except:
                         self.var_opt_icp.set("Select ICP-MS")
+
+                    try:
+                        self.container_var[key_setting]["Quantification Method Option"].set(splitted_lines[4])
+                        for index, key in enumerate(["Matrix-only Tracer (SILLS)", "Second Internal Standard (SILLS)",
+                                           "Geometric Approach (Halter et al. 2002)",
+                                           "Geometric Approach (Borisova et al. 2021)"]):
+                            if key == splitted_lines[4]:
+                                self.container_var[key_setting]["Quantification Method"].set(int(index + 1))
+                    except:
+                        self.container_var[key_setting]["Quantification Method Option"].set(
+                            "Matrix-only Tracer (SILLS)")
+                        self.container_var[key_setting]["Quantification Method"].set(1)
+
+                    try:
+                        self.container_var[key_setting]["Inclusion Setup Option"].set(splitted_lines[5])
+                        for index, key in enumerate(["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2024)",
+                                           "Custom Data", "External Calculation", "100 wt.% Oxides"]):
+                            if key == splitted_lines[5]:
+                                self.container_var[key_setting]["Inclusion Setup Selection"].set(int(index + 1))
+                    except:
+                        self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
+                        self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
 
     def open_project_part_02(self, key_setting, index_container, loaded_lines):
         ## STANDARD FILES
@@ -11778,17 +11810,18 @@ class PySILLS(tk.Frame):
                                         self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
                                         self.helper_checkbuttons["Isotopes"][isotope].set(1)
                                 elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
-                                    for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
-                                        var_last_compound = splitted_data[1]
-                                        var_melting_temperature = splitted_data[2]
+                                    current_filename = splitted_data[0]
+                                    var_last_compound = splitted_data[1]
+                                    var_melting_temperature = splitted_data[2]
 
-                                        self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
-                                        self.container_var["SMPL"][filename_smpl_long][
-                                            "Melting temperature"] = tk.StringVar()
-                                        self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(
-                                            var_last_compound)
-                                        self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
-                                            var_melting_temperature)
+                                    self.container_var["SMPL"][current_filename]["Last compound"] = tk.StringVar()
+                                    self.container_var["SMPL"][current_filename][
+                                        "Melting temperature"] = tk.StringVar()
+                                    self.container_var["SMPL"][current_filename]["Last compound"].set(
+                                        var_last_compound)
+                                    self.container_var["SMPL"][current_filename]["Melting temperature"].set(
+                                        var_melting_temperature)
+
                         current_step = 63
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
@@ -12066,17 +12099,17 @@ class PySILLS(tk.Frame):
                                         self.helper_checkbuttons["Isotopes"][isotope] = tk.IntVar()
                                         self.helper_checkbuttons["Isotopes"][isotope].set(1)
                                 elif splitted_data[0] in self.container_lists["SMPL"]["Short"]:
-                                    for filename_smpl_long in self.container_lists["SMPL"]["Long"]:
-                                        var_last_compound = splitted_data[1]
-                                        var_melting_temperature = splitted_data[2]
+                                    current_filename = splitted_data[0]
+                                    var_last_compound = splitted_data[1]
+                                    var_melting_temperature = splitted_data[2]
 
-                                        self.container_var["SMPL"][filename_smpl_long]["Last compound"] = tk.StringVar()
-                                        self.container_var["SMPL"][filename_smpl_long][
-                                            "Melting temperature"] = tk.StringVar()
-                                        self.container_var["SMPL"][filename_smpl_long]["Last compound"].set(
-                                            var_last_compound)
-                                        self.container_var["SMPL"][filename_smpl_long]["Melting temperature"].set(
-                                            var_melting_temperature)
+                                    self.container_var["SMPL"][current_filename]["Last compound"] = tk.StringVar()
+                                    self.container_var["SMPL"][current_filename][
+                                        "Melting temperature"] = tk.StringVar()
+                                    self.container_var["SMPL"][current_filename]["Last compound"].set(
+                                        var_last_compound)
+                                    self.container_var["SMPL"][current_filename]["Melting temperature"].set(
+                                        var_melting_temperature)
 
                         current_step = 63
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
@@ -30940,10 +30973,14 @@ class PySILLS(tk.Frame):
                 self.fi_select_srm_default(var_opt=self.container_var["SRM"]["default"][1].get(), mode="ISOTOPES")
 
         self.file_system_need_update = False
+
+        str_opt_incl = self.container_var[var_setting_key]["Inclusion Setup Option"].get()
+        str_opt_quant = self.container_var[var_setting_key]["Quantification Method Option"].get()
+
         self.select_opt_inclusion_is_quantification(
-            var_opt="Mass Balance", dict_geometry_info=var_quantification_method)
+            var_opt=str_opt_incl, dict_geometry_info=var_quantification_method)
         self.select_opt_inclusion_quantification(
-            var_opt="Matrix-only Tracer (SILLS)", dict_geometry_info=var_quantification_method)
+            var_opt=str_opt_quant, dict_geometry_info=var_quantification_method)
 
         if self.demo_mode:
             for index, filename_std_long in enumerate(self.container_lists["STD"]["Long"]):
@@ -31335,62 +31372,6 @@ class PySILLS(tk.Frame):
             self.container_var["SRM"]["I127"].set("Scapolite 17")
 
         self.build_srm_database()
-
-    def change_rb_inclusion_setup(self):
-        if self.pysills_mode in ["FI", "INCL"]:
-            key_setting = "fi_setting"
-        elif self.pysills_mode == "MI":
-            key_setting = "mi_setting"
-
-        if self.container_var[key_setting]["Inclusion Setup Selection"].get() == 1:
-            self.btn_setup_massbalance.configure(state="normal")
-            self.btn_setup_chargebalance.configure(state="disabled")
-            self.btn_setup_plugin.configure(state="disabled")
-        elif self.container_var[key_setting]["Inclusion Setup Selection"].get() == 2:
-            self.btn_setup_massbalance.configure(state="disabled")
-            self.btn_setup_chargebalance.configure(state="normal")
-            self.btn_setup_plugin.configure(state="disabled")
-        elif self.container_var[key_setting]["Inclusion Setup Selection"].get() == 3:
-            self.btn_setup_massbalance.configure(state="disabled")
-            self.btn_setup_chargebalance.configure(state="disabled")
-            self.btn_setup_plugin.configure(state="normal")
-
-    #
-    def change_rb_quantification_setup(self):
-        if self.pysills_mode in ["FI", "INCL"]:
-            var_setting_key = "fi_setting"
-        elif self.pysills_mode == "MI":
-            var_setting_key = "mi_setting"
-
-        if self.container_var[var_setting_key]["Quantification Method"].get() == 1:
-            self.btn_setup_quantification_matrixonly.configure(state="normal")
-            self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            if self.pysills_mode in ["FI", "INCL"]:
-                self.btn_setup_quantification_plugin.configure(state="disabled")
-            elif self.pysills_mode == "MI":
-                self.btn_setup_quantification_halter.configure(state="disabled")
-                self.btn_setup_quantification_borisova.configure(state="disabled")
-        elif self.container_var[var_setting_key]["Quantification Method"].get() == 2:
-            self.btn_setup_quantification_matrixonly.configure(state="disabled")
-            self.btn_setup_quantification_secondinternal.configure(state="normal")
-            if self.pysills_mode in ["FI", "INCL"]:
-                self.btn_setup_quantification_plugin.configure(state="disabled")
-            elif self.pysills_mode == "MI":
-                self.btn_setup_quantification_halter.configure(state="disabled")
-                self.btn_setup_quantification_borisova.configure(state="disabled")
-        elif self.container_var[var_setting_key]["Quantification Method"].get() == 3:
-            self.btn_setup_quantification_matrixonly.configure(state="disabled")
-            self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            if self.pysills_mode in ["FI", "INCL"]:
-                self.btn_setup_quantification_plugin.configure(state="normal")
-            elif self.pysills_mode == "MI":
-                self.btn_setup_quantification_halter.configure(state="normal")
-                self.btn_setup_quantification_borisova.configure(state="disabled")
-        elif self.container_var[var_setting_key]["Quantification Method"].get() == 4:
-            self.btn_setup_quantification_matrixonly.configure(state="disabled")
-            self.btn_setup_quantification_secondinternal.configure(state="disabled")
-            self.btn_setup_quantification_halter.configure(state="disabled")
-            self.btn_setup_quantification_borisova.configure(state="normal")
 
     #########################
     ## Calculation Methods ##
