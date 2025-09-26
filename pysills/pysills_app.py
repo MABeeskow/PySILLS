@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.83
-# Date:		25.09.2025
+# Version:	v1.0.84
+# Date:		26.09.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.83"
-        self.val_version = self.str_version_number + " - 25.09.2025"
+        self.str_version_number = "1.0.84"
+        self.val_version = self.str_version_number + " - 26.09.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -9653,11 +9653,16 @@ class PySILLS(tk.Frame):
         info_source = self.container_var[info_key]["Source ID"].get()
         info_carrier_gas = self.container_var["LASER"].get()
         info_icpms = self.var_opt_icp.get()
-        info_used_quantification_method = self.container_var[info_key]["Quantification Method Option"].get()
-        info_used_incl_method = self.container_var[info_key]["Inclusion Setup Option"].get()
 
-        str_proj = (str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms) +
-                    ";" + info_used_quantification_method + ";" + info_used_incl_method)
+        if self.pysills_mode in ["FI", "INCL", "MI"]:
+            info_used_quantification_method = self.container_var[info_key]["Quantification Method Option"].get()
+            info_used_incl_method = self.container_var[info_key]["Inclusion Setup Option"].get()
+
+            str_proj = (str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms) +
+                        ";" + info_used_quantification_method + ";" + info_used_incl_method)
+        else:
+            str_proj = (str(info_author) + ";" + str(info_source) + ";" + str(info_carrier_gas) + ";" + str(info_icpms))
+
         str_proj += "\n"
 
         save_file.write(str_proj)
@@ -10172,27 +10177,28 @@ class PySILLS(tk.Frame):
                     except:
                         self.var_opt_icp.set("Select ICP-MS")
 
-                    try:
-                        self.container_var[key_setting]["Quantification Method Option"].set(splitted_lines[4])
-                        for index, key in enumerate(["Matrix-only Tracer (SILLS)", "Second Internal Standard (SILLS)",
-                                           "Geometric Approach (Halter et al. 2002)",
-                                           "Geometric Approach (Borisova et al. 2021)"]):
-                            if key == splitted_lines[4]:
-                                self.container_var[key_setting]["Quantification Method"].set(int(index + 1))
-                    except:
-                        self.container_var[key_setting]["Quantification Method Option"].set(
-                            "Matrix-only Tracer (SILLS)")
-                        self.container_var[key_setting]["Quantification Method"].set(1)
+                    if self.pysills_mode != "MA":
+                        try:
+                            self.container_var[key_setting]["Quantification Method Option"].set(splitted_lines[4])
+                            for index, key in enumerate(["Matrix-only Tracer (SILLS)", "Second Internal Standard (SILLS)",
+                                               "Geometric Approach (Halter et al. 2002)",
+                                               "Geometric Approach (Borisova et al. 2021)"]):
+                                if key == splitted_lines[4]:
+                                    self.container_var[key_setting]["Quantification Method"].set(int(index + 1))
+                        except:
+                            self.container_var[key_setting]["Quantification Method Option"].set(
+                                "Matrix-only Tracer (SILLS)")
+                            self.container_var[key_setting]["Quantification Method"].set(1)
 
-                    try:
-                        self.container_var[key_setting]["Inclusion Setup Option"].set(splitted_lines[5])
-                        for index, key in enumerate(["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2024)",
-                                           "Custom Data", "External Calculation", "100 wt.% Oxides"]):
-                            if key == splitted_lines[5]:
-                                self.container_var[key_setting]["Inclusion Setup Selection"].set(int(index + 1))
-                    except:
-                        self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
-                        self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
+                        try:
+                            self.container_var[key_setting]["Inclusion Setup Option"].set(splitted_lines[5])
+                            for index, key in enumerate(["Mass Balance", "Charge Balance", "PyPitzer (Liu et al. 2024)",
+                                               "Custom Data", "External Calculation", "100 wt.% Oxides"]):
+                                if key == splitted_lines[5]:
+                                    self.container_var[key_setting]["Inclusion Setup Selection"].set(int(index + 1))
+                        except:
+                            self.container_var[key_setting]["Inclusion Setup Option"].set("Mass Balance")
+                            self.container_var[key_setting]["Inclusion Setup Selection"].set(1)
 
     def open_project_part_02(self, key_setting, index_container, loaded_lines):
         ## STANDARD FILES
@@ -41950,65 +41956,11 @@ class PySILLS(tk.Frame):
                         self.dict_species_pypitzer[datatype][filename_short][ion] = np.mean(helper_values)
 
     def fi_mass_balance_new(self, mode="mass balance"):
-        # # Colors
-        # font_color_dark = self.bg_colors["Dark Font"]
-        # font_color_light = self.bg_colors["Light Font"]
-        # background_color_dark = self.bg_colors["BG Window"]
-        # background_color_elements = self.bg_colors["Light"]
-        # background_color_light = self.bg_colors["Very Light"]
-        # accent_color = self.bg_colors["Accent"]  # self.accent_color
-        # font_header = self.font_settings["Header"]
-        # font_elements = self.font_settings["Elements"]
-        # font_option = self.font_settings["Options"]
-        # font_table = self.font_settings["Table"]
-        #
-        # str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
-        #
-        # ## Window Settings
-        # row_min = self.row_height
-        # column_min = self.column_width
-        # n_rows = self.window_dimensions["Setup mass balance"][0]
-        # n_columns = self.window_dimensions["Setup mass balance"][1]
-        #
-        # window_width = int(n_columns*self.column_width)
-        # window_height = int(n_rows*self.row_height)
-        #
-        # var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-        #
-        # subwindow_fi_inclusion_massbalance_new = tk.Toplevel(self.parent)
-        #
-        # if mode == "mass balance":
-        #     str_title_02 = self.language_dict["Mass balance"][self.var_language]
-        #     subwindow_fi_inclusion_massbalance_new.title(str_title_01 + " - " + str_title_02)
-        # else:
-        #     str_title_02 = self.language_dict["Charge balance"][self.var_language]
-        #     subwindow_fi_inclusion_massbalance_new.title(str_title_01 + " - " + str_title_02)
-        #
-        # subwindow_fi_inclusion_massbalance_new.geometry(var_geometry)
-        # subwindow_fi_inclusion_massbalance_new.resizable(False, False)
-        # subwindow_fi_inclusion_massbalance_new["bg"] = background_color_dark
-        #
-        # for x in range(n_columns):
-        #     tk.Grid.columnconfigure(subwindow_fi_inclusion_massbalance_new, x, weight=1)
-        # for y in range(n_rows):
-        #     tk.Grid.rowconfigure(subwindow_fi_inclusion_massbalance_new, y, weight=1)
-        #
-        # # Rows
-        # for i in range(0, n_rows):
-        #     subwindow_fi_inclusion_massbalance_new.grid_rowconfigure(i, minsize=row_min)
-        # # Columns
-        # for i in range(0, n_columns):
-        #     subwindow_fi_inclusion_massbalance_new.grid_columnconfigure(i, minsize=column_min)
-
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
 
         if "IS" not in self.container_optionmenu["SMPL"]:
             self.container_optionmenu["SMPL"]["IS"] = {}
-
-        # start_row = 0
-        # start_column = 0
-        # n_header = 16
 
         var_is = self.container_var["SMPL"][self.container_lists["SMPL"]["Long"][0]]["IS Data"]["IS"].get()
 
@@ -42040,312 +41992,7 @@ class PySILLS(tk.Frame):
             self.perform_quantification_mass_charge_balance()
             self.init_fi_massbalance = True
 
-        # ## Labels
-        # str_lbl_01 = self.language_dict["Composition"][self.var_language]
-        # str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
-        # str_lbl_03 = self.language_dict["Default settings"][self.var_language]
-        #
-        # lbl_01 = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row, column_id=start_column, n_rows=1,
-        #     n_columns=n_header, fg=font_color_light, bg=background_color_dark).create_simple_label(
-        #     text=str_lbl_01 + " - H2O + ...", relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_02 = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row, column_id=start_column + n_header + 1,
-        #     n_rows=1, n_columns=int(2*n_header), fg=font_color_light, bg=background_color_dark).create_simple_label(
-        #     text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
-        # lbl_02 = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=start_column + n_header + 1,
-        #     n_rows=1, n_columns=n_header - 8, fg=font_color_light, bg=background_color_dark).create_simple_label(
-        #     text=str_lbl_03, relief=tk.FLAT, fontsize="sans 10 bold")
-        #
-        # ## Buttons
-        # str_btn_01 = self.language_dict["Guess the composition"][self.var_language]
-        # str_btn_02 = self.language_dict["Fix quantification"][self.var_language]
-        # str_btn_03 = self.language_dict["Calculate again"][self.var_language]
-        #
-        # btn_01a = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header - 10, n_rows=1,
-        #     n_columns=n_header - (n_header - 10), fg=font_color_dark,
-        #     bg=background_color_elements).create_simple_button(
-        #     text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-        #     command=self.guess_salt_composition)
-        #
-        # btn_01b = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 15, n_rows=1,
-        #     n_columns=6, fg=font_color_dark, bg=background_color_elements).create_simple_button(
-        #     text=str_btn_03, bg_active=accent_color, fg_active=font_color_light,
-        #     command=lambda event="", var_entr=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
-        #                    mode="recalculate", var_file=None:
-        #     self.fi_calculate_massbalance(var_entr, mode, var_file, event))
-        #
-        # if self.var_os == "darwin":
-        #     font_color_accent = font_color_dark
-        # else:
-        #     font_color_accent = font_color_light
-        #
-        # btn_02a = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 2, column_id=n_header + 27, n_rows=1,
-        #     n_columns=11, fg=font_color_accent, bg=accent_color).create_simple_button(
-        #     text=str_btn_02, bg_active=accent_color, fg_active=font_color_accent,
-        #     command=self.fix_mass_charge_balance_calculation)
-        #
-        # ## Option Menus
-        # self.container_lists["Possible IS SMPL"] = self.container_lists["Measured Isotopes"]["All"].copy()
-        # for halogen in ["Cl", "Br", "I"]:
-        #     if halogen in self.container_lists["Measured Elements"]:
-        #         for isotope in self.container_lists["Measured Elements"][halogen]:
-        #             self.container_lists["Possible IS SMPL"].remove(isotope)
-        #
-        # opt_05a = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=start_column + n_header + 9,
-        #     n_rows=1, n_columns=6, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-        #     var_iso=self.container_var[key_setting]["Salt Correction"]["Default IS"],
-        #     option_list=self.container_lists["Possible IS SMPL"],
-        #     text_set=self.container_var[key_setting]["Salt Correction"]["Default IS"].get(),
-        #     fg_active=font_color_light, bg_active=accent_color,
-        #     command=lambda var_opt=self.container_var[key_setting]["Salt Correction"]["Default IS"],
-        #                    var_key="SMPL":
-        #     self.fi_change_is_default(var_opt, var_key))
-        # opt_05a["menu"].config(
-        #     fg=font_color_dark, bg=background_color_elements,
-        #     activeforeground=font_color_light,
-        #     activebackground=accent_color)
-        # opt_05a.config(
-        #     bg=background_color_elements, fg=font_color_dark,
-        #     activeforeground=font_color_light,
-        #     activebackground=accent_color, highlightthickness=0)
-        #
-        # self.opt_is_smpl_def = opt_05a
-        #
-        # ## Entries
-        # str_opt_01 = self.language_dict["Set salinity"][self.var_language]
-        # self.container_var[key_setting]["Salt Correction"]["Default Salinity"].set(str_opt_01 + " (%)")
-        #
-        # if mode == "mass balance":
-        #     entr_05a = SE(
-        #         parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 15,
-        #         n_rows=1, n_columns=6, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
-        #         var=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
-        #         text_default=self.container_var[key_setting]["Salt Correction"]["Default Salinity"].get(),
-        #         command=lambda event, var_entr=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
-        #                        mode="default", var_file=None:
-        #         self.fi_calculate_massbalance(var_entr, mode, var_file, event))
-        #     entr_05b = SE(
-        #         parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 21,
-        #         n_rows=1, n_columns=6, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
-        #         var=self.container_var[key_setting]["Salt Correction"]["Default Concentration"],
-        #         text_default=self.container_var[key_setting]["Salt Correction"]["Default Concentration"].get(),
-        #         command=self.fi_set_concentration_is_massbalance)
-        # elif mode == "charge balance":
-        #     entr_05a = SE(
-        #         parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 15,
-        #         n_rows=1, n_columns=6, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
-        #         var=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
-        #         text_default=self.container_var[key_setting]["Salt Correction"]["Default Salinity"].get(),
-        #         command=lambda event, var_entr=self.container_var[key_setting]["Salt Correction"]["Default Salinity"],
-        #                        mode="default", var_file=None:
-        #         self.fi_calculate_chargebalance(var_entr, mode, var_file, event))
-        #     entr_05b = SE(
-        #         parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 21,
-        #         n_rows=1, n_columns=6, fg=font_color_dark, bg=self.bg_colors["White"]).create_simple_entry(
-        #         var=self.container_var[key_setting]["Salt Correction"]["Default Concentration"],
-        #         text_default=self.container_var[key_setting]["Salt Correction"]["Default Concentration"].get(),
-        #         command=self.fi_set_concentration_is_chargebalance)
-        #
-        # ## CHECKBOXES
-        # str_cb_01 = self.language_dict["Molality-based quantification"][self.var_language]
-        #
-        # cb_01a = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=n_rows - 3, column_id=n_header + 27,
-        #     fg=font_color_dark, n_rows=1, n_columns=11,
-        #     bg=background_color_elements).create_simple_checkbox(
-        #     var_cb=self.molality_based_quantification, text=str_cb_01, set_sticky="nesw",
-        #     own_color=True, command=lambda var_cb=self.molality_based_quantification: self.change_checkbox(var_cb))
-        # cb_01a.configure(offvalue=False)
-        # #cb_01a.configure(state="disabled")
-        #
-        # ## Tables
-        # list_salts = []
-        # dict_salts = {}
-        # for element, dataset in self.container_lists["Measured Elements"]["Cations"].items():
-        #     salt = dataset["Cl"]
-        #     dict_salts[salt] = element
-        #     if salt not in list_salts:
-        #         list_salts.append(salt)
-        #
-        # frm_01 = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row + 1, column_id=start_column,
-        #     n_rows=n_rows - 3, n_columns=n_header, fg=font_color_dark,
-        #     bg=background_color_light).create_frame()
-        # vsb_01 = ttk.Scrollbar(master=frm_01, orient="vertical")
-        # text_01 = tk.Text(
-        #     master=frm_01, width=30, height=25, yscrollcommand=vsb_01.set, bg=background_color_light)
-        # vsb_01.config(command=text_01.yview)
-        # vsb_01.pack(side="right", fill="y")
-        # text_01.pack(side="left", fill="both", expand=True)
-        #
-        # self.helper_salt_selection = {}
-        # for salt in list_salts:
-        #     if salt not in self.helper_salt_selection:
-        #         self.helper_salt_selection[salt] = 0
-        #
-        #     if salt not in self.container_var[key_setting]["Salt Correction"]["Chlorides"]:
-        #         self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt] = {
-        #             "State": tk.IntVar(), "Weight": tk.StringVar()}
-        #         self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"].set(0)
-        #         self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"].set("1.0")
-        #
-        #     cb_i = tk.Checkbutton(
-        #         master=frm_01, text=salt+"\t", fg=font_color_dark, bg=background_color_light,
-        #         variable=self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["State"],
-        #         command=self.fi_check_elements_checkbutton)
-        #     text_01.window_create("end", window=cb_i)
-        #     text_01.insert("end", "\t")
-        #
-        #     entr_i = tk.Entry(
-        #         frm_01, textvariable=self.container_var[key_setting]["Salt Correction"]["Chlorides"][salt]["Weight"],
-        #         width=5, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
-        #     text_01.window_create("insert", window=entr_i)
-        #     text_01.insert("end", "\t")
-        #
-        #     element = dict_salts[salt]
-        #     incl_i = []
-        #     incl_na = []
-        #     for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-        #         list_isotopes = self.container_lists["Measured Elements"][file_smpl_short][element]
-        #         list_na = self.container_lists["Measured Elements"][file_smpl_short]["Na"]
-        #         if index == 0:
-        #             text = ""
-        #             for isotope in list_isotopes:
-        #                 text += isotope + ","
-        #             text = text[:-1]
-        #
-        #         for isotope_na in list_na:
-        #             intensity_incl_na = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["INCL"][
-        #                 isotope_na]
-        #             if intensity_incl_na != None:
-        #                 incl_na.append(intensity_incl_na)
-        #             else:
-        #                 incl_na.append(0.0)
-        #
-        #         for isotope in list_isotopes:
-        #             intensity_incl_i = self.container_intensity_corrected["SMPL"]["RAW"][file_smpl_short]["INCL"][
-        #                 isotope]
-        #             if intensity_incl_i != None:
-        #                 if intensity_incl_i > 0:
-        #                     incl_i.append(intensity_incl_i)
-        #                 else:
-        #                     incl_i.append(0.0)
-        #             else:
-        #                 incl_i.append(0.0)
-        #
-        #     incl_i = round(np.mean(incl_i), 1)
-        #     incl_na = round(np.mean(incl_na), 1)
-        #     if incl_na > 0:
-        #         magic_factor = round((incl_i/incl_na)*1000, 1)
-        #     else:
-        #         magic_factor = 0.0
-        #     self.helper_salt_selection[salt] = magic_factor
-        #
-        #     lbl_i = tk.Label(frm_01, text=text+"\t", bg=background_color_light, fg=font_color_dark)
-        #     text_01.window_create("end", window=lbl_i)
-        #     text_01.insert("end", "\t")
-        #
-        #     lbl2_i = tk.Label(frm_01, text=magic_factor, bg=background_color_light,
-        #                       fg=font_color_dark)
-        #     text_01.window_create("end", window=lbl2_i)
-        #     text_01.insert("end", "\n")
-        #
-        #     if salt == "NaCl":
-        #         cb_i.configure(state="disabled")
-        #         entr_i.configure(state="disabled")
-        #         lbl_i.configure(state="disabled")
-        #         lbl2_i.configure(state="disabled")
-        #
-        # frm_02 = SE(
-        #     parent=subwindow_fi_inclusion_massbalance_new, row_id=start_row + 1, column_id=start_column + n_header + 1,
-        #     n_rows=n_rows - 4, n_columns=int(2*n_header + 5), fg=font_color_dark,
-        #     bg=background_color_light).create_frame()
-        # vsb_02 = ttk.Scrollbar(master=frm_02, orient="vertical")
-        # text_02 = tk.Text(
-        #     master=frm_02, width=30, height=25, yscrollcommand=vsb_02.set, bg=background_color_light)
-        # vsb_02.config(command=text_02.yview)
-        # vsb_02.pack(side="right", fill="y")
-        # text_02.pack(side="left", fill="both", expand=True)
-        #
-        # for index, file_smpl_short in enumerate(self.container_lists["SMPL"]["Short"]):
-        #     if file_smpl_short not in self.helper_salt_composition:
-        #         self.helper_salt_composition[file_smpl_short] = tk.StringVar()
-        #         self.helper_salt_composition[file_smpl_short].set("unknown composition")
-        #     if file_smpl_short not in self.charge_balance_check:
-        #         self.charge_balance_check[file_smpl_short] = tk.StringVar()
-        #         self.charge_balance_check[file_smpl_short].set("1.0")
-        #
-        #     file_smpl = self.container_lists["SMPL"]["Long"][index]
-        #     lbl_i = tk.Label(frm_02, text=file_smpl_short + "\t", bg=background_color_light,
-        #                      fg=font_color_dark)
-        #     text_02.window_create("end", window=lbl_i)
-        #     text_02.insert("end", "\t")
-        #
-        #     opt_is_i = tk.OptionMenu(
-        #         frm_02, self.container_var["SMPL"][file_smpl]["IS Data"]["IS"],
-        #         *self.container_lists["Measured Isotopes"][file_smpl_short])
-        #     opt_is_i["menu"].config(fg=font_color_dark, bg=background_color_elements,
-        #                             activeforeground=font_color_light,
-        #                             activebackground=accent_color)
-        #     opt_is_i.config(bg=background_color_elements, fg=font_color_dark,
-        #                     activeforeground=font_color_light, activebackground=accent_color,
-        #                     highlightthickness=0)
-        #     self.container_optionmenu["SMPL"]["IS"][file_smpl] = opt_is_i
-        #
-        #     text_02.window_create("end", window=opt_is_i)
-        #     text_02.insert("end", " \t")
-        #
-        #     if mode == "mass balance":
-        #         entr_i = tk.Entry(
-        #             frm_02, textvariable=self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
-        #                 file_smpl_short], width=10, highlightthickness=0, bg=self.bg_colors["White"],
-        #             fg=font_color_dark)
-        #         entr_i.bind("<Return>", lambda event, var_entr=self.container_var[key_setting]["Salt Correction"][
-        #             "Salinity SMPL"][file_smpl_short], mode="specific", var_file=file_smpl:
-        #         self.fi_calculate_massbalance(var_entr, mode, var_file, event))
-        #     else:
-        #         entr_i = tk.Entry(
-        #             frm_02, textvariable=self.container_var[key_setting]["Salt Correction"]["Salinity SMPL"][
-        #                 file_smpl_short], width=10, highlightthickness=0, bg=self.bg_colors["White"],
-        #             fg=font_color_dark)
-        #         entr_i.bind("<Return>", lambda event, var_entr=self.container_var[key_setting]["Salt Correction"][
-        #             "Salinity SMPL"][file_smpl_short], mode="specific", var_file=file_smpl:
-        #         self.fi_calculate_chargebalance(var_entr, mode, var_file, event))
-        #
-        #     text_02.window_create("insert", window=entr_i)
-        #     text_02.insert("end", "\t")
-        #
-        #
-        #     entr2_i = tk.Entry(
-        #         frm_02, textvariable=self.container_var["SMPL"][file_smpl]["IS Data"]["Concentration"], width=15,
-        #         highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
-        #     text_02.window_create("insert", window=entr2_i)
-        #     text_02.insert("end", "\t")
-        #
-        #     entr3_i = tk.Entry(
-        #         frm_02, textvariable=self.charge_balance_check[file_smpl_short], width=5,
-        #         highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
-        #     text_02.window_create("insert", window=entr3_i)
-        #     text_02.insert("end", "\t")
-        #
-        #     entr3_i.configure(state="disabled")
-        #
-        #     entr4_i = tk.Entry(
-        #         frm_02, textvariable=self.helper_salt_composition[file_smpl_short], width=40,
-        #         highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
-        #     text_02.window_create("insert", window=entr4_i)
-        #     text_02.insert("end", "\n")
-        #
-        #     entr4_i.configure(state="disabled")
-
         ## INITIALIZATION
-        #self.fi_check_elements_checkbutton()
         if mode == "mass balance":
             self.setup_mass_charge_balance(mass_balance=True)
         elif mode == "charge balance":
@@ -43507,20 +43154,20 @@ class PySILLS(tk.Frame):
                                             var_file_short=var_file_short, var_isotope=var_isotope,
                                             var_value_raw=value_raw, var_value_smoothed=value_smoothed, mode=None,
                                             var_index=var_index)
-                            print("File:", var_file_short)
-                            print("Isotope:", var_isotope)
-                            print("Spikes found at index:", self.container_spikes[var_file_short][var_isotope]["Indices"],
-                                  len(self.container_spikes[var_file_short][var_isotope]["Indices"]))
-                            if var_isotope in self.container_spike_values[var_file_short]:
-                                print("Comparison 'Save':",
-                                      list(self.container_spike_values[var_file_short][var_isotope]["Save"].keys()),
-                                      len(list(self.container_spike_values[var_file_short][var_isotope]["Save"].keys(
-
-                                      ))))
-                                print("Current:", self.container_spike_values[var_file_short][var_isotope]["Current"],
-                                      len(self.container_spike_values[var_file_short][var_isotope]["Current"]))
-                            else:
-                                print("Comparison 'Save': [], 0")
+                            # print("File:", var_file_short)
+                            # print("Isotope:", var_isotope)
+                            # print("Spikes found at index:", self.container_spikes[var_file_short][var_isotope]["Indices"],
+                            #       len(self.container_spikes[var_file_short][var_isotope]["Indices"]))
+                            # if var_isotope in self.container_spike_values[var_file_short]:
+                            #     print("Comparison 'Save':",
+                            #           list(self.container_spike_values[var_file_short][var_isotope]["Save"].keys()),
+                            #           len(list(self.container_spike_values[var_file_short][var_isotope]["Save"].keys(
+                            #
+                            #           ))))
+                            #     print("Current:", self.container_spike_values[var_file_short][var_isotope]["Current"],
+                            #           len(self.container_spike_values[var_file_short][var_isotope]["Current"]))
+                            # else:
+                            #     print("Comparison 'Save': [], 0")
         else:
             self.refresh_smoothed_data(filetype=mode)
 
