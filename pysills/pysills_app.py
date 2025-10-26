@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.84
-# Date:		26.09.2025
+# Version:	v1.0.85
+# Date:		26.10.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.84"
-        self.val_version = self.str_version_number + " - 26.09.2025"
+        self.str_version_number = "1.0.85"
+        self.val_version = self.str_version_number + " - 26.10.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -12917,6 +12917,7 @@ class PySILLS(tk.Frame):
 
             condition = False
             index_isotope = 0
+            isotope_is = "Select IS"
             if file_long in self.container_lists["STD"]["Long"]:
                 var_srm_file = self.container_var["STD"][file_long]["SRM"].get()
                 index = self.container_lists["STD"]["Long"].index(file_long)
