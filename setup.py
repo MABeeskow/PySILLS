@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="latin-1") as f:
     description = f.read()
 
 setup(
-    name="PySILLS",
+    name="pysills",
     version="1.0.85",
     packages=find_packages(),
     url="https://github.com/MABeeskow/PySILLS",
