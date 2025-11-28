@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="latin-1") as f:
 
 setup(
     name="pysills",
-    version="1.0.85",
+    version="1.0.86",
     packages=find_packages(),
     url="https://github.com/MABeeskow/PySILLS",
     license="LGPL-3.0",
