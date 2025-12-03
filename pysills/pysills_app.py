@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.86
-# Date:		28.11.2025
+# Version:	v1.0.88
+# Date:		03.12.2025
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.87"
-        self.val_version = self.str_version_number + " - 28.11.2025"
+        self.str_version_number = "1.0.88"
+        self.val_version = self.str_version_number + " - 03.12.2025"
 
         ## Colors
         self.green_dark = "#282D28"
@@ -12363,7 +12363,7 @@ class PySILLS(tk.Frame):
 
                     time_end = datetime.datetime.now()
                     time_delta = (time_end - time_start)*1000
-                    print(f"Process time (opening project - part 'Initialization'):", time_delta.total_seconds(), "ms")
+                    #print(f"Process time (opening project - part 'Initialization'):", time_delta.total_seconds(), "ms")
                 except FileNotFoundError:
                     print("File not found!")
 
@@ -25319,7 +25319,7 @@ class PySILLS(tk.Frame):
                 time_now = datetime.datetime.now()
                 time_delta_new = (time_now - time_previous)*1000
                 time_previous = time_now
-                print(f"Process time (Concentration calculation:", time_delta_new.total_seconds(), "ms")
+                #print(f"Process time (Concentration calculation:", time_delta_new.total_seconds(), "ms")
                 # Normalized Sensitivity
                 SQ(dataframe_01=self.container_intensity_corrected[var_type][str_keyword][var_file_short],
                    dataframe_02=self.container_concentration[var_type][str_keyword][var_file_short],
@@ -26036,8 +26036,7 @@ class PySILLS(tk.Frame):
         time_previous = time_new
         title = "A"
         helper_times_init[title] = time_delta_new.total_seconds()
-        print(f"Process time (Final calculation - part '" + title + "'):",
-              time_delta_new.total_seconds(), "ms")
+        #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         var_filetype = "None"
         var_file_short = "None"
@@ -26056,8 +26055,7 @@ class PySILLS(tk.Frame):
         time_previous = time_new
         title = "B"
         helper_times_init[title] = time_delta_new.total_seconds()
-        print(f"Process time (Final calculation - part '" + title + "'):",
-              time_delta_new.total_seconds(), "ms")
+        #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         for var_datatype in ["RAW", "SMOOTHED"]:
             # Intensity Analysis
@@ -26075,8 +26073,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "C " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             IQ(dataframe=None, project_type=self.pysills_mode,
                results_container=self.container_intensity_corrected["STD"][var_datatype]).get_averaged_intensities(
@@ -26088,8 +26085,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "D " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             self.ma_get_intensity_ratio(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
@@ -26100,8 +26096,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "E " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             # Sensitivity Analysis
             self.get_analytical_sensitivity(
@@ -26114,8 +26109,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "F " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             IQ(dataframe=None, project_type=self.pysills_mode,
                results_container=self.container_intensity_ratio).get_intensity_ratio(
@@ -26126,8 +26120,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "G " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             # Compositional Analysis
             self.ma_get_concentration(
@@ -26139,8 +26132,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "H " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             self.ma_get_rsf(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
@@ -26151,8 +26143,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "I " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             SQ(dataframe_01=self.container_intensity_corrected, dataframe_02=self.container_concentration,
                results_container=self.container_normalized_sensitivity).get_normalized_sensitivity(
@@ -26163,8 +26154,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "J " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             self.ma_get_concentration_ratio(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
@@ -26175,8 +26165,7 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "K " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
             self.get_lod(
                 var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
@@ -26187,16 +26176,14 @@ class PySILLS(tk.Frame):
             time_previous = time_new
             title = "L " + var_datatype
             helper_times_init[title] = time_delta_new.total_seconds()
-            print(f"Process time (Final calculation - part '" + title + "'):",
-                  time_delta_new.total_seconds(), "ms")
+            #print(f"Process time (Final calculation - part '" + title + "'):", time_delta_new.total_seconds(), "ms")
 
         time_new = datetime.datetime.now()
         time_delta_new = (time_new - time_start)*1000
         time_previous = time_new
         title = "Total"
         helper_times_init[title] = time_delta_new.total_seconds()
-        print(f"Process time (Final calculation -" + title + "'):",
-              time_delta_new.total_seconds(), "ms")
+        #print(f"Process time (Final calculation -" + title + "'):", time_delta_new.total_seconds(), "ms")
 
     def ma_datareduction_tables(self, init=False):  # MA - data reduction tables #######################
         ## Initialization
@@ -26211,180 +26198,6 @@ class PySILLS(tk.Frame):
 
         if init:
             self.run_quantification_ma_tables()
-            # helper_times_init = {}
-            # time_start = datetime.datetime.now()
-            # time_previous = time_start
-            #
-            # for var_filetype in ["STD", "SMPL"]:
-            #     for var_file_short in self.container_lists[var_filetype]["Short"]:
-            #         self.get_condensed_intervals_of_file(filetype=var_filetype, filename_short=var_file_short)
-            #
-            # time_new = datetime.datetime.now()
-            # time_delta_new = (time_new - time_previous)*1000
-            # time_previous = time_new
-            # title = "A"
-            # helper_times_init[title] = time_delta_new.total_seconds()
-            # print(f"Process time (Final calculation - part '" + title + "'):",
-            #       time_delta_new.total_seconds(), "ms")
-            #
-            # var_filetype = "None"
-            # var_file_short = "None"
-            # var_file_long = "None"
-            # var_focus = "None"
-            # self.var_init_ma_datareduction = True
-            #
-            # list_is = {"STD": [], "SMPL": []}
-            # for str_filename_long in self.container_lists["SMPL"]["Long"]:
-            #     str_is = self.container_var["SMPL"][str_filename_long]["IS Data"]["IS"].get()
-            #     if str_is not in list_is["SMPL"]:
-            #         list_is["SMPL"].append(str_is)
-            #
-            # time_new = datetime.datetime.now()
-            # time_delta_new = (time_new - time_previous)*1000
-            # time_previous = time_new
-            # title = "B"
-            # helper_times_init[title] = time_delta_new.total_seconds()
-            # print(f"Process time (Final calculation - part '" + title + "'):",
-            #       time_delta_new.total_seconds(), "ms")
-            #
-            # for var_datatype in ["RAW", "SMOOTHED"]:
-            #     # Intensity Analysis
-            #     self.get_intensity(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_focus=var_focus, mode="All")
-            #
-            #     if self.container_var["General Settings"]["Desired Average"].get() == 1:
-            #         str_averagetype = "arithmetic mean"
-            #     else:
-            #         str_averagetype = "median"
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "C " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     IQ(dataframe=None, project_type=self.pysills_mode,
-            #        results_container=self.container_intensity_corrected["STD"][var_datatype]).get_averaged_intensities(
-            #         data_container=self.container_intensity_corrected["STD"][var_datatype],
-            #         average_type=str_averagetype)
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "D " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     self.ma_get_intensity_ratio(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_file_long=var_file_long, var_focus=var_focus, mode="All")
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "E " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     # Sensitivity Analysis
-            #     self.get_analytical_sensitivity(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_file_long=var_file_long, mode="All")
-            #     results_is = self.determine_possible_is(filetype="ALL")
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "F " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     IQ(dataframe=None, project_type=self.pysills_mode,
-            #        results_container=self.container_intensity_ratio).get_intensity_ratio(
-            #         data_container=self.container_intensity_corrected, dict_is=results_is, datatype=var_datatype)
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "G " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     # Compositional Analysis
-            #     self.ma_get_concentration(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_file_long=var_file_long, mode="All")
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "H " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     self.ma_get_rsf(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_file_long=var_file_long, mode="All")
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "I " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     SQ(dataframe_01=self.container_intensity_corrected, dataframe_02=self.container_concentration,
-            #        results_container=self.container_normalized_sensitivity).get_normalized_sensitivity(
-            #         datatype=var_datatype, data_sensitivity=self.container_analytical_sensitivity, dict_is=results_is)
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "J " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     self.ma_get_concentration_ratio(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_file_long=var_file_long, mode="All")
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "K " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            #     self.get_lod(
-            #         var_filetype=var_filetype, var_datatype=var_datatype, var_file_short=var_file_short,
-            #         var_file_long=var_file_long, var_focus=None, mode="All")
-            #
-            #     time_new = datetime.datetime.now()
-            #     time_delta_new = (time_new - time_previous)*1000
-            #     time_previous = time_new
-            #     title = "L " + var_datatype
-            #     helper_times_init[title] = time_delta_new.total_seconds()
-            #     print(f"Process time (Final calculation - part '" + title + "'):",
-            #           time_delta_new.total_seconds(), "ms")
-            #
-            # time_new = datetime.datetime.now()
-            # time_delta_new = (time_new - time_start)*1000
-            # time_previous = time_new
-            # title = "Total"
-            # helper_times_init[title] = time_delta_new.total_seconds()
-            # print(f"Process time (Final calculation -" + title + "'):",
-            #       time_delta_new.total_seconds(), "ms")
 
         if self.container_var["ma_datareduction_files"]["File Type"].get() == 0:
             var_filetype = "STD"
@@ -32894,7 +32707,9 @@ class PySILLS(tk.Frame):
                         self.srm_actual[var_srm_file].items(), key=lambda item: item[1], reverse=True):
                     if element in self.container_lists["Measured Elements"][var_file_short]:
                         var_is = self.container_lists["Measured Elements"][var_file_short][element][0]
-                    break
+                        break
+                    else:
+                        pass
             else:
                 var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
 
@@ -43625,7 +43440,7 @@ class PySILLS(tk.Frame):
         var_file_short = "None"
 
         for var_datatype in ["RAW", "SMOOTHED"]:
-            print(filetype, var_datatype)
+            # print(filetype, var_datatype)
             # Extract signal intensity values
             self.get_intensity(
                 var_filetype=filetype, var_datatype=var_datatype, var_file_short=var_file_short,
@@ -43650,7 +43465,7 @@ class PySILLS(tk.Frame):
 
         time_end = datetime.datetime.now()
         time_delta = (time_end - time_start)*1000
-        print(f"Process time:", filetype, "-", time_delta.total_seconds(), "ms")
+        # print(f"Process time:", filetype, "-", time_delta.total_seconds(), "ms")
 
     def run_datareduction(self, filetype, focus_intensity=False, focus_sensitivity=False, focus_concentration=False):
         str_filetype = filetype
