@@ -26,6 +26,7 @@ import tkinter as tk
 from tkinter import filedialog, ttk, font
 import random as rd
 # internal
+from src.pysills.gui.colors import Colors as GUIcolors
 try:
     from pysills.pypitzer.Pitzer.models import FluidPitzer
 except:
@@ -78,31 +79,12 @@ class PySILLS(tk.Frame):
         self.val_version = self.str_version_number + " - 03.12.2025"
 
         ## Colors
-        self.green_dark = "#282D28"
-        self.green_medium = "#616D61"
-        self.green_light = "#CFD3CF"
-        green_dict = {"Dark": self.green_dark, "Medium": self.green_medium, "Light": self.green_light}
-        self.red_dark = "#E76F51"
-        self.red_medium = "#F1A896"
-        self.red_light = "#FDF0ED"
-        red_dict = {"Dark": self.red_dark, "Medium": self.red_medium, "Light": self.red_light}
-        self.yellow_dark = "#E9C46A"
-        self.yellow_medium = "#F3DFAE"
-        self.yellow_light = "#FDFAF2"
-        yellow_dict = {"Dark": self.yellow_dark, "Medium": self.yellow_medium, "Light": self.yellow_light}
-        self.blue_dark = "#5B828E"
-        self.blue_medium = "#8CA7AF"
-        self.blue_light = "#CDD9DD"
-        blue_dict = {"Dark": self.blue_dark, "Medium": self.blue_medium, "Light": self.blue_light}
-        self.brown_dark = "#AC7E62"
-        self.brown_medium = "#C4A491"
-        self.brown_light = "#EEE5DF"
-        brown_dict = {"Dark": self.brown_dark, "Medium": self.brown_medium, "Light": self.brown_light}
-        self.slate_grey_dark = "#6E7894"
-        self.slate_grey_medium = "#9AA1B4"
-        self.slate_grey_light = "#E2E4EA"
-        slategrey_dict = {"Dark": self.slate_grey_dark, "Medium": self.slate_grey_medium,
-                          "Light": self.slate_grey_light}
+        self.green_dict = GUIcolors().get_colors(name="green")
+        self.red_dict = GUIcolors().get_colors(name="red")
+        self.yellow_dict = GUIcolors().get_colors(name="yellow")
+        self.blue_dict = GUIcolors().get_colors(name="blue")
+        self.brown_dict = GUIcolors().get_colors(name="brown")
+        self.slategrey_dict = GUIcolors().get_colors(name="slate grey")
 
         self.bg_colors = {
             "BG Window": "#2C2C2C", "Very Dark": "#3C3C3C", "Dark": "#676767", "Medium": "#909090", "Light": "#BABABA",
@@ -1533,17 +1515,17 @@ class PySILLS(tk.Frame):
             for subcategory in subcategories:
                 if category != "Sign":
                     if subcategory == "Green":
-                        self.container_lists["Colors PySILLS"][category][subcategory] = green_dict[category]
+                        self.container_lists["Colors PySILLS"][category][subcategory] = self.green_dict[category]
                     elif subcategory == "Red":
-                        self.container_lists["Colors PySILLS"][category][subcategory] = red_dict[category]
+                        self.container_lists["Colors PySILLS"][category][subcategory] = self.red_dict[category]
                     elif subcategory == "Blue":
-                        self.container_lists["Colors PySILLS"][category][subcategory] = blue_dict[category]
+                        self.container_lists["Colors PySILLS"][category][subcategory] = self.blue_dict[category]
                     elif subcategory == "Yellow":
-                        self.container_lists["Colors PySILLS"][category][subcategory] = yellow_dict[category]
+                        self.container_lists["Colors PySILLS"][category][subcategory] = self.yellow_dict[category]
                     elif subcategory == "Brown":
-                        self.container_lists["Colors PySILLS"][category][subcategory] = brown_dict[category]
+                        self.container_lists["Colors PySILLS"][category][subcategory] = self.brown_dict[category]
                     elif subcategory == "Slate Grey":
-                        self.container_lists["Colors PySILLS"][category][subcategory] = slategrey_dict[category]
+                        self.container_lists["Colors PySILLS"][category][subcategory] = self.slategrey_dict[category]
                 else:
                     if subcategory in ["Red", "Yellow", "Green"]:
                         self.container_lists["Colors PySILLS"][category][subcategory] = sign_dict[subcategory]
@@ -2081,7 +2063,7 @@ class PySILLS(tk.Frame):
         frame_01 = tk.Frame(self.parent, bg=self.bg_colors["BG Window"], borderwidth=0, highlightthickness=0,
                             relief=tk.FLAT)
         frame_01.grid(row=3, column=0, rowspan=42, columnspan=22, sticky="nesw")
-        frame_02 = tk.Frame(self.parent, bg=self.red_dark, borderwidth=0, highlightthickness=0)
+        frame_02 = tk.Frame(self.parent, bg=self.red_dict["Dark"], borderwidth=0, highlightthickness=0)
         frame_02.grid(row=2, column=0, rowspan=1, columnspan=22, sticky="nesw")
 
         # ## USER SETTINGS
@@ -3195,14 +3177,14 @@ class PySILLS(tk.Frame):
                     #
                     if self.diagrams_setup[filetype][filename_short]["FIG"] == None:
                         self.diagrams_setup[filetype][filename_short]["FIG"] = Figure(
-                            figsize=(10, 5), facecolor=self.green_light)
+                            figsize=(10, 5), facecolor=self.green_dict["Light"])
                         self.diagrams_setup[filetype][filename_short]["AX"] = \
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG"].add_subplot()
                     #
                     if self.diagrams_setup[filetype][filename_short]["FIG_RATIO"] == None:
                         self.diagrams_setup[filetype][filename_short]["FIG_RATIO"] = Figure(
-                            figsize=(10, 5), facecolor=self.green_light)
+                            figsize=(10, 5), facecolor=self.green_dict["Light"])
                         self.diagrams_setup[filetype][filename_short]["AX_RATIO"] = \
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG_RATIO"].add_subplot()
@@ -3227,9 +3209,9 @@ class PySILLS(tk.Frame):
                     spk_id = 1
                     #
                     box_spk = self.diagrams_setup[filetype][filename_short]["AX"].axvspan(
-                        start_time, end_time, alpha=0.125, color=self.yellow_dark)
+                        start_time, end_time, alpha=0.125, color=self.yellow_dict["Dark"])
                     box_spk_ratio = self.diagrams_setup[filetype][filename_short]["AX_RATIO"].axvspan(
-                        start_time, end_time, alpha=0.125, color=self.yellow_dark)
+                        start_time, end_time, alpha=0.125, color=self.yellow_dict["Dark"])
                     #
                     isotope = "".join(self.container_lists["ISOTOPES"])
                     #
@@ -3291,14 +3273,14 @@ class PySILLS(tk.Frame):
                     #
                     if self.diagrams_setup[filetype][filename_short]["FIG"] == None:
                         self.diagrams_setup[filetype][filename_short]["FIG"] = Figure(
-                            figsize=(10, 5), facecolor=self.green_light)
+                            figsize=(10, 5), facecolor=self.green_dict["Light"])
                         self.diagrams_setup[filetype][filename_short]["AX"] = \
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG"].add_subplot()
                     #
                     if self.diagrams_setup[filetype][filename_short]["FIG_RATIO"] == None:
                         self.diagrams_setup[filetype][filename_short]["FIG_RATIO"] = Figure(
-                            figsize=(10, 5), facecolor=self.green_light)
+                            figsize=(10, 5), facecolor=self.green_dict["Light"])
                         self.diagrams_setup[filetype][filename_short]["AX_RATIO"] = \
                             self.diagrams_setup[filetype][filename_short][
                                 "FIG_RATIO"].add_subplot()
@@ -3334,9 +3316,9 @@ class PySILLS(tk.Frame):
                     spk_id = 1
                     #
                     box_spk = self.diagrams_setup[filetype][filename_short]["AX"].axvspan(
-                        start_time, end_time, alpha=0.125, color=self.yellow_dark)
+                        start_time, end_time, alpha=0.125, color=self.yellow_dict["Dark"])
                     box_spk_ratio = self.diagrams_setup[filetype][filename_short]["AX_RATIO"].axvspan(
-                        start_time, end_time, alpha=0.125, color=self.yellow_dark)
+                        start_time, end_time, alpha=0.125, color=self.yellow_dict["Dark"])
                     #
                     isotope = "".join(self.container_lists["ISOTOPES"])
                     #
@@ -3573,7 +3555,7 @@ class PySILLS(tk.Frame):
             warning_is.title("Warning")
             warning_is.geometry("250x100+0+0")
             warning_is.resizable(False, False)
-            warning_is["bg"] = self.green_light
+            warning_is["bg"] = self.green_dict["Light"]
             #
             window_width = 250
             window_height = 100
@@ -3596,7 +3578,7 @@ class PySILLS(tk.Frame):
             #
             lbl_01 = SE(
                 parent=warning_is, row_id=0, column_id=0, n_rows=n_rows, n_columns=n_columns, fg=self.green_dark,
-                bg=self.red_dark).create_simple_label(
+                bg=self.red_dict["Dark"]).create_simple_label(
                 text="Please load your internal\n standard concentration data\n or select a mineral", relief=tk.GROOVE,
                 fontsize="sans 10 bold")
             #
@@ -3659,7 +3641,7 @@ class PySILLS(tk.Frame):
             warning_is.title("Warning")
             warning_is.geometry("250x100+0+0")
             warning_is.resizable(False, False)
-            warning_is["bg"] = self.green_light
+            warning_is["bg"] = self.green_dict["Light"]
             #
             window_width = 250
             window_height = 100
@@ -3682,7 +3664,7 @@ class PySILLS(tk.Frame):
             #
             lbl_01 = SE(
                 parent=warning_is, row_id=0, column_id=0, n_rows=n_rows, n_columns=n_columns, fg=self.green_dark,
-                bg=self.red_dark).create_simple_label(
+                bg=self.red_dict["Dark"]).create_simple_label(
                 text="Please load your internal\n standard concentration data\n or select a mineral", relief=tk.GROOVE,
                 fontsize="sans 10 bold")
             #
@@ -5026,7 +5008,7 @@ class PySILLS(tk.Frame):
         self.container_var["Plotting"][self.pysills_mode]["Quickview"][var_file_short]["Canvas"].draw()
 
     def place_srm_values(self, var_srm, header_col, default=False):
-        lbl_srm_03 = SE(parent=self.parent, row_id=0, column_id=header_col, n_rows=1, n_columns=42, fg=self.green_light,
+        lbl_srm_03 = SE(parent=self.parent, row_id=0, column_id=header_col, n_rows=1, n_columns=42, fg=self.green_dict["Light"],
                         bg=self.green_dark).create_simple_label(text=str(var_srm) + " - Element Concentrations (ppm)",
                                                                 relief=tk.GROOVE, fontsize="sans 10 bold")
         self.container_elements["SRM"]["Label"].append(lbl_srm_03)
@@ -5444,7 +5426,7 @@ class PySILLS(tk.Frame):
     #
     def place_mineral_values(self, var_min, header_col):
         #
-        lbl_srm_03 = SE(parent=self.parent, row_id=0, column_id=header_col, n_rows=1, n_columns=42, fg=self.green_light,
+        lbl_srm_03 = SE(parent=self.parent, row_id=0, column_id=header_col, n_rows=1, n_columns=42, fg=self.green_dict["Light"],
                         bg=self.green_dark).create_simple_label(text=str(var_min) + " - Element Concentrations (ppm)",
                                                                 relief=tk.GROOVE, fontsize="sans 10 bold")
         self.container_elements["SRM"]["Label"].append(lbl_srm_03)
@@ -5949,7 +5931,7 @@ class PySILLS(tk.Frame):
                              round(self.container_helper["positions"][filename][1], 4)])
                         #
                         if len(isotope_list) > 1:
-                            color_var = self.yellow_dark
+                            color_var = self.yellow_dict["Dark"]
                         else:
                             color_var = self.isotope_colors[isotope]
                         self.container_listboxes[self.file_type][filename]["SPK"][0].insert(
@@ -14434,136 +14416,6 @@ class PySILLS(tk.Frame):
             else:
                 self.container_files["SMPL"][file_short]["IS"].set(var_is)
                 self.container_files["SMPL"][file_short]["IS Concentration"].set(value_is)
-
-    # def srm_window(self):
-    #     ## Window Settings
-    #     window_width = 860
-    #     window_height = 625
-    #     var_geometry = str(window_width) + "x" + str(window_height) + "+" + str(0) + "+" + str(0)
-    #
-    #     window_srm = tk.Toplevel(self.parent)
-    #     window_srm.title("SRM and Mineral Composition Data")
-    #     window_srm.geometry(var_geometry)
-    #     window_srm.resizable(False, False)
-    #     window_srm["bg"] = self.green_light
-    #
-    #     row_min = 25
-    #     n_rows = int(window_height/row_min)
-    #     column_min = 20
-    #     n_columns = int(window_width/column_min)
-    #
-    #     for x in range(n_columns):
-    #         tk.Grid.columnconfigure(window_srm, x, weight=1)
-    #     for y in range(n_rows):
-    #         tk.Grid.rowconfigure(window_srm, y, weight=1)
-    #
-    #     # Rows
-    #     for i in range(0, n_rows):
-    #         window_srm.grid_rowconfigure(i, minsize=row_min)
-    #     # Columns
-    #     for i in range(0, n_columns):
-    #         window_srm.grid_columnconfigure(i, minsize=column_min)
-    #
-    #     ###########################################################
-    #
-    #     ## Frames
-    #     frm_01 = SE(
-    #         parent=window_srm, row_id=0, column_id=0, n_rows=n_rows, n_columns=9,
-    #         fg=self.green_light, bg=self.green_dark).create_frame(relief=tk.FLAT)
-    #
-    #     ## Labels
-    #     lbl_01 = SE(
-    #         parent=window_srm, row_id=0, column_id=0, n_rows=1, n_columns=9, fg=self.green_light,
-    #         bg=self.green_dark).create_simple_label(
-    #         text="Select SRM", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #     lbl_02 = SE(
-    #         parent=window_srm, row_id=2, column_id=0, n_rows=1, n_columns=9, fg=self.green_light,
-    #         bg=self.green_dark).create_simple_label(
-    #         text="Select Mineral", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #     lbl_03 = SE(
-    #         parent=window_srm, row_id=0, column_id=10, n_rows=1, n_columns=32, fg=self.green_light,
-    #         bg=self.green_dark).create_simple_label(
-    #         text="Periodic Table of the Elements", relief=tk.GROOVE, fontsize="sans 10 bold")
-    #     lbl_04 = SE(
-    #         parent=window_srm, row_id=n_rows - 4, column_id=0, n_rows=4, n_columns=9, fg=self.green_dark,
-    #         bg=self.red_dark).create_simple_label(
-    #         text="CAUTION!\n The mineral composition\n data reflects only the\n ideal composition of\n pure endmembers",
-    #         relief=tk.GROOVE, fontsize="sans 10 bold")
-    #
-    #     ## Option Menues
-    #     list_srm = np.sort(self.list_srm)
-    #     opt_srm = SE(
-    #         parent=window_srm, row_id=1, column_id=0, n_rows=1, n_columns=9, fg=self.green_dark,
-    #         bg=self.green_medium).create_simple_optionmenu(
-    #         var_opt=self.container_var["srm_window"]["Option Menu"]["SRM"], var_default="Select SRM",
-    #         var_list=list_srm, fg_active=self.green_dark, bg_active=self.red_dark,
-    #         command=lambda var_opt=self.container_var["srm_window"]["Option Menu"]["SRM"]:
-    #         self.change_option_srm_window(var_opt))
-    #
-    #     list_minerals = np.sort(self.mineral_list)
-    #     opt_mineral = SE(
-    #         parent=window_srm, row_id=3, column_id=0, n_rows=1, n_columns=9, fg=self.green_dark,
-    #         bg=self.green_medium).create_simple_optionmenu(
-    #         var_opt=self.container_var["srm_window"]["Option Menu"]["Mineral"], var_default="Select Mineral",
-    #         var_list=list_minerals, fg_active=self.green_dark, bg_active=self.red_dark,
-    #         command=lambda var_opt=self.container_var["srm_window"]["Option Menu"]["Mineral"]:
-    #         self.change_option_srm_window(var_opt))
-    #
-    #     ## Labels and Entries
-    #     start_column_pse = 10
-    #     for index, element in enumerate(self.list_pse):
-    #         if 0 <= index < 23:
-    #             lbl_i = SE(
-    #                 parent=window_srm, row_id=index + 1, column_id=start_column_pse, n_rows=1, n_columns=3,
-    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-    #
-    #             if element not in self.container_var["srm_window"]["Entry"]:
-    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-    #
-    #             entr_i = SE(
-    #                 parent=window_srm, row_id=index + 1, column_id=start_column_pse + 3, n_rows=1, n_columns=5,
-    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-    #         elif 23 <= index < 46:
-    #             lbl_i = SE(
-    #                 parent=window_srm, row_id=index + 1 - 23, column_id=start_column_pse + 8, n_rows=1, n_columns=3,
-    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-    #
-    #             if element not in self.container_var["srm_window"]["Entry"]:
-    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-    #
-    #             entr_i = SE(
-    #                 parent=window_srm, row_id=index + 1 - 23, column_id=start_column_pse + 11, n_rows=1, n_columns=5,
-    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-    #         elif 46 <= index < 69:
-    #             lbl_i = SE(
-    #                 parent=window_srm, row_id=index + 1 - 46, column_id=start_column_pse + 16, n_rows=1, n_columns=3,
-    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-    #
-    #             if element not in self.container_var["srm_window"]["Entry"]:
-    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-    #
-    #             entr_i = SE(
-    #                 parent=window_srm, row_id=index + 1 - 46, column_id=start_column_pse + 19, n_rows=1, n_columns=5,
-    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
-    #         elif 69 <= index < 92:
-    #             lbl_i = SE(
-    #                 parent=window_srm, row_id=index + 1 - 69, column_id=start_column_pse + 24, n_rows=1, n_columns=3,
-    #                 fg=self.green_light, bg=self.green_medium).create_simple_label(
-    #                 text=str(index + 1) + " " + element, relief=tk.GROOVE, fontsize="sans 10 bold", anchor="w")
-    #
-    #             if element not in self.container_var["srm_window"]["Entry"]:
-    #                 self.container_var["srm_window"]["Entry"][element] = tk.StringVar()
-    #
-    #             entr_i = SE(
-    #                 parent=window_srm, row_id=index + 1 - 69, column_id=start_column_pse + 27, n_rows=1, n_columns=5,
-    #                 fg=self.green_light, bg=self.green_dark).create_simple_entry(
-    #                 var=self.container_var["srm_window"]["Entry"][element], text_default="0.0", command=None)
 
     def change_option_srm_window(self, var_opt):
         self.srm_values = {}
