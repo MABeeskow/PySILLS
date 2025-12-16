@@ -1,0 +1,36 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  id: 57e22f8d-5d0f-4195-a49e-f7b7dc39586a
+  title: PySILLS
+  description: Python-based, open source tool for data reduction of major, minor and trace element composition in 
+    minerals, fluid and melt inclusions using experimental LA-ICP-MS data.
+  # keywords: []
+  # authors: []
+  github: https://github.com/MABeeskow/PySILLS
+  toc:
+    - file: index.md
+    - file: installation.md
+    - title: Concepts
+      children:
+        - file:   concepts-general.md
+        - file:   concepts-intensity.md
+        - file:   concepts-sensitivity.md
+        - file:   concepts-concentration.md
+    - title: Mineral analysis
+      children:
+        - file:   minerals-general.md
+        - file:   minerals-tutorial.md
+    - title: Fluid inclusion analysis
+      children:
+        - file:   fluidinclusions-general.md
+        - file:   fluidinclusions-tutorial.md
+    - title: Melt inclusion analysis
+      children:
+        - file:   meltinclusions-general.md
+        - file:   meltinclusions-tutorial.md
+site:
+  template: book-theme
+  # options:
+  #   favicon: favicon.ico
+  #   logo: site_logo.png
