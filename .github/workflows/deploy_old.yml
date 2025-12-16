@@ -1,29 +1,23 @@
-# This file was created automatically with `jupyter-book init --gh-pages` 🪄 💚
-# Ensure your GitHub Pages settings for this repository are set to deploy with **GitHub Actions**.
-
 name: deploy-book
+
 on:
   push:
-    # Runs on pushes targeting the default branch
     branches: [master]
+
 env:
-  # `BASE_URL` determines, relative to the root of the domain, the URL that your site is served from.
-  # E.g., if your site lives at `https://mydomain.org/myproject`, set `BASE_URL=/myproject`.
-  # If, instead, your site lives at the root of the domain, at `https://mydomain.org`, set `BASE_URL=''`.
   BASE_URL: /${{ github.event.repository.name }}
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+
 concurrency:
   group: pages
   cancel-in-progress: false
+
 jobs:
-  deploy:
+  deploy-book:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -59,7 +53,7 @@ jobs:
       - name: Debug – check html build
         run: ls -la docs/book/_build/html || echo "HTML build directory missing!"
 
-      - name: Upload artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs/book/_build/html
