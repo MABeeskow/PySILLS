@@ -1,0 +1,63 @@
+name: deploy-book
+
+on:
+  push:
+    branches: [master]
+
+env:
+  BASE_URL: /${{ github.event.repository.name }}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy-book:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Jupyter Book (MyST)
+        run: |
+          pip install jupyter-book mystmd
+
+      - name: Check Jupyter Book version
+        run: jupyter-book --version
+
+      - name: Build static site
+        run: |
+          cd docs/book
+          myst build --site --html
+
+      - name: Debug – check site build
+        run: |
+          ls -la docs/book/_build
+          ls -la docs/book/_build/site
+          ls -la docs/book/_build/html/index.html
+
+      - name: Debug – check html build
+        run: ls -la docs/book/_build/html || echo "HTML build directory missing!"
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/book/_build/html
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

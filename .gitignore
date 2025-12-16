@@ -1,0 +1,12 @@
+# Directories
+build/*
+dist/*
+lib/*
+.idea/*
+
+# Files
+tests/dist/*
+tests/build/*
+notebooks/.ipynb_checkpoints
+pysills/lib/demo_files/.ipynb_checkpoints
+PySILLS.egg-info
