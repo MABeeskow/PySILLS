@@ -8,5 +8,5 @@ lib/*
 tests/dist/*
 tests/build/*
 notebooks/.ipynb_checkpoints
-pysills/lib/demo_files/.ipynb_checkpoints
+pysills_legacy/lib/demo_files/.ipynb_checkpoints
 PySILLS.egg-info

@@ -1,3 +1,3 @@
-from pysills import pysills
+from pysills_legacy import pysills
 
 pysills()
