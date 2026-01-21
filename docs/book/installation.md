@@ -58,6 +58,6 @@ pip install .
 When installing from *GitHub*, the installed code corresponds to the current state of the repository. Depending on the 
 development status, stability cannot be guaranteed.
 
-#### Recommendation
+### Developer's recommendation
 For regular users and productive workflows, installation via *pip* is strongly recommended. Installation from *GitHub* 
 is primarily intended for developers and advanced users.
