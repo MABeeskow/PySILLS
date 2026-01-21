@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.90
+# Version:	v1.0.91
 # Date:		21.01.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.90"
+        self.str_version_number = "1.0.91"
         self.val_version = self.str_version_number + " - 21.01.2026"
 
         ## Colors
