@@ -12,19 +12,17 @@
 
 ## MODULES
 # external
-import os, pathlib, sys, re, datetime, csv, string, math, webbrowser, time
+import os, pathlib, sys, re, datetime, csv, math, webbrowser, time
 import numpy as np
 import pandas as pd
 pd.options.mode.chained_assignment = None
 import scipy.io
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import colors
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.figure import Figure
 import tkinter as tk
 from tkinter import filedialog, ttk, font
-import random as rd
 from pathlib import Path
 
 # internal
@@ -1707,11 +1705,8 @@ class PySILLS(tk.Frame):
              ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
              ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"], ["OU-6 (GeoReM)"]])[:, 0]
 
-        self.path_pysills = PACKAGE_ROOT
-        self.path_pysills_main = self.path_pysills
-
-        folder_path = os.path.join(self.path_pysills, "legacy", "lib", "srm")
-        folder_path_translations = os.path.join(self.path_pysills, "legacy", "lib", "translations", "")
+        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "srm")
+        folder_path_translations = os.path.join(PACKAGE_ROOT, "legacy", "lib", "translations", "")
         helper_srm_library = os.listdir(folder_path)
 
         for language in ["Chinese"]:
@@ -1782,7 +1777,7 @@ class PySILLS(tk.Frame):
 
                 self.container_lists["SRM Library"].append(var_srm_new)
 
-        folder_path = os.path.join(self.path_pysills, "legacy", "lib", "icpms")
+        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "icpms")
         helper_icpms_library = os.listdir(folder_path)
 
         if "__init__.py" in helper_icpms_library:
@@ -2482,7 +2477,7 @@ class PySILLS(tk.Frame):
 
     def select_icp_ms(self, var_opt):
         path = os.getcwd()
-        path = self.path_pysills
+        path = PACKAGE_ROOT
         var_instrument_raw = "Select ICP-MS"
 
         if self.file_loaded == False:
@@ -17508,7 +17503,7 @@ class PySILLS(tk.Frame):
         """Main settings window of a mineral analysis project."""
         if self.file_system_need_update:
             path2 = os.getcwd()
-            path = self.path_pysills
+            path = PACKAGE_ROOT
             parent = os.path.dirname(path)
 
             if self.demo_mode:
@@ -17521,10 +17516,7 @@ class PySILLS(tk.Frame):
                     folder_path = folder_path.replace("\\", "/")
                     demo_files = os.listdir(path=folder_path)
                 except:
-                    if "pysills" not in self.path_pysills_main:
-                        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "pysills", "lib", "demo_files")
-                    else:
-                        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "demo_files")
+                    folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "demo_files")
 
                     if self.var_os == "win32":
                         folder_path = folder_path.replace("\\", "/")
@@ -30159,9 +30151,7 @@ class PySILLS(tk.Frame):
     ########################################################################################################################
     def fi_settings(self):
         if self.file_system_need_update:
-            path = os.getcwd()
-            path = self.path_pysills
-            parent = os.path.dirname(path)
+            path = PACKAGE_ROOT
             if self.demo_mode:
                 self.var_opt_icp.set("Agilent 7900s")
                 self.select_icp_ms(var_opt=self.var_opt_icp)
@@ -30172,10 +30162,7 @@ class PySILLS(tk.Frame):
                     folder_path = folder_path.replace("\\", "/")
                     demo_files = os.listdir(path=folder_path)
                 except:
-                    if "pysills" not in self.path_pysills_main:
-                        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "pysills", "lib", "demo_files")
-                    else:
-                        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "demo_files")
+                    folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "demo_files")
 
                     if self.var_os == "win32":
                         folder_path = folder_path.replace("\\", "/")
@@ -30579,7 +30566,7 @@ class PySILLS(tk.Frame):
     def mi_settings(self):
         if self.file_system_need_update:
             path = os.getcwd()
-            path = self.path_pysills
+            path = PACKAGE_ROOT
             parent = os.path.dirname(path)
             if self.demo_mode:
                 self.var_opt_icp.set("Agilent 7900s")
@@ -30591,10 +30578,7 @@ class PySILLS(tk.Frame):
                     folder_path = folder_path.replace("\\", "/")
                     demo_files = os.listdir(path=folder_path)
                 except:
-                    if "pysills" not in self.path_pysills_main:
-                        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "pysills", "lib", "demo_files")
-                    else:
-                        folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "demo_files")
+                    folder_path = os.path.join(PACKAGE_ROOT, "legacy", "lib", "demo_files")
 
                     if self.var_os == "win32":
                         folder_path = folder_path.replace("\\", "/")
@@ -43389,16 +43373,16 @@ class PySILLS(tk.Frame):
 
     def create_starter_file(self):
         str_path_to_python = self.container_var["Python path"].get()
-        str_path_to_pysills_folder = os.path.join(self.path_pysills_main, "pysills")
+        str_path_to_pysills_folder = os.path.join(PACKAGE_ROOT)
         str_path_to_pysills_app = self.container_var["PySILLS path"].get()
-        str_path_to_pysills_icon = os.path.join(self.path_pysills_main, "pysills", "lib", "images", "PySILLS_Icon.png")
+        str_path_to_pysills_icon = os.path.join(PACKAGE_ROOT, "legacy", "lib", "images", "PySILLS_Icon.png")
 
         if self.var_os == "linux":
-            filename = os.path.join(str_path_to_pysills_folder, "pysills_app.desktop")
+            filename = os.path.join(PACKAGE_ROOT, "pysills_app.desktop")
         elif self.var_os == "darwin":
-            filename = os.path.join(str_path_to_pysills_folder, "pysills_app.sh")
+            filename = os.path.join(PACKAGE_ROOT, "pysills_app.sh")
         else:
-            filename = os.path.join(str_path_to_pysills_folder, "pysills_app.bat")
+            filename = os.path.join(PACKAGE_ROOT, "pysills_app.bat")
 
         if os.path.exists(filename):
             os.remove(filename)
@@ -43411,7 +43395,7 @@ class PySILLS(tk.Frame):
                 file_content.write("Version=" + str(self.str_version_number) + "\n")
                 file_content.write("Exec=" + str(str_path_to_python) + " " + str(str_path_to_pysills_app) + "\n")
                 file_content.write("Icon=" + str(str_path_to_pysills_icon) + "\n")
-                file_content.write("Path=" + str(self.path_pysills_main) + "\n")
+                file_content.write("Path=" + str(PACKAGE_ROOT) + "\n")
                 file_content.write("Terminal=true" + "\n")
                 file_content.write("Type=Application" + "\n")
                 file_content.write("Categories=Utility;Application;")
@@ -43425,20 +43409,20 @@ class PySILLS(tk.Frame):
                 file_content.write(str(str_path_to_python) + " " + str(str_path_to_pysills_app))
 
     def get_current_path_pysills_folder(self):
-        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_pysills_app = os.path.join(PACKAGE_ROOT, "pysills_app.py")
         self.container_var["PySILLS path"].set(str_path_to_pysills_app)
 
     def get_current_path_pysills_script(self):
-        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
-        str_path_to_pysills_app = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
-        str_path_to_pysills_icon = os.path.join(self.path_pysills_main, "pysills", "lib", "images", "PySILLS_Icon.png")
+        str_path_to_pysills_app = os.path.join(PACKAGE_ROOT, "pysills_app.py")
+        str_path_to_pysills_app = os.path.join(PACKAGE_ROOT, "pysills_app.py")
+        str_path_to_pysills_icon = os.path.join(PACKAGE_ROOT, "legacy", "lib", "images", "PySILLS_Icon.png")
 
         if self.var_os == "linux":
-            filename = os.path.join(self.path_pysills_main, "pysills_app.desktop")
+            filename = os.path.join(PACKAGE_ROOT, "pysills_app.desktop")
         elif self.var_os == "darwin":
-            filename = os.path.join(self.path_pysills_main, "pysills_app.sh")
+            filename = os.path.join(PACKAGE_ROOT, "pysills_app.sh")
         else:
-            filename = os.path.join(self.path_pysills_main, "pysills_app.bat")
+            filename = os.path.join(PACKAGE_ROOT, "pysills_app.bat")
 
         list_paths = sys.path
         for path in list_paths:
@@ -43474,7 +43458,7 @@ class PySILLS(tk.Frame):
         self.container_var["PySILLS script"].set(str_path_to_pysills_app)
 
     def get_current_path_python(self):
-        str_path_to_python = os.path.join(self.path_pysills_main, "pysills", "pysills_app.py")
+        str_path_to_python = os.path.join(PACKAGE_ROOT, "pysills_app.py")
 
         list_paths = sys.path
         for path in list_paths:
