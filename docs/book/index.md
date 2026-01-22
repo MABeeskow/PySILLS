@@ -30,6 +30,14 @@ The following list shows some ideas, that we have in mind, for the future develo
 - *Jupyter notebooks* for a browser-based data reduction of LA-ICP-MS experiments,
 - production of a *YouTube* video course.
 
+### Citing PySILLS
+
+If you have used *PySILLS* for your work, please use the following citation:
+
+- Maximilian Beeskow, Fusswinkel, T., & Wagner, T. (2026). PySILLS, Python-based and open source data reduction tool for 
+the major, minor, and trace element analysis of minerals, fluid and melt inclusions, Zenodo, 
+https://doi.org/10.5281/zenodo.8206534
+
 ### Disclaimer
 Although PySILLS has been tested extensively and many issues encountered during development have been resolved, 
 undiscovered bugs may still exist.
@@ -41,3 +49,7 @@ that deviated from the documented tutorials. PySILLS is a powerful but complex d
 adherence to the provided tutorials is essential for correct usage.
 An intuitive workflow does not imply the absence of methodological constraints. Users are therefore strongly encouraged 
 to read and follow the tutorials thoroughly before reporting potential issues.
+
+---
+
+Last updated: 22.01.2026

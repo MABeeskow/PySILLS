@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.91
-# Date:		21.01.2026
+# Version:	v1.0.92
+# Date:		22.01.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -64,8 +64,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.91"
-        self.val_version = self.str_version_number + " - 21.01.2026"
+        self.str_version_number = "1.0.92"
+        self.val_version = self.str_version_number + " - 22.01.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -29932,17 +29932,12 @@ class PySILLS(tk.Frame):
         lbl_03a = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 10, column_id=start_column + 11, n_rows=1,
             n_columns=20, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="If you use PySILLS for your work, please cite the following", relief=tk.FLAT,
+            text="If you have used PySILLS for your work, please follow the information on the", relief=tk.FLAT,
             fontsize="sans 10 bold", anchor=tk.W)
         lbl_03b = SE(
             parent=self.subwindow_about_pysills, row_id=start_row + 11, column_id=start_column + 11, n_rows=1,
             n_columns=20, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="journal article:", relief=tk.FLAT,
-            fontsize="sans 10 bold", anchor=tk.W)
-        lbl_03cb = SE(
-            parent=self.subwindow_about_pysills, row_id=start_row + 12, column_id=start_column + 11, n_rows=1,
-            n_columns=20, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text="Placeholder Journal Article", relief=tk.FLAT,
+            text="PySILLS Github page. Thank you very much.", relief=tk.FLAT,
             fontsize="sans 10 bold", anchor=tk.W)
 
         lbl_04 = SE(

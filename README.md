@@ -1,9 +1,8 @@
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-370/) &nbsp;
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0) &nbsp;
-[![DOI](https://zenodo.org/badge/663565362.svg)](https://zenodo.org/badge/latestdoi/663565362)
 
 <a href="https://github.com/MABeeskow/PySILLS">
-  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/pysills/lib/images/PySILLS_Logo_Header.png" width="75%">
+  <img src="https://raw.githubusercontent.com/MABeeskow/PySILLS/master/src/pysills/legacy/lib/images/PySILLS_Logo_Header.png" width="75%">
 </a>
 
 developed by Maximilian Alexander Beeskow
@@ -40,6 +39,14 @@ The following features extend PySILLS and do not replace already existing featur
 * production of a video course on YouTube
 
 If you like this project, please consider to follow (click on the star icon above) it.
+
+## 💭 Citing PySILLS
+
+If you have used PySILLS for your work, please use the following citation:
+
+- Maximilian Beeskow, Fusswinkel, T., & Wagner, T. (2026). PySILLS, Python-based and open source data reduction tool for 
+the major, minor, and trace element analysis of minerals, fluid and melt inclusions, Zenodo, 
+https://doi.org/10.5281/zenodo.8206534
 
 ---
 
@@ -122,12 +129,6 @@ not appear anymore!
 
 ![Blogger](https://img.shields.io/badge/Blogger-FF5722?style=for-the-badge&logo=blogger&logoColor=white) &nbsp;
 ![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=for-the-badge&logo=YouTube&logoColor=white)
-
-## 💭 Citing PySILLS
-
-Coming soon ...
-
-[![DOI](https://zenodo.org/badge/663565362.svg)](https://zenodo.org/badge/latestdoi/663565362)
 
 ---
 
@@ -321,5 +322,4 @@ https://www.sciencedirect.com/science/article/abs/pii/S016913681100134X)
 
 ---
 
-Version: v1.0.90
-Last updated: 27.06.2024
+Last updated: 22.01.2026

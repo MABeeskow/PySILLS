@@ -61,3 +61,7 @@ development status, stability cannot be guaranteed.
 ### Developer's recommendation
 For regular users and productive workflows, installation via *pip* is strongly recommended. Installation from *GitHub* 
 is primarily intended for developers and advanced users.
+
+---
+
+Last updated: 22.01.2026
