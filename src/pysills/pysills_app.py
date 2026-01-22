@@ -14824,9 +14824,7 @@ class PySILLS(tk.Frame):
         self.container_var["General Settings"]["Delimiter"].set(var_opt)
 
     def confirm_general_settings(self):
-        path_pysills = os.path.dirname(os.path.realpath(__file__))
-        path_pysills = self.path_pysills
-        filename = os.path.join(self.path_pysills_main, "user_settings.txt")
+        filename = os.path.join(DIRECTORY_ROOT, "user_settings.txt")
         with open(filename, "w") as file_settings:
             file_settings.write("GENERAL SETTINGS" + ";\n")
             for key, value in self.container_var["General Settings"].items():
