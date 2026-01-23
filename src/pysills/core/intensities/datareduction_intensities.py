@@ -148,7 +148,7 @@ class DataReductionIntensities:
 
         return df_ready
 
-    def reduce_intervals(self, df_ready, intervals, statistic="mean"):
+    def reduce_intervals(self, df_ready, intervals, statistics=("mean", "std")):
         """
         Reduce signal intensities over one or multiple index-based intervals.
 
@@ -160,8 +160,10 @@ class DataReductionIntensities:
         intervals : list of tuple[int, int]
             List of inclusive index intervals [(start, end), ...].
             All intervals are merged into a single data block prior to reduction.
-        statistic : {"mean", "sum", "std"}, optional
-            Statistic applied to the merged data block (default: "mean").
+        statistics : tuple of {"mean", "std", "sum", "median"}, optional
+            Statistics to compute for the merged data block.
+            Default is ("mean", "std"), where standard deviation is calculated
+            with ddof=1.
 
         Returns
         -------
@@ -176,22 +178,24 @@ class DataReductionIntensities:
         """
         if not intervals:
             raise ValueError("No intervals provided")
-        funcs = {"mean": np.nanmean, "sum": np.nansum, "std": np.nanstd}
-        if statistic not in funcs:
-            raise ValueError(f"Unknown statistic: {statistic}")
 
-        values = df_ready.iloc[:, 1:].to_numpy()  # considering only isotopes
-        blocks = []
+        funcs = {
+            "mean": np.nanmean,
+            "sum": np.nansum,
+            "median": np.nanmedian,
+            "std": lambda x, axis=0: np.nanstd(x, axis=axis, ddof=1),
+        }
 
-        for start, end in intervals:
-            if not (0 <= start <= end < len(values)):
-                raise ValueError(f"Invalid interval: {(start, end)}")
-            blocks.append(values[start:end + 1])
+        for stat in statistics:
+            if stat not in funcs:
+                raise ValueError(f"Unknown statistic: {stat}")
 
+        values = df_ready.iloc[:, 1:].to_numpy()
+        blocks = [values[s:e + 1] for s, e in intervals]
         data = np.vstack(blocks)
-        result = funcs[statistic](data, axis=0)
+        result = {stat: funcs[stat](data, axis=0) for stat in statistics}
 
-        return pd.Series(result, index=df_ready.columns[1:])
+        return {stat: pd.Series(vals, index=df_ready.columns[1:]) for stat, vals in result.items()}
 
     def find_index_for_time(self, df_ready, time_value):
         """
