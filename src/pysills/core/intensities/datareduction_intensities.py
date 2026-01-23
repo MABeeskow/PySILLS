@@ -324,3 +324,32 @@ class DataReductionIntensities:
         if percent:
             rsd *= 100.0
         return rsd
+
+    def compute_intensity_ratios(self, intensities, reference_isotope):
+        """
+        Compute intensity ratios I_x / I_ref.
+
+        Parameters
+        ----------
+        intensities : pandas.Series
+            Background-corrected mean intensities indexed by isotope.
+        reference_isotope : str
+            Isotope used as reference (e.g. 'Si29').
+
+        Returns
+        -------
+        pandas.Series
+            Intensity ratios indexed by isotope.
+        """
+        if reference_isotope not in intensities.index:
+            raise ValueError(f"Reference isotope '{reference_isotope}' not found")
+
+        i_ref = intensities.loc[reference_isotope]
+
+        if i_ref <= 0:
+            raise ValueError("Reference intensity must be positive")
+
+        ratios = intensities/i_ref
+        ratios.name = f"I/I_{reference_isotope}"
+
+        return ratios

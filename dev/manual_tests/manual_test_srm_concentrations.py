@@ -45,11 +45,13 @@ def run_manual_test(show_full_df=False):
         if show_full_df:
             print(df, "\n")
 
-        ratios = srm.compute_concentration_ratios(df, reference_element="Si")
+        ref_element = "Si"
+        ratios = srm.compute_concentration_ratios(df, reference_element=ref_element)
+        print("Reference element:", ref_element)
         print(f"  -> shape: {ratios.shape}")
         print(f"  -> index range: {ratios.index.min()} – {ratios.index.max()}")
         if show_full_df:
-            print(ratios.map("{:.3e}".format))
+            print(ratios.map("{:.3e}".format), "\n")
 
 if __name__ == "__main__":
     run_manual_test(show_full_df=True)

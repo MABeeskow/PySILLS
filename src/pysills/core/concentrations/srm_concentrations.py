@@ -76,8 +76,8 @@ class StandardReferenceMaterial:
         pandas.Series
             Concentration ratios indexed by element symbol.
         """
-        df = df_srm.set_index("Element")
-
+        df = df_srm.set_index("Element", drop=True)
+        reference_element = reference_element.strip().capitalize()
         if reference_element not in df.index:
             raise ValueError(f"Reference element '{reference_element}' not found in SRM")
 
