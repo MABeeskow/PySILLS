@@ -78,7 +78,7 @@ def _count_points(intervals):
     return sum(e - s + 1 for s, e in intervals)
 
 class DataReductionIntensities:
-    def __init__(self, sep=",", time_s="time_s"):
+    def __init__(self, sep=",", time_s="time_s", zero_time=False):
         """
         Initialize the intensity data reduction handler.
 
@@ -88,9 +88,12 @@ class DataReductionIntensities:
             Column separator used in input files.
         time_s : str, optional
             Name of the time column used in reduction-ready data.
+        zero_time : bool, optional
+            If True, shift time axis so that the first time value is zero.
         """
         self.sep = sep
         self.time_s = time_s
+        self.zero_time = zero_time
 
     def read_input_data(self, file_path):
         """
@@ -141,10 +144,16 @@ class DataReductionIntensities:
             Reduction-ready DataFrame with a RangeIndex and a 'time_s' column.
         """
         df_ready = df.copy()
+        # assign time column
+        time = df.index.to_numpy(dtype=float)
+
+        if self.zero_time:
+            time = time - time[0]
+
         # Assign time data
-        df_ready.insert(0, self.time_s, df.index.to_numpy())
+        df_ready.insert(0, self.time_s, time)
         df_ready.reset_index(drop=True, inplace=True)
-        # Assign data types
+        # Assign data type
         df_ready[self.time_s] = df_ready[self.time_s].astype(float)
         df_ready.iloc[:, 1:] = df_ready.iloc[:, 1:].astype(float)
 

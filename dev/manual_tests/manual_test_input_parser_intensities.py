@@ -33,7 +33,7 @@ def run_manual_test(show_full_df=False):
     root = Path(__file__).resolve().parents[2]
     demo_dir = root/"src"/"pysills"/"legacy"/"lib"/"demo_files"
     filenames = ["demo_ma01.csv", "another_demo_file.xl"]
-    dri = DRI()
+    dri = DRI(zero_time=True)
 
     for fname in filenames:
         file_path = demo_dir/fname
