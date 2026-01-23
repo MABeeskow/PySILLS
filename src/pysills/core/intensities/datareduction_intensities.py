@@ -192,3 +192,42 @@ class DataReductionIntensities:
         result = funcs[statistic](data, axis=0)
 
         return pd.Series(result, index=df_ready.columns[1:])
+
+    def find_index_for_time(self, df_ready, time_value):
+        """
+        Find the index corresponding to the first time value
+        greater than or equal to the given time.
+
+        Parameters
+        ----------
+        df_ready : pandas.DataFrame
+            Reduction-ready DataFrame containing a time column.
+        time_value : float
+            Target time (in seconds).
+
+        Returns
+        -------
+        int
+            Index of the closest time >= time_value.
+
+        Raises
+        ------
+        ValueError
+            If the time_value is outside the available time range.
+        """
+        times = df_ready["time_s"].to_numpy()
+
+        idx = np.searchsorted(times, time_value)
+
+        if idx == 0:
+            return 0
+        if idx == len(times):
+            return len(times) - 1
+
+        before = idx - 1
+        after = idx
+
+        if abs(times[after] - time_value) < abs(times[before] - time_value):
+            return after
+        else:
+            return before

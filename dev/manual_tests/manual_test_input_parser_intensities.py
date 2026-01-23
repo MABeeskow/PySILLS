@@ -59,9 +59,28 @@ def run_manual_test(show_full_df=False):
             print(df_ready, "\n")
 
         if "demo_ma01.csv" in fname:
-            data_bg = DRI().reduce_intervals(df_ready=df_ready, intervals=[(19, 125)])
+            t_0 = 6
+            t_1 = 36
+            t_2 = 105
+            t_3 = 115
+            idx_0 = DRI().find_index_for_time(df_ready=df_ready, time_value=t_0)
+            idx_1 = DRI().find_index_for_time(df_ready=df_ready, time_value=t_1)
+            idx_2 = DRI().find_index_for_time(df_ready=df_ready, time_value=t_2)
+            idx_3 = DRI().find_index_for_time(df_ready=df_ready, time_value=t_3)
+
+            print("Closest measured time value to given value of", t_0, ":  ", idx_0, df_ready["time_s"][idx_0])
+            print("Closest measured time value to given value of", t_1, ":  ", idx_1, df_ready["time_s"][idx_1])
+
+            data_bg = DRI().reduce_intervals(df_ready=df_ready, intervals=[(idx_0, idx_1)])
             print("data_bg", data_bg, "\n")
-            data_bg = DRI().reduce_intervals(df_ready=df_ready, intervals=[(19, 125), (346, 392)])
+
+            idx_0 = DRI().find_index_for_time(df_ready=df_ready, time_value=t_0)
+            idx_1 = DRI().find_index_for_time(df_ready=df_ready, time_value=t_1)
+
+            print("Closest measured time value to given value of", t_2, ":  ", idx_2, df_ready["time_s"][idx_2])
+            print("Closest measured time value to given value of", t_3, ":  ", idx_3, df_ready["time_s"][idx_3])
+
+            data_bg = DRI().reduce_intervals(df_ready=df_ready, intervals=[(idx_0, idx_1), (idx_2, idx_3)])
             print("data_bg", data_bg, "\n")
 
 
