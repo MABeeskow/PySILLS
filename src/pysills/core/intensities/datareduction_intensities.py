@@ -74,6 +74,8 @@ def _to_dataframe(data_lines, sep=","):
     buffer = StringIO("\n".join(data_lines))
     return pd.read_csv(buffer, sep=sep, index_col=0)
 
+def _count_points(intervals):
+    return sum(e - s + 1 for s, e in intervals)
 
 class DataReductionIntensities:
     def __init__(self, sep=",", time_s="time_s"):
@@ -199,8 +201,7 @@ class DataReductionIntensities:
 
     def find_index_for_time(self, df_ready, time_value):
         """
-        Find the index corresponding to the first time value
-        greater than or equal to the given time.
+        Find the index corresponding to the closest time value to the given time.
 
         Parameters
         ----------
@@ -212,7 +213,7 @@ class DataReductionIntensities:
         Returns
         -------
         int
-            Index of the closest time >= time_value.
+            Index of the closest time approx. equal to time_value.
 
         Raises
         ------
@@ -235,3 +236,91 @@ class DataReductionIntensities:
             return after
         else:
             return before
+
+    def subtract_background(self, signal, background):
+        """
+        Subtract background intensities from signal intensities.
+
+        Parameters
+        ----------
+        signal : pandas.Series
+            Mean signal intensities per isotope.
+        background : pandas.Series
+            Mean background intensities per isotope.
+
+        Returns
+        -------
+        pandas.Series
+            Background-corrected signal intensities per isotope.
+        """
+        if not signal.index.equals(background.index):
+            raise ValueError("Signal and background isotopes do not match")
+
+        return signal - background
+
+    def propagate_background_uncertainty(self, signal_std, background_std):
+        """
+        Propagate uncertainties for background-corrected signal intensities.
+
+        Parameters
+        ----------
+        signal_std : pandas.Series
+            Standard deviation of the signal intensities per isotope.
+        background_std : pandas.Series
+            Standard deviation of the background intensities per isotope.
+
+        Returns
+        -------
+        pandas.Series
+            Propagated standard deviation of background-corrected intensities.
+        """
+        if not signal_std.index.equals(background_std.index):
+            raise ValueError("Signal and background isotopes do not match")
+
+        return np.sqrt(signal_std**2 + background_std**2)
+
+    def compute_standard_error(self, std, intervals):
+        """
+        Compute the standard error of the mean.
+
+        Parameters
+        ----------
+        std : pandas.Series
+            Standard deviation per isotope.
+        intervals : list of tuple[int, int]
+            List of inclusive index intervals [(start, end), ...].
+            All intervals are merged into a single data block prior to reduction.
+
+        Returns
+        -------
+        pandas.Series
+            Standard error per isotope.
+        """
+        n = _count_points(intervals=intervals)
+        if n <= 0:
+            raise ValueError("n must be positive")
+
+        return std/np.sqrt(n)
+
+    def compute_rsd(self, mean, std, percent=True):
+        """
+        Compute relative standard deviation (RSD).
+
+        Parameters
+        ----------
+        mean : pandas.Series
+            Mean intensity per isotope.
+        std : pandas.Series
+            Standard deviation per isotope.
+        percent : bool, optional
+            If True, return RSD in percent.
+
+        Returns
+        -------
+        pandas.Series
+            Relative standard deviation.
+        """
+        rsd = std/mean
+        if percent:
+            rsd *= 100.0
+        return rsd
