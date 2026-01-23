@@ -3,7 +3,7 @@
 # ----------------------
 # chemistry.py
 # Maximilian Beeskow
-# 22.04.2022
+# 23.01.2026
 # ----------------------
 #
 ## MODULES
@@ -31,12 +31,12 @@ class PeriodicSystemOfElements:
         ]
         #
         return pse_masses
-    #
+
     def get_isotopic_mcr(self, isotopes):
         pse_names = self.get_element_names()
         mcr_values = np.zeros(len(isotopes))
         for i in range(len(isotopes)):
-            key = re.search("(\D+)(\d+)", isotopes)
+            key = re.search(r"(\D+)(\d+)", isotopes[i])
             index_isotope = pse_names.index(key.group(1))
 
 class PeriodicSystem:

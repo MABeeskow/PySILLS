@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+# -*-coding: utf-8 -*-
+
+#-----------------------------------------------
+
+# Name:		datareduction_intensities.py
+# Author:	Maximilian A. Beeskow
+# Version:	1.0
+# Date:		23.01.2026
+
+#-----------------------------------------------
+
+"""
+Module: datareduction_intensities.py
+This module performs the data reduction of the LA-ICP-MS signal intensity input data.
+"""
+
+# PACKAGES
+import re
+import numpy as np
+import pandas as pd
+from io import StringIO
+from pathlib import Path
+
+# MODULES
+
+# CODE
+ISOTOPE_PATTERN = re.compile(r"^[A-Z][a-z]?\d+$")
+
+
+def _read_raw_lines(file_path):
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        return [line.strip() for line in f if line.strip()]
+
+
+def _is_icp_header(line, sep=","):
+    parts = line.split(sep)
+
+    if len(parts) < 3:
+        return False
+
+    if not parts[0].lower().startswith(("time", "t")):
+        return False
+
+    isotope_hits = sum(bool(ISOTOPE_PATTERN.match(p)) for p in parts[1:])
+
+    return isotope_hits >= 1
+
+
+def _extract_data_block(lines, sep=","):
+    for i, line in enumerate(lines):
+        if _is_icp_header(line, sep):
+            header_idx = i
+            break
+    else:
+        raise ValueError("Kein ICP-MS Datenheader gefunden")
+
+    data_lines = [lines[header_idx]]  # Header
+    for line in lines[header_idx + 1:]:
+        parts = line.split(sep)
+        try:
+            float(parts[0])
+            data_lines.append(line)
+        except ValueError:
+            break  # Datenblock endet
+
+    return data_lines
+
+
+def _to_dataframe(data_lines, sep=","):
+    buffer = StringIO("\n".join(data_lines))
+    return pd.read_csv(buffer, sep=sep, index_col=0)
+
+
+class DataReductionIntensities:
+    def __init__(self, sep=",", time_s="time_s"):
+        self.sep = sep
+        self.time_s = time_s
+
+    def read_input_data(self, file_path):
+        suffix = Path(file_path).suffix.lower()
+        if suffix in [".xls", ".xlsx"]:
+            raise ValueError("Binary Excel files are not supported by this parser")
+
+        lines = _read_raw_lines(file_path)
+        data_block = _extract_data_block(lines, sep=self.sep)
+        df = _to_dataframe(data_block, sep=self.sep)
+        df.index = df.index.astype(float)
+        df.index.name = self.time_s
+
+        return df
+
+    def prepare_for_reduction(self, df):
+        df_ready = df.copy()
+        # Assign time data
+        df_ready.insert(0, self.time_s, df.index.to_numpy())
+        df_ready.reset_index(drop=True, inplace=True)
+        # Assign data types
+        df_ready[self.time_s] = df_ready[self.time_s].astype(float)
+        df_ready.iloc[:, 1:] = df_ready.iloc[:, 1:].astype(float)
+
+        return df_ready
+
+    def reduce_intervals(self, df_ready, intervals, statistic="mean"):
+        if not intervals:
+            raise ValueError("No intervals provided")
+        funcs = {"mean": np.nanmean, "sum": np.nansum, "std": np.nanstd}
+        if statistic not in funcs:
+            raise ValueError(f"Unknown statistic: {statistic}")
+
+        values = df_ready.iloc[:, 1:].to_numpy()  # considering only isotopes
+        blocks = []
+
+        for start, end in intervals:
+            if not (0 <= start <= end < len(values)):
+                raise ValueError(f"Invalid interval: {(start, end)}")
+            blocks.append(values[start:end + 1])
+
+        data = np.vstack(blocks)
+        result = funcs[statistic](data, axis=0)
+
+        return pd.Series(result, index=df_ready.columns[1:])
