@@ -29,16 +29,17 @@ ISOTOPE_PATTERN = re.compile(r"^[A-Z][a-z]?\d+$")
 
 
 def _read_raw_lines(file_path):
+    """Read non-empty lines from a text-based input file."""
     with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         return [line.strip() for line in f if line.strip()]
 
 
 def _is_icp_header(line, sep=","):
+    """Check whether a line represents a valid ICP-MS data header."""
     parts = line.split(sep)
 
     if len(parts) < 3:
         return False
-
     if not parts[0].lower().startswith(("time", "t")):
         return False
 
@@ -48,6 +49,7 @@ def _is_icp_header(line, sep=","):
 
 
 def _extract_data_block(lines, sep=","):
+    """Extract the contiguous ICP-MS data block starting from the header line."""
     for i, line in enumerate(lines):
         if _is_icp_header(line, sep):
             header_idx = i
@@ -68,16 +70,45 @@ def _extract_data_block(lines, sep=","):
 
 
 def _to_dataframe(data_lines, sep=","):
+    """Convert extracted data lines into a pandas DataFrame."""
     buffer = StringIO("\n".join(data_lines))
     return pd.read_csv(buffer, sep=sep, index_col=0)
 
 
 class DataReductionIntensities:
     def __init__(self, sep=",", time_s="time_s"):
+        """
+        Initialize the intensity data reduction handler.
+
+        Parameters
+        ----------
+        sep : str, optional
+            Column separator used in input files.
+        time_s : str, optional
+            Name of the time column used in reduction-ready data.
+        """
         self.sep = sep
         self.time_s = time_s
 
     def read_input_data(self, file_path):
+        """
+        Parse a raw LA-ICP-MS input file and return the signal intensity data.
+
+        Parameters
+        ----------
+        file_path : str or pathlib.Path
+            Path to a text-based ICP-MS data file.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Parsed intensity data with time as index and isotopes as columns.
+
+        Raises
+        ------
+        ValueError
+            If a binary Excel file is provided or no valid data block is found.
+        """
         suffix = Path(file_path).suffix.lower()
         if suffix in [".xls", ".xlsx"]:
             raise ValueError("Binary Excel files are not supported by this parser")
@@ -91,6 +122,22 @@ class DataReductionIntensities:
         return df
 
     def prepare_for_reduction(self, df):
+        """
+        Prepare a parsed intensity DataFrame for index-based data reduction.
+
+        This converts the time index into an explicit column and resets the
+        DataFrame index to a RangeIndex for optimal performance.
+
+        Parameters
+        ----------
+        df : pandas.DataFrame
+            Parsed intensity DataFrame with time as index.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Reduction-ready DataFrame with a RangeIndex and a 'time_s' column.
+        """
         df_ready = df.copy()
         # Assign time data
         df_ready.insert(0, self.time_s, df.index.to_numpy())
@@ -102,6 +149,31 @@ class DataReductionIntensities:
         return df_ready
 
     def reduce_intervals(self, df_ready, intervals, statistic="mean"):
+        """
+        Reduce signal intensities over one or multiple index-based intervals.
+
+        Parameters
+        ----------
+        df_ready : pandas.DataFrame
+            Reduction-ready DataFrame with a RangeIndex and a time column
+            (e.g. 'time_s') followed by isotopic intensity columns.
+        intervals : list of tuple[int, int]
+            List of inclusive index intervals [(start, end), ...].
+            All intervals are merged into a single data block prior to reduction.
+        statistic : {"mean", "sum", "std"}, optional
+            Statistic applied to the merged data block (default: "mean").
+
+        Returns
+        -------
+        pandas.Series
+            Reduced intensities for each isotope, indexed by isotope name.
+
+        Raises
+        ------
+        ValueError
+            If no intervals are provided, intervals are invalid,
+            or the statistic is unsupported.
+        """
         if not intervals:
             raise ValueError("No intervals provided")
         funcs = {"mean": np.nanmean, "sum": np.nansum, "std": np.nanstd}
