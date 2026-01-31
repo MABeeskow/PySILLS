@@ -6,7 +6,7 @@
 # Name:		manual_test_input_parser_intensities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		23.01.2026
+# Date:		31.01.2026
 
 #-----------------------------------------------
 
@@ -51,8 +51,9 @@ def run_manual_test(show_full_df=False):
         df_ready = dri.prepare_for_reduction(df)
         print(f"  -> shape: {df_ready.shape}")
         print(f"  -> index range: {df_ready.index.min()} – {df_ready.index.max()}")
-        print(f"  -> time range: "
-              f"{df_ready["time_s"].min()} – {df_ready["time_s"].max()}")
+        tmin = df_ready["time_s"].min()
+        tmax = df_ready["time_s"].max()
+        print(f"  -> time range: {tmin} – {tmax}")
         print(f"  -> number of isotopes: {df_ready.shape[1] - 1}")
         print(f"  -> first isotopes: {list(df_ready.columns[:5])}")
         print()
