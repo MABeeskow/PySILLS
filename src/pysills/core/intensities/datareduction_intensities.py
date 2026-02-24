@@ -232,7 +232,6 @@ class DataReductionIntensities:
         times = df_ready["time_s"].to_numpy()
 
         idx = np.searchsorted(times, time_value)
-
         if idx == 0:
             return 0
         if idx == len(times):

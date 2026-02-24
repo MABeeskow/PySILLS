@@ -6,7 +6,7 @@
 # Name:		datareduction_sensitivities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		23.01.2026
+# Date:		24.02.2026
 
 #-----------------------------------------------
 
@@ -17,6 +17,7 @@ This module performs the data reduction of the LA-ICP-MS signal intensity input 
 
 # PACKAGES
 import re
+import numpy as np
 import pandas as pd
 
 # MODULES
@@ -84,6 +85,80 @@ class DataReductionSensitivities:
             rsf[iso] = i_ratio/c_ratio
 
         return pd.Series(rsf, name="RSF")
+
+    def calculate_sensitivity_drift(self, sensitivities_dict, time_info):
+        """
+        Calculate linear drift of RSF per isotope.
+
+        Parameters
+        ----------
+        sensitivities_dict : dict
+            file_name -> pandas.Series (RSF values)
+
+        time_info : dict
+            file_name -> {"path": ..., "time_delta": float}
+
+        Returns
+        -------
+        pandas.DataFrame
+            Index = isotope
+            Columns = ["intercept", "slope"]
+        """
+        # Build RSF matrix
+        df = pd.DataFrame(sensitivities_dict).T
+        # Extract time axis aligned with df index
+        times = []
+        for fname in df.index:
+            if fname not in time_info:
+                raise ValueError(f"No time information for file {fname}")
+            times.append(time_info[fname]["time_delta"])
+
+        t = np.array(times, dtype=float)
+        if len(t) < 2:
+            raise ValueError("At least two SRM time points required for drift calculation.")
+
+        # Design matrix
+        A = np.vstack([np.ones_like(t), t]).T
+        results = []
+        for isotope in df.columns:
+            y = df[isotope].to_numpy(dtype=float)
+            mask = np.isfinite(y)
+            if mask.sum() < 2:
+                results.append((isotope, np.nan, np.nan))
+                continue
+
+            A_valid = A[mask]
+            y_valid = y[mask]
+            coeffs, _, _, _ = np.linalg.lstsq(A_valid, y_valid, rcond=None)
+            intercept = float(coeffs[0])
+            slope = float(coeffs[1])
+            results.append((isotope, intercept, slope))
+
+        df_drift = pd.DataFrame(
+            results,
+            columns=["isotope", "intercept", "slope"]
+        ).set_index("isotope")
+
+        return df_drift
+
+    def predict_sensitivities(self, df_drift, t_probe):
+        """
+        Parameters
+        ----------
+        df_drift : DataFrame
+            Index = isotope
+            Columns = ["intercept", "slope"]
+
+        t_probe : float
+
+        Returns
+        -------
+        pandas.Series
+            RSF per isotope at time t_probe
+        """
+        rsf = df_drift["intercept"] + df_drift["slope"]*t_probe
+        rsf.name = "RSF"
+        return rsf
 
     def calculate_analytical_sensitivity(self, df_intensities, df_concentrations):
         result = df_intensities/df_concentrations
