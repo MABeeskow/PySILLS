@@ -5,7 +5,7 @@
 
 # Name:		essential_functions.py
 # Author:	Maximilian A. Beeskow
-# Date:		21.01.2026
+# Date:		24.02.2026
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -399,133 +399,21 @@ class EssentialsSRM:
         var_os = sys.platform
         self.var_os = var_os
 
+    def normalize_srm_name(self, name: str) -> str:
+        name = name.replace(" ", "_")
+        name = re.sub(r"[()]", "", name)  # Removing brackets
+        name = name.replace("-", "_")  # optional
+        return name
+
     def place_srm_values(self, srm_name, srm_dict):
-        path = Path(__file__).resolve().parents[1]
-        path_main = path
-        list_srm = list(np.array(
-            [["NIST 606"], ["NIST 610"], ["NIST 610 (GeoReM)"], ["NIST 610 (Spandler)"], ["NIST 611"],
-             ["NIST 611 (GeoReM)"], ["NIST 612"], ["NIST 612 (GeoReM)"], ["NIST 613"], ["NIST 613 (GeoReM)"],
-             ["NIST 614"], ["NIST 614 (GeoReM)"], ["NIST 615"], ["NIST 615 (GeoReM)"], ["NIST 616"],
-             ["NIST 616 (GeoReM)"], ["NIST 617"], ["NIST 617 (GeoReM)"], ["USGS BCR-2G (GeoReM)"],
-             ["USGS GSD-1G (GeoReM)"], ["USGS GSE-1G (GeoReM)"], ["B6"], ["Durango Apatite"], ["Scapolite 17"],
-             ["BAM-376"], ["BCR-2G"], ["BL-Q"], ["Br-Glass"], ["GSD-1G (GeoReM)"], ["GSE-1G (GeoReM)"], ["GSE-2G"],
-             ["HAL-O"], ["K-Br"], ["MACS-3"], ["Po 724"], ["STDGL-2B2"], ["OU-6 (GeoReM)"]])[:, 0])
+        path_main = Path(__file__).resolve().parents[1]
+        srm_dir = path_main/"lib"/"srm"
+        srm_file = self.normalize_srm_name(srm_name) + ".csv"
+        path_file = srm_dir/srm_file
 
-        if srm_name == "NIST 606":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_606.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 610":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_610.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 610 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_610_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 610 (Spandler)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_610_Spandler.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 611":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_611.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 611 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_611_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 612":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_612.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 612 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_612_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 613":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_613.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 613 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_613_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 614":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_614.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 614 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_614_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 615":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_615.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 615 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_615_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 616":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_616.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 616 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_616_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 617":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_617.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "NIST 617 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "NIST_617_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "USGS BCR-2G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "USGS_BCR2G_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "USGS GSD-1G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "USGS_GSD1G_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "USGS GSE-1G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "USGS_GSE1G_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "B6":
-            path_file = os.path.join(path_main, "lib", "srm", "B6.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "Durango Apatite":
-            path_file = os.path.join(path_main, "lib", "srm", "Durango_Apatite.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "Scapolite 17":
-            path_file = os.path.join(path_main, "lib", "srm", "Scapolite_17.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "BAM-376":
-            path_file = os.path.join(path_main, "lib", "srm", "BAM_376.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "BCR-2G":
-            path_file = os.path.join(path_main, "lib", "srm", "BCR_2G.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "BL-Q":
-            path_file = os.path.join(path_main, "lib", "srm", "BL_Q.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "Br-Glass":
-            path_file = os.path.join(path_main, "lib", "srm", "Br_Glass.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "GSD-1G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "GSD_1G_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "GSE-1G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "GSE_1G_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "GSE-2G":
-            path_file = os.path.join(path_main, "lib", "srm", "GSE_2G.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "HAL-O":
-            path_file = os.path.join(path_main, "lib", "srm", "HAL_O.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "K-Br":
-            path_file = os.path.join(path_main, "lib", "srm", "K_Br.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "MACS-3":
-            path_file = os.path.join(path_main, "lib", "srm", "MACS_3.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "Po 724":
-            path_file = os.path.join(path_main, "lib", "srm", "Po_724.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "STDGL-2B2":
-            path_file = os.path.join(path_main, "lib", "srm", "STDGL_2B2.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        elif srm_name == "OU-6 (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "OU_6_GeoReM.csv")
-            data_srm = data.general().importSRM(filename=path_file)
-        else:
-            srm_name_new = srm_name.replace(" ", "_")
-            path_file = os.path.join(path_main, "lib", "srm", srm_name_new)
-            data_srm = data.general().importSRM(filename=path_file)
+        if not path_file.exists():
+            raise FileNotFoundError(f"SRM file not found: {path_file}")
 
+        data_srm = data.general().importSRM(filename=str(path_file))
         for item in data_srm:
             srm_dict[srm_name][item[0]] = round(item[1], 4)

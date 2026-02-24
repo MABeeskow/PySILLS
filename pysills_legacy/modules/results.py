@@ -579,11 +579,11 @@ class SimpleSignals:
         elif self.var_srm.get() == "NIST 617 (GeoReM)":
             data_srm = data.general().importSRM(filename=parent+str("/lib/NIST_617_GeoReM.csv"))
         elif self.var_srm.get() == "USGS BCR-2G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_BCR2G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_BCR_2G_GeoReM.csv"))
         elif self.var_srm.get() == "USGS GSD-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSD1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSD_1G_GeoReM.csv"))
         elif self.var_srm.get() == "USGS GSE-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSE1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSE_1G_GeoReM.csv"))
 
         self.isotopes_measured = np.array(data_srm)[:, 0]
         for element in self.pse_list:

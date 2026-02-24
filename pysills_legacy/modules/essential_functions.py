@@ -499,13 +499,13 @@ class EssentialsSRM:
             path_file = os.path.join(path_main, "lib", "srm", "NIST_617_GeoReM.csv")
             data_srm = data.general().importSRM(filename=path_file)
         elif srm_name == "USGS BCR-2G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "USGS_BCR2G_GeoReM.csv")
+            path_file = os.path.join(path_main, "lib", "srm", "USGS_BCR_2G_GeoReM.csv")
             data_srm = data.general().importSRM(filename=path_file)
         elif srm_name == "USGS GSD-1G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "USGS_GSD1G_GeoReM.csv")
+            path_file = os.path.join(path_main, "lib", "srm", "USGS_GSD_1G_GeoReM.csv")
             data_srm = data.general().importSRM(filename=path_file)
         elif srm_name == "USGS GSE-1G (GeoReM)":
-            path_file = os.path.join(path_main, "lib", "srm", "USGS_GSE1G_GeoReM.csv")
+            path_file = os.path.join(path_main, "lib", "srm", "USGS_GSE_1G_GeoReM.csv")
             data_srm = data.general().importSRM(filename=path_file)
         elif srm_name == "B6":
             path_file = os.path.join(path_main, "lib", "srm", "B6.csv")

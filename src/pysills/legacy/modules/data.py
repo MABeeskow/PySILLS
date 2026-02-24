@@ -3,39 +3,33 @@
 # ----------------------
 # data.py
 # Maximilian Beeskow
-# 30.06.2025
+# 24.02.2026
 # ----------------------
-#
+
 ## MODULES
 import re, os
 import numpy as np
 import pandas as pd
 import tkinter as tk
-from pathlib import Path
-#
-## TOOLS
-#
+
 class Data:
-    #
     def __init__(self, filename):
         self.filename = filename
-    #
+
     def import_data_to_pandas(self, skip_header, skip_footer, delimiter=";", names=None):
-        #
         self.delimiter = delimiter
         self.skip_header = skip_header
         self.skip_footer = skip_footer
         self.names = names
-        #
         dataframe = pd.read_csv(self.filename, sep=self.delimiter, header=self.skip_header, skipfooter=self.skip_footer,
                            names=self.names, engine="python")
         blank_df = dataframe.loc[dataframe.isnull().all(1)]
         if len(blank_df) > 0:
             first_blank_index = blank_df.index[0]
             dataframe = dataframe[:first_blank_index]
-        #
+
         return dataframe
-    #
+
     def import_as_list(self, skip_header=0, skip_footer=0, timestamp=None, delimiter=",", icpms=None):
         f = open(self.filename, 'r')
         imported_data = f.readlines()
@@ -146,7 +140,6 @@ class general:
         pass
 
     def importData(self, filename, delimiter, skipHeader, skipFooter):
-
         self.filename = filename
         self.delimiter = delimiter
         self.skipHeader = skipHeader
@@ -168,46 +161,13 @@ class general:
 
     def importSRM(self, filename, delimiter=";", skipHeader=0, skipFooter=0):
         self.filename = filename
-        self.delimiter = delimiter
-        self.skipHeader = skipHeader
-        self.skipFooter = skipFooter
-
-        obj_path = Path(self.filename)
-        str_directory = obj_path.parent
-        str_filename = obj_path.name
-
-        if "(" in str_filename:
-            str_filename_updated = str_filename.replace("(", "")
-        else:
-            str_filename_updated = str_filename
-
-        if ")" in str_filename:
-            str_filename_updated = str_filename.replace(")", "")
-        else:
-            str_filename_updated = str_filename
-
-        if "-" in str_filename:
-            str_filename_updated = str_filename.replace("-", "_")
-        else:
-            str_filename_updated = str_filename
-
-        self.filename = os.path.join(str_directory, str_filename_updated)
-
-        if "venv_" in self.filename:
-            self.filename = self.filename.replace("venv_", "venv-")
-        if "site_packages" in self.filename:
-            self.filename = self.filename.replace("site_packages", "site-packages")
-        if "local_packages" in self.filename:
-            self.filename = self.filename.replace("local_packages", "local-packages")
-
-        inputData = np.genfromtxt(self.filename, delimiter=self.delimiter, dtype=str, skip_header=self.skipHeader,
-                                  skip_footer=self.skipFooter)
-        nLines = len(inputData)
-        nRows = len(inputData[0])
+        inputData = np.genfromtxt(
+            self.filename, delimiter=delimiter, dtype=str, skip_header=skipHeader, skip_footer=skipFooter)
         data = []
-
-        for i in range(0, nLines):
-            data.append([inputData[i][0], float(inputData[i][1])])
+        for i in range(len(inputData)):
+            element = inputData[i][0]
+            value = float(inputData[i][1])
+            data.append([element, value])
 
         return data
 

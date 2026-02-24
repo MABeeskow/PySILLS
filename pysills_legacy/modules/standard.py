@@ -787,13 +787,13 @@ class StandardReferenceMaterials:
             data_srm = data.general().importSRM(filename=parent+str("/lib/NIST_617_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif self.var_srm.get() == "USGS BCR-2G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_BCR2G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_BCR_2G_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif self.var_srm.get() == "USGS GSD-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSD1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSD_1G_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif self.var_srm.get() == "USGS GSE-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSE1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSE_1G_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif self.var_srm.get() == "B6":
             data_srm = data.general().importSRM(filename=parent+str("/lib/B6.csv"))
@@ -1525,11 +1525,11 @@ class StandardReferenceMaterials:
             data_srm = data.general().importSRM(filename=parent+str("/lib/NIST_617_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif var_srm == "USGS BCR-2G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_BCR2G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_BCR_2G_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif var_srm == "USGS GSD-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSD1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSD_1G_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
         elif var_srm == "USGS GSE-1G (GeoReM)":
-            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSE1G_GeoReM.csv"))
+            data_srm = data.general().importSRM(filename=parent+str("/lib/USGS_GSE_1G_GeoReM.csv"))
             self.place_concentrations(input_srm=data_srm)
