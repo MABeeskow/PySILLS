@@ -57,8 +57,50 @@ class SampleAnalysis:
 
         return pd.Series(concentrations, name="Concentration")
 
-    def compute_concentration_ratios(self, df_smpl, reference_element):
-        pass
+    def compute_concentration_ratios(self, concentrations, reference_isotope):
+        """
+        Compute concentration ratios C_x / C_ref.
 
-    def compute_limit_of_detection(self, df_smpl):
-        pass
+        Parameters
+        ----------
+        concentrations : pandas.Series
+            Mean concentrations indexed by isotope.
+        reference_isotope : str
+            Isotope used as reference (e.g. 'Si29').
+
+        Returns
+        -------
+        pandas.Series
+            Concentration ratios indexed by isotope.
+        """
+        if reference_isotope not in concentrations.index:
+            raise ValueError(f"Reference isotope '{reference_isotope}' not found")
+
+        conc_ref = concentrations.loc[reference_isotope]
+        if conc_ref <= 0:
+            raise ValueError("Reference intensity must be positive")
+
+        ratios = concentrations/conc_ref
+        ratios.name = f"C/C_{reference_isotope}"
+
+        return ratios
+
+    def compute_limit_of_detection(
+            self, intensities, concentrations, n_bg_values, n_mat_values, intensities_bg=None, tau_values=None,
+            sigma_values=None, mode="Pettke"):
+        if mode == "Pettke":
+            lod = (3.29*(intensities_bg*tau_values*n_mat_values*(1 + n_mat_values/n_bg_values))**(0.5) +
+                            2.71)/(n_mat_values*tau_values)*(concentrations/intensities)
+            a = 3.29/3.3
+            b = 1/3.29
+        elif mode == "Longerich":
+            lod = (3*sigma_values*concentrations)/(intensities)*(1/n_bg_values + 1/n_mat_values)**(0.5)
+            a = 3.0/3.3
+            b = 1/3.0
+
+        lob = 1.65*a*b*lod
+        loq = 10*a*b*lod
+
+        results = pd.DataFrame({"LoB": lob, "LoD": lod, "LoQ": loq})
+
+        return results

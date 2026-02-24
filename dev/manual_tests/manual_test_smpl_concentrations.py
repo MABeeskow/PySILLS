@@ -17,8 +17,10 @@ This file tests if quantification of the sample composition is working as expect
 
 # PACKAGES
 from pathlib import Path
+
+import numpy as np
 import pandas as pd
-pd.options.display.float_format = "{:.3f}".format
+pd.options.display.float_format = "{:.4f}".format
 
 # MODULES
 from pysills.core.sensitivities.datareduction_sensitivities import DataReductionSensitivities as DRS
@@ -89,7 +91,6 @@ def run_manual_test(show_full_df=False):
         filename = run["filename"]
         time_deltas[filename] = {"time_delta": t_rel}
 
-    results_srm = {}
     results_smpl = {}
     srm_sensitivities = {}
     for fname, setup_info in files_srm_setup.items():
@@ -115,6 +116,7 @@ def run_manual_test(show_full_df=False):
         drs = DRS(isotope_to_element)
         df_sens = drs.calculate_relative_sensitivity(intensity_ratios=i_ratios, concentration_ratios=i_ratios_srm)
         srm_sensitivities[fname] = df_sens
+
         if show_full_df:
             print("Filename:", fname, "\n")
             print(df_sens, "\n")
@@ -138,17 +140,30 @@ def run_manual_test(show_full_df=False):
 
         data_bg1 = dri.reduce_intervals(df_ready=df_ready, intervals=[(idx_0, idx_1)])
         data_sig = dri.reduce_intervals(df_ready=df_ready, intervals=[(idx_4, idx_5)])
-        data_sig_corr = dri.subtract_background(signal=data_sig["mean"], background=data_bg1["mean"])
-        i_ratios = dri.compute_intensity_ratios(intensities=data_sig_corr, reference_isotope=ref_isotope)
-        df_comp = SA(reference_isotope=ref_isotope).compute_concentrations(
+
+        n_bg_values = np.ones(len(data_bg1["mean"]))*(idx_1 - idx_0 + 1)
+        n_mat_values = np.ones(len(data_sig["mean"]))*(idx_5 - idx_4 + 1)
+        tau_values = np.ones(len(data_sig["mean"]))*0.01
+
+        df_intensities = dri.subtract_background(signal=data_sig["mean"], background=data_bg1["mean"])
+        i_ratios = dri.compute_intensity_ratios(intensities=df_intensities, reference_isotope=ref_isotope)
+        df_concentrations = SA(reference_isotope=ref_isotope).compute_concentrations(
             intensity_ratios=i_ratios, sensitivity_values=rsf_pred, reference_concentration=reference_concentration)
+        comp_ratios = SA(reference_isotope=ref_isotope).compute_concentration_ratios(
+            concentrations=df_concentrations, reference_isotope=ref_isotope)
+
+        df_lod = SA(reference_isotope=ref_isotope).compute_limit_of_detection(
+            intensities=df_intensities, concentrations=df_concentrations, n_bg_values=n_bg_values,
+            n_mat_values=n_mat_values, intensities_bg=data_bg1["mean"], tau_values=tau_values)
 
         if fname in ["demo_ma04.csv", "demo_ma05.csv", "demo_ma06.csv", "demo_ma07.csv", "demo_ma08.csv"]:
             results_smpl[fname] = {
-                "intensities": data_sig_corr, "ratios": i_ratios, "sensitivities": df_sens, "composition": df_comp}
+                "intensities": df_intensities, "intensity_ratios": i_ratios, "sensitivities": df_sens,
+                "composition": df_concentrations, "composition_ratios": comp_ratios}
             if show_full_df:
                 print("Filename:", fname, "\n")
-                print(df_comp)
+                print(df_concentrations)
+                print(df_lod)
 
 
 if __name__ == "__main__":
