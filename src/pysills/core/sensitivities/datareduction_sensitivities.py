@@ -6,7 +6,7 @@
 # Name:		datareduction_sensitivities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		24.02.2026
+# Date:		25.02.2026
 
 #-----------------------------------------------
 
@@ -25,6 +25,9 @@ import pandas as pd
 # CODE
 ISOTOPE_REGEX = re.compile(r"^([A-Z][a-z]?)(\d+)$")
 
+
+def extract_element(iso: str) -> str:
+    return re.findall(r"[A-Za-z]+", iso)[0]
 
 def build_isotope_to_element_mapping(isotopes):
     """
@@ -160,7 +163,19 @@ class DataReductionSensitivities:
         rsf.name = "RSF"
         return rsf
 
-    def calculate_analytical_sensitivity(self, df_intensities, df_concentrations):
+    def calculate_normalized_sensitivity(self, df_intensities, df_concentrations):
         result = df_intensities/df_concentrations
 
         return result
+
+    def calculate_relative_sensitivity_factor(
+            self, df_srm_intensities, df_srm_concentrations, df_is_intensity, df_is_concentration, df_sensitivity):
+        elements = df_srm_intensities.index.map(lambda x: re.findall(r"[A-Za-z]+", x)[0])
+        df_srm_concentrations = (df_srm_concentrations.set_index("Element")["Concentration"].astype(float))
+        conc_iso = pd.Series(elements, index=df_srm_intensities.index).map(df_srm_concentrations)
+        mask = (conc_iso.notna() & (conc_iso > 0) & (df_srm_intensities > 0) & (df_is_concentration > 0))
+        rsf = pd.Series(np.nan, index=df_srm_intensities.index)
+        rsf[mask] = (df_sensitivity[mask]*(conc_iso[mask]/df_srm_intensities[mask])*
+                     (df_is_intensity/df_is_concentration))
+
+        return rsf.rename("RSF")

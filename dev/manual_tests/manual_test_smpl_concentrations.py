@@ -6,7 +6,7 @@
 # Name:		manual_test_smpl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		24.02.2026
+# Date:		25.02.2026
 
 #-----------------------------------------------
 
@@ -93,6 +93,7 @@ def run_manual_test(show_full_df=False):
 
     results_smpl = {}
     srm_sensitivities = {}
+    srm_intensities = {}
     for fname, setup_info in files_srm_setup.items():
         file_path = demo_dir/fname
         df = dri.read_input_data(file_path)
@@ -109,17 +110,21 @@ def run_manual_test(show_full_df=False):
 
         data_bg1 = dri.reduce_intervals(df_ready=df_ready, intervals=[(idx_0, idx_1)])
         data_sig = dri.reduce_intervals(df_ready=df_ready, intervals=[(idx_4, idx_5)])
-        data_sig_corr = dri.subtract_background(signal=data_sig["mean"], background=data_bg1["mean"])
-        i_ratios = dri.compute_intensity_ratios(intensities=data_sig_corr, reference_isotope=ref_isotope)
+        df_srm_intensities = dri.subtract_background(signal=data_sig["mean"], background=data_bg1["mean"])
+        i_ratios = dri.compute_intensity_ratios(intensities=df_srm_intensities, reference_isotope=ref_isotope)
 
         isotope_to_element = build_isotope_to_element_mapping(i_ratios.index)
         drs = DRS(isotope_to_element)
         df_sens = drs.calculate_relative_sensitivity(intensity_ratios=i_ratios, concentration_ratios=i_ratios_srm)
         srm_sensitivities[fname] = df_sens
+        srm_intensities[fname] = df_srm_intensities
 
         if show_full_df:
             print("Filename:", fname, "\n")
             print(df_sens, "\n")
+
+    df_srm_intensities = pd.concat(srm_intensities.values(), axis=1)
+    df_srm_intensities = df_srm_intensities.mean(axis=1)
 
     for fname, setup_info in files_smpl_setup.items():
         file_path = demo_dir/fname
@@ -151,10 +156,15 @@ def run_manual_test(show_full_df=False):
             intensity_ratios=i_ratios, sensitivity_values=rsf_pred, reference_concentration=reference_concentration)
         comp_ratios = SA(reference_isotope=ref_isotope).compute_concentration_ratios(
             concentrations=df_concentrations, reference_isotope=ref_isotope)
-
         df_lod = SA(reference_isotope=ref_isotope).compute_limit_of_detection(
             intensities=df_intensities, concentrations=df_concentrations, n_bg_values=n_bg_values,
             n_mat_values=n_mat_values, intensities_bg=data_bg1["mean"], tau_values=tau_values)
+
+        df_norm_sens = drs.calculate_normalized_sensitivity(df_intensities, df_concentrations)
+        df_rsf = drs.calculate_relative_sensitivity_factor(
+            df_srm_intensities=df_srm_intensities, df_srm_concentrations=df_srm,
+            df_is_intensity=df_intensities[ref_isotope], df_is_concentration=reference_concentration,
+            df_sensitivity=rsf_pred)
 
         if fname in ["demo_ma04.csv", "demo_ma05.csv", "demo_ma06.csv", "demo_ma07.csv", "demo_ma08.csv"]:
             results_smpl[fname] = {
@@ -164,6 +174,9 @@ def run_manual_test(show_full_df=False):
                 print("Filename:", fname, "\n")
                 print(df_concentrations)
                 print(df_lod)
+                print(rsf_pred)
+                print(df_norm_sens)
+                print(df_rsf)
 
 
 if __name__ == "__main__":
