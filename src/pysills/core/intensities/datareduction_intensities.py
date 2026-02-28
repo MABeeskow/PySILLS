@@ -6,7 +6,7 @@
 # Name:		datareduction_intensities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		23.01.2026
+# Date:		28.02.2026
 
 #-----------------------------------------------
 
@@ -159,7 +159,7 @@ class DataReductionIntensities:
 
         return df_ready
 
-    def reduce_intervals(self, df_ready, intervals, statistics=("mean", "std")):
+    def reduce_intervals(self, df_ready, intervals, statistics=("mean", "std", "length")):
         """
         Reduce signal intensities over one or multiple index-based intervals.
 
@@ -198,15 +198,27 @@ class DataReductionIntensities:
         }
 
         for stat in statistics:
-            if stat not in funcs:
-                raise ValueError(f"Unknown statistic: {stat}")
+            if stat not in funcs and stat != "length":
+                if stat not in funcs:
+                    raise ValueError(f"Unknown statistic: {stat}")
 
         values = df_ready.iloc[:, 1:].to_numpy()
         blocks = [values[s:e + 1] for s, e in intervals]
         data = np.vstack(blocks)
-        result = {stat: funcs[stat](data, axis=0) for stat in statistics}
+        result = {}
 
-        return {stat: pd.Series(vals, index=df_ready.columns[1:]) for stat, vals in result.items()}
+        for stat in statistics:
+            if stat == "length":
+                n = data.shape[0]
+                result[stat] = pd.Series(
+                    np.full(data.shape[1], n),
+                    index=df_ready.columns[1:]
+                )
+            else:
+                vals = funcs[stat](data, axis=0)
+                result[stat] = pd.Series(vals, index=df_ready.columns[1:])
+
+        return result
 
     def find_index_for_time(self, df_ready, time_value):
         """
@@ -361,3 +373,32 @@ class DataReductionIntensities:
         ratios.name = f"I/I_{reference_isotope}"
 
         return ratios
+
+    def calculate_1_sigma_intensity(self, intensities_bg, intensities_sig):
+        """
+        Compute 1-sigma intensity.
+
+        Parameters
+        ----------
+        intensities_bg : dictionary of pandas.Series containing 'mean', 'std' and 'length'
+            Mean background intensities indexed by isotope.
+        intensities_sig : dictionary of pandas.Series containing 'mean', 'std' and 'length'
+            Mean signal intensities indexed by isotope.
+
+        Returns
+        -------
+        pandas.DataFrame with columns 'uncorrected' and 'corrected'.
+            1-sigma intensities indexed by isotope.
+
+        Comment
+        -------
+        If intensities_sig corresponds to the background as well, the corrected values are obviously all zero. If
+        intensities_sig corresponds to the matrix (mineral phase), the corrected values are background-corrected 1-sigma
+        intensities. If intensities_sig corresponds to the inclusion phase, the corrected values are the 1-sigma mixed
+        intensities.
+        """
+        helper_bg = intensities_bg["std"]/np.sqrt(intensities_bg["length"])
+        helper_sig = intensities_sig["std"]/np.sqrt(intensities_sig["length"])
+        results = pd.DataFrame({"uncorrected": helper_sig, "corrected": helper_sig - helper_bg})
+
+        return results

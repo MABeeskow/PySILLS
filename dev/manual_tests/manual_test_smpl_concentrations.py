@@ -6,7 +6,7 @@
 # Name:		manual_test_smpl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		25.02.2026
+# Date:		28.02.2026
 
 #-----------------------------------------------
 
@@ -20,7 +20,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-pd.options.display.float_format = "{:.4f}".format
+pd.options.display.float_format = "{:.5f}".format
 
 # MODULES
 from pysills.core.sensitivities.datareduction_sensitivities import DataReductionSensitivities as DRS
@@ -165,6 +165,11 @@ def run_manual_test(show_full_df=False):
             df_srm_intensities=df_srm_intensities, df_srm_concentrations=df_srm,
             df_is_intensity=df_intensities[ref_isotope], df_is_concentration=reference_concentration,
             df_sensitivity=rsf_pred)
+        df_sigma_intensities = dri.calculate_1_sigma_intensity(intensities_bg=data_bg1, intensities_sig=data_sig)
+        df_sigma_concentrations = SA(reference_isotope=ref_isotope).calculate_1_sigma_concentration(
+            intensities_bg=data_bg1, intensities_sig=data_sig, tau_values=tau_values,
+            ref_concentration_sig=reference_concentration, ref_intensity_sig=df_intensities[ref_isotope],
+            sensitivity_sig=rsf_pred)
 
         if fname in ["demo_ma04.csv", "demo_ma05.csv", "demo_ma06.csv", "demo_ma07.csv", "demo_ma08.csv"]:
             results_smpl[fname] = {
@@ -173,10 +178,12 @@ def run_manual_test(show_full_df=False):
             if show_full_df:
                 print("Filename:", fname, "\n")
                 print(df_concentrations)
-                print(df_lod)
+                print(df_lod["LoD"])
+                print(df_sigma_intensities["uncorrected"])
+                print(df_sigma_concentrations)
                 print(rsf_pred)
                 print(df_norm_sens)
-                print(df_rsf)
+                print(df_rsf, "\n")
 
 
 if __name__ == "__main__":

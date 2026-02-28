@@ -16,6 +16,7 @@ This module performs the compositional analysis of the sample input files.
 """
 
 # PACKAGES
+import numpy as np
 import pandas as pd
 
 # MODULES
@@ -102,5 +103,20 @@ class SampleAnalysis:
         loq = 10*a*b*lod
 
         results = pd.DataFrame({"LoB": lob, "LoD": lod, "LoQ": loq})
+
+        return results
+
+    def calculate_1_sigma_concentration(
+            self, intensities_bg, intensities_sig, tau_values, ref_concentration_sig, ref_intensity_sig,
+            sensitivity_sig):
+        var_intensities_bg = intensities_bg["mean"]
+        var_length_bg = intensities_bg["length"]
+        var_intensities_sig = intensities_sig["mean"]
+        var_length_sig = intensities_sig["length"]
+
+        sigma_bg = np.sqrt(var_intensities_bg/(var_length_bg*tau_values))
+        sigma_sig = np.sqrt(var_intensities_sig/(var_length_sig*tau_values))
+        sigma = np.sqrt(sigma_bg**2 + sigma_sig**2)
+        results = (ref_concentration_sig/(ref_intensity_sig*sensitivity_sig))*sigma
 
         return results
