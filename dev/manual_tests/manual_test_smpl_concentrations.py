@@ -170,6 +170,7 @@ def run_manual_test(show_full_df=False):
             intensities_bg=data_bg1, intensities_sig=data_sig, tau_values=tau_values,
             ref_concentration_sig=reference_concentration, ref_intensity_sig=df_intensities[ref_isotope],
             sensitivity_sig=rsf_pred)
+        df_fano = dri.calculate_fano_factor(intensities=data_sig, tau_values=tau_values)
 
         if fname in ["demo_ma04.csv", "demo_ma05.csv", "demo_ma06.csv", "demo_ma07.csv", "demo_ma08.csv"]:
             results_smpl[fname] = {
@@ -184,6 +185,7 @@ def run_manual_test(show_full_df=False):
                 print(rsf_pred)
                 print(df_norm_sens)
                 print(df_rsf, "\n")
+                print(df_fano)
 
 
 if __name__ == "__main__":

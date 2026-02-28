@@ -402,3 +402,12 @@ class DataReductionIntensities:
         results = pd.DataFrame({"uncorrected": helper_sig, "corrected": helper_sig - helper_bg})
 
         return results
+
+    def calculate_fano_factor(self, intensities, tau_values):
+        intensities_std = intensities["std"]
+        intensities_mu = intensities["mean"]
+        fano = (tau_values*intensities_std**2)/intensities_mu
+        k = 1/fano**0.5
+        results = pd.DataFrame({"Fano": fano, "k": k})
+
+        return results
