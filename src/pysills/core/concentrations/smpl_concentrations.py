@@ -6,7 +6,7 @@
 # Name:		smpl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		24.02.2026
+# Date:		04.03.2026
 
 #-----------------------------------------------
 
@@ -120,3 +120,12 @@ class SampleAnalysis:
         results = (ref_concentration_sig/(ref_intensity_sig*sensitivity_sig))*sigma
 
         return results
+
+    def perform_quantification_by_halter_iterative(self):
+        pass
+
+    def perform_quantification_by_halter(self):
+        pass
+
+    def perform_quantification_by_borisova(self):
+        pass
