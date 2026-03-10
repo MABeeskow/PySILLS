@@ -25,8 +25,10 @@ import pandas as pd
 
 
 class SampleAnalysis:
-    def __init__(self, reference_isotope):
+    def __init__(self, reference_isotope, reference_second_isotope=None, reference_matrix_only_tracer=None):
         self.reference_isotope = reference_isotope
+        self.reference_second_isotope = reference_second_isotope
+        self.reference_matrix_only_tracer = reference_matrix_only_tracer
 
     def compute_concentrations(self, intensity_ratios, sensitivity_values, reference_concentration):
         """
@@ -118,6 +120,46 @@ class SampleAnalysis:
         sigma_sig = np.sqrt(var_intensities_sig/(var_length_sig*tau_values))
         sigma = np.sqrt(sigma_bg**2 + sigma_sig**2)
         results = (ref_concentration_sig/(ref_intensity_sig*sensitivity_sig))*sigma
+
+        return results
+
+    def calculate_mixed_concentration_ratio(self, intensities_mix, sensitivity):
+        if self.reference_second_isotope is not None:
+            intensity_mix_is1 = intensities_mix[self.reference_second_isotope]
+            intensity_mix_is2 = intensities_mix[self.reference_isotope]
+            sensitivity_is1 = sensitivity[self.reference_second_isotope]
+            result = intensity_mix_is1/(intensity_mix_is2*sensitivity_is1)
+        elif self.reference_matrix_only_tracer is not None:
+            intensity_mix_t = intensities_mix[self.reference_matrix_only_tracer]
+            intensity_mix_is = intensities_mix[self.reference_isotope]
+            sensitivity_t = sensitivity[self.reference_matrix_only_tracer]
+            result = intensity_mix_t/(intensity_mix_is*sensitivity_t)
+
+        return result
+
+    def calculate_mass_fraction(self, concentrations_mat, concentrations_incl, mixed_ratio):
+        if self.reference_second_isotope is not None:
+            concentration_mat_is1 = concentrations_mat[self.reference_second_isotope]
+            concentration_mat_is2 = concentrations_mat[self.reference_isotope]
+            concentration_incl_is1 = concentrations_incl[self.reference_second_isotope]
+            concentration_incl_is2 = concentrations_incl[self.reference_isotope]
+            a = mixed_ratio
+            result = (concentration_mat_is1 - a*concentration_mat_is2)/(
+                    concentration_mat_is1 - concentration_incl_is1 - a*(concentration_mat_is2 - concentration_incl_is2))
+        elif self.reference_matrix_only_tracer is not None:
+            concentration_mat_is = concentrations_mat[self.reference_isotope]
+            concentration_mat_t = concentrations_mat[self.reference_matrix_only_tracer]
+            concentration_incl_is = concentrations_incl[self.reference_isotope]
+            concentration_incl_t = concentrations_incl[self.reference_matrix_only_tracer]
+            a = mixed_ratio
+            result = (concentration_mat_t - a*concentration_mat_is)/(
+                    concentration_mat_t - concentration_incl_t - a*(concentration_mat_is - concentration_incl_is))
+
+        return result
+
+    def calculate_inclusion_concentration_using_x(self, concentratios_mix, concentratios_host, mass_fraction):
+        x = mass_fraction
+        results = (concentratios_mix + (x - 1)*concentratios_host)/x
 
         return results
 

@@ -27544,7 +27544,6 @@ class PySILLS(tk.Frame):
                         xi_std_helper[file_std_short] = {}
                         delta_std_i = self.container_lists["Acquisition Times Delta"][file_std_short]
                         list_delta_std_i.append(delta_std_i)
-
                         for isotope in file_isotopes:
                             var_srm_i = self.container_var["SRM"][isotope].get()
                             if isotope not in list_xi_std_i:
@@ -27595,7 +27594,6 @@ class PySILLS(tk.Frame):
                     xi_opt[isotope].extend(xi_regr)
 
                 delta_i = self.container_lists["Acquisition Times Delta"][var_file_short]
-
                 if var_focus == "MAT":
                     if self.pysills_mode == "MA":
                         var_is = self.container_var[var_filetype][var_file_long]["IS Data"]["IS"].get()
@@ -31736,7 +31734,7 @@ class PySILLS(tk.Frame):
                             var_a = self.calculate_mixed_concentration_ratio(
                                 intensity_mix_i=var_intensity_mix_is2, intensity_mix_IS=var_intensity_mix_is1,
                                 sensitivity_IS_i=var_sensitivity_is2)
-
+                            var_a_alt = var_intensity_mix_is2/(var_intensity_mix_is1*var_sensitivity_is2)
                             ## Mixing ratio x
                             var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
                                 var_file_short]["MAT"][var_is1]
@@ -31757,15 +31755,18 @@ class PySILLS(tk.Frame):
                                 concentration_mat_IS=var_concentration_host_is1,
                                 concentraton_incl_i=var_concentration_incl_is2,
                                 concentration_incl_IS=var_concentration_incl_is1)
-
+                            var_x_alt = (var_concentration_host_is2 - var_a_alt*var_concentration_host_is1)/(
+                                var_concentration_host_is2 - var_concentration_incl_is2 - var_a_alt*(
+                                    var_concentration_host_is1 - var_concentration_incl_is1))
                             ## Mixed Concentration IS1
                             var_concentration_mix_is1 = ((1 - var_x)*var_concentration_host_is1 +
                                                          var_x*var_concentration_incl_is1)
-
+                            var_concentration_mix_is1_alt = ((1 - var_x_alt)*var_concentration_host_is1 +
+                                                         var_x_alt*var_concentration_incl_is1)
                             ## Mixed Concentrations
                             for index, isotope in enumerate(file_isotopes):
-                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
-                                    isotope]
+                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][isotope]
                                 var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                     var_file_short]["INCL"][isotope]
 
@@ -31776,6 +31777,14 @@ class PySILLS(tk.Frame):
 
                                 var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
                                     var_file_short]["INCL"][var_is]
+                                var_intensity_incl_i = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope]
+                                var_intensity_host_is1 = self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][var_is1]
+                                var_intensity_host_i = var_intensity_host_is1*(
+                                        var_concentration_host_i/var_concentration_host_is1)*var_sensitivity_i
+                                var_intensity_incl_i = var_intensity_mix_i - var_intensity_host_i
+                                var_intensity_incl_is1 = var_intensity_mix_is1 - var_intensity_host_is1
                                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
                                     var_file_short]["BG"][isotope]
                                 var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
@@ -31792,9 +31801,18 @@ class PySILLS(tk.Frame):
 
                                 ## Inclusion Concentrations
                                 if var_x > 0:
-                                    var_result_i = (var_concentration_mix_i - (1 - var_x)*var_concentration_host_i)/var_x
+                                    var_result_i = (var_concentration_mix_i - (1 - var_x)*
+                                                    var_concentration_host_i)/var_x
+                                    var_result_i_alt = (var_intensity_incl_i/var_intensity_incl_is1)*(
+                                            var_concentration_incl_is1/var_sensitivity_i)
+                                    if var_result_i_alt < 0:
+                                        var_result_i_alt = 0.0000
                                     var_result_sigma_i = (var_concentration_incl_is1/(
                                             var_intensity_incl_is*var_sensitivity_i))*var_sigma
+                                    var_result_sigma_i_alt = (var_concentration_incl_is1/(
+                                            var_intensity_incl_is1*var_sensitivity_i))*var_sigma
+                                    var_result_i = var_result_i_alt
+                                    var_result_sigma_i = var_result_sigma_i_alt
                                 else:
                                     var_result_i = np.nan
                                     var_result_sigma_i = 0.0

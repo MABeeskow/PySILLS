@@ -6,7 +6,7 @@
 # Name:		icpms_reader.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		24.02.2026
+# Date:		10.03.2026
 
 #-----------------------------------------------
 
@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 from io import StringIO
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # MODULES
 
@@ -101,7 +101,8 @@ class ICPMSReader:
         # Build relative time axis
         t0 = runs[0]["timestamp"]
         for r in runs:
-            r["t_rel"] = (r["timestamp"] - t0).total_seconds()
+            t_rel = (r["timestamp"] - t0).total_seconds()
+            r["t_rel"] = round(t_rel/60)*60
 
         return runs
 
@@ -109,27 +110,64 @@ class ICPMSReader:
         with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
             return [line.strip() for line in f if line.strip()]
 
-    def _extract_timestamp(self, lines):
+    def _extract_timestamp(self, lines, mode="end"):
         """
-        Extract timestamp from header line:
-        'Acquired : DD/MM/YYYY HH:MM:SS using ...'
-        """
-        pattern = re.compile(
-            r"Acquired\s*:\s*(\d{2}/\d{2}/\d{4})\s+(\d{2}:\d{2}:\d{2})"
-        )
+        Extract timestamp from header.
 
-        for line in lines[:30]:
+        Parameters
+        ----------
+        lines : list[str]
+            File lines
+        mode : str
+            "start" -> Acquired timestamp
+            "end"   -> Printed timestamp
+
+        Returns
+        -------
+        datetime or None
+        """
+
+        if mode == "start":
+            pattern = re.compile(
+                r"Acquired\s*:\s*(\d{2}/\d{2}/\d{4})\s+(\d{2}:\d{2}:\d{2})"
+            )
+            search_lines = lines[:30]
+
+        elif mode == "end":
+            pattern = re.compile(
+                r"Printed\s*:?\s*(\d{2}/\d{2}/\d{4})\s+(\d{2}:\d{2}:\d{2})"
+            )
+            search_lines = reversed(lines)
+
+        else:
+            raise ValueError("mode must be 'start' or 'end'")
+
+        for line in search_lines:
             match = pattern.search(line)
             if match:
                 date_str = match.group(1)
                 time_str = match.group(2)
 
-                return datetime.strptime(
+                timestamp = datetime.strptime(
                     f"{date_str} {time_str}",
                     "%d/%m/%Y %H:%M:%S"
                 )
 
+                #timestamp = self._round_timestamp(timestamp)
+
+                return timestamp
+
         return None
+
+    def _round_timestamp(self, ts):
+        """
+        Round datetime to nearest minute depending on seconds.
+        """
+
+        if ts.second >= 30:
+            ts = ts + timedelta(minutes=1)
+
+        return ts.replace(second=0, microsecond=0)
 
     def _is_icp_header(self, line):
         parts = line.split(self.sep)
