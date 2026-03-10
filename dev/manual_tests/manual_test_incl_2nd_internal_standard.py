@@ -6,7 +6,7 @@
 # Name:		manual_test_incl_2nd_internal_standard.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		10.03.2026
+# Date:		11.03.2026
 
 #-----------------------------------------------
 
@@ -42,10 +42,9 @@ def run_manual_test(show_full_df=False):
     srm_dir = root/"src"/"pysills"/"legacy"/"lib"/"srm"
     filenames = ["NIST_610_GeoReM.csv", "Scapolite_17.csv"]
     srm = SRM(sep=";")
-    ref_element_matrix = "Si"
     ref_isotope_matrix = "Si29"
-    ref_element_2 = "As"
     ref_isotope_2 = "As75"
+    #ref_isotope_2 = "Li7"
     ref_element = "Na"
     ref_isotope = "Na23"
 
@@ -61,6 +60,7 @@ def run_manual_test(show_full_df=False):
     reference_concentration_mat = 467436.7125
     concentration_incl_is = {"demo_fi05.csv": 19415.2373, "demo_fi06.csv": 19344.7604}
     concentration_incl_is2 = {"demo_fi05.csv": 2137.07749, "demo_fi06.csv": 1800.24031}
+    #concentration_incl_is2 = {"demo_fi05.csv": 95.25327, "demo_fi06.csv": 306.39438}
     demo_dir = root/"src"/"pysills"/"legacy"/"lib"/"demo_files"
     filenames_smpl = []
     for counter in range(13):
@@ -197,7 +197,6 @@ def run_manual_test(show_full_df=False):
         # inclusion quantification
         df_intensities_mix = dri.subtract_background(signal=data_incl["mean"], background=data_bg1["mean"])
         a_alt = df_intensities_mix[ref_isotope_2]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_2])
-        print(a_alt)
         a = SA(reference_isotope=ref_isotope,
                reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
             intensities_mix=df_intensities_mix, sensitivity=rsf_pred_nist610)
@@ -224,6 +223,9 @@ def run_manual_test(show_full_df=False):
         df_concentrations_incl_x = df_concentrations_incl_x_nist610.copy()
         df_concentrations_incl_x[cols_replace] = df_concentrations_incl_x_sca17[cols_replace]
         df_concentrations_incl_x = df_concentrations_incl_x.clip(lower=0.0)
+        df_concentrations_mix = df_concentrations_mix_nist610.copy()
+        df_concentrations_mix[cols_replace] = df_concentrations_mix_sca17[cols_replace]
+        df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
         df_sensitivity_drift = rsf_pred_nist610.copy()
         df_sensitivity_drift[cols_replace] = rsf_pred_sca17[cols_replace]
 
@@ -236,6 +238,7 @@ def run_manual_test(show_full_df=False):
                 print("-- results: inclusion analysis")
                 print("a", round(a, 5), "x", round(x, 5), "\n")
                 print(df_concentrations_incl_x)
+                print(df_concentrations_mix)
                 print(df_sensitivity_drift)
 
 if __name__ == "__main__":
