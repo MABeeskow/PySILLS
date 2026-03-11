@@ -141,8 +141,11 @@ def run_manual_test(show_full_df=False):
 
         #if show_full_df:
         #    print("Filename:", fname, "\n")
-        #    print(srm_sensitivities_nist610[fname], "\n")
-        #    print(srm_sensitivities_sca17[fname], "\n")
+        #    if "NIST" in srmname:
+        #        print(df_srm_intensities)
+        #        print(srm_sensitivities_nist610[fname], "\n")
+        #    else:
+        #        print(srm_sensitivities_sca17[fname], "\n")
 
     df_srm_intensities = pd.concat(srm_intensities.values(), axis=1)
     df_srm_intensities = df_srm_intensities.mean(axis=1)
