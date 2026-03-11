@@ -411,3 +411,14 @@ class DataReductionIntensities:
         results = pd.DataFrame({"Fano": fano, "k": k})
 
         return results
+
+    def calculate_inclusion_intensity_using_x(
+            self, intensities_mix, intensities_mat, mass_fraction, concentrations_mat, concentration_mix, sensitivities,
+            reference_concentration_incl, reference_isotope):
+        x = mass_fraction
+        intensity_incl_is = intensities_mat[reference_isotope] - (
+                intensities_mat[reference_isotope] - intensities_mix[reference_isotope])/x
+        results = (intensity_incl_is/x*((x - 1)*concentrations_mat + concentration_mix)*
+                   sensitivities/reference_concentration_incl)
+
+        return results
