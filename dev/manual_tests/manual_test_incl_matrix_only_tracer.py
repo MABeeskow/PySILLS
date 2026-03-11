@@ -62,13 +62,6 @@ def run_manual_test(show_full_df=False):
     reference_concentration_incl_t = 0
     concentration_incl_is = {"demo_fi05.csv": 19415.2373, "demo_fi06.csv": 19344.7604}
     demo_dir = root/"src"/"pysills"/"legacy"/"lib"/"demo_files"
-    filenames_smpl = []
-    for counter in range(13):
-        if counter < 10:
-            filename = "demo_fi0" + str(counter) + ".csv"
-        else:
-            filename = "demo_fi" + str(counter) + ".csv"
-        filenames_smpl.append(filename)
     dri = DRI(zero_time=False)
 
     files_srm_setup = {
@@ -139,8 +132,8 @@ def run_manual_test(show_full_df=False):
         #    print(srm_sensitivities_nist610[fname], "\n")
         #    print(srm_sensitivities_sca17[fname], "\n")
 
-    df_srm_intensities = pd.concat(srm_intensities.values(), axis=1)
-    df_srm_intensities = df_srm_intensities.mean(axis=1)
+    #df_srm_intensities = pd.concat(srm_intensities.values(), axis=1)
+    #df_srm_intensities = df_srm_intensities.mean(axis=1)
 
     for fname, setup_info in files_smpl_setup.items():
         reference_concentration_incl = concentration_incl_is[fname]

@@ -6,7 +6,7 @@
 # Name:		smpl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		04.03.2026
+# Date:		11.03.2026
 
 #-----------------------------------------------
 
@@ -91,6 +91,37 @@ class SampleAnalysis:
     def compute_limit_of_detection(
             self, intensities, concentrations, n_bg_values, n_mat_values, intensities_bg=None, tau_values=None,
             sigma_values=None, mode="Pettke"):
+        """
+        Compute limit of detection, blank and quantification (lod, lob, loq).
+
+        Parameters
+        ----------
+        intensities : pandas.Series
+            Mean intensities, indexed by isotope.
+        concentrations : pandas.Series
+            Mean concentrations, indexed by isotope.
+        n_bg_values : int
+            Number of datapoints in (combined) background intervals.
+        n_mat_values : int
+            Number of datapoints in (combined) sample intervals.
+        intensities_bg : pandas.Series
+            Mean background intensities, indexed by isotope.
+        tau_values : pandas.Series
+            Dwell times, indexed by isotope.
+        sigma_values : pandas.Series
+            Standard deviation intensity values for the background, indexed by isotope.
+        mode : str
+            Quantification method (Pettke, Longerich).
+
+        Returns
+        -------
+        lod : pandas.Series
+            Limit of detection, indexed by isotope.
+        lob : pandas.Series
+            Limit of blank, indexed by isotope.
+        loq : pandas.Series
+            Limit of quantification, indexed by isotope.
+        """
         if mode == "Pettke":
             lod = (3.29*(intensities_bg*tau_values*n_mat_values*(1 + n_mat_values/n_bg_values))**(0.5) +
                             2.71)/(n_mat_values*tau_values)*(concentrations/intensities)
