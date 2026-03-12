@@ -6,7 +6,7 @@
 # Name:		incl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		10.03.2026
+# Date:		12.03.2026
 
 #-----------------------------------------------
 
@@ -66,3 +66,18 @@ class InclusionAnalysis:
         concentration_inclusion = concentrations_mixed/x - (1 - x)/x*concentrations_matrix
 
         return concentration_inclusion
+
+    def determine_concentrations_halter(self, intensities_srm, concentrations_srm, intensities_incl, rsf):
+        concentrations_smpl = (concentrations_srm*intensities_incl*rsf)/intensities_srm
+
+        return concentrations_smpl
+
+    def determine_inclusion_concentrations_halter(self, concentrations_mat, concentrations_mixed, x):
+        concentrations_incl = concentrations_mat - (concentrations_mat - concentrations_mixed)/x
+
+        return concentrations_incl
+
+    def determine_mass_fraction_halter(self, concentrations_mat_is, concentrations_mix_is, concentrations_incl_is):
+        x = (concentrations_mat_is - concentrations_mix_is)/(concentrations_mat_is - concentrations_incl_is)
+
+        return x

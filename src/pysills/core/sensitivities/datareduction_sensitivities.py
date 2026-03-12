@@ -6,7 +6,7 @@
 # Name:		datareduction_sensitivities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		25.02.2026
+# Date:		12.03.2026
 
 #-----------------------------------------------
 
@@ -179,3 +179,8 @@ class DataReductionSensitivities:
                      (df_is_intensity/df_is_concentration))
 
         return rsf.rename("RSF")
+
+    def determine_rsf_is(self, intensity_srm_is, concentration_srm_is, intensity_smpl_is, concentration_smpl_is):
+        rsf = (concentration_srm_is*intensity_smpl_is)/(concentration_smpl_is*intensity_srm_is)
+
+        return rsf
