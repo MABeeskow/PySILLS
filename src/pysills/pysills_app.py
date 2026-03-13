@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.97
-# Date:		11.03.2026
+# Version:	v1.0.98
+# Date:		13.03.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,8 +62,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.97"
-        self.val_version = self.str_version_number + " - 11.03.2026"
+        self.str_version_number = "1.0.98"
+        self.val_version = self.str_version_number + " - 13.03.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -10555,7 +10555,7 @@ class PySILLS(tk.Frame):
                         filename, sep=",", header=0, skiprows=data[0], nrows=data[1] - data[0],
                         usecols=header_names, engine="python")
 
-                dataframe_blank = dataframe.loc[dataframe.isnull().all(1)]
+                dataframe_blank = dataframe.loc[dataframe.isnull().all(axis=1)]
                 if len(dataframe_blank) > 0:
                     first_blank_index = dataframe_blank.index[0]
                     dataframe = dataframe[:first_blank_index]
@@ -28856,29 +28856,28 @@ class PySILLS(tk.Frame):
                         var_focus][var_is]
                     var_sensitivity_is = self.container_analytical_sensitivity[var_filetype][var_datatype][
                         var_file_short]["MAT"][var_is]
-
                     if self.container_var["General Settings"]["LOD Selection"].get() == 0:
                         var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                             isotope]
                         var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
 
                         if var_sensitivity_is != None:
-                            if var_sensitivity_is > 0:
+                            if var_sensitivity_is == 0:
+                                var_sensitivity_i = np.nan
+                            else:
                                 var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                     var_file_short]["MAT"][isotope]/var_sensitivity_is
-                            else:
-                                var_sensitivity_i = 0.0
                         else:
                             var_sensitivity_i = np.nan
 
                         if None not in [var_concentration_is, var_sensitivity_i, var_intensity_is]:
-                            if var_sensitivity_i > 0 and var_intensity_is > 0 and var_n_bg > 0:
-                                var_result_i = ((3.29*
-                                                (var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5)
-                                                + 2.71)/(var_n_mat*var_tau_i*var_sensitivity_i)*
-                                                (var_concentration_is/var_intensity_is))
-                            else:
+                            if var_n_bg == 0 and var_intensity_is == 0 and (var_n_mat*var_tau_i*var_sensitivity_i) == 0:
                                 var_result_i = np.nan
+                            else:
+                                var_result_i = (
+                                        (3.29*(var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5)
+                                                + 2.71)/(var_n_mat*var_tau_i*var_sensitivity_i)*(
+                                        var_concentration_is/var_intensity_is))
                         else:
                             var_result_i = np.nan
 
@@ -28891,8 +28890,6 @@ class PySILLS(tk.Frame):
                             isotope] = var_result_i
                         self.container_loq[var_filetype][var_datatype][var_file_short][var_focus][
                             isotope] = 10*a*b*var_result_i
-                        # self.container_lod[var_filetype][var_datatype][var_file_short][var_focus][
-                        #     isotope] = var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
                         if self.container_var["General Settings"]["Desired Average"].get() == 1:
@@ -31719,11 +31716,17 @@ class PySILLS(tk.Frame):
                         # Second Internal Standard
                         elif self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
+                            # 1) Determine a
+                            # 2) Determine x
+                            # 3) Determine mixed concentration of 1st  internal standard
+                            # 4) Determine mixed concentrations of all other isotopes
+                            # 5) Determine inclusion concentrations of all isotopes
+
+                            ## Initial setup
                             var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                             var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
                                 "Name"].get()
 
-                            ## Mixed concentration ratio a
                             var_intensity_mix_is1 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
                                 var_is1]
                             var_intensity_mix_is2 = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][
@@ -31731,11 +31734,6 @@ class PySILLS(tk.Frame):
                             var_sensitivity_is2 = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                 var_file_short]["INCL"][var_is2]
 
-                            var_a = self.calculate_mixed_concentration_ratio(
-                                intensity_mix_i=var_intensity_mix_is2, intensity_mix_IS=var_intensity_mix_is1,
-                                sensitivity_IS_i=var_sensitivity_is2)
-                            var_a = (var_intensity_mix_is2)/(var_intensity_mix_is1*var_sensitivity_is2)
-                            ## Mixing ratio x
                             var_concentration_host_is1 = self.container_concentration["SMPL"][var_datatype][
                                 var_file_short]["MAT"][var_is1]
                             var_concentration_host_is2 = self.container_concentration["SMPL"][var_datatype][
@@ -31750,30 +31748,49 @@ class PySILLS(tk.Frame):
                             var_concentration_incl_is2 = float(
                                 self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Value"].get())
 
+                            var_intensity_mat_is1 = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_is1]
+
+                            ## Mixed concentration ratio a
+                            var_a = self.calculate_mixed_concentration_ratio(
+                                intensity_mix_i=var_intensity_mix_is2, intensity_mix_IS=var_intensity_mix_is1,
+                                sensitivity_IS_i=var_sensitivity_is2)
+
+                            ## Mass fraction x
                             var_x = self.calculate_mixing_ratio(
                                 factor_a=var_a, concentration_mat_i=var_concentration_host_is2,
                                 concentration_mat_IS=var_concentration_host_is1,
                                 concentraton_incl_i=var_concentration_incl_is2,
                                 concentration_incl_IS=var_concentration_incl_is1)
-                            var_x = (var_concentration_host_is2 - var_a*var_concentration_host_is1)/(
-                                    var_concentration_host_is2 - var_concentration_incl_is2 - var_a*(
-                                    var_concentration_host_is1 - var_concentration_incl_is1))
-                            ## Mixed Concentration IS1
+                            if var_x < 0:
+                                print(
+                                    "WARNING! The mass fraction x has become negative, which may be considered in "
+                                    "your data interpretation. A negative x can eventually be avoided by a "
+                                    "different interval definition.")
+
+                            ## Mixed concentration IS1
                             var_concentration_mix_is1 = ((1 - var_x)*var_concentration_host_is1 +
                                                          var_x*var_concentration_incl_is1)
-                            ## Mixed Concentrations
+
+                            ## Inclusion intensity IS1
+                            var_intensity_incl_is1 = var_intensity_mat_is1 - (
+                                    var_intensity_mat_is1 - var_intensity_mix_is1)/var_x
+
+                            ## Mixed and inclusion concentrations
                             for index, isotope in enumerate(file_isotopes):
-                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
-                                    var_file_short][isotope]
                                 var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                                     var_file_short]["INCL"][isotope]
-
-                                var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is1)*(
-                                        var_concentration_mix_is1/var_sensitivity_i)
                                 var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
                                     var_file_short]["MAT"][isotope]
-                                var_intensity_incl_is = self.container_intensity_corrected[var_filetype][var_datatype][
-                                    var_file_short]["INCL"][var_is]
+                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][isotope]
+                                var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is1)*(
+                                        var_concentration_mix_is1/var_sensitivity_i)
+                                var_intensity_incl_i = (
+                                        var_intensity_incl_is1/var_x*((var_x - 1)*var_concentration_host_i +
+                                                                      var_concentration_mix_i)*var_sensitivity_i/
+                                        var_concentration_incl_is1)
+                                var_intensity_incl_ratio_i = var_intensity_incl_i/var_intensity_incl_is1
 
                                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
                                     var_file_short]["BG"][isotope]
@@ -31789,22 +31806,26 @@ class PySILLS(tk.Frame):
                                                      /var_tau_i)**2)**0.5
                                 var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
 
-                                ## Inclusion Concentrations
-                                if var_x > 0:
-                                    var_result_i = (var_concentration_mix_i + (var_x - 1)*
-                                                    var_concentration_host_i)/var_x
-                                    if (var_intensity_incl_is*var_sensitivity_i) > 0:
-                                        var_result_sigma_i = (var_concentration_incl_is1/(
-                                                var_intensity_incl_is*var_sensitivity_i))*var_sigma
-                                    else:
-                                        var_result_sigma_i = np.nan
-                                else:
+                                ## Inclusion
+                                if var_x == 0:
                                     var_result_i = np.nan
-                                    var_result_sigma_i = 0.0
+                                else:
+                                    var_result_i = ((var_concentration_mix_i + (var_x - 1)*var_concentration_host_i)/
+                                                    var_x)
+                                    if var_result_i < 0:
+                                        var_result_i = 0.0
+                                if (var_intensity_incl_is1*var_sensitivity_i) == 0:
+                                    var_result_sigma_i = np.nan
+                                else:
+                                    var_result_sigma_i = (var_concentration_incl_is1/(
+                                            var_intensity_incl_is1*var_sensitivity_i))*var_sigma
 
-                                if var_result_i < 0:
-                                    var_result_i = 0.0
-
+                                self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope] = var_intensity_incl_i
+                                self.container_intensity_ratio[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope] = var_intensity_incl_ratio_i
+                                self.container_mixed_concentration["SMPL"][var_datatype][var_file_short][
+                                    isotope] = var_concentration_mix_i
                                 self.container_concentration[var_filetype][var_datatype][var_file_short][
                                     "INCL"][isotope] = var_result_i
                                 self.container_concentration[var_filetype][var_datatype][var_file_short][
@@ -32385,7 +32406,7 @@ class PySILLS(tk.Frame):
                 var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                     "INCL"][isotope]
                 var_intensity_bg_i = self.container_intensity["SMPL"][var_datatype][var_file_short]["BG"][isotope]
-                var_intensity_mix_i =  self.container_intensity["SMPL"][var_datatype][var_file_short]["INCL"][isotope]
+                var_intensity_mix_i = self.container_intensity["SMPL"][var_datatype][var_file_short]["INCL"][isotope]
                 var_n_bg = self.container_intensity["SMPL"][var_datatype][var_file_short]["N BG"][isotope]
                 var_n_mix = self.container_intensity["SMPL"][var_datatype][var_file_short]["N INCL"][isotope]
                 var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
@@ -32623,14 +32644,12 @@ class PySILLS(tk.Frame):
                         var_focus][var_is]
                     var_intensity_is = self.container_intensity_corrected[var_filetype][var_datatype][var_file_short][
                         var_focus][var_is]
-                    #
                     if self.container_var["General Settings"]["LOD Selection"].get() == 0:
                         var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
                             isotope]
                         var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
                         var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                             var_file_short]["MAT"][isotope]
-
                         if var_n_bg > 0 and var_intensity_is > 0:
                             var_result_i = (3.29*(
                                     var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5) + 2.71)/(
@@ -37230,15 +37249,7 @@ class PySILLS(tk.Frame):
     def fi_show_quick_results(self, var_file, var_type, filesetup=False):
         # Colors
         font_color_dark = self.bg_colors["Dark Font"]
-        font_color_light = self.bg_colors["Light Font"]
-        background_color_dark = self.bg_colors["BG Window"]
-        background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
-        accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = self.font_settings["Header"]
-        font_elements = self.font_settings["Elements"]
-        font_option = self.font_settings["Options"]
-        font_table = self.font_settings["Table"]
 
         parts = var_file.split("/")
         var_file_short = parts[-1]
