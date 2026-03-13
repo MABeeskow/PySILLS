@@ -6,7 +6,7 @@
 # Name:		smpl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		11.03.2026
+# Date:		13.03.2026
 
 #-----------------------------------------------
 
@@ -142,6 +142,30 @@ class SampleAnalysis:
     def calculate_1_sigma_concentration(
             self, intensities_bg, intensities_sig, tau_values, ref_concentration_sig, ref_intensity_sig,
             sensitivity_sig):
+        """
+        Calculates the 1-sigma concentration. "sig" represents the specific signal contribution (e.g., matrix, mixed,
+        inclusion)
+
+        Parameters
+        ----------
+        intensities_bg : pandas.Series
+            Mean background intensities, indexed by isotope.
+        intensities_sig : str
+            Mean sample intensities, indexed by isotope.
+        tau_values : str
+            Dwell times, indexed by isotope.
+        ref_concentration_sig : str
+            Sample concentration of the reference isotope.
+        ref_intensity_sig : str
+            Sample intensity of the reference isotope.
+        sensitivity_sig : str
+            Normalized/relative sample sensitivity, indexed by isotope.
+
+        Returns
+        -------
+        results : pandas.Series
+            1-sigma concentration, indexed by isotope.
+        """
         var_intensities_bg = intensities_bg["mean"]
         var_length_bg = intensities_bg["length"]
         var_intensities_sig = intensities_sig["mean"]
@@ -188,10 +212,28 @@ class SampleAnalysis:
 
         return result
 
+    def determine_mass_fraction_volume(self, volume_incl, rho_incl, volume_mat, rho_mat):
+        x = (volume_incl*rho_incl)/(volume_mat*rho_mat + volume_incl*rho_incl)
+
+        return x
+
+    def determine_mass_fraction_geometric(self, a, b, radius, rho_mat, rho_incl, c=None):
+        if c is not None:
+            volume = 4/3*np.pi*a*b*c
+            upper_term = volume*rho_incl
+            lower_term = (2*np.pi*c*radius**2 - volume)*rho_mat + upper_term
+            x = upper_term/lower_term
+        else:
+            area = 4/3*np.pi*a*b
+            upper_term = area*rho_incl
+            lower_term = (2*np.pi*radius**2 - area)*rho_mat + upper_term
+            x = upper_term/lower_term
+
+        return x
+
     def calculate_inclusion_concentration_using_x(self, concentratios_mix, concentratios_host, mass_fraction):
         x = mass_fraction
         results = (concentratios_mix + (x - 1)*concentratios_host)/x
-
         return results
 
     def perform_quantification_by_halter_iterative(self):

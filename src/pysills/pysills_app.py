@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.98
+# Version:	v1.0.99
 # Date:		13.03.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.98"
+        self.str_version_number = "1.0.99"
         self.val_version = self.str_version_number + " - 13.03.2026"
 
         ## Colors
@@ -1975,7 +1975,7 @@ class PySILLS(tk.Frame):
             "Matrix quantification": [5, 24], "Mineral quantification": [18, 40], "Stepwise analysis": [32, 55],
             "MA specific file": [34, 60], "MA datareduction files": [25, 63],
             "Detailed analysis": [32, 45], "About PySILLS": [22, 32], "Calculation report": [9, 13],
-            "Sensitivity drift": [32, 70], "FI datareduction files": [29, 63], "Setup Halter": [24, 34],
+            "Sensitivity drift": [32, 70], "FI datareduction files": [29, 63], "Setup Halter": [24, 25],
             "Setup Borisova": [22, 34], "Setup matrix-only tracer": [15, 41], "Setup 2nd IS": [15, 36],
             "FI specific file": [34, 68], "Setup PyPitzer": [20, 60], "Setup mass balance": [24, 55],
             "Setup external calculation": [11, 33], "Custom spike check": [24, 45], "Popup window error": [12, 20],
@@ -26505,23 +26505,24 @@ class PySILLS(tk.Frame):
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
                     elif self.container_var[key_setting][
                         "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                        var_t = self.container_var["Halter2002"]["Name"].get()
+                        var_t = None
                     elif self.container_var[key_setting][
                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                         var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                    if var_t != str_var_01:
-                        IQ(dataframe=None, project_type=self.pysills_mode,
-                           results_container=self.container_intensity_corrected[var_filetype][var_datatype][
-                               var_file_short]).get_intensity_corrected(
-                            data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
-                            mode=mode_id, isotope_t=var_t)
-                    else:
-                        self.create_popup_window_before_error(
-                            var_text="It seems that a variable was still not defined. Please check if the "
-                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                     "standard method or for the methods from Halter or Borisova was already "
-                                     "defined.")
+                    if var_t is not None:
+                        if var_t != str_var_01:
+                            IQ(dataframe=None, project_type=self.pysills_mode,
+                               results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                   var_file_short]).get_intensity_corrected(
+                                data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                                mode=mode_id, isotope_t=var_t)
+                        else:
+                            self.create_popup_window_before_error(
+                                var_text="It seems that a variable was still not defined. Please check if the "
+                                         "reference isotope for the matrix-only tracer method, the 2nd internal "
+                                         "standard method or for the methods from Halter or Borisova was already "
+                                         "defined.")
 
             elif self.pysills_mode == "MI":
                 mode_id = self.container_var["mi_setting"]["Inclusion Intensity Calculation"].get()
@@ -26541,23 +26542,24 @@ class PySILLS(tk.Frame):
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
                     elif self.container_var["mi_setting"][
                         "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                        var_t = self.container_var["Halter2002"]["Name"].get()
+                        var_t = None
                     elif self.container_var["mi_setting"][
                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                         var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                    if var_t != str_var_01:
-                        IQ(dataframe=None, project_type=self.pysills_mode,
-                           results_container=self.container_intensity_corrected[var_filetype][var_datatype][
-                               var_file_short]).get_intensity_corrected(
-                            data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
-                            mode=mode_id, isotope_t=var_t)
-                    else:
-                        self.create_popup_window_before_error(
-                            var_text="It seems that a variable was still not defined. Please check if the "
-                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                     "standard method or for the methods from Halter or Borisova was already "
-                                     "defined.")
+                    if var_t is not None:
+                        if var_t != str_var_01:
+                            IQ(dataframe=None, project_type=self.pysills_mode,
+                               results_container=self.container_intensity_corrected[var_filetype][var_datatype][
+                                   var_file_short]).get_intensity_corrected(
+                                data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
+                                mode=mode_id, isotope_t=var_t)
+                        else:
+                            self.create_popup_window_before_error(
+                                var_text="It seems that a variable was still not defined. Please check if the "
+                                         "reference isotope for the matrix-only tracer method, the 2nd internal "
+                                         "standard method or for the methods from Halter or Borisova was already "
+                                         "defined.")
             else:
                 IQ(dataframe=None, project_type=self.pysills_mode,
                    results_container=self.container_intensity_corrected[var_filetype][var_datatype][
@@ -26674,23 +26676,24 @@ class PySILLS(tk.Frame):
                                             "Name"].get()
                                     elif self.container_var[key_setting][
                                         "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                                        var_t = self.container_var["Halter2002"]["Name"].get()
+                                        var_t = None
                                     elif self.container_var[key_setting][
                                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                                         var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                                    if var_t != "Select Isotope":
-                                        IQ(dataframe=None, project_type=self.pysills_mode,
-                                           results_container=self.container_intensity_corrected[var_filetype][var_datatype][
-                                               var_file_short]).get_intensity_corrected(
-                                            data_container=self.container_intensity[var_filetype][var_datatype][
-                                                var_file_short], mode=mode_id, isotope_t=var_t)
-                                    else:
-                                        self.create_popup_window_before_error(
-                                            var_text="It seems that a variable was still not defined. Please check if the "
-                                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                                     "standard method or for the methods from Halter or Borisova was already "
-                                                     "defined.")
+                                    if var_t is not None:
+                                        if var_t != "Select Isotope":
+                                            IQ(dataframe=None, project_type=self.pysills_mode,
+                                               results_container=self.container_intensity_corrected[var_filetype][
+                                                   var_datatype][var_file_short]).get_intensity_corrected(
+                                                data_container=self.container_intensity[var_filetype][var_datatype][
+                                                    var_file_short], mode=mode_id, isotope_t=var_t)
+                                        else:
+                                            self.create_popup_window_before_error(
+                                                var_text="It seems that a variable was still not defined. Please check "
+                                                         "if the reference isotope for the matrix-only tracer method, "
+                                                         "the 2nd internal standard method or for the methods from "
+                                                         "Halter or Borisova was already defined.")
                             elif self.pysills_mode == "MI" and run_calculation == True:
                                 mode_id = self.container_var["mi_setting"]["Inclusion Intensity Calculation"].get()
 
@@ -26713,23 +26716,24 @@ class PySILLS(tk.Frame):
                                             "Name"].get()
                                     elif self.container_var["mi_setting"][
                                         "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                                        var_t = self.container_var["Halter2002"]["Name"].get()
+                                        var_t = None
                                     elif self.container_var["mi_setting"][
                                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                                         var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                                    if var_t != "Select Isotope":
-                                        IQ(dataframe=None, project_type=self.pysills_mode,
-                                           results_container=self.container_intensity_corrected[var_filetype][var_datatype][
-                                               var_file_short]).get_intensity_corrected(
-                                            data_container=self.container_intensity[var_filetype][var_datatype][var_file_short],
-                                            mode=mode_id, isotope_t=var_t)
-                                    else:
-                                        self.create_popup_window_before_error(
-                                            var_text="It seems that a variable was still not defined. Please check if the "
-                                                     "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                                     "standard method or for the methods from Halter or Borisova was already "
-                                                     "defined.")
+                                    if var_t is not None:
+                                        if var_t != "Select Isotope":
+                                            IQ(dataframe=None, project_type=self.pysills_mode,
+                                               results_container=self.container_intensity_corrected[var_filetype][
+                                                   var_datatype][var_file_short]).get_intensity_corrected(
+                                                data_container=self.container_intensity[var_filetype][var_datatype][
+                                                    var_file_short], mode=mode_id, isotope_t=var_t)
+                                        else:
+                                            self.create_popup_window_before_error(
+                                                var_text="It seems that a variable was still not defined. Please check "
+                                                         "if the reference isotope for the matrix-only tracer method, "
+                                                         "the 2nd internal standard method or for the methods from "
+                                                         "Halter or Borisova was already defined.")
                             else:
                                 if run_calculation == True:
                                     IQ(dataframe=None, project_type=self.pysills_mode,
@@ -30999,81 +31003,88 @@ class PySILLS(tk.Frame):
                             var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
                         elif self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                            var_t = self.container_var["Halter2002"]["Name"].get()
+                            var_t = None
                         elif self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                             var_t = self.container_var["Borisova2021"]["Name"].get()
 
-                        var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short]["INCL"][
-                            isotope]
-                        if var_t != "Select Isotope":
-                            var_intensity_bg_t = self.container_intensity[var_filetype][var_datatype][var_file_short]["BG"][
-                                var_t]
-                            var_intensity_mat_t = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "MAT"][var_t]
-                            var_intensity_incl_t = self.container_intensity[var_filetype][var_datatype][var_file_short][
-                                "INCL"][var_t]
+                        var_intensity_incl_i = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                            "INCL"][isotope]
+
+                        if var_t is not None:
+                            if var_t != "Select Isotope":
+                                var_intensity_bg_t = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["BG"][var_t]
+                                var_intensity_mat_t = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["MAT"][var_t]
+                                var_intensity_incl_t = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][var_t]
+                            else:
+                                print("It seems that a variable was still not defined. Please check if the "
+                                      "reference isotope for the matrix-only tracer method, the 2nd internal "
+                                      "standard method or for the methods from Halter or Borisova was already defined.")
+                                self.parent.bell()
+
+                            # var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
+                            # var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                            # var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                            # var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+
+
+
+                            if var_intensity_mat_i > var_intensity_bg_i:
+                                var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
+                            else:
+                                var_intensity_host_i = 0.0
+
+                            if var_intensity_incl_i > var_intensity_bg_i:
+                                var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
+                            else:
+                                var_intensity_mix_i = 0.0
+
+                            if var_intensity_mat_t > var_intensity_bg_t:
+                                var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
+                            else:
+                                var_intensity_host_t = 0.0
+
+                            if var_intensity_incl_t > var_intensity_bg_t:
+                                var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
+                            else:
+                                var_intensity_incl_host_t = 0.0
+
+                            var_intensity_mix_t = var_intensity_incl_host_t
+                            # var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
+
+                            if var_intensity_host_t > 0:
+                                var_intensity_incl_host_i = ((var_intensity_incl_host_t/var_intensity_host_t)*
+                                                             var_intensity_host_i)
+                            else:
+                                var_intensity_incl_host_i = 0.0
+
+                            if self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 0:
+                                # Heinrich (2003)
+                                var_result = round(self.calculate_intensity_incl_heinrich(
+                                    intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
+                                    intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
+                            elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 1:
+                                # SILLS Equation Sheet
+                                ## without R
+                                var_result = round(self.calculate_intensity_incl_sills(
+                                    intensity_mix_i=var_intensity_mix_i,
+                                    intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+                            elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 2:
+                                # SILLS Equation Sheet
+                                ## with R
+                                var_result = round(self.calculate_intensity_incl_sills(
+                                    intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
+                                    intensity_mat_i=var_intensity_host_i, with_r=True), 6)
+                            elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 3:
+                                # Theory
+                                var_result = round(self.calculate_intensity_incl_theory(
+                                    intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
+                                    intensity_incl_mat_i=var_intensity_incl_host_i), 6)
                         else:
-                            print("It seems that a variable was still not defined. Please check if the "
-                                  "reference isotope for the matrix-only tracer method, the 2nd internal "
-                                  "standard method or for the methods from Halter or Borisova was already defined.")
-                            self.parent.bell()
-
-                        # var_intensity_host_i = abs(var_intensity_mat_i - var_intensity_bg_i)
-                        # var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
-                        # var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                        # var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
-
-                        if var_intensity_mat_i > var_intensity_bg_i:
-                            var_intensity_host_i = var_intensity_mat_i - var_intensity_bg_i
-                        else:
-                            var_intensity_host_i = 0.0
-
-                        if var_intensity_incl_i > var_intensity_bg_i:
-                            var_intensity_mix_i = var_intensity_incl_i - var_intensity_bg_i
-                        else:
-                            var_intensity_mix_i = 0.0
-
-                        if var_intensity_mat_t > var_intensity_bg_t:
-                            var_intensity_host_t = var_intensity_mat_t - var_intensity_bg_t
-                        else:
-                            var_intensity_host_t = 0.0
-
-                        if var_intensity_incl_t > var_intensity_bg_t:
-                            var_intensity_incl_host_t = var_intensity_incl_t - var_intensity_bg_t
-                        else:
-                            var_intensity_incl_host_t = 0.0
-
-                        var_intensity_mix_t = var_intensity_incl_host_t
-                        # var_intensity_incl_host_i = (var_intensity_incl_host_t/var_intensity_host_t)*var_intensity_host_i
-
-                        if var_intensity_host_t > 0:
-                            var_intensity_incl_host_i = ((var_intensity_incl_host_t/var_intensity_host_t)*
-                                                         var_intensity_host_i)
-                        else:
-                            var_intensity_incl_host_i = 0.0
-
-                        if self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 0:
-                            # Heinrich (2003)
-                            var_result = round(self.calculate_intensity_incl_heinrich(
-                                intensity_mix_i=var_intensity_mix_i, intensity_mix_t=var_intensity_mix_t,
-                                intensity_mat_i=var_intensity_host_i, intensity_mat_t=var_intensity_host_t), 6)
-                        elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 1:
-                            # SILLS Equation Sheet
-                            ## without R
-                            var_result = round(self.calculate_intensity_incl_sills(
-                                intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i), 6)
-                        elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 2:
-                            # SILLS Equation Sheet
-                            ## with R
-                            var_result = round(self.calculate_intensity_incl_sills(
-                                intensity_mix_i=var_intensity_mix_i, intensity_incl_mat_i=var_intensity_incl_host_i,
-                                intensity_mat_i=var_intensity_host_i, with_r=True), 6)
-                        elif self.container_var[key_setting]["Inclusion Intensity Calculation"].get() == 3:
-                            # Theory
-                            var_result = round(self.calculate_intensity_incl_theory(
-                                intensity_incl_total_i=var_intensity_incl_i, intensity_bg_i=var_intensity_bg_i,
-                                intensity_incl_mat_i=var_intensity_incl_host_i), 6)
+                            var_result = np.nan
 
                     elif var_focus == "BG":
                         var_result = var_intensity_bg_i
@@ -31084,7 +31095,8 @@ class PySILLS(tk.Frame):
                     else:
                         print(
                             "There is a problem with the result for file", var_file_short, var_datatype,
-                            ". Please check if all variables are set and if the spike elimination was refreshed. Thank you!"
+                            ". Please check if all variables are set and if the spike elimination was refreshed. "
+                            "Thank you!"
                         )
                         run_calculation = False
                         self.parent.bell()
@@ -31834,6 +31846,115 @@ class PySILLS(tk.Frame):
                                     "1 SIGMA INCL"][isotope] = var_result_sigma_i
                         elif self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                            # 1) Determine x
+                            # 2) Determine mixed concentration of internal standard
+                            # 3) Determine mixed concentration of all other isotopes
+                            # 4) Determine inclusion concentration of all isotopes
+
+                            ## Initial setup
+                            var_a = float(self.container_var["SMPL"][var_file_long]["Halter2002"]["a"].get())
+                            var_b = float(self.container_var["SMPL"][var_file_long]["Halter2002"]["b"].get())
+                            var_rho_host = float(self.container_var["SMPL"][var_file_long]["Halter2002"][
+                                                     "rho(host)"].get())
+                            var_rho_incl = float(self.container_var["SMPL"][var_file_long]["Halter2002"][
+                                                     "rho(incl)"].get())
+                            var_radius = float(self.container_var["SMPL"][var_file_long]["Halter2002"]["R"].get())
+
+                            var_concentration_mat_is = self.container_concentration["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_mat_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
+                                var_file_short][var_is]
+
+                            if pypitzer == False:
+                                var_concentration_incl_is = float(
+                                    self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                            else:
+                                var_concentration_incl_is = 10000
+
+                            # Mass fraction x
+                            area = 4/3*np.pi*var_a*var_b
+                            upper_term = area*var_rho_incl
+                            lower_term = (2*np.pi*var_radius**2 - area)*var_rho_host + upper_term
+                            var_x = upper_term/lower_term
+
+                            if var_x < 0:
+                                print(
+                                    "WARNING! The mass fraction x has become negative, which may be considered in "
+                                    "your data interpretation. A negative x can eventually be avoided by a "
+                                    "different interval definition.")
+
+                            ## Mixed concentration IS
+                            var_concentration_mix_is = (
+                                    (1 - var_x)*var_concentration_mat_is + var_x*var_concentration_incl_is)
+
+                            ## Inclusion intensity IS
+                            var_intensity_incl_is = var_intensity_mat_is - (
+                                    var_intensity_mat_is - var_intensity_mix_is)/var_x
+
+                            ## Mixed and inclusion concentrations
+                            for index, isotope in enumerate(file_isotopes):
+                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope]
+                                var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][isotope]
+                                var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is)*(
+                                        var_concentration_mix_is/var_sensitivity_i)
+                                var_concentration_mix_ratio_i = var_concentration_mix_i/var_concentration_mix_is
+                                var_intensity_incl_i = (
+                                        var_intensity_incl_is/var_x*((var_x - 1)*var_concentration_host_i +
+                                                                     var_concentration_mix_i)*
+                                        var_sensitivity_i/var_concentration_incl_is)
+                                var_intensity_incl_ratio_i = var_intensity_incl_i/var_intensity_incl_is
+
+                                var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["BG"][isotope]
+                                var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope]
+                                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+                                    isotope]
+                                var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                    "N INCL"][isotope]
+                                var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+                                var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+                                var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+                                                     /var_tau_i)**2)**0.5
+                                var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+
+                                ## Inclusion
+                                if var_x == 0:
+                                    var_result_i = np.nan
+                                else:
+                                    var_result_i = ((var_concentration_mix_i + (var_x - 1)*var_concentration_host_i)/
+                                                    var_x)
+                                    if var_result_i < 0:
+                                        var_result_i = 0.0
+                                if (var_intensity_incl_is*var_sensitivity_i) == 0:
+                                    var_result_sigma_i = np.nan
+                                else:
+                                    var_result_sigma_i = (var_concentration_incl_is/(
+                                            var_intensity_incl_is*var_sensitivity_i))*var_sigma
+
+                                self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope] = var_intensity_incl_i
+                                self.container_intensity_ratio[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope] = var_intensity_incl_ratio_i
+                                self.container_mixed_concentration["SMPL"][var_datatype][var_file_short][
+                                    isotope] = var_concentration_mix_i
+                                self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][
+                                    isotope] = var_concentration_mix_ratio_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "INCL"][isotope] = var_result_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "Halter2002"][isotope] = var_result_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "1 SIGMA INCL"][isotope] = var_result_sigma_i
+                                self.container_mixing_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_x
+                        elif self.container_var[key_setting][
+                            "Quantification Method Option"].get() == "Iterative approach (Halter et al. 2002)":
                             # Mixing ratio x
                             for index, isotope in enumerate(file_isotopes):
                                 if index == 0:
@@ -32164,7 +32285,7 @@ class PySILLS(tk.Frame):
                 var_mo = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
             elif self.container_var[key_setting][
                 "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                var_mo = self.container_var["Halter2002"]["Name"].get()
+                var_mo = None
             elif self.container_var[key_setting][
                 "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                 var_mo = self.container_var["Borisova2021"]["Name"].get()
@@ -32183,24 +32304,20 @@ class PySILLS(tk.Frame):
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "INCL"][var_mo]
                 elif self.container_var[key_setting][
-                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                    var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
-                    var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
-                    var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
-                        "INCL"][var_mo]
-                elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                     var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_mo]
                     var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][var_file_short][var_is]
                     var_sensitivity_i = self.container_analytical_sensitivity["SMPL"][var_datatype][var_file_short][
                         "INCL"][var_mo]
 
-                if (var_intensity_mix_is*var_sensitivity_i) > 0:
-                    var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
-                else:
-                    var_result_i = np.nan
+                if var_mo is not None:
+                    if (var_intensity_mix_is*var_sensitivity_i) > 0:
+                        var_result_i = var_intensity_mix_i/(var_intensity_mix_is*var_sensitivity_i)
+                    else:
+                        var_result_i = np.nan
 
-                self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
+                    self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][
+                        isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -32302,17 +32419,7 @@ class PySILLS(tk.Frame):
                             var_concentration_host_is1 - var_concentration_incl_is1)
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
-                    var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
-                    var_concentration_host_mo = self.container_concentration["SMPL"][var_datatype][var_file_short][
-                        "MAT"][var_mo]
-                    var_concentration_host_is = self.container_concentration["SMPL"][var_datatype][var_file_short][
-                        "MAT"][var_is]
-                    var_concentration_incl_is = self.container_concentration["SMPL"][var_datatype][var_file_short][
-                        "INCL"][var_is]
-
-                    upper_term = var_concentration_host_mo - var_a*var_concentration_host_is
-                    lower_term = var_concentration_host_mo - var_a*(
-                            var_concentration_host_is - var_concentration_incl_is)
+                    upper_term = None
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
                     var_a = self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][isotope]
@@ -32327,12 +32434,13 @@ class PySILLS(tk.Frame):
                     lower_term = var_concentration_host_mo - var_a*(
                             var_concentration_host_is - var_concentration_incl_is)
 
-                if lower_term != 0:
-                    var_result_i = upper_term/lower_term
-                else:
-                    var_result_i = 0
+                if upper_term is not None:
+                    if lower_term != 0:
+                        var_result_i = upper_term/lower_term
+                    else:
+                        var_result_i = 0
 
-                self.container_mixing_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
+                    self.container_mixing_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_result_i
         else:
             for var_filetype in ["SMPL"]:
                 for isotope in self.container_lists["Measured Isotopes"]["All"]:
@@ -34936,10 +35044,6 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = self.font_settings["Header"]
-        font_elements = self.font_settings["Elements"]
-        font_option = self.font_settings["Options"]
-        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -34986,8 +35090,6 @@ class PySILLS(tk.Frame):
         ## LABELS
         str_lbl_01 = self.language_dict["Default settings"][self.var_language]
         str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
-        str_lbl_03 = self.language_dict["Setup"][self.var_language]
-        str_lbl_04 = self.language_dict["Inclusion intensity"][self.var_language]
         str_lbl_05 = self.language_dict["Inclusion dimensions"][self.var_language]
         str_lbl_06 = self.language_dict["Densities"][self.var_language]
         str_lbl_07 = self.language_dict["Matrix density"][self.var_language]
@@ -35040,29 +35142,6 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=33, fg=font_color_light,
             bg=background_color_dark).create_simple_label(
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold", anchor=tk.W)
-        lbl_006 = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_light, bg=background_color_dark).create_simple_label(
-            text=str_lbl_03 + " - " + str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_006a = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column + 19,
-            n_rows=1, n_columns=8, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold")
-
-        # OPTION MENUS
-        list_isotopes_all = self.container_lists["Measured Isotopes"]["All"]
-        opt_03a = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 1, column_id=start_column + 27,
-            n_rows=1, n_columns=6, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=self.container_var["Halter2002"]["Name"], option_list=list_isotopes_all,
-            text_set=self.container_var["Halter2002"]["Name"].get(), fg_active=font_color_light,
-            bg_active=accent_color)
-        opt_03a["menu"].config(
-            fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
-            activebackground=accent_color)
-        opt_03a.config(
-            bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-            activeforeground=font_color_light, highlightthickness=0)
 
         ## BUTTONS
         if self.var_os == "darwin":
@@ -35077,35 +35156,6 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=8, fg=font_color_accent, bg=accent_color).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=self.change_values_halter2002_all)
-
-        # RADIOBUTTONS
-        str_rb_01 = self.language_dict["without"][self.var_language]
-        str_rb_02 = self.language_dict["with"][self.var_language]
-
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 2, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Heinrich et al. (2003)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 3, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_01 + " R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 4, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (" + str_rb_02 + " R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 5, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark,
-            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
         ## ENTRIES
         entr_002a = SE(
@@ -35153,7 +35203,7 @@ class PySILLS(tk.Frame):
 
         frm_smpl = SE(
             parent=self.subwindow_quantification_setup_halter2002, row_id=start_row + 11, column_id=start_column,
-            n_rows=12, n_columns=33, fg=font_color_dark,
+            n_rows=12, n_columns=24, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_frame()
         vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
@@ -35192,31 +35242,31 @@ class PySILLS(tk.Frame):
 
             entr_1_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["a"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_1_i)
             text_smpl.insert("end", "\t")
 
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["b"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_2_i)
             text_smpl.insert("end", "\t")
 
             entr_3_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(host)"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_3_i)
             text_smpl.insert("end", "\t")
 
             entr_4_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(incl)"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_4_i)
             text_smpl.insert("end", "\t")
 
             entr_5_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["R"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_5_i)
             text_smpl.insert("end", "\n")
 
