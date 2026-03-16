@@ -6,7 +6,7 @@
 # Name:		datareduction_intensities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		28.02.2026
+# Date:		16.03.2026
 
 #-----------------------------------------------
 
@@ -422,3 +422,8 @@ class DataReductionIntensities:
                    sensitivities/reference_concentration_incl)
 
         return results
+
+    def calculate_integrated_intensity_borisova(self, intensities_incl, intensity_mix_t):
+        k = intensities_incl/intensity_mix_t
+
+        return k

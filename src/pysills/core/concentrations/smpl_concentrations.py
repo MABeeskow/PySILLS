@@ -6,7 +6,7 @@
 # Name:		smpl_concentrations.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		13.03.2026
+# Date:		16.03.2026
 
 #-----------------------------------------------
 
@@ -242,5 +242,8 @@ class SampleAnalysis:
     def perform_quantification_by_halter(self):
         pass
 
-    def perform_quantification_by_borisova(self):
-        pass
+    def calculate_inclusion_concentration_by_borisova(
+            self, concentrations_mat_t, rho_mat, rho_incl, radius_mat, radius_incl, sensitivities, k):
+        results = (concentrations_mat_t*(rho_mat/rho_incl)*(1/sensitivities)*k*(1.5*(radius_mat/radius_incl)**2 - 1))
+
+        return results
