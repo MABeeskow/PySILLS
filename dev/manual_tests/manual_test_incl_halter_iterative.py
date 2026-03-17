@@ -203,52 +203,82 @@ def run_manual_test(show_full_df=False):
             intensities=df_intensities_mat, concentrations=df_concentrations, n_bg_values=n_bg_values,
             n_mat_values=n_mat_values, intensities_bg=data_bg1["mean"], tau_values=tau_values)
 
-        tol = 1e-5
-        max_iter = 500
-        x_low = 0.05
-        x_high = 0.95
+        df_sigma_concentrations_mat = SA(reference_isotope=ref_isotope_matrix).calculate_1_sigma_concentration(
+            intensities_bg=data_bg1, intensities_sig=data_sig, tau_values=tau_values,
+            ref_concentration_sig=reference_concentration_mat, ref_intensity_sig=df_intensities_mat[ref_isotope_matrix],
+            sensitivity_sig=df_sensitivity_drift)
 
-        def compute_error(x):
-            concentration_mix_is = (1 - x)*df_concentrations[ref_isotope] + x*reference_concentration_incl
-            i_mix_ratios = dri.compute_intensity_ratios(intensities=df_intensities_mix, reference_isotope=ref_isotope)
-            df_concentrations_mix = SA(reference_isotope=ref_isotope).compute_concentrations(
-                intensity_ratios=i_mix_ratios, sensitivity_values=df_sensitivity_drift,
-                reference_concentration=concentration_mix_is)
-            df_concentrations_incl = SA(reference_isotope=ref_isotope).calculate_inclusion_concentration_using_x(
-                concentratios_mix=df_concentrations_mix, concentratios_host=df_concentrations, mass_fraction=x)
-            Ca = df_concentrations_incl[ref_isotope]
-            Cb = df_concentrations_incl[comparison_isotope]
+        ## Inclusion analysis
+        def fitting_function(p, q, r, Cx, Cm, Cy=1, Cn=1):
+            f_star = p*(Cm/Cn)**2 + q*(Cm/Cn) + r - (Cx/Cy)
+            return f_star
 
-            return Cb - (a*Ca**2 + b*Ca + c)
+        def determine_mixed_concentrations(
+                x, concentration_mat_is, concentration_incl_is, intensities_mix, intensity_mix_is, sensitivities):
+            concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_incl_is
+            concentrations_mix = (intensities_mix*concentration_mix_is)/(intensity_mix_is*sensitivities)
+            return concentrations_mix
 
-        err_low = compute_error(x_low)
-        err_high = compute_error(x_high)
+        def determine_inclusion_concentrations(x, concentrations_mat, concentrations_mix):
+            concentrations_incl = concentrations_mat - (concentrations_mat - concentrations_mix)/x
+            return concentrations_incl
 
-        if err_low*err_high > 0:
-            print("⚠ No sign change → searching best-fit x instead")
-            x_vals = np.linspace(0.01, 0.99, 200)
-            errors = [abs(compute_error(x_test)) for x_test in x_vals]
-            idx = np.argmin(errors)
-            x = x_vals[idx]
-            print(f"Best-fit x: {x:.5f}, residual: {errors[idx]:.5e}")
-        else:
-            # Bisection
-            for i in range(max_iter):
-                x_mid = 0.5*(x_low + x_high)
-                err_mid = compute_error(x_mid)
-                if abs(err_mid) < tol:
-                    x = x_mid
+        def find_x_iteratively():
+            tolerance = 0.00001
+            max_steps = 500
+            x_low = 0.0001
+            x_high = 1
+            x_values_initial = [x_low, x_high]
+            f_values_initial = []
+            for x_value in x_values_initial:
+                concentrations_mix = determine_mixed_concentrations(
+                    x=x_value, concentration_mat_is=df_concentrations_mat[ref_isotope],
+                    concentration_incl_is=reference_concentration_incl, intensities_mix=df_intensities_mix,
+                    intensity_mix_is=df_intensities_mix[ref_isotope], sensitivities=df_sensitivity_drift)
+                concentrations_incl = determine_inclusion_concentrations(
+                    x=x_value, concentrations_mat=df_concentrations_mat, concentrations_mix=concentrations_mix)
+                f_value = fitting_function(
+                    p=a, q=b, r=c, Cx=concentrations_incl[comparison_isotope], Cm=concentrations_incl[ref_isotope])
+                f_values_initial.append(f_value)
+
+            x_star = 0.5
+            for i in range(max_steps):
+                concentrations_mix = determine_mixed_concentrations(
+                    x=x_star, concentration_mat_is=df_concentrations_mat[ref_isotope],
+                    concentration_incl_is=reference_concentration_incl, intensities_mix=df_intensities_mix,
+                    intensity_mix_is=df_intensities_mix[ref_isotope], sensitivities=df_sensitivity_drift)
+                concentrations_mix = concentrations_mix.clip(lower=0.0)
+                concentrations_mix = concentrations_mix.mask(concentrations_mix > 1000000, 0.0)
+                concentrations_incl = determine_inclusion_concentrations(
+                    x=x_star, concentrations_mat=df_concentrations_mat, concentrations_mix=concentrations_mix)
+                concentrations_incl = concentrations_incl.clip(lower=0.0)
+                concentrations_incl = concentrations_incl.mask(concentrations_incl > 1000000, 0.0)
+                f_star = fitting_function(
+                    p=a, q=b, r=c, Cx=concentrations_incl[comparison_isotope], Cm=concentrations_incl[ref_isotope])
+
+                if abs(f_star) < tolerance:
+                    x = x_star
                     break
-
-                if err_low*err_mid < 0:
-                    x_high = x_mid
-                    err_high = err_mid
                 else:
-                    x_low = x_mid
-                    err_low = err_mid
+                    if f_values_initial[0] < f_values_initial[-1]:
+                        if f_star > 0:
+                            x_high = x_star
+                            x_star = (x_low + x_high)/2
+                        else:
+                            x_low = x_star
+                            x_star = (x_low + x_high)/2
+                    else:
+                        if f_star > 0:
+                            x_low = x_star
+                            x_star = (x_low + x_high)/2
+                        else:
+                            x_high = x_star
+                            x_star = (x_low + x_high)/2
             else:
                 raise RuntimeError("Iteration did not converge")
+            return x
 
+        x = find_x_iteratively()
         concentration_mix_is = (1 - x)*df_concentrations[ref_isotope] + x*reference_concentration_incl
         i_mix_ratios = dri.compute_intensity_ratios(intensities=df_intensities_mix, reference_isotope=ref_isotope)
         df_concentrations_mix = SA(reference_isotope=ref_isotope).compute_concentrations(
@@ -265,7 +295,7 @@ def run_manual_test(show_full_df=False):
             reference_isotope=ref_isotope)
         i_incl_ratios = dri.compute_intensity_ratios(
             intensities=df_intensities_incl, reference_isotope=ref_isotope)
-        df_concentrations_incl = SA(reference_isotope=ref_isotope).compute_concentrations(
+        df_concentrations_incl_alt = SA(reference_isotope=ref_isotope).compute_concentrations(
             intensity_ratios=i_incl_ratios, sensitivity_values=df_sensitivity_drift,
             reference_concentration=reference_concentration_incl)
         df_concentrations_incl = SA(reference_isotope=ref_isotope).calculate_inclusion_concentration_using_x(
@@ -273,11 +303,29 @@ def run_manual_test(show_full_df=False):
 
         df_concentrations_incl = df_concentrations_incl.clip(lower=0.0)
         df_concentrations_incl = df_concentrations_incl.mask(df_concentrations_incl > 1000000, 0.0)
+        df_concentrations_incl_alt = df_concentrations_incl_alt.clip(lower=0.0)
+        df_concentrations_incl_alt = df_concentrations_incl_alt.mask(df_concentrations_incl_alt > 1000000, 0.0)
 
-        df_sigma_concentrations = SA(reference_isotope=ref_isotope_matrix).calculate_1_sigma_concentration(
-            intensities_bg=data_bg1, intensities_sig=data_sig, tau_values=tau_values,
-            ref_concentration_sig=reference_concentration_mat, ref_intensity_sig=df_intensities_mat[ref_isotope_matrix],
+        n_bg_values = np.ones(len(data_bg1["mean"]))*(idx_1 - idx_0 + 1)
+        n_incl_values = np.ones(len(data_incl["mean"]))*((idx_7 - idx_6 + 1))
+        tau_values_incl = np.ones(len(data_incl["mean"]))*0.01
+
+        comp_ratios = SA(reference_isotope=ref_isotope).compute_concentration_ratios(
+            concentrations=df_concentrations_incl, reference_isotope=ref_isotope)
+        df_lod_incl = SA(reference_isotope=ref_isotope).compute_limit_of_detection(
+            intensities=df_intensities_incl, concentrations=df_concentrations_incl, n_bg_values=n_bg_values,
+            n_mat_values=n_incl_values, intensities_bg=data_bg1["mean"], tau_values=tau_values_incl)
+
+        df_sigma_concentrations_incl = SA(reference_isotope=ref_isotope).calculate_1_sigma_concentration(
+            intensities_bg=data_bg1, intensities_sig=data_incl, tau_values=tau_values_incl,
+            ref_concentration_sig=reference_concentration_incl, ref_intensity_sig=df_intensities_incl[ref_isotope],
             sensitivity_sig=df_sensitivity_drift)
+
+        df_lod_incl = df_lod_incl.clip(lower=0.0)
+        df_lod_incl = df_lod_incl.mask(df_lod_incl > 1000000, 0.0)
+        df_sigma_concentrations_incl = df_sigma_concentrations_incl.clip(lower=0.0)
+        df_sigma_concentrations_incl = df_sigma_concentrations_incl.mask(
+            df_sigma_concentrations_incl > 1000000, 0.0)
 
         if fname in ["demo_fi05.csv", "demo_fi06.csv"]:
             results_smpl[fname] = {
@@ -288,14 +336,15 @@ def run_manual_test(show_full_df=False):
                 print("-- results: matrix analysis\n")
                 print(df_concentrations)
                 print(df_lod["LoD"])
-                print(df_sigma_concentrations)
-                print(rsf_pred_nist610/rsf_pred_nist610[ref_isotope_matrix])
+                print(df_sigma_concentrations_mat)
+                print(df_sensitivity_drift/df_sensitivity_drift[ref_isotope_matrix])
                 print("-- results: inclusion analysis")
                 print("x", round(x, 5), "\n")
-                print("C(INCL):", df_concentrations_incl)
-                print("C(MIX):", df_concentrations_mix)
+                print(df_concentrations_incl)
+                print(df_lod_incl["LoD"])
+                print(df_sigma_concentrations_incl)
+                print(df_concentrations_mix)
                 print(df_sensitivity_drift)
-                print(df_intensities_mix)
 
 if __name__ == "__main__":
     run_manual_test(show_full_df=True)
