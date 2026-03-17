@@ -234,6 +234,9 @@ def run_manual_test(show_full_df=False):
         df_concentrations_mix = df_concentrations_mix_nist610.copy()
         df_concentrations_mix[cols_replace] = df_concentrations_mix_sca17[cols_replace]
 
+        df_concentrations_incl_x = df_concentrations_incl_x.clip(lower=0.0)
+        df_concentrations_incl_x = df_concentrations_incl_x.mask(df_concentrations_incl_x > 1000000, 0.0)
+
         if fname in ["demo_fi05.csv", "demo_fi06.csv"]:
             results_smpl[fname] = {
                 "intensities": df_intensities_mat, "intensity_ratios": i_ratios, "sensitivities": df_sens,
