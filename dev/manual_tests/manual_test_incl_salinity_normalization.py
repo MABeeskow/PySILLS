@@ -62,6 +62,12 @@ def run_manual_test(show_full_df=False):
         df_srm_i[fname] = df_srm
         df_srm_i_ratios[fname] = i_ratios_srm
 
+    MNa = 22.99
+    MCl = 35.45
+    MNaCl = MNa + MCl
+    wNa = MNa/MNaCl
+    wCl = 1 - wNa
+
     reference_concentration_mat = 467436.7125
     reference_concentration_incl_t = 0
     concentration_incl_is = {"demo_fi05.csv": 19415.2373, "demo_fi06.csv": 19344.7604}
@@ -166,6 +172,7 @@ def run_manual_test(show_full_df=False):
 
     for fname, setup_info in files_smpl_setup.items():
         salinity = salinities[fname]
+        concentration_na_equiv = wNa*10**4*salinity*100
         volatile_scaling = volatiles[fname]
         file_path = demo_dir/fname
         df = dri.read_input_data(file_path)
@@ -236,12 +243,23 @@ def run_manual_test(show_full_df=False):
         concentrations_apparent_mix = sa_mat.calculate_apparent_concentrations(
             concentrations_srm=df_concentrations_srm, intensities_smpl=df_intensities_mix,
             intensities_srm=df_srm_intensities)
-        df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
-            concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True, salinity=salinity)
+        # df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
+        #     concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True, salinity=salinity)
+        # df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
+        # df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
+
+        # x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
+
+        a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
+        concentration_mat_t = df_concentrations_mat[ref_isotope_t]
+        concentration_mat_is = df_concentrations_mat[ref_isotope]
+        x = (concentration_mat_t - a*concentration_mat_is)/(
+                concentration_mat_t - a*(concentration_mat_is - concentration_na_equiv))
+        concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
+        df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
+                concentration_mix_is/df_sensitivity_drift)
         df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
         df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
-
-        x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
 
         def determine_inclusion_concentrations(x, concentrations_mat, concentrations_mix):
             concentrations_incl = concentrations_mat - (concentrations_mat - concentrations_mix)/x
@@ -252,10 +270,11 @@ def run_manual_test(show_full_df=False):
         df_concentrations_incl = df_concentrations_incl.clip(lower=0.0)
         df_concentrations_incl = df_concentrations_incl.mask(df_concentrations_incl > 1000000, 0.0)
         reference_concentration_incl = df_concentrations_incl[ref_isotope]
-
-        df_concentrations_incl = sa_mat.calculate_inclusion_concentrations_by_normalizing_oxides_using_salinity(
-            concentrations_apparent=df_concentrations_incl, salinity=salinity, dissolved_volatiles=volatile_scaling)
-
+        #print(concentration_na_equiv, reference_concentration_incl)
+        #print(concentration_na_equiv/reference_concentration_incl)
+        #print(concentration_na_equiv/reference_concentration_incl*df_concentrations_incl)
+        # df_concentrations_incl = sa_mat.calculate_inclusion_concentrations_by_normalizing_oxides_using_salinity(
+        #     concentrations_apparent=df_concentrations_incl, salinity=salinity, dissolved_volatiles=volatile_scaling)
         df_intensities_incl = dri.calculate_inclusion_intensity_using_x(
             intensities_mix=df_intensities_mix, intensities_mat=df_intensities_mat, mass_fraction=x,
             concentrations_mat=df_concentrations_mat, concentration_mix=df_concentrations_mix,
@@ -283,18 +302,18 @@ def run_manual_test(show_full_df=False):
 
         if fname in ["demo_fi05.csv", "demo_fi06.csv"] and show_full_df is True:
             print("Filename:", fname)
-            print("-- results: matrix analysis\n")
+            print("\n-- results: matrix analysis\n")
             print(df_concentrations)
             print(df_lod["LoD"])
             print(df_sigma_concentrations_mat)
             print(df_sensitivity_drift/df_sensitivity_drift[ref_isotope_matrix])
-            print("-- results: inclusion analysis")
+            print("\n-- results: inclusion analysis")
             print("x", round(x, 5), "\n")
             print(df_concentrations_incl)
             print(df_concentrations_mix)
             print(df_lod_incl["LoD"])
             print(df_sigma_concentrations_incl)
-            print(df_sensitivity_drift)
+            print(df_sensitivity_drift, "\n")
 
 if __name__ == "__main__":
     run_manual_test(show_full_df=True)
