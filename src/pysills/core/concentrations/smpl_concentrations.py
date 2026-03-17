@@ -409,7 +409,7 @@ class SampleAnalysis:
         return results
 
     def convert_element_concentrations_to_oxide_concentrations(
-            self, concentrations_apparent, accept_unphysical_values=False):
+            self, concentrations_apparent, accept_unphysical_values=False, salinity=None):
         list_isotopes = concentrations_apparent.index.tolist()
         list_elements = []
         conversion_factors = {}
@@ -430,7 +430,40 @@ class SampleAnalysis:
 
         df_conversion_factors = pd.Series(conversion_factors, index=list_isotopes)
         df_concentrations_oxides = concentrations_apparent*df_conversion_factors
-        rsf = 10**6/df_concentrations_oxides.sum()
+        if salinity is not None:
+            rsf = (1 - 1.7*salinity)*10**6/df_concentrations_oxides.sum()
+        else:
+            rsf = 10**6/df_concentrations_oxides.sum()
+        concentrations = concentrations_apparent*rsf
+        if accept_unphysical_values:
+            concentrations = concentrations.clip(lower=0.0)
+            concentrations = concentrations.mask(concentrations > 1000000, 0.0)
+
+        return concentrations
+
+    def calculate_inclusion_concentrations_by_normalizing_oxides_using_salinity(
+            self, concentrations_apparent, salinity, dissolved_volatiles=1.0, accept_unphysical_values=False):
+        list_isotopes = concentrations_apparent.index.tolist()
+        list_elements = []
+        conversion_factors = {}
+        for isotope in list_isotopes:
+            key_element = re.search(r"(\D+)(\d+)", isotope)
+            element = key_element.group(1)
+            list_elements.append(element)
+            list_oxides = _chemistry_oxides_sorted[element]
+            for oxide in list_oxides:
+                if element in ["P", "S", "Cl", "Ti", "Mn", "Fe", "Cu", "Ge", "As", "Br", "W", "Au"]:
+                    if oxide in ["P2O5", "SO3", "Cl2O", "TiO2", "MnO", "Fe2O3", "CuO", "GeO2", "As2O3", "Br2O", "WO3",
+                                 "Au2O3"]:
+                        factor = _conversion_factors[oxide]
+                        conversion_factors[isotope] = factor
+                else:
+                    factor = _conversion_factors[oxide]
+                    conversion_factors[isotope] = factor
+
+        df_conversion_factors = pd.Series(conversion_factors, index=list_isotopes)
+        df_concentrations_oxides = concentrations_apparent*df_conversion_factors
+        rsf = (salinity*dissolved_volatiles)*10**6/df_concentrations_oxides.sum()
         concentrations = concentrations_apparent*rsf
         if accept_unphysical_values:
             concentrations = concentrations.clip(lower=0.0)
