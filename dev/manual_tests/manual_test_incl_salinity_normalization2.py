@@ -51,7 +51,8 @@ def run_manual_test(show_full_df=False):
     ref_isotope_t = "Si29"
     ref_element = "Na"
     ref_isotope = "Na23"
-    ref_isotope_2 = "Cl35"
+    ref_isotope_2 = "As75"
+    ref_isotope_2 = "Li7"
     #ref_isotope_2 = "K39"
     matrix_only_tracer = False
 
@@ -73,6 +74,8 @@ def run_manual_test(show_full_df=False):
     reference_concentration_mat = 467436.7125
     reference_concentration_incl_t = 0
     concentration_incl_is = {"demo_fi05.csv": 19415.2373, "demo_fi06.csv": 19344.7604}
+    concentration_incl_is2 = {"demo_fi05.csv": 2137.07749, "demo_fi06.csv": 1800.24031}  # As
+    concentration_incl_is2 = {"demo_fi05.csv": 95.25327, "demo_fi06.csv": 306.39438}  # Li
     salinities = {"demo_fi05.csv": 0.0494, "demo_fi06.csv": 0.0492}
     demo_dir = root/"src"/"pysills"/"legacy"/"lib"/"demo_files"
     dri = DRI(zero_time=False)
@@ -174,7 +177,7 @@ def run_manual_test(show_full_df=False):
     for fname, setup_info in files_smpl_setup.items():
         salinity = salinities[fname]
         concentration_na_equiv = wNa*10**4*salinity*100
-        concentration_cl_equiv = wCl*10**4*salinity*100
+        reference_concentration_incl_2 = concentration_incl_is2[fname]
         file_path = demo_dir/fname
         df = dri.read_input_data(file_path)
         df_ready = dri.prepare_for_reduction(df)
@@ -186,9 +189,9 @@ def run_manual_test(show_full_df=False):
             sensitivities_dict=srm_sensitivities_sca17, time_info=time_deltas)
         rsf_pred_sca17 = drs.predict_sensitivities(df_drift=df_rsf_drift_sca17, t_probe=time_delta)
 
-        #cols_replace = ["Cl35", "Br81"]
+        cols_replace = ["Cl35", "Br81"]
         df_sensitivity_drift = rsf_pred_nist610.copy()
-        #df_sensitivity_drift[cols_replace] = rsf_pred_sca17[cols_replace]
+        df_sensitivity_drift[cols_replace] = rsf_pred_sca17[cols_replace]
 
         t_0 = setup_info["BG"][0]
         t_1 = setup_info["BG"][1]
@@ -241,33 +244,44 @@ def run_manual_test(show_full_df=False):
 
         # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         ## Inclusion analysis ##########################################################################################
-        sa_mat = SA(reference_isotope=ref_isotope)
-        concentrations_apparent_mix = sa_mat.calculate_apparent_concentrations(
-            concentrations_srm=df_concentrations_srm, intensities_smpl=df_intensities_mix,
-            intensities_srm=df_srm_intensities)
-        df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
-            concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True)
-
         if matrix_only_tracer:
-            x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
-
-            # a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
-            # concentration_mat_t = df_concentrations_mat[ref_isotope_t]
-            # concentration_mat_is = df_concentrations_mat[ref_isotope]
-            # x = (concentration_mat_t - a*concentration_mat_is)/(
-            #         concentration_mat_t - a*(concentration_mat_is - concentration_na_equiv))
-            # concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
-            # df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
-            #         concentration_mix_is/df_sensitivity_drift)
-        else:
-            a = SA(reference_isotope=ref_isotope,
-                   reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
+            ref_isotope_2 = ref_isotope_t
+            concentration_cl_equiv = reference_concentration_incl_t
+            a_out = SA(reference_isotope=ref_isotope,
+                       reference_matrix_only_tracer=ref_isotope_2).calculate_mixed_concentration_ratio(
                 intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
-            x = SA(reference_isotope=ref_isotope,
-                   reference_second_isotope=ref_isotope_2).calculate_mass_fraction(
+            a = a_out["a"]
+            x_out = SA(reference_isotope=ref_isotope,
+                       reference_matrix_only_tracer=ref_isotope_2).calculate_mass_fraction(
                 concentrations_mat=df_concentrations_mat, concentrations_incl={
                     ref_isotope_2: concentration_cl_equiv, ref_isotope: concentration_na_equiv},
                 mixed_ratio=a)
+            x = x_out["x"]
+        else:
+            sa_mat = SA(reference_isotope=ref_isotope)
+            concentrations_apparent_mix = sa_mat.calculate_apparent_concentrations(
+                concentrations_srm=df_concentrations_srm, intensities_smpl=df_intensities_mix,
+                intensities_srm=df_srm_intensities)
+            df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
+                concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True)
+            concentration_cl_equiv = ((df_concentrations_mix[ref_isotope_2])/(df_concentrations_mix[ref_isotope])*
+                                      concentration_na_equiv)
+            #concentration_cl_equiv = reference_concentration_incl_2
+            a_out = SA(reference_isotope=ref_isotope,
+                       reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
+                intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
+            a = a_out["a"]
+            x_out = SA(reference_isotope=ref_isotope,
+                       reference_second_isotope=ref_isotope_2).calculate_mass_fraction(
+                concentrations_mat=df_concentrations_mat, concentrations_incl={
+                    ref_isotope_2: concentration_cl_equiv, ref_isotope: concentration_na_equiv},
+                mixed_ratio=a)
+            x = x_out["x"]
+
+        concentration_mat_is = df_concentrations_mat[ref_isotope]
+        concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
+        df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
+                concentration_mix_is/df_sensitivity_drift)
 
         df_concentrations_incl = df_concentrations_mat - (df_concentrations_mat - df_concentrations_mix)/x
         reference_concentration_incl = df_concentrations_incl[ref_isotope]
@@ -280,43 +294,40 @@ def run_manual_test(show_full_df=False):
         reference_concentration_incl = df_concentrations_incl[ref_isotope]
         concentration_cl_equiv = df_concentrations_incl[ref_isotope_2]
 
-        # concentrations_apparent_incl = sa_mat.calculate_apparent_concentrations(
-        #     concentrations_srm=df_concentrations_srm, intensities_smpl=df_intensities_mix - df_intensities_mat,
-        #     intensities_srm=df_srm_intensities)
-        # df_concentrations_incl = sa_mat.convert_element_concentrations_to_oxide_concentrations(
-        #     concentrations_apparent=concentrations_apparent_incl, accept_unphysical_values=True)
-        # reference_concentration_incl = df_concentrations_incl[ref_isotope]
-        # factor = reference_concentration_incl/concentration_na_equiv
-        # df_concentrations_incl = df_concentrations_incl/factor
-        #
-        # df_concentrations_incl = df_concentrations_incl.clip(lower=0.0)
-        # df_concentrations_incl = df_concentrations_incl.mask(df_concentrations_incl > 1000000, 0.0)
-        #
-        # reference_concentration_incl = df_concentrations_incl[ref_isotope]
-        # concentration_cl_equiv = df_concentrations_incl[ref_isotope_2]
-
         # Mixed concentration correction
         if matrix_only_tracer:
-            a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
-            concentration_mat_t = df_concentrations_mat[ref_isotope_t]
-            concentration_mat_is = df_concentrations_mat[ref_isotope]
-            x = (concentration_mat_t - a*concentration_mat_is)/(
-                    concentration_mat_t - a*(concentration_mat_is - reference_concentration_incl))
-        else:
-            a = SA(reference_isotope=ref_isotope,
-                   reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
+            ref_isotope_2 = ref_isotope_t
+            concentration_cl_equiv = reference_concentration_incl_t
+            a_out = SA(reference_isotope=ref_isotope,
+                       reference_matrix_only_tracer=ref_isotope_2).calculate_mixed_concentration_ratio(
                 intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
-            x = SA(reference_isotope=ref_isotope,
-                   reference_second_isotope=ref_isotope_2).calculate_mass_fraction(
+            a = a_out["a"]
+            x_out = SA(reference_isotope=ref_isotope,
+                       reference_matrix_only_tracer=ref_isotope_2).calculate_mass_fraction(
                 concentrations_mat=df_concentrations_mat, concentrations_incl={
                     ref_isotope_2: concentration_cl_equiv, ref_isotope: concentration_na_equiv},
                 mixed_ratio=a)
-
-            a = df_intensities_mix[ref_isotope_2]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_2])
-            concentration_mat_is = df_concentrations_mat[ref_isotope]
-            concentration_mat_is2 = df_concentrations_mat[ref_isotope_2]
-            x = (concentration_mat_is2 - a*concentration_mat_is)/(concentration_mat_is2 - concentration_cl_equiv - a*
-                                                                  (concentration_mat_is - concentration_na_equiv))
+            x = x_out["x"]
+        else:
+            sa_mat = SA(reference_isotope=ref_isotope)
+            concentrations_apparent_mix = sa_mat.calculate_apparent_concentrations(
+                concentrations_srm=df_concentrations_srm, intensities_smpl=df_intensities_mix,
+                intensities_srm=df_srm_intensities)
+            df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
+                concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True)
+            concentration_cl_equiv = ((df_concentrations_mix[ref_isotope_2])/(df_concentrations_mix[ref_isotope])*
+                                      concentration_na_equiv)
+            #concentration_cl_equiv = reference_concentration_incl_2
+            a_out = SA(reference_isotope=ref_isotope,
+                       reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
+                intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
+            a = a_out["a"]
+            x_out = SA(reference_isotope=ref_isotope,
+                       reference_second_isotope=ref_isotope_2).calculate_mass_fraction(
+                concentrations_mat=df_concentrations_mat, concentrations_incl={
+                    ref_isotope_2: concentration_cl_equiv, ref_isotope: concentration_na_equiv},
+                mixed_ratio=a)
+            x = x_out["x"]
 
         # concentration_mix_is = (1 - x)*concentration_mat_is + x*reference_concentration_incl
         # df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
@@ -324,7 +335,6 @@ def run_manual_test(show_full_df=False):
         df_concentrations_mix = (1 - x)*df_concentrations_mat + x*df_concentrations_incl
         df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
         df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
-
 
 
         #print(concentration_na_equiv, reference_concentration_incl)

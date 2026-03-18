@@ -334,39 +334,360 @@ class SampleAnalysis:
 
         return results
 
-    def calculate_mixed_concentration_ratio(self, intensities_mix, sensitivity):
+    def calculate_mixed_concentration_ratio(
+            self, intensities_mix: dict, sensitivity: dict, tol: float = 1e-12, return_diagnostics: bool = True):
+        """
+        Calculate the mixed concentration ratio 'a' for the 2-IS or matrix-only tracer approach.
+
+        The ratio is defined as:
+
+            a = C_M(i) / C_M(IS)
+
+        and computed via:
+
+            a = (I_M(i) / I_M(IS)) * (1 / xi_M(i))
+
+        where:
+            I_M(i)   : Mixed intensity of isotope i (either second IS or tracer)
+            I_M(IS)  : Mixed intensity of primary internal standard
+            xi_M(i)  : Sensitivity factor for isotope i
+
+        Modes
+        -----
+        1. Two-IS mode:
+            i = reference_second_isotope
+
+        2. Matrix-only tracer mode:
+            i = reference_matrix_only_tracer
+
+        Parameters
+        ----------
+        intensities_mix : dict
+            Dictionary of mixed signal intensities {isotope: intensity}
+        sensitivity : dict
+            Dictionary of sensitivities {isotope: xi}
+        tol : float, optional
+            Numerical tolerance for stability checks
+        return_diagnostics : bool, optional
+            If True, returns diagnostic flags and quality assessment
+
+        Returns
+        -------
+        float or dict
+            If return_diagnostics=False:
+                a : float
+
+            If return_diagnostics=True:
+                {
+                    "a": float,
+                    "mode": str,
+                    "flags": list,
+                    "quality": str
+                }
+
+        Raises
+        ------
+        ValueError
+            If neither second IS nor tracer is defined
+        KeyError
+            If required isotopes are missing
+        """
+
+        flags = []
+        mode = None
+
+        # -------------------------
+        # Mode selection
+        # -------------------------
         if self.reference_second_isotope is not None:
-            intensity_mix_is1 = intensities_mix[self.reference_second_isotope]
-            intensity_mix_is2 = intensities_mix[self.reference_isotope]
-            sensitivity_is1 = sensitivity[self.reference_second_isotope]
-            result = intensity_mix_is1/(intensity_mix_is2*sensitivity_is1)
+            mode = "2ndIS"
+            iso_i = self.reference_second_isotope
+            iso_is = self.reference_isotope
         elif self.reference_matrix_only_tracer is not None:
-            intensity_mix_t = intensities_mix[self.reference_matrix_only_tracer]
-            intensity_mix_is = intensities_mix[self.reference_isotope]
-            sensitivity_t = sensitivity[self.reference_matrix_only_tracer]
-            result = intensity_mix_t/(intensity_mix_is*sensitivity_t)
+            mode = "MoT"
+            iso_i = self.reference_matrix_only_tracer
+            iso_is = self.reference_isotope
 
-        return result
+        else:
+            raise ValueError("No valid reference isotope configuration provided.")
 
-    def calculate_mass_fraction(self, concentrations_mat, concentrations_incl, mixed_ratio):
+        # -------------------------
+        # Input validation
+        # -------------------------
+        try:
+            I_i = intensities_mix[iso_i]
+            I_is = intensities_mix[iso_is]
+            xi_i = sensitivity[iso_i]
+        except KeyError as e:
+            raise KeyError(f"Missing required isotope data: {e}")
+
+        # -------------------------
+        # Basic checks
+        # -------------------------
+        if I_i <= 0:
+            flags.append("invalid_intensity_i")
+        if I_is <= 0:
+            flags.append("invalid_intensity_is")
+        if xi_i <= 0:
+            flags.append("invalid_sensitivity")
+        if abs(I_is) < tol:
+            flags.append("instability_small_is_intensity")
+        if abs(xi_i) < tol:
+            flags.append("instability_small_sensitivity")
+
+        # -------------------------
+        # Compute a
+        # -------------------------
+        try:
+            a = I_i/(I_is*xi_i)
+        except ZeroDivisionError:
+            flags.append("division_by_zero")
+            a = float("nan")
+
+        # -------------------------
+        # Post checks
+        # -------------------------
+        if a < 0:
+            flags.append("non_positive_a")
+
+        if not (a < float("inf")):
+            flags.append("non_finite_a")
+
+        # -------------------------
+        # Quality assessment
+        # -------------------------
+        if "division_by_zero" in flags or "invalid_intensity_is" in flags:
+            quality = "invalid"
+        elif "instability_small_is_intensity" in flags or "instability_small_sensitivity" in flags:
+            quality = "unstable"
+        elif "non_positive_a" in flags:
+            quality = "questionable"
+        else:
+            quality = "ok"
+
+        # -------------------------
+        # Return
+        # -------------------------
+        if return_diagnostics:
+            return {
+                "a": a,
+                "mode": mode,
+                "flags": flags,
+                "quality": quality
+            }
+        else:
+            return a
+
+    def calculate_mass_fraction(
+            self, concentrations_mat: dict, concentrations_incl: dict, mixed_ratio: float, tol: float = 1e-12,
+            return_diagnostics: bool = True):
+        """
+        Calculate the mass fraction x (inclusion contribution) using the mixing model.
+        The mixing relationship is:
+
+            C_M = (1 - x) * C_H + x * C_I
+
+        Using two reference components (either two IS or IS + tracer), x is derived from:
+
+            a = C_M(i) / C_M(IS)
+
+        and:
+
+            x = (C_H(i) - a * C_H(IS)) /
+                [a * (C_I(IS) - C_H(IS)) - (C_I(i) - C_H(i))]
+
+        Modes
+        -----
+        1. Two-IS mode:
+            i  = reference_second_isotope
+            IS = reference_isotope
+
+        2. Matrix-only tracer mode:
+            i  = reference_matrix_only_tracer
+            IS = reference_isotope
+
+        Parameters
+        ----------
+        concentrations_mat : dict
+            Host concentrations {isotope: concentration}
+        concentrations_incl : dict
+            Inclusion concentrations {isotope: concentration}
+        mixed_ratio : float
+            Precomputed ratio 'a'
+        tol : float
+            Numerical tolerance
+        return_diagnostics : bool
+            If True, returns flags and quality metrics
+
+        Returns
+        -------
+        float or dict
+            x or diagnostic dictionary
+        """
+
+        flags = []
+        mode = None
+        if isinstance(mixed_ratio, dict):
+            a = mixed_ratio.get("a", np.nan)
+        else:
+            a = mixed_ratio
+
+        # -------------------------
+        # Mode selection
+        # -------------------------
         if self.reference_second_isotope is not None:
-            concentration_mat_is1 = concentrations_mat[self.reference_second_isotope]
-            concentration_mat_is2 = concentrations_mat[self.reference_isotope]
-            concentration_incl_is1 = concentrations_incl[self.reference_second_isotope]
-            concentration_incl_is2 = concentrations_incl[self.reference_isotope]
-            a = mixed_ratio
-            result = (concentration_mat_is1 - a*concentration_mat_is2)/(
-                    concentration_mat_is1 - concentration_incl_is1 - a*(concentration_mat_is2 - concentration_incl_is2))
+            mode = "2ndIS"
+            iso_i = self.reference_second_isotope
+            iso_is = self.reference_isotope
         elif self.reference_matrix_only_tracer is not None:
-            concentration_mat_is = concentrations_mat[self.reference_isotope]
-            concentration_mat_t = concentrations_mat[self.reference_matrix_only_tracer]
-            concentration_incl_is = concentrations_incl[self.reference_isotope]
-            concentration_incl_t = concentrations_incl[self.reference_matrix_only_tracer]
-            a = mixed_ratio
-            result = (concentration_mat_t - a*concentration_mat_is)/(
-                    concentration_mat_t - concentration_incl_t - a*(concentration_mat_is - concentration_incl_is))
+            mode = "MoT"
+            iso_i = self.reference_matrix_only_tracer
+            iso_is = self.reference_isotope
+        else:
+            raise ValueError("No valid reference isotope configuration provided.")
 
-        return result
+        # -------------------------
+        # Extract values
+        # -------------------------
+        try:
+            C_H_i = concentrations_mat[iso_i]
+            C_H_IS = concentrations_mat[iso_is]
+            C_I_i = concentrations_incl[iso_i]
+            C_I_IS = concentrations_incl[iso_is]
+        except KeyError as e:
+            raise KeyError(f"Missing required concentration: {e}")
+
+        # -------------------------
+        # Basic checks
+        # -------------------------
+        for val, name in [
+            (C_H_i, "C_H_i"),
+            (C_H_IS, "C_H_IS"),
+            (C_I_i, "C_I_i"),
+            (C_I_IS, "C_I_IS")
+        ]:
+            if val < 0:
+                flags.append(f"non_positive_{name}")
+
+        # -------------------------
+        # Endmember ratios
+        # -------------------------
+        a_H = C_H_i/C_H_IS
+        a_I = C_I_i/C_I_IS
+        a_min = min(a_H, a_I)
+        a_max = max(a_H, a_I)
+
+        # print("a:", a)
+        # print("C_H_i:", C_H_i)
+        # print("C_H_IS:", C_H_IS)
+        # print("C_I_i:", C_I_i)
+        # print("C_I_IS:", C_I_IS)
+        # print("a_H:", C_H_i/C_H_IS)
+        # print("a_I:", C_I_i/C_I_IS, "\n")
+
+        # -------------------------
+        # Interval check (critical!)
+        # -------------------------
+
+        tol_interval = 0.05  # z.B. 5%
+        #if not (a_min*(1 - tol_interval) <= a <= a_max*(1 + tol_interval)):
+        #    flags.append("a_outside_mixing_interval")
+        delta = a_max - a_min
+        a_min_tol = a_min - tol_interval*delta
+        a_max_tol = a_max + tol_interval*delta
+        if not (a_min_tol <= a <= a_max_tol):
+            flags.append("a_outside_mixing_interval")
+        #if not (a_min - tol <= a <= a_max + tol):
+        #    flags.append("a_outside_mixing_interval")
+
+        # -------------------------
+        # Degeneracy check
+        # -------------------------
+        if abs(a_H - a_I)/max(abs(a_H), abs(a_I), tol) < 1e-3:
+            flags.append("degenerate_system")
+        #if abs(a_H - a_I) < tol:
+        #    flags.append("degenerate_system")
+
+        # -------------------------
+        # Denominator
+        # -------------------------
+        D = a*(C_I_IS - C_H_IS) - (C_I_i - C_H_i)
+        #if abs(D) < tol:
+        #    flags.append("singular_denominator")
+        if abs(D) < tol*max(abs(C_H_i), abs(C_I_i), abs(C_H_IS), abs(C_I_IS)):
+            flags.append("singular_denominator")
+
+        # -------------------------
+        # Compute x
+        # -------------------------
+        try:
+            x = (C_H_i - a*C_H_IS)/D
+        except ZeroDivisionError:
+            flags.append("division_by_zero")
+            x = float("nan")
+
+        # -------------------------
+        # Physical bounds
+        # -------------------------
+        if x < -tol:
+            flags.append("x_negative")
+        if x > 1 + tol:
+            flags.append("x_above_one")
+        if 0 <= x <= tol:
+            flags.append("x_near_zero")
+        if abs(1 - x) <= tol:
+            flags.append("x_near_one")
+
+        # -------------------------
+        # Consistency check
+        # -------------------------
+        if not any(f in flags for f in ["singular_denominator", "division_by_zero"]):
+            a_model = ((1 - x)*C_H_i + x*C_I_i)/((1 - x)*C_H_IS + x*C_I_IS)
+            if abs(a - a_model) > tol*max(1, abs(a)):
+                flags.append("inconsistent_reconstruction")
+
+        # -------------------------
+        # Quality classification
+        # -------------------------
+        if "singular_denominator" in flags or "division_by_zero" in flags:
+            quality = "invalid"
+        elif "a_outside_mixing_interval" in flags:
+            deviation = min(abs(a - a_min), abs(a - a_max)) / max(abs(a_min), abs(a_max), tol)
+            if deviation < 0.05:
+                quality = "near_boundary"
+            else:
+                quality = "invalid"
+        elif "degenerate_system" in flags:
+            quality = "unstable"
+        elif "x_negative" in flags or "x_above_one" in flags:
+            quality = "unphysical"
+        elif "inconsistent_reconstruction" in flags:
+            quality = "inconsistent"
+        else:
+            quality = "ok"
+
+        # -------------------------
+        # Return
+        # -------------------------
+        if return_diagnostics:
+            if x > 1:
+                x_clipped = 1
+            elif x < 0:
+                x_clipped = 0
+            else:
+                x_clipped = x
+            results = {
+                "x": x_clipped,
+                "a": a,
+                "mode": mode,
+                "flags": flags,
+                "quality": quality,
+                "a_H": a_H,
+                "a_I": a_I
+            }
+            return results
+        else:
+            return x
 
     def determine_mass_fraction_volume(self, volume_incl, rho_incl, volume_mat, rho_mat):
         x = (volume_incl*rho_incl)/(volume_mat*rho_mat + volume_incl*rho_incl)

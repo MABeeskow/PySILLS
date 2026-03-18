@@ -6,7 +6,7 @@
 # Name:		datareduction_intensities.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		16.03.2026
+# Date:		18.03.2026
 
 #-----------------------------------------------
 
@@ -257,7 +257,7 @@ class DataReductionIntensities:
         else:
             return before
 
-    def subtract_background(self, signal, background):
+    def subtract_background(self, signal, background, clip_negative=True, warn=False):
         """
         Subtract background intensities from signal intensities.
 
@@ -267,6 +267,10 @@ class DataReductionIntensities:
             Mean signal intensities per isotope.
         background : pandas.Series
             Mean background intensities per isotope.
+        clip_negative : bool, optional
+            If True, negative values are set to 0. Default is True.
+        warn : bool, optional
+            If True, prints a warning if negative values occur.
 
         Returns
         -------
@@ -276,7 +280,17 @@ class DataReductionIntensities:
         if not signal.index.equals(background.index):
             raise ValueError("Signal and background isotopes do not match")
 
-        return signal - background
+        corrected = signal - background
+        if clip_negative:
+            negative_mask = corrected < 0
+
+            if warn and negative_mask.any():
+                n_neg = negative_mask.sum()
+                print(f"Warning: {n_neg} negative values detected and set to 0.")
+
+            corrected = corrected.clip(lower=0.0)
+
+        return corrected
 
     def propagate_background_uncertainty(self, signal_std, background_std):
         """
@@ -414,16 +428,35 @@ class DataReductionIntensities:
 
     def calculate_inclusion_intensity_using_x(
             self, intensities_mix, intensities_mat, mass_fraction, concentrations_mat, concentration_mix, sensitivities,
-            reference_concentration_incl, reference_isotope):
+            reference_concentration_incl, reference_isotope, clip_negative=True, warn=False):
         x = mass_fraction
+        if x <= 0:
+            raise ValueError("Mass fraction x must be > 0")
+
         intensity_incl_is = intensities_mat[reference_isotope] - (
                 intensities_mat[reference_isotope] - intensities_mix[reference_isotope])/x
         results = (intensity_incl_is/x*((x - 1)*concentrations_mat + concentration_mix)*
                    sensitivities/reference_concentration_incl)
+        if clip_negative:
+            negative_mask = results < 0
+            if warn and negative_mask.any():
+                print(f"Warning: {negative_mask.sum()} negative inclusion intensities set to 0.")
+
+            results = results.clip(lower=0.0)
 
         return results
 
-    def calculate_integrated_intensity_borisova(self, intensities_incl, intensity_mix_t):
+    def calculate_integrated_intensity_borisova(
+            self, intensities_incl, intensity_mix_t, clip_negative=True, warn=False):
+        if (intensity_mix_t == 0).any():
+            raise ValueError("Zero values in intensity_mix_t lead to division by zero")
+
         k = intensities_incl/intensity_mix_t
+        if clip_negative:
+            negative_mask = k < 0
+            if warn and negative_mask.any():
+                print(f"Warning: {negative_mask.sum()} negative k-values set to 0.")
+
+            k = k.clip(lower=0.0)
 
         return k

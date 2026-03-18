@@ -53,7 +53,7 @@ def run_manual_test(show_full_df=False):
     ref_isotope = "Na23"
     ref_isotope_2 = "Cl35"
     ref_isotope_2 = "K39"
-    matrix_only_tracer = False
+    matrix_only_tracer = True
 
     df_srm_i_ratios = {}
     df_srm_i = {}
@@ -251,25 +251,38 @@ def run_manual_test(show_full_df=False):
                                   concentration_na_equiv)
 
         if matrix_only_tracer:
-            x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
-
-            # a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
-            # concentration_mat_t = df_concentrations_mat[ref_isotope_t]
-            # concentration_mat_is = df_concentrations_mat[ref_isotope]
-            # x = (concentration_mat_t - a*concentration_mat_is)/(
-            #         concentration_mat_t - a*(concentration_mat_is - concentration_na_equiv))
-            # concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
-            # df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
-            #         concentration_mix_is/df_sensitivity_drift)
+            ref_isotope_2 = ref_isotope_t
+            concentration_cl_equiv = reference_concentration_incl_t
+            a_out = SA(reference_isotope=ref_isotope,
+                       reference_matrix_only_tracer=ref_isotope_2).calculate_mixed_concentration_ratio(
+                intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
+            a = a_out["a"]
+            x_out = SA(reference_isotope=ref_isotope,
+                   reference_matrix_only_tracer=ref_isotope_2).calculate_mass_fraction(
+                concentrations_mat=df_concentrations_mat, concentrations_incl={
+                    ref_isotope_2: concentration_cl_equiv, ref_isotope: concentration_na_equiv},
+                mixed_ratio=a)
+            x = x_out["x"]
         else:
-            a = SA(reference_isotope=ref_isotope,
+            a_out = SA(reference_isotope=ref_isotope,
                    reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
                 intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
-            x = SA(reference_isotope=ref_isotope,
+            a = a_out["a"]
+            x_out = SA(reference_isotope=ref_isotope,
                    reference_second_isotope=ref_isotope_2).calculate_mass_fraction(
                 concentrations_mat=df_concentrations_mat, concentrations_incl={
                     ref_isotope_2: concentration_cl_equiv, ref_isotope: concentration_na_equiv},
                 mixed_ratio=a)
+            x = x_out["x"]
+
+        print("Report for a and x:")
+        print("a:", a_out)
+        print("x:", x_out)
+
+        concentration_mat_is = df_concentrations_mat[ref_isotope]
+        concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
+        df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
+                concentration_mix_is/df_sensitivity_drift)
 
         df_concentrations_incl = df_concentrations_mat - (df_concentrations_mat - df_concentrations_mix)/x
         reference_concentration_incl = df_concentrations_incl[ref_isotope]

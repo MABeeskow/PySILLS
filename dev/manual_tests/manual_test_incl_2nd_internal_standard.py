@@ -6,7 +6,7 @@
 # Name:		manual_test_incl_2nd_internal_standard.py
 # Author:	Maximilian A. Beeskow
 # Version:	1.0
-# Date:		11.03.2026
+# Date:		18.03.2026
 
 #-----------------------------------------------
 
@@ -201,14 +201,16 @@ def run_manual_test(show_full_df=False):
         # inclusion quantification
         df_intensities_mix = dri.subtract_background(signal=data_incl["mean"], background=data_bg1["mean"])
 
-        a = SA(reference_isotope=ref_isotope,
+        a_out = SA(reference_isotope=ref_isotope,
                reference_second_isotope=ref_isotope_2).calculate_mixed_concentration_ratio(
             intensities_mix=df_intensities_mix, sensitivity=df_sensitivity_drift)
-        x = SA(reference_isotope=ref_isotope,
+        a = a_out["a"]
+        x_out = SA(reference_isotope=ref_isotope,
                reference_second_isotope=ref_isotope_2).calculate_mass_fraction(
             concentrations_mat=df_concentrations_mat, concentrations_incl={
                 ref_isotope_2: reference_concentration_incl_2, ref_isotope: reference_concentration_incl},
             mixed_ratio=a)
+        x = x_out["x"]
 
         concentration_mix_is = (1 - x)*df_concentrations_mat[ref_isotope] + x*reference_concentration_incl
         i_mix_ratios = dri.compute_intensity_ratios(
