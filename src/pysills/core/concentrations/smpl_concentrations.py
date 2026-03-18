@@ -409,7 +409,7 @@ class SampleAnalysis:
         return results
 
     def convert_element_concentrations_to_oxide_concentrations(
-            self, concentrations_apparent, accept_unphysical_values=False):
+            self, concentrations_apparent, accept_unphysical_values=True):
         list_isotopes = concentrations_apparent.index.tolist()
         list_elements = []
         conversion_factors = {}
@@ -432,7 +432,7 @@ class SampleAnalysis:
         df_concentrations_oxides = concentrations_apparent*df_conversion_factors
         rsf = 10**6/df_concentrations_oxides.sum()
         concentrations = concentrations_apparent*rsf
-        if accept_unphysical_values:
+        if accept_unphysical_values is False:
             concentrations = concentrations.clip(lower=0.0)
             concentrations = concentrations.mask(concentrations > 1000000, 0.0)
 

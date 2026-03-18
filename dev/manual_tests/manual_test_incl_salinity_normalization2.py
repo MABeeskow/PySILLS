@@ -52,7 +52,7 @@ def run_manual_test(show_full_df=False):
     ref_element = "Na"
     ref_isotope = "Na23"
     ref_isotope_2 = "Cl35"
-    ref_isotope_2 = "K39"
+    #ref_isotope_2 = "K39"
     matrix_only_tracer = False
 
     df_srm_i_ratios = {}
@@ -186,9 +186,9 @@ def run_manual_test(show_full_df=False):
             sensitivities_dict=srm_sensitivities_sca17, time_info=time_deltas)
         rsf_pred_sca17 = drs.predict_sensitivities(df_drift=df_rsf_drift_sca17, t_probe=time_delta)
 
-        cols_replace = ["Cl35", "Br81"]
+        #cols_replace = ["Cl35", "Br81"]
         df_sensitivity_drift = rsf_pred_nist610.copy()
-        df_sensitivity_drift[cols_replace] = rsf_pred_sca17[cols_replace]
+        #df_sensitivity_drift[cols_replace] = rsf_pred_sca17[cols_replace]
 
         t_0 = setup_info["BG"][0]
         t_1 = setup_info["BG"][1]
@@ -247,8 +247,6 @@ def run_manual_test(show_full_df=False):
             intensities_srm=df_srm_intensities)
         df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
             concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True)
-        concentration_cl_equiv = ((df_concentrations_mix[ref_isotope_2])/(df_concentrations_mix[ref_isotope])*
-                                  concentration_na_equiv)
 
         if matrix_only_tracer:
             x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
