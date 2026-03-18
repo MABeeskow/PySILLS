@@ -243,21 +243,21 @@ def run_manual_test(show_full_df=False):
         concentrations_apparent_mix = sa_mat.calculate_apparent_concentrations(
             concentrations_srm=df_concentrations_srm, intensities_smpl=df_intensities_mix,
             intensities_srm=df_srm_intensities)
-        # df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
-        #     concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True, salinity=salinity)
-        # df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
-        # df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
+        df_concentrations_mix = sa_mat.convert_element_concentrations_to_oxide_concentrations(
+            concentrations_apparent=concentrations_apparent_mix, accept_unphysical_values=True)
+        df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
+        df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
 
-        # x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
+        x = 1 - df_concentrations_mix[ref_isotope_t]/df_concentrations_mat[ref_isotope_t]
 
-        a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
-        concentration_mat_t = df_concentrations_mat[ref_isotope_t]
-        concentration_mat_is = df_concentrations_mat[ref_isotope]
-        x = (concentration_mat_t - a*concentration_mat_is)/(
-                concentration_mat_t - a*(concentration_mat_is - concentration_na_equiv))
-        concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
-        df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
-                concentration_mix_is/df_sensitivity_drift)
+        # a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
+        # concentration_mat_t = df_concentrations_mat[ref_isotope_t]
+        # concentration_mat_is = df_concentrations_mat[ref_isotope]
+        # x = (concentration_mat_t - a*concentration_mat_is)/(
+        #         concentration_mat_t - a*(concentration_mat_is - concentration_na_equiv))
+        # concentration_mix_is = (1 - x)*concentration_mat_is + x*concentration_na_equiv
+        # df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
+        #         concentration_mix_is/df_sensitivity_drift)
         df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
         df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
 
@@ -270,6 +270,24 @@ def run_manual_test(show_full_df=False):
         df_concentrations_incl = df_concentrations_incl.clip(lower=0.0)
         df_concentrations_incl = df_concentrations_incl.mask(df_concentrations_incl > 1000000, 0.0)
         reference_concentration_incl = df_concentrations_incl[ref_isotope]
+        factor = reference_concentration_incl/concentration_na_equiv
+        df_concentrations_incl = df_concentrations_incl/factor
+        reference_concentration_incl = df_concentrations_incl[ref_isotope]
+        # Mixed concentration correction
+        a = df_intensities_mix[ref_isotope_t]/(df_intensities_mix[ref_isotope]*df_sensitivity_drift[ref_isotope_t])
+        concentration_mat_t = df_concentrations_mat[ref_isotope_t]
+        concentration_mat_is = df_concentrations_mat[ref_isotope]
+        x = (concentration_mat_t - a*concentration_mat_is)/(
+                concentration_mat_t - a*(concentration_mat_is - reference_concentration_incl))
+        concentration_mix_is = (1 - x)*concentration_mat_is + x*reference_concentration_incl
+        df_concentrations_mix = (df_intensities_mix/df_intensities_mix[ref_isotope])*(
+                concentration_mix_is/df_sensitivity_drift)
+        df_concentrations_mix = (1 - x)*df_concentrations_mat + x*df_concentrations_incl
+        df_concentrations_mix = df_concentrations_mix.clip(lower=0.0)
+        df_concentrations_mix = df_concentrations_mix.mask(df_concentrations_mix > 1000000, 0.0)
+
+
+
         #print(concentration_na_equiv, reference_concentration_incl)
         #print(concentration_na_equiv/reference_concentration_incl)
         #print(concentration_na_equiv/reference_concentration_incl*df_concentrations_incl)

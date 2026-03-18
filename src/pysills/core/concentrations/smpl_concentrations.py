@@ -409,7 +409,7 @@ class SampleAnalysis:
         return results
 
     def convert_element_concentrations_to_oxide_concentrations(
-            self, concentrations_apparent, accept_unphysical_values=False, salinity=None):
+            self, concentrations_apparent, accept_unphysical_values=False):
         list_isotopes = concentrations_apparent.index.tolist()
         list_elements = []
         conversion_factors = {}
@@ -430,10 +430,7 @@ class SampleAnalysis:
 
         df_conversion_factors = pd.Series(conversion_factors, index=list_isotopes)
         df_concentrations_oxides = concentrations_apparent*df_conversion_factors
-        if salinity is not None:
-            rsf = (1 - 1.7*salinity)*10**6/df_concentrations_oxides.sum()
-        else:
-            rsf = 10**6/df_concentrations_oxides.sum()
+        rsf = 10**6/df_concentrations_oxides.sum()
         concentrations = concentrations_apparent*rsf
         if accept_unphysical_values:
             concentrations = concentrations.clip(lower=0.0)

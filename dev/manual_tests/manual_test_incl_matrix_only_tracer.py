@@ -251,7 +251,7 @@ def run_manual_test(show_full_df=False):
                 print("-- results: inclusion analysis")
                 print("a", round(a, 5), "x", round(x, 5), "\n")
                 print(df_concentrations_incl_x)
-                print("C(MIX):", df_concentrations_mix)
+                print(df_concentrations_mix)
                 print(rsf_pred_nist610)
 
 if __name__ == "__main__":
