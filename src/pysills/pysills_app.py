@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.100
+# Version:	v1.0.101
 # Date:		19.03.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.100"
+        self.str_version_number = "1.0.101"
         self.val_version = self.str_version_number + " - 19.03.2026"
 
         ## Colors
@@ -35457,6 +35457,8 @@ class PySILLS(tk.Frame):
         ## LABELS
         str_lbl_01 = self.language_dict["Default settings"][self.var_language]
         str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
+        str_lbl_03 = self.language_dict["Setup"][self.var_language]
+        str_lbl_04 = self.language_dict["Inclusion intensity"][self.var_language]
         str_lbl_05 = self.language_dict["Dimensions"][self.var_language]
         str_lbl_06 = self.language_dict["Densities"][self.var_language]
         str_lbl_07 = self.language_dict["Matrix density"][self.var_language]
@@ -35494,9 +35496,32 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
             text=str_lbl_08, relief=tk.FLAT, fontsize="sans 10 bold")
         lbl_005 = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 10, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_006 = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 7, column_id=start_column,
+            n_rows=1, n_columns=18, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text=str_lbl_03 + " - " + str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
+        lbl_006a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column,
+            n_rows=1, n_columns=10, fg=font_color_dark, bg=background_color_elements).create_simple_label(
+            text="Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold")
+
+        # OPTION MENUS
+        list_isotopes_all = self.container_lists["Measured Isotopes"]["All"]
+        opt_03a = SE(
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column + 10,
+            n_rows=1, n_columns=8, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
+            var_iso=self.container_var["Borisova2021"]["Name"], option_list=list_isotopes_all,
+            text_set=self.container_var["Borisova2021"]["Name"].get(), fg_active=font_color_light,
+            bg_active=accent_color)
+        opt_03a["menu"].config(
+            fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
+            activebackground=accent_color)
+        opt_03a.config(
+            bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
+            activeforeground=font_color_light, highlightthickness=0)
 
         ## BUTTONS
         if self.var_os == "darwin":
@@ -35507,7 +35532,7 @@ class PySILLS(tk.Frame):
         str_btn_01 = self.language_dict["Confirm all"][self.var_language]
 
         btn_001 = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 7, column_id=start_column + 10,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 9, column_id=start_column + 10,
             n_rows=1, n_columns=8, fg=font_color_accent, bg=accent_color).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=self.change_values_borisova2021_all)
@@ -35550,8 +35575,8 @@ class PySILLS(tk.Frame):
         str_tv_05 = self.language_dict["Ablation radius"][self.var_language]
 
         frm_smpl = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 9, column_id=start_column,
-            n_rows=12, n_columns=25, fg=font_color_dark,
+            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 11, column_id=start_column,
+            n_rows=10, n_columns=25, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_frame()
         vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
