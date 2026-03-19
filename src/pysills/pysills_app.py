@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.101
-# Date:		19.03.2026
+# Version:	v1.0.102
+# Date:		20.03.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,8 +62,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.101"
-        self.val_version = self.str_version_number + " - 19.03.2026"
+        self.str_version_number = "1.0.102"
+        self.val_version = self.str_version_number + " - 20.03.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -28878,10 +28878,13 @@ class PySILLS(tk.Frame):
                             if var_n_bg == 0 and var_intensity_is == 0 and (var_n_mat*var_tau_i*var_sensitivity_i) == 0:
                                 var_result_i = np.nan
                             else:
-                                var_result_i = (
-                                        (3.29*(var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(0.5)
-                                                + 2.71)/(var_n_mat*var_tau_i*var_sensitivity_i)*(
-                                        var_concentration_is/var_intensity_is))
+                                if var_intensity_is > 0:
+                                    var_result_i = (
+                                            (3.29*(var_intensity_bg_i*var_tau_i*var_n_mat*(1 + var_n_mat/var_n_bg))**(
+                                                0.5) + 2.71)/(var_n_mat*var_tau_i*var_sensitivity_i)*(
+                                            var_concentration_is/var_intensity_is))
+                                else:
+                                    var_result_i = np.nan
                         else:
                             var_result_i = np.nan
 
@@ -31785,8 +31788,7 @@ class PySILLS(tk.Frame):
                                                          var_x*var_concentration_incl_is1)
 
                             ## Inclusion intensity IS1
-                            var_intensity_incl_is1 = var_intensity_mat_is1 - (
-                                    var_intensity_mat_is1 - var_intensity_mix_is1)/var_x
+                            var_intensity_incl_is1 = (var_intensity_mix_is1 - (1 - var_x)*var_intensity_mat_is1)/var_x
 
                             ## Mixed and inclusion concentrations
                             for index, isotope in enumerate(file_isotopes):
@@ -31798,11 +31800,14 @@ class PySILLS(tk.Frame):
                                     var_file_short][isotope]
                                 var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is1)*(
                                         var_concentration_mix_is1/var_sensitivity_i)
-                                var_intensity_incl_i = (
-                                        var_intensity_incl_is1/var_x*((var_x - 1)*var_concentration_host_i +
-                                                                      var_concentration_mix_i)*var_sensitivity_i/
-                                        var_concentration_incl_is1)
-                                var_intensity_incl_ratio_i = var_intensity_incl_i/var_intensity_incl_is1
+                                if var_x*var_intensity_incl_is1 > 0:
+                                    var_intensity_incl_i = (
+                                            ((var_concentration_mix_i + (var_x - 1)*var_concentration_host_i)/var_x)*
+                                            var_intensity_incl_is1*var_sensitivity_i/var_concentration_incl_is1)
+                                    var_intensity_incl_ratio_i = var_intensity_incl_i/var_intensity_incl_is1
+                                else:
+                                    var_intensity_incl_i = np.nan
+                                    var_intensity_incl_ratio_i = np.nan
 
                                 var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
                                     var_file_short]["BG"][isotope]

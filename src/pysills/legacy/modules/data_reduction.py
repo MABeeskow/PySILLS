@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.77
-# Date:		16.05.2025
+# Date:		19.03.2026
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -523,11 +523,17 @@ class IntensityQuantification:
 
                         if mode == 0:   # Heinrich et al. (2003)
                             intensity_mix_t = intensity_sig3_t - intensity_bg_t
-                            value_incl_i = intensity_mix_i - intensity_mix_t*(intensity_mat_i/intensity_mat_t)
+                            if intensity_mat_t > 0:
+                                value_incl_i = intensity_mix_i - intensity_mix_t*(intensity_mat_i/intensity_mat_t)
+                            else:
+                                value_incl_i = np.nan
                         elif mode == 1: # "SILLS (without R)"
                             intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
-                            intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
-                            value_incl_i = intensity_mix_i - intensity_incl_mat_i
+                            if intensity_mat_t > 0:
+                                intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                                value_incl_i = intensity_mix_i - intensity_incl_mat_i
+                            else:
+                                value_incl_i = np.nan
                         elif mode == 2: # "SILLS (with R)"
                             intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
                             intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
@@ -538,8 +544,11 @@ class IntensityQuantification:
                             value_incl_i = intensity_mix_i - factor_r*intensity_mat_i
                         elif mode == 3: # "Theory"
                             intensity_incl_mat_t = intensity_sig3_t - intensity_bg_t
-                            intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
-                            value_incl_i = intensity_sig3_i - intensity_bg_i - intensity_incl_mat_i
+                            if intensity_mat_t > 0:
+                                intensity_incl_mat_i = (intensity_incl_mat_t/intensity_mat_t)*intensity_mat_i
+                                value_incl_i = intensity_sig3_i - intensity_bg_i - intensity_incl_mat_i
+                            else:
+                                value_incl_i = np.nan
 
                         if value_incl_i > 0:
                             result_incl_i = value_incl_i
