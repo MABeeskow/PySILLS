@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.99
-# Date:		13.03.2026
+# Version:	v1.0.100
+# Date:		19.03.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,8 +62,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.99"
-        self.val_version = self.str_version_number + " - 13.03.2026"
+        self.str_version_number = "1.0.100"
+        self.val_version = self.str_version_number + " - 19.03.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -1976,7 +1976,7 @@ class PySILLS(tk.Frame):
             "MA specific file": [34, 60], "MA datareduction files": [25, 63],
             "Detailed analysis": [32, 45], "About PySILLS": [22, 32], "Calculation report": [9, 13],
             "Sensitivity drift": [32, 70], "FI datareduction files": [29, 63], "Setup Halter": [24, 25],
-            "Setup Borisova": [22, 34], "Setup matrix-only tracer": [15, 41], "Setup 2nd IS": [15, 36],
+            "Setup Borisova": [22, 26], "Setup matrix-only tracer": [15, 41], "Setup 2nd IS": [15, 36],
             "FI specific file": [34, 68], "Setup PyPitzer": [20, 60], "Setup mass balance": [24, 55],
             "Setup external calculation": [11, 33], "Custom spike check": [24, 45], "Popup window error": [12, 20],
             "Popup window progress": [4, 20], "Popup window progress datareduction": [16, 20],
@@ -35242,31 +35242,31 @@ class PySILLS(tk.Frame):
 
             entr_1_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["a"],
-                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=6, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_1_i)
             text_smpl.insert("end", "\t")
 
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["b"],
-                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=6, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_2_i)
             text_smpl.insert("end", "\t")
 
             entr_3_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(host)"],
-                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=7, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_3_i)
             text_smpl.insert("end", "\t")
 
             entr_4_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["rho(incl)"],
-                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=7, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_4_i)
             text_smpl.insert("end", "\t")
 
             entr_5_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Halter2002"]["R"],
-                width=10, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=6, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_5_i)
             text_smpl.insert("end", "\n")
 
@@ -35411,10 +35411,6 @@ class PySILLS(tk.Frame):
         background_color_elements = self.bg_colors["Light"]
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = self.font_settings["Header"]
-        font_elements = self.font_settings["Elements"]
-        font_option = self.font_settings["Options"]
-        font_table = self.font_settings["Table"]
 
         if self.pysills_mode in ["FI", "INCL"]:
             key_setting = "fi_setting"
@@ -35461,8 +35457,6 @@ class PySILLS(tk.Frame):
         ## LABELS
         str_lbl_01 = self.language_dict["Default settings"][self.var_language]
         str_lbl_02 = self.language_dict["Sample Files"][self.var_language]
-        str_lbl_03 = self.language_dict["Setup"][self.var_language]
-        str_lbl_04 = self.language_dict["Inclusion intensity"][self.var_language]
         str_lbl_05 = self.language_dict["Dimensions"][self.var_language]
         str_lbl_06 = self.language_dict["Densities"][self.var_language]
         str_lbl_07 = self.language_dict["Matrix density"][self.var_language]
@@ -35503,30 +35497,6 @@ class PySILLS(tk.Frame):
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 8, column_id=start_column,
             n_rows=1, n_columns=18, fg=font_color_light, bg=background_color_dark).create_simple_label(
             text=str_lbl_02, relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_006 = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_light,
-            bg=background_color_dark).create_simple_label(
-            text=str_lbl_03 + " - " + str_lbl_04, relief=tk.FLAT, fontsize="sans 10 bold")
-        lbl_006a = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 19,
-            n_rows=1, n_columns=8, fg=font_color_dark, bg=background_color_elements).create_simple_label(
-            text="Matrix-only tracer", relief=tk.FLAT, fontsize="sans 10 bold")
-
-        # OPTION MENUS
-        list_isotopes_all = self.container_lists["Measured Isotopes"]["All"]
-        opt_03a = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 1, column_id=start_column + 27,
-            n_rows=1, n_columns=6, fg=font_color_dark, bg=background_color_elements).create_option_isotope(
-            var_iso=self.container_var["Borisova2021"]["Name"], option_list=list_isotopes_all,
-            text_set=self.container_var["Borisova2021"]["Name"].get(), fg_active=font_color_light,
-            bg_active=accent_color)
-        opt_03a["menu"].config(
-            fg=font_color_dark, bg=background_color_elements, activeforeground=font_color_light,
-            activebackground=accent_color)
-        opt_03a.config(
-            bg=background_color_elements, fg=font_color_dark, activebackground=accent_color,
-            activeforeground=font_color_light, highlightthickness=0)
 
         ## BUTTONS
         if self.var_os == "darwin":
@@ -35541,32 +35511,6 @@ class PySILLS(tk.Frame):
             n_rows=1, n_columns=8, fg=font_color_accent, bg=accent_color).create_simple_button(
             text=str_btn_01, bg_active=accent_color, fg_active=font_color_accent,
             command=self.change_values_borisova2021_all)
-
-        # RADIOBUTTONS
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 2, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=0,
-            color_bg=background_color_elements, fg=font_color_dark, text="Heinrich et al. (2003)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 3, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=1,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (without R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 4, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=2,
-            color_bg=background_color_elements, fg=font_color_dark, text="SILLS (with R)",
-            sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
-        rb_01b = SE(
-            parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 5, column_id=start_column + 19,
-            n_rows=1, n_columns=14, fg=font_color_dark, bg=background_color_elements).create_radiobutton(
-            var_rb=self.container_var[key_setting]["Inclusion Intensity Calculation"], value_rb=3,
-            color_bg=background_color_elements, fg=font_color_dark,
-            text="Theory (simple intensity composition)", sticky="nesw", relief=tk.FLAT, font="sans 10 bold")
 
         ## ENTRIES
         entr_002a = SE(
@@ -35607,7 +35551,7 @@ class PySILLS(tk.Frame):
 
         frm_smpl = SE(
             parent=self.subwindow_quantification_setup_borisova2021, row_id=start_row + 9, column_id=start_column,
-            n_rows=12, n_columns=33, fg=font_color_dark,
+            n_rows=12, n_columns=25, fg=font_color_dark,
             bg=self.bg_colors["White"]).create_frame()
         vsb_smpl = ttk.Scrollbar(master=frm_smpl, orient="vertical")
         text_smpl = tk.Text(
@@ -35644,13 +35588,13 @@ class PySILLS(tk.Frame):
 
             entr_2_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["R(incl)"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=7, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_2_i)
             text_smpl.insert("end", "\t")
 
             entr_3_i = tk.Entry(
                 frm_smpl, textvariable=self.container_var["SMPL"][file_smpl_long]["Borisova2021"]["R(host)"],
-                width=8, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
+                width=7, highlightthickness=0, bg=self.bg_colors["White"], fg=font_color_dark)
             text_smpl.window_create("insert", window=entr_3_i)
             text_smpl.insert("end", "\t")
 
