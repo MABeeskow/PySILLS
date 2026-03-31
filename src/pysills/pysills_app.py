@@ -10816,6 +10816,7 @@ class PySILLS(tk.Frame):
                                 self.container_var["dwell_times"]["Entry"][isotope].set("0.002")
 
                     for index3, data in enumerate(data_file):
+                        #print("ID:", index3, data_file)
                         if index3 == 0:
                             number_measurements = len(data)
                             list_indices_measurements = []
@@ -10836,15 +10837,20 @@ class PySILLS(tk.Frame):
                                     isotope = list_isotopes[j]
                                     helper_std[str_std][isotope].append(float(value))
                         elif index3 == 5:    # Standard Reference Material (SRM)
-                            index_srm = data[0][0] - 1
+                            if len(data) > 1:
+                                index_srm = data[0][0] - 1
+                            else:
+                                index_srm = 0
                             self.container_files["STD"][str_std]["SRM"].set(list_srm[index_srm])
                             self.container_var["STD"][str_std]["SRM"].set(list_srm[index_srm])
                         elif index3 == 6:    # Background interval
                             for i, interval in enumerate(data):
-                                start_i = interval[0]
-                                end_i = interval[1]
-                                self.build_intervals(filetype="STD", filename=str_std, focus="BG", list_time=list_time,
-                                                     start_i=start_i, end_i=end_i, id=i)
+                                if len(interval) > 1:
+                                    start_i = interval[0]
+                                    end_i = interval[1]
+                                    self.build_intervals(
+                                        filetype="STD", filename=str_std, focus="BG", list_time=list_time,
+                                        start_i=start_i, end_i=end_i, id=i)
                         elif index3 == 7:    # Matrix interval
                             for i, interval in enumerate(data):
                                 start_i = interval[0]
