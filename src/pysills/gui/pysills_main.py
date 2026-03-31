@@ -188,7 +188,7 @@ class PySILLSApp:
             listbox_style = {
                 "bg": "#3a3a3a",
                 "fg": "#e6e6e6",
-                "selectbackground": "#4a90e2",
+                "selectbackground": "#e76f51",
                 "selectforeground": "#ffffff",
                 "highlightthickness": 0,
                 "borderwidth": 0,
@@ -197,7 +197,7 @@ class PySILLSApp:
             # Toggle.TButton
             style.map("Toggle.TButton",
                 background=[
-                    ("pressed", "#4a90e2"),   # aktiv
+                    ("pressed", "#e76f51"),   # aktiv
                     ("active", "#5c5c5c")     # hover
                 ]
             )
@@ -205,7 +205,7 @@ class PySILLSApp:
             listbox_style = {
                 "bg": "#d5d5d5",
                 "fg": "#000000",
-                "selectbackground": "#4a90e2",
+                "selectbackground": "#e76f51",
                 "selectforeground": "#ffffff",
                 "highlightthickness": 0,
                 "borderwidth": 0,
@@ -214,7 +214,7 @@ class PySILLSApp:
             # Toggle.TButton
             style.map("Toggle.TButton",
                 background=[
-                    ("pressed", "#4a90e2"),   # aktiv
+                    ("pressed", "#e76f51"),   # aktiv
                     ("active", "#bbbbbb")     # hover
                 ]
             )
