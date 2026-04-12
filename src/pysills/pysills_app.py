@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.102
-# Date:		20.03.2026
+# Version:	v1.0.103
+# Date:		08.04.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,8 +62,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.102"
-        self.val_version = self.str_version_number + " - 20.03.2026"
+        self.str_version_number = "1.0.103"
+        self.val_version = self.str_version_number + " - 08.04.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -611,6 +611,7 @@ class PySILLS(tk.Frame):
         self.bool_secondinternalstandard = False
         self.bool_halter2002 = False
         self.bool_borisova2021 = False
+        self.bool_combined = False
 
         self.container_flags = {"STD": {"Initialization": False}, "SMPL": {"Initialization": False}}
 
@@ -10072,7 +10073,7 @@ class PySILLS(tk.Frame):
                             self.container_var[key_setting]["Quantification Method Option"].set(splitted_lines[4])
                             for index, key in enumerate(["Matrix-only Tracer (SILLS)", "Second Internal Standard (SILLS)",
                                                "Geometric Approach (Halter et al. 2002)",
-                                               "Geometric Approach (Borisova et al. 2021)"]):
+                                               "Geometric Approach (Borisova et al. 2021)", "Combined approach"]):
                                 if key == splitted_lines[4]:
                                     self.container_var[key_setting]["Quantification Method"].set(int(index + 1))
                         except:
@@ -18402,7 +18403,8 @@ class PySILLS(tk.Frame):
             str_default_quantification_setup = self.container_var[key_setting]["Quantification Method Option"].get()
             list_opt_incl_quantification = [
                 "Matrix-only Tracer (SILLS)", "Second Internal Standard (SILLS)",
-                "Geometric Approach (Halter et al. 2002)", "Geometric Approach (Borisova et al. 2021)"]
+                "Geometric Approach (Halter et al. 2002)", "Geometric Approach (Borisova et al. 2021)",
+                "Combined approach"]
 
             opt_03a = SE(
                 parent=var_parent, row_id=var_row_start + 1, column_id=var_column_start, n_rows=var_row_n,
@@ -18635,6 +18637,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_halter2002.grid_remove()
                 if self.bool_borisova2021:
                     self.btn_setup_borisova2021.grid_remove()
+                if self.btn_setup_combined:
+                    self.btn_setup_combined.grid_remove()
         elif var_opt == "Second Internal Standard (SILLS)":
             if self.bool_secondinternalstandard == False:
                 self.btn_setup_secondis = SE(
@@ -18652,6 +18656,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_halter2002.grid_remove()
                 if self.bool_borisova2021:
                     self.btn_setup_borisova2021.grid_remove()
+                if self.btn_setup_combined:
+                    self.btn_setup_combined.grid_remove()
         elif var_opt == "Geometric Approach (Halter et al. 2002)":
             if self.bool_halter2002 == False:
                 self.btn_setup_halter2002 = SE(
@@ -18669,6 +18675,8 @@ class PySILLS(tk.Frame):
                     self.btn_setup_secondis.grid_remove()
                 if self.bool_borisova2021:
                     self.btn_setup_borisova2021.grid_remove()
+                if self.btn_setup_combined:
+                    self.btn_setup_combined.grid_remove()
         elif var_opt == "Geometric Approach (Borisova et al. 2021)":
             if self.bool_borisova2021 == False:
                 self.btn_setup_borisova2021 = SE(
@@ -18686,6 +18694,27 @@ class PySILLS(tk.Frame):
                     self.btn_setup_secondis.grid_remove()
                 if self.bool_halter2002:
                     self.btn_setup_halter2002.grid_remove()
+                if self.btn_setup_combined:
+                    self.btn_setup_combined.grid_remove()
+        elif var_opt == "Combined approach":
+            if self.bool_borisova2021 == False:
+                self.btn_setup_combined = SE(
+                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+                    n_columns=var_category_n - 6, fg=font_color_dark,
+                    bg=background_color_elements).create_simple_button(
+                    text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+                    command=self.define_setup_halter2002)
+                self.bool_combined = True
+            else:
+                self.btn_setup_combined.grid()
+                if self.bool_matrixonlytracer:
+                    self.btn_setup_matrixonlytracer.grid_remove()
+                if self.bool_secondinternalstandard:
+                    self.btn_setup_secondis.grid_remove()
+                if self.bool_halter2002:
+                    self.btn_setup_halter2002.grid_remove()
+                if self.btn_setup_borisova2021:
+                    self.btn_setup_borisova2021.grid_remove()
 
     def place_assemblage_setup(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Assemblage Setup'
@@ -26510,7 +26539,8 @@ class PySILLS(tk.Frame):
                         "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
                     elif self.container_var[key_setting][
-                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                        "Quantification Method Option"].get() in [
+                        "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                         var_t = None
                     elif self.container_var[key_setting][
                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -26547,7 +26577,8 @@ class PySILLS(tk.Frame):
                         "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
                     elif self.container_var["mi_setting"][
-                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                        "Quantification Method Option"].get() in [
+                        "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                         var_t = None
                     elif self.container_var["mi_setting"][
                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -26681,7 +26712,8 @@ class PySILLS(tk.Frame):
                                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
                                             "Name"].get()
                                     elif self.container_var[key_setting][
-                                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                                        "Quantification Method Option"].get() in [
+                                        "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                                         var_t = None
                                     elif self.container_var[key_setting][
                                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -26721,7 +26753,8 @@ class PySILLS(tk.Frame):
                                         var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"][
                                             "Name"].get()
                                     elif self.container_var["mi_setting"][
-                                        "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                                        "Quantification Method Option"].get() in [
+                                        "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                                         var_t = None
                                     elif self.container_var["mi_setting"][
                                         "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -31011,7 +31044,8 @@ class PySILLS(tk.Frame):
                             "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                             var_t = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
                         elif self.container_var[key_setting][
-                            "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                            "Quantification Method Option"].get() in [
+                            "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                             var_t = None
                         elif self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -31965,6 +31999,121 @@ class PySILLS(tk.Frame):
                                     "1 SIGMA INCL"][isotope] = var_result_sigma_i
                                 self.container_mixing_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_x
                         elif self.container_var[key_setting][
+                            "Quantification Method Option"].get() == "Combined approach":
+                            # 1) Determine x
+                            # 2) Determine mixed concentration of internal standard
+                            # 3) Determine mixed concentration of all other isotopes
+                            # 4) Determine inclusion concentration of all isotopes
+
+                            ## Initial setup
+                            var_a = float(self.container_var["SMPL"][var_file_long]["Halter2002"]["a"].get())
+                            var_b = float(self.container_var["SMPL"][var_file_long]["Halter2002"]["b"].get())
+                            var_rho_host = float(self.container_var["SMPL"][var_file_long]["Halter2002"][
+                                                     "rho(host)"].get())
+                            var_rho_incl = float(self.container_var["SMPL"][var_file_long]["Halter2002"][
+                                                     "rho(incl)"].get())
+                            var_radius = float(self.container_var["SMPL"][var_file_long]["Halter2002"]["R"].get())
+
+                            var_concentration_mat_is = self.container_concentration["SMPL"][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_mat_is = self.container_intensity_corrected[var_filetype][var_datatype][
+                                var_file_short]["MAT"][var_is]
+                            var_intensity_mix_is = self.container_intensity_mix["SMPL"][var_datatype][
+                                var_file_short][var_is]
+
+                            if pypitzer == False:
+                                var_concentration_incl_is = float(
+                                    self.container_var["SMPL"][var_file_long]["IS Data"]["Concentration"].get())
+                            else:
+                                var_concentration_incl_is = 10000
+
+                            # Mass fraction x
+                            area = 4/3*np.pi*var_a*var_b
+                            upper_term = area*var_rho_incl
+                            lower_term = (2*np.pi*var_radius**2 - area)*var_rho_host + upper_term
+                            var_x = upper_term/lower_term
+
+                            if var_x < 0:
+                                print(
+                                    "WARNING! The mass fraction x has become negative, which may be considered in "
+                                    "your data interpretation. A negative x can eventually be avoided by a "
+                                    "different interval definition.")
+
+                            ## Mixed concentration IS
+                            var_concentration_mix_is = (
+                                    (1 - var_x)*var_concentration_mat_is + var_x*var_concentration_incl_is)
+
+                            ## Inclusion intensity IS
+                            var_intensity_incl_is = var_intensity_mat_is - (
+                                    var_intensity_mat_is - var_intensity_mix_is)/var_x
+
+                            ## Mixed and inclusion concentrations
+                            for index, isotope in enumerate(file_isotopes):
+                                var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope]
+                                var_concentration_host_i = self.container_concentration["SMPL"][var_datatype][
+                                    var_file_short]["MAT"][isotope]
+                                var_intensity_mix_i = self.container_intensity_mix["SMPL"][var_datatype][
+                                    var_file_short][isotope]
+                                var_concentration_mix_i = (var_intensity_mix_i/var_intensity_mix_is)*(
+                                        var_concentration_mix_is/var_sensitivity_i)
+                                var_concentration_mix_ratio_i = var_concentration_mix_i/var_concentration_mix_is
+                                var_intensity_incl_i = (
+                                        var_intensity_incl_is/var_x*((var_x - 1)*var_concentration_host_i +
+                                                                     var_concentration_mix_i)*
+                                        var_sensitivity_i/var_concentration_incl_is)
+                                var_intensity_incl_ratio_i = var_intensity_incl_i/var_intensity_incl_is
+
+                                var_intensity_bg_i = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["BG"][isotope]
+                                var_intensity_incl_total_i = self.container_intensity[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope]
+                                var_n_bg = self.container_intensity[var_filetype][var_datatype][var_file_short]["N BG"][
+                                    isotope]
+                                var_n_incl = self.container_intensity[var_filetype][var_datatype][var_file_short][
+                                    "N INCL"][isotope]
+                                var_tau_i = float(self.container_var["dwell_times"]["Entry"][isotope].get())
+                                var_sigma_bg_i = ((((var_intensity_bg_i*var_tau_i)/var_n_bg)**0.5/var_tau_i)**2)**0.5
+                                var_sigma_incl_i = ((((var_intensity_incl_total_i*var_tau_i)/var_n_incl)**0.5
+                                                     /var_tau_i)**2)**0.5
+                                var_sigma = (var_sigma_bg_i**2 + var_sigma_incl_i**2)**0.5
+
+                                ## Inclusion
+                                if var_x == 0:
+                                    var_result_i = np.nan
+                                else:
+                                    var_result_i = ((var_concentration_mix_i + (var_x - 1)*var_concentration_host_i)/
+                                                    var_x)
+                                    if var_result_i < 0:
+                                        var_result_i = 0.0
+                                    elif var_result_i > 1000000:
+                                        print(
+                                            "File:", var_file_short,
+                                            "- WARNING! The calculated concentration value for", isotope,
+                                            "does not make sense. It counts more than 10^6 ppm.")
+                                        var_result_i = np.nan
+                                if (var_intensity_incl_is*var_sensitivity_i) == 0:
+                                    var_result_sigma_i = np.nan
+                                else:
+                                    var_result_sigma_i = (var_concentration_incl_is/(
+                                            var_intensity_incl_is*var_sensitivity_i))*var_sigma
+
+                                self.container_intensity_corrected[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope] = var_intensity_incl_i
+                                self.container_intensity_ratio[var_filetype][var_datatype][
+                                    var_file_short]["INCL"][isotope] = var_intensity_incl_ratio_i
+                                self.container_mixed_concentration["SMPL"][var_datatype][var_file_short][
+                                    isotope] = var_concentration_mix_i
+                                self.container_mixed_concentration_ratio["SMPL"][var_datatype][var_file_short][
+                                    isotope] = var_concentration_mix_ratio_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "INCL"][isotope] = var_result_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "Halter2002"][isotope] = var_result_i
+                                self.container_concentration[var_filetype][var_datatype][var_file_short][
+                                    "1 SIGMA INCL"][isotope] = var_result_sigma_i
+                                self.container_mixing_ratio["SMPL"][var_datatype][var_file_short][isotope] = var_x
+                        elif self.container_var[key_setting][
                             "Quantification Method Option"].get() == "Iterative approach (Halter et al. 2002)":
                             # Mixing ratio x
                             for index, isotope in enumerate(file_isotopes):
@@ -32125,7 +32274,8 @@ class PySILLS(tk.Frame):
                                 filetype=var_filetype, datatype=var_datatype, filename_short=var_file_short,
                                 list_isotopes=file_isotopes, focus="INCL")
                 if (self.container_var[key_setting][
-                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)"
+                    "Quantification Method Option"].get() in [
+                    "Geometric Approach (Halter et al. 2002)", "Combined approach"]
                         and var_focus == "INCL"):
                     var_is = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                     var_concentration_incl_is = self.container_concentration[var_filetype][var_datatype][
@@ -32295,7 +32445,8 @@ class PySILLS(tk.Frame):
                 "Quantification Method Option"].get() == "Second Internal Standard (SILLS)":
                 var_mo = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
             elif self.container_var[key_setting][
-                "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                "Quantification Method Option"].get() in [
+                "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                 var_mo = None
             elif self.container_var[key_setting][
                 "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -32388,7 +32539,8 @@ class PySILLS(tk.Frame):
                 var_is1 = self.container_var["SMPL"][var_file_long]["IS Data"]["IS"].get()
                 var_is2 = self.container_var["SMPL"][var_file_long]["Second Internal Standard"]["Name"].get()
             elif self.container_var[key_setting][
-                "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                "Quantification Method Option"].get() in [
+                "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                 var_mo = self.container_var["Halter2002"]["Name"].get()
             elif self.container_var[key_setting][
                 "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -32429,7 +32581,8 @@ class PySILLS(tk.Frame):
                     lower_term = var_concentration_host_is2 - var_concentration_incl_is2 - var_a*(
                             var_concentration_host_is1 - var_concentration_incl_is1)
                 elif self.container_var[key_setting][
-                    "Quantification Method Option"].get() == "Geometric Approach (Halter et al. 2002)":
+                    "Quantification Method Option"].get() in [
+                    "Geometric Approach (Halter et al. 2002)", "Combined approach"]:
                     upper_term = None
                 elif self.container_var[key_setting][
                     "Quantification Method Option"].get() == "Geometric Approach (Borisova et al. 2021)":
@@ -35056,12 +35209,12 @@ class PySILLS(tk.Frame):
         background_color_light = self.bg_colors["Very Light"]
         accent_color = self.bg_colors["Accent"]  # self.accent_color
 
-        if self.pysills_mode in ["FI", "INCL"]:
-            key_setting = "fi_setting"
-            str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
-        elif self.pysills_mode == "MI":
-            key_setting = "mi_setting"
-            str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
+        # if self.pysills_mode in ["FI", "INCL"]:
+        #     key_setting = "fi_setting"
+        #     str_title_01 = self.language_dict["Fluid Inclusions"][self.var_language]
+        # elif self.pysills_mode == "MI":
+        #     key_setting = "mi_setting"
+        str_title_01 = self.language_dict["Melt Inclusions"][self.var_language]
 
         str_title_02 = self.language_dict["Geometric approach"][self.var_language]
 
