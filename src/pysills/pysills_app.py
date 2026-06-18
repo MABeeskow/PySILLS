@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.103
-# Date:		08.04.2026
+# Version:	v1.0.104
+# Date:		18.06.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -62,8 +62,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.103"
-        self.val_version = self.str_version_number + " - 08.04.2026"
+        self.str_version_number = "1.0.104"
+        self.val_version = self.str_version_number + " - 18.06.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -612,6 +612,12 @@ class PySILLS(tk.Frame):
         self.bool_halter2002 = False
         self.bool_borisova2021 = False
         self.bool_combined = False
+
+        self.btn_setup_matrixonlytracer = None
+        self.btn_setup_secondis = None
+        self.btn_setup_halter2002 = None
+        self.btn_setup_borisova2021 = None
+        self.btn_setup_combined = None
 
         self.container_flags = {"STD": {"Initialization": False}, "SMPL": {"Initialization": False}}
 
@@ -3493,7 +3499,23 @@ class PySILLS(tk.Frame):
             #
             self.container_var["IS"]["Default STD"].set("Select IS")
 
-    #
+    def _safe_grid_remove(self, widget):
+        try:
+            if widget is not None and widget.winfo_exists():
+                widget.grid_remove()
+        except tk.TclError:
+            pass
+
+    def _safe_grid(self, widget):
+        try:
+            if widget is not None and widget.winfo_exists():
+                widget.grid()
+                return True
+        except tk.TclError:
+            pass
+
+        return False
+
     def change_smpl_is(self, element, file, mineral=None):
         self.container_var["SMPL"][file]["IS"].set(element)
         if mineral != None:
@@ -18586,18 +18608,156 @@ class PySILLS(tk.Frame):
                 if self.bool_incl_is_external:
                     self.btn_setup_external.grid_remove()
 
+    # def select_opt_inclusion_quantification(self, var_opt, dict_geometry_info):
+    #     # Colors
+    #     font_color_dark = self.bg_colors["Dark Font"]
+    #     font_color_light = self.bg_colors["Light Font"]
+    #     background_color_dark = self.bg_colors["BG Window"]
+    #     background_color_elements = self.bg_colors["Light"]
+    #     background_color_light = self.bg_colors["Very Light"]
+    #     accent_color = self.bg_colors["Accent"]  # self.accent_color
+    #     font_header = self.font_settings["Header"]
+    #     font_elements = self.font_settings["Elements"]
+    #     font_option = self.font_settings["Options"]
+    #     font_table = self.font_settings["Table"]
+    #
+    #     var_row_start = dict_geometry_info["Row start"]
+    #     var_row_n = dict_geometry_info["N rows"]
+    #     var_column_n = dict_geometry_info["N columns"]
+    #     var_category_n = var_column_n - 6
+    #
+    #     if self.pysills_mode in ["FI", "INCL"]:
+    #         var_parent = self.subwindow_fi_settings
+    #     elif self.pysills_mode == "MI":
+    #         var_parent = self.subwindow_mi_settings
+    #
+    #     str_btn_01 = self.language_dict["Setup"][self.var_language]
+    #
+    #     if var_opt == "Matrix-only Tracer (SILLS)":
+    #         if self.bool_matrixonlytracer == False:
+    #             self.btn_setup_matrixonlytracer = SE(
+    #                 parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+    #                 n_columns=var_category_n - 6, fg=font_color_dark,
+    #                 bg=background_color_elements).create_simple_button(
+    #                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+    #                 command=self.fi_setup_matrix_only_tracer)
+    #             self.bool_matrixonlytracer = True
+    #         else:
+    #             try:
+    #                 self.btn_setup_matrixonlytracer.grid()
+    #             except:
+    #                 self.btn_setup_matrixonlytracer = SE(
+    #                     parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+    #                     n_columns=var_category_n - 6, fg=font_color_dark,
+    #                     bg=background_color_elements).create_simple_button(
+    #                     text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+    #                     command=self.fi_setup_matrix_only_tracer)
+    #                 self.bool_matrixonlytracer = True
+    #             if self.bool_secondinternalstandard:
+    #                 self.btn_setup_secondis.grid_remove()
+    #             if self.bool_halter2002:
+    #                 self.btn_setup_halter2002.grid_remove()
+    #             if self.bool_borisova2021:
+    #                 self.btn_setup_borisova2021.grid_remove()
+    #             self._safe_grid_remove(self.btn_setup_combined)
+    #             #if self.btn_setup_combined:
+    #             #    self.btn_setup_combined.grid_remove()
+    #     elif var_opt == "Second Internal Standard (SILLS)":
+    #         if self.bool_secondinternalstandard == False:
+    #             self.btn_setup_secondis = SE(
+    #                 parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+    #                 n_columns=var_category_n - 6, fg=font_color_dark,
+    #                 bg=background_color_elements).create_simple_button(
+    #                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+    #                 command=self.fi_setup_second_internal_standard)
+    #             self.bool_secondinternalstandard = True
+    #         else:
+    #             self.btn_setup_secondis.grid()
+    #             if self.bool_matrixonlytracer:
+    #                 self.btn_setup_matrixonlytracer.grid_remove()
+    #             if self.bool_halter2002:
+    #                 self.btn_setup_halter2002.grid_remove()
+    #             if self.bool_borisova2021:
+    #                 self.btn_setup_borisova2021.grid_remove()
+    #             self._safe_grid_remove(self.btn_setup_combined)
+    #             #if self.btn_setup_combined:
+    #             #    self.btn_setup_combined.grid_remove()
+    #     elif var_opt == "Geometric Approach (Halter et al. 2002)":
+    #         if self.bool_halter2002 == False:
+    #             self.btn_setup_halter2002 = SE(
+    #                 parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+    #                 n_columns=var_category_n - 6, fg=font_color_dark,
+    #                 bg=background_color_elements).create_simple_button(
+    #                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+    #                 command=self.define_setup_halter2002)
+    #             self.bool_halter2002 = True
+    #         #else:
+    #         else:
+    #             if not self._safe_grid(self.btn_setup_halter2002):
+    #                 self.bool_halter2002 = False
+    #
+    #             self._safe_grid_remove(self.btn_setup_matrixonlytracer)
+    #             self._safe_grid_remove(self.btn_setup_secondis)
+    #             self._safe_grid_remove(self.btn_setup_borisova2021)
+    #             self._safe_grid_remove(self.btn_setup_combined)
+    #             #self.btn_setup_halter2002.grid()
+    #             #if not self._safe_grid(self.btn_setup_halter2002):
+    #             #    self.bool_halter2002 = False
+    #             #if self.bool_matrixonlytracer:
+    #             #    self.btn_setup_matrixonlytracer.grid_remove()
+    #             #if self.bool_secondinternalstandard:
+    #             #    self.btn_setup_secondis.grid_remove()
+    #             #if self.bool_borisova2021:
+    #             #    self.btn_setup_borisova2021.grid_remove()
+    #             #self._safe_grid_remove(self.btn_setup_combined)
+    #             #if self.btn_setup_combined:
+    #             #    self.btn_setup_combined.grid_remove()
+    #     elif var_opt == "Geometric Approach (Borisova et al. 2021)":
+    #         if self.bool_borisova2021 == False:
+    #             self.btn_setup_borisova2021 = SE(
+    #                 parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+    #                 n_columns=var_category_n - 6, fg=font_color_dark,
+    #                 bg=background_color_elements).create_simple_button(
+    #                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+    #                 command=self.define_setup_borisova2021)
+    #             self.bool_borisova2021 = True
+    #         else:
+    #             self.btn_setup_borisova2021.grid()
+    #             if self.bool_matrixonlytracer:
+    #                 self.btn_setup_matrixonlytracer.grid_remove()
+    #             if self.bool_secondinternalstandard:
+    #                 self.btn_setup_secondis.grid_remove()
+    #             if self.bool_halter2002:
+    #                 self.btn_setup_halter2002.grid_remove()
+    #             self._safe_grid_remove(self.btn_setup_combined)
+    #             #if self.btn_setup_combined:
+    #             #    self.btn_setup_combined.grid_remove()
+    #     elif var_opt == "Combined approach":
+    #         #if self.bool_combined == False:
+    #         if self.bool_borisova2021 == False:
+    #             self.btn_setup_combined = SE(
+    #                 parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
+    #                 n_columns=var_category_n - 6, fg=font_color_dark,
+    #                 bg=background_color_elements).create_simple_button(
+    #                 text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
+    #                 command=self.define_setup_halter2002)
+    #             self.bool_combined = True
+    #         else:
+    #             self.btn_setup_combined.grid()
+    #             if self.bool_matrixonlytracer:
+    #                 self.btn_setup_matrixonlytracer.grid_remove()
+    #             if self.bool_secondinternalstandard:
+    #                 self.btn_setup_secondis.grid_remove()
+    #             if self.bool_halter2002:
+    #                 self.btn_setup_halter2002.grid_remove()
+    #             if self.btn_setup_borisova2021:
+    #                 self.btn_setup_borisova2021.grid_remove()
+
     def select_opt_inclusion_quantification(self, var_opt, dict_geometry_info):
-        # Colors
         font_color_dark = self.bg_colors["Dark Font"]
         font_color_light = self.bg_colors["Light Font"]
-        background_color_dark = self.bg_colors["BG Window"]
         background_color_elements = self.bg_colors["Light"]
-        background_color_light = self.bg_colors["Very Light"]
-        accent_color = self.bg_colors["Accent"]  # self.accent_color
-        font_header = self.font_settings["Header"]
-        font_elements = self.font_settings["Elements"]
-        font_option = self.font_settings["Options"]
-        font_table = self.font_settings["Table"]
+        accent_color = self.bg_colors["Accent"]
 
         var_row_start = dict_geometry_info["Row start"]
         var_row_n = dict_geometry_info["N rows"]
@@ -18608,113 +18768,73 @@ class PySILLS(tk.Frame):
             var_parent = self.subwindow_fi_settings
         elif self.pysills_mode == "MI":
             var_parent = self.subwindow_mi_settings
+        else:
+            return
 
         str_btn_01 = self.language_dict["Setup"][self.var_language]
 
-        if var_opt == "Matrix-only Tracer (SILLS)":
-            if self.bool_matrixonlytracer == False:
-                self.btn_setup_matrixonlytracer = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                    n_columns=var_category_n - 6, fg=font_color_dark,
-                    bg=background_color_elements).create_simple_button(
-                    text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-                    command=self.fi_setup_matrix_only_tracer)
-                self.bool_matrixonlytracer = True
-            else:
-                try:
-                    self.btn_setup_matrixonlytracer.grid()
-                except:
-                    self.btn_setup_matrixonlytracer = SE(
-                        parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                        n_columns=var_category_n - 6, fg=font_color_dark,
-                        bg=background_color_elements).create_simple_button(
-                        text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-                        command=self.fi_setup_matrix_only_tracer)
-                    self.bool_matrixonlytracer = True
-                if self.bool_secondinternalstandard:
-                    self.btn_setup_secondis.grid_remove()
-                if self.bool_halter2002:
-                    self.btn_setup_halter2002.grid_remove()
-                if self.bool_borisova2021:
-                    self.btn_setup_borisova2021.grid_remove()
-                if self.btn_setup_combined:
-                    self.btn_setup_combined.grid_remove()
-        elif var_opt == "Second Internal Standard (SILLS)":
-            if self.bool_secondinternalstandard == False:
-                self.btn_setup_secondis = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                    n_columns=var_category_n - 6, fg=font_color_dark,
-                    bg=background_color_elements).create_simple_button(
-                    text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-                    command=self.fi_setup_second_internal_standard)
-                self.bool_secondinternalstandard = True
-            else:
-                self.btn_setup_secondis.grid()
-                if self.bool_matrixonlytracer:
-                    self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_halter2002:
-                    self.btn_setup_halter2002.grid_remove()
-                if self.bool_borisova2021:
-                    self.btn_setup_borisova2021.grid_remove()
-                if self.btn_setup_combined:
-                    self.btn_setup_combined.grid_remove()
-        elif var_opt == "Geometric Approach (Halter et al. 2002)":
-            if self.bool_halter2002 == False:
-                self.btn_setup_halter2002 = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                    n_columns=var_category_n - 6, fg=font_color_dark,
-                    bg=background_color_elements).create_simple_button(
-                    text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-                    command=self.define_setup_halter2002)
-                self.bool_halter2002 = True
-            else:
-                self.btn_setup_halter2002.grid()
-                if self.bool_matrixonlytracer:
-                    self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_secondinternalstandard:
-                    self.btn_setup_secondis.grid_remove()
-                if self.bool_borisova2021:
-                    self.btn_setup_borisova2021.grid_remove()
-                if self.btn_setup_combined:
-                    self.btn_setup_combined.grid_remove()
-        elif var_opt == "Geometric Approach (Borisova et al. 2021)":
-            if self.bool_borisova2021 == False:
-                self.btn_setup_borisova2021 = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                    n_columns=var_category_n - 6, fg=font_color_dark,
-                    bg=background_color_elements).create_simple_button(
-                    text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-                    command=self.define_setup_borisova2021)
-                self.bool_borisova2021 = True
-            else:
-                self.btn_setup_borisova2021.grid()
-                if self.bool_matrixonlytracer:
-                    self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_secondinternalstandard:
-                    self.btn_setup_secondis.grid_remove()
-                if self.bool_halter2002:
-                    self.btn_setup_halter2002.grid_remove()
-                if self.btn_setup_combined:
-                    self.btn_setup_combined.grid_remove()
-        elif var_opt == "Combined approach":
-            if self.bool_borisova2021 == False:
-                self.btn_setup_combined = SE(
-                    parent=var_parent, row_id=var_row_start + 1, column_id=var_category_n, n_rows=var_row_n,
-                    n_columns=var_category_n - 6, fg=font_color_dark,
-                    bg=background_color_elements).create_simple_button(
-                    text=str_btn_01, bg_active=accent_color, fg_active=font_color_light,
-                    command=self.define_setup_halter2002)
-                self.bool_combined = True
-            else:
-                self.btn_setup_combined.grid()
-                if self.bool_matrixonlytracer:
-                    self.btn_setup_matrixonlytracer.grid_remove()
-                if self.bool_secondinternalstandard:
-                    self.btn_setup_secondis.grid_remove()
-                if self.bool_halter2002:
-                    self.btn_setup_halter2002.grid_remove()
-                if self.btn_setup_borisova2021:
-                    self.btn_setup_borisova2021.grid_remove()
+        button_map = {
+            "Matrix-only Tracer (SILLS)": (
+                "btn_setup_matrixonlytracer",
+                "bool_matrixonlytracer",
+                self.fi_setup_matrix_only_tracer,
+            ),
+            "Second Internal Standard (SILLS)": (
+                "btn_setup_secondis",
+                "bool_secondinternalstandard",
+                self.fi_setup_second_internal_standard,
+            ),
+            "Geometric Approach (Halter et al. 2002)": (
+                "btn_setup_halter2002",
+                "bool_halter2002",
+                self.define_setup_halter2002,
+            ),
+            "Geometric Approach (Borisova et al. 2021)": (
+                "btn_setup_borisova2021",
+                "bool_borisova2021",
+                self.define_setup_borisova2021,
+            ),
+            "Combined approach": (
+                "btn_setup_combined",
+                "bool_combined",
+                self.define_setup_halter2002,
+            ),
+        }
+
+        if var_opt not in button_map:
+            return
+
+        selected_btn_attr, selected_bool_attr, selected_command = button_map[var_opt]
+
+        # Hide all other setup buttons safely
+        for btn_attr, bool_attr, _ in button_map.values():
+            if btn_attr != selected_btn_attr:
+                self._safe_grid_remove(getattr(self, btn_attr, None))
+
+        # Show selected button if still alive
+        selected_btn = getattr(self, selected_btn_attr, None)
+
+        if not self._safe_grid(selected_btn):
+            selected_btn = SE(
+                parent=var_parent,
+                row_id=var_row_start + 1,
+                column_id=var_category_n,
+                n_rows=var_row_n,
+                n_columns=var_category_n - 6,
+                fg=font_color_dark,
+                bg=background_color_elements,
+            ).create_simple_button(
+                text=str_btn_01,
+                bg_active=accent_color,
+                fg_active=font_color_light,
+                command=selected_command,
+            )
+
+            setattr(self, selected_btn_attr, selected_btn)
+
+        # Update bool flags consistently
+        for _, bool_attr, _ in button_map.values():
+            setattr(self, bool_attr, bool_attr == selected_bool_attr)
 
     def place_assemblage_setup(self, var_geometry_info):
         """Creates and places the necessary tkinter widgets for the section: 'Assemblage Setup'
