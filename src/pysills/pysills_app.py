@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.104
-# Date:		18.06.2026
+# Version:	v1.0.105
+# Date:		20.08.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +14,8 @@
 # external
 import os, pathlib, sys, re, datetime, csv, math, webbrowser, time
 import numpy as np
+import warnings
+warnings.filterwarnings("error", category=RuntimeWarning)
 import pandas as pd
 pd.options.mode.chained_assignment = None
 import scipy.io
@@ -62,8 +64,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.104"
-        self.val_version = self.str_version_number + " - 18.06.2026"
+        self.str_version_number = "1.0.105"
+        self.val_version = self.str_version_number + " - 20.08.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -4649,7 +4651,23 @@ class PySILLS(tk.Frame):
 
         return lim_min, lim_max
 
-    def fill_tv_qpl_extra(self, var_type, var_file_short, list_isotopes, section="MAT", init=False, isotope_is=None):
+    def fill_tv_qpl_extra(
+            self, var_type, var_file_short, list_isotopes, section="MAT", init=False, isotope_is=None):
+        """
+
+        Parameters
+        ----------
+        var_type
+        var_file_short
+        list_isotopes
+        section
+        init
+        isotope_is
+
+        Returns
+        -------
+
+        """
         if init == True:
             for isotope in list_isotopes:
                 helper_values = [isotope, "---", "---", "---", "---", "---"]
@@ -4677,11 +4695,31 @@ class PySILLS(tk.Frame):
                             end_index = interval[1] + 1
                             dataset_i = df_data[isotope][start_index:end_index]
                             dataset_is = df_data[isotope_is][start_index:end_index]
-                            helper["Min"].append(min(dataset_i))
-                            helper["Max"].append(max(dataset_i))
-                            helper["Mean"].append(np.mean(dataset_i))
-                            helper["Standard deviation"].append(np.std(dataset_i, ddof=1))
-                            helper["Ratio"].append(np.mean(dataset_i)/np.mean(dataset_is))
+
+                            # helper["Min"].append(min(dataset_i))
+                            # helper["Max"].append(max(dataset_i))
+                            # helper["Mean"].append(np.mean(dataset_i))
+                            # helper["Standard deviation"].append(np.std(dataset_i, ddof=1))
+                            # helper["Ratio"].append(np.mean(dataset_i)/np.mean(dataset_is))
+
+                            if len(dataset_i) == 0:
+                                continue
+
+                            mean_i = np.mean(dataset_i)
+                            helper["Min"].append(np.min(dataset_i))
+                            helper["Max"].append(np.max(dataset_i))
+                            helper["Mean"].append(mean_i)
+
+                            if len(dataset_i) > 1:
+                                helper["Standard deviation"].append(np.std(dataset_i, ddof=1))
+                            else:
+                                helper["Standard deviation"].append(np.nan)
+
+                            if len(dataset_is) > 0:
+                                mean_is = np.mean(dataset_is)
+                                if mean_is != 0:
+                                    helper["Ratio"].append(mean_i/mean_is)
+
                         helper_values = [
                             isotope, round(np.mean(helper["Min"]), 2), round(np.mean(helper["Max"]), 2),
                             round(np.mean(helper["Mean"]), 2), round(np.mean(helper["Standard deviation"]), 2),
@@ -26989,10 +27027,18 @@ class PySILLS(tk.Frame):
                                         var_file_short][var_focus][isotope]
                                     helper_results.append(var_result_i)
 
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result_i = np.mean(helper_results)
+                        # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                        #     var_result_i = np.mean(helper_results)
+                        # else:
+                        #     var_result_i = np.median(helper_results)
+
+                        if len(helper_results) > 0:
+                            if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                var_result_i = np.mean(helper_results)
+                            else:
+                                var_result_i = np.median(helper_results)
                         else:
-                            var_result_i = np.median(helper_results)
+                            var_result_i = np.nan
 
                         self.container_intensity_corrected[var_filetype][var_datatype][isotope] = var_result_i
                         self.container_intensity_corrected[var_filetype][var_datatype][var_focus][
@@ -27102,10 +27148,18 @@ class PySILLS(tk.Frame):
                                             var_file_short][var_focus][isotope]
                                         helper_results.append(var_result_i)
 
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_result_i = np.mean(helper_results)
+                        # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                        #     var_result_i = np.mean(helper_results)
+                        # else:
+                        #     var_result_i = np.median(helper_results)
+
+                        if len(helper_results) > 0:
+                            if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                var_result_i = np.mean(helper_results)
+                            else:
+                                var_result_i = np.median(helper_results)
                         else:
-                            var_result_i = np.median(helper_results)
+                            var_result_i = np.nan
 
                         self.container_intensity_ratio[var_filetype][var_datatype][isotope] = var_result_i
 
@@ -28708,7 +28762,10 @@ class PySILLS(tk.Frame):
                         var_data = self.container_spikes[var_file_short][isotope][var_key][
                                    var_indices[0]:var_indices[1] + 1]
                         var_n_bg += len(var_data)
-                        helper_sigma_i.append(np.std(var_data, ddof=1))
+                        # helper_sigma_i.append(np.std(var_data, ddof=1))
+
+                        if len(var_data) > 1:
+                            helper_sigma_i.append(np.std(var_data, ddof=1))
 
                     if index == 0:
                         condensed_intervals = IQ(dataframe=None).combine_all_intervals(
@@ -28748,10 +28805,18 @@ class PySILLS(tk.Frame):
                             isotope] = 10*a*b*var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_sigma_bg_i = np.mean(helper_sigma_i)
+                        # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                        #     var_sigma_bg_i = np.mean(helper_sigma_i)
+                        # else:
+                        #     var_sigma_bg_i = np.median(helper_sigma_i)
+
+                        if len(helper_sigma_i) > 0:
+                            if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                var_sigma_bg_i = np.mean(helper_sigma_i)
+                            else:
+                                var_sigma_bg_i = np.median(helper_sigma_i)
                         else:
-                            var_sigma_bg_i = np.median(helper_sigma_i)
+                            var_sigma_bg_i = np.nan
 
                         var_result_i = (3*var_sigma_bg_i*var_concentration_i)/(var_intensity_i)*(
                                 1/var_n_bg + 1/var_n_mat)**(0.5)
@@ -28826,10 +28891,18 @@ class PySILLS(tk.Frame):
                             isotope] = 10*a*b*var_result_i
 
                     elif self.container_var["General Settings"]["LOD Selection"].get() == 1:
-                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                            var_sigma_bg_i = np.mean(helper_sigma_i)
+                        # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                        #     var_sigma_bg_i = np.mean(helper_sigma_i)
+                        # else:
+                        #     var_sigma_bg_i = np.median(helper_sigma_i)
+
+                        if len(helper_sigma_i) > 0:
+                            if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                                var_sigma_bg_i = np.mean(helper_sigma_i)
+                            else:
+                                var_sigma_bg_i = np.median(helper_sigma_i)
                         else:
-                            var_sigma_bg_i = np.median(helper_sigma_i)
+                            var_sigma_bg_i = np.nan
 
                         var_sensitivity_i = self.container_analytical_sensitivity[var_filetype][var_datatype][
                             var_file_short]["MAT"][isotope]
@@ -28873,14 +28946,24 @@ class PySILLS(tk.Frame):
                                         "MAT"][isotope]
                                     helper_results.append(var_result_i)
 
-                    if self.container_var["General Settings"]["Desired Average"].get() == 1:
-                        var_result_i = np.mean(helper_results)
+                    # if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                    #     var_result_i = np.mean(helper_results)
+                    # else:
+                    #     var_result_i = np.median(helper_results)
+
+                    if len(helper_results) > 0:
+                        if self.container_var["General Settings"]["Desired Average"].get() == 1:
+                            var_result_i = np.mean(helper_results)
+                        else:
+                            var_result_i = np.median(helper_results)
                     else:
-                        var_result_i = np.median(helper_results)
+                        var_result_i = np.nan
 
                     self.container_lod[var_filetype][var_datatype][isotope] = var_result_i
 
-    def get_lod(self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus, mode="Specific"):
+    def get_lod(
+            self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus,
+            mode="Specific"):
         """ Calculates the Limit of Detection, LoD, based on the following two equations:
         1) Standard Files:  C_i = C_std_i/C_std_is
         2) Sample Files:    C_i = C_smpl_i/C_smpl_is

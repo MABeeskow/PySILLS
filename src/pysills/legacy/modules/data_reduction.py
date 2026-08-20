@@ -6,7 +6,7 @@
 # Name:		data_reduction.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.77
-# Date:		19.03.2026
+# Date:		20.08.2026
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -242,10 +242,18 @@ class IntensityQuantification:
             Dictionary that contains the results.
         -------
         """
+        # if self.project_type == "MA":
+        #     list_focus = ["BG", "MAT"]
+        # else:
+        #     list_focus = ["BG", "MAT", "INCL"]
+
         if self.project_type == "MA":
             list_focus = ["BG", "MAT"]
         else:
-            list_focus = ["BG", "MAT", "INCL"]
+            list_focus = ["BG", "MAT"]
+
+            if interval_incl:
+                list_focus.append("INCL")
 
         if data_key == "Data SMOOTHED":
             data_key = "Data IMPROVED"
@@ -340,7 +348,6 @@ class IntensityQuantification:
                             else:
                                 helper_mat.append(np.median(dataset))
                             helper_mat_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
-                            helper_mat_sigma.append(np.std(dataset, ddof=1)/np.sqrt(len(dataset)))
                         else:
                             helper_mat.extend(dataset)
 
@@ -404,6 +411,7 @@ class IntensityQuantification:
                             helper_incl.extend(dataset)
 
                     n_dataset = len(helper_incl_2)
+
                     if n_dataset % 2 == 0:
                         n_1st_half = int(len(helper_incl_2)/2)
                     else:
