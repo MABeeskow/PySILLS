@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.106
-# Date:		26.08.2026
+# Version:	v1.0.107
+# Date:		27.08.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -64,8 +64,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.106"
-        self.val_version = self.str_version_number + " - 26.08.2026"
+        self.str_version_number = "1.0.107"
+        self.val_version = self.str_version_number + " - 27.08.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -29057,7 +29057,7 @@ class PySILLS(tk.Frame):
 
                     self.container_lod[var_filetype][var_datatype][isotope] = var_result_i
 
-    def get_lod(
+    def get_lod2(
             self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus,
             mode="Specific"):
         """ Calculates the Limit of Detection, LoD, based on the following two equations:
@@ -29312,6 +29312,469 @@ class PySILLS(tk.Frame):
                             var_result_i = np.median(helper_results)
 
                         self.container_lod[var_filetype][var_datatype][isotope] = var_result_i
+
+    def get_lod(
+            self, var_filetype, var_datatype, var_file_short, var_file_long, var_focus,
+            mode="Specific"):
+        """
+        Calculate Limit of Blank (LoB), Limit of Detection (LoD) and
+        Limit of Quantification (LoQ).
+
+        Parameters
+        ----------
+        var_filetype : str
+            File category, e.g. "STD" or "SMPL".
+        var_datatype : str
+            Data category, e.g. "RAW" or "SMOOTHED".
+        var_file_short : str
+            Short filename.
+        var_file_long : str
+            Full filepath.
+        var_focus : str
+            Signal focus, e.g. "MAT" or "INCL".
+        mode : str
+            "Specific" calculates individual files.
+            "All" calculates and aggregates all relevant files.
+        """
+
+        lod_selection = self.container_var["General Settings"]["LOD Selection"].get()
+        desired_average = self.container_var["General Settings"]["Desired Average"].get()
+
+        if mode not in ["Specific", "All"]:
+            raise ValueError(f"Unknown LoD calculation mode: {mode}")
+
+        if mode == "Specific":
+            file_isotopes = self.container_lists["Measured Isotopes"][var_file_short]
+
+            # ----------------------------------------------------------------------
+            # STANDARD FILES
+            # ----------------------------------------------------------------------
+            if var_filetype == "STD":
+                condensed_bg = IQ(dataframe=None).combine_all_intervals(
+                    interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+
+                condensed_mat = IQ(dataframe=None).combine_all_intervals(
+                    interval_set=self.container_helper[var_filetype][var_file_short]["MAT"]["Content"])
+
+                for isotope in file_isotopes:
+                    var_n_bg = 0
+                    var_n_mat = 0
+                    helper_sigma_i = []
+
+                    var_key = "Data " + str(var_datatype)
+
+                    # Background data
+                    for items in condensed_bg.values():
+                        var_indices = items
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                            var_indices[0]:var_indices[1] + 1]
+
+                        var_n_bg += len(var_data)
+
+                        if len(var_data) > 1:
+                            sigma_i = np.std(var_data, ddof=1)
+                            if np.isfinite(sigma_i):
+                                helper_sigma_i.append(sigma_i)
+
+                    # Matrix data
+                    for items in condensed_mat.values():
+                        var_indices = items
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                            var_indices[0]:var_indices[1] + 1]
+
+                        var_n_mat += len(var_data)
+
+                    var_concentration_i = self.container_concentration[
+                        var_filetype][var_datatype][var_file_short]["MAT"][isotope]
+
+                    var_intensity_i = self.container_intensity_corrected[
+                        var_filetype][var_datatype][var_file_short]["MAT"][isotope]
+
+                    # --------------------------------------------------------------
+                    # Pettke-type LoD
+                    # --------------------------------------------------------------
+                    if lod_selection == 0:
+                        var_intensity_bg_i = self.container_intensity[
+                            var_filetype][var_datatype][var_file_short]["BG"][isotope]
+
+                        var_tau_i = float(
+                            self.container_var["dwell_times"]["Entry"][isotope].get())
+
+                        valid = (
+                                var_n_bg > 0
+                                and var_n_mat > 0
+                                and np.isfinite(var_tau_i)
+                                and var_tau_i > 0
+                                and var_concentration_i is not None
+                                and np.isfinite(var_concentration_i)
+                                and var_intensity_i is not None
+                                and np.isfinite(var_intensity_i)
+                                and var_intensity_i > 0
+                                and var_intensity_bg_i is not None
+                                and np.isfinite(var_intensity_bg_i)
+                                and var_intensity_bg_i >= 0
+                        )
+
+                        if valid:
+                            var_result_i = (
+                                    (
+                                            3.29*(
+                                            var_intensity_bg_i
+                                            *var_tau_i
+                                            *var_n_mat
+                                            *(1 + var_n_mat/var_n_bg)
+                                    )**0.5
+                                            + 2.71
+                                    )
+                                    /(var_n_mat*var_tau_i)
+                                    *(var_concentration_i/var_intensity_i)
+                            )
+                        else:
+                            var_result_i = np.nan
+
+                        a = 3.29/3.3
+                        b = 1/3.29
+
+                    # --------------------------------------------------------------
+                    # Longerich-type LoD
+                    # --------------------------------------------------------------
+                    elif lod_selection == 1:
+                        if helper_sigma_i:
+                            if desired_average == 1:
+                                var_sigma_bg_i = np.mean(helper_sigma_i)
+                            else:
+                                var_sigma_bg_i = np.median(helper_sigma_i)
+                        else:
+                            var_sigma_bg_i = np.nan
+
+                        valid = (
+                                var_n_bg > 0
+                                and var_n_mat > 0
+                                and np.isfinite(var_sigma_bg_i)
+                                and var_concentration_i is not None
+                                and np.isfinite(var_concentration_i)
+                                and var_intensity_i is not None
+                                and np.isfinite(var_intensity_i)
+                                and var_intensity_i > 0
+                        )
+
+                        if valid:
+                            var_result_i = (
+                                    (3*var_sigma_bg_i*var_concentration_i)
+                                    /var_intensity_i
+                                    *(1/var_n_bg + 1/var_n_mat)**0.5
+                            )
+                        else:
+                            var_result_i = np.nan
+
+                        a = 3.0/3.3
+                        b = 1/3.0
+
+                    else:
+                        raise ValueError(
+                            f"Unknown LoD selection: {lod_selection}")
+
+                    self.container_lob[var_filetype][var_datatype][
+                        var_file_short]["MAT"][isotope] = 1.65*a*b*var_result_i
+
+                    self.container_lod[var_filetype][var_datatype][
+                        var_file_short]["MAT"][isotope] = var_result_i
+
+                    self.container_loq[var_filetype][var_datatype][
+                        var_file_short]["MAT"][isotope] = 10*a*b*var_result_i
+
+            # ----------------------------------------------------------------------
+            # SAMPLE FILES
+            # ----------------------------------------------------------------------
+            elif var_filetype == "SMPL":
+                condensed_bg = IQ(dataframe=None).combine_all_intervals(
+                    interval_set=self.container_helper[var_filetype][var_file_short]["BG"]["Content"])
+
+                condensed_focus = IQ(dataframe=None).combine_all_intervals(
+                    interval_set=self.container_helper[var_filetype][var_file_short][var_focus]["Content"])
+
+                for isotope in file_isotopes:
+                    var_n_bg = 0
+                    var_n_mat = 0
+                    helper_sigma_i = []
+
+                    var_key = "Data " + str(var_datatype)
+
+                    # Background data - recalculated for every isotope
+                    for items in condensed_bg.values():
+                        var_indices = items
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                            var_indices[0]:var_indices[1] + 1]
+
+                        var_n_bg += len(var_data)
+
+                        if len(var_data) > 1:
+                            sigma_i = np.std(var_data, ddof=1)
+                            if np.isfinite(sigma_i):
+                                helper_sigma_i.append(sigma_i)
+
+                    # Signal interval
+                    for items in condensed_focus.values():
+                        var_indices = items
+                        var_data = self.container_spikes[var_file_short][isotope][var_key][
+                            var_indices[0]:var_indices[1] + 1]
+
+                        var_n_mat += len(var_data)
+
+                    # Internal standard
+                    if self.pysills_mode == "MA":
+                        var_is = self.container_var[
+                            var_filetype][var_file_long]["IS Data"]["IS"].get()
+
+                    else:
+                        if var_focus == "MAT":
+                            var_is = self.container_var[
+                                "SMPL"][var_file_long]["Matrix Setup"]["IS"]["Name"].get()
+                        else:
+                            var_is = self.container_var[
+                                var_filetype][var_file_long]["IS Data"]["IS"].get()
+
+                    var_concentration_is = self.container_concentration[
+                        var_filetype][var_datatype][var_file_short][var_focus][var_is]
+
+                    var_intensity_is = self.container_intensity_corrected[
+                        var_filetype][var_datatype][var_file_short][var_focus][var_is]
+
+                    var_sensitivity_is = self.container_analytical_sensitivity[
+                        var_filetype][var_datatype][var_file_short]["MAT"][var_is]
+
+                    # --------------------------------------------------------------
+                    # Pettke-type LoD
+                    # --------------------------------------------------------------
+                    if lod_selection == 0:
+                        var_intensity_bg_i = self.container_intensity[
+                            var_filetype][var_datatype][var_file_short]["BG"][isotope]
+
+                        var_tau_i = float(
+                            self.container_var["dwell_times"]["Entry"][isotope].get())
+
+                        if (
+                                var_sensitivity_is is not None
+                                and np.isfinite(var_sensitivity_is)
+                                and var_sensitivity_is != 0
+                        ):
+                            var_sensitivity_i = (
+                                    self.container_analytical_sensitivity[
+                                        var_filetype][var_datatype][var_file_short]["MAT"][isotope]
+                                    /var_sensitivity_is
+                            )
+                        else:
+                            var_sensitivity_i = np.nan
+
+                        valid = (
+                                var_n_bg > 0
+                                and var_n_mat > 0
+                                and np.isfinite(var_tau_i)
+                                and var_tau_i > 0
+                                and var_concentration_is is not None
+                                and np.isfinite(var_concentration_is)
+                                and var_intensity_is is not None
+                                and np.isfinite(var_intensity_is)
+                                and var_intensity_is > 0
+                                and np.isfinite(var_sensitivity_i)
+                                and var_sensitivity_i > 0
+                                and var_intensity_bg_i is not None
+                                and np.isfinite(var_intensity_bg_i)
+                                and var_intensity_bg_i >= 0
+                        )
+
+                        if valid:
+                            var_result_i = (
+                                    (
+                                            3.29*(
+                                            var_intensity_bg_i
+                                            *var_tau_i
+                                            *var_n_mat
+                                            *(1 + var_n_mat/var_n_bg)
+                                    )**0.5
+                                            + 2.71
+                                    )
+                                    /(
+                                            var_n_mat
+                                            *var_tau_i
+                                            *var_sensitivity_i
+                                    )
+                                    *(
+                                            var_concentration_is
+                                            /var_intensity_is
+                                    )
+                            )
+                        else:
+                            var_result_i = np.nan
+
+                        a = 3.29/3.3
+                        b = 1/3.29
+
+                    # --------------------------------------------------------------
+                    # Longerich-type LoD
+                    # --------------------------------------------------------------
+                    elif lod_selection == 1:
+                        if helper_sigma_i:
+                            if desired_average == 1:
+                                var_sigma_bg_i = np.mean(helper_sigma_i)
+                            else:
+                                var_sigma_bg_i = np.median(helper_sigma_i)
+                        else:
+                            var_sigma_bg_i = np.nan
+
+                        var_sensitivity_i = self.container_analytical_sensitivity[
+                            var_filetype][var_datatype][var_file_short]["MAT"][isotope]
+
+                        valid = (
+                                var_n_bg > 0
+                                and var_n_mat > 0
+                                and np.isfinite(var_sigma_bg_i)
+                                and var_concentration_is is not None
+                                and np.isfinite(var_concentration_is)
+                                and var_intensity_is is not None
+                                and np.isfinite(var_intensity_is)
+                                and var_intensity_is > 0
+                                and var_sensitivity_i is not None
+                                and np.isfinite(var_sensitivity_i)
+                                and var_sensitivity_i > 0
+                        )
+
+                        if valid:
+                            var_result_i = (
+                                    (3*var_sigma_bg_i*var_concentration_is)
+                                    /(var_sensitivity_i*var_intensity_is)
+                                    *(1/var_n_bg + 1/var_n_mat)**0.5
+                            )
+                        else:
+                            var_result_i = np.nan
+
+                        a = 3.0/3.3
+                        b = 1/3.0
+
+                    else:
+                        raise ValueError(
+                            f"Unknown LoD selection: {lod_selection}")
+
+                    self.container_lob[var_filetype][var_datatype][
+                        var_file_short][var_focus][isotope] = 1.65*a*b*var_result_i
+
+                    self.container_lod[var_filetype][var_datatype][
+                        var_file_short][var_focus][isotope] = var_result_i
+
+                    self.container_loq[var_filetype][var_datatype][
+                        var_file_short][var_focus][isotope] = 10*a*b*var_result_i
+
+            else:
+                raise ValueError(
+                    f"Unknown file type for LoD calculation: {var_filetype}")
+
+        # --------------------------------------------------------------------------
+        # ALL FILES
+        # --------------------------------------------------------------------------
+        elif mode == "All":
+            for var_filetype in ["STD", "SMPL"]:
+
+                if self.pysills_mode == "MA":
+                    list_focus = ["MAT"]
+                    var_init_datareduction = self.var_init_ma_datareduction
+                else:
+                    if var_filetype == "STD":
+                        list_focus = ["MAT"]
+                    else:
+                        list_focus = ["MAT", "INCL"]
+
+                    if self.pysills_mode in ["FI", "INCL"]:
+                        var_init_datareduction = self.var_init_fi_datareduction
+                    else:
+                        var_init_datareduction = self.var_init_mi_datareduction
+
+                for focus in list_focus:
+                    valid_files = []
+
+                    # --------------------------------------------------------------
+                    # Calculate every relevant file exactly once
+                    # --------------------------------------------------------------
+                    for index, var_file_long in enumerate(
+                            self.container_lists[var_filetype]["Long"]):
+
+                        if self.container_var[
+                            var_filetype][var_file_long]["Checkbox"].get() != 1:
+                            continue
+
+                        var_file_short = self.container_lists[
+                            var_filetype]["Short"][index]
+
+                        if var_filetype == "SMPL":
+                            var_id = self.container_var[
+                                var_filetype][var_file_long]["ID"].get()
+
+                            var_id_selected = self.container_var[
+                                "ID"]["Results Files"].get()
+
+                            if not (
+                                    var_id == var_id_selected
+                                    or var_init_datareduction is True
+                            ):
+                                continue
+
+                        self.get_lod(
+                            var_filetype=var_filetype,
+                            var_datatype=var_datatype,
+                            var_file_short=var_file_short,
+                            var_file_long=var_file_long,
+                            var_focus=focus,
+                            mode="Specific"
+                        )
+
+                        valid_files.append(
+                            (var_file_short, var_file_long)
+                        )
+
+                    # --------------------------------------------------------------
+                    # Aggregate previously calculated LoD values per isotope
+                    # --------------------------------------------------------------
+                    for isotope in self.container_lists["Measured Isotopes"]["All"]:
+                        helper_results = []
+
+                        for var_file_short, var_file_long in valid_files:
+
+                            file_isotopes = self.container_lists[
+                                "Measured Isotopes"][var_file_short]
+
+                            if isotope not in file_isotopes:
+                                continue
+
+                            # STD files are only valid for the SRM assigned
+                            # to the current isotope
+                            if var_filetype == "STD":
+                                var_srm_i = self.container_var["SRM"][isotope].get()
+
+                                var_srm_file = self.container_var[
+                                    "STD"][var_file_long]["SRM"].get()
+
+                                if var_srm_i != var_srm_file:
+                                    continue
+
+                            var_result_i = self.container_lod[
+                                var_filetype][var_datatype][
+                                var_file_short][focus][isotope]
+
+                            if (
+                                    var_result_i is not None
+                                    and np.isfinite(var_result_i)
+                            ):
+                                helper_results.append(var_result_i)
+
+                        if helper_results:
+                            if desired_average == 1:
+                                var_result_i = np.mean(helper_results)
+                            else:
+                                var_result_i = np.median(helper_results)
+                        else:
+                            var_result_i = np.nan
+
+                        self.container_lod[
+                            var_filetype][var_datatype][isotope] = var_result_i
 
     def ma_datareduction_files(self):  # MA - DATAREDUCTION FILES ######################################################
         # Colors
