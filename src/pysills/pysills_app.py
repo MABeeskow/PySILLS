@@ -5,8 +5,8 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.105
-# Date:		20.08.2026
+# Version:	v1.0.106
+# Date:		26.08.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -64,8 +64,8 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.105"
-        self.val_version = self.str_version_number + " - 20.08.2026"
+        self.str_version_number = "1.0.106"
+        self.val_version = self.str_version_number + " - 26.08.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -7220,7 +7220,18 @@ class PySILLS(tk.Frame):
             self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
             report_loq, report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
             report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header):
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        if var_file_extension == ".csv":
+            filetypes = [("CSV files", "*.csv")]
+        else:
+            filetypes = [("Text files", "*.txt")]
+
+        export_file = filedialog.asksaveasfile(
+            mode="w",
+            defaultextension=var_file_extension,
+            filetypes=filetypes,
+            title="Save Calculation Report"
+        )
+
         filename = export_file.name
 
         with open(filename, "w", newline="") as report_file:
@@ -7339,7 +7350,18 @@ class PySILLS(tk.Frame):
             self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
             report_loq, report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
             report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header):
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        if var_file_extension == ".csv":
+            filetypes = [("CSV files", "*.csv")]
+        else:
+            filetypes = [("Text files", "*.txt")]
+
+        export_file = filedialog.asksaveasfile(
+            mode="w",
+            defaultextension=var_file_extension,
+            filetypes=filetypes,
+            title="Save Calculation Report"
+        )
+
         filename_base = export_file.name
         filename_base_parts = filename_base.split(".")
         filename_std = filename_base_parts[0] + "_std" + var_file_extension
@@ -7586,7 +7608,18 @@ class PySILLS(tk.Frame):
             self, report_concentration, report_concentration_sigma, report_concentration_ratio, report_lob, report_lod,
             report_loq, report_intensity, report_intensity_sigma, report_intensity_ratio, report_analytical_sensitivity,
             report_normalized_sensitivity, report_rsf, var_file_extension, var_delimiter, header):
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        if var_file_extension == ".csv":
+            filetypes = [("CSV files", "*.csv")]
+        else:
+            filetypes = [("Text files", "*.txt")]
+
+        export_file = filedialog.asksaveasfile(
+            mode="w",
+            defaultextension=var_file_extension,
+            filetypes=filetypes,
+            title="Save Calculation Report"
+        )
+
         filename_base = export_file.name
         filename_base_parts = filename_base.split(".")
         filename_raw = filename_base_parts[0] + "_raw" + var_file_extension
@@ -8152,11 +8185,29 @@ class PySILLS(tk.Frame):
                             lod_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
 
-                            if value_i >= lod_i:
-                                value_i = value_i
+                            # if value_i >= lod_i:
+                            #     value_i = value_i
+                            # else:
+                            #     #value_i *= -1
+                            #     value_i = -lod_i
+
+                            if lod_i is None:
+                                print(
+                                    "DEBUG missing INCL LoD:",
+                                    var_filetype,
+                                    var_datatype,
+                                    file_short,
+                                    isotope,
+                                    "concentration =", value_i
+                                )
+
+                            if value_i is not None and lod_i is not None:
+                                if value_i >= lod_i:
+                                    value_i = value_i
+                                else:
+                                    value_i = -lod_i
                             else:
-                                #value_i *= -1
-                                value_i = -lod_i
+                                value_i = None
 
                             if var_filetype == "SMPL":
                                 value_sigma_i = self.container_concentration[var_filetype][var_datatype][file_short][
@@ -8218,20 +8269,32 @@ class PySILLS(tk.Frame):
                             # Limit of Blank (Matrix)
                             value_i = self.container_lob[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
-                            report_lob_mat[var_filetype][var_datatype][file_short][isotope] = round(
-                                value_i, n_digits)
+
+                            if value_i is not None:
+                                report_lob_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_i, n_digits)
+                            else:
+                                report_lob_mat[var_filetype][var_datatype][file_short][isotope] = "---"
 
                             # Limit of Detection (Matrix)
                             value_i = self.container_lod[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
-                            report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
-                                value_i, n_digits)
+
+                            if value_i is not None:
+                                report_lod_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_i, n_digits)
+                            else:
+                                report_lod_mat[var_filetype][var_datatype][file_short][isotope] = "---"
 
                             # Limit of Quantification (Matrix)
                             value_i = self.container_loq[var_filetype][var_datatype][file_short]["MAT"][isotope]
                             n_digits = 5
-                            report_loq_mat[var_filetype][var_datatype][file_short][isotope] = round(
-                                value_i, n_digits)
+
+                            if value_i is not None:
+                                report_loq_mat[var_filetype][var_datatype][file_short][isotope] = round(
+                                    value_i, n_digits)
+                            else:
+                                report_loq_mat[var_filetype][var_datatype][file_short][isotope] = "---"
 
                             # Mixing Ratio (Factor a)
                             if var_filetype == "SMPL":
@@ -8371,7 +8434,18 @@ class PySILLS(tk.Frame):
             report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
             report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
             var_delimiter, header):
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        if var_file_extension == ".csv":
+            filetypes = [("CSV files", "*.csv")]
+        else:
+            filetypes = [("Text files", "*.txt")]
+
+        export_file = filedialog.asksaveasfile(
+            mode="w",
+            defaultextension=var_file_extension,
+            filetypes=filetypes,
+            title="Save Calculation Report"
+        )
+
         filename = export_file.name
 
         with open(filename, "w", newline="") as report_file:
@@ -8634,7 +8708,18 @@ class PySILLS(tk.Frame):
             report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
             report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
             var_delimiter, header):
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        if var_file_extension == ".csv":
+            filetypes = [("CSV files", "*.csv")]
+        else:
+            filetypes = [("Text files", "*.txt")]
+
+        export_file = filedialog.asksaveasfile(
+            mode="w",
+            defaultextension=var_file_extension,
+            filetypes=filetypes,
+            title="Save Calculation Report"
+        )
+
         filename_base = export_file.name
         filename_base_parts = filename_base.split(".")
         filename_std = filename_base_parts[0] + "_std" + var_file_extension
@@ -9021,7 +9106,18 @@ class PySILLS(tk.Frame):
             report_loq_mat, report_intensity_incl, report_intensity_mat, report_intensity_bg, report_intensity_mix,
             report_analytical_sensitivity, report_normalized_sensitivity, report_rsf, var_file_extension,
             var_delimiter, header):
-        export_file = filedialog.asksaveasfile(mode="w", defaultextension=var_file_extension)
+        if var_file_extension == ".csv":
+            filetypes = [("CSV files", "*.csv")]
+        else:
+            filetypes = [("Text files", "*.txt")]
+
+        export_file = filedialog.asksaveasfile(
+            mode="w",
+            defaultextension=var_file_extension,
+            filetypes=filetypes,
+            title="Save Calculation Report"
+        )
+
         filename_base = export_file.name
         filename_base_parts = filename_base.split(".")
         filename_raw = filename_base_parts[0] + "_raw" + var_file_extension
@@ -34929,9 +35025,9 @@ class PySILLS(tk.Frame):
         self.ax_sensitivity_03a3.axhline(0, color="black", linestyle="dashed")
 
         if len(self.container_lists["Measured Isotopes"]["All"]) > 20:
-            self.ax_sensitivity_03a3.set_xticklabels(self.container_lists["Measured Isotopes"]["All"], rotation=90)
+            self.ax_sensitivity_03a3.tick_params(axis="x", labelrotation=90)
         else:
-            self.ax_sensitivity_03a3.set_xticklabels(self.container_lists["Measured Isotopes"]["All"], rotation=45)
+            self.ax_sensitivity_03a3.tick_params(axis="x", labelrotation=45)
 
         self.ax_sensitivity_03a3.grid(True)
         self.ax_sensitivity_03a3.grid(which="major", linestyle="-", linewidth=1)
