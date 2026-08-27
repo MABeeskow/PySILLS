@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.107
+# Version:	v1.0.108
 # Date:		27.08.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.107"
+        self.str_version_number = "1.0.108"
         self.val_version = self.str_version_number + " - 27.08.2026"
 
         ## Colors
@@ -629,6 +629,7 @@ class PySILLS(tk.Frame):
         self.list_smpl_previous = []
 
         self.container_spike_values = {}
+        self.container_spike_manual = {}
 
         self.old_file = False
         self.without_pypitzer = False
@@ -3081,6 +3082,12 @@ class PySILLS(tk.Frame):
         self.var_calculation = calculation
 
         if algorithm == "Grubbs":
+            for index, var_file_short in enumerate(self.container_lists[filetype]["Short"]):
+                var_file_long = self.container_lists[filetype]["Long"][index]
+
+                if self.container_var[filetype][var_file_long]["Checkbox"].get() == 1:
+                    self.container_spike_manual.pop(var_file_short, None)
+
             if filetype == "STD":
                 for filename_long in self.list_std:
                     parts = filename_long.split("/")
@@ -6623,6 +6630,7 @@ class PySILLS(tk.Frame):
                             text=file_smpl + " : " + isotope + " - " + str(round(current_step, 2)) + " %", anchor=tk.W)
 
             self.helper_fill_container_spike_values(mode=filetype)
+            ##self.apply_manual_spike_corrections(filetype=filetype)
 
             current_step += stepwidth
             if current_step >= 100:
@@ -9673,6 +9681,7 @@ class PySILLS(tk.Frame):
         self.save_interval_information_in_file(save_file=save_file)
         # Save information about 'Spike Elimination'
         self.save_spike_elimination_information_in_file(save_file=save_file)
+        self.save_manual_spike_corrections_in_file(save_file=save_file)
         # Save information about the experimental input data
         self.save_experimental_data_in_file(save_file=save_file)
         # END
@@ -10162,6 +10171,32 @@ class PySILLS(tk.Frame):
 
         save_file.write("\n")
 
+    def save_manual_spike_corrections_in_file(self, save_file):
+        """
+
+        Parameters
+        ----------
+        save_file
+
+        Returns
+        -------
+
+        """
+        save_file.write("MANUAL SPIKE CORRECTIONS\n")
+
+        for var_file, isotope_data in self.container_spike_manual.items():
+            save_file.write(var_file + "\n")
+
+            for var_isotope, corrections in isotope_data.items():
+                line = var_isotope
+
+                for var_index, value in corrections.items():
+                    line += ";" + str(var_index) + ";" + str(value)
+
+                save_file.write(line + "\n")
+
+        save_file.write("\n")
+
     def save_experimental_data_in_file(self, save_file):
         save_file.write("EXPERIMENTAL DATA" + "\n")
 
@@ -10609,8 +10644,11 @@ class PySILLS(tk.Frame):
         ## SPIKE ELIMINATION
         analysis_mode = key_setting[:2]
         index = 0
+
         if self.old_file:
             final_line = index_container["END"] - 1
+        elif "MANUAL SPIKE CORRECTIONS" in index_container:
+            final_line = index_container["MANUAL SPIKE CORRECTIONS"] - 1
         else:
             final_line = index_container["EXPERIMENTAL DATA"] - 1
 
@@ -10663,6 +10701,60 @@ class PySILLS(tk.Frame):
                             var_id = int(list_values[var_index])
                             val_id = float(list_values[var_index + 1])
                             self.container_spike_values[var_file][var_isotope]["Save"][var_id] = val_id
+
+    def open_project_manual_spike_corrections(self, index_container, loaded_lines):
+        """
+
+        Parameters
+        ----------
+        index_container
+        loaded_lines
+
+        Returns
+        -------
+
+        """
+        if "MANUAL SPIKE CORRECTIONS" not in index_container:
+            return
+
+        self.container_spike_manual = {}
+
+        start_line = index_container["MANUAL SPIKE CORRECTIONS"] + 1
+        final_line = index_container["EXPERIMENTAL DATA"] - 1
+
+        var_file = None
+
+        for i in range(start_line, final_line):
+            line = loaded_lines[i].strip()
+
+            if not line:
+                continue
+
+            parts = line.split(";")
+
+            if len(parts) == 1:
+                var_file = parts[0]
+
+                if var_file not in self.container_spike_manual:
+                    self.container_spike_manual[var_file] = {}
+
+                continue
+
+            var_isotope = parts[0]
+
+            if var_file is None:
+                continue
+
+            if var_isotope not in self.container_spike_manual[var_file]:
+                self.container_spike_manual[var_file][var_isotope] = {}
+
+            values = parts[1:]
+
+            for index in range(0, len(values), 2):
+                var_id = int(values[index])
+                value = float(values[index + 1])
+
+                self.container_spike_manual[var_file][var_isotope][var_id] = value
 
     def open_project_part_09(self, key_setting, index_container, loaded_lines, filename):
         ## EXPERIMENTAL DATA
@@ -11688,6 +11780,11 @@ class PySILLS(tk.Frame):
                         break
                     self.select_experiment(var_rb=self.var_rb_mode)
 
+                    has_manual_spike_corrections = (
+                            "MANUAL SPIKE CORRECTIONS\n" in loaded_lines
+                            or "MANUAL SPIKE CORRECTIONS" in loaded_lines
+                    )
+
                     n_settings = 0
                     if "EXPERIMENTAL DATA\n" in loaded_lines or "EXPERIMENTAL DATA" in loaded_lines:
                         if self.pysills_mode == "MA":
@@ -11736,6 +11833,10 @@ class PySILLS(tk.Frame):
                                        "MATRIX SETTINGS", "DWELL TIME SETTINGS", "INTERVAL SETTINGS",
                                        "SPIKE ELIMINATION", "END"]
                         self.old_file = True
+
+                    if has_manual_spike_corrections:
+                        experimental_index = strings.index("EXPERIMENTAL DATA")
+                        strings.insert(experimental_index, "MANUAL SPIKE CORRECTIONS")
 
                     index_container = {}
                     while n_settings < len(strings):
@@ -11805,6 +11906,10 @@ class PySILLS(tk.Frame):
                         ## SPIKE ELIMINATION
                         self.open_project_part_08(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                        self.open_project_manual_spike_corrections(
+                            index_container=index_container,
+                            loaded_lines=loaded_lines
+                        )
                         current_step = 90
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text=str(current_step) +" %", anchor=tk.W)
@@ -11812,6 +11917,7 @@ class PySILLS(tk.Frame):
                         self.open_project_part_09(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
                             filename=filename)
+                        self.apply_manual_spike_corrections(filetype="SMPL")
                         current_step = 100
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
@@ -12094,6 +12200,10 @@ class PySILLS(tk.Frame):
                         ## SPIKE ELIMINATION
                         self.open_project_part_08(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                        self.open_project_manual_spike_corrections(
+                            index_container=index_container,
+                            loaded_lines=loaded_lines
+                        )
                         current_step = 87
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
@@ -12101,6 +12211,7 @@ class PySILLS(tk.Frame):
                         self.open_project_part_09(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
                             filename=filename)
+                        self.apply_manual_spike_corrections(filetype="SMPL")
                         current_step = 100
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
@@ -12382,6 +12493,10 @@ class PySILLS(tk.Frame):
                         ## SPIKE ELIMINATION
                         self.open_project_part_08(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines)
+                        self.open_project_manual_spike_corrections(
+                            index_container=index_container,
+                            loaded_lines=loaded_lines
+                        )
                         current_step = 87
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text=str(current_step) + " %", anchor=tk.W)
@@ -12389,6 +12504,7 @@ class PySILLS(tk.Frame):
                         self.open_project_part_09(
                             key_setting=key_setting, index_container=index_container, loaded_lines=loaded_lines,
                             filename=filename)
+                        self.apply_manual_spike_corrections(filetype="SMPL")
                         current_step = 100
                         self.update_progress(parent=subwindow_progressbar, variable=prgbar, value=current_step)
                         self.lbl_prg_spk.configure(text="Opening project finished!", anchor=tk.W)
@@ -43639,6 +43755,45 @@ class PySILLS(tk.Frame):
                                     self.container_spikes[var_file_short][var_isotope]["Data IMPROVED"][
                                         var_id] = val_saved
 
+    def apply_manual_spike_corrections(self, filetype):
+        """
+
+        Parameters
+        ----------
+        filetype
+
+        Returns
+        -------
+
+        """
+        for var_file, isotope_data in self.container_spike_manual.items():
+            if var_file not in self.container_lists[filetype]["Short"]:
+                continue
+
+            if var_file not in self.container_spikes:
+                continue
+
+            for var_isotope, corrections in isotope_data.items():
+                if var_isotope not in self.container_spikes[var_file]:
+                    continue
+
+                spike_data = self.container_spikes[var_file][var_isotope]
+
+                for var_index, value in corrections.items():
+                    if var_index < 0 or var_index >= len(spike_data["Data IMPROVED"]):
+                        continue
+
+                    spike_data["Data IMPROVED"][var_index] = value
+
+                    if var_index not in spike_data["Indices"]:
+                        spike_data["Indices"].append(var_index)
+
+                    if (
+                            var_file in self.container_spike_values
+                            and var_isotope in self.container_spike_values[var_file]
+                    ):
+                        self.container_spike_values[var_file][var_isotope]["Save"][var_index] = value
+
     def helper_fill_container_spike_values(self, mode="SMPL", file="all"):
         self.var_calculation = False
         if self.var_calculation == False:
@@ -43756,7 +43911,7 @@ class PySILLS(tk.Frame):
                 value_current = self.container_spike_values[var_file][var_isotope]["Save"][value_0]
                 self.current_current_value = round(value_current, 2)
                 if value_current == self.current_original_value:
-                    self.replace_spike_value(mode="RAW")
+                    self.replace_spike_value(mode="RAW", manual=False)
             else:
                 if len(self.container_spike_values[var_file][var_isotope]["Current"]) < current_id:
                     self.current_current_value = round(val_corrected, 2)
@@ -43768,9 +43923,16 @@ class PySILLS(tk.Frame):
         self.lbl_03b.configure(text=self.current_suggested_value)
         self.lbl_03c.configure(text=self.current_current_value)
 
+        # self.helper_spike_values(
+        #     var_file_short=var_file, var_isotope=var_isotope, var_value_raw=self.current_original_value,
+        #     var_value_smoothed=self.current_suggested_value, mode=mode)
         self.helper_spike_values(
-            var_file_short=var_file, var_isotope=var_isotope, var_value_raw=self.current_original_value,
-            var_value_smoothed=self.current_suggested_value, mode=mode)
+            var_file_short=var_file,
+            var_isotope=var_isotope,
+            var_value_raw=self.current_original_value,
+            var_value_smoothed=self.current_suggested_value,
+            mode=mode,
+            var_index=value_0)
         self.show_spike_diagram()
 
     def change_spk_isotope(self, var_opt_iso, mode=None, list_isotopes=None):
@@ -43907,7 +44069,7 @@ class PySILLS(tk.Frame):
 
             self.show_spike_data()
 
-    def replace_spike_value(self, mode):
+    def replace_spike_value(self, mode, manual=True):
         current_id = self.scl_01.get()
         var_id_real = self.list_indices[current_id - 1]
         var_file = self.current_file_spk
@@ -43925,6 +44087,15 @@ class PySILLS(tk.Frame):
         self.container_spike_values[var_file][var_isotope]["Current"][current_id - 1] = val_updated
         self.lbl_03c.configure(text=val_updated)
         self.container_spike_values[var_file][var_isotope]["Save"][var_id_real] = val_updated
+
+        if manual:
+            if var_file not in self.container_spike_manual:
+                self.container_spike_manual[var_file] = {}
+
+            if var_isotope not in self.container_spike_manual[var_file]:
+                self.container_spike_manual[var_file][var_isotope] = {}
+
+            self.container_spike_manual[var_file][var_isotope][var_id_real] = val_updated
 
         self.show_spike_diagram()
 
