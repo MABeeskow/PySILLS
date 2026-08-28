@@ -5,7 +5,7 @@
 
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
-# Version:	v1.0.108
+# Version:	v1.0.109
 # Date:		27.08.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class PySILLS(tk.Frame):
             var_scaling = 1.3
 
         ## Current version
-        self.str_version_number = "1.0.108"
+        self.str_version_number = "1.0.109"
         self.val_version = self.str_version_number + " - 27.08.2026"
 
         ## Colors
@@ -28237,6 +28237,12 @@ class PySILLS(tk.Frame):
     # FLUID INCLUSION ANALYSIS #########################################################################################
     ####################################################################################################################
     def fi_settings(self):
+        """
+
+        Returns
+        -------
+
+        """
         if self.file_system_need_update:
             path = PACKAGE_ROOT
             if self.demo_mode:
@@ -28301,8 +28307,20 @@ class PySILLS(tk.Frame):
                 file_parts = file_std.split("/")
                 var_file_short = file_parts[-1]
 
-                if self.file_loaded == False:
-                    if self.container_icpms["name"] != None:
+                if self.file_loaded is True and self.old_file is True:
+                    df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+                    self.container_icpms["name"] = "Undefined ICP-MS"
+                    self.container_icpms["skipheader"] = file_info["skipheader"]
+                    self.container_icpms["skipfooter"] = file_info["skipfooter"]
+
+                elif (
+                        "Dataframe" in self.container_measurements
+                        and var_file_short in self.container_measurements["Dataframe"]
+                ):
+                    df_exmpl = self.container_measurements["Dataframe"][var_file_short]
+
+                else:
+                    if self.container_icpms["name"] is not None:
                         var_skipheader = self.container_icpms["skipheader"]
                         var_skipfooter = self.container_icpms["skipfooter"]
                         df_exmpl = DE(filename_long=file_std).get_measurements(
@@ -28310,18 +28328,6 @@ class PySILLS(tk.Frame):
                     else:
                         df_exmpl = DE(filename_long=file_std).get_measurements(
                             delimiter=",", skip_header=3, skip_footer=1)
-                else:
-                    file_parts = file_std.split("/")
-                    try:
-                        if self.old_file == True:
-                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
-                            self.container_icpms["name"] = "Undefined ICP-MS"
-                            self.container_icpms["skipheader"] = file_info["skipheader"]
-                            self.container_icpms["skipfooter"] = file_info["skipfooter"]
-                        else:
-                            df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
-                    except:
-                        print("File (" + str(file_std) + str(")"), "cannot be read.")
 
                 if "Dataframe" not in self.container_measurements:
                     self.container_measurements["Dataframe"] = {}
@@ -28351,27 +28357,37 @@ class PySILLS(tk.Frame):
                 file_parts = file_smpl.split("/")
                 var_file_short = file_parts[-1]
 
-                if self.file_loaded == False:
-                    if self.container_icpms["name"] != None:
+                if self.file_loaded is True and self.old_file is True:
+                    df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_smpl)
+                    self.container_icpms["name"] = "Undefined ICP-MS"
+                    self.container_icpms["skipheader"] = file_info["skipheader"]
+                    self.container_icpms["skipfooter"] = file_info["skipfooter"]
+
+                elif (
+                        "Dataframe" in self.container_measurements
+                        and var_file_short in self.container_measurements["Dataframe"]
+                ):
+                    df_exmpl = self.container_measurements["Dataframe"][var_file_short]
+
+                else:
+                    if self.container_icpms["name"] is not None:
                         var_skipheader = self.container_icpms["skipheader"]
                         var_skipfooter = self.container_icpms["skipfooter"]
-                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
-                            delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
-                    else:
-                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
-                            delimiter=",", skip_header=3, skip_footer=1)
-                else:
-                    file_parts = file_smpl.split("/")
-                    try:
-                        if self.old_file == True:
-                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_std)
+
+                        try:
+                            df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                                delimiter=",", skip_header=var_skipheader, skip_footer=var_skipfooter)
+                        except:
+                            print("ERROR - Data import failed.")
+                            print("Possible problem: imported files were created by different ICP-MS instruments.")
+
+                            df_exmpl, file_info = self.find_icpms_data_in_file(filename_long=file_smpl)
                             self.container_icpms["name"] = "Undefined ICP-MS"
                             self.container_icpms["skipheader"] = file_info["skipheader"]
                             self.container_icpms["skipfooter"] = file_info["skipfooter"]
-                        else:
-                            df_exmpl = self.container_measurements["Dataframe"][file_parts[-1]]
-                    except:
-                        print("File (" + str(file_smpl) + str(")"), "cannot be read.")
+                    else:
+                        df_exmpl = DE(filename_long=file_smpl).get_measurements(
+                            delimiter=",", skip_header=3, skip_footer=1)
 
                 if var_file_short not in self.container_measurements["Dataframe"]:
                     self.container_measurements["Dataframe"][var_file_short] = df_exmpl
@@ -28606,8 +28622,9 @@ class PySILLS(tk.Frame):
                                     "Whisker analysis"]:
                                     var_method = "Grubbs"
                                     self.spike_elimination_all(filetype=filetype, algorithm=var_method)
-            except:
-                print("Problem with settings window creation. It has to be fixed one day.")
+            except Exception as exc:
+                print("Problem with settings window creation:")
+                print(type(exc).__name__, exc)
         else:
             self.fi_select_is_default(var_opt=self.container_var["IS"]["Default STD"].get())
             self.fi_select_id_default(var_opt=self.container_var["ID"]["Default SMPL"].get())
