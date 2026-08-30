@@ -6,7 +6,7 @@
 # Name:		pysills_app.py
 # Author:	Maximilian A. Beeskow
 # Version:	v1.0.109
-# Date:		27.08.2026
+# Date:		30.08.2026
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ class PySILLS(tk.Frame):
 
         ## Current version
         self.str_version_number = "1.0.109"
-        self.val_version = self.str_version_number + " - 27.08.2026"
+        self.val_version = self.str_version_number + " - 30.08.2026"
 
         ## Colors
         self.green_dict = GUIcolors().get_colors(name="green")
@@ -2204,8 +2204,12 @@ class PySILLS(tk.Frame):
                 var_rb=self.var_rb_mode, value_rb=index, color_bg=background_color_elements, fg=font_color_dark,
                 text=mode, sticky="NESW", relief=tk.FLAT, font=font_element, command=lambda var_rb=self.var_rb_mode:
                 self.select_experiment(var_rb))
+
             if index == 0:
                 self.rb_ma = rb_mode
+            elif index == 1:
+                self.rb_incl = rb_mode
+
             if mode in ["Report Analysis"]:
                 rb_mode.configure(state="disabled")
 
@@ -10697,10 +10701,16 @@ class PySILLS(tk.Frame):
                     self.select_icp_ms(var_opt=self.var_opt_icp)
 
                 if self.pysills_mode == "MA":
+                    self.var_rb_mode.set(0)
+                    self.rb_ma.configure(state="normal")
+                    self.rb_incl.configure(state="disabled")
                     self.ma_settings()
-                elif self.pysills_mode == "FIMI":
+                elif self.pysills_mode in ["FI", "MI", "FIMI", "INCL"]:
+                    self.pysills_mode = "INCL"
+                    self.var_rb_mode.set(1)
                     self.rb_ma.configure(state="disabled")
-                    print("Please select the correct analysis mode (Fluid/Melt inclusion analysis).")
+                    self.rb_incl.configure(state="normal")
+                    self.fi_settings()
             else:
                 try:
                     file_loaded = open(str(filename), "r")
@@ -10784,7 +10794,15 @@ class PySILLS(tk.Frame):
                             self.pysills_mode = "INCL"
                             self.var_rb_mode.set(1)
                         break
+
                     self.select_experiment(var_rb=self.var_rb_mode)
+
+                    if self.pysills_mode == "MA":
+                        self.rb_ma.configure(state="normal")
+                        self.rb_incl.configure(state="disabled")
+                    else:
+                        self.rb_ma.configure(state="disabled")
+                        self.rb_incl.configure(state="normal")
 
                     has_manual_spike_corrections = (
                             "MANUAL SPIKE CORRECTIONS\n" in loaded_lines
@@ -24576,7 +24594,11 @@ class PySILLS(tk.Frame):
         elif filetype == "ALL":
             for filetype_key in ["STD", "SMPL"]:
                 for index, filename_long in enumerate(self.container_lists[filetype_key]["Long"]):
+                    if self.container_var[filetype_key][filename_long]["Checkbox"].get() != 1:
+                        continue
+
                     filename_short = self.container_lists[filetype_key]["Short"][index]
+
                     if filetype_key == "STD":
                         isotope_is = self.container_var[filetype_key][filename_long]["IS Data"]["IS"].get()
                         helper_is[filetype_key][filename_short] = isotope_is
@@ -25308,13 +25330,25 @@ class PySILLS(tk.Frame):
                                 isotope] = var_result_i
         else:
             str_datatype = var_datatype
+
             for index, filename_short in enumerate(self.container_lists["STD"]["Short"]):
-                if var_is_host != None and var_is_smpl != None:
+                filename_long = self.container_lists["STD"]["Long"][index]
+
+                if self.container_var["STD"][filename_long]["Checkbox"].get() != 1:
+                    continue
+
+                if var_is_host is not None and var_is_smpl is not None:
                     self.get_analytical_sensitivity_std(
-                        var_datatype=str_datatype, var_file_short=filename_short, var_is_host=var_is_host,
-                        var_is_smpl=var_is_smpl)
+                        var_datatype=str_datatype,
+                        var_file_short=filename_short,
+                        var_is_host=var_is_host,
+                        var_is_smpl=var_is_smpl
+                    )
                 else:
-                    self.get_analytical_sensitivity_std(var_datatype=str_datatype, var_file_short=filename_short)
+                    self.get_analytical_sensitivity_std(
+                        var_datatype=str_datatype,
+                        var_file_short=filename_short
+                    )
 
     def get_analytical_sensitivity(
             self, var_filetype, var_datatype, var_file_short, var_file_long, mode="Specific", var_is_smpl=None,
@@ -25468,6 +25502,9 @@ class PySILLS(tk.Frame):
                 list_xi_std_i = {}
 
                 for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
+                    if self.container_var["STD"][file_std]["Checkbox"].get() != 1:
+                        continue
+
                     file_std_short = self.container_lists["STD"]["Short"][index]
                     file_isotopes = self.container_lists["Measured Isotopes"][file_std_short]
                     var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
@@ -25559,6 +25596,9 @@ class PySILLS(tk.Frame):
                     if var_focus == "MAT":  # MAT
                         xi_opt_host_is = []
                         for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
+                            if self.container_var["STD"][file_std]["Checkbox"].get() != 1:
+                                continue
+
                             file_std_short = self.container_lists["STD"]["Short"][index]
                             var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                             if var_srm_i != var_srm_file:
@@ -25592,6 +25632,9 @@ class PySILLS(tk.Frame):
                         if caution == True and var_focus2 == "INCL":
                             xi_opt_host_is = []
                             for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
+                                if self.container_var["STD"][file_std]["Checkbox"].get() != 1:
+                                    continue
+
                                 file_std_short = self.container_lists["STD"]["Short"][index]
                                 var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
                                 if var_srm_i != var_srm_file:
@@ -25626,6 +25669,9 @@ class PySILLS(tk.Frame):
                     else:   # INCL
                         xi_opt_host_is = []
                         for index, file_std in enumerate(self.container_lists["STD"]["Long"]):
+                            if self.container_var["STD"][file_std]["Checkbox"].get() != 1:
+                                continue
+
                             file_std_short = self.container_lists["STD"]["Short"][index]
                             var_srm_file = self.container_var["STD"][file_std]["SRM"].get()
 
